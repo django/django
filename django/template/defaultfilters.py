@@ -15,7 +15,7 @@ register = Library()
 
 def addslashes(value):
     "Adds slashes - useful for passing strings to JavaScript, for example."
-    return value.replace('"', '\\"').replace("'", "\\'")
+    return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
 
 def capfirst(value):
     "Capitalizes the first character of the value"
