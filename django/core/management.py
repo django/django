@@ -1017,10 +1017,12 @@ def get_validation_errors(outfile, app=None):
 
     return len(e.errors)
 
-def validate(outfile=sys.stdout):
+def validate(outfile=sys.stdout, silent_success=False):
     "Validates all installed models."
     try:
         num_errors = get_validation_errors(outfile)
+        if silent_success and num_errors == 0:
+            return
         outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
     except ImproperlyConfigured:
         outfile.write("Skipping validation because things aren't configured properly.")
@@ -1337,6 +1339,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action_mapping[action](args[1:])
     else:
         from django.db import models
+        validate(silent_success=True)
         try:
             mod_list = [models.get_app(app_label) for app_label in args[1:]]
         except ImportError, e:
