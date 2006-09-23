@@ -88,7 +88,7 @@ class RowLevelPermissionManager(models.Manager):
                                                   owner_id__in=user_group_list,
                                                   model_ct = model_ct
                                                   ).values('model_id')
-            id_list.append([o['model_id'] for o in group_model_ids])
+            id_list=id_list + [o['model_id'] for o in group_model_ids]
         return id_list
 
 class RowLevelPermission(models.Model):
