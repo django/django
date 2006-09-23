@@ -969,6 +969,13 @@ class CommaSeparatedIntegerField(TextField):
         except validators.ValidationError, e:
             raise validators.CriticalValidationError, e.messages
 
+    def render(self, data):
+        if data is None:
+            data = ''
+        elif isinstance(data, (list, tuple)):
+            data = ','.join(data)
+        return super(CommaSeparatedIntegerField, self).render(data)
+
 class RawIdAdminField(CommaSeparatedIntegerField):
     def html2python(data):
         if data:
