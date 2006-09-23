@@ -4,6 +4,11 @@ from django.dispatch import dispatcher
 from django.utils import datastructures
 from django import http
 from pprint import pformat
+from shutil import copyfileobj
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {
@@ -49,6 +54,21 @@ STATUS_CODE_TEXT = {
     504: 'GATEWAY TIMEOUT',
     505: 'HTTP VERSION NOT SUPPORTED',
 }
+
+def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
+    """
+    A version of shutil.copyfileobj that will not read more than 'size' bytes.
+    This makes it safe from clients sending more than CONTENT_LENGTH bytes of
+    data in the body.
+    """
+    if not size:
+        return copyfileobj(fsrc, fdst, length)
+    while size > 0:
+        buf = fsrc.read(min(length, size))
+        if not buf:
+            break
+        fdst.write(buf)
+        size -= len(buf)
 
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
@@ -119,7 +139,11 @@ class WSGIRequest(http.HttpRequest):
         try:
             return self._raw_post_data
         except AttributeError:
-            self._raw_post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
+            buf = StringIO()
+            content_length = int(self.environ['CONTENT_LENGTH'])
+            safe_copyfileobj(self.environ['wsgi.input'], buf, size=content_length)
+            self._raw_post_data = buf.getvalue()
+            buf.close()
             return self._raw_post_data
 
     GET = property(_get_get, _set_get)
