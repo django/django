@@ -1045,7 +1045,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port, use_reloader=True):
+def runserver(addr, port, use_reloader=True, admin_media_dir=''):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1063,7 +1063,10 @@ def runserver(addr, port, use_reloader=True):
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with %s." % quit_command
         try:
-            run(addr, int(port), AdminMediaHandler(WSGIHandler()))
+            import django
+            path = admin_media_dir or django.__path__[0] + '/contrib/admin/media'
+            handler = AdminMediaHandler(WSGIHandler(), path)
+            run(addr, int(port), handler)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -1084,7 +1087,7 @@ def runserver(addr, port, use_reloader=True):
         autoreload.main(inner_run)
     else:
         inner_run()
-runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
+runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1270,7 +1273,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT use the auto-reloader when running the development server.')
     parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
         type='choice', choices=['0', '1', '2'],
-        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Lets you manually specify the directory to serve admin media from when running the development server.'),
 
     options, args = parser.parse_args(argv[1:])
 
@@ -1334,7 +1338,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port, options.use_reloader)
+        action_mapping[action](addr, port, options.use_reloader, options.admin_media_path)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
