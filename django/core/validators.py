@@ -13,7 +13,7 @@ from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
 import re
 
-_datere = r'(19|2\d)\d{2}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
+_datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
 alnum_re = re.compile(r'^\w+$')
 alnumurl_re = re.compile(r'^[-\w/]+$')
@@ -122,9 +122,29 @@ def isOnlyLetters(field_data, all_data):
     if not field_data.isalpha():
         raise ValidationError, gettext("Only alphabetical characters are allowed here.")
 
+def _isValidDate(date_string):
+    """
+    A helper function used by isValidANSIDate and isValidANSIDatetime to
+    check if the date is valid.  The date string is assumed to already be in
+    YYYY-MM-DD format.
+    """
+    from datetime import date
+    # Could use time.strptime here and catch errors, but datetime.date below
+    # produces much friendlier error messages.
+    year, month, day = map(int, date_string.split('-'))
+    # This check is needed because strftime is used when saving the date
+    # value to the database, and strftime requires that the year be >=1900.
+    if year < 1900:
+        raise ValidationError, gettext('Year must be 1900 or later.')
+    try:
+        date(year, month, day)
+    except ValueError, e:
+        raise ValidationError, gettext('Invalid date: %s.' % e)    
+
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
+    _isValidDate(field_data)
 
 def isValidANSITime(field_data, all_data):
     if not ansi_time_re.search(field_data):
@@ -133,6 +153,7 @@ def isValidANSITime(field_data, all_data):
 def isValidANSIDatetime(field_data, all_data):
     if not ansi_datetime_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+    _isValidDate(field_data.split()[0])
 
 def isValidEmail(field_data, all_data):
     if not email_re.search(field_data):
