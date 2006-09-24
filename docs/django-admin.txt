@@ -352,8 +352,9 @@ options.
 
 **New in Django development version**
 
-Inform django-admin that the user should NOT be prompted for any input. Useful if
-the django-admin script will be executed as an unattended, automated script.
+Inform django-admin that the user should NOT be prompted for any input. Useful
+if the django-admin script will be executed as an unattended, automated
+script.
 
 --noreload
 ----------
@@ -382,6 +383,19 @@ Example usage::
 Verbosity determines the amount of notification and debug information that 
 will be printed to the console. '0' is no output, '1' is normal output,
 and `2` is verbose output.
+
+--adminmedia
+------------
+
+**New in Django development version**
+
+Example usage::
+    django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
+
+Tell Django where to find the various stylesheets and Javascript files for the
+admin interface when running the development server. Normally these files are
+served out of the Django source tree, but since some designers change these
+files for their site, this option allows you to test against custom versions.
 
 Extra niceties
 ==============
