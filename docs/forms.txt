@@ -337,8 +337,8 @@ The only real differences are:
       object being edited.
 
     * We set ``new_data`` based upon ``flatten_data()`` from the manipulator.
-      ``flatten_data()`` takes the data from the original object under 
-      manipulation, and converts it into a data dictionary that can be used 
+      ``flatten_data()`` takes the data from the original object under
+      manipulation, and converts it into a data dictionary that can be used
       to populate form elements with the existing values for the object.
 
     * The above example uses a different template, so create and edit can be
@@ -404,7 +404,7 @@ Here's a simple function that might drive the above form::
             errors = new_data = {}
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
-        
+
 ``FileField`` and ``ImageField`` special cases
 ==============================================
 
@@ -481,13 +481,13 @@ the data being validated.
 Also, because consistency in user interfaces is important, we strongly urge you
 to put punctuation at the end of your validation messages.
 
-When Are Validators Called?
+When are validators called?
 ---------------------------
 
 After a form has been submitted, Django first checks to see that all the
 required fields are present and non-empty. For each field that passes that
 test *and if the form submission contained data* for that field, all the
-validators for that field are called in turn. The emphasised portion in the
+validators for that field are called in turn. The emphasized portion in the
 last sentence is important: if a form field is not submitted (because it
 contains no data -- which is normal HTML behaviour), the validators are not
 run against the field.
@@ -497,13 +497,12 @@ This feature is particularly important for models using
 ``forms.CheckBoxField``. If the checkbox is not selected, it will not
 contribute to the form submission.
 
-If you would like your validator to *always* run, regardless of whether the
-field it is attached to contains any data, set the ``always_test`` attribute
-on the validator function. For example::
+If you would like your validator to run *always*, regardless of whether its
+attached field contains any data, set the ``always_test`` attribute on the
+validator function. For example::
 
     def my_custom_validator(field_data, all_data):
         # ...
-
     my_custom_validator.always_test = True
 
 This validator will always be executed for any field it is attached to.
