@@ -74,7 +74,7 @@ def fastcgi_help(message=None):
         print message
     return False
 
-def runfastcgi(argset, **kwargs):
+def runfastcgi(argset=[], **kwargs):
     options = FASTCGI_OPTIONS.copy()
     options.update(kwargs)
     for x in argset:

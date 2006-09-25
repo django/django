@@ -15,6 +15,9 @@ r"""
 >>> addslashes('"double quotes" and \'single quotes\'')
 '\\"double quotes\\" and \\\'single quotes\\\''
 
+>>> addslashes(r'\ : backslashes, too')
+'\\\\ : backslashes, too'
+
 >>> capfirst('hello world')
 'Hello world'
 

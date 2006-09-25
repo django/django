@@ -42,6 +42,7 @@ And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Django that much better:
 
+    adurdin@gmail.com
     akaihola
     Andreas
     ant9000@netwise.it
@@ -68,15 +69,19 @@ answer newbie questions, and generally made Django that much better:
     Alex Dedul
     deric@monowerks.com
     dne@mayonnaise.net
+    Maximillian Dornseif <md@hudora.de>
+    dummy@habmalnefrage.de
     Jeremy Dunck <http://dunck.us/>
     Andy Dustman <farcepest@gmail.com>
     Clint Ecker
+    favo@exoweb.net
     gandalf@owca.info
     Baishampayan Ghose
     martin.glueck@gmail.com
     Simon Greenhill <dev@simon.net.nz>
     Espen Grindhaug <http://grindhaug.org/>
     Brant Harris
+    heckj@mac.com
     hipertracker@gmail.com
     Ian Holsman <http://feh.holsman.net/>
     Kieran Holland <http://www.kieranholland.com>
@@ -96,6 +101,7 @@ answer newbie questions, and generally made Django that much better:
     lakin.wecker@gmail.com
     Stuart Langridge <http://www.kryogenix.org/>
     Eugene Lazutkin <http://lazutkin.com/blog/>
+    Jeong-Min Lee
     Christopher Lenz <http://www.cmlenz.net/>
     limodou
     Martin Maney <http://www.chipy.org/Martin_Maney>
@@ -122,6 +128,7 @@ answer newbie questions, and generally made Django that much better:
     Daniel Poelzleithner <http://poelzi.org/>
     J. Rademaker
     Michael Radziej <mir@noris.de>
+    ramiro
     Brian Ray <http://brianray.chipy.org/>
     rhettg@gmail.com
     Oliver Rutherfurd <http://rutherfurd.net/>
@@ -144,8 +151,10 @@ answer newbie questions, and generally made Django that much better:
     Milton Waddams
     Dan Watson <http://theidioteque.net/>
     Rachel Willmer <http://www.willmer.com/kb/>
+    Gary Wilson <gary.wilson@gmail.com>
     wojtek
     ye7cakf02@sneakemail.com
+    ymasuda@ethercube.com
     Cheng Zhang
 
 A big THANK YOU goes to:

@@ -596,6 +596,12 @@ Whether to prepend the "www." subdomain to URLs that don't have it. This is
 only used if ``CommonMiddleware`` is installed (see the `middleware docs`_).
 See also ``APPEND_SLASH``.
 
+PROFANITIES_LIST
+----------------
+
+A list of profanities that will trigger a validation error when the
+``hasNoProfanities`` validator is called.
+
 ROOT_URLCONF
 ------------
 

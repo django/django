@@ -347,7 +347,7 @@ def get_sql_initial_data_for_model(model):
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            fp = open(sql_file)
+            fp = open(sql_file, 'U')
             for statement in statements.split(fp.read()):
                 if statement.strip():
                     output.append(statement + ";")
@@ -958,7 +958,8 @@ def get_validation_errors(outfile, app=None):
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
-                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                            if not hasattr(cls, fn):
+                                e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
                         if fn not in opts.admin.list_display:
                             e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
@@ -1016,10 +1017,12 @@ def get_validation_errors(outfile, app=None):
 
     return len(e.errors)
 
-def validate(outfile=sys.stdout):
+def validate(outfile=sys.stdout, silent_success=False):
     "Validates all installed models."
     try:
         num_errors = get_validation_errors(outfile)
+        if silent_success and num_errors == 0:
+            return
         outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
     except ImproperlyConfigured:
         outfile.write("Skipping validation because things aren't configured properly.")
@@ -1042,7 +1045,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port, use_reloader=True):
+def runserver(addr, port, use_reloader=True, admin_media_dir=''):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1060,7 +1063,10 @@ def runserver(addr, port, use_reloader=True):
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with %s." % quit_command
         try:
-            run(addr, int(port), AdminMediaHandler(WSGIHandler()))
+            import django
+            path = admin_media_dir or django.__path__[0] + '/contrib/admin/media'
+            handler = AdminMediaHandler(WSGIHandler(), path)
+            run(addr, int(port), handler)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -1081,7 +1087,7 @@ def runserver(addr, port, use_reloader=True):
         autoreload.main(inner_run)
     else:
         inner_run()
-runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
+runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1267,7 +1273,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT use the auto-reloader when running the development server.')
     parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
         type='choice', choices=['0', '1', '2'],
-        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Lets you manually specify the directory to serve admin media from when running the development server.'),
 
     options, args = parser.parse_args(argv[1:])
 
@@ -1331,11 +1338,12 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port, options.use_reloader)
+        action_mapping[action](addr, port, options.use_reloader, options.admin_media_path)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
         from django.db import models
+        validate(silent_success=True)
         try:
             mod_list = [models.get_app(app_label) for app_label in args[1:]]
         except ImportError, e:

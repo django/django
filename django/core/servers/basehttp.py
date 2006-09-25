@@ -594,11 +594,14 @@ class AdminMediaHandler(object):
     Use this ONLY LOCALLY, for development! This hasn't been tested for
     security and is not super efficient.
     """
-    def __init__(self, application):
+    def __init__(self, application, media_dir = None):
         from django.conf import settings
-        import django
         self.application = application
-        self.media_dir = django.__path__[0] + '/contrib/admin/media'
+        if not media_dir:
+            import django
+            self.media_dir = django.__path__[0] + '/contrib/admin/media'
+        else:
+            self.media_dir = media_dir
         self.media_url = settings.ADMIN_MEDIA_PREFIX
 
     def __call__(self, environ, start_response):

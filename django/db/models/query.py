@@ -712,14 +712,10 @@ def parse_lookup(kwarg_items, opts):
             # Extract the last elements of the kwarg.
             # The very-last is the lookup_type (equals, like, etc).
             # The second-last is the table column on which the lookup_type is
-            # to be performed.
-            # The exceptions to this are:
-            # 1)  "pk", which is an implicit id__exact;
-            #     if we find "pk", make the lookup_type "exact', and insert
-            #     a dummy name of None, which we will replace when
-            #     we know which table column to grab as the primary key.
-            # 2)  If there is only one part, or the last part is not a query
-            #     term, assume that the query is an __exact
+            # to be performed. If this name is 'pk', it will be substituted with
+            # the name of the primary key.
+            # If there is only one part, or the last part is not a query
+            # term, assume that the query is an __exact
             lookup_type = path.pop()
             if lookup_type == 'pk':
                 lookup_type = 'exact'
@@ -766,7 +762,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     name = path.pop(0)
     # Has the primary key been requested? If so, expand it out
     # to be the name of the current class' primary key
-    if name is None:
+    if name is None or name == 'pk':
         name = current_opts.pk.name
 
     # Try to find the name in the fields associated with the current class

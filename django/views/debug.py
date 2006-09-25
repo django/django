@@ -4,7 +4,7 @@ from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 import os, re
 
-HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD')
+HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
 def linebreak_iter(template_source):
     yield 0

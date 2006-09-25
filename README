@@ -25,10 +25,10 @@ http://code.djangoproject.com/newticket
 To get more help:
 
     * Join the #django channel on irc.freenode.net. Lots of helpful people
-      hang out there. Read the archives at http://loglibrary.com/179 .
+      hang out there. Read the archives at http://simon.bofh.ms/logger/django/ .
 
     * Join the django-users mailing list, or read the archives, at
-      http://groups-beta.google.com/group/django-users.
+      http://groups.google.com/group/django-users.
 
 To contribute to Django:
 
