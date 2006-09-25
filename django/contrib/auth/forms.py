@@ -81,7 +81,7 @@ class PasswordResetForm(forms.Manipulator):
         try:
             self.user_cache = User.objects.get(email__iexact=new_data)
         except User.DoesNotExist:
-            raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
+            raise validators.ValidationError, _("That e-mail address doesn't have an associated user acount. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
@@ -113,14 +113,14 @@ class PasswordChangeForm(forms.Manipulator):
             forms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
                 validator_list=[self.isValidOldPassword]),
             forms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
-                validator_list=[validators.AlwaysMatchesOtherField('new_password2', "The two 'new password' fields didn't match.")]),
+                validator_list=[validators.AlwaysMatchesOtherField('new_password2', _("The two 'new password' fields didn't match."))]),
             forms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
         )
 
     def isValidOldPassword(self, new_data, all_data):
         "Validates that the old_password field is correct."
         if not self.user.check_password(new_data):
-            raise validators.ValidationError, "Your old password was entered incorrectly. Please enter it again."
+            raise validators.ValidationError, _("Your old password was entered incorrectly. Please enter it again.")
 
     def save(self, new_data):
         "Saves the new password."
