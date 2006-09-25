@@ -507,7 +507,7 @@ validator function. For example::
 
 This validator will always be executed for any field it is attached to.
 
-Ready-made Validators
+Ready-made validators
 ---------------------
 
 Writing your own validator is not difficult, but there are some situations
