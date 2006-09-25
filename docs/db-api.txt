@@ -1140,7 +1140,7 @@ The pk lookup shortcut
 ----------------------
 
 For convenience, Django provides a ``pk`` lookup type, which stands for
-"primary_key". This is shorthand for "an exact lookup on the primary-key."
+"primary_key". 
 
 In the example ``Blog`` model, the primary key is the ``id`` field, so these
 three statements are equivalent::
@@ -1149,6 +1149,14 @@ three statements are equivalent::
     Blog.objects.get(id=14) # __exact is implied
     Blog.objects.get(pk=14) # pk implies id__exact
 
+The use of ``pk`` isn't limited to ``__exact`` queries -- any query term 
+can be combined with ``pk`` to perform a query on the primary key of a model::
+
+    # Get blogs entries  with id 1, 4 and 7
+    Blog.objects.filter(pk__in=[1,4,7])
+    # Get all blog entries with id > 14
+    Blog.objects.filter(pk__gt=14) 
+    
 ``pk`` lookups also work across joins. For example, these three statements are
 equivalent::
 
