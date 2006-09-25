@@ -456,9 +456,9 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
 
-We are using this particular test as a relatively simple example, however be
-aware that if you just want to test if a permission is available to a user,
-you can use the ``permission_required()`` decorator described below.
+We're using this particular test as a relatively simple example. However, if
+you just want to test whether a permission is available to a user, you can use
+the ``permission_required()`` decorator, described later in this document.
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
@@ -495,20 +495,30 @@ Example in Python 2.4 syntax::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since checking whether a user has a particular permission available to them is a
-relatively common operation, Django provides a shortcut for that particular
-case: the ``permission_required()`` decorator. Using this decorator, the
-earlier example can be written as::
+**New in Django development version**
+
+It's a relatively common task to check whether a user has a particular
+permission. For that reason, Django provides a shortcut for that case: the
+``permission_required()`` decorator. Using this decorator, the earlier example
+can be written as::
 
     from django.contrib.auth.decorators import permission_required
-     
+
     def my_view(request):
         # ...
-     
     my_view = permission_required('polls.can_vote')(my_view)
 
 Note that ``permission_required()`` also takes an optional ``login_url``
-parameter.
+parameter. Example::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+As in the ``login_required`` decorator, ``login_url`` defaults to
+``'/accounts/login/'``.
 
 Limiting access to generic views
 --------------------------------
@@ -633,7 +643,7 @@ The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
     {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>    
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
     {% else %}
         <p>Welcome, new user. Please log in.</p>
     {% endif %}
