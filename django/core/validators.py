@@ -249,7 +249,7 @@ def hasNoProfanities(field_data, all_data):
         Watch your mouth! The words "f--k" and "s--t" are not allowed here.
     """
     field_data = field_data.lower() # normalize
-    words_seen = [w for w in settings.PROFANITIES_LIST if field_data.find(w) > -1]
+    words_seen = [w for w in settings.PROFANITIES_LIST if w in field_data]
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
