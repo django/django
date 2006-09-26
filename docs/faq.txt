@@ -313,6 +313,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
 
+Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
+----------------------------------------------------------------------------------------
+
+No. Django itself is guaranteed to work with any version of Python from 2.3
+and higher.
+
+If you use a Python version newer than 2.3, you will, of course, be able to
+take advantage of newer Python features in your own code, along with the speed
+improvements and other optimizations that have been made to the Python language
+itself. But the Django framework itself should work equally well on 2.3 as it
+does on 2.4 or 2.5.
+
 Do I have to use mod_python?
 ----------------------------
 
