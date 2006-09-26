@@ -177,7 +177,7 @@ class AutomaticManipulator(forms.Manipulator):
                         # case, because they'll be dealt with later.
 
                         if f == related.field:
-                            param = getattr(new_object, related.field.rel.field_name)
+                            param = getattr(new_object, related.field.rel.get_related_field().attname)
                         elif (not self.change) and isinstance(f, AutoField):
                             param = None
                         elif self.change and (isinstance(f, FileField) or not child_follow.get(f.name, None)):
