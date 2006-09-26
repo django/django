@@ -4,7 +4,6 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 class UserCreationForm(forms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
