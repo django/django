@@ -61,7 +61,6 @@ class DatabaseWrapper(local):
     def __init__(self):
         self.connection = None
         self.queries = []
-        self.server_version = None
 
     def _valid_connection(self):
         if self.connection is not None:
