@@ -215,6 +215,9 @@ class AutomaticManipulator(forms.Manipulator):
                         # Save many-to-many objects.
                         for f in related.opts.many_to_many:
                             if child_follow.get(f.name, None) and not f.rel.edit_inline:
+                                new_value = rel_new_data[f.attname]
+                                if f.rel.raw_id_admin:
+                                    new_value = new_value[0]
                                 setattr(new_rel_obj, f.name, f.rel.to.objects.filter(pk__in=rel_new_data[f.attname]))
                                 if self.change:
                                     self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
