@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 class UserCreationForm(forms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
@@ -13,7 +14,7 @@ class UserCreationForm(forms.Manipulator):
                 validator_list=[validators.isAlphaNumeric, self.isValidUsername]),
             forms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
             forms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
-                validator_list=[validators.AlwaysMatchesOtherField('password1', "The two password fields didn't match.")]),
+                validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 
     def isValidUsername(self, field_data, all_data):
@@ -21,7 +22,7 @@ class UserCreationForm(forms.Manipulator):
             User.objects.get(username=field_data)
         except User.DoesNotExist:
             return
-        raise validators.ValidationError, 'A user with that username already exists.'
+        raise validators.ValidationError, _('A user with that username already exists.')
 
     def save(self, new_data):
         "Creates the user."
