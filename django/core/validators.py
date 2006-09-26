@@ -377,7 +377,7 @@ class IsValidFloat(object):
         if len(data) > max_allowed_length:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places)) or ('.' in data and len(data) > (self.max_digits - (self.decimal_places - len(data.split('.')[1])) + 1)):
+        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:
