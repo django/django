@@ -30,6 +30,14 @@ class Waiter(models.Model):
     def __str__(self):
         return "%s the waiter at %s" % (self.name, self.restaurant)
 
+class ManualPrimaryKey(models.Model):
+    primary_key = models.CharField(maxlength=10, primary_key=True)
+    name = models.CharField(maxlength = 50)
+
+class RelatedModel(models.Model):
+    link = models.OneToOneField(ManualPrimaryKey)
+    name = models.CharField(maxlength = 50)
+
 __test__ = {'API_TESTS':"""
 # Create a couple of Places.
 >>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
@@ -151,4 +159,10 @@ DoesNotExist: Restaurant matching query does not exist.
 # Delete the restaurant; the waiter should also be removed
 >>> r = Restaurant.objects.get(pk=1)
 >>> r.delete()
+
+# One-to-one fields still work if you create your own primary key
+>>> o1 = ManualPrimaryKey(primary_key="abc123", name="primary")
+>>> o1.save()
+>>> o2 = RelatedModel(link=o1, name="secondary")
+>>> o2.save()
 """}

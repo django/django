@@ -147,7 +147,7 @@ def _get_sql_model_create(model, known_models=set()):
     table_output = []
     pending_references = {}
     for f in opts.fields:
-        if isinstance(f, models.ForeignKey):
+        if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
