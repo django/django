@@ -13,6 +13,7 @@ except ImportError, e:
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
+import re
 
 DatabaseError = Database.DatabaseError
 
@@ -23,6 +24,8 @@ django_conversions.update({
     FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
 })
+
+server_version_re = re.compile('[.-]')
 
 # This is an extra debug layer over MySQL queries, to display warnings.
 # It's only used when DEBUG=True.
@@ -61,6 +64,7 @@ class DatabaseWrapper(local):
     def __init__(self):
         self.connection = None
         self.queries = []
+        self.server_version = None
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -109,6 +113,14 @@ class DatabaseWrapper(local):
         if self.connection is not None:
             self.connection.close()
             self.connection = None
+
+    def get_server_version(self):
+        if not self.server_version:
+            if not self._valid_connection():
+                self.cursor()
+            version = server_version_re.split(self.connection.get_server_info())
+            self.server_version = tuple([int(x) for x in version[:3]]) + tuple(version[3:])
+        return self.server_version
 
 supports_constraints = True
 
