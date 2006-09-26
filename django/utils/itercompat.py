@@ -15,7 +15,7 @@ def compat_tee(iterable):
     # deliberate and safe in this instance.
     def gen(next, data={}, cnt=[0]):
         dpop = data.pop
-        for i in count():
+        for i in itertools.count():
             if i == cnt[0]:
                 item = data[i] = next()
                 cnt[0] += 1
