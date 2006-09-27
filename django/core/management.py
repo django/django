@@ -867,7 +867,7 @@ def get_validation_errors(outfile, app=None):
             if settings.DATABASE_ENGINE == 'mysql':
                 db_version = connection.get_server_version()
                 if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
-                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join(str(n) for n in db_version[:3])))
+                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
