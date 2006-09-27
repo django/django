@@ -13,6 +13,7 @@ except ImportError, e:
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
+import re
 
 DatabaseError = Database.DatabaseError
 
@@ -23,6 +24,12 @@ django_conversions.update({
     FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
 })
+
+# This should match the numerical portion of the version numbers (we can treat
+# versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
+# at http://dev.mysql.com/doc/refman/4.1/en/news.html and
+# http://dev.mysql.com/doc/refman/5.0/en/news.html .
+server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
 # This is an extra debug layer over MySQL queries, to display warnings.
 # It's only used when DEBUG=True.
@@ -61,6 +68,7 @@ class DatabaseWrapper(local):
     def __init__(self):
         self.connection = None
         self.queries = []
+        self.server_version = None
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -109,6 +117,16 @@ class DatabaseWrapper(local):
         if self.connection is not None:
             self.connection.close()
             self.connection = None
+
+    def get_server_version(self):
+        if not self.server_version:
+            if not self._valid_connection():
+                self.cursor()
+            m = server_version_re.match(self.connection.get_server_info())
+            if not m:
+                raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
+            self.server_version = m.groups()
+        return self.server_version
 
 supports_constraints = True
 
