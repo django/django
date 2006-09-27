@@ -125,7 +125,7 @@ class DatabaseWrapper(local):
             m = server_version_re.match(self.connection.get_server_info())
             if not m:
                 raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
-            self.server_version = m.groups()
+            self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 
 supports_constraints = True
