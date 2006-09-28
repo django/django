@@ -150,7 +150,7 @@ class ModPythonHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = ModPythonRequest(req)
-            response = self.get_response(req.uri, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:

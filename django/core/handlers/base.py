@@ -48,7 +48,7 @@ class BaseHandler(object):
             if hasattr(mw_instance, 'process_exception'):
                 self._exception_middleware.insert(0, mw_instance.process_exception)
 
-    def get_response(self, path, request):
+    def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
@@ -62,7 +62,7 @@ class BaseHandler(object):
 
         resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
         try:
-            callback, callback_args, callback_kwargs = resolver.resolve(path)
+            callback, callback_args, callback_kwargs = resolver.resolve(request.path)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
@@ -105,7 +105,7 @@ class BaseHandler(object):
                 exc_info = sys.exc_info()
                 receivers = dispatcher.send(signal=signals.got_request_exception)
                 # When DEBUG is False, send an error message to the admins.
-                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
                 try:
                     request_repr = repr(request)
                 except:
