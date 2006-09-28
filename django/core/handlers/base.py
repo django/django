@@ -89,7 +89,8 @@ class BaseHandler(object):
             return response
         except http.Http404, e:
             if settings.DEBUG:
-                return self.get_technical_error_response(request, is404=True, exception=e)
+                from django.views import debug
+                return debug.technical_404_response(request, e)
             else:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
@@ -99,7 +100,8 @@ class BaseHandler(object):
             pass # See http://code.djangoproject.com/ticket/1023
         except: # Handle everything else, including SuspiciousOperation, etc.
             if settings.DEBUG:
-                return self.get_technical_error_response(request)
+                from django.views import debug
+                return debug.technical_500_response(request, *sys.exc_info())
             else:
                 # Get the exception info now, in case another exception is thrown later.
                 exc_info = sys.exc_info()
@@ -115,17 +117,6 @@ class BaseHandler(object):
                 # Return an HttpResponse that displays a friendly error message.
                 callback, param_dict = resolver.resolve500()
                 return callback(request, **param_dict)
-
-    def get_technical_error_response(self, request, is404=False, exception=None):
-        """
-        Returns an HttpResponse that displays a TECHNICAL error message for a
-        fundamental error.
-        """
-        from django.views import debug
-        if is404:
-            return debug.technical_404_response(request, exception)
-        else:
-            return debug.technical_500_response(request, *sys.exc_info())
 
     def _get_traceback(self, exc_info=None):
         "Helper function to return the traceback as a string"
