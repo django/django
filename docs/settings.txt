@@ -401,15 +401,6 @@ Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
-ENABLE_PSYCO
-------------
-
-Default: ``False``
-
-Whether to enable Psyco, which optimizes Python code. Requires Psyco_.
-
-.. _Psyco: http://psyco.sourceforge.net/
-
 IGNORABLE_404_ENDS
 ------------------
 

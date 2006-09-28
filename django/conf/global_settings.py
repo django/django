@@ -223,10 +223,6 @@ YEAR_MONTH_FORMAT = 'F Y'
 # http://www.djangoproject.com/documentation/templates/#now
 MONTH_DAY_FORMAT = 'F j'
 
-# Whether to enable Psyco, which optimizes Python code. Requires Psyco.
-# http://psyco.sourceforge.net/
-ENABLE_PSYCO = False
-
 # Do you want to manage transactions manually?
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
