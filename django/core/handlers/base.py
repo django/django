@@ -112,15 +112,9 @@ class BaseHandler(object):
                     request_repr = "Request repr() unavailable"
                 message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
                 mail_admins(subject, message, fail_silently=True)
-                return self.get_friendly_error_response(request, resolver)
-
-    def get_friendly_error_response(self, request, resolver):
-        """
-        Returns an HttpResponse that displays a PUBLIC error message for a
-        fundamental error.
-        """
-        callback, param_dict = resolver.resolve500()
-        return callback(request, **param_dict)
+                # Return an HttpResponse that displays a friendly error message.
+                callback, param_dict = resolver.resolve500()
+                return callback(request, **param_dict)
 
     def get_technical_error_response(self, request, is404=False, exception=None):
         """
