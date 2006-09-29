@@ -66,8 +66,8 @@ Fields
       long and can contain any character. See the "Passwords" section below.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
-    * ``is_active`` -- Boolean. Designates whether this user can log into the
-      Django admin. Set this to ``False`` instead of deleting accounts.
+    * ``is_active`` -- Boolean. Designates whether this account can be used
+      to log in. Set this flag to ``False`` instead of deleting accounts.
     * ``is_superuser`` -- Boolean. Designates that this user has all permissions
       without explicitly assigning them.
     * ``last_login`` -- A datetime of the user's last login. Is set to the
