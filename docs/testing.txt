@@ -389,7 +389,7 @@ an alternative framework as if they were normal Django tests.
 
 When you run ``./manage.py test``, Django looks at the ``TEST_RUNNER``
 setting to determine what to do. By default, ``TEST_RUNNER`` points to ``django.test.simple.run_tests``. This method defines the default Django
-testing behaviour. This behaviour involves:
+testing behavior. This behavior involves:
 
 #. Performing global pre-test setup
 #. Creating the test database
@@ -435,7 +435,7 @@ a number of utility methods in the ``django.test.utils`` module.
 ``create_test_db(verbosity=1, autoclobber=False)``
     Creates a new test database, and run ``syncdb`` against it.
 
-    ``verbosity`` has the same behaviour as in the test runner.
+    ``verbosity`` has the same behavior as in the test runner.
 
     ``Autoclobber`` describes the behavior that will occur if a database with
     the same name as the test database is discovered. If ``autoclobber`` is False,
@@ -450,4 +450,4 @@ a number of utility methods in the ``django.test.utils`` module.
     Destroys the database with the name ``settings.DATABASE_NAME`` matching,
     and restores the value of ``settings.DATABASE_NAME`` to the provided name.
 
-    ``verbosity`` has the same behaviour as in the test runner.
+    ``verbosity`` has the same behavior as in the test runner.

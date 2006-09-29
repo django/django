@@ -1056,7 +1056,7 @@ Formats a date as the time since that date (i.e. "4 days, 6 hours").
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
-June 2006, and ``comment_date`` is a date instanace for 08:00 on 1 June 2006,
+June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
 
 timeuntil
