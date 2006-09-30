@@ -99,7 +99,9 @@ custom methods:
       should prefer using ``is_authenticated()`` to this method.
 
     * ``is_authenticated()`` -- Always returns ``True``. This is a way to
-      tell if the user has been authenticated.
+      tell if the user has been authenticated. This does not imply any 
+      permissions, and doesn't check if the user is active - it only indicates
+      that the user has provided a valid username and password.
 
     * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
       with a space in between.
@@ -120,13 +122,16 @@ custom methods:
 
     * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
       permission, where perm is in the format ``"package.codename"``.
+      If the user is inactive, this method will always return ``False``.
 
     * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
       specified permissions, where each perm is in the format
-      ``"package.codename"``.
+      ``"package.codename"``. If the user is inactive, this method will 
+      always return ``False``.
 
     * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
       any permissions in the given package (the Django app label).
+      If the user is inactive, this method will always return ``False``.
 
     * ``get_and_delete_messages()`` -- Returns a list of ``Message`` objects in
       the user's queue and deletes the messages from the queue.
@@ -283,7 +288,10 @@ password is invalid, ``authenticate()`` returns ``None``. Example::
     from django.contrib.auth import authenticate
     user = authenticate(username='john', password='secret')
     if user is not None:
-        print "You provided a correct username and password!"
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
     else:
         print "Your username and password were incorrect."
 
@@ -301,10 +309,13 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            # Redirect to a success page.
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
         else:
-            # Return an error message.
+            # Return a 'invalid login' error message.
 
 How to log a user out
 ---------------------

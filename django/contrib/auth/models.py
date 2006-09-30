@@ -216,6 +216,8 @@ class User(models.Model):
 
     def has_module_perms(self, app_label):
         "Returns True if the user has any permissions in the given app label."
+        if not self.is_active:
+            return False
         if self.is_superuser:
             return True
         return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
