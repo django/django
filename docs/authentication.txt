@@ -315,7 +315,7 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
             else:
                 # Return a 'disabled account' error message
         else:
-            # Return a 'invalid login' error message.
+            # Return an 'invalid login' error message.
 
 How to log a user out
 ---------------------
