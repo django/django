@@ -397,7 +397,7 @@ get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting Postg
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
-    "Returns a list of the CREATE INDEX SQL statements for the given app."
+    "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     from django.db import models
     output = []
     for model in models.get_models(app):
@@ -407,7 +407,7 @@ get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given
 get_sql_indexes.args = APP_ARGS
 
 def _get_sql_index(model):
-    "Returns the CREATE INDEX SQL statements for a specific model"
+    "Returns the CREATE INDEX SQL statements for a single model"
     from django.db import backend
     output = []
 
@@ -463,11 +463,12 @@ def syncdb(verbosity=1, interactive=True):
     pending_references = {}
 
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         model_list = models.get_models(app)
         for model in model_list:
             # Create the model's database table, if it doesn't already exist.
             if verbosity >= 2:
-                print "Processing model %s" % model._meta
+                print "Processing %s.%s model" % (app_name, model._meta.object_name)
             if model._meta.db_table in table_list:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
@@ -487,7 +488,7 @@ def syncdb(verbosity=1, interactive=True):
                 sql = _get_many_to_many_sql_for_model(model)
                 if sql:
                     if verbosity >= 2:
-                        print "Creating many-to-many tables for %s model" % model.__name__
+                        print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
                     for statement in sql:
                         cursor.execute(statement)
 
@@ -496,8 +497,9 @@ def syncdb(verbosity=1, interactive=True):
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         if verbosity >= 2:
-            print "Sending post-syncdb signal for application", app.__name__.split('.')[-2]
+            print "Running post-sync handlers for application", app_name
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models,
             verbosity=verbosity, interactive=interactive)
@@ -509,17 +511,17 @@ def syncdb(verbosity=1, interactive=True):
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
                     if verbosity >= 1:
-                        print "Installing initial data for %s model" % model._meta.object_name
+                        print "Installing initial data for %s.%s model" % model._meta.object_name
                     try:
                         for sql in initial_sql:
                             cursor.execute(sql)
                     except Exception, e:
-                        sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
-                                            (model._meta.object_name, e))
+                        sys.stderr.write("Failed to install initial SQL data for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
-
+                
 syncdb.args = ''
 
 def get_admin_index(app):
