@@ -1176,7 +1176,7 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(verbosity, app_labels):
+def test(app_labels, verbosity=1):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
@@ -1327,7 +1327,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
     elif action == 'test':
         try:
-            action_mapping[action](int(options.verbosity), args[1:])
+            action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
