@@ -422,7 +422,7 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-def syncdb(verbosity=2, interactive=True):
+def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
     from django.db.models import signals
@@ -459,18 +459,17 @@ def syncdb(verbosity=2, interactive=True):
         model_list = models.get_models(app)
         for model in model_list:
             # Create the model's database table, if it doesn't already exist.
+            if verbosity >= 2:
+                print "Processing model %s" % model._meta
             if model._meta.db_table in table_list:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
             created_models.add(model)
             for refto, refs in references.items():
-                try:
-                    pending_references[refto].extend(refs)
-                except KeyError:
-                    pending_references[refto] = refs
+                pending_references.setdefault(refto, []).extend(refs)
             sql.extend(_get_sql_for_pending_references(model, pending_references))
-            if verbosity >= 2:
+            if verbosity >= 1:
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
@@ -490,6 +489,8 @@ def syncdb(verbosity=2, interactive=True):
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        if verbosity >= 2:
+            print "Sending post-syncdb signal for application", app.__name__.split('.')[-2]
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models,
             verbosity=verbosity, interactive=interactive)
@@ -500,7 +501,7 @@ def syncdb(verbosity=2, interactive=True):
             if model in created_models:
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
-                    if verbosity >= 2:
+                    if verbosity >= 1:
                         print "Installing initial data for %s model" % model._meta.object_name
                     try:
                         for sql in initial_sql:
@@ -1281,7 +1282,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
-    parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
+    parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
     parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Specifies the directory from which to serve admin media for runserver.'),
