@@ -264,6 +264,13 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                                                                           change=admin_opts.grant_change_row_level_perm,
                                                                           delete=admin_opts.grant_delete_row_level_perm)
             
+            for rel_obj in manipulator.new_rel_objs:
+                if rel_obj._meta.row_level_permissions:
+                    from django.contrib.auth.models import RowLevelPermission
+                    admin_opts = rel_obj._meta.admin
+                    RowLevelPermission.objects.create_default_row_permissions(rel_obj, request.user, 
+                                                                              change=admin_opts.grant_change_row_level_perm,
+                                                                              delete=admin_opts.grant_delete_row_level_perm)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
@@ -352,6 +359,14 @@ def change_stage(request, app_label, model_name, object_id):
             if not change_message:
                 change_message = _('No fields changed.')
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
+
+            for rel_obj in manipulator.new_rel_objs:
+                if rel_obj._meta.row_level_permissions:
+                    from django.contrib.auth.models import RowLevelPermission
+                    admin_opts = rel_obj._meta.admin
+                    RowLevelPermission.objects.create_default_row_permissions(rel_obj, request.user, 
+                                                                              change=admin_opts.grant_change_row_level_perm,
+                                                                              delete=admin_opts.grant_delete_row_level_perm)
 
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             if request.POST.has_key("_continue"):
