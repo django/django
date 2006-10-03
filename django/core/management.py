@@ -401,12 +401,12 @@ def get_sql_indexes(app):
     from django.db import models
     output = []
     for model in models.get_models(app):
-        output.extend(_get_sql_index(model))
+        output.extend(get_sql_indexes_for_model(model))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
-def _get_sql_index(model):
+def get_sql_indexes_for_model(model):
     "Returns the CREATE INDEX SQL statements for a single model"
     from django.db import backend
     output = []
@@ -527,7 +527,7 @@ def syncdb(verbosity=1, interactive=True):
         app_name = app.__name__.split('.')[-2]
         for model in models.get_models(app):
             if model in created_models:
-                index_sql = _get_sql_index(model)
+                index_sql = get_sql_indexes_for_model(model)
                 if index_sql:
                     if verbosity >= 1:
                         print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
