@@ -103,7 +103,6 @@ def get_sql_create(app):
     known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-
     for model in app_models:
         output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
@@ -596,7 +595,7 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def reset(app):
+def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
     app_name = app.__name__.split('.')[-2]
@@ -607,21 +606,25 @@ def reset(app):
     _check_for_validation_errors(app)
     sql_list = get_sql_reset(app)
 
-    confirm = raw_input("""
+    if interactive:
+        confirm = raw_input("""
 You have requested a database reset.
 This will IRREVERSIBLY DESTROY any data in your database.
 Are you sure you want to do this?
 
 Type 'yes' to continue, or 'no' to cancel: """)
+    else:
+        confirm = 'yes'
+        
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
             for sql in sql_list:
                 cursor.execute(sql)
         except Exception, e:
-            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be reset. Possible reasons:
   * The database isn't running or isn't configured correctly.
-  * At least one of the database tables already exists.
+  * At least one of the database tables doesn't exist.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
 The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
@@ -1361,7 +1364,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
-            output = action_mapping[action](mod)
+            if action == 'reset':
+                output = action_mapping[action](mod, options.interactive)
+            else:
+                output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
