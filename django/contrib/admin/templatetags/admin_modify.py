@@ -119,6 +119,7 @@ class FieldWrapper(object):
 class FormFieldCollectionWrapper(object):
     def __init__(self, field_mapping, fields, index):
         self.field_mapping = field_mapping
+        self.original = field_mapping['original']
         self.fields = fields
         self.bound_fields = [AdminBoundField(field, self.field_mapping, field_mapping['original'])
                              for field in self.fields]
@@ -127,13 +128,17 @@ class FormFieldCollectionWrapper(object):
 class TabularBoundRelatedObject(BoundRelatedObject):
     def __init__(self, related_object, field_mapping, original):
         super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
+        
         self.field_wrapper_list = [FieldWrapper(field) for field in self.relation.editable_fields()]
-
+        
         fields = self.relation.editable_fields()
-
+        
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping, fields, i)
                                                for (i,field_mapping) in self.field_mappings.items() ]
+        
         self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list])
+        if original:
+            self.original = original
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):
@@ -147,6 +152,10 @@ class StackedBoundRelatedObject(BoundRelatedObject):
 
         self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields, i)
                                                for (i,field_mapping) in self.field_mappings.items()]
+
+        if original:
+            self.original = original
+        
         self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
 
     def template_name(self):

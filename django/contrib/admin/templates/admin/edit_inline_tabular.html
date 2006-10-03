@@ -9,6 +9,8 @@
    {% endfor %}
    </tr></thead>
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
+   {% load row_level_permission %}
+   {% check_rlp_inline fcw.original %}
       {% if change %}{% if original_row_needed %}
          {% if fcw.obj.original %}
             <tr class="row-label {% cycle row1,row2 %}"><td colspan="{{ num_headers }}"><strong>{{ fcw.obj.original }}</strong></tr>
@@ -31,7 +33,8 @@
          {% if fcw.obj.original %}<a href="/r/{{ fcw.obj.original.content_type_id }}/{{ fcw.obj.original.id }}/">View on site</a>{% endif %}
       </td>{% endif %}
       </tr>
-
+   
+   {% end_check_rlp_inline %}
    {% endfor %} </table>
 
    {% for fcw in bound_related_object.form_field_collection_wrappers %}

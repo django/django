@@ -34,6 +34,55 @@ def objref(parser, token):
         tok = "object"
     return objref_class(tok)
 
+def check_rlp_inline(parser, token):
+    tokens = token.split_contents()
+    if len(tokens)!=2:
+        raise template.TemplateSyntaxError, "%r tag requires only 1 arguments" % tokens[0]
+    
+    nodelist = parser.parse(('end_'+tokens[0],))
+    token = parser.next_token()    
+    
+    object_var = parser.compile_filter(tokens[1])
+    
+    return CheckRLPInlineNode(object_var, nodelist)
+
+class CheckRLPInlineNode(template.Node):
+    def __init__(self, object_var, nodelist):
+        self.object_var = object_var
+        self.nodelist = nodelist
+        
+    def render(self, context):
+        if self.object_var:
+            try:
+                object = self.object_var.resolve(context)
+            except template.VariableDoesNotExist:
+                return self.nodelist.render(context)
+        else:
+            return self.nodelist.render(context)
+        
+        if object is None:
+            return self.nodelist.render(context)            
+        
+        if not object._meta.row_level_permissions:
+            return self.nodelist.render(context)
+        
+        try:
+            user = template.resolve_variable("user", context)
+        except template.VariableDoesNotExist:
+            return settings.TEMPLATE_STRING_IF_INVALID
+        
+        permission = object._meta.get_change_permission()
+        
+        bool_perm = user.has_perm(object._meta.app_label+'.'+permission, object=object)
+        
+        if bool_perm:
+            return self.nodelist.render(context)
+        return ""
+        
+        
+        
+        
+
 #From: http://code.djangoproject.com/wiki/PaginatorTag
 def paginator(context, adjacent_pages=2):
     """Adds pagination context variables for first, adjacent and next page links
@@ -58,3 +107,4 @@ def paginator(context, adjacent_pages=2):
 register.inclusion_tag("admin/paginator.html", takes_context=True)(paginator)
 
 register.tag('objref', objref)
+register.tag('check_rlp_inline', check_rlp_inline)
