@@ -398,23 +398,30 @@ get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
     "Returns a list of the CREATE INDEX SQL statements for the given app."
-    from django.db import backend, models
+    from django.db import models
     output = []
-
     for model in models.get_models(app):
-        for f in model._meta.fields:
-            if f.db_index:
-                unique = f.unique and 'UNIQUE ' or ''
-                output.append(
-                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
-                    style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
-                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
-                )
+        output.extend(_get_sql_index(model))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
+
+def _get_sql_index(model):
+    "Returns the CREATE INDEX SQL statements for a specific model"
+    from django.db import backend
+    output = []
+
+    for f in model._meta.fields:
+        if f.db_index:
+            unique = f.unique and 'UNIQUE ' or ''
+            output.append(
+                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_KEYWORD('ON') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
+                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+            )
+    return output
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
