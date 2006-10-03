@@ -521,6 +521,25 @@ def syncdb(verbosity=1, interactive=True):
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
+
+    # Install SQL indicies for all newly created models
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        for model in models.get_models(app):
+            if model in created_models:
+                index_sql = _get_sql_index(model)
+                if index_sql:
+                    if verbosity >= 1:
+                        print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
+                    try:
+                        for sql in index_sql:
+                            cursor.execute(sql)
+                    except Exception, e:
+                        sys.stderr.write("Failed to install index for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
+                        transaction.rollback_unless_managed()
+                    else:
+                        transaction.commit_unless_managed()
                 
 syncdb.args = ''
 
