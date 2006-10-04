@@ -130,6 +130,7 @@ class AutomaticManipulator(forms.Manipulator):
 
         expanded_data = DotExpandedDict(dict(new_data))
         self.new_rel_objs = []
+
         # Save many-to-one objects. Example: Add the Choice objects for a Poll.
         for related in self.opts.get_all_related_objects():
             # Create obj_list, which is a DotExpandedDict such as this:
@@ -208,12 +209,14 @@ class AutomaticManipulator(forms.Manipulator):
                         if self.change:
                             if not old_rel_obj: # This object didn't exist before.
                                 self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
-                                self.new_rel_objs.append(new_rel_obj)
                             else:
                                 for f in related.opts.fields:
                                     if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
                                         self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
-
+                        
+                        if not old_rel_obj:
+                            self.new_rel_objs.append(new_rel_obj)
+                        
                         # Save many-to-many objects.
                         for f in related.opts.many_to_many:
                             if child_follow.get(f.name, None) and not f.rel.edit_inline:
