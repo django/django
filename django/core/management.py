@@ -511,7 +511,7 @@ def syncdb(verbosity=1, interactive=True):
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
                     if verbosity >= 1:
-                        print "Installing initial data for %s.%s model" % model._meta.object_name
+                        print "Installing initial data for %s.%s model" % (app_name, model._meta.object_name)
                     try:
                         for sql in initial_sql:
                             cursor.execute(sql)
