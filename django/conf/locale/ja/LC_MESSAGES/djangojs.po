@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
-"Report-Msgid-Bugs-To: Django-users Japan <django-ja@googlegroups.com>\n"
-"POT-Creation-Date: 2006-05-02 23:06+0900\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-10-06 00:30+0900\n"
 "PO-Revision-Date: 2006-05-08 13:39+0900\n"
 "Last-Translator: makoto tsuyuki <mtsuyuki@gmail.com>\n"
 "Language-Team: Japanese <django-ja@googlegroups.com>\n"
@@ -61,50 +61,58 @@ msgstr "選択してクリック"
 msgid "Clear all"
 msgstr "全てクリア"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "表示"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "非表示"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
 msgstr "現在"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
 msgstr "時計"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
 msgstr "時間を選択"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
 msgstr "夜中"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
 msgstr "午前 6 時"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
 msgstr "正午"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
 msgstr "今日"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
 msgstr "カレンダー"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
 msgstr "昨日"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "明日"
-
