@@ -212,6 +212,21 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+.. admonition:: For debug purposes only!
+
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
+    it is a bad idea to turn it on as a 'development default'. 
+    
+    Many templates, including those in the Admin site, rely upon the 
+    silence of the template system when a non-existent variable is 
+    encountered. If you assign a value other than ``''`` to
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    problems with these templates and sites.
+    
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
+    in order to debug a specific template problem, then cleared 
+    once debugging is complete.
+        
 Playing with Context objects
 ----------------------------
 
