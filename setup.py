@@ -1,7 +1,25 @@
-import ez_setup # From http://peak.telecommunity.com/DevCenter/setuptools
-ez_setup.use_setuptools()
+from distutils.core import setup
+from distutils.command.install import INSTALL_SCHEMES
+import os
 
-from setuptools import setup, find_packages
+# Tell distutils to put the data_files in platform-specific installation
+# locations. See here for an explanation:
+# http://groups.google.com/group/comp.lang.python/browse_thread/thread/35ec7b2fed36eaec/2105ee4d9e8042cb
+for scheme in INSTALL_SCHEMES.values():
+    scheme['data'] = scheme['purelib']
+
+# Compile the list of packages available, because distutils doesn't have
+# an easy way to do this.
+packages, data_files = [], []
+root_dir = os.path.join(os.path.dirname(__file__), 'django')
+for dirpath, dirnames, filenames in os.walk(root_dir):
+    # Ignore dirnames that start with '.'
+    for i, dirname in enumerate(dirnames):
+        if dirname.startswith('.'): del dirnames[i]
+    if '__init__.py' in filenames:
+        packages.append(dirpath.replace('/', '.'))
+    else:
+        data_files.append((dirpath, [os.path.join(dirpath, f) for f in filenames]))
 
 setup(
     name = "Django",
@@ -10,24 +28,7 @@ setup(
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',
     description = 'A high-level Python Web framework that encourages rapid development and clean, pragmatic design.',
-    license = 'BSD',
-    packages = find_packages(exclude=['examples', 'examples.*']),
-    package_data = {
-        '': ['*.TXT'],
-        'django.conf': ['locale/*/LC_MESSAGES/*'],
-        'django.contrib.admin': ['templates/admin/*.html',
-                                 'templates/admin/auth/user/*.html',
-                                 'templates/admin_doc/*.html',
-                                 'templates/registration/*.html',
-                                 'templates/widget/*.html',
-                                 'media/css/*.css',
-                                 'media/img/admin/*.gif',
-                                 'media/img/admin/*.png',
-                                 'media/js/*.js',
-                                 'media/js/admin/*js'],
-        'django.contrib.comments': ['templates/comments/*.html'],
-        'django.contrib.sitemaps': ['templates/*.xml'],
-    },
+    packages = packages,
+    data_files = data_files,
     scripts = ['django/bin/django-admin.py'],
-    zip_safe = False,
 )
