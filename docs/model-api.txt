@@ -188,7 +188,8 @@ JavaScript shortcuts.
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``maxlength``.
+This doesn't accept ``maxlength``; its ``maxlength`` is automatically set to
+75.
 
 ``FileField``
 ~~~~~~~~~~~~~
