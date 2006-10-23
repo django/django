@@ -257,7 +257,7 @@ provides a shortcut. Here's the full ``index()`` view, rewritten::
     from mysite.polls.models import Poll
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         return render_to_response('polls/index.html', {'latest_poll_list': latest_poll_list})
 
 Note that we no longer need to import ``loader``, ``Context`` or
