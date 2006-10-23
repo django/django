@@ -311,6 +311,20 @@ optional, third positional argument, ``processors``. In this example, the
             'foo': 'bar',
         }, [ip_address_processor])
 
+Note::
+    If you are using Django's ``render_to_response()`` shortcut to populate a
+    template with the contents of a dictionary, your template will be passed a
+    ``Context`` instance by default (not a ``RequestContext``). If you wish to
+    use a ``RequestContext`` in your template rendering, you need to pass an
+    optional third argument to ``render_to_response()``: a ``RequestContext``
+    instance. Your code might look like this::
+
+        def some_view(request):
+            # ...
+            return render_to_response('my_template'html',
+                                      my_data_dictionary,
+                                      context_instance = RequestContext(request))
+
 Here's what each of the default processors does:
 
 .. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
