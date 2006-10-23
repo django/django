@@ -211,7 +211,7 @@ Below is the finished view::
     def create_place(request):
         manipulator = Place.AddManipulator()
 
-        if request.POST:
+        if request.method == 'POST':
             # If data was POSTed, we're trying to create a new Place.
             new_data = request.POST.copy()
 
@@ -309,7 +309,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
         # Grab the Place object in question for future use.
         place = manipulator.original_object
 
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
             if not errors:
@@ -391,7 +391,7 @@ Here's a simple function that might drive the above form::
 
     def contact_form(request):
         manipulator = ContactManipulator()
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
             if not errors:
