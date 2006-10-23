@@ -579,7 +579,7 @@ fails. If no message is passed in, a default message is used.
 ``ValidateIfOtherFieldEquals``
     Takes three parameters: ``other_field``, ``other_value`` and
     ``validator_list``, in that order. If ``other_field`` has a value of
-    ``other_vaue``, then the validators in ``validator_list`` are all run
+    ``other_value``, then the validators in ``validator_list`` are all run
     against the current field.
 
 ``RequiredIfOtherFieldNotGiven``
