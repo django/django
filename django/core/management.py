@@ -540,7 +540,7 @@ def syncdb(verbosity=1, interactive=True):
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
-                
+
 syncdb.args = ''
 
 def get_admin_index(app):
@@ -627,6 +627,7 @@ install.args = APP_ARGS
 def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
+    from django.conf import settings
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -638,13 +639,14 @@ def reset(app, interactive=True):
     if interactive:
         confirm = raw_input("""
 You have requested a database reset.
-This will IRREVERSIBLY DESTROY any data in your database.
+This will IRREVERSIBLY DESTROY any data for
+the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """)
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, settings.DATABASE_NAME))
     else:
         confirm = 'yes'
-        
+
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
