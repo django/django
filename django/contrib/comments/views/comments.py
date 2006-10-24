@@ -217,7 +217,7 @@ def post_comment(request):
     errors = manipulator.get_validation_errors(new_data)
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
-    if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
+    if manipulator.get_user() and not manipulator.get_user().is_authenticated() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
         from django.contrib.auth import login
         login(request, manipulator.get_user())
     if errors or request.POST.has_key('preview'):
