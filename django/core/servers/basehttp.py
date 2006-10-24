@@ -594,7 +594,7 @@ class AdminMediaHandler(object):
     Use this ONLY LOCALLY, for development! This hasn't been tested for
     security and is not super efficient.
     """
-    def __init__(self, application, media_dir = None):
+    def __init__(self, application, media_dir=None):
         from django.conf import settings
         self.application = application
         if not media_dir:

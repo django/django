@@ -377,7 +377,7 @@ By default, ``TEMPLATE_DIRS`` is empty. So, let's add a line to it, to tell
 Django where our templates live::
 
     TEMPLATE_DIRS = (
-        "/home/mytemplates", # Change this to your own directory.
+        "/home/my_username/mytemplates", # Change this to your own directory.
     )
 
 Now copy the template ``admin/base_site.html`` from within the default Django

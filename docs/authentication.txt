@@ -66,8 +66,8 @@ Fields
       long and can contain any character. See the "Passwords" section below.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
-    * ``is_active`` -- Boolean. Designates whether this user can log into the
-      Django admin. Set this to ``False`` instead of deleting accounts.
+    * ``is_active`` -- Boolean. Designates whether this account can be used
+      to log in. Set this flag to ``False`` instead of deleting accounts.
     * ``is_superuser`` -- Boolean. Designates that this user has all permissions
       without explicitly assigning them.
     * ``last_login`` -- A datetime of the user's last login. Is set to the
@@ -99,7 +99,9 @@ custom methods:
       should prefer using ``is_authenticated()`` to this method.
 
     * ``is_authenticated()`` -- Always returns ``True``. This is a way to
-      tell if the user has been authenticated.
+      tell if the user has been authenticated. This does not imply any 
+      permissions, and doesn't check if the user is active - it only indicates
+      that the user has provided a valid username and password.
 
     * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
       with a space in between.
@@ -120,13 +122,16 @@ custom methods:
 
     * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
       permission, where perm is in the format ``"package.codename"``.
+      If the user is inactive, this method will always return ``False``.
 
     * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
       specified permissions, where each perm is in the format
-      ``"package.codename"``.
+      ``"package.codename"``. If the user is inactive, this method will 
+      always return ``False``.
 
     * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
       any permissions in the given package (the Django app label).
+      If the user is inactive, this method will always return ``False``.
 
     * ``get_and_delete_messages()`` -- Returns a list of ``Message`` objects in
       the user's queue and deletes the messages from the queue.
@@ -283,7 +288,10 @@ password is invalid, ``authenticate()`` returns ``None``. Example::
     from django.contrib.auth import authenticate
     user = authenticate(username='john', password='secret')
     if user is not None:
-        print "You provided a correct username and password!"
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
     else:
         print "Your username and password were incorrect."
 
@@ -301,10 +309,13 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            # Redirect to a success page.
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
         else:
-            # Return an error message.
+            # Return an 'invalid login' error message.
 
 How to log a user out
 ---------------------
@@ -456,9 +467,9 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
 
-We are using this particular test as a relatively simple example, however be
-aware that if you just want to test if a permission is available to a user,
-you can use the ``permission_required()`` decorator described below.
+We're using this particular test as a relatively simple example. However, if
+you just want to test whether a permission is available to a user, you can use
+the ``permission_required()`` decorator, described later in this document.
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
@@ -495,20 +506,30 @@ Example in Python 2.4 syntax::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since checking whether a user has a particular permission available to them is a
-relatively common operation, Django provides a shortcut for that particular
-case: the ``permission_required()`` decorator. Using this decorator, the
-earlier example can be written as::
+**New in Django development version**
+
+It's a relatively common task to check whether a user has a particular
+permission. For that reason, Django provides a shortcut for that case: the
+``permission_required()`` decorator. Using this decorator, the earlier example
+can be written as::
 
     from django.contrib.auth.decorators import permission_required
-     
+
     def my_view(request):
         # ...
-     
     my_view = permission_required('polls.can_vote')(my_view)
 
 Note that ``permission_required()`` also takes an optional ``login_url``
-parameter.
+parameter. Example::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+As in the ``login_required`` decorator, ``login_url`` defaults to
+``'/accounts/login/'``.
 
 Limiting access to generic views
 --------------------------------
@@ -633,7 +654,7 @@ The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
     {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>    
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
     {% else %}
         <p>Welcome, new user. Please log in.</p>
     {% endif %}

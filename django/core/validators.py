@@ -249,7 +249,7 @@ def hasNoProfanities(field_data, all_data):
         Watch your mouth! The words "f--k" and "s--t" are not allowed here.
     """
     field_data = field_data.lower() # normalize
-    words_seen = [w for w in settings.PROFANITIES_LIST if field_data.find(w) > -1]
+    words_seen = [w for w in settings.PROFANITIES_LIST if w in field_data]
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
@@ -377,7 +377,7 @@ class IsValidFloat(object):
         if len(data) > max_allowed_length:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places)) or ('.' in data and len(data) > (self.max_digits - (self.decimal_places - len(data.split('.')[1])) + 1)):
+        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:

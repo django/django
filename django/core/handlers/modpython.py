@@ -102,7 +102,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REQUEST_METHOD':    self._req.method,
                 'SCRIPT_NAME':       None, # Not supported
                 'SERVER_NAME':       self._req.server.server_hostname,
-                'SERVER_PORT':       self._req.server.port,
+                'SERVER_PORT':       str(self._req.connection.local_addr[1]),
                 'SERVER_PROTOCOL':   self._req.protocol,
                 'SERVER_SOFTWARE':   'mod_python'
             }
@@ -139,10 +139,6 @@ class ModPythonHandler(BaseHandler):
         # that use settings now can work
         from django.conf import settings
 
-        if settings.ENABLE_PSYCO:
-            import psyco
-            psyco.profile()
-
         # if we need to set up middleware, now that settings works we can do it now.
         if self._request_middleware is None:
             self.load_middleware()
@@ -150,7 +146,7 @@ class ModPythonHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = ModPythonRequest(req)
-            response = self.get_response(req.uri, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:
@@ -160,23 +156,20 @@ class ModPythonHandler(BaseHandler):
             dispatcher.send(signal=signals.request_finished)
 
         # Convert our custom HttpResponse object back into the mod_python req.
-        populate_apache_request(response, req)
-        return 0 # mod_python.apache.OK
+        req.content_type = response['Content-Type']
+        for key, value in response.headers.items():
+            if key != 'Content-Type':
+                req.headers_out[key] = value
+        for c in response.cookies.values():
+            req.headers_out.add('Set-Cookie', c.output(header=''))
+        req.status = response.status_code
+        try:
+            for chunk in response:
+                req.write(chunk)
+        finally:
+            response.close()
 
-def populate_apache_request(http_response, mod_python_req):
-    "Populates the mod_python request object with an HttpResponse"
-    mod_python_req.content_type = http_response['Content-Type']
-    for key, value in http_response.headers.items():
-        if key != 'Content-Type':
-            mod_python_req.headers_out[key] = value
-    for c in http_response.cookies.values():
-        mod_python_req.headers_out.add('Set-Cookie', c.output(header=''))
-    mod_python_req.status = http_response.status_code
-    try:
-        for chunk in http_response:
-            mod_python_req.write(chunk)
-    finally:
-        http_response.close()
+        return 0 # mod_python.apache.OK
 
 def handler(req):
     # mod_python hooks into this function.

@@ -170,6 +170,9 @@ class Templates(unittest.TestCase):
             # Escaped backslash using known escape char
             'basic-syntax35': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
 
+            # Empty strings can be passed as arguments to filters
+            'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
+
             ### COMMENT TAG ###########################################################
             'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
             'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),

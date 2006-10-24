@@ -74,7 +74,7 @@ class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
         self.path = environ['PATH_INFO']
-        self.META = environ 
+        self.META = environ
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
@@ -174,10 +174,6 @@ class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
 
-        if settings.ENABLE_PSYCO:
-            import psyco
-            psyco.profile()
-
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
@@ -186,7 +182,7 @@ class WSGIHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
-            response = self.get_response(request.path, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:

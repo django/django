@@ -56,6 +56,7 @@ LANGUAGES = (
     ('ja', gettext_noop('Japanese')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
+    ('pl', gettext_noop('Polish')),
     ('pt-br', gettext_noop('Brazilian')),
     ('ro', gettext_noop('Romanian')),
     ('ru', gettext_noop('Russian')),
@@ -223,10 +224,6 @@ YEAR_MONTH_FORMAT = 'F Y'
 # http://www.djangoproject.com/documentation/templates/#now
 MONTH_DAY_FORMAT = 'F j'
 
-# Whether to enable Psyco, which optimizes Python code. Requires Psyco.
-# http://psyco.sourceforge.net/
-ENABLE_PSYCO = False
-
 # Do you want to manage transactions manually?
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
@@ -274,8 +271,8 @@ CACHE_MIDDLEWARE_KEY_PREFIX = ''
 COMMENTS_ALLOW_PROFANITIES = False
 
 # The profanities that will trigger a validation error in the
-# 'hasNoProfanities' validator. All of these should be in lower-case.
-PROFANITIES_LIST = ['asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit']
+# 'hasNoProfanities' validator. All of these should be in lowercase.
+PROFANITIES_LIST = ('asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit')
 
 # The group ID that designates which users are banned.
 # Set to None if you're not using it.

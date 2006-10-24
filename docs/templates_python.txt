@@ -212,6 +212,21 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+.. admonition:: For debug purposes only!
+
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
+    it is a bad idea to turn it on as a 'development default'. 
+    
+    Many templates, including those in the Admin site, rely upon the 
+    silence of the template system when a non-existent variable is 
+    encountered. If you assign a value other than ``''`` to
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    problems with these templates and sites.
+    
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
+    in order to debug a specific template problem, then cleared 
+    once debugging is complete.
+        
 Playing with Context objects
 ----------------------------
 
@@ -296,6 +311,20 @@ optional, third positional argument, ``processors``. In this example, the
             'foo': 'bar',
         }, [ip_address_processor])
 
+Note::
+    If you are using Django's ``render_to_response()`` shortcut to populate a
+    template with the contents of a dictionary, your template will be passed a
+    ``Context`` instance by default (not a ``RequestContext``). If you wish to
+    use a ``RequestContext`` in your template rendering, you need to pass an
+    optional third argument to ``render_to_response()``: a ``RequestContext``
+    instance. Your code might look like this::
+
+        def some_view(request):
+            # ...
+            return render_to_response('my_template'html',
+                                      my_data_dictionary,
+                                      context_instance = RequestContext(request))
+
 Here's what each of the default processors does:
 
 .. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
@@ -365,6 +394,18 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current
 `HttpRequest object`_. Note that this processor is not enabled by default;
 you'll have to activate it.
+
+Writing your own context processors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A context processor has a very simple interface: It's just a Python function
+that takes one argument, an ``HttpRequest`` object, and returns a dictionary
+that gets added to the template context. Each context processor *must* return
+a dictionary.
+
+Custom context processors can live anywhere in your code base. All Django cares
+about is that your custom context processors are pointed-to by your
+``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
 Loading templates
 -----------------
@@ -805,7 +846,7 @@ Inclusion tags
 
 Another common type of template tag is the type that displays some data by
 rendering *another* template. For example, Django's admin interface uses custom
-template tags to display the buttons along the botton of the "add/change" form
+template tags to display the buttons along the bottom of the "add/change" form
 pages. Those buttons always look the same, but the link targets change depending
 on the object being edited -- so they're a perfect case for using a small
 template that is filled with details from the current object. (In the admin's

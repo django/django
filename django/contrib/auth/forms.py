@@ -13,7 +13,7 @@ class UserCreationForm(forms.Manipulator):
                 validator_list=[validators.isAlphaNumeric, self.isValidUsername]),
             forms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
             forms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
-                validator_list=[validators.AlwaysMatchesOtherField('password1', "The two password fields didn't match.")]),
+                validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 
     def isValidUsername(self, field_data, all_data):
@@ -21,7 +21,7 @@ class UserCreationForm(forms.Manipulator):
             User.objects.get(username=field_data)
         except User.DoesNotExist:
             return
-        raise validators.ValidationError, 'A user with that username already exists.'
+        raise validators.ValidationError, _('A user with that username already exists.')
 
     def save(self, new_data):
         "Creates the user."
@@ -81,7 +81,7 @@ class PasswordResetForm(forms.Manipulator):
         try:
             self.user_cache = User.objects.get(email__iexact=new_data)
         except User.DoesNotExist:
-            raise validators.ValidationError, _("That e-mail address doesn't have an associated user acount. Are you sure you've registered?")
+            raise validators.ValidationError, _("That e-mail address doesn't have an associated user account. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
