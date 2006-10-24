@@ -109,6 +109,21 @@ Some tags require beginning and ending tags (i.e.
 below describes all the built-in tags. You can create your own tags, if you
 know how to write Python code.
 
+Comments
+========
+
+**New in Django development version**
+
+To comment-out part of a template, use the comment syntax: ``{# #}``.
+
+For example, this template would render as ``'hello'``::
+
+    {# greeting #}hello
+
+A comment can contain any template code, invalid or not. For example::
+
+    {# {% if foo %}bar{% else %} #}
+
 Template inheritance
 ====================
 
