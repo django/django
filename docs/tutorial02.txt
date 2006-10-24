@@ -383,10 +383,10 @@ Django where our templates live::
 Now copy the template ``admin/base_site.html`` from within the default Django
 admin template directory (``django/contrib/admin/templates``) into an ``admin``
 subdirectory of whichever directory you're using in ``TEMPLATE_DIRS``. For
-example, if your ``TEMPLATE_DIRS`` includes ``"/home/mytemplates"``, as above,
-then copy ``django/contrib/admin/templates/admin/base_site.html`` to
-``/home/mytemplates/admin/base_site.html``. Don't forget that ``admin``
-subdirectory.
+example, if your ``TEMPLATE_DIRS`` includes ``"/home/my_username/mytemplates"``,
+as above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
+``/home/my_username/mytemplates/admin/base_site.html``. Don't forget that
+``admin`` subdirectory.
 
 Then, just edit the file and replace the generic Django text with your own
 site's name and URL as you see fit.
