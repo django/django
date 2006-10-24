@@ -41,7 +41,7 @@ class ModPythonRequest(http.HttpRequest):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
 
     def is_secure(self):
-        return self._req.subprocess_env.has_key('HTTPS') and self._req.subprocess_env['HTTPS'] == 'on'
+        return bool(self._req.is_https())
 
     def _load_post_and_files(self):
         "Populates self._post and self._files"
