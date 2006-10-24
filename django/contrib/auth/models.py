@@ -126,7 +126,7 @@ class User(models.Model):
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
         return False
-    
+
     def is_authenticated(self):
         """Always return True. This is a way to tell if the user has been authenticated in templates.
         """
@@ -270,6 +270,15 @@ class AnonymousUser(object):
     def __str__(self):
         return 'AnonymousUser'
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return 1 # instances always return the same hash value
+
     def save(self):
         raise NotImplementedError
 
@@ -301,6 +310,6 @@ class AnonymousUser(object):
 
     def is_anonymous(self):
         return True
-    
+
     def is_authenticated(self):
         return False
