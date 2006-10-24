@@ -102,7 +102,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REQUEST_METHOD':    self._req.method,
                 'SCRIPT_NAME':       None, # Not supported
                 'SERVER_NAME':       self._req.server.server_hostname,
-                'SERVER_PORT':       str(self._req.connection.local_addr[1]),
+                'SERVER_PORT':       self._req.server.port,
                 'SERVER_PROTOCOL':   self._req.protocol,
                 'SERVER_SOFTWARE':   'mod_python'
             }
