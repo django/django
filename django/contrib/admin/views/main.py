@@ -97,8 +97,16 @@ class ChangeList(object):
         self.mod, self.opts = _get_mod_opts(app_label, module_name)
         if not request.user.has_perm(app_label + '.' + self.opts.get_change_permission()):
             raise PermissionDenied
-
-        self.lookup_mod, self.lookup_opts = self.mod, self.opts
+        
+        lookup_mod, lookup_opts = self.mod, self.opts
+        if self.opts.one_to_one_field:
+            lookup_mod = self.opts.one_to_one_field.rel.to.get_model_module()
+            lookup_opts = lookup_mod.Klass._meta
+            # If lookup_opts doesn't have admin set, give it the default meta.Admin().
+            if not lookup_opts.admin:
+                lookup_opts.admin = meta.Admin()
+                
+        self.lookup_mod, self.lookup_opts = lookup_mod, lookup_opts
 
     def get_search_parameters(self, request):
         # Get search parameters from the query string.
@@ -226,6 +234,8 @@ class ChangeList(object):
                     or_queries.append(meta.Q(**{'%s__icontains' % field_name: bit}))
                 complex_queries.append(reduce(operator.or_, or_queries))
             lookup_params['complex'] = reduce(operator.and_, complex_queries)
+        if opts.one_to_one_field:
+            lookup_params.update(opts.one_to_one_field.rel.limit_choices_to)
         self.lookup_params = lookup_params
 
 def change_list(request, app_label, module_name):
