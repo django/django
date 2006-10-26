@@ -15,7 +15,7 @@ class Person(models.Model):
     def __str__(self):
         return '%s %s' % (self.first_name, self.last_name)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a Person.
 >>> p = Person(first_name='John', last_name='Smith')
 >>> p.save()
@@ -50,4 +50,4 @@ AttributeError: 'Person' object has no attribute 'firstname'
 Traceback (most recent call last):
     ...
 AttributeError: 'Person' object has no attribute 'last'
-"""
+"""}

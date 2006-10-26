@@ -38,7 +38,7 @@ def authenticate(**credentials):
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
-        user.backend = str(backend.__class__)
+        user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
         return user
 
 def login(request, user):
@@ -56,8 +56,14 @@ def logout(request):
     """
     Remove the authenticated user's ID from the request.
     """
-    del request.session[SESSION_KEY]
-    del request.session[BACKEND_SESSION_KEY]
+    try:
+        del request.session[SESSION_KEY]
+    except KeyError:
+        pass
+    try:
+        del request.session[BACKEND_SESSION_KEY]
+    except KeyError:
+        pass
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser

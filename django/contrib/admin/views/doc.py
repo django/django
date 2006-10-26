@@ -28,7 +28,7 @@ def bookmarklets(request):
     # Hack! This couples this view to the URL it lives at.
     admin_root = request.path[:-len('doc/bookmarklets/')]
     return render_to_response('admin_doc/bookmarklets.html', {
-        'admin_url': "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', get_host(request), admin_root),
+        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', get_host(request), admin_root),
     }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 
@@ -43,11 +43,11 @@ def template_tag_index(request):
         for tag_name, tag_func in library.tags.items():
             title, body, metadata = utils.parse_docstring(tag_func.__doc__)
             if title:
-                title = utils.parse_rst(title, 'tag', 'tag:' + tag_name)
+                title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
             if body:
-                body = utils.parse_rst(body, 'tag', 'tag:' + tag_name)
+                body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
             for key in metadata:
-                metadata[key] = utils.parse_rst(metadata[key], 'tag', 'tag:' + tag_name)
+                metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
             if library in template.builtins:
                 tag_library = None
             else:
@@ -74,11 +74,11 @@ def template_filter_index(request):
         for filter_name, filter_func in library.filters.items():
             title, body, metadata = utils.parse_docstring(filter_func.__doc__)
             if title:
-                title = utils.parse_rst(title, 'filter', 'filter:' + filter_name)
+                title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
             if body:
-                body = utils.parse_rst(body, 'filter', 'filter:' + filter_name)
+                body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
             for key in metadata:
-                metadata[key] = utils.parse_rst(metadata[key], 'filter', 'filter:' + filter_name)
+                metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
             if library in template.builtins:
                 tag_library = None
             else:
@@ -132,11 +132,11 @@ def view_detail(request, view):
         raise Http404
     title, body, metadata = utils.parse_docstring(view_func.__doc__)
     if title:
-        title = utils.parse_rst(title, 'view', 'view:' + view)
+        title = utils.parse_rst(title, 'view', _('view:') + view)
     if body:
-        body = utils.parse_rst(body, 'view', 'view:' + view)
+        body = utils.parse_rst(body, 'view', _('view:') + view)
     for key in metadata:
-        metadata[key] = utils.parse_rst(metadata[key], 'model', 'view:' + view)
+        metadata[key] = utils.parse_rst(metadata[key], 'model', _('view:') + view)
     return render_to_response('admin_doc/view_detail.html', {
         'name': view,
         'summary': title,
@@ -161,14 +161,14 @@ def model_detail(request, app_label, model_name):
     try:
         app_mod = models.get_app(app_label)
     except ImproperlyConfigured:
-        raise Http404, "App %r not found" % app_label
+        raise Http404, _("App %r not found") % app_label
     model = None
     for m in models.get_models(app_mod):
         if m._meta.object_name.lower() == model_name:
             model = m
             break
     if model is None:
-        raise Http404, "Model %r not found in app %r" % (model_name, app_label)
+        raise Http404, _("Model %r not found in app %r") % (model_name, app_label)
 
     opts = model._meta
 
@@ -180,7 +180,7 @@ def model_detail(request, app_label, model_name):
         if isinstance(field, models.ForeignKey):
             data_type = related_object_name = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst(("the related `%s.%s` object"  % (app_label, data_type)), 'model', 'model:' + data_type)
+            verbose = utils.parse_rst((_("the related `%s.%s` object")  % (app_label, data_type)), 'model', _('model:') + data_type)
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name
@@ -202,7 +202,7 @@ def model_detail(request, app_label, model_name):
                 continue
             verbose = func.__doc__
             if verbose:
-                verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', 'model:' + opts.module_name)
+                verbose = utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.module_name)
             fields.append({
                 'name': func_name,
                 'data_type': get_return_data_type(func_name),
@@ -211,22 +211,22 @@ def model_detail(request, app_label, model_name):
 
     # Gather related objects
     for rel in opts.get_all_related_objects():
-        verbose = "related `%s.%s` objects" % (rel.opts.app_label, rel.opts.object_name)
+        verbose = _("related `%s.%s` objects") % (rel.opts.app_label, rel.opts.object_name)
         accessor = rel.get_accessor_name()
         fields.append({
             'name'      : "%s.all" % accessor,
             'data_type' : 'List',
-            'verbose'   : utils.parse_rst("all " + verbose , 'model', 'model:' + opts.module_name),
+            'verbose'   : utils.parse_rst(_("all %s") % verbose , 'model', _('model:') + opts.module_name),
         })
         fields.append({
             'name'      : "%s.count" % accessor,
             'data_type' : 'Integer',
-            'verbose'   : utils.parse_rst("number of " + verbose , 'model', 'model:' + opts.module_name),
+            'verbose'   : utils.parse_rst(_("number of %s") % verbose , 'model', _('model:') + opts.module_name),
         })
 
     return render_to_response('admin_doc/model_detail.html', {
         'name': '%s.%s' % (opts.app_label, opts.object_name),
-        'summary': "Fields on %s objects" % opts.object_name,
+        'summary': _("Fields on %s objects") % opts.object_name,
         'description': model.__doc__,
         'fields': fields,
     }, context_instance=RequestContext(request))
@@ -328,15 +328,19 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     views = []
     for p in urlpatterns:
-        if hasattr(p, 'get_callback'):
+        if hasattr(p, '_get_callback'):
             try:
-                views.append((p.get_callback(), base + p.regex.pattern))
+                views.append((p._get_callback(), base + p.regex.pattern))
             except ViewDoesNotExist:
                 continue
         elif hasattr(p, '_get_url_patterns'):
-            views.extend(extract_views_from_urlpatterns(p.url_patterns, base + p.regex.pattern))
+            try:
+                patterns = p.url_patterns
+            except ImportError:
+                continue
+            views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
         else:
-            raise TypeError, "%s does not appear to be a urlpattern object" % p
+            raise TypeError, _("%s does not appear to be a urlpattern object") % p
     return views
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')

@@ -106,12 +106,12 @@ All attributes except ``session`` should be considered read-only.
     A ``django.contrib.auth.models.User`` object representing the currently
     logged-in user. If the user isn't currently logged in, ``user`` will be set
     to an instance of ``django.contrib.auth.models.AnonymousUser``. You
-    can tell them apart with ``is_anonymous()``, like so::
+    can tell them apart with ``is_authenticated()``, like so::
 
-        if request.user.is_anonymous():
-            # Do something for anonymous users.
-        else:
+        if request.user.is_authenticated():
             # Do something for logged-in users.
+        else:
+            # Do something for anonymous users.
 
     ``user`` is only available if your Django installation has the
     ``AuthenticationMiddleware`` activated. For more, see
@@ -134,21 +134,25 @@ Methods
 -------
 
 ``__getitem__(key)``
-    Returns the GET/POST value for the given key, checking POST first, then
-    GET. Raises ``KeyError`` if the key doesn't exist.
+   Returns the GET/POST value for the given key, checking POST first, then
+   GET. Raises ``KeyError`` if the key doesn't exist.
 
-    This lets you use dictionary-accessing syntax on an ``HttpRequest``
-    instance. Example: ``request["foo"]`` would return ``True`` if either
-    ``request.POST`` or ``request.GET`` had a ``"foo"`` key.
+   This lets you use dictionary-accessing syntax on an ``HttpRequest``
+   instance. Example: ``request["foo"]`` would return ``True`` if either
+   ``request.POST`` or ``request.GET`` had a ``"foo"`` key.
 
 ``has_key()``
-    Returns ``True`` or ``False``, designating whether ``request.GET`` or
-    ``request.POST`` has the given key.
+   Returns ``True`` or ``False``, designating whether ``request.GET`` or
+   ``request.POST`` has the given key.
 
 ``get_full_path()``
-    Returns the ``path``, plus an appended query string, if applicable.
+   Returns the ``path``, plus an appended query string, if applicable.
 
-    Example: ``"/music/bands/the_beatles/?print=true"``
+   Example: ``"/music/bands/the_beatles/?print=true"``
+
+``is_secure()``
+   Returns ``True`` if the request is secure; that is, if it was made with
+   HTTPS.
 
 QueryDict objects
 -----------------
@@ -337,9 +341,9 @@ hard-coded strings. If you use this technique, follow these guidelines:
 Methods
 -------
 
-``__init__(content='', mimetype=DEFAULT_MIME_TYPE)``
+``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
     Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``'text/html'``.
+    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 
     ``content`` can be an iterator or a string. If it's an iterator, it should
     return strings, and those strings will be joined together to form the
@@ -376,9 +380,13 @@ Methods
 
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
-``delete_cookie(key)``
+``delete_cookie(key, path='/', domain=None)``
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
+
+    The ``path`` and ``domain`` arguments are new in the Django development version.
+    Due to the way cookies work, ``path`` and ``domain`` should be the same
+    values you used in ``set_cookie()`` -- otherwise the cookie may not be deleted.
 
 ``content``
     Returns the content as a Python string, encoding it from a Unicode object

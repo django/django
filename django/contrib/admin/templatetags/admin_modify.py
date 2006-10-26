@@ -1,9 +1,7 @@
 from django import template
 from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
-from django.utils.html import escape
 from django.utils.text import capfirst
-from django.utils.functional import curry
 from django.db import models
 from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
@@ -162,8 +160,10 @@ class EditInlineNode(template.Node):
         context.push()
         if relation.field.rel.edit_inline == models.TABULAR:
             bound_related_object_class = TabularBoundRelatedObject
-        else:
+        elif relation.field.rel.edit_inline == models.STACKED:
             bound_related_object_class = StackedBoundRelatedObject
+        else:
+            bound_related_object_class = relation.field.rel.edit_inline
         original = context.get('original', None)
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
@@ -198,7 +198,7 @@ def filter_interface_script_maybe(bound_field):
     if f.rel and isinstance(f.rel, models.ManyToManyRel) and f.rel.filter_interface:
         return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
-              f.name, f.verbose_name, f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
+              f.name, f.verbose_name.replace('"', '\\"'), f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
     else:
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)

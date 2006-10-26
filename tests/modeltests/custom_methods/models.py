@@ -36,7 +36,7 @@ class Article(models.Model):
         # positional arguments to Article().
         return [self.__class__(*row) for row in cursor.fetchall()]
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a couple of Articles.
 >>> from datetime import date
 >>> a = Article(id=None, headline='Area man programs in Python', pub_date=date(2005, 7, 27))
@@ -55,4 +55,4 @@ False
 [<Article: Area man programs in Python>]
 >>> b.articles_from_same_day_2()
 [<Article: Area man programs in Python>]
-"""
+"""}

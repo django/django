@@ -1,4 +1,4 @@
-body { margin:0; padding:0; font-size:12px; font-family:"Lucida Grande","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#333; background:#fff; }
+body { margin:0; padding:0; font-size:12px; font-family:"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif; color:#333; background:#fff; }
 
 /* LINKS */
 a:link, a:visited { color: #5b80b2; text-decoration:none; }
@@ -31,7 +31,7 @@ fieldset { margin:0; padding:0; }
 blockquote { font-size:11px; color:#777; margin-left:2px; padding-left:10px; border-left:5px solid #ddd; }
 code, pre { font-family:"Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace; background:inherit; color:#666; font-size:11px; }
 pre.literal-block { margin:10px; background:#eee; padding:6px 8px; }
-code strong	{ color:#930; }
+code strong { color:#930; }
 hr { clear:both; color:#eee; background-color:#eee; height:1px; border:none; margin:0; padding:0; font-size:1px; line-height:1px; }
 
 /* TEXT STYLES & MODIFIERS */
@@ -81,7 +81,7 @@ table.orderable tbody tr td:first-child { padding-left:14px; background-image:ur
 table.orderable-initalized .order-cell, body>tr>td.order-cell { display:none; }
 
 /* FORM DEFAULTS */
-input, textarea, select	{ margin:2px 0; padding:2px 3px; vertical-align:middle; font-family:"Lucida Grande", Verdana, Arial, sans-serif; font-weight:normal; font-size:11px; }
+input, textarea, select { margin:2px 0; padding:2px 3px; vertical-align:middle; font-family:"Lucida Grande", Verdana, Arial, sans-serif; font-weight:normal; font-size:11px; }
 textarea { vertical-align:top !important; }
 input[type=text], input[type=password], textarea, select, .vTextField { border:1px solid #ccc; }
 
@@ -92,7 +92,7 @@ input[type=submit].default, .submit-row input.default { border:2px solid #5b80b2
 input[type=submit].default:active { background-image:url(../img/admin/default-bg-reverse.gif); background-position:top; }
 
 /* MODULES */
-.module	{ border:1px solid #ccc; margin-bottom:5px; background:white; }
+.module { border:1px solid #ccc; margin-bottom:5px; background:white; }
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre { padding-left:10px; padding-right:10px; }
 .module blockquote { margin-left:12px; }
 .module ul, .module ol { margin-left:1.5em; }

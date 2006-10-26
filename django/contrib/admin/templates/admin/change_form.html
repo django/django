@@ -11,8 +11,8 @@
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
      <a href="../../../">{% trans "Home" %}</a> &rsaquo;
-     <a href="../">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-     {% if add %}{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18"|escape }}{% endif %}
+     <a href="../">{{ opts.verbose_name_plural|capfirst|escape }}</a> &rsaquo;
+     {% if add %}{% trans "Add" %} {{ opts.verbose_name|escape }}{% else %}{{ original|truncatewords:"18"|escape }}{% endif %}
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
@@ -21,7 +21,7 @@
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post">{% block form_top %}{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if opts.admin.save_on_top %}{% submit_row %}{% endif %}

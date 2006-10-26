@@ -127,7 +127,7 @@ If the given URL is ``None``, Django will return an ``HttpResponseGone`` (410).
 This example redirects from ``/foo/<id>/`` to ``/bar/<id>/``::
 
     urlpatterns = patterns('django.views.generic.simple',
-        ('^foo/(?p<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/'}),
+        ('^foo/(?P<id>\d+)/$', 'redirect_to', {'url': '/bar/%(id)s/'}),
     )
 
 This example returns a 410 HTTP error for requests to ``/bar/``::
@@ -148,7 +148,8 @@ are views for displaying drilldown pages for date-based data.
 **Description:**
 
 A top-level index page showing the "latest" objects, by date. Objects with
-a date in the *future* are not included.
+a date in the *future* are not included unless you set ``allow_future`` to
+``True``.
 
 **Required arguments:**
 
@@ -183,7 +184,12 @@ a date in the *future* are not included.
       the view's template. See the `RequestContext docs`_.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -217,7 +223,8 @@ In addition to ``extra_context``, the template's context will be:
 **Description:**
 
 A yearly archive page showing all available months in a given year. Objects
-with a date in the *future* are not displayed.
+with a date in the *future* are not displayed unless you set ``allow_future``
+to ``True``.
 
 **Required arguments:**
 
@@ -263,7 +270,12 @@ with a date in the *future* are not displayed.
       this is ``False``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -296,7 +308,8 @@ In addition to ``extra_context``, the template's context will be:
 **Description:**
 
 A monthly archive page showing all objects in a given month. Objects with a
-date in the *future* are not displayed.
+date in the *future* are not displayed unless you set ``allow_future`` to
+``True``.
 
 **Required arguments:**
 
@@ -344,7 +357,12 @@ date in the *future* are not displayed.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -378,7 +396,7 @@ In addition to ``extra_context``, the template's context will be:
 **Description:**
 
 A weekly archive page showing all objects in a given week. Objects with a date
-in the *future* are not displayed.
+in the *future* are not displayed unless you set ``allow_future`` to ``True``.
 
 **Required arguments:**
 
@@ -420,7 +438,12 @@ in the *future* are not displayed.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -445,7 +468,8 @@ In addition to ``extra_context``, the template's context will be:
 **Description:**
 
 A day archive page showing all objects in a given day. Days in the future throw
-a 404 error, regardless of whether any objects exist for future days.
+a 404 error, regardless of whether any objects exist for future days, unless
+you set ``allow_future`` to ``True``.
 
 **Required arguments:**
 
@@ -499,7 +523,12 @@ a 404 error, regardless of whether any objects exist for future days.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -537,7 +566,9 @@ and today's date is used instead.
 
 **Description:**
 
-A page representing an individual object.
+A page representing an individual object. If the object has a date value in the
+future, the view will throw a 404 error by default, unless you set
+``allow_future`` to ``True``.
 
 **Required arguments:**
 
@@ -602,7 +633,12 @@ A page representing an individual object.
        to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
+    * ``allow_future``: A boolean specifying whether to include "future"
+      objects on this page, where "future" means objects in which the field
+      specified in ``date_field`` is greater than the current date/time. By
+      default, this is ``False``.
 
 **Template name:**
 
@@ -671,7 +707,7 @@ A page representing a list of objects.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 
@@ -783,7 +819,7 @@ A page representing an individual object.
        to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 

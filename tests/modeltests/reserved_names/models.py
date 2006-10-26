@@ -24,7 +24,7 @@ class Thing(models.Model):
     def __str__(self):
         return self.when
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> import datetime
 >>> day1 = datetime.date(2005, 1, 1)
 >>> day2 = datetime.date(2006, 2, 2)
@@ -53,4 +53,4 @@ b
 
 >>> Thing.objects.filter(where__month=1)
 [<Thing: a>]
-"""
+"""}

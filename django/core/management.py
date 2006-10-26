@@ -103,7 +103,6 @@ def get_sql_create(app):
     known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-
     for model in app_models:
         output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
@@ -147,7 +146,7 @@ def _get_sql_model_create(model, known_models=set()):
     table_output = []
     pending_references = {}
     for f in opts.fields:
-        if isinstance(f, models.ForeignKey):
+        if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
@@ -347,7 +346,7 @@ def get_sql_initial_data_for_model(model):
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            fp = open(sql_file)
+            fp = open(sql_file, 'U')
             for statement in statements.split(fp.read()):
                 if statement.strip():
                     output.append(statement + ";")
@@ -398,21 +397,11 @@ get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting Postg
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
-    "Returns a list of the CREATE INDEX SQL statements for the given app."
-    from django.db import backend, models
+    "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
+    from django.db import models
     output = []
-
     for model in models.get_models(app):
-        for f in model._meta.fields:
-            if f.db_index:
-                unique = f.unique and 'UNIQUE ' or ''
-                output.append(
-                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
-                    style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
-                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
-                )
+        output.extend(get_sql_indexes_for_model(model))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
@@ -639,13 +628,30 @@ def get_sql_evolution_check_for_dead_fields(klass, new_table_name):
         output.append( '-- end warning' )
     return output
 
+def get_sql_indexes_for_model(model):
+    "Returns the CREATE INDEX SQL statements for a single model"
+    from django.db import backend
+    output = []
+
+    for f in model._meta.fields:
+        if f.db_index:
+            unique = f.unique and 'UNIQUE ' or ''
+            output.append(
+                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_KEYWORD('ON') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
+                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+            )
+    return output
+
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-def syncdb():
+def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
     from django.db.models import signals
@@ -679,21 +685,22 @@ def syncdb():
     pending_references = {}
 
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         model_list = models.get_models(app)
         for model in model_list:
             # Create the model's database table, if it doesn't already exist.
+            if verbosity >= 2:
+                print "Processing %s.%s model" % (app_name, model._meta.object_name)
             if model._meta.db_table in table_list or model._meta.aka in table_list or len(set(model._meta.aka) & set(table_list))>0:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
             created_models.add(model)
             for refto, refs in references.items():
-                try:
-                    pending_references[refto].extend(refs)
-                except KeyError:
-                    pending_references[refto] = refs
+                pending_references.setdefault(refto, []).extend(refs)
             sql.extend(_get_sql_for_pending_references(model, pending_references))
-            print "Creating table %s" % model._meta.db_table
+            if verbosity >= 1:
+                print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
             table_list.append(model._meta.db_table)
@@ -702,7 +709,8 @@ def syncdb():
             if model in created_models:
                 sql = _get_many_to_many_sql_for_model(model)
                 if sql:
-                    print "Creating many-to-many tables for %s model" % model.__name__
+                    if verbosity >= 2:
+                        print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
                     for statement in sql:
                         cursor.execute(statement)
 
@@ -715,8 +723,12 @@ def syncdb():
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if verbosity >= 2:
+            print "Running post-sync handlers for application", app_name
         dispatcher.send(signal=signals.post_syncdb, sender=app,
-            app=app, created_models=created_models)
+            app=app, created_models=created_models,
+            verbosity=verbosity, interactive=interactive)
 
         # Install initial data for the app (but only if this is a model we've
         # just created)
@@ -724,13 +736,33 @@ def syncdb():
             if model in created_models:
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
-                    print "Installing initial data for %s model" % model._meta.object_name
+                    if verbosity >= 1:
+                        print "Installing initial data for %s.%s model" % (app_name, model._meta.object_name)
                     try:
                         for sql in initial_sql:
                             cursor.execute(sql)
                     except Exception, e:
-                        sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
-                                            (model._meta.object_name, e))
+                        sys.stderr.write("Failed to install initial SQL data for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
+                        transaction.rollback_unless_managed()
+                    else:
+                        transaction.commit_unless_managed()
+
+    # Install SQL indicies for all newly created models
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        for model in models.get_models(app):
+            if model in created_models:
+                index_sql = get_sql_indexes_for_model(model)
+                if index_sql:
+                    if verbosity >= 1:
+                        print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
+                    try:
+                        for sql in index_sql:
+                            cursor.execute(sql)
+                    except Exception, e:
+                        sys.stderr.write("Failed to install index for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
@@ -774,7 +806,7 @@ def diffsettings():
     # Inspired by Postfix's "postconf -n".
     from django.conf import settings, global_settings
 
-    user_settings = _module_to_dict(settings)
+    user_settings = _module_to_dict(settings._target)
     default_settings = _module_to_dict(global_settings)
 
     output = []
@@ -818,9 +850,10 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def reset(app):
+def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
+    from django.conf import settings
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -829,21 +862,26 @@ def reset(app):
     _check_for_validation_errors(app)
     sql_list = get_sql_reset(app)
 
-    confirm = raw_input("""
+    if interactive:
+        confirm = raw_input("""
 You have requested a database reset.
-This will IRREVERSIBLY DESTROY any data in your database.
+This will IRREVERSIBLY DESTROY any data for
+the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """)
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, settings.DATABASE_NAME))
+    else:
+        confirm = 'yes'
+
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
             for sql in sql_list:
                 cursor.execute(sql)
         except Exception, e:
-            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be reset. Possible reasons:
   * The database isn't running or isn't configured correctly.
-  * At least one of the database tables already exists.
+  * At least one of the database tables doesn't exist.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
 The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
@@ -1042,7 +1080,8 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.db import models
+    from django.conf import settings
+    from django.db import models, connection
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
@@ -1083,6 +1122,12 @@ def get_validation_errors(outfile, app=None):
                             e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
+
+            # Check that maxlength <= 255 if using older MySQL versions.
+            if settings.DATABASE_ENGINE == 'mysql':
+                db_version = connection.get_server_version()
+                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
+                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -1125,27 +1170,32 @@ def get_validation_errors(outfile, app=None):
 
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
             rel_query_name = f.related_query_name()
-            for r in rel_opts.fields:
-                if r.name == rel_name:
-                    e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                if r.name == rel_query_name:
-                    e.add(opts, "Reverse query name for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-            for r in rel_opts.many_to_many:
-                if r.name == rel_name:
-                    e.add(opts, "Accessor for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-                if r.name == rel_query_name:
-                    e.add(opts, "Reverse query name for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
-            for r in rel_opts.get_all_related_many_to_many_objects():
-                if r.field is not f:
+            # If rel_name is none, there is no reverse accessor.
+            # (This only occurs for symmetrical m2m relations to self).
+            # If this is the case, there are no clashes to check for this field, as
+            # there are no reverse descriptors for this field.
+            if rel_name is not None:
+                for r in rel_opts.fields:
+                    if r.name == rel_name:
+                        e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    if r.name == rel_query_name:
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                for r in rel_opts.many_to_many:
+                    if r.name == rel_name:
+                        e.add(opts, "Accessor for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    if r.name == rel_query_name:
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                for r in rel_opts.get_all_related_many_to_many_objects():
+                    if r.field is not f:
+                        if r.get_accessor_name() == rel_name:
+                            e.add(opts, "Accessor for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                        if r.get_accessor_name() == rel_query_name:
+                            e.add(opts, "Reverse query name for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                for r in rel_opts.get_all_related_objects():
                     if r.get_accessor_name() == rel_name:
-                        e.add(opts, "Accessor for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                        e.add(opts, "Accessor for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
                     if r.get_accessor_name() == rel_query_name:
-                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-            for r in rel_opts.get_all_related_objects():
-                if r.get_accessor_name() == rel_name:
-                    e.add(opts, "Accessor for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
-                if r.get_accessor_name() == rel_query_name:
-                    e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         # Check admin attribute.
         if opts.admin is not None:
@@ -1175,7 +1225,8 @@ def get_validation_errors(outfile, app=None):
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
-                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                            if not hasattr(cls, fn):
+                                e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
                         if fn not in opts.admin.list_display:
                             e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
@@ -1233,10 +1284,12 @@ def get_validation_errors(outfile, app=None):
 
     return len(e.errors)
 
-def validate(outfile=sys.stdout):
+def validate(outfile=sys.stdout, silent_success=False):
     "Validates all installed models."
     try:
         num_errors = get_validation_errors(outfile)
+        if silent_success and num_errors == 0:
+            return
         outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
     except ImproperlyConfigured:
         outfile.write("Skipping validation because things aren't configured properly.")
@@ -1259,7 +1312,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port, use_reloader=True):
+def runserver(addr, port, use_reloader=True, admin_media_dir=''):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1277,7 +1330,10 @@ def runserver(addr, port, use_reloader=True):
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with %s." % quit_command
         try:
-            run(addr, int(port), AdminMediaHandler(WSGIHandler()))
+            import django
+            path = admin_media_dir or django.__path__[0] + '/contrib/admin/media'
+            handler = AdminMediaHandler(WSGIHandler(), path)
+            run(addr, int(port), handler)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -1298,7 +1354,7 @@ def runserver(addr, port, use_reloader=True):
         autoreload.main(inner_run)
     else:
         inner_run()
-runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
+runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1380,6 +1436,29 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
+def test(app_labels, verbosity=1):
+    "Runs the test suite for the specified applications"
+    from django.conf import settings
+    from django.db.models import get_app, get_apps
+
+    if len(app_labels) == 0:
+        app_list = get_apps()
+    else:
+        app_list = [get_app(app_label) for app_label in app_labels]
+
+    test_path = settings.TEST_RUNNER.split('.')
+    # Allow for Python 2.5 relative paths
+    if len(test_path) > 1:
+        test_module_name = '.'.join(test_path[:-1])
+    else:
+        test_module_name = '.'
+    test_module = __import__(test_module_name, [],[],test_path[-1])
+    test_runner = getattr(test_module, test_path[-1])
+
+    test_runner(app_list, verbosity)
+test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
+test.args = '[--verbosity] ' + APP_ARGS
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
@@ -1405,6 +1484,7 @@ DEFAULT_ACTION_MAPPING = {
     'startproject': startproject,
     'syncdb': syncdb,
     'validate': validate,
+    'test':test,
 }
 
 NO_SQL_TRANSACTION = (
@@ -1455,8 +1535,15 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
+        help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
+    parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
+        type='choice', choices=['0', '1', '2'],
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Specifies the directory from which to serve admin media for runserver.'),
+
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1483,8 +1570,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
 
     if action == 'shell':
         action_mapping[action](options.plain is True)
-    elif action in ('syncdb', 'validate', 'diffsettings', 'dbshell'):
+    elif action in ('validate', 'diffsettings', 'dbshell'):
         action_mapping[action]()
+    elif action == 'syncdb':
+        action_mapping[action](int(options.verbosity), options.interactive)
     elif action == 'inspectdb':
         try:
             for line in action_mapping[action]():
@@ -1495,6 +1584,11 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
     elif action == 'createcachetable':
         try:
             action_mapping[action](args[1])
+        except IndexError:
+            parser.print_usage_and_exit()
+    elif action == 'test':
+        try:
+            action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
@@ -1512,11 +1606,12 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port, options.use_reloader)
+        action_mapping[action](addr, port, options.use_reloader, options.admin_media_path)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
         from django.db import models
+        validate(silent_success=True)
         try:
             mod_list = [models.get_app(app_label) for app_label in args[1:]]
         except ImportError, e:
@@ -1527,7 +1622,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
-            output = action_mapping[action](mod)
+            if action == 'reset':
+                output = action_mapping[action](mod, options.interactive)
+            else:
+                output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:

@@ -1,5 +1,5 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, resolve_variable
-from django.template import Library, Context, Node
+from django.template import Library, Node
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
 
@@ -50,12 +50,14 @@ class ExtendsNode(Node):
             if self.parent_name_expr:
                 error_msg += " Got this from the %r variable." % self.parent_name_expr #TODO nice repr.
             raise TemplateSyntaxError, error_msg
+        if hasattr(parent, 'render'):
+            return parent # parent is a Template object
         try:
             source, origin = find_template_source(parent, self.template_dirs)
         except TemplateDoesNotExist:
             raise TemplateSyntaxError, "Template %r cannot be extended, because it doesn't exist" % parent
         else:
-            return get_template_from_string(source, origin)
+            return get_template_from_string(source, origin, parent)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
@@ -125,7 +127,7 @@ def do_block(parser, token):
         if block_name in parser.__loaded_blocks:
             raise TemplateSyntaxError, "'%s' tag with name '%s' appears more than once" % (bits[0], block_name)
         parser.__loaded_blocks.append(block_name)
-    except AttributeError: # parser._loaded_blocks isn't a list yet
+    except AttributeError: # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]
     nodelist = parser.parse(('endblock',))
     parser.delete_first_token()
@@ -137,8 +139,9 @@ def do_extends(parser, token):
 
     This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
-    or ``{% extends variable %}`` uses the value of ``variable`` as the name
-    of the parent template to extend.
+    or ``{% extends variable %}`` uses the value of ``variable`` as either the
+    name of the parent template to extend (if it evaluates to a string,) or as
+    the parent tempate itelf (if it evaluates to a Template object).
     """
     bits = token.contents.split()
     if len(bits) != 2:

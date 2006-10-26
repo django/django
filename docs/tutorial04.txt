@@ -198,7 +198,7 @@ By default, the ``object_detail`` generic view uses a template called
 ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app name>/<module name>_list.html``. Thus, rename ``poll/index.html`` to
+``<app name>/<module name>_list.html``. Thus, rename ``polls/index.html`` to
 ``polls/poll_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
@@ -206,8 +206,8 @@ for the polls app, we manually specify a template name for the results view:
 ``template_name='polls/results.html'``. Otherwise, both views would use the same
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
-In previous versions of the tutorial, the templates have been provided with a context
-that contains the ``poll` and ``latest_poll_list`` context variables. However,
+In previous parts of the tutorial, the templates have been provided with a context
+that contains the ``poll`` and ``latest_poll_list`` context variables. However,
 the generic views provide the variables ``object`` and ``object_list`` as context.
 Therefore, you need to change your templates to match the new context variables.
 Go through your templates, and modify any reference to ``latest_poll_list`` to

@@ -10,8 +10,10 @@ include = lambda urlconf_module: [urlconf_module]
 def patterns(prefix, *tuples):
     pattern_list = []
     for t in tuples:
-        if type(t[1]) == list:
-            pattern_list.append(RegexURLResolver(t[0], t[1][0]))
+        regex, view_or_include = t[:2]
+        default_kwargs = t[2:]
+        if type(view_or_include) == list:
+            pattern_list.append(RegexURLResolver(regex, view_or_include[0], *default_kwargs))
         else:
-            pattern_list.append(RegexURLPattern(t[0], prefix and (prefix + '.' + t[1]) or t[1], *t[2:]))
+            pattern_list.append(RegexURLPattern(regex, prefix and (prefix + '.' + view_or_include) or view_or_include, *default_kwargs))
     return pattern_list

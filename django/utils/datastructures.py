@@ -14,6 +14,9 @@ class MergeDict(object):
                 pass
         raise KeyError
 
+    def __contains__(self, key):
+        return self.has_key(key)
+
     def get(self, key, default):
         try:
             return self[key]
@@ -187,17 +190,23 @@ class MultiValueDict(dict):
         "Returns a copy of this object."
         return self.__deepcopy__()
 
-    def update(self, other_dict):
-        "update() extends rather than replaces existing key lists."
-        if isinstance(other_dict, MultiValueDict):
-            for key, value_list in other_dict.lists():
-                self.setlistdefault(key, []).extend(value_list)
-        else:
-            try:
-                for key, value in other_dict.items():
-                    self.setlistdefault(key, []).append(value)
-            except TypeError:
-                raise ValueError, "MultiValueDict.update() takes either a MultiValueDict or dictionary"
+    def update(self, *args, **kwargs):
+        "update() extends rather than replaces existing key lists. Also accepts keyword args."
+        if len(args) > 1:
+            raise TypeError, "update expected at most 1 arguments, got %d", len(args)
+        if args:
+            other_dict = args[0]
+            if isinstance(other_dict, MultiValueDict):
+                for key, value_list in other_dict.lists():
+                    self.setlistdefault(key, []).extend(value_list)
+            else:
+                try:
+                    for key, value in other_dict.items():
+                        self.setlistdefault(key, []).append(value)
+                except TypeError:
+                    raise ValueError, "MultiValueDict.update() takes either a MultiValueDict or dictionary"
+        for key, value in kwargs.iteritems():
+            self.setlistdefault(key, []).append(value)
 
 class DotExpandedDict(dict):
     """

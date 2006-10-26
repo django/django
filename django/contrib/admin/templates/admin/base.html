@@ -6,6 +6,7 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% admin_media_prefix %}css/rtl.css{% endblock %}" />{% endif %}
 {% block extrastyle %}{% endblock %}
 {% block extrahead %}{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}
 
@@ -20,13 +21,13 @@
         <div id="branding">
         {% block branding %}{% endblock %}
         </div>
-        {% if not user.is_anonymous %}{% if user.is_staff %}
+        {% if user.is_authenticated and user.is_staff %}
         <div id="user-tools">{% trans 'Welcome,' %} <strong>{% if user.first_name %}{{ user.first_name|escape }}{% else %}{{ user.username }}{% endif %}</strong>. {% block userlinks %}<a href="doc/">{% trans 'Documentation' %}</a> / <a href="password_change/">{% trans 'Change password' %}</a> / <a href="logout/">{% trans 'Log out' %}</a>{% endblock %}</div>
-        {% endif %}{% endif %}
+        {% endif %}
         {% block nav-global %}{% endblock %}
     </div>
     <!-- END Header -->
-    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>{% endblock %}
+    {% block breadcrumbs %}<div class="breadcrumbs"><a href="/">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title|escape }}{% endif %}</div>{% endblock %}
     {% endif %}
 
         {% if messages %}
@@ -36,7 +37,7 @@
     <!-- Content -->
     <div id="content" class="{% block coltype %}colM{% endblock %}">
         {% block pretitle %}{% endblock %}
-        {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+        {% block content_title %}{% if title %}<h1>{{ title|escape }}</h1>{% endif %}{% endblock %}
         {% block content %}{{ content }}{% endblock %}
         {% block sidebar %}{% endblock %}
         <br class="clear" />

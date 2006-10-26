@@ -28,7 +28,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a couple of Publications.
 >>> p1 = Publication(id=None, title='The Python Journal')
 >>> p1.save()
@@ -231,4 +231,4 @@ API_TESTS = """
 >>> p1.article_set.all()
 [<Article: NASA uses Python>]
 
-"""
+"""}

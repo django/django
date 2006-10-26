@@ -15,7 +15,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':r"""
 # Create a couple of Articles.
 >>> from datetime import datetime
 >>> a1 = Article(headline='Article 1', pub_date=datetime(2005, 7, 26))
@@ -161,13 +161,14 @@ DoesNotExist: Article matching query does not exist.
 <Article: Article 1>
 
 # Underscores and percent signs have special meaning in the underlying
-# database library, but Django handles the quoting of them automatically.
+# SQL code, but Django handles the quoting of them automatically.
 >>> a8 = Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
 >>> a8.save()
 >>> Article.objects.filter(headline__startswith='Article')
 [<Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.filter(headline__startswith='Article_')
 [<Article: Article_ with underscore>]
+
 >>> a9 = Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
 >>> a9.save()
 >>> Article.objects.filter(headline__startswith='Article')
@@ -182,4 +183,12 @@ DoesNotExist: Article matching query does not exist.
 [<Article: Article% with percent sign>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 >>> Article.objects.exclude(headline="Article 7")
 [<Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 1>]
-"""
+
+# Backslashes also have special meaning in the underlying SQL code, but Django
+# automatically quotes them appropriately.
+>>> a10 = Article(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
+>>> a10.save()
+>>> Article.objects.filter(headline__contains='\\')
+[<Article: Article with \ backslash>]
+
+"""}

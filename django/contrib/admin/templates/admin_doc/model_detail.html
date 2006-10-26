@@ -9,13 +9,13 @@
 </style>
 {% endblock %}
 
-{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../../">Documentation</a> &rsaquo; <a href="../">Models</a> &rsaquo; {{ name }}</div>{% endblock %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="../../../">Home</a> &rsaquo; <a href="../../">Documentation</a> &rsaquo; <a href="../">Models</a> &rsaquo; {{ name|escape }}</div>{% endblock %}
 
-{% block title %}Model: {{ name }}{% endblock %}
+{% block title %}Model: {{ name|escape }}{% endblock %}
 
 {% block content %}
 <div id="content-main">
-<h1>{{ summary }}</h1>
+<h1>{{ summary|escape }}</h1>
 
 {% if description %}
   <p>{% filter escape|linebreaksbr %}{% trans description %}{% endfilter %}</p>

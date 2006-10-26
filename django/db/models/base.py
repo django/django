@@ -4,8 +4,7 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
-from django.db.models.related import RelatedObject
-from django.db.models.query import orderlist2sql, delete_objects
+from django.db.models.query import delete_objects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend, transaction
 from django.db.models import signals
@@ -45,7 +44,7 @@ class ModelBase(type):
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Bail out early if we have already created this class.
-        m = get_model(new_class._meta.app_label, name)
+        m = get_model(new_class._meta.app_label, name, False)
         if m is not None:
             return m
 
@@ -69,7 +68,7 @@ class ModelBase(type):
         # the first class for this model to register with the framework. There
         # should only be one class for each model, so we must always return the
         # registered version.
-        return get_model(new_class._meta.app_label, name)
+        return get_model(new_class._meta.app_label, name, False)
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -177,11 +176,12 @@ class Model(object):
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
                 db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
-                cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                    (backend.quote_name(self._meta.db_table),
-                    ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
-                    backend.quote_name(self._meta.pk.column)),
-                    db_values + [pk_val])
+                if db_values:
+                    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
+                        (backend.quote_name(self._meta.db_table),
+                        ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
+                        backend.quote_name(self._meta.pk.column)),
+                        db_values + [pk_val])
             else:
                 record_exists = False
         if not pk_set or not record_exists:

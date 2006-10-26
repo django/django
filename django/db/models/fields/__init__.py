@@ -5,6 +5,7 @@ from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
+from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
@@ -80,7 +81,7 @@ class Field(object):
         self.prepopulate_from = prepopulate_from
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
         self.unique_for_year = unique_for_year
-        self.choices = choices or []
+        self._choices = choices or []
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
@@ -325,6 +326,14 @@ class Field(object):
     def bind(self, fieldmapping, original, bound_field_class):
         return bound_field_class(self, fieldmapping, original)
 
+    def _get_choices(self):
+        if hasattr(self._choices, 'next'):
+            choices, self._choices = tee(self._choices)
+            return choices
+        else:
+            return self._choices
+    choices = property(_get_choices)
+
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
@@ -368,8 +377,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value in ('t', 'True'): return True
-        if value in ('f', 'False'): return False
+        if value in ('t', 'True', '1'): return True
+        if value in ('f', 'False', '0'): return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):

@@ -66,8 +66,8 @@ Fields
       long and can contain any character. See the "Passwords" section below.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
-    * ``is_active`` -- Boolean. Designates whether this user can log into the
-      Django admin. Set this to ``False`` instead of deleting accounts.
+    * ``is_active`` -- Boolean. Designates whether this account can be used
+      to log in. Set this flag to ``False`` instead of deleting accounts.
     * ``is_superuser`` -- Boolean. Designates that this user has all permissions
       without explicitly assigning them.
     * ``last_login`` -- A datetime of the user's last login. Is set to the
@@ -82,20 +82,26 @@ Methods
 ``user_permissions``. ``User`` objects can access their related
 objects in the same way as any other `Django model`_::
 
-    myuser.objects.groups = [group_list]
-    myuser.objects.groups.add(group, group,...)
-    myuser.objects.groups.remove(group, group,...)
-    myuser.objects.groups.clear()
-    myuser.objects.permissions = [permission_list]
-    myuser.objects.permissions.add(permission, permission, ...)
-    myuser.objects.permissions.remove(permission, permission, ...]
-    myuser.objects.permissions.clear()
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group,...)
+    myuser.groups.remove(group, group,...)
+    myuser.groups.clear()
+    myuser.permissions = [permission_list]
+    myuser.permissions.add(permission, permission, ...)
+    myuser.permissions.remove(permission, permission, ...]
+    myuser.permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
 
     * ``is_anonymous()`` -- Always returns ``False``. This is a way of
-      comparing ``User`` objects to anonymous users.
+      differentiating ``User`` and ``AnonymousUser`` objects. Generally, you
+      should prefer using ``is_authenticated()`` to this method.
+
+    * ``is_authenticated()`` -- Always returns ``True``. This is a way to
+      tell if the user has been authenticated. This does not imply any 
+      permissions, and doesn't check if the user is active - it only indicates
+      that the user has provided a valid username and password.
 
     * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
       with a space in between.
@@ -116,13 +122,16 @@ custom methods:
 
     * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
       permission, where perm is in the format ``"package.codename"``.
+      If the user is inactive, this method will always return ``False``.
 
     * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
       specified permissions, where each perm is in the format
-      ``"package.codename"``.
+      ``"package.codename"``. If the user is inactive, this method will 
+      always return ``False``.
 
     * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
       any permissions in the given package (the Django app label).
+      If the user is inactive, this method will always return ``False``.
 
     * ``get_and_delete_messages()`` -- Returns a list of ``Message`` objects in
       the user's queue and deletes the messages from the queue.
@@ -219,6 +228,7 @@ the ``django.contrib.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
+    * ``is_authenticated()`` returns ``False`` instead of ``True``.
     * ``has_perm()`` always returns ``False``.
     * ``set_password()``, ``check_password()``, ``save()``, ``delete()``,
       ``set_groups()`` and ``set_permissions()`` raise ``NotImplementedError``.
@@ -254,12 +264,12 @@ Once you have those middlewares installed, you'll be able to access
 ``request.user`` in views. ``request.user`` will give you a ``User`` object
 representing the currently logged-in user. If a user isn't currently logged in,
 ``request.user`` will be set to an instance of ``AnonymousUser`` (see the
-previous section). You can tell them apart with ``is_anonymous()``, like so::
+previous section). You can tell them apart with ``is_authenticated()``, like so::
 
-    if request.user.is_anonymous():
-        # Do something for anonymous users.
+    if request.user.is_authenticated():
+        # Do something for authenticated users.
     else:
-        # Do something for logged-in users.
+        # Do something for anonymous users.
 
 .. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
 .. _session documentation: http://www.djangoproject.com/documentation/sessions/
@@ -278,7 +288,10 @@ password is invalid, ``authenticate()`` returns ``None``. Example::
     from django.contrib.auth import authenticate
     user = authenticate(username='john', password='secret')
     if user is not None:
-        print "You provided a correct username and password!"
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
     else:
         print "Your username and password were incorrect."
 
@@ -296,10 +309,13 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            # Redirect to a success page.
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
         else:
-            # Return an error message.
+            # Return an 'invalid login' error message.
 
 How to log a user out
 ---------------------
@@ -323,19 +339,19 @@ The raw way
 ~~~~~~~~~~~
 
 The simple, raw way to limit access to pages is to check
-``request.user.is_anonymous()`` and either redirect to a login page::
+``request.user.is_authenticated()`` and either redirect to a login page::
 
     from django.http import HttpResponseRedirect
 
     def my_view(request):
-        if request.user.is_anonymous():
+        if not request.user.is_authenticated():
             return HttpResponseRedirect('/login/?next=%s' % request.path)
         # ...
 
 ...or display an error message::
 
     def my_view(request):
-        if request.user.is_anonymous():
+        if not request.user.is_authenticated():
             return render_to_response('myapp/login_error.html')
         # ...
 
@@ -439,7 +455,7 @@ For example, this view checks to make sure the user is logged in and has the
 permission ``polls.can_vote``::
 
     def my_view(request):
-        if request.user.is_anonymous() or not request.user.has_perm('polls.can_vote'):
+        if not (request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
             return HttpResponse("You can't vote in this poll.")
         # ...
 
@@ -450,6 +466,10 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
     def my_view(request):
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+
+We're using this particular test as a relatively simple example. However, if
+you just want to test whether a permission is available to a user, you can use
+the ``permission_required()`` decorator, described later in this document.
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
@@ -482,6 +502,34 @@ Example in Python 2.4 syntax::
     @user_passes_test(lambda u: u.has_perm('polls.can_vote'), login_url='/login/')
     def my_view(request):
         # ...
+
+The permission_required decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+It's a relatively common task to check whether a user has a particular
+permission. For that reason, Django provides a shortcut for that case: the
+``permission_required()`` decorator. Using this decorator, the earlier example
+can be written as::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote')(my_view)
+
+Note that ``permission_required()`` also takes an optional ``login_url``
+parameter. Example::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+As in the ``login_required`` decorator, ``login_url`` defaults to
+``'/accounts/login/'``.
 
 Limiting access to generic views
 --------------------------------
@@ -605,10 +653,10 @@ Users
 The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
-    {% if user.is_anonymous %}
-        <p>Welcome, new user. Please log in.</p>
-    {% else %}
+    {% if user.is_authenticated %}
         <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+    {% else %}
+        <p>Welcome, new user. Please log in.</p>
     {% endif %}
 
 Permissions
@@ -672,7 +720,7 @@ timestamps.
 Messages are used by the Django admin after successful actions. For example,
 ``"The poll Foo was created successfully."`` is a message.
 
-The API is simple::
+The API is simple:
 
     * To create a new message, use
       ``user_obj.message_set.create(message='message_text')``.

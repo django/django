@@ -131,6 +131,9 @@ class RelatedObject(object):
         # many-to-many objects. It uses the lower-cased object_name + "_set",
         # but this can be overridden with the "related_name" option.
         if self.field.rel.multiple:
+            # If this is a symmetrical m2m relation on self, there is no reverse accessor.
+            if getattr(self.field.rel, 'symmetrical', False) and self.model == self.parent_model:
+                return None
             return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
         else:
             return self.field.rel.related_name or (self.opts.object_name.lower())

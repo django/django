@@ -15,7 +15,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # prepare a list of objects for pagination
 >>> from datetime import datetime
 >>> for x in range(1, 10):
@@ -64,4 +64,4 @@ True
 >>> paginator.last_on_page(1)
 9
 
-"""
+"""}

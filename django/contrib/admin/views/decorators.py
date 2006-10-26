@@ -46,7 +46,7 @@ def staff_member_required(view_func):
     member, displaying the login page if necessary.
     """
     def _checklogin(request, *args, **kwargs):
-        if not request.user.is_anonymous() and request.user.is_staff:
+        if request.user.is_authenticated() and request.user.is_staff:
             # The user is valid. Continue to the admin page.
             if request.POST.has_key('post_data'):
                 # User must have re-authenticated through a different window
@@ -87,7 +87,7 @@ def staff_member_required(view_func):
 
         # The user data is correct; log in the user in and continue.
         else:
-            if user.is_staff:
+            if user.is_active and user.is_staff:
                 login(request, user)
                 # TODO: set last_login with an event.
                 user.last_login = datetime.datetime.now()

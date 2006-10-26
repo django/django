@@ -1,7 +1,8 @@
 from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
-import md5, os
+import md5
+import re
 
 class CommonMiddleware(object):
     """
@@ -44,7 +45,7 @@ class CommonMiddleware(object):
         if new_url != old_url:
             # Redirect
             if new_url[0]:
-                newurl = "%s://%s%s" % (os.environ.get('HTTPS') == 'on' and 'https' or 'http', new_url[0], new_url[1])
+                newurl = "%s://%s%s" % (request.is_secure() and 'https' or 'http', new_url[0], new_url[1])
             else:
                 newurl = new_url[1]
             if request.GET:
@@ -61,11 +62,12 @@ class CommonMiddleware(object):
                 # send a note to the managers.
                 domain = http.get_host(request)
                 referer = request.META.get('HTTP_REFERER', None)
-                is_internal = referer and (domain in referer)
+                is_internal = _is_internal_request(domain, referer)
                 path = request.get_full_path()
                 if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
+                    ua = request.META.get('HTTP_USER_AGENT', '<none>')
                     mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                        "Referrer: %s\nRequested URL: %s\n" % (referer, request.get_full_path()))
+                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\n" % (referer, request.get_full_path(), ua))
                 return response
 
         # Use ETags, if requested.
@@ -87,3 +89,8 @@ def _is_ignorable_404(uri):
         if uri.endswith(end):
             return True
     return False
+
+def _is_internal_request(domain, referer):
+    "Return true if the referring URL is the same domain as the current request"
+    # Different subdomains are treated as different domains.
+    return referer is not None and re.match("^https?://%s/" % re.escape(domain), referer)

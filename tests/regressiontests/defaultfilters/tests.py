@@ -15,6 +15,9 @@ r"""
 >>> addslashes('"double quotes" and \'single quotes\'')
 '\\"double quotes\\" and \\\'single quotes\\\''
 
+>>> addslashes(r'\ : backslashes, too')
+'\\\\ : backslashes, too'
+
 >>> capfirst('hello world')
 'Hello world'
 
@@ -230,6 +233,9 @@ False
 # real testing of time() is done in dateformat.py
 >>> time(datetime.time(13), "h")
 '01'
+
+>>> time(datetime.time(0), "h")
+'12'
 
 # real testing is done in timesince.py, where we can provide our own 'now'
 >>> timesince(datetime.datetime.now() - datetime.timedelta(1))

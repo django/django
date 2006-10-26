@@ -114,7 +114,7 @@ class CommentListNode(template.Node):
         comment_list = get_list_function(**kwargs).order_by(self.ordering + 'submit_date').select_related()
 
         if not self.free:
-            if context.has_key('user') and not context['user'].is_anonymous():
+            if context.has_key('user') and context['user'].is_authenticated():
                 user_id = context['user'].id
                 context['user_can_moderate_comments'] = Comment.objects.user_is_moderator(context['user'])
             else:

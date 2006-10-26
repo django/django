@@ -2,11 +2,14 @@
 The "contrib" add-ons
 =====================
 
-Django aims to follow Python's "batteries included" philosophy. It ships with a
-variety of extra, optional tools that solve common Web-development problems.
+Django aims to follow Python's `"batteries included" philosophy`_. It ships
+with a variety of extra, optional tools that solve common Web-development
+problems.
 
 This code lives in ``django/contrib`` in the Django distribution. Here's a
 rundown of the packages in ``contrib``:
+
+.. _"batteries included" philosophy: http://docs.python.org/tut/node12.html#batteries-included
 
 admin
 =====
@@ -149,6 +152,15 @@ one or more sites.
 See the `sites documentation`_.
 
 .. _sites documentation: http://www.djangoproject.com/documentation/sites/
+
+sitemaps
+========
+
+A framework for generating Google sitemap XML files.
+
+See the `sitemaps documentation`_.
+
+.. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
 
 syndication
 ===========

@@ -46,6 +46,7 @@ LANGUAGES = (
     ('en', gettext_noop('English')),
     ('es', gettext_noop('Spanish')),
     ('es_AR', gettext_noop('Argentinean Spanish')),
+    ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
@@ -55,6 +56,7 @@ LANGUAGES = (
     ('ja', gettext_noop('Japanese')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
+    ('pl', gettext_noop('Polish')),
     ('pt-br', gettext_noop('Brazilian')),
     ('ro', gettext_noop('Romanian')),
     ('ru', gettext_noop('Russian')),
@@ -62,6 +64,8 @@ LANGUAGES = (
     ('sl', gettext_noop('Slovenian')),
     ('sr', gettext_noop('Serbian')),
     ('sv', gettext_noop('Swedish')),
+    ('ta', gettext_noop('Tamil')),
+    ('tr', gettext_noop('Turkish')),
     ('uk', gettext_noop('Ukrainian')),
     ('zh-cn', gettext_noop('Simplified Chinese')),
     ('zh-tw', gettext_noop('Traditional Chinese')),
@@ -220,10 +224,6 @@ YEAR_MONTH_FORMAT = 'F Y'
 # http://www.djangoproject.com/documentation/templates/#now
 MONTH_DAY_FORMAT = 'F j'
 
-# Whether to enable Psyco, which optimizes Python code. Requires Psyco.
-# http://psyco.sourceforge.net/
-ENABLE_PSYCO = False
-
 # Do you want to manage transactions manually?
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
@@ -251,6 +251,7 @@ MIDDLEWARE_CLASSES = (
 SESSION_COOKIE_NAME = 'sessionid'         # Cookie name. This can be whatever you want.
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2 # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_DOMAIN = None              # A string like ".lawrence.com", or None for standard domain cookie.
+SESSION_COOKIE_SECURE = False             # Whether the session cookie should be secure (https:// only).
 SESSION_SAVE_EVERY_REQUEST = False        # Whether to save the session data on every request.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # Whether sessions expire when a user closes his browser.
 
@@ -268,6 +269,10 @@ CACHE_MIDDLEWARE_KEY_PREFIX = ''
 ####################
 
 COMMENTS_ALLOW_PROFANITIES = False
+
+# The profanities that will trigger a validation error in the
+# 'hasNoProfanities' validator. All of these should be in lowercase.
+PROFANITIES_LIST = ('asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit')
 
 # The group ID that designates which users are banned.
 # Set to None if you're not using it.
@@ -294,3 +299,14 @@ BANNED_IPS = ()
 ##################
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+
+###########
+# TESTING #
+###########
+
+# The name of the method to use to invoke the test suite
+TEST_RUNNER = 'django.test.simple.run_tests'
+
+# The name of the database to use for testing purposes.
+# If None, a name of 'test_' + DATABASE_NAME will be assumed
+TEST_DATABASE_NAME = None

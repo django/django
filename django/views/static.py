@@ -1,5 +1,4 @@
 from django.template import loader
-from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseNotModified
 from django.template import Template, Context, TemplateDoesNotExist
 import mimetypes
@@ -82,7 +81,7 @@ def directory_index(path, fullpath):
     try:
         t = loader.get_template('static/directory_index')
     except TemplateDoesNotExist:
-        t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE)
+        t = Template(DEFAULT_DIRECTORY_INDEX_TEMPLATE, name='Default directory index template')
     files = []
     for f in os.listdir(fullpath):
         if not f.startswith('.'):

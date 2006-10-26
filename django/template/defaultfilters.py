@@ -15,7 +15,7 @@ register = Library()
 
 def addslashes(value):
     "Adds slashes - useful for passing strings to JavaScript, for example."
-    return value.replace('"', '\\"').replace("'", "\\'")
+    return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
 
 def capfirst(value):
     "Capitalizes the first character of the value"
@@ -133,7 +133,7 @@ def wordwrap(value, arg):
     """
     Wraps words at specified line length
 
-    Argument: number of words to wrap the text at.
+    Argument: number of characters to wrap the text at.
     """
     from django.utils.text import wrap
     return wrap(str(value), int(arg))
@@ -339,7 +339,7 @@ def date(value, arg=None):
 def time(value, arg=None):
     "Formats a time according to the given format"
     from django.utils.dateformat import time_format
-    if not value:
+    if value in (None, ''):
         return ''
     if arg is None:
         arg = settings.TIME_FORMAT
@@ -437,8 +437,8 @@ def pluralize(value, arg='s'):
     is used instead. If the provided argument contains a comma, the text before
     the comma is used for the singular case.
     """
-    if not ',' in arg: 
-	    arg = ',' + arg
+    if not ',' in arg:
+        arg = ',' + arg
     bits = arg.split(',')
     if len(bits) > 2:
         return ''

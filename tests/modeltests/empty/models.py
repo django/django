@@ -10,7 +10,7 @@ from django.db import models
 class Empty(models.Model):
     pass
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> m = Empty()
 >>> m.id
 >>> m.save()
@@ -20,5 +20,7 @@ API_TESTS = """
 2
 >>> m.id is not None
 True
+>>> existing = Empty(m.id)
+>>> existing.save()
 
-"""
+"""}

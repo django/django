@@ -1,12 +1,13 @@
 {% load admin_modify %}
 <fieldset class="module">
-   <h2>{{ bound_related_object.relation.opts.verbose_name_plural|capfirst }}</h2><table>
+   <h2>{{ bound_related_object.relation.opts.verbose_name_plural|capfirst|escape }}</h2><table>
    <thead><tr>
    {% for fw in bound_related_object.field_wrapper_list %}
       {% if fw.needs_header %}
-         <th{{ fw.header_class_attribute }}>{{ fw.field.verbose_name|capfirst }}</th>
+         <th{{ fw.header_class_attribute }}>{{ fw.field.verbose_name|capfirst|escape }}</th>
       {% endif %}
    {% endfor %}
+   </tr></thead>
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
       {% if change %}{% if original_row_needed %}
          {% if fcw.obj.original %}

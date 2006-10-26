@@ -22,7 +22,7 @@ def template_validator(request):
         new_data = request.POST.copy()
         errors = manipulator.get_validation_errors(new_data)
         if not errors:
-            request.user.add_message('The template is valid.')
+            request.user.message_set.create(message='The template is valid.')
     return render_to_response('admin/template_validator.html', {
         'title': 'Template validator',
         'form': forms.FormWrapper(manipulator, new_data, errors),
@@ -32,7 +32,7 @@ template_validator = staff_member_required(template_validator)
 class TemplateValidator(forms.Manipulator):
     def __init__(self, settings_modules):
         self.settings_modules = settings_modules
-        site_list = Site.objects.get_in_bulk(settings_modules.keys()).values()
+        site_list = Site.objects.in_bulk(settings_modules.keys()).values()
         self.fields = (
             forms.SelectField('site', is_required=True, choices=[(s.id, s.name) for s in site_list]),
             forms.LargeTextField('template', is_required=True, rows=25, validator_list=[self.isValidTemplate]),

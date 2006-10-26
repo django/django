@@ -192,6 +192,14 @@ documentation.
 
 .. _serving static files: http://www.djangoproject.com/documentation/static_files/
 
+Turning off auto-reload
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To disable auto-reloading of code while the development server is running, use the
+``--noreload`` option, like so::
+
+    django-admin.py runserver --noreload
+
 shell
 -----
 
@@ -284,6 +292,15 @@ this command to install the default apps.
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
 
+test
+----
+
+**New in Django development version**
+
+Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
+
+.. _testing django applications: ../testing/
+
 validate
 --------
 
@@ -330,6 +347,20 @@ setting the Python path for you.
 Displays a help message that includes a terse list of all available actions and
 options.
 
+--noinput
+---------
+
+**New in Django development version**
+
+Inform django-admin that the user should NOT be prompted for any input. Useful
+if the django-admin script will be executed as an unattended, automated
+script.
+
+--noreload
+----------
+
+Disable the use of the auto-reloader when running the development server.
+
 --version
 ---------
 
@@ -339,6 +370,32 @@ Example output::
 
     0.9.1
     0.9.1 (SVN)
+
+--verbosity
+-----------
+
+**New in Django development version**
+
+Example usage::
+
+    django-admin.py syncdb --verbosity=2
+
+Verbosity determines the amount of notification and debug information that 
+will be printed to the console. '0' is no output, '1' is normal output,
+and `2` is verbose output.
+
+--adminmedia
+------------
+
+**New in Django development version**
+
+Example usage::
+    django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
+
+Tells Django where to find the various CSS and JavaScript files for the admin
+interface when running the development server. Normally these files are served
+out of the Django source tree, but because some designers customize these files
+for their site, this option allows you to test against custom versions.
 
 Extra niceties
 ==============

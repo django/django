@@ -16,12 +16,17 @@ hours to take a complicated Web application from concept to public launch.
 At the same time, the World Online Web developers have consistently been
 perfectionists when it comes to following best practices of Web development.
 
-Thus, Django was designed not only to allow fast Web development, but
-*best-practice* Web development.
+In fall 2003, the World Online developers (Adrian Holovaty and Simon Willison)
+ditched PHP and began using Python to develop its Web sites. As they built
+intensive, richly interactive sites such as Lawrence.com, they began to extract
+a generic Web development framework that let them build Web applications more
+and more quickly. They tweaked this framework constantly, adding improvements
+over two years.
 
-Django would not be possible without a whole host of open-source projects --
-`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to
-be able to give something back to the open-source community.
+In summer 2005, World Online decided to open-source the resulting software,
+Django. Django would not be possible without a whole host of open-source
+projects -- `Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're
+thrilled to be able to give something back to the open-source community.
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -42,8 +47,8 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 Is Django stable?
 -----------------
 
-Yes. World Online has been using Django for more than two years. Sites built on
-Django have weathered traffic spikes of over one million hits an hour and a
+Yes. World Online has been using Django for more than three years. Sites built
+on Django have weathered traffic spikes of over one million hits an hour and a
 number of Slashdottings. Yes, it's quite stable.
 
 Does Django scale?
@@ -98,10 +103,9 @@ Lawrence, Kansas, USA.
     On IRC, Simon goes by ``SimonW``.
 
 `Wilson Miner`_
-    Wilson's design-fu makes us all look like rock stars. When not sneaking
-    into apartment complex swimming pools, he's the Commercial Development
-    Director for World Online, which means he makes the money that pays all our
-    paychecks. He lives in Lawrence, Kansas.
+    Wilson's design-fu makes us all look like rock stars. By day, he's an
+    interactive designer for `Apple`. Don't ask him what he's working on, or
+    he'll have to kill you. He lives in San Francisco.
 
     On IRC, Wilson goes by ``wilsonian``.
 
@@ -113,6 +117,7 @@ Lawrence, Kansas, USA.
 .. _`simon.incutio.com`: http://simon.incutio.com/
 .. _`Jacob Kaplan-Moss`: http://www.jacobian.org/
 .. _`Wilson Miner`: http://www.wilsonminer.com/
+.. _`Apple`: http://www.apple.com/
 
 Which sites use Django?
 -----------------------
@@ -156,7 +161,7 @@ logical to us.
 -----------------------------------------------------
 
 We're well aware that there are other awesome Web frameworks out there, and
-we're not adverse to borrowing ideas where appropriate. However, Django was
+we're not averse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X>" does it is not going to be sufficient reason
 to add a given feature to Django.
@@ -222,9 +227,7 @@ When will you release Django 1.0?
 
 Short answer: When we're comfortable with Django's APIs, have added all
 features that we feel are necessary to earn a "1.0" status, and are ready to
-begin maintaining backwards compatibility. This should happen in a couple of
-months or so, although it's entirely possible that it could happen earlier.
-That translates into summer 2006.
+begin maintaining backwards compatibility. 
 
 The merging of Django's `magic-removal branch`_ went a long way toward Django
 1.0.
@@ -250,6 +253,16 @@ versions of those ReST documents, so the docs on the Django site may offer more
 information than the docs that come with the latest Django release.
 
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
+
+Where can I find Django developers for hire?
+--------------------------------------------
+
+Consult our `developers for hire page`_ for a list of Django developers who
+would be happy to help you.
+
+You might also be interested in posting a job to http://www.gypsyjobs.com/ .
+
+.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
 
 Installation questions
 ======================
@@ -297,6 +310,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
+
+Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
+----------------------------------------------------------------------------------------
+
+No. Django itself is guaranteed to work with any version of Python from 2.3
+and higher.
+
+If you use a Python version newer than 2.3, you will, of course, be able to
+take advantage of newer Python features in your own code, along with the speed
+improvements and other optimizations that have been made to the Python language
+itself. But the Django framework itself should work equally well on 2.3 as it
+does on 2.4 or 2.5.
 
 Do I have to use mod_python?
 ----------------------------
@@ -472,7 +497,7 @@ specify an object to edit or delete.
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
-We try to avoid adding special cases in the Django code to accomodate all the
+We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
 statements that do what you want to do. The initial data files are executed in
@@ -535,13 +560,26 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+How can I prevent the cache middleware from caching the admin site?
+-------------------------------------------------------------------
+
+Set the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
+`cache documentation`_ for more information.
+
+.. _cache documentation: ../cache/#the-per-site-cache
+
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
-At this point, you can't do this. But it's an oft-requested feature, so we're
-discussing how it can be implemented. The problem is we don't want to couple
-the model layer with the admin layer with the request layer (to get the current
-user). It's a tricky problem.
+At this point, Django doesn't have an official way to do this. But it's an oft-requested
+feature, so we're discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current user). It's a
+tricky problem.
+
+One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
+unofficial solution, and there's no guarantee it won't break at some point.
+
+.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
 How do I limit admin access so that objects can only be edited by the users who created them?
 ---------------------------------------------------------------------------------------------
@@ -597,12 +635,35 @@ like to make should be possible by editing the stylesheet. We've got a
 How do I create users without having to edit password hashes?
 -------------------------------------------------------------
 
-We don't recommend you create users via the admin interface, because at the
-moment it requires you to edit password hashes manually. (Passwords are hashed
-using one-way hash algorithms for security; there's currently no Web interface
-for changing passwords by entering the actual password rather than the hash.)
+If you'd like to use the admin site to create users, upgrade to the Django
+development version, where this problem was fixed on Aug. 4, 2006.
 
-To create a user, you'll have to use the Python API. See `creating users`_ for
-full info.
+You can also use the Python API. See `creating users`_ for full info.
 
 .. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+
+Contributing code
+=================
+
+How can I get started contributing code to Django?
+--------------------------------------------------
+
+Thanks for asking! We've written an entire document devoted to this question.
+It's titled `Contributing to Django`_.
+
+.. _Contributing to Django: http://www.djangoproject.com/documentation/contributing/
+
+I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
+--------------------------------------------------------------------------------------------
+
+Don't worry: We're not ignoring you!
+
+It's important to understand there is a difference between "a ticket is being
+ignored" and "a ticket has not been attended to yet." Django's ticket system
+contains hundreds of open tickets, of various degrees of impact on end-user
+functionality, and Django's developers have to review and prioritize.
+
+Besides, if your feature request stands no chance of inclusion in Django, we
+won't ignore it -- we'll just close the ticket. So if your ticket is still
+open, it doesn't mean we're ignoring you; it just means we haven't had time to
+look at it yet.

@@ -1,5 +1,5 @@
 {% load i18n %}
-<h3>{% blocktrans %} By {{ title }} {% endblocktrans %}</h3>
+<h3>{% blocktrans with title|escape as filter_title %} By {{ filter_title }} {% endblocktrans %}</h3>
 <ul>
 {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}>
