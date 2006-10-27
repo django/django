@@ -707,34 +707,35 @@ def parse_lookup(kwarg_items, opts):
     joins, where, params = SortedDict(), [], []
 
     for kwarg, value in kwarg_items:
-        if value is not None:
-            path = kwarg.split(LOOKUP_SEPARATOR)
-            # Extract the last elements of the kwarg.
-            # The very-last is the lookup_type (equals, like, etc).
-            # The second-last is the table column on which the lookup_type is
-            # to be performed.
-            # The exceptions to this are:
-            # 1)  "pk", which is an implicit id__exact;
-            #     if we find "pk", make the lookup_type "exact', and insert
-            #     a dummy name of None, which we will replace when
-            #     we know which table column to grab as the primary key.
-            # 2)  If there is only one part, or the last part is not a query
-            #     term, assume that the query is an __exact
-            lookup_type = path.pop()
-            if lookup_type == 'pk':
-                lookup_type = 'exact'
-                path.append(None)
-            elif len(path) == 0 or lookup_type not in QUERY_TERMS:
-                path.append(lookup_type)
-                lookup_type = 'exact'
+        path = kwarg.split(LOOKUP_SEPARATOR)
+        # Extract the last elements of the kwarg.
+        # The very-last is the lookup_type (equals, like, etc).
+        # The second-last is the table column on which the lookup_type is
+        # to be performed. If this name is 'pk', it will be substituted with
+        # the name of the primary key.
+        # If there is only one part, or the last part is not a query
+        # term, assume that the query is an __exact
+        lookup_type = path.pop()
+        if lookup_type == 'pk':
+            lookup_type = 'exact'
+            path.append(None)
+        elif len(path) == 0 or lookup_type not in QUERY_TERMS:
+            path.append(lookup_type)
+            lookup_type = 'exact'
 
-            if len(path) < 1:
-                raise TypeError, "Cannot parse keyword query %r" % kwarg
+        if len(path) < 1:
+            raise TypeError, "Cannot parse keyword query %r" % kwarg
+        
+        if value is None:
+            # Interpret '__exact=None' as the sql '= NULL'; otherwise, reject
+            # all uses of None as a query value.
+            if lookup_type != 'exact':
+                raise ValueError, "Cannot use None as a query value"
 
-            joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
-            joins.update(joins2)
-            where.extend(where2)
-            params.extend(params2)
+        joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
+        joins.update(joins2)
+        where.extend(where2)
+        params.extend(params2)
     return joins, where, params
 
 class FieldFound(Exception):
@@ -766,7 +767,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     name = path.pop(0)
     # Has the primary key been requested? If so, expand it out
     # to be the name of the current class' primary key
-    if name is None:
+    if name is None or name == 'pk':
         name = current_opts.pk.name
 
     # Try to find the name in the fields associated with the current class

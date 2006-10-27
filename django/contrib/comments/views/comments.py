@@ -109,7 +109,7 @@ class PublicCommentManipulator(AuthenticationForm):
         # send the comment to the managers.
         if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
             message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
-                'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s') % \
+                'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s', settings.COMMENTS_FIRST_FEW) % \
                 {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
         if settings.COMMENTS_SKETCHY_USERS_GROUP and settings.COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
@@ -217,7 +217,7 @@ def post_comment(request):
     errors = manipulator.get_validation_errors(new_data)
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
-    if manipulator.get_user() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
+    if manipulator.get_user() and not manipulator.get_user().is_authenticated() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
         from django.contrib.auth import login
         login(request, manipulator.get_user())
     if errors or request.POST.has_key('preview'):

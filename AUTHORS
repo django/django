@@ -42,6 +42,7 @@ And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Django that much better:
 
+    adurdin@gmail.com
     akaihola
     Andreas
     ant9000@netwise.it
@@ -63,6 +64,7 @@ answer newbie questions, and generally made Django that much better:
     Ian Clelland <clelland@gmail.com>
     crankycoder@gmail.com
     Matt Croydon <http://www.postneo.com/>
+    dackze+django@gmail.com
     Jonathan Daugherty (cygnus) <http://www.cprogrammer.org/>
     Jason Davies (Esaj) <http://www.jasondavies.com/>
     Alex Dedul
@@ -73,6 +75,7 @@ answer newbie questions, and generally made Django that much better:
     Jeremy Dunck <http://dunck.us/>
     Andy Dustman <farcepest@gmail.com>
     Clint Ecker
+    Enrico <rico.bl@gmail.com>
     favo@exoweb.net
     gandalf@owca.info
     Baishampayan Ghose
@@ -80,7 +83,9 @@ answer newbie questions, and generally made Django that much better:
     Simon Greenhill <dev@simon.net.nz>
     Espen Grindhaug <http://grindhaug.org/>
     Brant Harris
+    Hawkeye
     heckj@mac.com
+    Joel Heenan <joelh-django@planetjoel.com>
     hipertracker@gmail.com
     Ian Holsman <http://feh.holsman.net/>
     Kieran Holland <http://www.kieranholland.com>
@@ -94,26 +99,31 @@ answer newbie questions, and generally made Django that much better:
     kilian <kilian.cavalotti@lip6.fr>
     Sune Kirkeby <http://ibofobi.dk/>
     Cameron Knight (ckknight)
+    Meir Kriheli <http://mksoft.co.il/>
     Bruce Kroeze <http://coderseye.com/>
     Joseph Kocherhans
     konrad@gwu.edu
     lakin.wecker@gmail.com
     Stuart Langridge <http://www.kryogenix.org/>
     Eugene Lazutkin <http://lazutkin.com/blog/>
-    Jeong-Min Lee
+    Jeong-Min Lee <falsetru@gmail.com>
     Christopher Lenz <http://www.cmlenz.net/>
+    lerouxb@gmail.com
     limodou
+    mattmcc
     Martin Maney <http://www.chipy.org/Martin_Maney>
     Manuzhai
     Petar Marić
     mark@junklight.com
     mattycakes@gmail.com
     Jason McBrayer <http://www.carcosa.net/jason/>
+    mccutchen@gmail.com
     michael.mcewan@gmail.com
     mmarshall
     Eric Moritz <http://eric.themoritzfamily.com/>
     Robin Munn <http://www.geekforgod.com/>
     Nebojša Dorđević
+    Fraser Nevett <mail@nevett.org>
     Sam Newman <http://www.magpiebrain.com/>
     Neal Norwitz <nnorwitz@google.com>
     oggie rob <oz.robharvey@gmail.com>
@@ -141,6 +151,7 @@ answer newbie questions, and generally made Django that much better:
     Radek Švarz <http://www.svarz.cz/translate/>
     Swaroop C H <http://www.swaroopch.info>
     Aaron Swartz <http://www.aaronsw.com/>
+    Tyson Tate <tyson@fallingbullets.com>
     Tom Tobin
     Tom Insam
     Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
@@ -150,8 +161,10 @@ answer newbie questions, and generally made Django that much better:
     Milton Waddams
     Dan Watson <http://theidioteque.net/>
     Rachel Willmer <http://www.willmer.com/kb/>
+    Gary Wilson <gary.wilson@gmail.com>
     wojtek
     ye7cakf02@sneakemail.com
+    ymasuda@ethercube.com
     Cheng Zhang
 
 A big THANK YOU goes to:

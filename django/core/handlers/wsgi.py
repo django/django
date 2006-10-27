@@ -74,13 +74,30 @@ class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
         self.path = environ['PATH_INFO']
-        self.META = environ 
+        self.META = environ
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
+        # Since this is called as part of error handling, we need to be very
+        # robust against potentially malformed input.
+        try:
+            get = pformat(self.GET)
+        except:
+            get = '<could not parse>'
+        try:
+            post = pformat(self.POST)
+        except:
+            post = '<could not parse>'
+        try:
+            cookies = pformat(self.COOKIES)
+        except:
+            cookies = '<could not parse>'
+        try:
+            meta = pformat(self.META)
+        except:
+            meta = '<could not parse>'
         return '<WSGIRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META))
+            (get, post, cookies, meta)
 
     def get_full_path(self):
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
@@ -157,10 +174,6 @@ class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
 
-        if settings.ENABLE_PSYCO:
-            import psyco
-            psyco.profile()
-
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
@@ -169,7 +182,7 @@ class WSGIHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
-            response = self.get_response(request.path, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:

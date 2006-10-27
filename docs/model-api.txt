@@ -188,7 +188,8 @@ JavaScript shortcuts.
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``maxlength``.
+This doesn't accept ``maxlength``; its ``maxlength`` is automatically set to
+75.
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -545,7 +546,7 @@ The default value for the field.
 
 If ``False``, the field will not be editable in the admin or via form
 processing using the object's ``AddManipulator`` or ``ChangeManipulator``
-classes. Default is  ``True``.
+classes. Default is ``True``.
 
 ``help_text``
 ~~~~~~~~~~~~~

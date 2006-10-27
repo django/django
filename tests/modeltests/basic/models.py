@@ -86,6 +86,10 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.get(pk=1)
 <Article: Area woman programs in Python>
 
+# pk can be used as a shortcut for the primary key name in any query
+>>> Article.objects.filter(pk__in=[1])
+[<Article: Area woman programs in Python>]
+
 # Model instances of the same type and same ID are considered equal.
 >>> a = Article.objects.get(pk=1)
 >>> b = Article.objects.get(pk=1)

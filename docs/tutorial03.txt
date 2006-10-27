@@ -91,7 +91,7 @@ Finally, it calls that ``detail()`` function like so::
 The ``poll_id='23'`` part comes from ``(?P<poll_id>\d+)``. Using parenthesis around a
 pattern "captures" the text matched by that pattern and sends it as an argument
 to the view function; the ``?P<poll_id>`` defines the name that will be used to
-identify the matched pattern; and ``\d+`` is a regular experession to match a sequence of
+identify the matched pattern; and ``\d+`` is a regular expression to match a sequence of
 digits (i.e., a number).
 
 Because the URL patterns are regular expressions, there really is no limit on
@@ -257,7 +257,7 @@ provides a shortcut. Here's the full ``index()`` view, rewritten::
     from mysite.polls.models import Poll
 
     def index(request):
-        latest_poll_list = Poll.objects.all().order_by('-pub_date')
+        latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         return render_to_response('polls/index.html', {'latest_poll_list': latest_poll_list})
 
 Note that we no longer need to import ``loader``, ``Context`` or

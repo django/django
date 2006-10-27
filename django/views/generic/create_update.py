@@ -102,7 +102,7 @@ def update_object(request, model, object_id=None, slug=None,
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
 
-    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.name), follow=follow)
+    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.attname), follow=follow)
 
     if request.POST:
         new_data = request.POST.copy()
@@ -142,7 +142,7 @@ def update_object(request, model, object_id=None, slug=None,
         else:
             c[key] = value
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
+    populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
     return response
 
 def delete_object(request, model, post_delete_redirect,
@@ -196,5 +196,5 @@ def delete_object(request, model, post_delete_redirect,
             else:
                 c[key] = value
         response = HttpResponse(t.render(c))
-        populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
+        populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
         return response

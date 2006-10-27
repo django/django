@@ -227,9 +227,7 @@ When will you release Django 1.0?
 
 Short answer: When we're comfortable with Django's APIs, have added all
 features that we feel are necessary to earn a "1.0" status, and are ready to
-begin maintaining backwards compatibility. This should happen in a couple of
-months or so, although it's entirely possible that it could happen earlier.
-That translates into summer 2006.
+begin maintaining backwards compatibility. 
 
 The merging of Django's `magic-removal branch`_ went a long way toward Django
 1.0.
@@ -312,6 +310,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
+
+Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
+----------------------------------------------------------------------------------------
+
+No. Django itself is guaranteed to work with any version of Python from 2.3
+and higher.
+
+If you use a Python version newer than 2.3, you will, of course, be able to
+take advantage of newer Python features in your own code, along with the speed
+improvements and other optimizations that have been made to the Python language
+itself. But the Django framework itself should work equally well on 2.3 as it
+does on 2.4 or 2.5.
 
 Do I have to use mod_python?
 ----------------------------
@@ -487,7 +497,7 @@ specify an object to edit or delete.
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
-We try to avoid adding special cases in the Django code to accomodate all the
+We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
 statements that do what you want to do. The initial data files are executed in

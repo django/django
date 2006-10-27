@@ -13,7 +13,7 @@ from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
 import re
 
-_datere = r'(19|2\d)\d{2}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
+_datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
 alnum_re = re.compile(r'^\w+$')
 alnumurl_re = re.compile(r'^[-\w/]+$')
@@ -122,9 +122,29 @@ def isOnlyLetters(field_data, all_data):
     if not field_data.isalpha():
         raise ValidationError, gettext("Only alphabetical characters are allowed here.")
 
+def _isValidDate(date_string):
+    """
+    A helper function used by isValidANSIDate and isValidANSIDatetime to
+    check if the date is valid.  The date string is assumed to already be in
+    YYYY-MM-DD format.
+    """
+    from datetime import date
+    # Could use time.strptime here and catch errors, but datetime.date below
+    # produces much friendlier error messages.
+    year, month, day = map(int, date_string.split('-'))
+    # This check is needed because strftime is used when saving the date
+    # value to the database, and strftime requires that the year be >=1900.
+    if year < 1900:
+        raise ValidationError, gettext('Year must be 1900 or later.')
+    try:
+        date(year, month, day)
+    except ValueError, e:
+        raise ValidationError, gettext('Invalid date: %s.' % e)    
+
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
+    _isValidDate(field_data)
 
 def isValidANSITime(field_data, all_data):
     if not ansi_time_re.search(field_data):
@@ -133,6 +153,7 @@ def isValidANSITime(field_data, all_data):
 def isValidANSIDatetime(field_data, all_data):
     if not ansi_datetime_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+    _isValidDate(field_data.split()[0])
 
 def isValidEmail(field_data, all_data):
     if not email_re.search(field_data):
@@ -228,7 +249,7 @@ def hasNoProfanities(field_data, all_data):
         Watch your mouth! The words "f--k" and "s--t" are not allowed here.
     """
     field_data = field_data.lower() # normalize
-    words_seen = [w for w in settings.PROFANITIES_LIST if field_data.find(w) > -1]
+    words_seen = [w for w in settings.PROFANITIES_LIST if w in field_data]
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
@@ -356,7 +377,7 @@ class IsValidFloat(object):
         if len(data) > max_allowed_length:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places)) or ('.' in data and len(data) > (self.max_digits - (self.decimal_places - len(data.split('.')[1])) + 1)):
+        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:

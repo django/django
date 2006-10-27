@@ -103,7 +103,6 @@ def get_sql_create(app):
     known_models = set([model for model in _get_installed_models(_get_table_list()) if model not in app_models])
     pending_references = {}
 
-
     for model in app_models:
         output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
@@ -147,7 +146,7 @@ def _get_sql_model_create(model, known_models=set()):
     table_output = []
     pending_references = {}
     for f in opts.fields:
-        if isinstance(f, models.ForeignKey):
+        if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
@@ -347,7 +346,7 @@ def get_sql_initial_data_for_model(model):
                  os.path.join(app_dir, "%s.sql" % opts.object_name.lower())]
     for sql_file in sql_files:
         if os.path.exists(sql_file):
-            fp = open(sql_file)
+            fp = open(sql_file, 'U')
             for statement in statements.split(fp.read()):
                 if statement.strip():
                     output.append(statement + ";")
@@ -398,24 +397,31 @@ get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting Postg
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
-    "Returns a list of the CREATE INDEX SQL statements for the given app."
-    from django.db import backend, models
+    "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
+    from django.db import models
     output = []
-
     for model in models.get_models(app):
-        for f in model._meta.fields:
-            if f.db_index:
-                unique = f.unique and 'UNIQUE ' or ''
-                output.append(
-                    style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
-                    style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
-                    "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
-                )
+        output.extend(get_sql_indexes_for_model(model))
     return output
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
+
+def get_sql_indexes_for_model(model):
+    "Returns the CREATE INDEX SQL statements for a single model"
+    from django.db import backend
+    output = []
+
+    for f in model._meta.fields:
+        if f.db_index:
+            unique = f.unique and 'UNIQUE ' or ''
+            output.append(
+                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_KEYWORD('ON') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
+                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+            )
+    return output
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
@@ -423,7 +429,7 @@ def get_sql_all(app):
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
 
-def syncdb(verbosity=2, interactive=True):
+def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
     from django.db.models import signals
@@ -457,21 +463,21 @@ def syncdb(verbosity=2, interactive=True):
     pending_references = {}
 
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         model_list = models.get_models(app)
         for model in model_list:
             # Create the model's database table, if it doesn't already exist.
+            if verbosity >= 2:
+                print "Processing %s.%s model" % (app_name, model._meta.object_name)
             if model._meta.db_table in table_list:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
             created_models.add(model)
             for refto, refs in references.items():
-                try:
-                    pending_references[refto].extend(refs)
-                except KeyError:
-                    pending_references[refto] = refs
+                pending_references.setdefault(refto, []).extend(refs)
             sql.extend(_get_sql_for_pending_references(model, pending_references))
-            if verbosity >= 2:
+            if verbosity >= 1:
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
@@ -482,7 +488,7 @@ def syncdb(verbosity=2, interactive=True):
                 sql = _get_many_to_many_sql_for_model(model)
                 if sql:
                     if verbosity >= 2:
-                        print "Creating many-to-many tables for %s model" % model.__name__
+                        print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
                     for statement in sql:
                         cursor.execute(statement)
 
@@ -491,6 +497,9 @@ def syncdb(verbosity=2, interactive=True):
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if verbosity >= 2:
+            print "Running post-sync handlers for application", app_name
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models,
             verbosity=verbosity, interactive=interactive)
@@ -501,14 +510,33 @@ def syncdb(verbosity=2, interactive=True):
             if model in created_models:
                 initial_sql = get_sql_initial_data_for_model(model)
                 if initial_sql:
-                    if verbosity >= 2:
-                        print "Installing initial data for %s model" % model._meta.object_name
+                    if verbosity >= 1:
+                        print "Installing initial data for %s.%s model" % (app_name, model._meta.object_name)
                     try:
                         for sql in initial_sql:
                             cursor.execute(sql)
                     except Exception, e:
-                        sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
-                                            (model._meta.object_name, e))
+                        sys.stderr.write("Failed to install initial SQL data for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
+                        transaction.rollback_unless_managed()
+                    else:
+                        transaction.commit_unless_managed()
+
+    # Install SQL indicies for all newly created models
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        for model in models.get_models(app):
+            if model in created_models:
+                index_sql = get_sql_indexes_for_model(model)
+                if index_sql:
+                    if verbosity >= 1:
+                        print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
+                    try:
+                        for sql in index_sql:
+                            cursor.execute(sql)
+                    except Exception, e:
+                        sys.stderr.write("Failed to install index for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
                         transaction.rollback_unless_managed()
                     else:
                         transaction.commit_unless_managed()
@@ -596,9 +624,10 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def reset(app):
+def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
+    from django.conf import settings
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -607,21 +636,26 @@ def reset(app):
     _check_for_validation_errors(app)
     sql_list = get_sql_reset(app)
 
-    confirm = raw_input("""
+    if interactive:
+        confirm = raw_input("""
 You have requested a database reset.
-This will IRREVERSIBLY DESTROY any data in your database.
+This will IRREVERSIBLY DESTROY any data for
+the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """)
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, settings.DATABASE_NAME))
+    else:
+        confirm = 'yes'
+
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
             for sql in sql_list:
                 cursor.execute(sql)
         except Exception, e:
-            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be reset. Possible reasons:
   * The database isn't running or isn't configured correctly.
-  * At least one of the database tables already exists.
+  * At least one of the database tables doesn't exist.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
 The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
@@ -820,7 +854,8 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.db import models
+    from django.conf import settings
+    from django.db import models, connection
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
@@ -861,6 +896,12 @@ def get_validation_errors(outfile, app=None):
                             e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
+
+            # Check that maxlength <= 255 if using older MySQL versions.
+            if settings.DATABASE_ENGINE == 'mysql':
+                db_version = connection.get_server_version()
+                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
+                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -1045,7 +1086,7 @@ def _check_for_validation_errors(app=None):
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port, use_reloader=True):
+def runserver(addr, port, use_reloader=True, admin_media_dir=''):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1063,7 +1104,10 @@ def runserver(addr, port, use_reloader=True):
         print "Development server is running at http://%s:%s/" % (addr, port)
         print "Quit the server with %s." % quit_command
         try:
-            run(addr, int(port), AdminMediaHandler(WSGIHandler()))
+            import django
+            path = admin_media_dir or django.__path__[0] + '/contrib/admin/media'
+            handler = AdminMediaHandler(WSGIHandler(), path)
+            run(addr, int(port), handler)
         except WSGIServerException, e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -1084,7 +1128,7 @@ def runserver(addr, port, use_reloader=True):
         autoreload.main(inner_run)
     else:
         inner_run()
-runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
+runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1166,7 +1210,7 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(verbosity, app_labels):
+def test(app_labels, verbosity=1):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
@@ -1268,9 +1312,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
-    parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
+    parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2'],
-        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
+        help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Specifies the directory from which to serve admin media for runserver.'),
 
     options, args = parser.parse_args(argv[1:])
 
@@ -1316,7 +1361,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
     elif action == 'test':
         try:
-            action_mapping[action](int(options.verbosity), args[1:])
+            action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
@@ -1334,7 +1379,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port, options.use_reloader)
+        action_mapping[action](addr, port, options.use_reloader, options.admin_media_path)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:
@@ -1350,7 +1395,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
-            output = action_mapping[action](mod)
+            if action == 'reset':
+                output = action_mapping[action](mod, options.interactive)
+            else:
+                output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:

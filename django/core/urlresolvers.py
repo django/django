@@ -15,7 +15,8 @@ class Resolver404(Http404):
     pass
 
 class NoReverseMatch(Exception):
-    pass
+    # Don't make this raise an error when used in a template.
+    silent_variable_failure = True  
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to

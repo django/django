@@ -51,6 +51,10 @@ DoesNotExist: Employee matching query does not exist.
 >>> Employee.objects.get(employee_code__exact='ABC123')
 <Employee: Dan Jones>
 
+# pk can be used as a substitute for the primary key.
+>>> Employee.objects.filter(pk__in=['ABC123','XYZ456'])
+[<Employee: Fran Bones>, <Employee: Dan Jones>]
+
 # Fran got married and changed her last name.
 >>> fran = Employee.objects.get(pk='XYZ456')
 >>> fran.last_name = 'Jones'

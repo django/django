@@ -179,7 +179,7 @@ class AutomaticManipulator(forms.Manipulator):
                         # case, because they'll be dealt with later.
 
                         if f == related.field:
-                            param = getattr(new_object, related.field.rel.field_name)
+                            param = getattr(new_object, related.field.rel.get_related_field().attname)
                         elif (not self.change) and isinstance(f, AutoField):
                             param = None
                         elif self.change and (isinstance(f, FileField) or not child_follow.get(f.name, None)):
@@ -220,8 +220,11 @@ class AutomaticManipulator(forms.Manipulator):
                         # Save many-to-many objects.
                         for f in related.opts.many_to_many:
                             if child_follow.get(f.name, None) and not f.rel.edit_inline:
-                                was_changed = getattr(new_rel_obj, 'set_%s' % f.name)(rel_new_data[f.attname])
-                                if self.change and was_changed:
+                                new_value = rel_new_data[f.attname]
+                                if f.rel.raw_id_admin:
+                                    new_value = new_value[0]
+                                setattr(new_rel_obj, f.name, f.rel.to.objects.filter(pk__in=new_value))
+                                if self.change:
                                     self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                     # If, in the change stage, all of the core fields were blank and
@@ -306,7 +309,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         pass
     else:
         raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
-            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list(field_name_list[1:], 'and')}
+            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list([f.verbose_name for f in field_list[1:]], 'and')}
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOneRel
