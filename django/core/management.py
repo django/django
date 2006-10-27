@@ -32,6 +32,7 @@ class dummy: pass
 style = dummy()
 style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
 style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
+style.NOTICE = termcolors.make_style(fg='red')
 style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
 style.SQL_COLTYPE = termcolors.make_style(fg='green')
 style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
@@ -696,7 +697,10 @@ def _start_helper(app_or_project, name, directory, other_name=''):
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
             fp_old.close()
             fp_new.close()
-            shutil.copymode(path_old, path_new)
+            try:
+                shutil.copymode(path_old, path_new)
+            except OSError:
+                sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
