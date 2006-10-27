@@ -800,7 +800,11 @@ The argument tells which template bit to output:
     ``closevariable``   ``}}``
     ``openbrace``       ``{``
     ``closebrace``      ``}``
+    ``opencomment``     ``{#``
+    ``closecomment``    ``#}``
     ==================  =======
+
+Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
 
 widthratio
 ~~~~~~~~~~

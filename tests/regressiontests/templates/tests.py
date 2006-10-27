@@ -552,6 +552,8 @@ class Templates(unittest.TestCase):
             'templatetag08': ('{% templatetag closebrace %}', {}, '}'),
             'templatetag09': ('{% templatetag openbrace %}{% templatetag openbrace %}', {}, '{{'),
             'templatetag10': ('{% templatetag closebrace %}{% templatetag closebrace %}', {}, '}}'),
+            'templatetag11': ('{% templatetag opencomment %}', {}, '{#'),
+            'templatetag12': ('{% templatetag closecomment %}', {}, '#}'),
 
             ### WIDTHRATIO TAG ########################################################
             'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
