@@ -389,12 +389,12 @@ u''
 >>> print p['last_name']
 <input type="text" name="last_name" value="Lennon" />
 >>> print p['birthday']
-<input type="text" name="birthday" value="1940-10-09" />
+<input type="text" name="birthday" value="1940-10-9" />
 >>> for boundfield in p:
 ...     print boundfield
 <input type="text" name="first_name" value="John" />
 <input type="text" name="last_name" value="Lennon" />
-<input type="text" name="birthday" value="1940-10-09" />
+<input type="text" name="birthday" value="1940-10-9" />
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors()
