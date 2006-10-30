@@ -92,6 +92,13 @@ which is a dictionary of the parameters captured in the URL.
 
     * ``template``: The full name of a template to use.
 
+**Optional arguments:**
+
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template.
+      
 **Example:**
 
 Given the following URL patterns::
@@ -171,7 +178,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
       template. By default, it's ``django.template.loader``.
 
     * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary.
+      context. By default, this is an empty dictionary. If a value in the
       dictionary is callable, the generic view will call it
       just before rendering the template.
 
