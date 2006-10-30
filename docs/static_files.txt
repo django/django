@@ -31,7 +31,7 @@ How to do it
 
 Just put this in your URLconf_::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
 
 ...where ``site_media`` is the URL where your media will be rooted, and
 ``/path/to/media`` is the filesystem root for your media.
@@ -60,7 +60,7 @@ listings for directories.
 
 Example::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
 
 You can customize the index view by creating a template called
 ``static/directory_index``. That template gets two objects in its context:
