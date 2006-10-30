@@ -69,7 +69,7 @@ def get_standard_processors():
             i = path.rfind('.')
             module, attr = path[:i], path[i+1:]
             try:
-                mod = __import__(module, '', '', [attr])
+                mod = __import__(module, {}, {}, [attr])
             except ImportError, e:
                 raise ImproperlyConfigured, 'Error importing request processor module %s: "%s"' % (module, e)
             try:

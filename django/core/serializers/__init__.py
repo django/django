@@ -29,7 +29,7 @@ _serializers = {}
         
 def register_serializer(format, serializer_module):
     """Register a new serializer by passing in a module name."""
-    module = __import__(serializer_module, '', '', [''])
+    module = __import__(serializer_module, {}, {}, [''])
     _serializers[format] = module
     
 def unregister_serializer(format):
