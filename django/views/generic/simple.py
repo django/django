@@ -18,7 +18,7 @@ def redirect_to(request, url, **kwargs):
     ``/foo/<id>/`` to ``/bar/<id>/``, you could use the following URLconf::
 
         urlpatterns = patterns('',
-            ('^foo/(?p<id>\d+)/$', 'django.views.generic.simple.redirect_to', {'url' : '/bar/%(id)s/'}),
+            ('^foo/(?P<id>\d+)/$', 'django.views.generic.simple.redirect_to', {'url' : '/bar/%(id)s/'}),
         )
 
     If the given url is ``None``, a HttpResponseGone (410) will be issued.
