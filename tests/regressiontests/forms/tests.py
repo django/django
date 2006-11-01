@@ -29,6 +29,84 @@ u'<input type="text" class="fun" value="foo@example.com" name="email" />'
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="text" class="special" name="email" />'
 
+# PasswordInput Widget ############################################################
+
+>>> w = PasswordInput()
+>>> w.render('email', '')
+u'<input type="password" name="email" />'
+>>> w.render('email', None)
+u'<input type="password" name="email" />'
+>>> w.render('email', 'test@example.com')
+u'<input type="password" name="email" value="test@example.com" />'
+>>> w.render('email', 'some "quoted" & ampersanded value')
+u'<input type="password" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+>>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
+u'<input type="password" name="email" value="test@example.com" class="fun" />'
+
+You can also pass 'attrs' to the constructor:
+>>> w = PasswordInput(attrs={'class': 'fun'})
+>>> w.render('email', '')
+u'<input type="password" class="fun" name="email" />'
+>>> w.render('email', 'foo@example.com')
+u'<input type="password" class="fun" value="foo@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = PasswordInput(attrs={'class': 'pretty'})
+>>> w.render('email', '', attrs={'class': 'special'})
+u'<input type="password" class="special" name="email" />'
+
+# HiddenInput Widget ############################################################
+
+>>> w = HiddenInput()
+>>> w.render('email', '')
+u'<input type="hidden" name="email" />'
+>>> w.render('email', None)
+u'<input type="hidden" name="email" />'
+>>> w.render('email', 'test@example.com')
+u'<input type="hidden" name="email" value="test@example.com" />'
+>>> w.render('email', 'some "quoted" & ampersanded value')
+u'<input type="hidden" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+>>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
+u'<input type="hidden" name="email" value="test@example.com" class="fun" />'
+
+You can also pass 'attrs' to the constructor:
+>>> w = HiddenInput(attrs={'class': 'fun'})
+>>> w.render('email', '')
+u'<input type="hidden" class="fun" name="email" />'
+>>> w.render('email', 'foo@example.com')
+u'<input type="hidden" class="fun" value="foo@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = HiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', '', attrs={'class': 'special'})
+u'<input type="hidden" class="special" name="email" />'
+
+# FileInput Widget ############################################################
+
+>>> w = FileInput()
+>>> w.render('email', '')
+u'<input type="file" name="email" />'
+>>> w.render('email', None)
+u'<input type="file" name="email" />'
+>>> w.render('email', 'test@example.com')
+u'<input type="file" name="email" value="test@example.com" />'
+>>> w.render('email', 'some "quoted" & ampersanded value')
+u'<input type="file" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+>>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
+u'<input type="file" name="email" value="test@example.com" class="fun" />'
+
+You can also pass 'attrs' to the constructor:
+>>> w = FileInput(attrs={'class': 'fun'})
+>>> w.render('email', '')
+u'<input type="file" class="fun" name="email" />'
+>>> w.render('email', 'foo@example.com')
+u'<input type="file" class="fun" value="foo@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = HiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', '', attrs={'class': 'special'})
+u'<input type="hidden" class="special" name="email" />'
+
 # Textarea Widget #############################################################
 
 >>> w = Textarea()
@@ -76,6 +154,87 @@ u'<input type="checkbox" class="pretty" name="is_cool" />'
 >>> w = CheckboxInput(attrs={'class': 'pretty'})
 >>> w.render('is_cool', '', attrs={'class': 'special'})
 u'<input type="checkbox" class="special" name="is_cool" />'
+
+# Select Widget ###############################################################
+
+>>> w = Select()
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select name="beatle">
+<option value="J" selected="selected">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+
+If the value is None, none of the options are selected:
+>>> print w.render('beatle', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select name="beatle">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+
+If the value corresponds to a label (but not to an option value), none of the options are selected:
+>>> print w.render('beatle', 'John', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select name="beatle">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+
+The value is compared to its str():
+>>> print w.render('num', 2, choices=[('1', '1'), ('2', '2'), ('3', '3')])
+<select name="num">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+>>> print w.render('num', '2', choices=[(1, 1), (2, 2), (3, 3)])
+<select name="num">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+>>> print w.render('num', 2, choices=[(1, 1), (2, 2), (3, 3)])
+<select name="num">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+
+The 'choices' argument can be any iterable:
+>>> def get_choices():
+...     for i in range(5):
+...         yield (i, i)
+>>> print w.render('num', 2, choices=get_choices())
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+
+You can also pass 'choices' to the constructor:
+>>> w = Select(choices=[(1, 1), (2, 2), (3, 3)])
+>>> print w.render('num', 2)
+<select name="num">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+
+If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
+>>> print w.render('num', 2, choices=[(4, 4), (5, 5)])
+<select name="num">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+</select>
 
 # CharField ###################################################################
 
@@ -352,6 +511,56 @@ ValidationError: [u'Enter a valid e-mail address.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
+
+# URLField ##################################################################
+
+>>> f = URLField()
+>>> f.to_python('http://example.com')
+u'http://example.com'
+>>> f.to_python('http://www.example.com')
+u'http://www.example.com'
+>>> f.to_python('foo')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('example.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('http://')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('http://example')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('http://example.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('http://.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+
+URLField takes an optional verify_exists parameter, which is False by default.
+This verifies that the URL is live on the Internet and doesn't return a 404 or 500:
+>>> f = URLField(verify_exists=True)
+>>> f.to_python('http://www.google.com')
+u'http://www.google.com'
+>>> f.to_python('http://example')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.to_python('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
+Traceback (most recent call last):
+...
+ValidationError: [u'This URL appears to be a broken link.']
+>>> f.to_python('http://google.com/we-love-microsoft.html') # good domain, bad page
+Traceback (most recent call last):
+...
+ValidationError: [u'This URL appears to be a broken link.']
 
 # BooleanField ################################################################
 
