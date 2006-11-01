@@ -12,7 +12,7 @@ __all__ = (
     'Field', 'CharField', 'IntegerField',
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
-    'RegexField', 'EmailField', 'BooleanField',
+    'RegexField', 'EmailField', 'URLField', 'BooleanField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -174,6 +174,29 @@ email_re = re.compile(
 class EmailField(RegexField):
     def __init__(self, required=True, widget=None):
         RegexField.__init__(self, email_re, u'Enter a valid e-mail address.', required, widget)
+
+url_re = re.compile(
+    r'^https?://' # http:// or https://
+    r'(?:[A-Z0-9-]+\.)+[A-Z]{2,6}' # domain
+    r'(?::\d+)?' # optional port
+    r'(?:/?|/\S+)$', re.IGNORECASE)
+
+class URLField(RegexField):
+    def __init__(self, required=True, verify_exists=False, widget=None):
+        RegexField.__init__(self, url_re, u'Enter a valid URL.', required, widget)
+        self.verify_exists = verify_exists
+
+    def to_python(self, value):
+        value = RegexField.to_python(self, value)
+        if self.verify_exists:
+            import urllib2
+            try:
+                u = urllib2.urlopen(value)
+            except ValueError:
+                raise ValidationError(u'Enter a valid URL.')
+            except: # urllib2.URLError, httplib.InvalidURL, etc.
+                raise ValidationError(u'This URL appears to be a broken link.')
+        return value
 
 class BooleanField(Field):
     widget = CheckboxInput
