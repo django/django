@@ -680,6 +680,64 @@ False
 >>> f.to_python('Django rocks')
 True
 
+# ChoiceField #################################################################
+
+>>> f = ChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f.to_python(1)
+u'1'
+>>> f.to_python('1')
+u'1'
+>>> f.to_python(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.to_python('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.to_python('3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
+>>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
+>>> f.to_python('J')
+u'J'
+>>> f.to_python('John')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+
+# MultipleChoiceField #########################################################
+
+>>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f.to_python([1])
+[u'1']
+>>> f.to_python(['1'])
+[u'1']
+>>> f.to_python(['1', '2'])
+[u'1', u'2']
+>>> f.to_python([1, '2'])
+[u'1', u'2']
+>>> f.to_python((1, '2'))
+[u'1', u'2']
+>>> f.to_python('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.to_python([])
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.to_python(())
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.to_python(['3'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
 # Form ########################################################################
 
 >>> class Person(Form):
@@ -787,6 +845,48 @@ u'<textarea name="subject">Hello</textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" value="I love you." />'
 
+For a form with a <select>, use ChoiceField:
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')])
+>>> f = FrameworkForm()
+>>> print f['language']
+<select name="language">
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+>>> f = FrameworkForm({'name': 'Django', 'language': 'P'})
+>>> print f['language']
+<select name="language">
+<option value="P" selected="selected">Python</option>
+<option value="J">Java</option>
+</select>
+
+MultipleChoiceField is a special case, as its data is required to be a list:
+>>> class SongForm(Form):
+...     name = CharField()
+...     composers = MultipleChoiceField()
+>>> f = SongForm()
+>>> print f['composers']
+<select multiple="multiple" name="composers">
+</select>
+>>> class SongForm(Form):
+...     name = CharField()
+...     composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')])
+>>> f = SongForm()
+>>> print f['composers']
+<select multiple="multiple" name="composers">
+<option value="J">John Lennon</option>
+<option value="P">Paul McCartney</option>
+</select>
+>>> f = SongForm({'name': 'Yesterday', 'composers': ['P']})
+>>> print f['name']
+<input type="text" name="name" value="Yesterday" />
+>>> print f['composers']
+<select multiple="multiple" name="composers">
+<option value="J">John Lennon</option>
+<option value="P" selected="selected">Paul McCartney</option>
+</select>
 """
 
 if __name__ == "__main__":

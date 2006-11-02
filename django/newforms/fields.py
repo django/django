@@ -3,7 +3,7 @@ Field classes
 """
 
 from util import ValidationError, DEFAULT_ENCODING
-from widgets import TextInput, CheckboxInput
+from widgets import TextInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
 import time
@@ -13,10 +13,16 @@ __all__ = (
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
+    'ChoiceField', 'MultipleChoiceField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
 EMPTY_VALUES = (None, '')
+
+try:
+    set # Only available in Python 2.4+
+except NameError:
+    from sets import Set as set # Python 2.3 fallback
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
@@ -205,3 +211,51 @@ class BooleanField(Field):
         "Returns a Python boolean object."
         Field.to_python(self, value)
         return bool(value)
+
+class ChoiceField(Field):
+    def __init__(self, choices=(), required=True, widget=Select):
+        if isinstance(widget, type):
+            widget = widget(choices=choices)
+        Field.__init__(self, required, widget)
+        self.choices = choices
+
+    def to_python(self, value):
+        """
+        Validates that the input is in self.choices.
+        """
+        value = Field.to_python(self, value)
+        if value in EMPTY_VALUES: value = u''
+        if not isinstance(value, basestring):
+            value = unicode(str(value), DEFAULT_ENCODING)
+        elif not isinstance(value, unicode):
+            value = unicode(value, DEFAULT_ENCODING)
+        valid_values = set([str(k) for k, v in self.choices])
+        if value not in valid_values:
+            raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % value)
+        return value
+
+class MultipleChoiceField(ChoiceField):
+    def __init__(self, choices=(), required=True, widget=SelectMultiple):
+        ChoiceField.__init__(self, choices, required, widget)
+
+    def to_python(self, value):
+        """
+        Validates that the input is a list or tuple.
+        """
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(u'Enter a list of values.')
+        if self.required and not value:
+            raise ValidationError(u'This field is required.')
+        new_value = []
+        for val in value:
+            if not isinstance(val, basestring):
+                value = unicode(str(val), DEFAULT_ENCODING)
+            elif not isinstance(val, unicode):
+                value = unicode(val, DEFAULT_ENCODING)
+            new_value.append(value)
+        # Validate that each value in the value list is in self.choices.
+        valid_values = set([k for k, v in self.choices])
+        for val in new_value:
+            if val not in valid_values:
+                raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % val)
+        return new_value

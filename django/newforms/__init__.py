@@ -3,7 +3,6 @@ Django validation and HTML form handling.
 
 TODO:
     Validation not tied to a particular field
-    <select> and validation of lists
     Default value for field
     Field labels
     Nestable Forms
