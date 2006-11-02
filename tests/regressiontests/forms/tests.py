@@ -236,6 +236,110 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+# SelectMultiple Widget #######################################################
+
+>>> w = SelectMultiple()
+>>> print w.render('beatles', ['J'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J" selected="selected">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+>>> print w.render('beatles', ['J', 'P'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+>>> print w.render('beatles', ['J', 'P', 'R'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R" selected="selected">Ringo</option>
+</select>
+
+If the value is None, none of the options are selected:
+>>> print w.render('beatles', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+
+If the value corresponds to a label (but not to an option value), none of the options are selected:
+>>> print w.render('beatles', ['John'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+
+If multiple values are given, but some of them are not valid, the valid ones are selected:
+>>> print w.render('beatles', ['J', 'G', 'foo'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<select multiple="multiple" name="beatles">
+<option value="J" selected="selected">John</option>
+<option value="P">Paul</option>
+<option value="G" selected="selected">George</option>
+<option value="R">Ringo</option>
+</select>
+
+The value is compared to its str():
+>>> print w.render('nums', [2], choices=[('1', '1'), ('2', '2'), ('3', '3')])
+<select multiple="multiple" name="nums">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+>>> print w.render('nums', ['2'], choices=[(1, 1), (2, 2), (3, 3)])
+<select multiple="multiple" name="nums">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+>>> print w.render('nums', [2], choices=[(1, 1), (2, 2), (3, 3)])
+<select multiple="multiple" name="nums">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+
+The 'choices' argument can be any iterable:
+>>> def get_choices():
+...     for i in range(5):
+...         yield (i, i)
+>>> print w.render('nums', [2], choices=get_choices())
+<select multiple="multiple" name="nums">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+
+You can also pass 'choices' to the constructor:
+>>> w = SelectMultiple(choices=[(1, 1), (2, 2), (3, 3)])
+>>> print w.render('nums', [2])
+<select multiple="multiple" name="nums">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+</select>
+
+If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
+>>> print w.render('nums', [2], choices=[(4, 4), (5, 5)])
+<select multiple="multiple" name="nums">
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+</select>
+
 # CharField ###################################################################
 
 >>> f = CharField(required=False)
