@@ -457,7 +457,9 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
+            value = value.date().strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.date):
             value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
@@ -487,12 +489,19 @@ class DateTimeField(DateField):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = str(value)
+        elif isinstance(value, datetime.date):
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+                value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
+            value = str(value)
+            
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
