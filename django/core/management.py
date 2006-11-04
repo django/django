@@ -214,7 +214,7 @@ def _get_sql_for_pending_references(model, pending_references):
     Get any ALTER TABLE statements to add constraints after the fact.
     """
     from django.db import backend, get_creation_module
-    from django.db.backend.util import truncate_name
+    from django.db.backends.util import truncate_name
     data_types = get_creation_module().DATA_TYPES
 
     final_output = []
