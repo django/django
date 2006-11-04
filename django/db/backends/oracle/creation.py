@@ -1,3 +1,5 @@
+import sys
+
 DATA_TYPES = {
     'AutoField':                    'number(11)',
     'BooleanField':                 'number(1) CHECK (%(column)s IN (0,1))',
