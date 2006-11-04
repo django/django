@@ -47,6 +47,7 @@ def create_test_db(verbosity=1, autoclobber=False):
     creation_module = get_creation_module()
     if hasattr(creation_module, "create_test_db"):
         creation_module.create_test_db(settings, connection, backend, verbosity, autoclobber)
+        return
     
     if verbosity >= 1:
         print "Creating test database..."
@@ -98,6 +99,7 @@ def destroy_test_db(old_database_name, verbosity=1):
     creation_module = get_creation_module()
     if hasattr(creation_module, "destroy_test_db"):
         creation_module.destroy_test_db(settings, connection, backend, old_database_name, verbosity)
+        return
     
     # Unless we're using SQLite, remove the test database to clean up after
     # ourselves. Connect to the previous database (not the test database)
