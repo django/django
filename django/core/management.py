@@ -227,9 +227,6 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                # For MySQL, r_name must be unique in the first 64 characters.
-                # So we are careful with character usage here.
-                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
                                     (backend.quote_name(r_table), truncate_name(r_name, backend.get_max_name_length()),
                                      backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
