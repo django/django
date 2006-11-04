@@ -76,7 +76,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         
         # cx can not execute the query with the closing ';' 
         if query.endswith(';'):
-            query = query[0:len(query)-1]			
+            query = query[:-1]
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
