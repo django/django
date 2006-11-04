@@ -37,7 +37,8 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
 
     cursor = connection.cursor()
     try:
-        _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME))
+        _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
+			verbosity)
     except Exception, e:            
         sys.stderr.write("Got an error creating the test database: %s\n" % e)
         if not autoclobber:
@@ -46,10 +47,12 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
             try:
                 if verbosity >= 1:
                     print "Destroying old test database..."                
-                _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME))
+                _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
+				 verbosity)
                 if verbosity >= 1:
                     print "Creating test database..."
-                _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME))
+                _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
+				verbosity)
             except Exception, e:
                 sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                 sys.exit(2)
@@ -74,7 +77,7 @@ def destroy_test_db(settings, connection, backend, old_database_name, verbosity=
 
     cursor = connection.cursor()
     time.sleep(1) # To avoid "database is being accessed by other users" errors.
-    _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME))
+    _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME), verbosity)
     connection.close()
 
 def _create_test_db(cursor, dbname):
@@ -93,17 +96,17 @@ def _create_test_db(cursor, dbname):
 	"""grant resource to %(user)s""",
 	"""grant connect to %(user)s""",
     ]
-    _execute_statements(cursor, statements, dbname)
+    _execute_statements(cursor, statements, dbname, verbosity)
     
-def _destroy_test_db(cursor, dbname):
+def _destroy_test_db(cursor, dbname, verbosity):
     statements = [
 	"""drop user %(user)s cascade""",
 	"""drop tablespace %(user)s including contents and datafiles cascade constraints""",
 	"""drop tablespace %(user)s_temp including contents and datafiles cascade constraints""",
 	]
-    _execute_statements(cursor, statements, dbname)
+    _execute_statements(cursor, statements, dbname, verbosity)
 
-def _execute_statements(cursor, statements, dbname):
+def _execute_statements(cursor, statements, dbname, verbosity):
     for template in statements:
 	stmt = template % {'user': dbname, 'password': "Im a lumberjack"}
 	if verbosity >= 1:
