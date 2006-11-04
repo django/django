@@ -1,4 +1,5 @@
 import datetime
+import md5
 from time import time
 
 class CursorDebugWrapper(object):
@@ -91,6 +92,16 @@ def typecast_boolean(s):
 
 def rev_typecast_boolean(obj, d):
     return obj and '1' or '0'
+
+def truncate_name(name, length=None):
+    """Shortens a string to a repeatable mangled version with the given length.
+    """
+    if length is None or len(name) <= length:
+        return name
+    
+    hash = md5.md5(name).hexdigest()[:4]
+    
+    return '%s%s' % (name[:length-4], hash)
 
 ##################################################################################
 # Helper functions for dictfetch* for databases that don't natively support them #
