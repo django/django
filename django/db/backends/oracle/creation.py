@@ -110,7 +110,7 @@ def _destroy_test_db(cursor, dbname, verbosity):
 def _execute_statements(cursor, statements, dbname, verbosity):
     for template in statements:
         stmt = template % {'user': dbname,
-			   'password': "Im a lumberjack"}
+			   'password': "Im_a_lumberjack"}
         if verbosity >= 2:
             print stmt
         try:
