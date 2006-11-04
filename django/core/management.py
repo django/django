@@ -520,12 +520,7 @@ def syncdb(verbosity=1, interactive=True):
             if verbosity >= 1:
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
-                # go on if one table could not be created 
-                try: 
-                    cursor.execute(statement) 
-                except Exception, e: 
-                    print statement 
-                    print e 
+                cursor.execute(statement) 
             table_list.append(model._meta.db_table)
 
         for model in model_list:
@@ -535,11 +530,7 @@ def syncdb(verbosity=1, interactive=True):
                     if verbosity >= 2:
                         print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
                     for statement in sql:
-                        try:
-                            cursor.execute(statement)
-                        except Exception, e:
-                            print statement
-                            print e
+                        cursor.execute(statement)
 
         transaction.commit_unless_managed()
 
