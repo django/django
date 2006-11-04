@@ -128,6 +128,9 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_max_name_length():
+    return 30
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

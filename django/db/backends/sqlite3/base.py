@@ -144,6 +144,9 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "NULL"
 
+def get_max_name_length():
+    return None
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)
