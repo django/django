@@ -111,7 +111,8 @@ def _execute_statements(cursor, statements, backend, dbname, verbosity):
     for template in statements:
         stmt = template % {'user': backend.quote_name(dbname),
 			   'user_temp': backend.quote_name(dbname + '_temp'),
-			   'tempfile': dbname + '_temp.dat'
+			   # purposefully *not* using backend.quote_name here
+			   'tempfile': dbname + '_temp.dat',
 			   'password': "Im a lumberjack"}
         if verbosity >= 2:
             print stmt
