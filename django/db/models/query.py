@@ -1,3 +1,4 @@
+from django import db
 from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
@@ -74,7 +75,7 @@ def quote_only_if_word(word):
     else:
         return backend.quote_name(word)
 
-class QuerySet(object):
+class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
     def __init__(self, model=None):
         self.model = model
@@ -556,6 +557,15 @@ class QuerySet(object):
                 full_query = None 
              
             return select, " ".join(sql), params, full_query
+
+# Check to see if the DB backend would like to define its own QuerySet class
+# and otherwise use the default.
+backend_query_module = db.get_query_module()
+if hasattr(backend_query_module, "get_query_set_class"):
+    QuerySet = db.get_query_module().get_query_set_class(_QuerySet)
+else:
+    QuerySet = _QuerySet
+            
 class ValuesQuerySet(QuerySet):
     def iterator(self):
         # select_related and select aren't supported in values().
