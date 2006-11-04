@@ -82,7 +82,7 @@ def _create_test_db(cursor, backend, dbname, verbosity):
         print "_create_test_db(): dbname = %s" % dbname
     statements = [
         """create tablespace "%(user)s"
-           datafile '%(user)s.dbf' size 10M autoextend on next 10M  maxsize 20M
+           datafile '%(datafile)s' size 10M autoextend on next 10M  maxsize 20M
         """,
         """create temporary tablespace %(user_temp)s
            tempfile '%(tempfile)s' size 10M autoextend on next 10M  maxsize 20M
@@ -90,7 +90,7 @@ def _create_test_db(cursor, backend, dbname, verbosity):
         """create user %(user)s
            identified by %(password)s
            default tablespace %(user)s
-           temporary tablespace %(user)s_temp
+           temporary tablespace %(user_temp)s
         """,
         """grant resource to %(user)s""",
         """grant connect to %(user)s""",
@@ -113,6 +113,7 @@ def _execute_statements(cursor, statements, backend, dbname, verbosity):
 			   'user_temp': backend.quote_name(dbname + '_temp'),
 			   # purposefully *not* using backend.quote_name here
 			   'tempfile': dbname + '_temp.dat',
+			   'datafile': dbname + '.dbf',
 			   'password': "Im a lumberjack"}
         if verbosity >= 2:
             print stmt
