@@ -6,7 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
-from django.conf import settings 
+from django.conf import settings
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -164,8 +164,8 @@ def _get_sql_model_create(model, known_models=set()):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if (settings.DATABASE_ENGINE == 'oracle') and f.unique and f.primary_key: 
-                # Suppress UNIQUE/PRIMARY KEY for Oracle (ORA-02259) 
+            if (settings.DATABASE_ENGINE == 'oracle') and f.unique and f.primary_key:
+                # Suppress UNIQUE/PRIMARY KEY for Oracle (ORA-02259)
                 field_output.remove(style.SQL_KEYWORD('UNIQUE'))
             if f.rel:
                 if f.rel.to in known_models:
@@ -191,11 +191,11 @@ def _get_sql_model_create(model, known_models=set()):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
     final_output.append('\n'.join(full_statement))
-    
-    # To simulate auto-incrementing primary keys in Oracle -- creating primary tables 
-    if (settings.DATABASE_ENGINE == 'oracle') & (opts.has_auto_field): 
-        sequence_statement = 'CREATE SEQUENCE %s_sq;' % opts.db_table 
-        final_output.append(sequence_statement) 
+
+    # To simulate auto-incrementing primary keys in Oracle -- creating primary tables
+    if (settings.DATABASE_ENGINE == 'oracle') & (opts.has_auto_field):
+        sequence_statement = 'CREATE SEQUENCE %s_sq;' % opts.db_table
+        final_output.append(sequence_statement)
         trigger_statement = '' + \
             'CREATE OR REPLACE trigger %s_tr\n'    % opts.db_table + \
             '  before insert on %s\n'           % backend.quote_name(opts.db_table) + \
@@ -203,8 +203,8 @@ def _get_sql_model_create(model, known_models=set()):
             '      when (new.id is NULL)\n' + \
             '        begin\n' + \
             '         select %s_sq.NEXTVAL into :new.id from DUAL;\n' % opts.db_table + \
-            '      end;\n'                                                                        
-        final_output.append(trigger_statement) 
+            '      end;\n'
+        final_output.append(trigger_statement)
 
 
     return final_output, pending_references
@@ -214,6 +214,7 @@ def _get_sql_for_pending_references(model, pending_references):
     Get any ALTER TABLE statements to add constraints after the fact.
     """
     from django.db import backend, get_creation_module
+    from django.db.backend.util import truncate_name
     data_types = get_creation_module().DATA_TYPES
 
     final_output = []
@@ -229,15 +230,9 @@ def _get_sql_for_pending_references(model, pending_references):
                 # For MySQL, r_name must be unique in the first 64 characters.
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
-                # if constraint name size is over 29 char and db is oracle, chop it 
-                if settings.DATABASE_ENGINE == 'oracle' and len(r_name) > 29: 
-                    final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                                        (backend.quote_name(r_table), r_name[0:29], 
-                                         backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col))) 
-                else: 
-                    final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                                        (backend.quote_name(r_table), r_name,
-                                         backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
+                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                                    (backend.quote_name(r_table), truncate_name(r_name, backend.get_max_name_length()),
+                                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
             del pending_references[model]
     return final_output
 
@@ -275,11 +270,11 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
-        # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables 
-        if (settings.DATABASE_ENGINE == 'oracle'): 
-            m_table = f.m2m_db_table() 
-            sequence_statement = 'CREATE SEQUENCE %s_sq;' % m_table 
-            final_output.append(sequence_statement) 
+        # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
+        if (settings.DATABASE_ENGINE == 'oracle'):
+            m_table = f.m2m_db_table()
+            sequence_statement = 'CREATE SEQUENCE %s_sq;' % m_table
+            final_output.append(sequence_statement)
             trigger_statement = '' + \
             'CREATE OR REPLACE trigger %s_tr\n'    % m_table + \
             '  before insert on %s\n'           % backend.quote_name(m_table) + \
@@ -287,8 +282,8 @@ def _get_many_to_many_sql_for_model(model):
             '      when (new.id is NULL)\n' + \
             '        begin\n' + \
             '         select %s_sq.NEXTVAL into :new.id from DUAL;\n' % m_table + \
-            '      end;\n' 
-            final_output.append(trigger_statement) 
+            '      end;\n'
+            final_output.append(trigger_statement)
     return final_output
 
 def get_sql_delete(app):
@@ -520,7 +515,7 @@ def syncdb(verbosity=1, interactive=True):
             if verbosity >= 1:
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
-                cursor.execute(statement) 
+                cursor.execute(statement)
             table_list.append(model._meta.db_table)
 
         for model in model_list:
