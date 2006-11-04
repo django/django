@@ -80,7 +80,7 @@ def destroy_test_db(settings, connection, backend, old_database_name, verbosity=
     _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME), verbosity)
     connection.close()
 
-def _create_test_db(cursor, dbname):
+def _create_test_db(cursor, dbname, verbosity):
     statements = [
 	"""create tablespace %(user)s
            datafile '%(user)s.dat' size 10M autoextend on next 10M  maxsize 20M
