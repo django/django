@@ -69,30 +69,30 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     you'll need to use "%%s".
     """
     def execute(self, query, params=None):
-        if params is None: params = []
-        query = self.convert_arguments(query, len(params))
+        if params is None: 
+            params = []
+        args = [(':arg%s' % i) for i in range(num_params)]
+        query = query % tuple(args)
+        
         # cx can not execute the query with the closing ';' 
-        if query.endswith(';') :
+        if query.endswith(';'):
             query = query[0:len(query)-1]			
-	print query
-	print params	
-	return Database.Cursor.execute(self, query, params)
+        return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
         if params is None: params = []
         query = self.convert_arguments(query, len(params[0]))
         # cx can not execute the query with the closing ';' 
         if query.endswith(';') :
-            query = query[0:len(query)-1]						    
+            query = query[0:len(query)-1]
         return Database.Cursor.executemany(self, query, params)
 
-    def convert_arguments(self, query, num_params):
-        # replace occurances of "%s" with ":arg" - Oracle requires colons for parameter placeholders.
-        args = [':arg' for i in range(num_params)]
-        return query % tuple(args)
-
 def quote_name(name):
-    return name
+    if name.startswith('"') and name.endswith('"'):
+        return name # Quoting once is enough.
+        
+    # Oracle requires that quoted names be uppercase.
+    return '"%s"' % name.upper()
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
