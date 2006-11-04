@@ -42,7 +42,7 @@ class DatabaseWrapper(local):
         # set oracle date to ansi date format
         cursor =  self.connection.cursor()
         cursor.execute("alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS'")
-        cursor.close()					     
+        cursor.close()
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
