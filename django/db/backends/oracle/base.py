@@ -71,7 +71,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     def execute(self, query, params=None):
         if params is None: 
             params = []
-        args = [(':arg%s' % i) for i in range(num_params)]
+        args = [(':arg%s' % i) for i in range(len(params))]
         query = query % tuple(args)
         
         # cx can not execute the query with the closing ';' 
