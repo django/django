@@ -5,7 +5,7 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
     cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
-    return [row[0] for row in cursor.fetchall()]
+    return [row[0].upper() for row in cursor]
 
 def get_table_description(cursor, table_name):
     return table_name
