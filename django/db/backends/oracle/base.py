@@ -61,6 +61,7 @@ class DatabaseWrapper(local):
             self.connection = None
 
 supports_constraints = True
+uses_case_insensitive_names = True
 
 class FormatStylePlaceholderCursor(Database.Cursor):
     """

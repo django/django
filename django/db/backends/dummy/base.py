@@ -24,6 +24,7 @@ class DatabaseWrapper:
         pass # close()
 
 supports_constraints = False
+uses_case_insensitive_names = False
 quote_name = complain
 dictfetchone = complain
 dictfetchmany = complain

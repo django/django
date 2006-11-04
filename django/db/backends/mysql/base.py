@@ -129,6 +129,7 @@ class DatabaseWrapper(local):
         return self.server_version
 
 supports_constraints = True
+uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith("`") and name.endswith("`"):
