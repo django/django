@@ -1,6 +1,6 @@
 import sys, time
 from django.conf import settings
-from django.db import connection, transaction, backend
+from django.db import connection, transaction, backend, get_creation_module
 from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
@@ -43,6 +43,11 @@ def _set_autocommit(connection):
         connection.connection.set_isolation_level(0)
 
 def create_test_db(verbosity=1, autoclobber=False):
+    # If the database backend wants to create the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "create_test_db"):
+        creation_module.create_test_db(verbosity, autoclobber)
+    
     if verbosity >= 1:
         print "Creating test database..."
     # If we're using SQLite, it's more convenient to test against an
@@ -89,6 +94,11 @@ def create_test_db(verbosity=1, autoclobber=False):
     cursor = connection.cursor()
 
 def destroy_test_db(old_database_name, verbosity=1):
+    # If the database wants to drop the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "destroy_test_db"):
+        creation_module.destroy_test_db(old_database_name, verbosity=1)
+    
     # Unless we're using SQLite, remove the test database to clean up after
     # ourselves. Connect to the previous database (not the test database)
     # to do so, because it's not allowed to delete a database while being
