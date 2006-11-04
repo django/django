@@ -23,9 +23,17 @@ except ImportError, e:
     else:
         raise # If there's some other error, this must be an error in Django itself.
 
-get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, {}, {}, [''])
-get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
-runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
+def backend_module_accessor(module_name):
+    def accessor():
+        full_name = 'django.db.backends.%s.%s' % (settings.DATABASE_ENGINE, module_name)
+        return __import__(full_name, {}, {}, [''])
+    return accessor
+
+get_introspection_module = backend_module_accessor("introspection")
+get_creation_module = backend_module_accessor("creation")
+get_query_module = backend_module_accessor("query")
+get_client_module = backend_module_accessor("client")
+runshell = lambda: get_client_module().runshell()
 
 connection = backend.DatabaseWrapper()
 DatabaseError = backend.DatabaseError
