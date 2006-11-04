@@ -56,12 +56,16 @@ def _is_valid_dir_name(s):
 
 def _get_installed_models(table_list):
     "Gets a set of all models that are installed, given a list of existing tables"
-    from django.db import models
+    from django.db import models, backend
     all_models = []
     for app in models.get_apps():
         for model in models.get_models(app):
             all_models.append(model)
-    return set([m for m in all_models if m._meta.db_table in table_list])
+    if backend.uses_case_insensitive_names:
+        converter = str.upper
+    else:
+        converter = lambda x: x
+    return set([m for m in all_models if converter(m._meta.db_table) in map(converter, table_list)])
 
 def _get_table_list():
     "Gets a list of all db tables that are physically installed."
