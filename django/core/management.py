@@ -304,6 +304,10 @@ def get_sql_delete(app):
         table_names = introspection.get_table_list(cursor)
     else:
         table_names = []
+    if backend.uses_case_insensitive_names:
+        table_name_converter = str.upper
+    else:
+        table_name_converter = lambda x: x
 
     output = []
 
@@ -313,7 +317,7 @@ def get_sql_delete(app):
     references_to_delete = {}
     app_models = models.get_models(app)
     for model in app_models:
-        if cursor and model._meta.db_table in table_names:
+        if cursor and table_name_converter(model._meta.db_table) in table_names:
             # The table exists, so it needs to be dropped
             opts = model._meta
             for f in opts.fields:
@@ -323,7 +327,7 @@ def get_sql_delete(app):
             to_delete.add(model)
 
     for model in app_models:
-        if cursor and model._meta.db_table in table_names:
+        if cursor and table_name_converter(model._meta.db_table) in table_names:
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
@@ -344,7 +348,7 @@ def get_sql_delete(app):
     for model in app_models:
         opts = model._meta
         for f in opts.many_to_many:
-            if cursor and f.m2m_db_table() in table_names:
+            if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
                     style.SQL_TABLE(backend.quote_name(f.m2m_db_table()))))
 
@@ -469,7 +473,7 @@ get_sql_all.args = APP_ARGS
 
 def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import connection, transaction, models, get_creation_module
+    from django.db import backend, connection, transaction, models, get_creation_module
     from django.db.models import signals
     from django.conf import settings
     from django.dispatch import dispatcher
@@ -494,6 +498,10 @@ def syncdb(verbosity=1, interactive=True):
     # Get a list of all existing database tables,
     # so we know what needs to be added.
     table_list = _get_table_list()
+    if backend.uses_case_insensitive_names:
+        table_name_converter = str.upper
+    else:
+        table_name_converter = lambda x: x
 
     # Get a list of already installed *models* so that references work right.
     seen_models = _get_installed_models(table_list)
@@ -507,7 +515,7 @@ def syncdb(verbosity=1, interactive=True):
             # Create the model's database table, if it doesn't already exist.
             if verbosity >= 2:
                 print "Processing %s.%s model" % (app_name, model._meta.object_name)
-            if model._meta.db_table in table_list:
+            if table_name_converter(model._meta.db_table) in table_list:
                 continue
             sql, references = _get_sql_model_create(model, seen_models)
             seen_models.add(model)
@@ -519,7 +527,7 @@ def syncdb(verbosity=1, interactive=True):
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
                 cursor.execute(statement)
-            table_list.append(model._meta.db_table)
+            table_list.append(table_name_converter(model._meta.db_table))
 
         for model in model_list:
             if model in created_models:
