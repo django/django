@@ -343,63 +343,63 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 # CharField ###################################################################
 
 >>> f = CharField(required=False)
->>> f.to_python(1)
+>>> f.clean(1)
 u'1'
->>> f.to_python('hello')
+>>> f.clean('hello')
 u'hello'
->>> f.to_python(None)
+>>> f.clean(None)
 u''
->>> f.to_python([1, 2, 3])
+>>> f.clean([1, 2, 3])
 u'[1, 2, 3]'
 
 CharField accepts an optional max_length parameter:
 >>> f = CharField(max_length=10, required=False)
->>> f.to_python('')
+>>> f.clean('')
 u''
->>> f.to_python('12345')
+>>> f.clean('12345')
 u'12345'
->>> f.to_python('1234567890')
+>>> f.clean('1234567890')
 u'1234567890'
->>> f.to_python('1234567890a')
+>>> f.clean('1234567890a')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at most 10 characters.']
 
 CharField accepts an optional min_length parameter:
 >>> f = CharField(min_length=10, required=False)
->>> f.to_python('')
+>>> f.clean('')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at least 10 characters.']
->>> f.to_python('12345')
+>>> f.clean('12345')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at least 10 characters.']
->>> f.to_python('1234567890')
+>>> f.clean('1234567890')
 u'1234567890'
->>> f.to_python('1234567890a')
+>>> f.clean('1234567890a')
 u'1234567890a'
 
 # IntegerField ################################################################
 
 >>> f = IntegerField()
->>> f.to_python('1')
+>>> f.clean('1')
 1
->>> isinstance(f.to_python('1'), int)
+>>> isinstance(f.clean('1'), int)
 True
->>> f.to_python('23')
+>>> f.clean('23')
 23
->>> f.to_python('a')
+>>> f.clean('a')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
->>> f.to_python('1 ')
+>>> f.clean('1 ')
 1
->>> f.to_python(' 1')
+>>> f.clean(' 1')
 1
->>> f.to_python(' 1 ')
+>>> f.clean(' 1 ')
 1
->>> f.to_python('1a')
+>>> f.clean('1a')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
@@ -408,75 +408,75 @@ ValidationError: [u'Enter a whole number.']
 
 >>> import datetime
 >>> f = DateField()
->>> f.to_python(datetime.date(2006, 10, 25))
+>>> f.clean(datetime.date(2006, 10, 25))
 datetime.date(2006, 10, 25)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
 datetime.date(2006, 10, 25)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
 datetime.date(2006, 10, 25)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
 datetime.date(2006, 10, 25)
->>> f.to_python('2006-10-25')
+>>> f.clean('2006-10-25')
 datetime.date(2006, 10, 25)
->>> f.to_python('10/25/2006')
+>>> f.clean('10/25/2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('10/25/06')
+>>> f.clean('10/25/06')
 datetime.date(2006, 10, 25)
->>> f.to_python('Oct 25 2006')
+>>> f.clean('Oct 25 2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('October 25 2006')
+>>> f.clean('October 25 2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('October 25, 2006')
+>>> f.clean('October 25, 2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('25 October 2006')
+>>> f.clean('25 October 2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('25 October, 2006')
+>>> f.clean('25 October, 2006')
 datetime.date(2006, 10, 25)
->>> f.to_python('2006-4-31')
+>>> f.clean('2006-4-31')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
->>> f.to_python('200a-10-25')
+>>> f.clean('200a-10-25')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
->>> f.to_python('25/10/06')
+>>> f.clean('25/10/06')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
->>> f.to_python(None)
+>>> f.clean(None)
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
 
 >>> f = DateField(required=False)
->>> f.to_python(None)
->>> repr(f.to_python(None))
+>>> f.clean(None)
+>>> repr(f.clean(None))
 'None'
->>> f.to_python('')
->>> repr(f.to_python(''))
+>>> f.clean('')
+>>> repr(f.clean(''))
 'None'
 
 DateField accepts an optional input_formats parameter:
 >>> f = DateField(input_formats=['%Y %m %d'])
->>> f.to_python(datetime.date(2006, 10, 25))
+>>> f.clean(datetime.date(2006, 10, 25))
 datetime.date(2006, 10, 25)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
 datetime.date(2006, 10, 25)
->>> f.to_python('2006 10 25')
+>>> f.clean('2006 10 25')
 datetime.date(2006, 10, 25)
 
 The input_formats parameter overrides all default input formats,
 so the default formats won't work unless you specify them:
->>> f.to_python('2006-10-25')
+>>> f.clean('2006-10-25')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
->>> f.to_python('10/25/2006')
+>>> f.clean('10/25/2006')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
->>> f.to_python('10/25/06')
+>>> f.clean('10/25/06')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
@@ -485,63 +485,63 @@ ValidationError: [u'Enter a valid date.']
 
 >>> import datetime
 >>> f = DateTimeField()
->>> f.to_python(datetime.date(2006, 10, 25))
+>>> f.clean(datetime.date(2006, 10, 25))
 datetime.datetime(2006, 10, 25, 0, 0)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
 datetime.datetime(2006, 10, 25, 14, 30, 59)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
 datetime.datetime(2006, 10, 25, 14, 30, 59, 200)
->>> f.to_python('2006-10-25 14:30:45')
+>>> f.clean('2006-10-25 14:30:45')
 datetime.datetime(2006, 10, 25, 14, 30, 45)
->>> f.to_python('2006-10-25 14:30:00')
+>>> f.clean('2006-10-25 14:30:00')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('2006-10-25 14:30')
+>>> f.clean('2006-10-25 14:30')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('2006-10-25')
+>>> f.clean('2006-10-25')
 datetime.datetime(2006, 10, 25, 0, 0)
->>> f.to_python('10/25/2006 14:30:45')
+>>> f.clean('10/25/2006 14:30:45')
 datetime.datetime(2006, 10, 25, 14, 30, 45)
->>> f.to_python('10/25/2006 14:30:00')
+>>> f.clean('10/25/2006 14:30:00')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('10/25/2006 14:30')
+>>> f.clean('10/25/2006 14:30')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('10/25/2006')
+>>> f.clean('10/25/2006')
 datetime.datetime(2006, 10, 25, 0, 0)
->>> f.to_python('10/25/06 14:30:45')
+>>> f.clean('10/25/06 14:30:45')
 datetime.datetime(2006, 10, 25, 14, 30, 45)
->>> f.to_python('10/25/06 14:30:00')
+>>> f.clean('10/25/06 14:30:00')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('10/25/06 14:30')
+>>> f.clean('10/25/06 14:30')
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python('10/25/06')
+>>> f.clean('10/25/06')
 datetime.datetime(2006, 10, 25, 0, 0)
->>> f.to_python('hello')
+>>> f.clean('hello')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date/time.']
->>> f.to_python('2006-10-25 4:30 p.m.')
+>>> f.clean('2006-10-25 4:30 p.m.')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date/time.']
 
 DateField accepts an optional input_formats parameter:
 >>> f = DateTimeField(input_formats=['%Y %m %d %I:%M %p'])
->>> f.to_python(datetime.date(2006, 10, 25))
+>>> f.clean(datetime.date(2006, 10, 25))
 datetime.datetime(2006, 10, 25, 0, 0)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
 datetime.datetime(2006, 10, 25, 14, 30)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
 datetime.datetime(2006, 10, 25, 14, 30, 59)
->>> f.to_python(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
 datetime.datetime(2006, 10, 25, 14, 30, 59, 200)
->>> f.to_python('2006 10 25 2:30 PM')
+>>> f.clean('2006 10 25 2:30 PM')
 datetime.datetime(2006, 10, 25, 14, 30)
 
 The input_formats parameter overrides all default input formats,
 so the default formats won't work unless you specify them:
->>> f.to_python('2006-10-25 14:30:45')
+>>> f.clean('2006-10-25 14:30:45')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date/time.']
@@ -549,51 +549,51 @@ ValidationError: [u'Enter a valid date/time.']
 # RegexField ##################################################################
 
 >>> f = RegexField('^\d[A-F]\d$')
->>> f.to_python('2A2')
+>>> f.clean('2A2')
 u'2A2'
->>> f.to_python('3F3')
+>>> f.clean('3F3')
 u'3F3'
->>> f.to_python('3G3')
+>>> f.clean('3G3')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
->>> f.to_python(' 2A2')
+>>> f.clean(' 2A2')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
->>> f.to_python('2A2 ')
+>>> f.clean('2A2 ')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
 
 Alternatively, RegexField can take a compiled regular expression:
 >>> f = RegexField(re.compile('^\d[A-F]\d$'))
->>> f.to_python('2A2')
+>>> f.clean('2A2')
 u'2A2'
->>> f.to_python('3F3')
+>>> f.clean('3F3')
 u'3F3'
->>> f.to_python('3G3')
+>>> f.clean('3G3')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
->>> f.to_python(' 2A2')
+>>> f.clean(' 2A2')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
->>> f.to_python('2A2 ')
+>>> f.clean('2A2 ')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
 
 RegexField takes an optional error_message argument:
 >>> f = RegexField('^\d\d\d\d$', 'Enter a four-digit number.')
->>> f.to_python('1234')
+>>> f.clean('1234')
 u'1234'
->>> f.to_python('123')
+>>> f.clean('123')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a four-digit number.']
->>> f.to_python('abcd')
+>>> f.clean('abcd')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a four-digit number.']
@@ -601,17 +601,17 @@ ValidationError: [u'Enter a four-digit number.']
 # EmailField ##################################################################
 
 >>> f = EmailField()
->>> f.to_python('person@example.com')
+>>> f.clean('person@example.com')
 u'person@example.com'
->>> f.to_python('foo')
+>>> f.clean('foo')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
->>> f.to_python('foo@')
+>>> f.clean('foo@')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
->>> f.to_python('foo@bar')
+>>> f.clean('foo@bar')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
@@ -619,31 +619,31 @@ ValidationError: [u'Enter a valid e-mail address.']
 # URLField ##################################################################
 
 >>> f = URLField()
->>> f.to_python('http://example.com')
+>>> f.clean('http://example.com')
 u'http://example.com'
->>> f.to_python('http://www.example.com')
+>>> f.clean('http://www.example.com')
 u'http://www.example.com'
->>> f.to_python('foo')
+>>> f.clean('foo')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('example.com')
+>>> f.clean('example.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('http://')
+>>> f.clean('http://')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('http://example')
+>>> f.clean('http://example')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('http://example.')
+>>> f.clean('http://example.')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('http://.com')
+>>> f.clean('http://.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
@@ -651,17 +651,17 @@ ValidationError: [u'Enter a valid URL.']
 URLField takes an optional verify_exists parameter, which is False by default.
 This verifies that the URL is live on the Internet and doesn't return a 404 or 500:
 >>> f = URLField(verify_exists=True)
->>> f.to_python('http://www.google.com')
+>>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
 u'http://www.google.com'
->>> f.to_python('http://example')
+>>> f.clean('http://example')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.to_python('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
+>>> f.clean('http://www.jfoiwjfoi23jfoijoaijfoiwjofiwjefewl.com') # bad domain
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
->>> f.to_python('http://google.com/we-love-microsoft.html') # good domain, bad page
+>>> f.clean('http://google.com/we-love-microsoft.html') # good domain, bad page
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
@@ -669,41 +669,41 @@ ValidationError: [u'This URL appears to be a broken link.']
 # BooleanField ################################################################
 
 >>> f = BooleanField()
->>> f.to_python(True)
+>>> f.clean(True)
 True
->>> f.to_python(False)
+>>> f.clean(False)
 False
->>> f.to_python(1)
+>>> f.clean(1)
 True
->>> f.to_python(0)
+>>> f.clean(0)
 False
->>> f.to_python('Django rocks')
+>>> f.clean('Django rocks')
 True
 
 # ChoiceField #################################################################
 
 >>> f = ChoiceField(choices=[('1', '1'), ('2', '2')])
->>> f.to_python(1)
+>>> f.clean(1)
 u'1'
->>> f.to_python('1')
+>>> f.clean('1')
 u'1'
->>> f.to_python(None)
+>>> f.clean(None)
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.to_python('')
+>>> f.clean('')
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.to_python('3')
+>>> f.clean('3')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
->>> f.to_python('J')
+>>> f.clean('J')
 u'J'
->>> f.to_python('John')
+>>> f.clean('John')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. John is not one of the available choices.']
@@ -711,32 +711,56 @@ ValidationError: [u'Select a valid choice. John is not one of the available choi
 # MultipleChoiceField #########################################################
 
 >>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')])
->>> f.to_python([1])
+>>> f.clean([1])
 [u'1']
->>> f.to_python(['1'])
+>>> f.clean(['1'])
 [u'1']
->>> f.to_python(['1', '2'])
+>>> f.clean(['1', '2'])
 [u'1', u'2']
->>> f.to_python([1, '2'])
+>>> f.clean([1, '2'])
 [u'1', u'2']
->>> f.to_python((1, '2'))
+>>> f.clean((1, '2'))
 [u'1', u'2']
->>> f.to_python('hello')
+>>> f.clean('hello')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a list of values.']
->>> f.to_python([])
+>>> f.clean([])
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.to_python(())
+>>> f.clean(())
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
->>> f.to_python(['3'])
+>>> f.clean(['3'])
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
+# ComboField ##################################################################
+
+ComboField takes a list of fields that should be used to validate a value,
+in that order:
+>>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
+>>> f.clean('test@example.com')
+u'test@example.com'
+>>> f.clean('longemailaddress@example.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 20 characters.']
+>>> f.clean('not an e-mail')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid e-mail address.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 
 # Form ########################################################################
 
@@ -744,6 +768,41 @@ ValidationError: [u'Select a valid choice. 3 is not one of the available choices
 ...     first_name = CharField()
 ...     last_name = CharField()
 ...     birthday = DateField()
+>>> p = Person()
+>>> print p
+<table>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+</table>
+>>> print p.as_table()
+<table>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+</table>
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+</ul>
+>>> print p.as_table_with_errors()
+<table>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+</table>
+>>> print p.as_ul_with_errors()
+<ul>
+<li><ul><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
+<li><ul><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
+<li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
+</ul>
+
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
 >>> p.errors()
 {}
@@ -753,7 +812,7 @@ True
 u''
 >>> p.errors().as_text()
 u''
->>> p.to_python()
+>>> p.clean()
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> print p['first_name']
 <input type="text" name="first_name" value="John" />
@@ -766,6 +825,12 @@ u''
 <input type="text" name="first_name" value="John" />
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
+>>> print p
+<table>
+<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
+</table>
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors()
@@ -779,8 +844,8 @@ u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is re
   * This field is required.
 * birthday
   * This field is required.
->>> p.to_python()
->>> repr(p.to_python())
+>>> p.clean()
+>>> repr(p.clean())
 'None'
 >>> p['first_name'].errors
 [u'This field is required.']
@@ -887,6 +952,84 @@ MultipleChoiceField is a special case, as its data is required to be a list:
 <option value="J">John Lennon</option>
 <option value="P" selected="selected">Paul McCartney</option>
 </select>
+
+There are a couple of ways to do multiple-field validation. If you want the
+validation message to be associated with a particular field, implement the
+clean_XXX() method on the Form, where XXX is the field name. As in
+Field.clean(), the clean_XXX() method should return the cleaned value:
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput)
+...    def clean_password2(self):
+...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...            raise ValidationError(u'Please make sure your passwords match.')
+...        return self.clean_data['password2']
+>>> f = UserRegistration()
+>>> f.errors()
+{'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
+>>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
+>>> f.errors()
+{'password2': [u'Please make sure your passwords match.']}
+>>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
+>>> f.errors()
+{}
+>>> f.clean()
+{'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
+
+Another way of doing multiple-field validation is by implementing the
+Form's clean() method. If you do this, any ValidationError raised by that
+method will not be associated with a particular field; it will have a
+special-case association with the field named '__all__'. Note that
+Form.clean() still needs to return a dictionary of all clean data:
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput)
+...    def clean(self):
+...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...            raise ValidationError(u'Please make sure your passwords match.')
+...        return self.clean_data
+>>> f = UserRegistration()
+>>> print f.as_table()
+<table>
+<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
+<tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
+</table>
+>>> f.errors()
+{'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
+>>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
+>>> f.errors()
+{'__all__': [u'Please make sure your passwords match.']}
+>>> print f.as_table()
+<table>
+<tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
+<tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
+<tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
+</table>
+>>> print f.as_table_with_errors()
+<table>
+<tr><td colspan="2"><ul><li>Please make sure your passwords match.</li></ul></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
+<tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
+<tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
+</table>
+>>> print f.as_ul_with_errors()
+<ul>
+<li><ul><li>Please make sure your passwords match.</li></ul></li>
+<li>Username: <input type="text" name="username" value="adrian" /></li>
+<li>Password1: <input type="password" name="password1" value="foo" /></li>
+<li>Password2: <input type="password" name="password2" value="bar" /></li>
+</ul>
+>>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
+>>> f.errors()
+{}
+>>> f.clean()
+{'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
+
+
+
 """
 
 if __name__ == "__main__":
