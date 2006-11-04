@@ -120,4 +120,5 @@ def _test_database_name(settings):
 	name = settings.TEST_DATABASE_NAME
     else:
 	name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
+    return name
     
