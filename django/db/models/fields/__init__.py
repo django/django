@@ -159,6 +159,10 @@ class Field(object):
 
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
+        # Oracle treats empty strings ('') the same as NULLs.  
+        # To get around this wart, we need to change it to something else...  
+        if settings.DATABASE_ENGINE == 'oracle' and  value == '': 
+            value = ' '
         return value
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -458,9 +462,13 @@ class DateField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if isinstance(value, datetime.datetime):
-            value = value.date().strftime('%Y-%m-%d')
+            if settings.DATABASE_ENGINE != 'oracle':
+                #Oracle does not need a string conversion
+                value = value.date().strftime('%Y-%m-%d')
         elif isinstance(value, datetime.date):
-            value = value.strftime('%Y-%m-%d')
+            if settings.DATABASE_ENGINE != 'oracle':
+                #Oracle does not need a string conversion
+                value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
@@ -490,21 +498,25 @@ class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if isinstance(value, datetime.datetime):
-            # MySQL will throw a warning if microseconds are given, because it
+            # MySQL/Oracle will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+            if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = str(value)
         elif isinstance(value, datetime.date):
-            # MySQL will throw a warning if microseconds are given, because it
+            # MySQL/Oracle will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+            if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
                 value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
             value = str(value)
             
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
+        # Oracle will throw an error if microseconds are given, because it
+        # doesn't support microseconds.
+        if (settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
+            value = value.replace(microsecond=0)
         if lookup_type == 'range':
             value = [str(v) for v in value]
         else:
@@ -532,8 +544,13 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+        #cx_Oracle does not support strftime 
+        if (settings.DATABASE_ENGINE=='oracle'): 
+            return {date_field: (val is not None or ''), 
+                    time_field: (val is not None or '')} 
+        else: 
+            return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''), 
+                    time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
@@ -765,7 +782,13 @@ class TimeField(Field):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql':
                 value = value.replace(microsecond=0)
-            value = str(value)
+                value = str(value) 
+            elif settings.DATABASE_ENGINE == 'oracle': 
+                value = value.replace(microsecond=0) 
+                # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
+                value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
+            else: 
+                value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):

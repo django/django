@@ -3,6 +3,7 @@ from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+from django.conf import settings
 import operator
 import re
 
@@ -168,8 +169,17 @@ class QuerySet(object):
         extra_select = self._select.items()
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause()
-        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+        
+        full_query = None
+        if (settings.DATABASE_ENGINE == 'oracle'):
+            select, sql, params, full_query = self._get_sql_clause() 
+        else:
+            select, sql, params = self._get_sql_clause() 
+
+        if not full_query: 
+            cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
+        else: 
+            cursor.execute(full_query, params) 
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
         while 1:
@@ -192,7 +202,10 @@ class QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        select, sql, params = counter._get_sql_clause()
+        if (settings.DATABASE_ENGINE == 'oracle'):
+            select, sql, params, full_query = counter._get_sql_clause() 
+        else:
+            select, sql, params = counter._get_sql_clause() 
         cursor = connection.cursor()
         if self._distinct:
             id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
@@ -501,13 +514,48 @@ class QuerySet(object):
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
-        if self._limit is not None:
-            sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
+        if (settings.DATABASE_ENGINE != 'oracle'):             
+            if self._limit is not None:
+                sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
+            else:
+                assert self._offset is None, "'offset' is not allowed without 'limit'"
+
+            return select, " ".join(sql), params
         else:
-            assert self._offset is None, "'offset' is not allowed without 'limit'"
+            # To support limits and offsets, Oracle requires some funky rewriting of an otherwise normal looking query. 
+            select_clause = ",".join(select) 
+            distinct = (self._distinct and "DISTINCT " or "") 
 
-        return select, " ".join(sql), params
+            if order_by:  
+                order_by_clause = " OVER (ORDER BY %s )" % (", ".join(order_by)) 
+            else:
+                #Oracle's row_number() function always requires an order-by clause. 
+                #So we need to define a default order-by, since none was provided. 
+                order_by_clause = " OVER (ORDER BY %s.%s)" % \
+                    (backend.quote_name(opts.db_table),  
+                    backend.quote_name(opts.fields[0].db_column or opts.fields[0].column)) 
+            # limit_and_offset_clause 
+            offset = self._offset and int(self._offset) or 0 
+            limit = self._limit and int(self._limit) or None 
+            limit_and_offset_clause = '' 
+            if limit: 
+                limit_and_offset_clause = "WHERE rn > %s AND rn <= %s" % (offset, limit+offset) 
+            elif offset:
+                limit_and_offset_clause = "WHERE rn > %s" % (offset) 
 
+            if len(limit_and_offset_clause) > 0: 
+                full_query = """SELECT * FROM  
+                    (SELECT %s    
+                    %s, 
+                    ROW_NUMBER() %s AS rn 
+                    %s 
+                    ) 
+                    %s 
+                    """ % (distinct, select_clause, order_by_clause, " ".join(sql), limit_and_offset_clause)
+            else:
+                full_query = None 
+             
+            return select, " ".join(sql), params, full_query
 class ValuesQuerySet(QuerySet):
     def iterator(self):
         # select_related and select aren't supported in values().
@@ -523,7 +571,10 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause()
+        if (settings.DATABASE_ENGINE == 'oracle'):
+            select, sql, params, full_query = self._get_sql_clause() 
+        else:
+            select, sql, params = self._get_sql_clause() 
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -636,6 +687,9 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
+    #put some oracle exceptions here 
+    if lookup_type == "icontains" and settings.DATABASE_ENGINE == 'oracle': 
+        return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s')) 
     try:
         return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
@@ -667,6 +721,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
+    from django.db.models.fields import AutoField 
     qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
@@ -680,7 +735,10 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
                 (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (qn(db_table), qn(f2.column)) for f2 in f.rel.to._meta.fields])
+            if settings.DATABASE_ENGINE == 'oracle':
+                select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields if not isinstance(f2, AutoField)]) 
+            else:
+                select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields]) 
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def parse_lookup(kwarg_items, opts):

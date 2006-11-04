@@ -39,6 +39,10 @@ class DatabaseWrapper(local):
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string)
+        # set oracle date to ansi date format
+        cursor =  self.connection.cursor()
+        cursor.execute("alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS'")
+        cursor.close()					     
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
@@ -67,11 +71,19 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     def execute(self, query, params=None):
         if params is None: params = []
         query = self.convert_arguments(query, len(params))
-        return Database.Cursor.execute(self, query, params)
+        # cx can not execute the query with the closing ';' 
+        if query.endswith(';') :
+            query = query[0:len(query)-1]			
+	print query
+	print params	
+	return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
         if params is None: params = []
         query = self.convert_arguments(query, len(params[0]))
+        # cx can not execute the query with the closing ';' 
+        if query.endswith(';') :
+            query = query[0:len(query)-1]						    
         return Database.Cursor.executemany(self, query, params)
 
     def convert_arguments(self, query, num_params):

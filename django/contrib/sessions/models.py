@@ -51,6 +51,7 @@ class Session(models.Model):
     session_key = models.CharField(_('session key'), maxlength=40, primary_key=True)
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'))
+
     objects = SessionManager()
     class Meta:
         db_table = 'django_session'

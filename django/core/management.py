@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured
 import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
+from django.conf import settings 
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -84,7 +85,7 @@ def get_version():
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import get_creation_module, models
+    from django.db import models,get_creation_module, backend
     data_types = get_creation_module().DATA_TYPES
 
     if not data_types:
@@ -163,6 +164,9 @@ def _get_sql_model_create(model, known_models=set()):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+            if (settings.DATABASE_ENGINE == 'oracle') and f.unique and f.primary_key: 
+                # Suppress UNIQUE/PRIMARY KEY for Oracle (ORA-02259) 
+                field_output.remove(style.SQL_KEYWORD('UNIQUE'))
             if f.rel:
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
@@ -187,6 +191,21 @@ def _get_sql_model_create(model, known_models=set()):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(');')
     final_output.append('\n'.join(full_statement))
+    
+    # To simulate auto-incrementing primary keys in Oracle -- creating primary tables 
+    if (settings.DATABASE_ENGINE == 'oracle') & (opts.has_auto_field): 
+        sequence_statement = 'CREATE SEQUENCE %s_sq;' % opts.db_table 
+        final_output.append(sequence_statement) 
+        trigger_statement = '' + \
+            'CREATE OR REPLACE trigger %s_tr\n'    % opts.db_table + \
+            '  before insert on %s\n'           % backend.quote_name(opts.db_table) + \
+            '    for each row\n'  + \
+            '      when (new.id is NULL)\n' + \
+            '        begin\n' + \
+            '         select %s_sq.NEXTVAL into :new.id from DUAL;\n' % opts.db_table + \
+            '      end;\n'                                                                        
+        final_output.append(trigger_statement) 
+
 
     return final_output, pending_references
 
@@ -210,9 +229,15 @@ def _get_sql_for_pending_references(model, pending_references):
                 # For MySQL, r_name must be unique in the first 64 characters.
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
-                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table), r_name,
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
+                # if constraint name size is over 29 char and db is oracle, chop it 
+                if settings.DATABASE_ENGINE == 'oracle' and len(r_name) > 29: 
+                    final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                                        (backend.quote_name(r_table), r_name[0:29], 
+                                         backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col))) 
+                else: 
+                    final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                                        (backend.quote_name(r_table), r_name,
+                                         backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
             del pending_references[model]
     return final_output
 
@@ -250,6 +275,20 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
+        # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables 
+        if (settings.DATABASE_ENGINE == 'oracle'): 
+            m_table = f.m2m_db_table() 
+            sequence_statement = 'CREATE SEQUENCE %s_sq;' % m_table 
+            final_output.append(sequence_statement) 
+            trigger_statement = '' + \
+            'CREATE OR REPLACE trigger %s_tr\n'    % m_table + \
+            '  before insert on %s\n'           % backend.quote_name(m_table) + \
+            '    for each row\n'  + \
+            '      when (new.id is NULL)\n' + \
+            '        begin\n' + \
+            '         select %s_sq.NEXTVAL into :new.id from DUAL;\n' % m_table + \
+            '      end;\n' 
+            final_output.append(trigger_statement) 
     return final_output
 
 def get_sql_delete(app):
@@ -481,7 +520,12 @@ def syncdb(verbosity=1, interactive=True):
             if verbosity >= 1:
                 print "Creating table %s" % model._meta.db_table
             for statement in sql:
-                cursor.execute(statement)
+                # go on if one table could not be created 
+                try: 
+                    cursor.execute(statement) 
+                except Exception, e: 
+                    print statement 
+                    print e 
             table_list.append(model._meta.db_table)
 
         for model in model_list:
@@ -491,7 +535,11 @@ def syncdb(verbosity=1, interactive=True):
                     if verbosity >= 2:
                         print "Creating many-to-many tables for %s.%s model" % (app_name, model._meta.object_name)
                     for statement in sql:
-                        cursor.execute(statement)
+                        try:
+                            cursor.execute(statement)
+                        except Exception, e:
+                            print statement
+                            print e
 
         transaction.commit_unless_managed()
 
@@ -1397,7 +1445,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if not mod_list:
             parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
-            print style.SQL_KEYWORD("BEGIN;")
+            if settings.DATABASE_ENGINE != 'oracle':
+                print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
             if action == 'reset':
                 output = action_mapping[action](mod, options.interactive)
@@ -1406,7 +1455,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
-            print style.SQL_KEYWORD("COMMIT;")
+            if settings.DATABASE_ENGINE != 'oracle':
+                print style.SQL_KEYWORD("COMMIT;")
 
 def setup_environ(settings_mod):
     """

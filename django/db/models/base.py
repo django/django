@@ -171,8 +171,9 @@ class Model(object):
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
-                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
+            lim = settings.DATABASE_ENGINE != 'oracle' and ' LIMIT 1' or ''
+            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s %s" % \
+                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), lim), [pk_val])
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
                 db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
