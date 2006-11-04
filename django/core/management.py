@@ -444,6 +444,7 @@ get_sql_indexes.args = APP_ARGS
 def get_sql_indexes_for_model(model):
     "Returns the CREATE INDEX SQL statements for a single model"
     from django.db import backend
+    from django.db.backends.util import truncate_name
     output = []
 
     for f in model._meta.fields:
@@ -451,7 +452,7 @@ def get_sql_indexes_for_model(model):
             unique = f.unique and 'UNIQUE ' or ''
             output.append(
                 style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                truncate_name(style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)), backend.get_max_name_length()) + ' ' + \
                 style.SQL_KEYWORD('ON') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                 "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
