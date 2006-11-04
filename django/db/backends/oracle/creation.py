@@ -38,7 +38,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     cursor = connection.cursor()
     try:
         _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
-			verbosity)
+                        verbosity)
     except Exception, e:            
         sys.stderr.write("Got an error creating the test database: %s\n" % e)
         if not autoclobber:
@@ -48,11 +48,11 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
                 if verbosity >= 1:
                     print "Destroying old test database..."                
                 _destroy_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
-				 verbosity)
+                                 verbosity)
                 if verbosity >= 1:
                     print "Creating test database..."
                 _create_test_db(cursor, backend.quote_name(TEST_DATABASE_NAME),
-				verbosity)
+                                verbosity)
             except Exception, e:
                 sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                 sys.exit(2)
@@ -66,7 +66,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
     cursor = connection.cursor()
-	
+        
 def destroy_test_db(settings, connection, backend, old_database_name, verbosity=1):
     if verbosity >= 1:
         print "Destroying test database..."
@@ -81,47 +81,51 @@ def destroy_test_db(settings, connection, backend, old_database_name, verbosity=
     connection.close()
 
 def _create_test_db(cursor, dbname, verbosity):
+    if verbosity >= 2:
+        print "_create_test_db(): dbname = %s" % dbname
     statements = [
-	"""create tablespace %(user)s
-           datafile '%(user)s.dat' size 10M autoextend on next 10M  maxsize 20M
-	""",
-	"""create temporary tablespace %(user)s_temp
-	   tempfile '%(user)s_temp.dat' size 10M autoextend on next 10M  maxsize 20M
-	""",
-	"""create user %(user)s
+        """create tablespace "%(user)s"
+           datafile '%(user)s.dbf' size 10M autoextend on next 10M  maxsize 20M
+        """,
+        """create temporary tablespace "%(user)s_temp"
+           tempfile '%(user)s_temp.dat' size 10M autoextend on next 10M  maxsize 20M
+        """,
+        """create user %(user)s
            identified by %(password)s
            default tablespace %(user)s
            temporary tablespace %(user)s_temp
         """,
-	"""grant resource to %(user)s""",
-	"""grant connect to %(user)s""",
+        """grant resource to %(user)s""",
+        """grant connect to %(user)s""",
     ]
     _execute_statements(cursor, statements, dbname, verbosity)
     
 def _destroy_test_db(cursor, dbname, verbosity):
+    if verbosity >= 2:
+        print "_destroy_test_db(): dbname=%s" % dbname
     statements = [
-	"""drop user %(user)s cascade""",
-	"""drop tablespace %(user)s including contents and datafiles cascade constraints""",
-	"""drop tablespace %(user)s_temp including contents and datafiles cascade constraints""",
-	]
+        """drop user %(user)s cascade""",
+        """drop tablespace %(user)s including contents and datafiles cascade constraints""",
+        """drop tablespace %(user)s_temp including contents and datafiles cascade constraints""",
+        ]
     _execute_statements(cursor, statements, dbname, verbosity)
 
 def _execute_statements(cursor, statements, dbname, verbosity):
     for template in statements:
-	stmt = template % {'user': dbname, 'password': "Im a lumberjack"}
-	if verbosity >= 1:
-	    print stmt
-	try:
-	    cursor.execute(stmt)
-	except Exception, err:
-	    sys.stderr.write("Failed (%s)\n" % (err))
-	    if required:
-		raise
+        stmt = template % {'user': dbname, 'password': "Im a lumberjack"}
+        if verbosity >= 2:
+            print stmt
+        try:
+            cursor.execute(stmt)
+        except Exception, err:
+            sys.stderr.write("Failed (%s)\n" % (err))
+            if required:
+                raise
 
 def _test_database_name(settings):
     if settings.TEST_DATABASE_NAME:
-	name = settings.TEST_DATABASE_NAME
+        name = settings.TEST_DATABASE_NAME
     else:
-	name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
+        name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
     return name
     
