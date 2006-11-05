@@ -28,6 +28,7 @@ DATA_TYPES = {
 }
 
 TEST_DATABASE_PREFIX = 'test_'
+PASSWORD = 'Im_a_lumberjack'
 
 def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False):
     if verbosity >= 1:
@@ -58,7 +59,8 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
             sys.exit(1)
                
     connection.close()
-    settings.DATABASE_NAME = TEST_DATABASE_NAME
+    settings.DATABASE_USER = TEST_DATABASE_NAME
+    settings.DATABASE_PASSWORD = PASSWORD
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
@@ -110,7 +112,7 @@ def _destroy_test_db(cursor, dbname, verbosity):
 def _execute_statements(cursor, statements, dbname, verbosity):
     for template in statements:
         stmt = template % {'user': dbname,
-			   'password': "Im_a_lumberjack"}
+			   'password': PASSWORD}
         if verbosity >= 2:
             print stmt
         try:
