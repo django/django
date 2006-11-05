@@ -76,7 +76,7 @@ class Options(object):
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
             self.db_table = truncate_name(self.db_table,
-                                          backend.get_max_name_length)
+                                          backend.get_max_name_length())
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
