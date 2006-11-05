@@ -145,6 +145,7 @@ def _get_sql_model_create(model, known_models=set()):
     Returns list_of_sql, pending_references_dict
     """
     from django.db import backend, get_creation_module, models
+    from django.db.backends.util import truncate_name
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
@@ -198,7 +199,8 @@ def _get_sql_model_create(model, known_models=set()):
 
     # To simulate auto-incrementing primary keys in Oracle -- creating primary tables
     if (settings.DATABASE_ENGINE == 'oracle') & (opts.has_auto_field):
-        sequence_statement = 'CREATE SEQUENCE %s_sq;' % opts.db_table
+        sequence_name = truncate_name('%s_sq' % opts.db_table, backend.get_max_name_length())
+        sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
         final_output.append(sequence_statement)
         trigger_statement = '' + \
             'CREATE OR REPLACE trigger %s_tr\n'    % opts.db_table + \
@@ -206,7 +208,7 @@ def _get_sql_model_create(model, known_models=set()):
             '    for each row\n'  + \
             '      when (new.id is NULL)\n' + \
             '        begin\n' + \
-            '         select %s_sq.NEXTVAL into :new.id from DUAL;\n' % opts.db_table + \
+            '         select %s.NEXTVAL into :new.id from DUAL;\n' % sequence_name + \
             '      end;\n'
         final_output.append(trigger_statement)
 
