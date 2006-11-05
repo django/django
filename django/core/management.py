@@ -275,21 +275,22 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
             table_output.append(');')
             final_output.append('\n'.join(table_output))
-        # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
-        if (settings.DATABASE_ENGINE == 'oracle'):
-            m_table = f.m2m_db_table()
-            sequence_name = truncate_name('%s_sq' % m_table, backend.get_max_name_length())
-            sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
-            final_output.append(sequence_statement)
-            trigger_statement = '' + \
-            'CREATE OR REPLACE trigger %s\n'    % truncate_name('%s_tr' % m_table, backend.get_max_name_length()) + \
-            '  before insert on %s\n'           % backend.quote_name(m_table) + \
-            '    for each row\n'  + \
-            '      when (new.id is NULL)\n' + \
-            '        begin\n' + \
-            '         select %s.NEXTVAL into :new.id from DUAL;\n' % sequence_name + \
-            '      end;\n'
-            final_output.append(trigger_statement)
+
+            # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
+            if (settings.DATABASE_ENGINE == 'oracle'):
+                m_table = f.m2m_db_table()
+                sequence_name = truncate_name('%s_sq' % m_table, backend.get_max_name_length())
+                sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
+                final_output.append(sequence_statement)
+                trigger_statement = '' + \
+                'CREATE OR REPLACE trigger %s\n'    % truncate_name('%s_tr' % m_table, backend.get_max_name_length()) + \
+                '  before insert on %s\n'           % backend.quote_name(m_table) + \
+                '    for each row\n'  + \
+                '      when (new.id is NULL)\n' + \
+                '        begin\n' + \
+                '         select %s.NEXTVAL into :new.id from DUAL;\n' % sequence_name + \
+                '      end;\n'
+                final_output.append(trigger_statement)
     return final_output
 
 def get_sql_delete(app):
