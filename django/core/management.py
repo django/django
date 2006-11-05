@@ -279,7 +279,7 @@ def _get_many_to_many_sql_for_model(model):
         if (settings.DATABASE_ENGINE == 'oracle'):
             m_table = f.m2m_db_table()
             sequence_name = truncate_name('%s_sq' % m_table, backend.get_max_name_length())
-            sequence_statement = 'CREATE SEQUENCE %s_sq;' % sequence_name
+            sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
             final_output.append(sequence_statement)
             trigger_statement = '' + \
             'CREATE OR REPLACE trigger %s_tr\n'    % m_table + \
