@@ -105,7 +105,7 @@ def _destroy_test_db(cursor, dbname, verbosity):
     statements = [
         """drop user %(user)s cascade""",
         """drop tablespace %(user)s including contents and datafiles cascade constraints""",
-        """drop tablespace %(user)s including contents and datafiles cascade constraints""",
+        """drop tablespace %(user)s_temp including contents and datafiles cascade constraints""",
         ]
     _execute_statements(cursor, statements, dbname, verbosity)
 
