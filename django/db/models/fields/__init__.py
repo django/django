@@ -161,7 +161,7 @@ class Field(object):
         "Returns field's value prepared for saving into a database."
         # Oracle treats empty strings ('') the same as NULLs.
         # To get around this wart, we need to change it to something else...
-        if settings.DATABASE_ENGINE == 'oracle' and  value == '':
+        if settings.DATABASE_ENGINE == 'oracle' and value == '':
             value = ' '
         return value
 
@@ -463,11 +463,11 @@ class DateField(Field):
         # Casts dates into string format for entry into database.
         if isinstance(value, datetime.datetime):
             if settings.DATABASE_ENGINE != 'oracle':
-                #Oracle does not need a string conversion
+                # Oracle does not need a string conversion
                 value = value.date().strftime('%Y-%m-%d')
         elif isinstance(value, datetime.date):
             if settings.DATABASE_ENGINE != 'oracle':
-                #Oracle does not need a string conversion
+                # Oracle does not need a string conversion
                 value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
@@ -498,19 +498,19 @@ class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if isinstance(value, datetime.datetime):
-            # MySQL/Oracle will throw a warning if microseconds are given, because it
-            # doesn't support microseconds.
-            if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
+            # MySQL/Oracle will throw a warning if microseconds are given, because
+            # neither database supports microseconds.
+            if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            # cx_Oracle wants the raw datetime instead of a string
+            # cx_Oracle wants the raw datetime instead of a string.
             if settings.DATABASE_ENGINE != 'oracle':
                 value = str(value)
         elif isinstance(value, datetime.date):
-            # MySQL/Oracle will throw a warning if microseconds are given, because it
-            # doesn't support microseconds.
-            if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
+            # MySQL/Oracle will throw a warning if microseconds are given, because
+            # neither database supports microseconds.
+            if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
                 value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
-            # cx_Oracle wants the raw datetime instead of a string
+            # cx_Oracle wants the raw datetime instead of a string.
             if settings.DATABASE_ENGINE != 'oracle':
                 value = str(value)
         return Field.get_db_prep_save(self, value)
@@ -518,7 +518,7 @@ class DateTimeField(DateField):
     def get_db_prep_lookup(self, lookup_type, value):
         # Oracle will throw an error if microseconds are given, because it
         # doesn't support microseconds.
-        if (settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
+        if settings.DATABASE_ENGINE == 'oracle' and hasattr(value, 'microsecond'):
             value = value.replace(microsecond=0)
         if lookup_type == 'range':
             value = [str(v) for v in value]
@@ -547,8 +547,8 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        #cx_Oracle does not support strftime
-        if (settings.DATABASE_ENGINE=='oracle'):
+        # cx_Oracle does not support strftime
+        if settings.DATABASE_ENGINE == 'oracle':
             return {date_field: (val is not None or ''),
                     time_field: (val is not None or '')}
         else:

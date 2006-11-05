@@ -89,7 +89,7 @@ def get_version():
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import models,get_creation_module, backend
+    from django.db import models, get_creation_module, backend
     data_types = get_creation_module().DATA_TYPES
 
     if not data_types:
@@ -169,7 +169,7 @@ def _get_sql_model_create(model, known_models=set()):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if (settings.DATABASE_ENGINE == 'oracle') and f.unique and f.primary_key:
+            if settings.DATABASE_ENGINE == 'oracle' and f.unique and f.primary_key:
                 # Suppress UNIQUE/PRIMARY KEY for Oracle (ORA-02259)
                 field_output.remove(style.SQL_KEYWORD('UNIQUE'))
             if f.rel:
@@ -198,7 +198,7 @@ def _get_sql_model_create(model, known_models=set()):
     final_output.append('\n'.join(full_statement))
 
     # To simulate auto-incrementing primary keys in Oracle -- creating primary tables
-    if (settings.DATABASE_ENGINE == 'oracle') & (opts.has_auto_field):
+    if settings.DATABASE_ENGINE == 'oracle' and opts.has_auto_field:
         sequence_name = truncate_name('%s_sq' % opts.db_table, backend.get_max_name_length())
         sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
         final_output.append(sequence_statement)
@@ -277,7 +277,7 @@ def _get_many_to_many_sql_for_model(model):
             final_output.append('\n'.join(table_output))
 
             # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
-            if (settings.DATABASE_ENGINE == 'oracle'):
+            if settings.DATABASE_ENGINE == 'oracle':
                 m_table = f.m2m_db_table()
                 sequence_name = truncate_name('%s_sq' % m_table, backend.get_max_name_length())
                 sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name

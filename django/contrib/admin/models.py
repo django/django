@@ -16,7 +16,6 @@ class LogEntry(models.Model):
     action_time = models.DateTimeField(_('action time'), auto_now=True)
     user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
-    #changed for Oracle support
     object_id = models.CharField(_('object id'), maxlength=200, blank=True, null=True)
     object_repr = models.CharField(_('object repr'), maxlength=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))

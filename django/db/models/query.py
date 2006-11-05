@@ -172,7 +172,7 @@ class _QuerySet(object):
         cursor = connection.cursor()
         
         full_query = None
-        if (settings.DATABASE_ENGINE == 'oracle'):
+        if settings.DATABASE_ENGINE == 'oracle':
             select, sql, params, full_query = self._get_sql_clause() 
         else:
             select, sql, params = self._get_sql_clause() 
@@ -203,7 +203,7 @@ class _QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        if (settings.DATABASE_ENGINE == 'oracle'):
+        if settings.DATABASE_ENGINE == 'oracle':
             select, sql, params, full_query = counter._get_sql_clause() 
         else:
             select, sql, params = counter._get_sql_clause() 
@@ -515,7 +515,7 @@ class _QuerySet(object):
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
-        if (settings.DATABASE_ENGINE != 'oracle'):             
+        if settings.DATABASE_ENGINE != 'oracle':             
             if self._limit is not None:
                 sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
             else:
@@ -581,7 +581,7 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        if (settings.DATABASE_ENGINE == 'oracle'):
+        if settings.DATABASE_ENGINE == 'oracle':
             select, sql, params, full_query = self._get_sql_clause() 
         else:
             select, sql, params = self._get_sql_clause() 
@@ -697,7 +697,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
-    #put some oracle exceptions here 
+    # Put some oracle exceptions here
     if lookup_type == "icontains" and settings.DATABASE_ENGINE == 'oracle': 
         return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s')) 
     try:
