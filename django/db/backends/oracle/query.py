@@ -49,7 +49,7 @@ def get_query_set_class(DefaultQuerySet):
                     obj = self.model(*row[:index_end])
                 for i, k in enumerate(extra_select):
                     setattr(obj, k[0], row[index_end+i])
-            yield obj
+                yield obj
 
         
     return OracleQuerySet
