@@ -172,15 +172,9 @@ class _QuerySet(object):
         cursor = connection.cursor()
         
         full_query = None
-        if settings.DATABASE_ENGINE == 'oracle':
-            select, sql, params, full_query = self._get_sql_clause() 
-        else:
-            select, sql, params = self._get_sql_clause() 
+        select, sql, params = self._get_sql_clause() 
+        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
 
-        if not full_query: 
-            cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
-        else: 
-            cursor.execute(full_query, params) 
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
         while 1:
@@ -515,48 +509,12 @@ class _QuerySet(object):
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
-        if settings.DATABASE_ENGINE != 'oracle':             
-            if self._limit is not None:
-                sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
-            else:
-                assert self._offset is None, "'offset' is not allowed without 'limit'"
-
-            return select, " ".join(sql), params
+        if self._limit is not None:
+            sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
         else:
-            # To support limits and offsets, Oracle requires some funky rewriting of an otherwise normal looking query. 
-            select_clause = ",".join(select) 
-            distinct = (self._distinct and "DISTINCT " or "") 
+            assert self._offset is None, "'offset' is not allowed without 'limit'"
 
-            if order_by:  
-                order_by_clause = " OVER (ORDER BY %s )" % (", ".join(order_by)) 
-            else:
-                #Oracle's row_number() function always requires an order-by clause. 
-                #So we need to define a default order-by, since none was provided. 
-                order_by_clause = " OVER (ORDER BY %s.%s)" % \
-                    (backend.quote_name(opts.db_table),  
-                    backend.quote_name(opts.fields[0].db_column or opts.fields[0].column)) 
-            # limit_and_offset_clause 
-            offset = self._offset and int(self._offset) or 0 
-            limit = self._limit and int(self._limit) or None 
-            limit_and_offset_clause = '' 
-            if limit: 
-                limit_and_offset_clause = "WHERE rn > %s AND rn <= %s" % (offset, limit+offset) 
-            elif offset:
-                limit_and_offset_clause = "WHERE rn > %s" % (offset) 
-
-            if len(limit_and_offset_clause) > 0: 
-                full_query = """SELECT * FROM  
-                    (SELECT %s    
-                    %s, 
-                    ROW_NUMBER() %s AS rn 
-                    %s 
-                    ) 
-                    %s 
-                    """ % (distinct, select_clause, order_by_clause, " ".join(sql), limit_and_offset_clause)
-            else:
-                full_query = None 
-             
-            return select, " ".join(sql), params, full_query
+        return select, " ".join(sql), params
 
 # Check to see if the DB backend would like to define its own QuerySet class
 # and otherwise use the default.
