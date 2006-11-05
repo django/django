@@ -632,7 +632,10 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
-        return '%s_%s' % (opts.db_table, self.name)
+        from django.db import backend
+        from django.db.backends.util import truncate_name
+        name = '%s_%s' % (opts.db_table, self.name)
+        return truncate_name(name, backend.get_max_name_length())
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
