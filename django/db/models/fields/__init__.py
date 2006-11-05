@@ -159,9 +159,9 @@ class Field(object):
 
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
-        # Oracle treats empty strings ('') the same as NULLs.  
-        # To get around this wart, we need to change it to something else...  
-        if settings.DATABASE_ENGINE == 'oracle' and  value == '': 
+        # Oracle treats empty strings ('') the same as NULLs.
+        # To get around this wart, we need to change it to something else...
+        if settings.DATABASE_ENGINE == 'oracle' and  value == '':
             value = ' '
         return value
 
@@ -502,14 +502,17 @@ class DateTimeField(DateField):
             # doesn't support microseconds.
             if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            value = str(value)
+            # cx_Oracle wants the raw datetime instead of a string
+            if settings.DATABASE_ENGINE != 'oracle':
+                value = str(value)
         elif isinstance(value, datetime.date):
             # MySQL/Oracle will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
             if (settings.DATABASE_ENGINE == 'mysql' or settings.DATABASE_ENGINE=='oracle') and hasattr(value, 'microsecond'):
                 value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
-            value = str(value)
-            
+            # cx_Oracle wants the raw datetime instead of a string
+            if settings.DATABASE_ENGINE != 'oracle':
+                value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -544,12 +547,12 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        #cx_Oracle does not support strftime 
-        if (settings.DATABASE_ENGINE=='oracle'): 
-            return {date_field: (val is not None or ''), 
-                    time_field: (val is not None or '')} 
-        else: 
-            return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''), 
+        #cx_Oracle does not support strftime
+        if (settings.DATABASE_ENGINE=='oracle'):
+            return {date_field: (val is not None or ''),
+                    time_field: (val is not None or '')}
+        else:
+            return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
                     time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
 class EmailField(CharField):
@@ -782,12 +785,12 @@ class TimeField(Field):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql':
                 value = value.replace(microsecond=0)
-                value = str(value) 
-            elif settings.DATABASE_ENGINE == 'oracle': 
-                value = value.replace(microsecond=0) 
+                value = str(value)
+            elif settings.DATABASE_ENGINE == 'oracle':
+                value = value.replace(microsecond=0)
                 # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
                 value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
-            else: 
+            else:
                 value = str(value)
         return Field.get_db_prep_save(self, value)
 
