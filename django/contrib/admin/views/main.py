@@ -1,5 +1,6 @@
 from django import forms, template
 from django.conf import settings
+from django.contrib.auth import has_permission
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
@@ -199,8 +200,8 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
     extra_context = {
         'add': add,
         'change': change,
-        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
-        'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
+        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission().codename],
+        'has_change_permission': context['perms'][app_label][opts.get_change_permission().codename],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
@@ -229,16 +230,8 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
 
-    if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
+    if not has_permission(request.user, opts.get_add_permission()):
         raise PermissionDenied
-
-    if post_url is None:
-        if request.user.has_perm(app_label + '.' + opts.get_change_permission()):
-            # redirect to list view
-            post_url = '../'
-        else:
-            # Object list will give 'Permission Denied', so go back to admin home
-            post_url = '../../../'
 
     manipulator = model.AddManipulator()
     if request.POST:
@@ -255,6 +248,18 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
             pk_value = new_object._get_pk_val()
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+
+            if post_url is None:
+                # We want to call has permission WITHOUT passing it the new
+                # object here. We're concerned with whether the user can edit
+                # ANY instances of this model, not just the one we created.
+                if has_permission(request.user, opts.get_change_permission()):
+                    # redirect to list view
+                    post_url = '../'
+                else:
+                    # Object list will give 'Permission Denied', so go back to admin home
+                    post_url = '../../../'
+
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if request.POST.has_key("_continue"):
@@ -303,9 +308,6 @@ def change_stage(request, app_label, model_name, object_id):
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
 
-    if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
-        raise PermissionDenied
-
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, app_label, model_name, form_url='../../add/')
 
@@ -313,6 +315,9 @@ def change_stage(request, app_label, model_name, object_id):
         manipulator = model.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
         raise Http404
+
+    if not has_permission(request.user, opts.get_change_permission(), manipulator.original_object):
+        raise PermissionDenied
 
     if request.POST:
         new_data = request.POST.copy()
@@ -419,8 +424,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 pass
             else:
                 if related.opts.admin:
-                    p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                    if not user.has_perm(p):
+                    if not has_permission(user, related.opts.get_delete_permission(), related):
                         perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
@@ -450,8 +454,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
             if related.opts.admin and has_related_objs:
-                p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                if not user.has_perm(p):
+                if not has_permission(user, related.opts.get_delete_permission(), related):
                     perms_needed.add(rel_opts_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
@@ -479,8 +482,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
-            p = '%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
-            if not user.has_perm(p):
+            if not has_permission(user, related.opts.get_delete_permission(), related):
                 perms_needed.add(related.opts.verbose_name)
 
 def delete_stage(request, app_label, model_name, object_id):
@@ -490,9 +492,9 @@ def delete_stage(request, app_label, model_name, object_id):
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
     opts = model._meta
-    if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
-        raise PermissionDenied
     obj = get_object_or_404(model, pk=object_id)
+    if not has_permission(request.user, opts.get_delete_permission(), obj):
+        raise PermissionDenied
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
@@ -730,7 +732,10 @@ def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404, "App %r, model %r, not found" % (app_label, model_name)
-    if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
+    # There isn't a specific object to check here, so don't pass one to 
+    # has_permission. There should be a has_permission implementation 
+    # registered that knows when the obj arg is missing.
+    if not has_permission(request.user, model._meta.get_change_permission()):
         raise PermissionDenied
     try:
         cl = ChangeList(request, model)
