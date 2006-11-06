@@ -268,6 +268,8 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
             if request.POST.has_key("_popup"):
+                if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
+                    pk_value = '"%s"' % pk_value.replace('"', '\\"')
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
                     (pk_value, str(new_object).replace('"', '\\"')))
             elif request.POST.has_key("_addanother"):
@@ -455,7 +457,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             # permission to delete them, add the missing perm to perms_needed.
             if related.opts.admin and has_related_objs:
                 if not has_permission(user, related.opts.get_delete_permission(), related):
-                    perms_needed.add(rel_opts_name)
+                    perms_needed.add(related.opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
             continue
@@ -713,10 +715,22 @@ class ChangeList(object):
         qs = qs.order_by((self.order_type == 'desc' and '-' or '') + lookup_order_field)
 
         # Apply keyword searches.
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
         if self.lookup_opts.admin.search_fields and self.query:
             for bit in self.query.split():
-                or_queries = [models.Q(**{'%s__icontains' % field_name: bit}) for field_name in self.lookup_opts.admin.search_fields]
+                or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
                 other_qs = QuerySet(self.model)
+                if qs._select_related:
+                    other_qs = other_qs.select_related()
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
 

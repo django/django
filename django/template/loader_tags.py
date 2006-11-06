@@ -51,13 +51,13 @@ class ExtendsNode(Node):
                 error_msg += " Got this from the %r variable." % self.parent_name_expr #TODO nice repr.
             raise TemplateSyntaxError, error_msg
         if hasattr(parent, 'render'):
-            return parent
+            return parent # parent is a Template object
         try:
             source, origin = find_template_source(parent, self.template_dirs)
         except TemplateDoesNotExist:
             raise TemplateSyntaxError, "Template %r cannot be extended, because it doesn't exist" % parent
         else:
-            return get_template_from_string(source, origin)
+            return get_template_from_string(source, origin, parent)
 
     def render(self, context):
         compiled_parent = self.get_parent(context)

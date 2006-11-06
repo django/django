@@ -68,17 +68,36 @@ class SelfClashForeign(models.Model):
     foreign_1 = models.ForeignKey("SelfClashForeign", related_name='id')
     foreign_2 = models.ForeignKey("SelfClashForeign", related_name='src_safe')
 
+class ValidM2M(models.Model):
+    src_safe = models.CharField(maxlength=10)
+    validm2m = models.CharField(maxlength=10)
+
+    # M2M fields are symmetrical by default. Symmetrical M2M fields
+    # on self don't require a related accessor, so many potential
+    # clashes are avoided.
+    validm2m_set = models.ManyToManyField("ValidM2M")
+    
+    m2m_1 = models.ManyToManyField("ValidM2M", related_name='id')
+    m2m_2 = models.ManyToManyField("ValidM2M", related_name='src_safe')
+
+    m2m_3 = models.ManyToManyField('self')
+    m2m_4 = models.ManyToManyField('self')
+
 class SelfClashM2M(models.Model):
     src_safe = models.CharField(maxlength=10)
     selfclashm2m = models.CharField(maxlength=10)
 
-    selfclashm2m_set = models.ManyToManyField("SelfClashM2M")
-    m2m_1 = models.ManyToManyField("SelfClashM2M", related_name='id')
-    m2m_2 = models.ManyToManyField("SelfClashM2M", related_name='src_safe')
+    # Non-symmetrical M2M fields _do_ have related accessors, so 
+    # there is potential for clashes.
+    selfclashm2m_set = models.ManyToManyField("SelfClashM2M", symmetrical=False)
+    
+    m2m_1 = models.ManyToManyField("SelfClashM2M", related_name='id', symmetrical=False)
+    m2m_2 = models.ManyToManyField("SelfClashM2M", related_name='src_safe', symmetrical=False)
 
+    m2m_3 = models.ManyToManyField('self', symmetrical=False)
+    m2m_4 = models.ManyToManyField('self', symmetrical=False)
 
-
-error_log = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
+model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "max_digits" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
@@ -147,9 +166,17 @@ invalid_models.selfclashforeign: Accessor for field 'foreign_2' clashes with fie
 invalid_models.selfclashforeign: Reverse query name for field 'foreign_2' clashes with field 'SelfClashForeign.src_safe'. Add a related_name argument to the definition for 'foreign_2'.
 invalid_models.selfclashm2m: Accessor for m2m field 'selfclashm2m_set' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'selfclashm2m_set'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'selfclashm2m_set' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'selfclashm2m_set'.
+invalid_models.selfclashm2m: Accessor for m2m field 'selfclashm2m_set' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'selfclashm2m_set'.
 invalid_models.selfclashm2m: Accessor for m2m field 'm2m_1' clashes with field 'SelfClashM2M.id'. Add a related_name argument to the definition for 'm2m_1'.
 invalid_models.selfclashm2m: Accessor for m2m field 'm2m_2' clashes with field 'SelfClashM2M.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_1' clashes with field 'SelfClashM2M.id'. Add a related_name argument to the definition for 'm2m_1'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_2' clashes with field 'SelfClashM2M.src_safe'. Add a related_name argument to the definition for 'm2m_2'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_3' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
+invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
 """
-

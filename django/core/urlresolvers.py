@@ -15,7 +15,8 @@ class Resolver404(Http404):
     pass
 
 class NoReverseMatch(Exception):
-    pass
+    # Don't make this raise an error when used in a template.
+    silent_variable_failure = True  
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -86,10 +87,15 @@ class MatchChecker(object):
 class RegexURLPattern(object):
     def __init__(self, regex, callback, default_args=None):
         # regex is a string representing a regular expression.
-        # callback is something like 'foo.views.news.stories.story_detail',
-        # which represents the path to a module and a view function name.
+        # callback is either a string like 'foo.views.news.stories.story_detail'
+        # which represents the path to a module and a view function name, or a
+        # callable object (view).
         self.regex = re.compile(regex)
-        self.callback = callback
+        if callable(callback):
+            self._callback = callback
+        else:
+            self._callback = None
+            self._callback_str = callback
         self.default_args = default_args or {}
 
     def resolve(self, path):
@@ -106,23 +112,28 @@ class RegexURLPattern(object):
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
 
-            try: # Lazily load self.func.
-                return self.func, args, kwargs
-            except AttributeError:
-                self.func = self.get_callback()
-            return self.func, args, kwargs
+            return self.callback, args, kwargs
 
-    def get_callback(self):
-        mod_name, func_name = get_mod_func(self.callback)
+    def _get_callback(self):
+        if self._callback is not None:
+            return self._callback
+        mod_name, func_name = get_mod_func(self._callback_str)
         try:
-            return getattr(__import__(mod_name, '', '', ['']), func_name)
+            self._callback = getattr(__import__(mod_name, {}, {}, ['']), func_name)
         except ImportError, e:
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
         except AttributeError, e:
             raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
+        return self._callback
+    callback = property(_get_callback)
 
     def reverse(self, viewname, *args, **kwargs):
-        if viewname != self.callback:
+        mod_name, func_name = get_mod_func(viewname)
+        try:
+            lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        except (ImportError, AttributeError):
+            raise NoReverseMatch
+        if lookup_view != self.callback:
             raise NoReverseMatch
         return self.reverse_helper(*args, **kwargs)
 
@@ -160,7 +171,7 @@ class RegexURLResolver(object):
             return self._urlconf_module
         except AttributeError:
             try:
-                self._urlconf_module = __import__(self.urlconf_name, '', '', [''])
+                self._urlconf_module = __import__(self.urlconf_name, {}, {}, [''])
             except ValueError, e:
                 # Invalid urlconf_name, such as "foo.bar." (note trailing period)
                 raise ImproperlyConfigured, "Error while importing URLconf %r: %s" % (self.urlconf_name, e)
@@ -175,7 +186,7 @@ class RegexURLResolver(object):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type)
         mod_name, func_name = get_mod_func(callback)
         try:
-            return getattr(__import__(mod_name, '', '', ['']), func_name), {}
+            return getattr(__import__(mod_name, {}, {}, ['']), func_name), {}
         except (ImportError, AttributeError), e:
             raise ViewDoesNotExist, "Tried %s. Error was: %s" % (callback, str(e))
 
@@ -185,22 +196,28 @@ class RegexURLResolver(object):
     def resolve500(self):
         return self._resolve_special('500')
 
-    def reverse(self, viewname, *args, **kwargs):
+    def reverse(self, lookup_view, *args, **kwargs):
+        if not callable(lookup_view):
+            mod_name, func_name = get_mod_func(lookup_view)
+            try:
+                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+            except (ImportError, AttributeError):
+                raise NoReverseMatch
         for pattern in self.urlconf_module.urlpatterns:
             if isinstance(pattern, RegexURLResolver):
                 try:
-                    return pattern.reverse_helper(viewname, *args, **kwargs)
+                    return pattern.reverse_helper(lookup_view, *args, **kwargs)
                 except NoReverseMatch:
                     continue
-            elif pattern.callback == viewname:
+            elif pattern.callback == lookup_view:
                 try:
                     return pattern.reverse_helper(*args, **kwargs)
                 except NoReverseMatch:
                     continue
         raise NoReverseMatch
 
-    def reverse_helper(self, viewname, *args, **kwargs):
-        sub_match = self.reverse(viewname, *args, **kwargs)
+    def reverse_helper(self, lookup_view, *args, **kwargs):
+        sub_match = self.reverse(lookup_view, *args, **kwargs)
         result = reverse_helper(self.regex, *args, **kwargs)
         return result + sub_match
 

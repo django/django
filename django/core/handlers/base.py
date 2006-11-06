@@ -26,7 +26,7 @@ class BaseHandler(object):
                 raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
-                mod = __import__(mw_module, '', '', [''])
+                mod = __import__(mw_module, {}, {}, [''])
             except ImportError, e:
                 raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
             try:
@@ -48,7 +48,7 @@ class BaseHandler(object):
             if hasattr(mw_instance, 'process_exception'):
                 self._exception_middleware.insert(0, mw_instance.process_exception)
 
-    def get_response(self, path, request):
+    def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
@@ -62,7 +62,7 @@ class BaseHandler(object):
 
         resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
         try:
-            callback, callback_args, callback_kwargs = resolver.resolve(path)
+            callback, callback_args, callback_kwargs = resolver.resolve(request.path)
 
             # Apply view middleware
             for middleware_method in self._view_middleware:
@@ -89,7 +89,8 @@ class BaseHandler(object):
             return response
         except http.Http404, e:
             if settings.DEBUG:
-                return self.get_technical_error_response(request, is404=True, exception=e)
+                from django.views import debug
+                return debug.technical_404_response(request, e)
             else:
                 callback, param_dict = resolver.resolve404()
                 return callback(request, **param_dict)
@@ -99,39 +100,23 @@ class BaseHandler(object):
             pass # See http://code.djangoproject.com/ticket/1023
         except: # Handle everything else, including SuspiciousOperation, etc.
             if settings.DEBUG:
-                return self.get_technical_error_response(request)
+                from django.views import debug
+                return debug.technical_500_response(request, *sys.exc_info())
             else:
                 # Get the exception info now, in case another exception is thrown later.
                 exc_info = sys.exc_info()
                 receivers = dispatcher.send(signal=signals.got_request_exception)
                 # When DEBUG is False, send an error message to the admins.
-                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), getattr(request, 'path', ''))
+                subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
                 try:
                     request_repr = repr(request)
                 except:
                     request_repr = "Request repr() unavailable"
                 message = "%s\n\n%s" % (self._get_traceback(exc_info), request_repr)
                 mail_admins(subject, message, fail_silently=True)
-                return self.get_friendly_error_response(request, resolver)
-
-    def get_friendly_error_response(self, request, resolver):
-        """
-        Returns an HttpResponse that displays a PUBLIC error message for a
-        fundamental error.
-        """
-        callback, param_dict = resolver.resolve500()
-        return callback(request, **param_dict)
-
-    def get_technical_error_response(self, request, is404=False, exception=None):
-        """
-        Returns an HttpResponse that displays a TECHNICAL error message for a
-        fundamental error.
-        """
-        from django.views import debug
-        if is404:
-            return debug.technical_404_response(request, exception)
-        else:
-            return debug.technical_500_response(request, *sys.exc_info())
+                # Return an HttpResponse that displays a friendly error message.
+                callback, param_dict = resolver.resolve500()
+                return callback(request, **param_dict)
 
     def _get_traceback(self, exc_info=None):
         "Helper function to return the traceback as a string"

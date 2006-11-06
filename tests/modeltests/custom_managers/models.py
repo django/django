@@ -58,7 +58,7 @@ class Car(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> p1 = Person(first_name='Bugs', last_name='Bunny', fun=True)
 >>> p1.save()
 >>> p2 = Person(first_name='Droopy', last_name='Dog', fun=False)
@@ -104,4 +104,4 @@ True
 # to the first manager defined in the class. In this case, it's "cars".
 >>> Car._default_manager.order_by('name')
 [<Car: Corvette>, <Car: Neon>]
-"""
+"""}

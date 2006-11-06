@@ -38,7 +38,7 @@ class HttpRequest(object):
 
     def get_full_path(self):
         return ''
-        
+
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
 
@@ -161,10 +161,10 @@ class HttpResponse(object):
         if not mimetype:
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
         if hasattr(content, '__iter__'):
-            self._iterator = content
+            self._container = content
             self._is_string = False
         else:
-            self._iterator = [content]
+            self._container = [content]
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
@@ -203,39 +203,47 @@ class HttpResponse(object):
             if val is not None:
                 self.cookies[key][var.replace('_', '-')] = val
 
-    def delete_cookie(self, key):
-        try:
-            self.cookies[key]['max_age'] = 0
-        except KeyError:
-            pass
+    def delete_cookie(self, key, path='/', domain=None):
+        self.cookies[key] = ''
+        if path is not None:
+            self.cookies[key]['path'] = path
+        if domain is not None:
+            self.cookies[key]['domain'] = path
+        self.cookies[key]['expires'] = 0
+        self.cookies[key]['max-age'] = 0
 
     def _get_content(self):
-        content = ''.join(self._iterator)
+        content = ''.join(self._container)
         if isinstance(content, unicode):
             content = content.encode(self._charset)
         return content
 
     def _set_content(self, value):
-        self._iterator = [value]
+        self._container = [value]
         self._is_string = True
 
     content = property(_get_content, _set_content)
 
-    def _get_iterator(self):
-        "Output iterator. Converts data into client charset if necessary."
-        for chunk in self._iterator:
-            if isinstance(chunk, unicode):
-                chunk = chunk.encode(self._charset)
-            yield chunk
+    def __iter__(self):
+        self._iterator = self._container.__iter__()
+        return self
 
-    iterator = property(_get_iterator)
+    def next(self):
+        chunk = self._iterator.next()
+        if isinstance(chunk, unicode):
+            chunk = chunk.encode(self._charset)
+        return chunk
+
+    def close(self):
+        if hasattr(self._container, 'close'):
+            self._container.close()
 
     # The remaining methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
         if not self._is_string:
             raise Exception, "This %s instance is not writable" % self.__class__
-        self._iterator.append(content)
+        self._container.append(content)
 
     def flush(self):
         pass
@@ -243,7 +251,7 @@ class HttpResponse(object):
     def tell(self):
         if not self._is_string:
             raise Exception, "This %s instance cannot tell its position" % self.__class__
-        return sum([len(chunk) for chunk in self._iterator])
+        return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseRedirect(HttpResponse):
     def __init__(self, redirect_to):

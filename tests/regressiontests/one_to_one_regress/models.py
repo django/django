@@ -22,7 +22,7 @@ class Favorites(models.Model):
     def __str__(self):
         return "Favorites for %s" % self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Regression test for #1064 and #1506: Check that we create models via the m2m
 # relation if the remote model has a OneToOneField.
 >>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
@@ -34,4 +34,4 @@ API_TESTS = """
 >>> f.restaurants = [r]
 >>> f.restaurants.all()
 [<Restaurant: Demon Dogs the restaurant>]
-"""
+"""}

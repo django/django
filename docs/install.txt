@@ -84,9 +84,12 @@ Installing the official version
 
 Note that the last command will automatically download and install setuptools_
 if you don't already have it installed. This requires a working Internet
+connection and may cause problems on Python 2.5. If you run into problems,
+try using our development version by following the instructions below. The
+development version no longer uses setuptools nor requires an Internet
 connection.
 
-This will install Django in your Python installation's ``site-packages``
+The command will install Django in your Python installation's ``site-packages``
 directory.
 
 .. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
@@ -94,19 +97,34 @@ directory.
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Make sure you have Subversion_ installed.
-2. ``svn co http://code.djangoproject.com/svn/django/trunk/ django_src``
-3. Symlink ``django_src/django`` so that ``django`` is within your Python
-   ``site-packages`` directory:
+If you'd like to be able to update your Django code occasionally with the
+latest bug fixes and improvements, follow these instructions:
 
-   ``ln -s `pwd`/django_src/django /usr/lib/python2.3/site-packages/django``
+1. Make sure you have Subversion_ installed.
+2. Check out the Django code into your Python ``site-packages`` directory.
+   On Linux / Mac OSX / Unix, do this::
+
+       svn co http://code.djangoproject.com/svn/django/trunk/ django_src
+       ln -s `pwd`/django_src/django /usr/lib/python2.3/site-packages/django
 
    (In the above line, change ``python2.3`` to match your current Python version.)
 
-You don't have to run ``python setup.py install``.
+   On Windows, do this::
 
-When you want to update your code, just run the command ``svn update`` from
-within the ``django_src`` directory.
+       svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
+
+4. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
+   system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
+   (Windows). This step simply lets you type ``django-admin.py`` from within
+   any directory, rather than having to qualify the command with the full path
+   to the file.
+
+You *don't* have to run ``python setup.py install``, because that command
+takes care of steps 3 and 4 for you.
+
+When you want to update your copy of the Django source code, just run the
+command ``svn update`` from within the ``django`` directory. When you do this,
+Subversion will automatically download any changes.
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/

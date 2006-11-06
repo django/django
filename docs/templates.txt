@@ -109,6 +109,21 @@ Some tags require beginning and ending tags (i.e.
 below describes all the built-in tags. You can create your own tags, if you
 know how to write Python code.
 
+Comments
+========
+
+**New in Django development version**
+
+To comment-out part of a template, use the comment syntax: ``{# #}``.
+
+For example, this template would render as ``'hello'``::
+
+    {# greeting #}hello
+
+A comment can contain any template code, invalid or not. For example::
+
+    {# {% if foo %}bar{% else %} #}
+
 Template inheritance
 ====================
 
@@ -141,6 +156,7 @@ It's easiest to understand template inheritance by starting with an example::
             {% block content %}{% endblock %}
         </div>
     </body>
+    </html>
 
 This template, which we'll call ``base.html``, defines a simple HTML skeleton
 document that you might use for a simple two-column page. It's the job of
@@ -196,6 +212,7 @@ like::
             <p>This is my second entry.</p>
         </div>
     </body>
+    </html>
 
 Note that since the child template didn't define the ``sidebar`` block, the
 value from the parent template is used instead. Content within a ``{% block %}``
@@ -363,7 +380,7 @@ extends
 
 Signal that this template extends a parent template.
 
-This tag can be used in two ways: 
+This tag can be used in two ways:
 
    * ``{% extends "base.html" %}`` (with quotes) uses the literal value
      ``"base.html"`` as the name of the parent template to extend.
@@ -537,6 +554,11 @@ The arguments can be hard-coded strings, so the following is valid::
     {% ifequal user.username "adrian" %}
         ...
     {% endifequal %}
+
+It is only possible to compare an argument to template variables or strings.
+You cannot check for equality with Python objects such as ``True`` or
+``False``.  If you need to test if something is true or false, use the ``if``
+and ``ifnot`` tags instead.
 
 ifnotequal
 ~~~~~~~~~~
@@ -778,7 +800,11 @@ The argument tells which template bit to output:
     ``closevariable``   ``}}``
     ``openbrace``       ``{``
     ``closebrace``      ``}``
+    ``opencomment``     ``{#``
+    ``closecomment``    ``#}``
     ==================  =======
+
+Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
 
 widthratio
 ~~~~~~~~~~
@@ -961,13 +987,13 @@ any string.
 pluralize
 ~~~~~~~~~
 
-Returns a plural suffix if the value is not 1. By default, this suffix is ``'s'``. 
+Returns a plural suffix if the value is not 1. By default, this suffix is ``'s'``.
 
 Example::
 
     You have {{ num_messages }} message{{ num_messages|pluralize }}.
 
-For words that require a suffix other than ``'s'``, you can provide an alternate 
+For words that require a suffix other than ``'s'``, you can provide an alternate
 suffix as a parameter to the filter.
 
 Example::
@@ -1049,7 +1075,7 @@ Formats a date as the time since that date (i.e. "4 days, 6 hours").
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
-June 2006, and ``comment_date`` is a date instanace for 08:00 on 1 June 2006,
+June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
 
 timeuntil

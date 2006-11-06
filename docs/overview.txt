@@ -159,7 +159,7 @@ of contents for your app, it contains a simple mapping between URL patterns and
 Python callback functions. URLconfs also serve to decouple URLs from Python
 code.
 
-Here's what a URLconf might look like for the above ``Reporter``/``Article``
+Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
     from django.conf.urls.defaults import *

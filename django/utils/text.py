@@ -94,7 +94,8 @@ def compress_string(s):
     return zbuf.getvalue()
 
 ustring_re = re.compile(u"([\u0080-\uffff])")
-def javascript_quote(s):
+
+def javascript_quote(s, quote_double_quotes=False):
 
     def fix(match):
         return r"\u%04x" % ord(match.group(1))
@@ -104,9 +105,12 @@ def javascript_quote(s):
     elif type(s) != unicode:
         raise TypeError, s
     s = s.replace('\\', '\\\\')
+    s = s.replace('\r', '\\r')
     s = s.replace('\n', '\\n')
     s = s.replace('\t', '\\t')
     s = s.replace("'", "\\'")
+    if quote_double_quotes:
+        s = s.replace('"', '&quot;')
     return str(ustring_re.sub(fix, s))
 
 smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')

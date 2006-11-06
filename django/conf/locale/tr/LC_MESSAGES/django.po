@@ -1,0 +1,2209 @@
+# translation of django.po to Turkish
+# Django 0.95
+# Copyright (C) 2006 Django
+# This file is distributed under the same license as the Django package.
+#
+# Bahadır Kandemir <bahadir@pardus.org.tr>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-10-01 21:09+0300\n"
+"PO-Revision-Date: 2006-10-01 21:19+0300\n"
+"Last-Translator: Bahadır Kandemir <bahadir@pardus.org.tr>\n"
+"Language-Team: Turkish <bahadir@pardus.org.tr>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: db/models/manipulators.py:305
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(type)s ve %(field)s değerine sahip %(object)s kaydı zaten var."
+
+#: db/models/manipulators.py:332
+#, python-format
+msgid ""
+"Please enter a different %s. The one you entered is already being used for %"
+"s."
+msgstr "Lütfen farklı bir %s girin. Girdiğiniz, %s tarihinde bir kez kullanılmış."
+
+#: db/models/fields/__init__.py:41
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(fieldname)s için %(optname)s değeri zaten seçilmiş."
+
+#: db/models/fields/__init__.py:115 db/models/fields/__init__.py:266
+#: db/models/fields/__init__.py:560 db/models/fields/__init__.py:571
+#: forms/__init__.py:347
+msgid "This field is required."
+msgstr "Bu alan gerekli."
+
+#: db/models/fields/__init__.py:349
+msgid "This value must be an integer."
+msgstr "Bu değer tamsayı olmalı."
+
+#: db/models/fields/__init__.py:381
+msgid "This value must be either True or False."
+msgstr "Bu değer True ya da False olabilir."
+
+#: db/models/fields/__init__.py:397
+msgid "This field cannot be null."
+msgstr "Bu alan boş bırakılamaz."
+
+#: db/models/fields/__init__.py:424 core/validators.py:146
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "YYYY-AA-GG formatında tarih girin."
+
+#: db/models/fields/__init__.py:486 core/validators.py:155
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "YYYY-AA-GG SS:DD formatında tarih girin."
+
+#: db/models/fields/__init__.py:580
+msgid "Enter a valid filename."
+msgstr "Geçerli bir dosya adı girin."
+
+#: db/models/fields/related.py:51
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "Lütfen geçerli bir %s girin."
+
+#: db/models/fields/related.py:618
+msgid "Separate multiple IDs with commas."
+msgstr "Birden fazla numarayı virgül ile ayırın."
+
+#: db/models/fields/related.py:620
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"\"Ctrl\" ve Mac'de \"Command\" tuşunu basılı tutarak birden fazla seçimde "
+"bulunabilirsiniz."
+
+#: db/models/fields/related.py:664
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Lütfen geçerli bir %(self)s numarası girin. %(value)r değeri geçersiz."
+msgstr[1] "Lütfen geçerli %(self)s numaraları girin. %(value)r değerleri geçersiz."
+
+#: conf/global_settings.py:39
+msgid "Arabic"
+msgstr "Arapça"
+
+#: conf/global_settings.py:40
+msgid "Bengali"
+msgstr "Bengali Dili"
+
+#: conf/global_settings.py:41
+msgid "Czech"
+msgstr "Çekçe"
+
+#: conf/global_settings.py:42
+msgid "Welsh"
+msgstr "Galce"
+
+#: conf/global_settings.py:43
+msgid "Danish"
+msgstr "Danca"
+
+#: conf/global_settings.py:44
+msgid "German"
+msgstr "Almanca"
+
+#: conf/global_settings.py:45
+msgid "Greek"
+msgstr "Yunanca"
+
+#: conf/global_settings.py:46
+msgid "English"
+msgstr "İngilizce"
+
+#: conf/global_settings.py:47
+msgid "Spanish"
+msgstr "İspanyolca"
+
+#: conf/global_settings.py:48
+msgid "Argentinean Spanish"
+msgstr "Arjantin İspanyolcası"
+
+#: conf/global_settings.py:49
+msgid "Finnish"
+msgstr "Fince"
+
+#: conf/global_settings.py:50
+msgid "French"
+msgstr "Fransızca"
+
+#: conf/global_settings.py:51
+msgid "Galician"
+msgstr "Galler Dili"
+
+#: conf/global_settings.py:52
+msgid "Hungarian"
+msgstr "Macarca"
+
+#: conf/global_settings.py:53
+msgid "Hebrew"
+msgstr "İbranice"
+
+#: conf/global_settings.py:54
+msgid "Icelandic"
+msgstr "İzlanda dili"
+
+#: conf/global_settings.py:55
+msgid "Italian"
+msgstr "İtalyanca"
+
+#: conf/global_settings.py:56
+msgid "Japanese"
+msgstr "Japonca"
+
+#: conf/global_settings.py:57
+msgid "Dutch"
+msgstr "Flamanca"
+
+#: conf/global_settings.py:58
+msgid "Norwegian"
+msgstr "Norveç Dili"
+
+#: conf/global_settings.py:59
+msgid "Brazilian"
+msgstr "Brezilya Dili"
+
+#: conf/global_settings.py:60
+msgid "Romanian"
+msgstr "Romence"
+
+#: conf/global_settings.py:61
+msgid "Russian"
+msgstr "Rusça"
+
+#: conf/global_settings.py:62
+msgid "Slovak"
+msgstr "Slovakça"
+
+#: conf/global_settings.py:63
+msgid "Slovenian"
+msgstr "Slovence"
+
+#: conf/global_settings.py:64
+msgid "Serbian"
+msgstr "Sırpça"
+
+#: conf/global_settings.py:65
+msgid "Swedish"
+msgstr "İsveççe"
+
+#: conf/global_settings.py:66
+msgid "Tamil"
+msgstr "Tamilce"
+
+#: conf/global_settings.py:67
+msgid "Turkish"
+msgstr "Türkçe"
+
+#: conf/global_settings.py:68
+msgid "Ukrainian"
+msgstr "Ukraynaca"
+
+#: conf/global_settings.py:69
+msgid "Simplified Chinese"
+msgstr "Basiteştirilmiş Çince"
+
+#: conf/global_settings.py:70
+msgid "Traditional Chinese"
+msgstr "Gelenelsek Çince"
+
+#: forms/__init__.py:382
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Metnin %s karakterden az olmasına dikkat edin."
+msgstr[1] "Metnin %s karakterden az olmasına dikkat edin."
+
+#: forms/__init__.py:387
+msgid "Line breaks are not allowed here."
+msgstr "Burada birden fazla satır olamaz."
+
+#: forms/__init__.py:488 forms/__init__.py:561 forms/__init__.py:600
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "Geçerli bir seçimde bulunun; %(choices)s değerleri içinde '%(data)s' yok."
+
+#: forms/__init__.py:662 core/validators.py:172 core/validators.py:401
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."
+
+#: forms/__init__.py:664
+msgid "The submitted file is empty."
+msgstr "Gönderilen dosya boş."
+
+#: forms/__init__.py:720
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "-32,768 ve 32,767 arası bir sayı girin."
+
+#: forms/__init__.py:730
+msgid "Enter a positive number."
+msgstr "Pozitif tamsayı girin."
+
+#: forms/__init__.py:740
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "0 ve 32,767 arası bir sayı girin."
+
+#: core/validators.py:63
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Bu değer sadece karakter, rakam ve altçizgiden oluşabilir."
+
+#: core/validators.py:67
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr "Bu değer sadece harf, rakam, altçizgi, bölü ve ters bölüden oluşabilir."
+
+#: core/validators.py:71
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr "Bu değer sadece harf, rakam, altçizgi veya çizgiden oluşabilir."
+
+#: core/validators.py:75
+msgid "Uppercase letters are not allowed here."
+msgstr "Burada büyük harf kullanılamaz."
+
+#: core/validators.py:79
+msgid "Lowercase letters are not allowed here."
+msgstr "Burada küçük harf kullanılamaz."
+
+#: core/validators.py:86
+msgid "Enter only digits separated by commas."
+msgstr "Sadece virgülle ayrılmış sayılar girin."
+
+#: core/validators.py:98
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "Virgülle ayrılmış geçerli e-posta adresleri girin."
+
+#: core/validators.py:102
+msgid "Please enter a valid IP address."
+msgstr "Lütfen geçerli bir IP adresi girin."
+
+#: core/validators.py:106
+msgid "Empty values are not allowed here."
+msgstr "Burada boş değer kullanılamaz."
+
+#: core/validators.py:110
+msgid "Non-numeric characters aren't allowed here."
+msgstr "Burada numerik olmayan karakterler kullanılamaz."
+
+#: core/validators.py:114
+msgid "This value can't be comprised solely of digits."
+msgstr "Bu alanda sadece rakam kullanılamaz."
+
+#: core/validators.py:119
+msgid "Enter a whole number."
+msgstr "Sayı girin."
+
+#: core/validators.py:123
+msgid "Only alphabetical characters are allowed here."
+msgstr "Burada sadece alfabetik karakterler kullanılabilir."
+
+#: core/validators.py:138
+msgid "Year must be 1900 or later."
+msgstr "Yıl 1900 ya da sonrası olabilir."
+
+#: core/validators.py:142
+#, python-format
+msgid "Invalid date: %s."
+msgstr "Geçersiz tarih: %s"
+
+#: core/validators.py:151
+msgid "Enter a valid time in HH:MM format."
+msgstr "SS:DD formatında geçerli bir saat girin."
+
+#: core/validators.py:160
+msgid "Enter a valid e-mail address."
+msgstr "Geçerli bir e-posta adresi girin."
+
+#: core/validators.py:176
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Geçerli bir resim girin. Gönderdiğiniz dosya resim değil, ya da bozuk bir "
+"dosya."
+
+#: core/validators.py:183
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "%s adresi geçerli bir resme işaret etmiyor."
+
+#: core/validators.py:187
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr "Telefon numarası XXX-XXX-XXXX formatında olmalı. \"%s\" geçersiz."
+
+#: core/validators.py:195
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "%s adresi geçerli bir QuickTime dosyasına işaret etmiyor."
+
+#: core/validators.py:199
+msgid "A valid URL is required."
+msgstr "Geçerli bir URL gerekli."
+
+#: core/validators.py:213
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"Metnin geçerli bir HTML kodu olması gerekir. Hatalar:\n"
+"%s"
+
+#: core/validators.py:220
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "Geçersiz XML kodu: %s"
+
+#: core/validators.py:230
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "Geçersiz adres: %s"
+
+#: core/validators.py:234 core/validators.py:236
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "%s kırık bir link."
+
+#: core/validators.py:242
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "Geçerli bir şehir kodu girin."
+
+#: core/validators.py:256
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Söylediğinize dikkat edin! %s kelimesi burada kullanılamaz."
+msgstr[1] "Söylediğinize dikkat edin! %s kelimeleri burada kullanılamaz."
+
+#: core/validators.py:263
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "Bu alan '%s' ile alanı ile uyuşmalı."
+
+#: core/validators.py:282
+msgid "Please enter something for at least one field."
+msgstr "Lütfen en az bir alana giriş yapın."
+
+#: core/validators.py:291 core/validators.py:302
+msgid "Please enter both fields or leave them both empty."
+msgstr "Lütfen tüm alanları doldurun ya da hepsini boş bırakın."
+
+#: core/validators.py:309
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "Bu alan %(field)s alanı %(value)s değerine sahipse doldurulmalı."
+
+#: core/validators.py:321
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "Bu alan %(field)s alanı %(value)s değerine sahip değilse doldurulmalı."
+
+#: core/validators.py:340
+msgid "Duplicate values are not allowed."
+msgstr "Tekrarlanan değerler kabul edilmez."
+
+#: core/validators.py:363
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "Bu değer %s ya da kuvvetleri olabilir."
+
+#: core/validators.py:374
+msgid "Please enter a valid decimal number."
+msgstr "Lütfen geçerli bir ondalık sayı girin."
+
+#: core/validators.py:378
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "Lütfen en fazla %s basamaklı bir ondalık sayı girin."
+msgstr[1] "Lütfen en fazla %s basamaklı bir ondalık sayı girin."
+
+#: core/validators.py:381
+#, python-format
+msgid "Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr[0] "Lütfen tamsayı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+msgstr[1] "Lütfen tamsayı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+
+#: core/validators.py:384
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+msgstr[1] "Lütfen ondalıklı kısmı en fazla %s basamaklı bir ondalık sayı girin."
+
+#: core/validators.py:394
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "Gönderdiğiniz dosyanın en az %s byte uzunlukta olduğundan emin olun."
+
+#: core/validators.py:395
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "Gönderdiğiniz dosyanın en fazl %s byte uzunlukta olduğundan emin olun."
+
+#: core/validators.py:412
+msgid "The format for this field is wrong."
+msgstr "Bu alandaki veri formatı hatalı."
+
+#: core/validators.py:427
+msgid "This field is invalid."
+msgstr "Alan geçersiz."
+
+#: core/validators.py:463
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "%s içinden hiçbirşey aktarılamıyor."
+
+#: core/validators.py:466
+#, python-format
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr "%(url)s adresi geçersiz içerik türü (%(contenttype)s) gönderdi."
+
+#: core/validators.py:499
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"Lütfen %(line)s. satırdaki kapatılmayan %(tag)s etiketini kapatın. (Satır, "
+"\"%(start)s\" ile başlıyor.)"
+
+#: core/validators.py:503
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s. satırda başlayan bazı kelimeler içerik olarak kabul edilmiyor. "
+"(Satır, \"%(start)s\" ile başlıyor.)"
+
+#: core/validators.py:508
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz. (Satır, \"%(start)s\" "
+"ile başlıyor.)"
+
+#: core/validators.py:513
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"%(line)s. satırdaki \"<%(tag)s>\" etiketi geçersiz. (Satır, \"%(start)s\" "
+"ile başlıyor.)"
+
+#: core/validators.py:517
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s. satırdaki bir etiket eksik ya da eklenmesi gereken özellikleri "
+"var. (Satır, \"%(start)s\" ile başlıyor.)"
+
+#: core/validators.py:522
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s. satırdaki \"%(attr)s\" özelliği geçersiz bir değere sahip. (Satır, "
+"\"%(start)s\" ile başlıyor.)"
+
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "%(verbose_name)s başarıyla yaratıldı."
+
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "%(verbose_name)s başarıyla güncellendi."
+
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "%(verbose_name)s silindi."
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "Pazartesi"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "Salı"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "Çarşamba"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "Perşembe"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "Cuma"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "Cumartesi"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "Pazar"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "Ocak"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "Şubat"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "Mart"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "Nisan"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "Mayıs"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "Haziran"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "Temmuz"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "Ağustos"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "Eylül"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "Ekim"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "Kasım"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "Aralık"
+
+#: utils/dates.py:19
+msgid "jan"
+msgstr "oca"
+
+#: utils/dates.py:19
+msgid "feb"
+msgstr "şub"
+
+#: utils/dates.py:19
+msgid "mar"
+msgstr "mar"
+
+#: utils/dates.py:19
+msgid "apr"
+msgstr "nis"
+
+#: utils/dates.py:19
+msgid "may"
+msgstr "may"
+
+#: utils/dates.py:19
+msgid "jun"
+msgstr "haz"
+
+#: utils/dates.py:20
+msgid "jul"
+msgstr "tem"
+
+#: utils/dates.py:20
+msgid "aug"
+msgstr "ağu"
+
+#: utils/dates.py:20
+msgid "sep"
+msgstr "eyl"
+
+#: utils/dates.py:20
+msgid "oct"
+msgstr "eki"
+
+#: utils/dates.py:20
+msgid "nov"
+msgstr "kas"
+
+#: utils/dates.py:20
+msgid "dec"
+msgstr "ara"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "Oca."
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "Şub."
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "Ağu."
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "Eyl."
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "Eki."
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "Kas."
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "Ara."
+
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] "yıl"
+msgstr[1] "yıl"
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] "ay"
+msgstr[1] "ay"
+
+#: utils/timesince.py:14
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "hafta"
+msgstr[1] "hafta"
+
+#: utils/timesince.py:15
+msgid "day"
+msgid_plural "days"
+msgstr[0] "gün"
+msgstr[1] "gün"
+
+#: utils/timesince.py:16
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "saat"
+msgstr[1] "saat"
+
+#: utils/timesince.py:17
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "dakika"
+msgstr[1] "dakika"
+
+#: utils/translation/trans_real.py:362
+msgid "DATE_FORMAT"
+msgstr "DATE_FORMAT"
+
+#: utils/translation/trans_real.py:363
+msgid "DATETIME_FORMAT"
+msgstr "DATETIME_FORMAT"
+
+#: utils/translation/trans_real.py:364
+msgid "TIME_FORMAT"
+msgstr "TIME_FORMAT"
+
+#: utils/translation/trans_real.py:380
+msgid "YEAR_MONTH_FORMAT"
+msgstr "YEAR_MONTH_FORMAT"
+
+#: utils/translation/trans_real.py:381
+msgid "MONTH_DAY_FORMAT"
+msgstr "MONTH_DAY_FORMAT"
+
+#: contrib/contenttypes/models.py:20
+msgid "python model class name"
+msgstr "python model sınıfı"
+
+#: contrib/contenttypes/models.py:23
+msgid "content type"
+msgstr "içerik türü"
+
+#: contrib/contenttypes/models.py:24
+msgid "content types"
+msgstr "içerik türleri"
+
+#: contrib/auth/views.py:39
+msgid "Logged out"
+msgstr "Çıkış yapıldı"
+
+#: contrib/auth/models.py:38 contrib/auth/models.py:57
+msgid "name"
+msgstr "isim"
+
+#: contrib/auth/models.py:40
+msgid "codename"
+msgstr "takma ad"
+
+#: contrib/auth/models.py:42
+msgid "permission"
+msgstr "izin"
+
+#: contrib/auth/models.py:43 contrib/auth/models.py:58
+msgid "permissions"
+msgstr "izinler"
+
+#: contrib/auth/models.py:60
+msgid "group"
+msgstr "grup"
+
+#: contrib/auth/models.py:61 contrib/auth/models.py:100
+msgid "groups"
+msgstr "gruplar"
+
+#: contrib/auth/models.py:90
+msgid "username"
+msgstr "kullanıcı adı"
+
+#: contrib/auth/models.py:90
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr ""
+"Gerekli. 30 karakter ya da da az olmalı. Alfanumerik (harf, rakam ve alt "
+"çizgi) karakterler kullanılabilir."
+
+#: contrib/auth/models.py:91
+msgid "first name"
+msgstr "isim"
+
+#: contrib/auth/models.py:92
+msgid "last name"
+msgstr "soyisim"
+
+#: contrib/auth/models.py:93
+msgid "e-mail address"
+msgstr "e-posta adresi"
+
+#: contrib/auth/models.py:94
+msgid "password"
+msgstr "parola"
+
+#: contrib/auth/models.py:94
+msgid "Use '[algo]$[salt]$[hexdigest]'"
+msgstr "'[algo]$[salt]$[hexdigest]' formatında"
+
+#: contrib/auth/models.py:95
+msgid "staff status"
+msgstr "yönetici modu"
+
+#: contrib/auth/models.py:95
+msgid "Designates whether the user can log into this admin site."
+msgstr "Kullanıcının yönetici sayfasına girip giremeyeceğini belirler."
+
+#: contrib/auth/models.py:96
+msgid "active"
+msgstr "aktif"
+
+#: contrib/auth/models.py:96
+msgid ""
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Kullanıcının Django yönetim sayfasına girip giremeyeceğini belirler. "
+"Kullanıcı hesabı silmek yerine işareti kaldırın."
+
+#: contrib/auth/models.py:97
+msgid "superuser status"
+msgstr "süper kullanıcı modu"
+
+#: contrib/auth/models.py:97
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Kullanıcının tek tek hak atamasına gerek kalmadan tüm haklara sahip olup "
+"olamayacağını belirler."
+
+#: contrib/auth/models.py:98
+msgid "last login"
+msgstr "son ziyaret"
+
+#: contrib/auth/models.py:99
+msgid "date joined"
+msgstr "kayıt tarihi"
+
+#: contrib/auth/models.py:101
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Özel olarak atanmış hakların yanı sıra, kullanıcının üyesi olduğu grupların "
+"hakları alır."
+
+#: contrib/auth/models.py:102
+msgid "user permissions"
+msgstr "kullanıcı izinleri"
+
+#: contrib/auth/models.py:105
+msgid "user"
+msgstr "kullanıcı"
+
+#: contrib/auth/models.py:106
+msgid "users"
+msgstr "kullanıcılar"
+
+#: contrib/auth/models.py:111
+msgid "Personal info"
+msgstr "Kişisel bilgiler"
+
+#: contrib/auth/models.py:112
+msgid "Permissions"
+msgstr "İzinler"
+
+#: contrib/auth/models.py:113
+msgid "Important dates"
+msgstr "Önemli tarihler"
+
+#: contrib/auth/models.py:114
+msgid "Groups"
+msgstr "Gruplar"
+
+#: contrib/auth/models.py:258
+msgid "message"
+msgstr "mesaj"
+
+#: contrib/auth/forms.py:16
+msgid "The two password fields didn't match."
+msgstr "İki parola alanı uyuşmuyor."
+
+#: contrib/auth/forms.py:24
+msgid "A user with that username already exists."
+msgstr "Bu isimde bir kullanıcı zaten var."
+
+#: contrib/auth/forms.py:52
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Web tarayıcınızın çerezleri desteklemediği görülüyor. Çerezler giriş için "
+"gerekli."
+
+#: contrib/auth/forms.py:59 contrib/admin/views/decorators.py:10
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Lütfen geçerli bir kullanıcı adı ve parola girin. Tüm alanlar büyük/küçük "
+"harf duyarlıdır."
+
+#: contrib/auth/forms.py:61
+msgid "This account is inactive."
+msgstr "Bu hesap aktif değil."
+
+#: contrib/auth/forms.py:84
+msgid ""
+"That e-mail address doesn't have an associated user acount. Are you sure "
+"you've registered?"
+msgstr "Bu e-posta hesabıyla ilişkili kullanıcı bulunmuyor. Kayıtlı olduğunuzdan emin misiniz?"
+
+#: contrib/auth/forms.py:116
+msgid "The two 'new password' fields didn't match."
+msgstr "İki parola alanı uyuşmuyor."
+
+#: contrib/auth/forms.py:123
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Eski parolanız hatalı. Lütfen tekrar girin."
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr "eski adres"
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Buraya tam dosya yolu, alan adı kullanılmadan yazılmalı. Örnek: '/events/"
+"search/'."
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr "yeni adres"
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Buraya tam dosya yolu (yukarıdaki gibi), ya da 'http://' ile başlayan tam "
+"adres yazılmalı."
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr "yönlendirme"
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr "yönlendirmeler"
+
+#: contrib/comments/models.py:67 contrib/comments/models.py:166
+msgid "object ID"
+msgstr "nesne no"
+
+#: contrib/comments/models.py:68
+msgid "headline"
+msgstr "başlık"
+
+#: contrib/comments/models.py:69 contrib/comments/models.py:90
+#: contrib/comments/models.py:167
+msgid "comment"
+msgstr "yorum"
+
+#: contrib/comments/models.py:70
+msgid "rating #1"
+msgstr "reyting 1"
+
+#: contrib/comments/models.py:71
+msgid "rating #2"
+msgstr "reyting 2"
+
+#: contrib/comments/models.py:72
+msgid "rating #3"
+msgstr "reyting 3"
+
+#: contrib/comments/models.py:73
+msgid "rating #4"
+msgstr "reyting 4"
+
+#: contrib/comments/models.py:74
+msgid "rating #5"
+msgstr "reyting 5"
+
+#: contrib/comments/models.py:75
+msgid "rating #6"
+msgstr "reyting 6"
+
+#: contrib/comments/models.py:76
+msgid "rating #7"
+msgstr "reyting 7"
+
+#: contrib/comments/models.py:77
+msgid "rating #8"
+msgstr "reyting 8"
+
+#: contrib/comments/models.py:82
+msgid "is valid rating"
+msgstr "geçerli reyting"
+
+#: contrib/comments/models.py:83 contrib/comments/models.py:169
+msgid "date/time submitted"
+msgstr "gönderim tarihi/saati"
+
+#: contrib/comments/models.py:84 contrib/comments/models.py:170
+msgid "is public"
+msgstr "görünürlük"
+
+#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
+msgid "IP address"
+msgstr "IP adresi"
+
+#: contrib/comments/models.py:86
+msgid "is removed"
+msgstr "silinmiş"
+
+#: contrib/comments/models.py:86
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Yorum uygunsuz ise bu işareti kaldırın. \"Yorum silindi\" uyarısı "
+"görüntülenecek."
+
+#: contrib/comments/models.py:91
+msgid "comments"
+msgstr "yorumlar"
+
+#: contrib/comments/models.py:131 contrib/comments/models.py:207
+msgid "Content object"
+msgstr "İçerik nesnesi"
+
+#: contrib/comments/models.py:159
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(date)s tarihinde %(user)s göndermiş:\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:168
+msgid "person's name"
+msgstr "isim"
+
+#: contrib/comments/models.py:171
+msgid "ip address"
+msgstr "ip adresi"
+
+#: contrib/comments/models.py:173
+msgid "approved by staff"
+msgstr "yönetici onayı"
+
+#: contrib/comments/models.py:176
+msgid "free comment"
+msgstr "serbest yorum"
+
+#: contrib/comments/models.py:177
+msgid "free comments"
+msgstr "serbest yorumlar"
+
+#: contrib/comments/models.py:233
+msgid "score"
+msgstr "puan"
+
+#: contrib/comments/models.py:234
+msgid "score date"
+msgstr "puan tarihi"
+
+#: contrib/comments/models.py:237
+msgid "karma score"
+msgstr "karma puanı"
+
+#: contrib/comments/models.py:238
+msgid "karma scores"
+msgstr "karma puanları"
+
+#: contrib/comments/models.py:242
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "%(user)s tarafından %(score)d puan"
+
+#: contrib/comments/models.py:258
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"Bu yorum %(user)s tarafından işaretlenmiş:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/models.py:265
+msgid "flag date"
+msgstr "işaretleme tarihi"
+
+#: contrib/comments/models.py:268
+msgid "user flag"
+msgstr "kullanıcı işareti"
+
+#: contrib/comments/models.py:269
+msgid "user flags"
+msgstr "kullanıcı işaretleri"
+
+#: contrib/comments/models.py:273
+#, python-format
+msgid "Flag by %r"
+msgstr "%r tarafından işaret"
+
+#: contrib/comments/models.py:278
+msgid "deletion date"
+msgstr "silme tarihi"
+
+#: contrib/comments/models.py:280
+msgid "moderator deletion"
+msgstr "yönetici tarafından silinme"
+
+#: contrib/comments/models.py:281
+msgid "moderator deletions"
+msgstr "yönetici tarafından silinme"
+
+#: contrib/comments/models.py:285
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "%s tarafından silme işlemi"
+
+#: contrib/comments/views/karma.py:19
+msgid "Anonymous users cannot vote"
+msgstr "Kayıtsız kullanıcılar oy veremez"
+
+#: contrib/comments/views/karma.py:23
+msgid "Invalid comment ID"
+msgstr "Geçersiz yorum numarası"
+
+#: contrib/comments/views/karma.py:25
+msgid "No voting for yourself"
+msgstr "Kendinize oy veremezsiniz"
+
+#: contrib/comments/views/comments.py:27
+msgid "This rating is required because you've entered at least one other rating."
+msgstr "Reyting gerekli, çünkü en az bir reyting tanımladınız."
+
+#: contrib/comments/views/comments.py:111
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya "
+"ait:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"Bu yorum, %(count)s yorumdan daha az gönderide bulunmuş bir kullanıcıya "
+"ait:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:116
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"Bu yorum kusurlu bir kullanıcı tarafından gönderildi:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:188
+#: contrib/comments/views/comments.py:280
+msgid "Only POSTs are allowed"
+msgstr "Sadece POST yapılabilir"
+
+#: contrib/comments/views/comments.py:192
+#: contrib/comments/views/comments.py:284
+msgid "One or more of the required fields wasn't submitted"
+msgstr "Bir ya da daha fazla gerekli alan doldurulmadı"
+
+#: contrib/comments/views/comments.py:196
+#: contrib/comments/views/comments.py:286
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "Birisi yorum gönderme formunu kötüye kullanmaya çalıştı (güvenlik ihlali)"
+
+#: contrib/comments/views/comments.py:206
+#: contrib/comments/views/comments.py:292
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr "Bu yorumun geçersiz bir 'hedef' parametresi var -- nesne narası geçersiz"
+
+#: contrib/comments/views/comments.py:257
+#: contrib/comments/views/comments.py:321
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "Yorum görüntülememe mi yoksa gönderme amaçlı mı belirsiz"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:17
+msgid "Username:"
+msgstr "Kullanıcı:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+msgid "Log out"
+msgstr "Çık"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:20
+msgid "Password:"
+msgstr "Parola:"
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "Parolanızı mı unuttunuz?"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr "Reytingler"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "Gerekli"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "Opsiyonel"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "Resim gönder"
+
+#: contrib/comments/templates/comments/form.html:28
+#: contrib/comments/templates/comments/freeform.html:5
+msgid "Comment:"
+msgstr "Yorum:"
+
+#: contrib/comments/templates/comments/form.html:35
+#: contrib/comments/templates/comments/freeform.html:10
+msgid "Preview comment"
+msgstr "Yorumu görüntüle"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "İsminiz:"
+
+#: contrib/flatpages/models.py:7 contrib/admin/views/doc.py:315
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models.py:8
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Örnek: '/about/contact/'. Başında ve sonunda bölü işareti olduğundan emin "
+"olun."
+
+#: contrib/flatpages/models.py:9
+msgid "title"
+msgstr "başlık"
+
+#: contrib/flatpages/models.py:10
+msgid "content"
+msgstr "içerik"
+
+#: contrib/flatpages/models.py:11
+msgid "enable comments"
+msgstr "yorumlara izin ver"
+
+#: contrib/flatpages/models.py:12
+msgid "template name"
+msgstr "şablon adı"
+
+#: contrib/flatpages/models.py:13
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Örnek: 'flatpages/contact_page.html'. Eğer birşey yazılmazsa, sistem "
+"otomatik olarak 'flatpages/default.html' kullanacak."
+
+#: contrib/flatpages/models.py:14
+msgid "registration required"
+msgstr "kayıt gerekli"
+
+#: contrib/flatpages/models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "Bu seçili ise, sadece kayıtlı kullanıcılar sayfayı görüntüleyebilir."
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "düz sayfa"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "düz sayfalar"
+
+#: contrib/sessions/models.py:51
+msgid "session key"
+msgstr "oturum anahtarı"
+
+#: contrib/sessions/models.py:52
+msgid "session data"
+msgstr "oturum bilgisi"
+
+#: contrib/sessions/models.py:53
+msgid "expire date"
+msgstr "bitiş tarihi"
+
+#: contrib/sessions/models.py:57
+msgid "session"
+msgstr "oturum"
+
+#: contrib/sessions/models.py:58
+msgid "sessions"
+msgstr "oturumlar"
+
+#: contrib/sites/models.py:10
+msgid "domain name"
+msgstr "alan adı"
+
+#: contrib/sites/models.py:11
+msgid "display name"
+msgstr "görülen isim"
+
+#: contrib/sites/models.py:15
+msgid "site"
+msgstr "site"
+
+#: contrib/sites/models.py:16
+msgid "sites"
+msgstr "siteler"
+
+#: contrib/admin/filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>%s nesnesine göre:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+msgid "All"
+msgstr "Tümü"
+
+#: contrib/admin/filterspecs.py:109
+msgid "Any date"
+msgstr "Herhangi bir tarih"
+
+#: contrib/admin/filterspecs.py:110
+msgid "Today"
+msgstr "Bugün"
+
+#: contrib/admin/filterspecs.py:113
+msgid "Past 7 days"
+msgstr "7 gün içinde"
+
+#: contrib/admin/filterspecs.py:115
+msgid "This month"
+msgstr "Bu ay"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This year"
+msgstr "Bu yıl"
+
+#: contrib/admin/filterspecs.py:143
+msgid "Yes"
+msgstr "Evet"
+
+#: contrib/admin/filterspecs.py:143
+msgid "No"
+msgstr "Hayır"
+
+#: contrib/admin/filterspecs.py:150
+msgid "Unknown"
+msgstr "Bilinmiyor"
+
+#: contrib/admin/models.py:16
+msgid "action time"
+msgstr "işlem zamanı"
+
+#: contrib/admin/models.py:19
+msgid "object id"
+msgstr "nesne no"
+
+#: contrib/admin/models.py:20
+msgid "object repr"
+msgstr "nesne kodu"
+
+#: contrib/admin/models.py:21
+msgid "action flag"
+msgstr "işlem adı"
+
+#: contrib/admin/models.py:22
+msgid "change message"
+msgstr "mesajı değiştir"
+
+#: contrib/admin/models.py:25
+msgid "log entry"
+msgstr "girişi kaydet"
+
+#: contrib/admin/models.py:26
+msgid "log entries"
+msgstr "girişleri kaydet"
+
+#: contrib/admin/templatetags/admin_list.py:230
+msgid "All dates"
+msgstr "Tüm tarihler"
+
+#: contrib/admin/views/auth.py:17 contrib/admin/views/main.py:257
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "\"%(obj)s\" isimli %(name)s eklendi."
+
+#: contrib/admin/views/auth.py:22 contrib/admin/views/main.py:261
+#: contrib/admin/views/main.py:347
+msgid "You may edit it again below."
+msgstr "Tekrar düzenleyebilirsiniz."
+
+#: contrib/admin/views/auth.py:28
+msgid "Add user"
+msgstr "Kullanıcı ekle"
+
+#: contrib/admin/views/main.py:223
+msgid "Site administration"
+msgstr "Site yönetimi"
+
+#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
+#, python-format
+msgid "You may add another %s below."
+msgstr "Yeni bir %s ekleyebilirsiniz."
+
+#: contrib/admin/views/main.py:289
+#, python-format
+msgid "Add %s"
+msgstr "%s ekle"
+
+#: contrib/admin/views/main.py:335
+#, python-format
+msgid "Added %s."
+msgstr "%s eklendi."
+
+#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
+#: contrib/admin/views/main.py:339
+msgid "and"
+msgstr "ve"
+
+#: contrib/admin/views/main.py:337
+#, python-format
+msgid "Changed %s."
+msgstr "%s değiştirildi."
+
+#: contrib/admin/views/main.py:339
+#, python-format
+msgid "Deleted %s."
+msgstr "%s silindi."
+
+#: contrib/admin/views/main.py:342
+msgid "No fields changed."
+msgstr "Hiçbir alan değiştirilmedi."
+
+#: contrib/admin/views/main.py:345
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "\"%(obj)s\" isimli %(name)s değiştirildi."
+
+#: contrib/admin/views/main.py:353
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "\"%(obj)s\" isimli %(name)s eklendi. Aşağıda tekrar düzenleyebilirsiniz."
+
+#: contrib/admin/views/main.py:391
+#, python-format
+msgid "Change %s"
+msgstr "%s değiştir"
+
+#: contrib/admin/views/main.py:473
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "%(name)s içinde bir ya da daha fazla %(fieldname)s: %(obj)s"
+
+#: contrib/admin/views/main.py:478
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "%(name)s içinde bir ya da daha fazla %(fieldname)s:"
+
+#: contrib/admin/views/main.py:511
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "\"%(obj)s\" isimli %(name)s silindi."
+
+#: contrib/admin/views/main.py:514
+msgid "Are you sure?"
+msgstr "Emin misiniz?"
+
+#: contrib/admin/views/main.py:536
+#, python-format
+msgid "Change history: %s"
+msgstr "%s için değişiklik geçmişi:"
+
+#: contrib/admin/views/main.py:570
+#, python-format
+msgid "Select %s"
+msgstr "%s seç"
+
+#: contrib/admin/views/main.py:570
+#, python-format
+msgid "Select %s to change"
+msgstr "Değiştirilecek %s nesnesini seçin"
+
+#: contrib/admin/views/main.py:758
+msgid "Database error"
+msgstr "Veritabanı hatası"
+
+#: contrib/admin/views/decorators.py:24
+#: contrib/admin/templates/admin/login.html:25
+msgid "Log in"
+msgstr "Giriş yap"
+
+#: contrib/admin/views/decorators.py:62
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Oturumunuzun süresi geçti. Lütfen tekrar giriş yapın. Endişe etmeyin, "
+"gönderiniz kayıt edildi."
+
+#: contrib/admin/views/decorators.py:69
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Görünüşe göre tarayıcınız çerezleri kabul etmiyor. Çerez kullanımını aktif "
+"hale getirin ve sayfayı yeniden yükleyin."
+
+#: contrib/admin/views/decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "Kullanıcı isminde '@' karakteri bulunamaz."
+
+#: contrib/admin/views/decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "E-posta adresiniz kullanıcı adınız değil. '%s' kullanın."
+
+#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
+#: contrib/admin/views/doc.py:50
+msgid "tag:"
+msgstr "etiket:"
+
+#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
+#: contrib/admin/views/doc.py:81
+msgid "filter:"
+msgstr "filtre:"
+
+#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
+#: contrib/admin/views/doc.py:139
+msgid "view:"
+msgstr "view:"
+
+#: contrib/admin/views/doc.py:164
+#, python-format
+msgid "App %r not found"
+msgstr "%r uygulaması bulunamadı"
+
+#: contrib/admin/views/doc.py:171
+#, python-format
+msgid "Model %r not found in app %r"
+msgstr "%r modeli %r uygulamasında bulunamadı"
+
+#: contrib/admin/views/doc.py:183
+#, python-format
+msgid "the related `%s.%s` object"
+msgstr "ilgili `%s.%s` nesnesi"
+
+#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
+#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
+msgid "model:"
+msgstr "model:"
+
+#: contrib/admin/views/doc.py:214
+#, python-format
+msgid "related `%s.%s` objects"
+msgstr "ilgili `%s.%s` nesneleri"
+
+#: contrib/admin/views/doc.py:219
+#, python-format
+msgid "all %s"
+msgstr "tüm %s"
+
+#: contrib/admin/views/doc.py:224
+#, python-format
+msgid "number of %s"
+msgstr "%s sayısı"
+
+#: contrib/admin/views/doc.py:229
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s nesnesindeki alanlar"
+
+#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
+#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
+msgid "Integer"
+msgstr "Tamsayı"
+
+#: contrib/admin/views/doc.py:292
+msgid "Boolean (Either True or False)"
+msgstr "Mantıksal (True ya da False)"
+
+#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "Karakter disizi (en fazla %(maxlength)s)"
+
+#: contrib/admin/views/doc.py:294
+msgid "Comma-separated integers"
+msgstr "Virgülle ayrılmış tamsayılar"
+
+#: contrib/admin/views/doc.py:295
+msgid "Date (without time)"
+msgstr "Tarih (saat yok)"
+
+#: contrib/admin/views/doc.py:296
+msgid "Date (with time)"
+msgstr "Tarih (saat var)"
+
+#: contrib/admin/views/doc.py:297
+msgid "E-mail address"
+msgstr "E-posta adresi"
+
+#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
+#: contrib/admin/views/doc.py:302
+msgid "File path"
+msgstr "Dosya yolu"
+
+#: contrib/admin/views/doc.py:300
+msgid "Decimal number"
+msgstr "Ondalık sayı:"
+
+#: contrib/admin/views/doc.py:306
+msgid "Boolean (Either True, False or None)"
+msgstr "Mantıksal (True, False, ya da None)"
+
+#: contrib/admin/views/doc.py:307
+msgid "Relation to parent model"
+msgstr "Ana modelle ilişki"
+
+#: contrib/admin/views/doc.py:308
+msgid "Phone number"
+msgstr "Telefon numarası"
+
+#: contrib/admin/views/doc.py:313
+msgid "Text"
+msgstr "Metin"
+
+#: contrib/admin/views/doc.py:314
+msgid "Time"
+msgstr "Saat"
+
+#: contrib/admin/views/doc.py:316
+msgid "U.S. state (two uppercase letters)"
+msgstr "Şehir Kodu (iki karakter)"
+
+#: contrib/admin/views/doc.py:317
+msgid "XML text"
+msgstr "XML metni"
+
+#: contrib/admin/views/doc.py:343
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s geçerli vir adres kalıbı değil"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "Şimdiki:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "Değiştir:"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Tarih:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Saat:"
+
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dökümantasyon"
+
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+msgid "Change password"
+msgstr "Parola değiştir"
+
+#: contrib/admin/templates/admin/change_list.html:6
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Anasayfa"
+
+#: contrib/admin/templates/admin/change_list.html:11
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s Ekle"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " %(filter_title)s nesnesine göre "
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:20
+msgid "History"
+msgstr "Geçmiş"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Tarih/saat"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "User"
+msgstr "Kullanıcı"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "İşlem"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "DATE_WITH_TIME_FULL"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Bu nesnenin işlem geçmişi yok. Muhtemelen yönetici sayfası dışında bir "
+"yerden eklendi."
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "Git"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "1 sonuç"
+msgstr[1] "%(counter)s sonuç"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "toplam %(full_result_count)s"
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Tümünü göster"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django site yöneticisi"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django yönetimi"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Sunucu hatası"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Sunucu hatası (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Sunucu Hatası <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Bir hata oluştu. Hata, e-psota ile site yöneticisine bildirildi ve kısa süre "
+"içinde çözülecktir. Sabrınız için teşekkürler."
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Veritabanı kurulumu ile ilgili bir problem var. İlgili veritabanı "
+"tablolarının kurulu olduğundan ve veritabanının ilgili kullanıcı tarafından "
+"okunabilir olduğundan emin olun."
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "%(name)s uygulamasındaki modeller."
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:15
+msgid "Add"
+msgstr "Ekle"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "Değiştir"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "İşlem yapmaya yetkiniz yok."
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "Geçmiş İşlemler"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "İşlemlerim"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "Hiç yok"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Sayfa bulunamadı"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Üzgünüm, aradığınız sayfa bulunamadı."
+
+#: contrib/admin/templates/admin/filters.html:4
+msgid "Filter"
+msgstr "Filtrele"
+
+#: contrib/admin/templates/admin/change_form.html:21
+msgid "View on site"
+msgstr "Sitede görüntüle"
+
+#: contrib/admin/templates/admin/change_form.html:30
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Lütfen aşağıdaki hatayı düzeltin."
+msgstr[1] "Lütfen aşağıdaki hataları düzeltin."
+
+#: contrib/admin/templates/admin/change_form.html:48
+msgid "Ordering"
+msgstr "Sıralama:"
+
+#: contrib/admin/templates/admin/change_form.html:51
+msgid "Order:"
+msgstr "Sıra:"
+
+#: contrib/admin/templates/admin/login.html:22
+msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
+msgstr "<a href=\"/password_reset/\">Şifrenizi mi unuttunuz?</a>"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Sil"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"'%(escaped_object)s' isimli %(object_name)s nesnesini silmek, bağlantılı "
+"nesnelerin silinmesini gerektiriyor, ancak aşağıdaki nesneleri silme "
+"yetkiniz yok."
+
+#: contrib/admin/templates/admin/delete_confirmation.html:21
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"\"%(escaped_object)s\" isimli %(object_name)s nesnesini silmek "
+"istediğinizdenemin misiniz? Aşağıdaki bağlantılı öğeler silinecek:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "Evet, eminim"
+
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "Hoşgeldin,"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Yeni olarak kaydet"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Kaydet ve yeni bir tane ekle"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Kaydet ve düzenlemeye devam et"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Kaydet"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "Önce bir kullanıcı adı ve parola girin. Daha sonra daha fazla bilgi girebilirsiniz."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "Kullanıcı"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+msgid "Password"
+msgstr "Parola"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+msgid "Password (again)"
+msgstr "Parola (tekrar)"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+msgid "Enter the same password as above, for verification."
+msgstr "Onaylamak için, yukarıdaki parolanın aynısını girin."
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Parola değişimi"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Parola değişimi başarılı"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Parolanız değiştirildi."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Parolayı sıfırla"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Parolanızı mı unuttunuz? E-posta adresinizi aşağıya girin, parolanızı "
+"sıfırlayalım ve e-posta adresinize gönderelim."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-posta adresi:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Parolamı sıfırla"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Web sitesinde zaman geçirdiğiniz için teşekkür ederiz."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Tekrar giriş yap"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Parola sıfırlandı."
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Yeni şifreniz, e-posta adresinize gönderildi, kısa süre içinde size "
+"ulaşacaktır."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Güvenliğiniz için, lütfen eski parolanızı girin, sonra da yeni şifrenizi iki "
+"kere girin ve böylece doğru yazdığınızdan emin olun."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Eski parola:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "Yeni parola:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "Parolayı onayla:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "Parolamı değiştir"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Bu e-postayı aldınız çünkü "
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr ""
+"%(site_name)s adresindeki kullanıcı hesabınız için parola sıfırlama "
+"talebinde bulundunuz."
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Yeni parolanız: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Parolanızı değiştirmek için bu adrese gidebilirsiniz:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "Unutma ihtimaline karşı, kullanıcı adınız:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Teşekkürler!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s Ekibi"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Kısayollar"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "Döküman kısayolları"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Kısayolları kullanabilmek için, bağlantıyı tarayıcınızdaki "
+"araç çubuğuna sürükleyin, ya da sağ tıklayıp sık kullanılan adresler "
+"listenize ekleyin. Bazı kısayollar, uygulamayı çalıştıran sunucu ile aynı "
+"adreste bulunan istemciler tarafından kullanılabilir.</p>\n"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "Bu sayfa için dökümantasyon"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "Sizi, bu sayfayı üreten betiğin dökümantasyonuna yönlendirir."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "Nesne numarasını göster"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "Tek bir nesneyi temsil eden sayfaların içerik türünü ve numarasını gösterir."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "Nesneyi düzenle (aynı pencerede)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "Tek bir nesneyi temsil eden sayfaların yönetim sayfasını gösterir."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "Nesneyi düzenle (yeni pencerede)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "Yukarıdaki gibi, ancak yönetim sayfasını yeni bir pencerede açar."
+
+#: template/defaultfilters.py:401
+msgid "yes,no,maybe"
+msgstr "evet,hayır,olabilir"
+

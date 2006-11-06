@@ -1,0 +1,8 @@
+include AUTHORS
+include INSTALL
+include LICENSE
+recursive-include django/conf/locale *
+recursive-include django/contrib/admin/templates
+recursive-include django/contrib/admin/media
+recursive-include django/contrib/comments/templates
+recursive-include django/contrib/sitemaps/templates

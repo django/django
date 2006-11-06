@@ -66,6 +66,7 @@ __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
 TOKEN_BLOCK = 2
+TOKEN_COMMENT = 3
 
 # template syntax constants
 FILTER_SEPARATOR = '|'
@@ -75,6 +76,8 @@ BLOCK_TAG_START = '{%'
 BLOCK_TAG_END = '%}'
 VARIABLE_TAG_START = '{{'
 VARIABLE_TAG_END = '}}'
+COMMENT_TAG_START = '{#'
+COMMENT_TAG_END = '#}'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
 
@@ -85,8 +88,9 @@ ALLOWED_VARIABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 UNKNOWN_SOURCE="&lt;unknown source&gt;"
 
 # match a variable or block tag and capture the entire tag, including start/end delimiters
-tag_re = re.compile('(%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
-                                          re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END)))
+tag_re = re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
+                                          re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
+                                          re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END)))
 
 # global dictionary of libraries that have been loaded using get_library
 libraries = {}
@@ -137,13 +141,14 @@ class StringOrigin(Origin):
         return self.source
 
 class Template(object):
-    def __init__(self, template_string, origin=None):
+    def __init__(self, template_string, origin=None, name='<Unknown Template>'):
         "Compilation stage"
         if settings.TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
             # Could do some crazy stack-frame stuff to record where this string
             # came from...
         self.nodelist = compile_string(template_string, origin)
+        self.name = name
 
     def __iter__(self):
         for node in self.nodelist:
@@ -162,12 +167,12 @@ def compile_string(template_string, origin):
 
 class Token(object):
     def __init__(self, token_type, contents):
-        "The token_type must be TOKEN_TEXT, TOKEN_VAR or TOKEN_BLOCK"
+        "The token_type must be TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK or TOKEN_COMMENT"
         self.token_type, self.contents = token_type, contents
 
     def __str__(self):
         return '<%s token: "%s...">' % \
-            ({TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block'}[self.token_type],
+            ({TOKEN_TEXT: 'Text', TOKEN_VAR: 'Var', TOKEN_BLOCK: 'Block', TOKEN_COMMENT: 'Comment'}[self.token_type],
             self.contents[:20].replace('\n', ''))
 
     def split_contents(self):
@@ -190,6 +195,8 @@ class Lexer(object):
             token = Token(TOKEN_VAR, token_string[len(VARIABLE_TAG_START):-len(VARIABLE_TAG_END)].strip())
         elif token_string.startswith(BLOCK_TAG_START):
             token = Token(TOKEN_BLOCK, token_string[len(BLOCK_TAG_START):-len(BLOCK_TAG_END)].strip())
+        elif token_string.startswith(COMMENT_TAG_START):
+            token = Token(TOKEN_COMMENT, '')
         else:
             token = Token(TOKEN_TEXT, token_string)
         return token
@@ -434,7 +441,7 @@ class TokenParser(object):
             while i < len(subject) and subject[i] != subject[p]:
                 i += 1
             if i >= len(subject):
-                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % subject
+                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % (i, subject)
             i += 1
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
@@ -531,7 +538,7 @@ class FilterExpression(object):
                 constant_arg, i18n_arg, var_arg = match.group("constant_arg", "i18n_arg", "var_arg")
                 if i18n_arg:
                     args.append((False, _(i18n_arg.replace(r'\"', '"'))))
-                elif constant_arg:
+                elif constant_arg is not None:
                     args.append((False, constant_arg.replace(r'\"', '"')))
                 elif var_arg:
                     args.append((True, var_arg))
@@ -548,9 +555,12 @@ class FilterExpression(object):
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
             if ignore_failures:
-                return None
+                obj = None
             else:
-                return settings.TEMPLATE_STRING_IF_INVALID
+                if settings.TEMPLATE_STRING_IF_INVALID:
+                    return settings.TEMPLATE_STRING_IF_INVALID
+                else:
+                    obj = settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -614,11 +624,7 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path == 'False':
-        current = False
-    elif path == 'True':
-        current = True
-    elif path[0].isdigit():
+    if path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)
@@ -877,7 +883,7 @@ def get_library(module_name):
     lib = libraries.get(module_name, None)
     if not lib:
         try:
-            mod = __import__(module_name, '', '', [''])
+            mod = __import__(module_name, {}, {}, [''])
         except ImportError, e:
             raise InvalidTemplateLibrary, "Could not load template library from %s, %s" % (module_name, e)
         try:

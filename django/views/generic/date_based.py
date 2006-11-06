@@ -1,6 +1,7 @@
 from django.template import loader, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.xheaders import populate_xheaders
+from django.db.models.fields import DateTimeField
 from django.http import Http404, HttpResponse
 import datetime, time
 
@@ -235,9 +236,10 @@ def archive_day(request, year, month, day, queryset, date_field,
     model = queryset.model
     now = datetime.datetime.now()
 
-    lookup_kwargs = {
-        '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
-    }
+    if isinstance(model._meta.get_field(date_field), DateTimeField):
+        lookup_kwargs = {'%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max))}
+    else:
+        lookup_kwargs = {date_field: date}
 
     # Only bother to check current date if the date isn't in the past and future objects aren't requested.
     if date >= now.date() and not allow_future:
@@ -304,9 +306,10 @@ def object_detail(request, year, month, day, queryset, date_field,
     model = queryset.model
     now = datetime.datetime.now()
 
-    lookup_kwargs = {
-        '%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max)),
-    }
+    if isinstance(model._meta.get_field(date_field), DateTimeField):
+        lookup_kwargs = {'%s__range' % date_field: (datetime.datetime.combine(date, datetime.time.min), datetime.datetime.combine(date, datetime.time.max))}
+    else:
+        lookup_kwargs = {date_field: date}
 
     # Only bother to check current date if the date isn't in the past and future objects aren't requested.
     if date >= now.date() and not allow_future:

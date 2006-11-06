@@ -8,7 +8,7 @@ if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
 
 try:
-    backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, '', '', [''])
+    backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
 except ImportError, e:
     # The database backend wasn't found. Display a helpful error message
     # listing all possible database backends.
@@ -23,9 +23,9 @@ except ImportError, e:
     else:
         raise # If there's some other error, this must be an error in Django itself.
 
-get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, '', '', [''])
-get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, '', '', [''])
-runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, '', '', ['']).runshell()
+get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, {}, {}, [''])
+get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
+runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
 
 connection = backend.DatabaseWrapper()
 DatabaseError = backend.DatabaseError

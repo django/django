@@ -14,7 +14,7 @@ def template_validator(request):
     # get a dict of {site_id : settings_module} for the validator
     settings_modules = {}
     for mod in settings.ADMIN_FOR:
-        settings_module = __import__(mod, '', '', [''])
+        settings_module = __import__(mod, {}, {}, [''])
         settings_modules[settings_module.SITE_ID] = settings_module
     manipulator = TemplateValidator(settings_modules)
     new_data, errors = {}, {}

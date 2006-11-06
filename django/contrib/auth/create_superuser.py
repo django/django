@@ -46,6 +46,7 @@ def createsuperuser(username=None, email=None, password=None):
             if not username.isalnum():
                 sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
                 username = None
+                continue
             try:
                 User.objects.get(username=username)
             except User.DoesNotExist:

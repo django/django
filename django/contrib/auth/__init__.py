@@ -38,7 +38,7 @@ def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i+1:]
     try:
-        mod = __import__(module, '', '', [attr])
+        mod = __import__(module, {}, {}, [attr])
     except ImportError, e:
         raise ImproperlyConfigured, 'Error importing authentication backend %s: "%s"' % (module, e)
     try:

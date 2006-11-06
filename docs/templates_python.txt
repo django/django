@@ -198,10 +198,35 @@ some things to keep in mind:
 How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a variable doesn't exist, the template system inserts the value of the
-``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
-string) by default.
+Generally, if a variable doesn't exist, the template system inserts the
+value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
+(the empty string) by default.
 
+Filters that are applied to an invalid variable will only be applied if
+``TEMPLATE_STRING_IF_INVALID`` is set to ``''`` (the empty string). If
+``TEMPLATE_STRING_IF_INVALID`` is set to any other value, variable
+filters will be ignored.
+
+This behavior is slightly different for the ``if``, ``for`` and ``regroup``
+template tags. If an invalid variable is provided to one of these template
+tags, the variable will be interpreted as ``None``. Filters are always
+applied to invalid variables within these template tags.
+
+.. admonition:: For debug purposes only!
+
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
+    it is a bad idea to turn it on as a 'development default'. 
+    
+    Many templates, including those in the Admin site, rely upon the 
+    silence of the template system when a non-existent variable is 
+    encountered. If you assign a value other than ``''`` to
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    problems with these templates and sites.
+    
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
+    in order to debug a specific template problem, then cleared 
+    once debugging is complete.
+        
 Playing with Context objects
 ----------------------------
 
@@ -259,9 +284,10 @@ an `HttpRequest object`_ as its first argument. For example::
 The second difference is that it automatically populates the context with a few
 variables, according to your `TEMPLATE_CONTEXT_PROCESSORS setting`_.
 
-The ``TEMPLATE_CONTEXT_PROCESSORS`` setting is a tuple of callables that take a
-request object as their argument and return a dictionary of items to be merged
-into the context. By default, ``TEMPLATE_CONTEXT_PROCESSORS`` is set to::
+The ``TEMPLATE_CONTEXT_PROCESSORS`` setting is a tuple of callables -- called
+**context processors** -- that take a request object as their argument and
+return a dictionary of items to be merged into the context. By default,
+``TEMPLATE_CONTEXT_PROCESSORS`` is set to::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
@@ -285,6 +311,20 @@ optional, third positional argument, ``processors``. In this example, the
             'foo': 'bar',
         }, [ip_address_processor])
 
+Note::
+    If you're using Django's ``render_to_response()`` shortcut to populate a
+    template with the contents of a dictionary, your template will be passed a
+    ``Context`` instance by default (not a ``RequestContext``). To use a
+    ``RequestContext`` in your template rendering, pass an optional third
+    argument to ``render_to_response()``: a ``RequestContext``
+    instance. Your code might look like this::
+
+        def some_view(request):
+            # ...
+            return render_to_response('my_template'html',
+                                      my_data_dictionary,
+                                      context_instance=RequestContext(request))
+
 Here's what each of the default processors does:
 
 .. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
@@ -299,13 +339,22 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
       logged in). See the `user authentication docs`.
-    * ``messages`` -- A list of ``auth.Message`` objects for the currently
-      logged-in user.
-    * ``perms`` -- An instance of ``django.core.context_processors.PermWrapper``,
-      representing the permissions that the currently logged-in user has. See
-      the `permissions docs`_.
+
+    * ``messages`` -- A list of messages (as strings) for the currently
+      logged-in user. Behind the scenes, this calls
+      ``request.user.get_and_delete_messages()`` for every request. That method
+      collects the user's messages and deletes them from the database.
+
+      Note that messages are set with ``user.add_message()``. See the
+      `message docs`_ for more.
+
+    * ``perms`` -- An instance of
+      ``django.core.context_processors.PermWrapper``, representing the
+      permissions that the currently logged-in user has. See the `permissions
+      docs`_.
 
 .. _user authentication docs: http://www.djangoproject.com/documentation/authentication/#users
+.. _message docs: http://www.djangoproject.com/documentation/authentication/#messages
 .. _permissions docs: http://www.djangoproject.com/documentation/authentication/#permissions
 
 django.core.context_processors.debug
@@ -345,6 +394,18 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current
 `HttpRequest object`_. Note that this processor is not enabled by default;
 you'll have to activate it.
+
+Writing your own context processors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A context processor has a very simple interface: It's just a Python function
+that takes one argument, an ``HttpRequest`` object, and returns a dictionary
+that gets added to the template context. Each context processor *must* return
+a dictionary.
+
+Custom context processors can live anywhere in your code base. All Django cares
+about is that your custom context processors are pointed-to by your
+``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
 Loading templates
 -----------------
@@ -743,17 +804,17 @@ will use the function's name as the tag name.
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Many template tags take a single argument -- a string or a template variable
-reference -- and return a string after doing some processing based solely on
+Many template tags take a number of arguments -- strings or a template variables
+-- and return a string after doing some processing based solely on
 the input argument and some external information. For example, the
 ``current_time`` tag we wrote above is of this variety: we give it a format
 string, it returns the time as a string.
 
 To ease the creation of the types of tags, Django provides a helper function,
 ``simple_tag``. This function, which is a method of
-``django.template.Library``, takes a function that accepts one argument, wraps
-it in a ``render`` function and the other necessary bits mentioned above and
-registers it with the template system.
+``django.template.Library``, takes a function that accepts any number of
+arguments, wraps it in a ``render`` function and the other necessary bits
+mentioned above and registers it with the template system.
 
 Our earlier ``current_time`` function could thus be written like this::
 
@@ -769,18 +830,23 @@ In Python 2.4, the decorator syntax also works::
         ...
 
 A couple of things to note about the ``simple_tag`` helper function:
-    * Only the (single) argument is passed into our function.
     * Checking for the required number of arguments, etc, has already been
       done by the time our function is called, so we don't need to do that.
     * The quotes around the argument (if any) have already been stripped away,
       so we just receive a plain string.
+    * If the argument was a template variable, our function is passed the
+      current value of the variable, not the variable itself.
+
+When your template tag does not need access to the current context, writing a
+function to work with the input values and using the ``simple_tag`` helper is
+the easiest way to create a new tag.
 
 Inclusion tags
 ~~~~~~~~~~~~~~
 
 Another common type of template tag is the type that displays some data by
 rendering *another* template. For example, Django's admin interface uses custom
-template tags to display the buttons along the botton of the "add/change" form
+template tags to display the buttons along the bottom of the "add/change" form
 pages. Those buttons always look the same, but the link targets change depending
 on the object being edited -- so they're a perfect case for using a small
 template that is filled with details from the current object. (In the admin's
@@ -1026,7 +1092,7 @@ Configuring the template system in standalone mode
 .. note::
 
     This section is only of interest to people trying to use the template
-    system as an output component in another application. If you are using the
+    system as an output component in another application. If you're using the
     template system as part of a Django application, nothing here applies to
     you.
 
@@ -1043,7 +1109,7 @@ described in the `settings file`_ documentation. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
 templating functions, call ``django.conf.settings.configure()`` with any
 settings you wish to specify. You might want to consider setting at least
-``TEMPLATE_DIRS`` (if you are going to use template loaders),
+``TEMPLATE_DIRS`` (if you're going to use template loaders),
 ``DEFAULT_CHARSET`` (although the default of ``utf-8`` is probably fine) and
 ``TEMPLATE_DEBUG``. All available settings are described in the
 `settings documentation`_, and any setting starting with *TEMPLATE_*

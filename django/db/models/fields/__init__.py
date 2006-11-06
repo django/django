@@ -5,6 +5,7 @@ from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
+from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
@@ -20,7 +21,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -80,7 +81,7 @@ class Field(object):
         self.prepopulate_from = prepopulate_from
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
         self.unique_for_year = unique_for_year
-        self.choices = choices or []
+        self._choices = choices or []
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
@@ -324,6 +325,14 @@ class Field(object):
     def bind(self, fieldmapping, original, bound_field_class):
         return bound_field_class(self, fieldmapping, original)
 
+    def _get_choices(self):
+        if hasattr(self._choices, 'next'):
+            choices, self._choices = tee(self._choices)
+            return choices
+        else:
+            return self._choices
+    choices = property(_get_choices)
+
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
@@ -367,8 +376,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value in ('t', 'True'): return True
-        if value in ('f', 'False'): return False
+        if value in ('t', 'True', '1'): return True
+        if value in ('f', 'False', '0'): return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
@@ -448,7 +457,9 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
+            value = value.date().strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.date):
             value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
@@ -478,12 +489,19 @@ class DateTimeField(DateField):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = str(value)
+        elif isinstance(value, datetime.date):
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+                value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
+            value = str(value)
+            
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):

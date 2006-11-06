@@ -149,7 +149,7 @@ Methods
    Returns the ``path``, plus an appended query string, if applicable.
 
    Example: ``"/music/bands/the_beatles/?print=true"``
-    
+
 ``is_secure()``
    Returns ``True`` if the request is secure; that is, if it was made with
    HTTPS.
@@ -341,9 +341,9 @@ hard-coded strings. If you use this technique, follow these guidelines:
 Methods
 -------
 
-``__init__(content='', mimetype=DEFAULT_MIME_TYPE)``
+``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
     Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``'text/html'``.
+    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 
     ``content`` can be an iterator or a string. If it's an iterator, it should
     return strings, and those strings will be joined together to form the
@@ -380,9 +380,13 @@ Methods
 
     .. _`cookie Morsel`: http://www.python.org/doc/current/lib/morsel-objects.html
 
-``delete_cookie(key)``
+``delete_cookie(key, path='/', domain=None)``
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
+
+    The ``path`` and ``domain`` arguments are new in the Django development version.
+    Due to the way cookies work, ``path`` and ``domain`` should be the same
+    values you used in ``set_cookie()`` -- otherwise the cookie may not be deleted.
 
 ``content``
     Returns the content as a Python string, encoding it from a Unicode object

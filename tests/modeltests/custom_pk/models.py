@@ -27,7 +27,7 @@ class Business(models.Model):
     def __str__(self):
         return self.name
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> dan = Employee(employee_code='ABC123', first_name='Dan', last_name='Jones')
 >>> dan.save()
 >>> Employee.objects.all()
@@ -50,6 +50,10 @@ DoesNotExist: Employee matching query does not exist.
 # Use the name of the primary key, rather than pk.
 >>> Employee.objects.get(employee_code__exact='ABC123')
 <Employee: Dan Jones>
+
+# pk can be used as a substitute for the primary key.
+>>> Employee.objects.filter(pk__in=['ABC123','XYZ456'])
+[<Employee: Fran Bones>, <Employee: Dan Jones>]
 
 # Fran got married and changed her last name.
 >>> fran = Employee.objects.get(pk='XYZ456')
@@ -88,4 +92,4 @@ DoesNotExist: Employee matching query does not exist.
 >>> Business.objects.filter(employees__first_name__startswith='Fran')
 [<Business: Sears>]
 
-"""
+"""}

@@ -16,7 +16,7 @@ def _get_all_permissions(opts):
         perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name)))
     return perms + list(opts.permissions)
 
-def create_permissions(app, created_models):
+def create_permissions(app, created_models, verbosity):
     from django.contrib.contenttypes.models import ContentType
     from django.contrib.auth.models import Permission
     app_models = get_models(app)
@@ -27,13 +27,13 @@ def create_permissions(app, created_models):
         for codename, name in _get_all_permissions(klass._meta):
             p, created = Permission.objects.get_or_create(codename=codename, content_type__pk=ctype.id,
                 defaults={'name': name, 'content_type': ctype})
-            if created:
+            if created and verbosity >= 2:
                 print "Adding permission '%s'" % p
 
-def create_superuser(app, created_models):
+def create_superuser(app, created_models, verbosity, **kwargs):
     from django.contrib.auth.models import User
     from django.contrib.auth.create_superuser import createsuperuser as do_create
-    if User in created_models:
+    if User in created_models and kwargs.get('interactive', True):
         msg = "\nYou just installed Django's auth system, which means you don't have " \
                 "any superusers defined.\nWould you like to create one now? (yes/no): "
         confirm = raw_input(msg)

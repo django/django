@@ -2,7 +2,7 @@ from django.db import backend, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
-from django.utils.translation import gettext_lazy, string_concat
+from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
 from django import forms
@@ -618,7 +618,7 @@ class ManyToManyField(RelatedField, Field):
             msg = gettext_lazy('Separate multiple IDs with commas.')
         else:
             msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
-        self.help_text = string_concat(self.help_text, msg)
+        self.help_text = string_concat(self.help_text, ' ', msg)
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:

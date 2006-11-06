@@ -1,7 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
 from django.template import Node, NodeList, Template, Context, resolve_variable
-from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END
+from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
@@ -13,14 +13,18 @@ class CommentNode(Node):
         return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars):
+    def __init__(self, cyclevars, variable_name=None):
         self.cyclevars = cyclevars
         self.cyclevars_len = len(cyclevars)
         self.counter = -1
+        self.variable_name = variable_name
 
     def render(self, context):
         self.counter += 1
-        return self.cyclevars[self.counter % self.cyclevars_len]
+        value = self.cyclevars[self.counter % self.cyclevars_len]
+        if self.variable_name:
+            context[self.variable_name] = value
+        return value
 
 class DebugNode(Node):
     def render(self, context):
@@ -86,7 +90,7 @@ class ForNode(Node):
             parentloop = {}
         context.push()
         try:
-            values = self.sequence.resolve(context)
+            values = self.sequence.resolve(context, True)
         except VariableDoesNotExist:
             values = []
         if values is None:
@@ -125,6 +129,8 @@ class IfChangedNode(Node):
         self._last_seen = None
 
     def render(self, context):
+        if context.has_key('forloop') and context['forloop']['first']:
+            self._last_seen = None
         content = self.nodelist.render(context)
         if content != self._last_seen:
             firstloop = (self._last_seen == None)
@@ -212,13 +218,13 @@ class RegroupNode(Node):
         self.var_name = var_name
 
     def render(self, context):
-        obj_list = self.target.resolve(context)
-        if obj_list == '': # target_var wasn't found in context; fail silently
+        obj_list = self.target.resolve(context, True)
+        if obj_list == None: # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = self.expression.resolve(Context({'var': obj}))
+            grouper = self.expression.resolve(Context({'var': obj}), True)
             # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
@@ -251,7 +257,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output)
+                t = Template(output, name=self.filepath)
                 return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:
@@ -289,6 +295,8 @@ class TemplateTagNode(Node):
                'closevariable': VARIABLE_TAG_END,
                'openbrace': SINGLE_BRACE_START,
                'closebrace': SINGLE_BRACE_END,
+               'opencomment': COMMENT_TAG_START,
+               'closecomment': COMMENT_TAG_END,
                }
 
     def __init__(self, tagtype):
@@ -385,7 +393,7 @@ def cycle(parser, token):
             raise TemplateSyntaxError("Second 'cycle' argument must be 'as'")
         cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
         name = args[3]
-        node = CycleNode(cyclevars)
+        node = CycleNode(cyclevars, name)
 
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
@@ -825,6 +833,8 @@ def templatetag(parser, token):
         ``closevariable``   ``}}``
         ``openbrace``       ``{``
         ``closebrace``      ``}``
+        ``opencomment``     ``{#``
+        ``closecomment``    ``#}``
         ==================  =======
     """
     bits = token.contents.split()

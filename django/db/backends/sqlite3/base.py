@@ -4,10 +4,18 @@ SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 
 from django.db.backends import util
 try:
-    from pysqlite2 import dbapi2 as Database
+    try:
+        from sqlite3 import dbapi2 as Database
+    except ImportError:
+        from pysqlite2 import dbapi2 as Database
 except ImportError, e:
+    import sys
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading pysqlite2 module: %s" % e
+    if sys.version_info < (2, 5, 0):
+        module = 'pysqlite2'
+    else:
+        module = 'sqlite3'
+    raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
 
 DatabaseError = Database.DatabaseError
 
@@ -62,7 +70,10 @@ class DatabaseWrapper(local):
             self.connection.rollback()
 
     def close(self):
-        if self.connection is not None:
+        from django.conf import settings
+        # If database is in memory, closing the connection destroys the database.
+        # To prevent accidental data loss, ignore close requests on an in-memory db.
+        if self.connection is not None and settings.DATABASE_NAME != ":memory:":
             self.connection.close()
             self.connection = None
 

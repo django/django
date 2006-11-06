@@ -87,7 +87,7 @@ def staff_member_required(view_func):
 
         # The user data is correct; log in the user in and continue.
         else:
-            if user.is_staff:
+            if user.is_active and user.is_staff:
                 login(request, user)
                 # TODO: set last_login with an event.
                 user.last_login = datetime.datetime.now()

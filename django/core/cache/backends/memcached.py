@@ -20,7 +20,7 @@ class CacheClass(BaseCache):
             return val
 
     def set(self, key, value, timeout=0):
-        self._cache.set(key, value, timeout)
+        self._cache.set(key, value, timeout or self.default_timeout)
 
     def delete(self, key):
         self._cache.delete(key)

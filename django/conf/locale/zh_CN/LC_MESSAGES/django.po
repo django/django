@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: django v1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:10+0200\n"
-"PO-Revision-Date: 2006-05-17 13:47+0800\n"
+"PO-Revision-Date: 2006-09-01 22:05+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: Simplified Chinese <limodou@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -1167,7 +1167,7 @@ msgstr "个人信息"
 
 #: contrib/auth/models.py:77
 msgid "Permissions"
-msgstr "许可"
+msgstr "权限"
 
 #: contrib/auth/models.py:78
 msgid "Important dates"
