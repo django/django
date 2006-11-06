@@ -34,6 +34,12 @@ class HasPermission(object):
 
 has_permission = HasPermission()
 
+def has_permissions(user, permission_list, obj=None):
+    for permission in permission_list:
+        if not has_permission(user, permission, obj):
+            return False
+    return True
+
 def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i+1:]
