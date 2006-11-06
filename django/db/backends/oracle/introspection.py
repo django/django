@@ -24,8 +24,25 @@ def get_relations(cursor, table_name):
     """
     Returns a dictionary of {field_index: (field_index_other_table, other_table)}
     representing all relationships to the given table. Indexes are 0-based.
-    """
-    raise NotImplementedError
+    """    
+    cursor.execute("""
+SELECT ta.column_id - 1, tb.table_name, tb.column_id - 1
+FROM   user_constraints, USER_CONS_COLUMNS ca, USER_CONS_COLUMNS cb,
+user_tab_cols ta, user_tab_cols tb
+WHERE  user_constraints.table_name = %s AND
+      ta.table_name = %s AND
+      ta.column_name = ca.column_name AND
+      ca.table_name = %s AND
+      user_constraints.constraint_name = ca.constraint_name AND
+      user_constraints.r_constraint_name = cb.constraint_name AND
+      cb.table_name = tb.table_name AND
+      cb.column_name = tb.column_name AND
+      ca.position = cb.position""", [table_name, table_name, table_name])
+
+    relations = {}
+    for row in cursor.fetchall():
+        relations[row[0]] = (row[2], row[1])
+    return relations
 
 def get_indexes(cursor, table_name):
     """
