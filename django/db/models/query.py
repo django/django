@@ -5,8 +5,7 @@ from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.conf import settings
-import operator
-import re
+import datetime, operator, re
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -197,10 +196,7 @@ class _QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        if settings.DATABASE_ENGINE == 'oracle':
-            select, sql, params, full_query = counter._get_sql_clause() 
-        else:
-            select, sql, params = counter._get_sql_clause() 
+        select, sql, params = counter._get_sql_clause()[:3]
         cursor = connection.cursor()
         if self._distinct:
             id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
@@ -539,10 +535,7 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        if settings.DATABASE_ENGINE == 'oracle':
-            select, sql, params, full_query = self._get_sql_clause() 
-        else:
-            select, sql, params = self._get_sql_clause() 
+        select, sql, params = self._get_sql_clause()[:3]
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -655,9 +648,13 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
-    # Put some oracle exceptions here
-    if lookup_type == "icontains" and settings.DATABASE_ENGINE == 'oracle': 
-        return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s')) 
+    # TODO: move this into django.db.backends.oracle somehow
+    if settings.DATABASE_ENGINE == 'oracle':
+        if lookup_type == 'icontains':
+            return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))             
+        elif type(value) == datetime.datetime:
+            return "%s%s %s" % (table_prefix, field_name,
+                 (backend.OPERATOR_MAPPING[lookup_type] % "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"))       
     try:
         return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
@@ -703,10 +700,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
                 (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
-            if settings.DATABASE_ENGINE == 'oracle':
-                select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields if not isinstance(f2, AutoField)]) 
-            else:
-                select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields]) 
+            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields]) 
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def parse_lookup(kwarg_items, opts):

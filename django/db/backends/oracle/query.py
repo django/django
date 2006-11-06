@@ -1,15 +1,50 @@
 from django.db import backend, connection
-from django.db.models.query import handle_legacy_orderlist
+# TODO: Why the frack can't I just import get_cached_row?
+#from django.db.models.query import get_cached_row
+from django.db.models.query import handle_legacy_orderlist, orderfield2column
 from django.utils.datastructures import SortedDict
 import cx_Oracle as Database
 
 
+def get_cached_row(klass, row, index_start):
+    "Helper function that recursively returns an object with cache filled"
+    index_end = index_start + len(klass._meta.fields)
+    obj = klass(*row[index_start:index_end])
+    for f in klass._meta.fields:
+        if f.rel and not f.null:
+            rel_obj, index_end = get_cached_row(f.rel.to, row, index_end)
+            setattr(obj, f.get_cache_name(), rel_obj)
+    return obj, index_end
+
+
+def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen):
+    """
+    Helper function that recursively populates the select, tables and where (in
+    place) for select_related queries.
+    """
+    from django.db.models.fields import AutoField 
+    qn = backend.quote_name
+    for f in opts.fields:
+        if f.rel and not f.null:
+            db_table = f.rel.to._meta.db_table
+            if db_table not in cache_tables_seen:
+                tables.append(qn(db_table))
+            else: # The table was already seen, so give it a table alias.
+                new_prefix = '%s%s' % (db_table, len(cache_tables_seen))
+                tables.append('%s %s' % (qn(db_table), qn(new_prefix)))
+                db_table = new_prefix
+            cache_tables_seen.append(db_table)
+            where.append('%s.%s = %s.%s' % \
+                (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
+            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields if not isinstance(f2, AutoField)]) 
+            fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
+
+
 def get_query_set_class(DefaultQuerySet):
-    """
-    Create a custom QuerySet class for Oracle.
-    """
+    "Create a custom QuerySet class for Oracle."
     
     class OracleQuerySet(DefaultQuerySet):
+        
         def iterator(self):
             "Performs the SELECT database lookup of this QuerySet."
 
@@ -60,7 +95,7 @@ def get_query_set_class(DefaultQuerySet):
             joins = SortedDict()
             where = self._where[:]
             params = self._params[:]
-    
+        
             # Convert self._filters into SQL.
             joins2, where2, params2 = self._filters.get_sql(opts)
             joins.update(joins2)
@@ -156,6 +191,5 @@ def get_query_set_class(DefaultQuerySet):
                 full_query = None 
              
             return select, " ".join(sql), params, full_query
-    
-        
+            
     return OracleQuerySet
