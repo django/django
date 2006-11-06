@@ -1,10 +1,23 @@
 from django.core import validators
+from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 import datetime
 
-SESSION_KEY = '_auth_user_id'
+def check_password(raw_password, enc_password):
+    """
+    Returns a boolean of whether the raw_password was correct. Handles
+    encryption formats behind the scenes.
+    """
+    algo, salt, hsh = enc_password.split('$')
+    if algo == 'md5':
+        import md5
+        return hsh == md5.new(salt+raw_password).hexdigest()
+    elif algo == 'sha1':
+        import sha
+        return hsh == sha.new(salt+raw_password).hexdigest()
+    raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
     pass
@@ -113,6 +126,11 @@ class User(models.Model):
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
         return False
+    
+    def is_authenticated(self):
+        """Always return True. This is a way to tell if the user has been authenticated in templates.
+        """
+        return True
 
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
@@ -141,14 +159,7 @@ class User(models.Model):
                 self.set_password(raw_password)
                 self.save()
             return is_correct
-        algo, salt, hsh = self.password.split('$')
-        if algo == 'md5':
-            import md5
-            return hsh == md5.new(salt+raw_password).hexdigest()
-        elif algo == 'sha1':
-            import sha
-            return hsh == sha.new(salt+raw_password).hexdigest()
-        raise ValueError, "Got unknown password algorithm type in password."
+        return check_password(raw_password, self.password)
 
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
@@ -234,7 +245,7 @@ class User(models.Model):
                 app_label, model_name = settings.AUTH_PROFILE_MODULE.split('.')
                 model = models.get_model(app_label, model_name)
                 self._profile_cache = model._default_manager.get(user__id__exact=self.id)
-            except ImportError, ImproperlyConfigured:
+            except (ImportError, ImproperlyConfigured):
                 raise SiteProfileNotAvailable
         return self._profile_cache
 
@@ -288,3 +299,6 @@ class AnonymousUser(object):
 
     def is_anonymous(self):
         return True
+    
+    def is_authenticated(self):
+        return False

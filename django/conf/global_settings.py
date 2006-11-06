@@ -1,7 +1,9 @@
 # Default Django settings. Override these with settings in the module
 # pointed-to by the DJANGO_SETTINGS_MODULE environment variable.
 
-from django.utils.translation import gettext_lazy as _
+# This is defined here as a do-nothing function because we can't import
+# django.utils.translation -- that module depends on the settings.
+gettext_noop = lambda s: s
 
 ####################
 # CORE             #
@@ -34,38 +36,44 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for, out of the box. The language name
 # should be the utf-8 encoded local name for the language.
 LANGUAGES = (
-    ('bn', _('Bengali')),
-    ('cs', _('Czech')),
-    ('cy', _('Welsh')),
-    ('da', _('Danish')),
-    ('de', _('German')),
-    ('el', _('Greek')),
-    ('en', _('English')),
-    ('es', _('Spanish')),
-    ('es_AR', _('Argentinean Spanish')),
-    ('fr', _('French')),
-    ('gl', _('Galician')),
-    ('hu', _('Hungarian')),
-    ('he', _('Hebrew')),
-    ('is', _('Icelandic')),
-    ('it', _('Italian')),
-    ('ja', _('Japanese')),
-    ('nl', _('Dutch')),
-    ('no', _('Norwegian')),
-    ('pt-br', _('Brazilian')),
-    ('ro', _('Romanian')),
-    ('ru', _('Russian')),
-    ('sk', _('Slovak')),
-    ('sl', _('Slovenian')),
-    ('sr', _('Serbian')),
-    ('sv', _('Swedish')),
-    ('uk', _('Ukrainian')),
-    ('zh-cn', _('Simplified Chinese')),
-    ('zh-tw', _('Traditional Chinese')),
+    ('ar', gettext_noop('Arabic')),
+    ('bn', gettext_noop('Bengali')),
+    ('cs', gettext_noop('Czech')),
+    ('cy', gettext_noop('Welsh')),
+    ('da', gettext_noop('Danish')),
+    ('de', gettext_noop('German')),
+    ('el', gettext_noop('Greek')),
+    ('en', gettext_noop('English')),
+    ('es', gettext_noop('Spanish')),
+    ('es_AR', gettext_noop('Argentinean Spanish')),
+    ('fr', gettext_noop('French')),
+    ('gl', gettext_noop('Galician')),
+    ('hu', gettext_noop('Hungarian')),
+    ('he', gettext_noop('Hebrew')),
+    ('is', gettext_noop('Icelandic')),
+    ('it', gettext_noop('Italian')),
+    ('ja', gettext_noop('Japanese')),
+    ('nl', gettext_noop('Dutch')),
+    ('no', gettext_noop('Norwegian')),
+    ('pt-br', gettext_noop('Brazilian')),
+    ('ro', gettext_noop('Romanian')),
+    ('ru', gettext_noop('Russian')),
+    ('sk', gettext_noop('Slovak')),
+    ('sl', gettext_noop('Slovenian')),
+    ('sr', gettext_noop('Serbian')),
+    ('sv', gettext_noop('Swedish')),
+    ('ta', gettext_noop('Tamil')),
+    ('uk', gettext_noop('Ukrainian')),
+    ('zh-cn', gettext_noop('Simplified Chinese')),
+    ('zh-tw', gettext_noop('Traditional Chinese')),
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he",)
+LANGUAGES_BIDI = ("he", "ar")
+
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
@@ -281,3 +289,9 @@ COMMENTS_FIRST_FEW = 0
 # A tuple of IP addresses that have been banned from participating in various
 # Django-powered features.
 BANNED_IPS = ()
+
+##################
+# AUTHENTICATION #
+##################
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)

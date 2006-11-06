@@ -7,10 +7,10 @@
 form .form-row p { padding-left:0; font-size:11px; }
 
 /* FORM LABELS */
-form h4	{ margin:0 !important; padding:0 !important; border:none !important; }
+form h4 { margin:0 !important; padding:0 !important; border:none !important; }
 label { font-weight:normal !important; color:#666; font-size:12px; }
 label.inline { margin-left:20px; }
-.required label, label.required	{ font-weight:bold !important; color:#333 !important; }
+.required label, label.required { font-weight:bold !important; color:#333 !important; }
 
 /* RADIO BUTTONS */
 form ul.radiolist li { list-style-type:none; }

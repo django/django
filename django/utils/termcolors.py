@@ -2,8 +2,6 @@
 termcolors.py
 """
 
-import types
-
 color_names = ('black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white')
 foreground = dict([(color_names[x], '3%s' % x) for x in range(8)])
 background = dict([(color_names[x], '4%s' % x) for x in range(8)])

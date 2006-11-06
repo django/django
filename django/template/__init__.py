@@ -171,7 +171,7 @@ class Token(object):
             self.contents[:20].replace('\n', ''))
 
     def split_contents(self):
-        return smart_split(self.contents)
+        return list(smart_split(self.contents))
 
 class Lexer(object):
     def __init__(self, template_string, origin):
@@ -318,7 +318,7 @@ class Parser(object):
         self.tags.update(lib.tags)
         self.filters.update(lib.filters)
 
-    def compile_filter(self,token):
+    def compile_filter(self, token):
         "Convenient wrapper for FilterExpression"
         return FilterExpression(token, self)
 
@@ -358,7 +358,7 @@ class DebugParser(Parser):
         super(DebugParser, self).extend_nodelist(nodelist, node, token)
 
     def unclosed_block_tag(self, parse_until):
-        (command, source) = self.command_stack.pop()
+        command, source = self.command_stack.pop()
         msg = "Unclosed tag '%s'. Looking for one of: %s " % (command, ', '.join(parse_until))
         raise self.source_error( source, msg)
 
@@ -543,11 +543,14 @@ class FilterExpression(object):
             raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
         self.var, self.filters = var, filters
 
-    def resolve(self, context):
+    def resolve(self, context, ignore_failures=False):
         try:
             obj = resolve_variable(self.var, context)
         except VariableDoesNotExist:
-            obj = settings.TEMPLATE_STRING_IF_INVALID
+            if ignore_failures:
+                return None
+            else:
+                return settings.TEMPLATE_STRING_IF_INVALID
         for func, args in self.filters:
             arg_vals = []
             for lookup, arg in args:
@@ -611,7 +614,11 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0].isdigit():
+    if path == 'False':
+        current = False
+    elif path == 'True':
+        current = True
+    elif path[0].isdigit():
         number_type = '.' in path and float or int
         try:
             current = number_type(path)
@@ -701,9 +708,9 @@ class DebugNodeList(NodeList):
             if not hasattr(e, 'source'):
                 e.source = node.source
             raise
-        except Exception:
+        except Exception, e:
             from sys import exc_info
-            wrapped = TemplateSyntaxError('Caught an exception while rendering.')
+            wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
             wrapped.source = node.source
             wrapped.exc_info = exc_info()
             raise wrapped
@@ -751,7 +758,7 @@ class DebugVariableNode(VariableNode):
 
 def generic_tag_compiler(params, defaults, name, node_class, parser, token):
     "Returns a template.Node subclass."
-    bits = token.contents.split()[1:]
+    bits = token.split_contents()[1:]
     bmax = len(params)
     def_len = defaults and len(defaults) or 0
     bmin = bmax - def_len
@@ -810,7 +817,7 @@ class Library(object):
             self.filters[name] = filter_func
             return filter_func
         else:
-            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r, %r)", (name, compile_function, has_arg)
+            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r)", (name, filter_func)
 
     def filter_function(self, func):
         self.filters[func.__name__] = func

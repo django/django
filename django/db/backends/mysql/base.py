@@ -40,7 +40,7 @@ class MysqlDebugWrapper:
     def executemany(self, sql, param_list):
         try:
             return self.cursor.executemany(sql, param_list)
-        except Database.Warning:
+        except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
             raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
 

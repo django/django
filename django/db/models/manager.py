@@ -1,10 +1,7 @@
-from django.utils.functional import curry
-from django.db import backend, connection
 from django.db.models.query import QuerySet
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
-from django.utils.datastructures import SortedDict
 
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
@@ -69,8 +66,11 @@ class Manager(object):
     def get(self, *args, **kwargs):
         return self.get_query_set().get(*args, **kwargs)
 
-    def get_or_create(self, *args, **kwargs):
-        return self.get_query_set().get_or_create(*args, **kwargs)
+    def get_or_create(self, **kwargs):
+        return self.get_query_set().get_or_create(**kwargs)
+        
+    def create(self, **kwargs):
+        return self.get_query_set().create(**kwargs)
 
     def filter(self, *args, **kwargs):
         return self.get_query_set().filter(*args, **kwargs)

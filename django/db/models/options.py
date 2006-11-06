@@ -87,7 +87,10 @@ class Options(object):
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-
+        
+    def __str__(self):
+        return "%s.%s" % (self.app_label, self.module_name)
+        
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
@@ -196,12 +199,13 @@ class Options(object):
         return self._field_types[field_type]
 
 class AdminOptions(object):
-    def __init__(self, fields=None, js=None, list_display=None, list_filter=None,
+    def __init__(self, fields=None, js=None, list_display=None, list_display_links=None, list_filter=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
         self.fields = fields
         self.js = js or []
         self.list_display = list_display or ['__str__']
+        self.list_display_links = list_display_links or []
         self.list_filter = list_filter or []
         self.date_hierarchy = date_hierarchy
         self.save_as, self.ordering = save_as, ordering

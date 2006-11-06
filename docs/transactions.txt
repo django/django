@@ -2,7 +2,8 @@
 Managing database transactions
 ==============================
 
-Django gives you a few ways to control how database transactions are managed.
+Django gives you a few ways to control how database transactions are managed,
+if you're using a database that supports transactions.
 
 Django's default transaction behavior
 =====================================
@@ -144,3 +145,19 @@ Thus, this is best used in situations where you want to run your own
 transaction-controlling middleware or do something really strange. In almost
 all situations, you'll be better off using the default behavior, or the
 transaction middleware, and only modify selected functions as needed.
+
+Transactions in MySQL
+=====================
+
+If you're using MySQL, your tables may or may not support transactions; it
+depends on your MySQL version and the table types you're using. (By
+"table types," we mean something like "InnoDB" or "MyISAM".) MySQL transaction
+peculiarities are outside the scope of this article, but the MySQL site has
+`information on MySQL transactions`_.
+
+If your MySQL setup does *not* support transactions, then Django will function
+in auto-commit mode: Statements will be executed and committed as soon as
+they're called. If your MySQL setup *does* support transactions, Django will
+handle transactions as explained in this document.
+
+.. _information on MySQL transactions: http://dev.mysql.com/books/mysqlpress/mysql-tutorial/ch10.html

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
@@ -20,8 +21,7 @@ class AuthenticationForm(forms.Manipulator):
         self.fields = [
             forms.TextField(field_name="username", length=15, maxlength=30, is_required=True,
                 validator_list=[self.isValidUser, self.hasCookiesEnabled]),
-            forms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True,
-                validator_list=[self.isValidPasswordForUser]),
+            forms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True),
         ]
         self.user_cache = None
 
@@ -30,16 +30,10 @@ class AuthenticationForm(forms.Manipulator):
             raise validators.ValidationError, _("Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in.")
 
     def isValidUser(self, field_data, all_data):
-        try:
-            self.user_cache = User.objects.get(username=field_data)
-        except User.DoesNotExist:
-            raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
-
-    def isValidPasswordForUser(self, field_data, all_data):
+        username = field_data
+        password = all_data.get('password', None)
+        self.user_cache = authenticate(username=username, password=password)
         if self.user_cache is None:
-            return
-        if not self.user_cache.check_password(field_data):
-            self.user_cache = None
             raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
         elif not self.user_cache.is_active:
             raise validators.ValidationError, _("This account is inactive.")
@@ -67,7 +61,7 @@ class PasswordResetForm(forms.Manipulator):
         except User.DoesNotExist:
             raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
 
-    def save(self, domain_override=None):
+    def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
         new_pass = User.objects.make_random_password()
@@ -79,7 +73,7 @@ class PasswordResetForm(forms.Manipulator):
             domain = current_site.domain
         else:
             site_name = domain = domain_override
-        t = loader.get_template('registration/password_reset_email.html')
+        t = loader.get_template(email_template_name)
         c = {
             'new_password': new_pass,
             'email': self.user_cache.email,

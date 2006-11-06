@@ -263,12 +263,12 @@ Here's the example URLconf from the `Django overview`_::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^articles/(\d{4})/$', 'myproject.news.views.year_archive'),
-        (r'^articles/(\d{4})/(\d{2})/$', 'myproject.news.views.month_archive'),
-        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'myproject.news.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.news.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.news.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.news.views.article_detail'),
     )
 
-In this example, each view has a common prefix -- ``'myproject.news.views'``.
+In this example, each view has a common prefix -- ``'mysite.news.views'``.
 Instead of typing that out for each entry in ``urlpatterns``, you can use the
 first argument to the ``patterns()`` function to specify a prefix to apply to
 each view function.
@@ -277,7 +277,7 @@ With this in mind, the above example can be written more concisely as::
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('myproject.news.views',
+    urlpatterns = patterns('mysite.news.views',
         (r'^articles/(\d{4})/$', 'year_archive'),
         (r'^articles/(\d{4})/(\d{2})/$', 'month_archive'),
         (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'article_detail'),
@@ -389,3 +389,45 @@ to pass metadata and options to views.
 
 .. _generic views: http://www.djangoproject.com/documentation/generic_views/
 .. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+
+Passing extra options to ``include()``
+--------------------------------------
+
+**New in the Django development version.**
+
+Similarly, you can pass extra options to ``include()``. When you pass extra
+options to ``include()``, *each* line in the included URLconf will be passed
+the extra options.
+
+For example, these two URLconf sets are functionally identical:
+
+Set one::
+
+    # main.py
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner'), {'blogid': 3}),
+    )
+
+    # inner.py
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+    )
+
+Set two::
+
+    # main.py
+    urlpatterns = patterns('',
+        (r'^blog/', include('inner')),
+    )
+
+    # inner.py
+    urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
+        (r'^about/$', 'mysite.views.about', {'blogid': 3}),
+    )
+
+Note that extra options will *always* be passed to *every* line in the included
+URLconf, regardless of whether the line's view actually accepts those options
+as valid. For this reason, this technique is only useful if you're certain that
+every view in the the included URLconf accepts the extra options you're passing.

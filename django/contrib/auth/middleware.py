@@ -4,12 +4,8 @@ class LazyUser(object):
 
     def __get__(self, request, obj_type=None):
         if self._user is None:
-            from django.contrib.auth.models import User, AnonymousUser, SESSION_KEY
-            try:
-                user_id = request.session[SESSION_KEY]
-                self._user = User.objects.get(pk=user_id)
-            except (KeyError, User.DoesNotExist):
-                self._user = AnonymousUser()
+            from django.contrib.auth import get_user
+            self._user = get_user(request)
         return self._user
 
 class AuthenticationMiddleware(object):

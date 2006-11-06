@@ -313,6 +313,36 @@ False
 >>> pluralize(2)
 's'
 
+>>> pluralize([1])
+''
+
+>>> pluralize([])
+'s'
+
+>>> pluralize([1,2,3])
+'s'
+
+>>> pluralize(1,'es')
+''
+
+>>> pluralize(0,'es')
+'es'
+
+>>> pluralize(2,'es')
+'es'
+
+>>> pluralize(1,'y,ies')
+'y'
+
+>>> pluralize(0,'y,ies')
+'ies'
+
+>>> pluralize(2,'y,ies')
+'ies'
+
+>>> pluralize(0,'y,ies,error')
+''
+
 >>> phone2numeric('0800 flowers')
 '0800 3569377'
 

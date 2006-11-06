@@ -12,7 +12,11 @@ class GZipMiddleware(object):
     """
     def process_response(self, request, response):
         patch_vary_headers(response, ('Accept-Encoding',))
-        if response.has_header('Content-Encoding'):
+        
+        # Avoid gzipping if we've already got a content-encoding or if the
+        # content-type is Javascript (silly IE...)
+        is_js = "javascript" in response.headers.get('Content-Type', '').lower()
+        if response.has_header('Content-Encoding') or is_js:
             return response
 
         ae = request.META.get('HTTP_ACCEPT_ENCODING', '')

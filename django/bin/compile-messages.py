@@ -2,7 +2,6 @@
 
 import os
 import sys
-import getopt
 
 def compile_messages():
     basedir = None

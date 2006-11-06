@@ -4,12 +4,11 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
-from django.db.models.related import RelatedObject
-from django.db.models.query import orderlist2sql, delete_objects
+from django.db.models.query import delete_objects
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, backend, transaction
 from django.db.models import signals
-from django.db.models.loading import register_models
+from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
@@ -44,6 +43,11 @@ class ModelBase(type):
             # For 'django.contrib.sites.models', this would be 'sites'.
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
+        # Bail out early if we have already created this class.
+        m = get_model(new_class._meta.app_label, name, False)
+        if m is not None:
+            return m
+
         # Add all attributes to the class.
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
@@ -60,7 +64,11 @@ class ModelBase(type):
         new_class._prepare()
 
         register_models(new_class._meta.app_label, new_class)
-        return new_class
+        # Because of the way imports happen (recursively), we may or may not be
+        # the first class for this model to register with the framework. There
+        # should only be one class for each model, so we must always return the
+        # registered version.
+        return get_model(new_class._meta.app_label, name, False)
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -395,10 +403,10 @@ def method_set_order(ordered_obj, self, id_list):
     cursor = connection.cursor()
     # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
     sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
-        (backend.quote_name(ordered_obj.db_table), backend.quote_name('_order'),
-        backend.quote_name(ordered_obj.order_with_respect_to.column),
-        backend.quote_name(ordered_obj.pk.column))
-    rel_val = getattr(self, ordered_obj.order_with_respect_to.rel.field_name)
+        (backend.quote_name(ordered_obj._meta.db_table), backend.quote_name('_order'),
+        backend.quote_name(ordered_obj._meta.order_with_respect_to.column),
+        backend.quote_name(ordered_obj._meta.pk.column))
+    rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
     cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
     transaction.commit_unless_managed()
 

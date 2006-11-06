@@ -35,11 +35,24 @@ How to internationalize your app: in three steps
        support.
     3. Activate the locale middleware in your Django settings.
 
-
 .. admonition:: Behind the scenes
 
     Django's translation machinery uses the standard ``gettext`` module that
     comes with Python.
+
+If you don't need internationalization
+======================================
+
+Django's internationalization hooks are on by default, and that means there's a
+bit of i18n-related overhead in certain places of the framework. If you don't
+use internationalization, you should take the two seconds to set
+``USE_I18N = False`` in your settings file. If ``USE_I18N`` is set to
+``False``, then Django will make some optimizations so as not to load the
+internationalization machinery.
+
+See the `documentation for USE_I18N`_.
+
+.. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
 
 How to specify translation strings
 ==================================
@@ -211,11 +224,18 @@ block::
     This will have {{ myvar }} inside.
     {% endblocktrans %}
 
+If you need to bind more than one expression inside a ``blocktrans`` tag,
+separate the pieces with ``and``::
+
+    {% blocktrans with book|title as book_t and author|title as author_t %}
+    This is {{ book_t }} by {{ author_t }}
+    {% endblocktrans %}
+
 To pluralize, specify both the singular and plural forms with the
 ``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
 ``{% endblocktrans %}``. Example::
 
-    {% blocktrans count list|counted as counter %}
+    {% blocktrans count list|count as counter %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
@@ -293,7 +313,7 @@ marked for translation. It creates (or updates) a message file in the directory
 ``conf/locale``. In the ``de`` example, the file will be
 ``conf/locale/de/LC_MESSAGES/django.po``.
 
-If run over your project source tree or your appliation source tree, it will
+If run over your project source tree or your application source tree, it will
 do the same, but the location of the locale directory is ``locale/LANG/LC_MESSAGES``
 (note the missing ``conf`` prefix).
 
@@ -336,7 +356,7 @@ A quick explanation:
 Long messages are a special case. There, the first string directly after the
 ``msgstr`` (or ``msgid``) is an empty string. Then the content itself will be
 written over the next few lines as one string per line. Those strings are
-directlyconcatenated. Don't forget trailing spaces within the strings;
+directly concatenated. Don't forget trailing spaces within the strings;
 otherwise, they'll be tacked together without whitespace!
 
 .. admonition:: Mind your charset
@@ -439,7 +459,7 @@ Notes:
       ``de``.
     * Only languages listed in the `LANGUAGES setting`_ can be selected. If
       you want to restrict the language selection to a subset of provided
-      languages (because your appliaction doesn't provide all those languages),
+      languages (because your application doesn't provide all those languages),
       set ``LANGUAGES`` to a list of languages. For example::
 
           LANGUAGES = (
@@ -452,6 +472,30 @@ Notes:
       en-us).
 
       .. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
+
+    * If you define a custom ``LANGUAGES`` setting, as explained in the
+      previous bullet, it's OK to mark the languages as translation strings
+      -- but use a "dummy" ``gettext()`` function, not the one in
+      ``django.utils.translation``. You should *never* import
+      ``django.utils.translation`` from within your settings file, because that
+      module in itself depends on the settings, and that would cause a circular
+      import.
+
+      The solution is to use a "dummy" ``gettext()`` function. Here's a sample
+      settings file::
+
+          gettext = lambda s: s
+
+          LANGUAGES = (
+              ('de', gettext('German')),
+              ('en', gettext('English')),
+          )
+
+      With this arrangement, ``make-messages.py`` will still find and mark
+      these strings for translation, but the translation won't happen at
+      runtime -- so you'll have to remember to wrap the languages in the *real*
+      ``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+
     * The ``LocaleMiddleware`` can only select languages for which there is a
       Django-provided base translation. If you want to provide translations
       for your application that aren't already in the set of translations
@@ -610,7 +654,7 @@ The ``javascript_catalog`` view
 -------------------------------
 
 The main solution to these problems is the ``javascript_catalog`` view, which
-sends out a JavaScript code library with functions that mimick the ``gettext``
+sends out a JavaScript code library with functions that mimic the ``gettext``
 interface, plus an array of translation strings. Those translation strings are
 taken from the application, project or Django core, according to what you
 specify in either the {{{info_dict}}} or the URL.
@@ -628,7 +672,7 @@ You hook it up like this::
 Each string in ``packages`` should be in Python dotted-package syntax (the
 same format as the strings in ``INSTALLED_APPS``) and should refer to a package
 that contains a ``locale`` directory. If you specify multiple packages, all
-those catalogs aremerged into one catalog. This is useful if you have
+those catalogs are merged into one catalog. This is useful if you have
 JavaScript that uses strings from different applications.
 
 You can make the view dynamic by putting the packages into the URL pattern::

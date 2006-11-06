@@ -107,15 +107,20 @@ For more, see the `diffsettings documentation`_.
 Using settings in Python code
 =============================
 
-In your Django apps, use settings by importing them from
+In your Django apps, use settings by importing the object
 ``django.conf.settings``. Example::
 
-    from django.conf.settings import DEBUG
+    from django.conf import settings
 
-    if DEBUG:
+    if settings.DEBUG:
         # Do something
 
-Note that your code should *not* import from either ``global_settings`` or
+Note that ``django.conf.settings`` isn't a module -- it's an object. So
+importing individual settings is not possible::
+
+    from django.conf.settings import DEBUG  # This won't work.
+
+Also note that your code should *not* import from either ``global_settings`` or
 your own settings file. ``django.conf.settings`` abstracts the concepts of
 default settings and site-specific settings; it presents a single interface.
 It also decouples the code that uses settings from the location of your
@@ -127,9 +132,9 @@ Altering settings at runtime
 You shouldn't alter settings in your applications at runtime. For example,
 don't do this in a view::
 
-    from django.conf.settings import DEBUG
+    from django.conf import settings
 
-    DEBUG = True   # Don't do this!
+    settings.DEBUG = True   # Don't do this!
 
 The only place you should assign to settings is in a settings file.
 
@@ -496,6 +501,28 @@ specifies which languages are available for language selection. See the
 Generally, the default value should suffice. Only set this setting if you want
 to restrict language selection to a subset of the Django-provided languages.
 
+If you define a custom ``LANGUAGES`` setting, it's OK to mark the languages as
+translation strings (as in the default value displayed above) -- but use a
+"dummy" ``gettext()`` function, not the one in ``django.utils.translation``.
+You should *never* import ``django.utils.translation`` from within your
+settings file, because that module in itself depends on the settings, and that
+would cause a circular import.
+
+The solution is to use a "dummy" ``gettext()`` function. Here's a sample
+settings file::
+
+    gettext = lambda s: s
+
+    LANGUAGES = (
+        ('de', gettext('German')),
+        ('en', gettext('English')),
+    )
+
+With this arrangement, ``make-messages.py`` will still find and mark these
+strings for translation, but the translation won't happen at runtime -- so
+you'll have to remember to wrap the languages in the *real* ``gettext()`` in
+any code that uses ``LANGUAGES`` at runtime.
+
 MANAGERS
 --------
 
@@ -724,10 +751,21 @@ TIME_ZONE
 Default: ``'America/Chicago'``
 
 A string representing the time zone for this installation. `See available choices`_.
+(Note that list of available choices lists more than one on the same line;
+you'll want to use just one of the choices for a given time zone. For instance,
+one line says ``'Europe/London GB GB-Eire'``, but you should use the first bit
+of that -- ``'Europe/London'`` -- as your ``TIME_ZONE`` setting.)
 
 Note that this is the time zone to which Django will convert all dates/times --
 not necessarily the timezone of the server. For example, one server may serve
 multiple Django-powered sites, each with a separate time-zone setting.
+
+Normally, Django sets the ``os.environ['TZ']`` variable to the time zone you
+specify in the  ``TIME_ZONE`` setting. Thus, all your views and models will
+automatically operate in the correct time zone. However, if you're using the
+manual configuration option (see below), Django will *not* touch the ``TZ``
+environment variable, and it'll be up to you to ensure your processes are
+running in the correct environment.
 
 USE_ETAGS
 ---------
@@ -737,6 +775,16 @@ Default: ``False``
 A boolean that specifies whether to output the "Etag" header. This saves
 bandwidth but slows down performance. This is only used if ``CommonMiddleware``
 is installed (see the `middleware docs`_).
+
+USE_I18N
+--------
+
+Default: ``True``
+
+A boolean that specifies whether Django's internationalization system should be
+enabled. This provides an easy way to turn it off, for performance. If this is
+set to ``False``, Django will make some optimizations so as not to load the
+internationalization machinery.
 
 YEAR_MONTH_FORMAT
 -----------------
@@ -795,6 +843,15 @@ argument representing a setting and its value. Each argument name should be all
 uppercase, with the same name as the settings described above. If a particular
 setting is not passed to ``configure()`` and is needed at some later point,
 Django will use the default setting value.
+
+Configuring Django in this fashion is mostly necessary -- and, indeed,
+recommended -- when you're using a piece of the framework inside a larger
+application.
+
+Consequently, when configured via ``settings.configure()``, Django will not
+make any modifications to the process environment variables. (See the
+explanation of ``TIME_ZONE``, above, for why this would normally occur.) It's
+assumed that you're already in full control of your environment in these cases.
 
 Custom default settings
 -----------------------

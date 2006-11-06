@@ -27,7 +27,7 @@ def textile(value):
             raise template.TemplateSyntaxError, "Error in {% textile %} filter: The Python textile library isn't installed."
         return value
     else:
-        return textile.textile(value)
+        return textile.textile(value, encoding=settings.DEFAULT_CHARSET, output=settings.DEFAULT_CHARSET)
 
 def markdown(value):
     try:
@@ -47,7 +47,8 @@ def restructuredtext(value):
             raise template.TemplateSyntaxError, "Error in {% restructuredtext %} filter: The Python docutils library isn't installed."
         return value
     else:
-        parts = publish_parts(source=value, writer_name="html4css1")
+        docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
+        parts = publish_parts(source=value, writer_name="html4css1", settings_overrides=docutils_settings)
         return parts["fragment"]
 
 register.filter(textile)

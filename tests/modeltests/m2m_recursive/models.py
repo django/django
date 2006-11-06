@@ -2,7 +2,7 @@
 27. Many-to-many relationships between the same two tables
 
 In this example, A Person can have many friends, who are also people. Friendship is a
-symmetrical relationshiup - if I am your friend, you are my friend.
+symmetrical relationship - if I am your friend, you are my friend.
 
 A person can also have many idols - but while I may idolize you, you may not think
 the same of me. 'Idols' is an example of a non-symmetrical m2m field. Only recursive

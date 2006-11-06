@@ -1,5 +1,9 @@
 from django.conf import settings
 
+if __name__ == '__main__':
+    # When running this file in isolation, we need to set up the configuration
+    # before importing 'template'.
+    settings.configure()
 
 from django import template
 from django.template import loader
@@ -78,7 +82,7 @@ TEMPLATE_TESTS = {
     'basic-syntax03': ("{{ first }} --- {{ second }}", {"first" : 1, "second" : 2}, "1 --- 2"),
 
     # Fail silently when a variable is not found in the current context
-    'basic-syntax04': ("as{{ missing }}df", {}, "asdf"),
+    'basic-syntax04': ("as{{ missing }}df", {}, "asINVALIDdf"),
 
     # A variable may not contain more than one word
     'basic-syntax06': ("{{ multi word variable }}", {}, template.TemplateSyntaxError),
@@ -94,7 +98,7 @@ TEMPLATE_TESTS = {
     'basic-syntax10': ("{{ var.otherclass.method }}", {"var": SomeClass()}, "OtherClass.method"),
 
     # Fail silently when a variable's attribute isn't found
-    'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, ""),
+    'basic-syntax11': ("{{ var.blech }}", {"var": SomeClass()}, "INVALID"),
 
     # Raise TemplateSyntaxError when trying to access a variable beginning with an underscore
     'basic-syntax12': ("{{ var.__dict__ }}", {"var": SomeClass()}, template.TemplateSyntaxError),
@@ -110,10 +114,10 @@ TEMPLATE_TESTS = {
     'basic-syntax18': ("{{ foo.bar }}", {"foo" : {"bar" : "baz"}}, "baz"),
 
     # Fail silently when a variable's dictionary key isn't found
-    'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, ""),
+    'basic-syntax19': ("{{ foo.spam }}", {"foo" : {"bar" : "baz"}}, "INVALID"),
 
     # Fail silently when accessing a non-simple method
-    'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ""),
+    'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, "INVALID"),
 
     # Basic filter usage
     'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
@@ -152,7 +156,7 @@ TEMPLATE_TESTS = {
     'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
     # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
-    'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, "12"),
+    'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, "1INVALID2"),
 
     # In methods that raise an exception without a "silent_variable_attribute" set to True,
     # the exception propogates
@@ -406,6 +410,12 @@ TEMPLATE_TESTS = {
     # Three-level inheritance with {{ block.super }} from parent and grandparent
     'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
 
+    # Inheritance from local context without use of template loader
+    'inheritance24': ("{% extends context_template %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")}, '1234'),
+
+    # Inheritance from local context with variable parent template
+    'inheritance25': ("{% extends context_template.1 %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': [template.Template("Wrong"), template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")]}, '1234'),
+
     ### I18N ##################################################################
 
     # {% spaceless %} tag
@@ -495,7 +505,7 @@ TEMPLATE_TESTS = {
                   '{{ item.foo }}' + \
                   '{% endfor %},' + \
                   '{% endfor %}',
-                  {}, ''),
+                  {}, 'INVALID:INVALIDINVALIDINVALIDINVALIDINVALIDINVALIDINVALID,'),
 
     ### TEMPLATETAG TAG #######################################################
     'templatetag01': ('{% templatetag openblock %}', {}, '{%'),
@@ -538,10 +548,10 @@ TEMPLATE_TESTS = {
 
     ### TIMESINCE TAG ##################################################
     # Default compare with datetime.now()
-    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1)}, '1 minute'),
-    'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1))}, '1 day'),
+    'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
+    'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1, minutes = 1))}, '1 day'),
     'timesince03' : ('{{ a|timesince }}', {'a':(datetime.now() -
-        timedelta(hours=1, minutes=25))}, '1 hour, 25 minutes'),
+        timedelta(hours=1, minutes=25, seconds = 10))}, '1 hour, 25 minutes'),
 
     # Compare to a given parameter
     'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
@@ -552,9 +562,9 @@ TEMPLATE_TESTS = {
 
     ### TIMEUNTIL TAG ##################################################
     # Default compare with datetime.now()
-    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2)}, '2 minutes'),
-    'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1))}, '1 day'),
-    'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10))}, '8 hours, 10 minutes'),
+    'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
+    'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
+    'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8 hours, 10 minutes'),
 
     # Compare to a given parameter
     'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
@@ -579,6 +589,9 @@ def run_tests(verbosity=0, standalone=False):
 
     # Turn TEMPLATE_DEBUG off, because tests assume that.
     old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
+    # Set TEMPLATE_STRING_IF_INVALID to a known string 
+    old_invalid, settings.TEMPLATE_STRING_IF_INVALID = settings.TEMPLATE_STRING_IF_INVALID, 'INVALID'
+    
     for name, vals in tests:
         install()
         if 'LANGUAGE_CODE' in vals[1]:
@@ -609,6 +622,7 @@ def run_tests(verbosity=0, standalone=False):
     loader.template_source_loaders = old_template_loaders
     deactivate()
     settings.TEMPLATE_DEBUG = old_td
+    settings.TEMPLATE_STRING_IF_INVALID = old_invalid
 
     if failed_tests and not standalone:
         msg = "Template tests %s failed." % failed_tests
@@ -617,5 +631,4 @@ def run_tests(verbosity=0, standalone=False):
         raise Exception, msg
 
 if __name__ == "__main__":
-    settings.configure()
     run_tests(1, True)

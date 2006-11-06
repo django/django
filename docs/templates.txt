@@ -47,7 +47,7 @@ explained later in this document.::
     JavaScript and CSV. You can use the template language for any text-based
     format.
 
-    Oh, and one more thing: Making humans edit XML is masochistic!
+    Oh, and one more thing: Making humans edit XML is sadistic!
 
 Variables
 =========
@@ -363,10 +363,15 @@ extends
 
 Signal that this template extends a parent template.
 
-This tag may be used in two ways: ``{% extends "base.html" %}`` (with quotes)
-uses the literal value "base.html" as the name of the parent template to
-extend, or ``{% extends variable %}`` uses the value of ``variable`` as the
-name of the parent template to extend.
+This tag can be used in two ways: 
+
+   * ``{% extends "base.html" %}`` (with quotes) uses the literal value
+     ``"base.html"`` as the name of the parent template to extend.
+
+   * ``{% extends variable %}`` uses the value of ``variable``. If the variable
+     evaluates to a string, Django will use that string as the name of the
+     parent template. If the variable evaluates to a ``Template`` object,
+     Django will use that object as the parent template.
 
 See `Template inheritance`_ for more information.
 
@@ -492,6 +497,11 @@ If you need to combine ``and`` and ``or`` to do advanced logic, just use nested
             We have athletes, and either coaches or cheerleaders!
         {% endif %}
     {% endif %}
+
+Multiple uses of the same logical operator are fine, as long as you use the
+same operator. For example, this is valid::
+
+    {% if athlete_list or coach_list or parent_list or teacher_list %}
 
 ifchanged
 ~~~~~~~~~
@@ -951,11 +961,25 @@ any string.
 pluralize
 ~~~~~~~~~
 
-Returns ``'s'`` if the value is not 1.
+Returns a plural suffix if the value is not 1. By default, this suffix is ``'s'``. 
 
 Example::
 
     You have {{ num_messages }} message{{ num_messages|pluralize }}.
+
+For words that require a suffix other than ``'s'``, you can provide an alternate 
+suffix as a parameter to the filter.
+
+Example::
+
+    You have {{ num_walruses }} walrus{{ num_walrus|pluralize:"es" }}.
+
+For words that don't pluralize by simple suffix, you can specify both a
+singular and plural suffix, separated by a comma.
+
+Example::
+
+    You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
 pprint
 ~~~~~~

@@ -45,8 +45,8 @@ def disable_termcolors():
     global style
     style = dummy()
 
-# Disable terminal coloring on Windows or if somebody's piping the output.
-if sys.platform == 'win32' or not sys.stdout.isatty():
+# Disable terminal coloring on Windows, Pocket PC, or if somebody's piping the output.
+if sys.platform == 'win32' or sys.platform == 'Pocket PC' or not sys.stdout.isatty():
     disable_termcolors()
 
 def _is_valid_dir_name(s):
@@ -78,7 +78,7 @@ def get_version():
     from django import VERSION
     v = '.'.join([str(i) for i in VERSION[:-1]])
     if VERSION[-1]:
-        v += ' (%s)' % VERSION[-1]
+        v += '-' + VERSION[-1]
     return v
 
 def get_sql_create(app):
@@ -95,44 +95,39 @@ def get_sql_create(app):
         sys.exit(1)
 
     # Get installed models, so we generate REFERENCES right
-    installed_models = _get_installed_models(_get_table_list())
-
     final_output = []
-    models_output = set(installed_models)
+    known_models = set(_get_installed_models(_get_table_list()))
     pending_references = {}
 
     app_models = models.get_models(app)
 
-    for klass in app_models:
-        output, references = _get_sql_model_create(klass, models_output)
+    for model in app_models:
+        output, references = _get_sql_model_create(model, known_models)
         final_output.extend(output)
         for refto, refs in references.items():
-            try:
-                pending_references[refto].extend(refs)
-            except KeyError:
-                pending_references[refto] = refs
-        final_output.extend(_get_sql_for_pending_references(klass, pending_references))
+            pending_references.setdefault(refto,[]).extend(refs)
+        final_output.extend(_get_sql_for_pending_references(model, pending_references))
         # Keep track of the fact that we've created the table for this model.
-        models_output.add(klass)
+        known_models.add(model)
 
     # Create the many-to-many join tables.
-    for klass in app_models:
-        final_output.extend(_get_many_to_many_sql_for_model(klass))
+    for model in app_models:
+        final_output.extend(_get_many_to_many_sql_for_model(model))
 
     # Handle references to tables that are from other apps
     # but don't exist physically
     not_installed_models = set(pending_references.keys())
     if not_installed_models:
         final_output.append('-- The following references should be added but depend on non-existant tables:')
-        for klass in not_installed_models:
+        for model in not_installed_models:
             final_output.extend(['-- ' + sql for sql in
-                _get_sql_for_pending_references(klass, pending_references)])
+                _get_sql_for_pending_references(model, pending_references)])
 
     return final_output
 get_sql_create.help_doc = "Prints the CREATE TABLE SQL statements for the given app name(s)."
 get_sql_create.args = APP_ARGS
 
-def _get_sql_model_create(klass, models_already_seen=set()):
+def _get_sql_model_create(model, known_models=set()):
     """
     Get the SQL required to create a single model.
 
@@ -141,7 +136,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
     from django.db import backend, get_creation_module, models
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     table_output = []
     pending_references = {}
@@ -163,7 +158,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
             if f.rel:
-                if f.rel.to in models_already_seen:
+                if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
                         style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
@@ -171,7 +166,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
                 else:
                     # We haven't yet created the table to which this field
                     # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((klass, f))
+                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
@@ -189,7 +184,7 @@ def _get_sql_model_create(klass, models_already_seen=set()):
 
     return final_output, pending_references
 
-def _get_sql_for_pending_references(klass, pending_references):
+def _get_sql_for_pending_references(model, pending_references):
     """
     Get any ALTER TABLE statements to add constraints after the fact.
     """
@@ -198,28 +193,30 @@ def _get_sql_for_pending_references(klass, pending_references):
 
     final_output = []
     if backend.supports_constraints:
-        opts = klass._meta
-        if klass in pending_references:
-            for rel_class, f in pending_references[klass]:
+        opts = model._meta
+        if model in pending_references:
+            for rel_class, f in pending_references[model]:
                 rel_opts = rel_class._meta
                 r_table = rel_opts.db_table
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
+                # For MySQL, r_name must be unique in the first 64 characters.
+                # So we are careful with character usage here.
+                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
-                    (backend.quote_name(r_table),
-                    backend.quote_name('%s_referencing_%s_%s' % (r_col, table, col)),
+                    (backend.quote_name(r_table), r_name,
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
-            del pending_references[klass]
+            del pending_references[model]
     return final_output
 
-def _get_many_to_many_sql_for_model(klass):
+def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
     from django.db.models import GenericRel
-    
+
     data_types = get_creation_module().DATA_TYPES
 
-    opts = klass._meta
+    opts = model._meta
     final_output = []
     for f in opts.many_to_many:
         if not isinstance(f.rel, GenericRel):
@@ -273,37 +270,37 @@ def get_sql_delete(app):
 
     references_to_delete = {}
     app_models = models.get_models(app)
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # The table exists, so it needs to be dropped
-            opts = klass._meta
+            opts = model._meta
             for f in opts.fields:
                 if f.rel and f.rel.to not in to_delete:
-                    references_to_delete.setdefault(f.rel.to, []).append( (klass, f) )
+                    references_to_delete.setdefault(f.rel.to, []).append( (model, f) )
 
-            to_delete.add(klass)
+            to_delete.add(model)
 
-    for klass in app_models:
-        if cursor and klass._meta.db_table in table_names:
+    for model in app_models:
+        if cursor and model._meta.db_table in table_names:
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
-                style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(klass):
-                for rel_class, f in references_to_delete[klass]:
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
+            if backend.supports_constraints and references_to_delete.has_key(model):
+                for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
-                    r_table = klass._meta.db_table
-                    r_col = klass._meta.get_field(f.rel.field_name).column
+                    r_table = model._meta.db_table
+                    r_col = model._meta.get_field(f.rel.field_name).column
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
                         style.SQL_FIELD(backend.quote_name("%s_referencing_%s_%s" % (col, r_table, r_col)))))
-                del references_to_delete[klass]
+                del references_to_delete[model]
 
     # Output DROP TABLE statements for many-to-many tables.
-    for klass in app_models:
-        opts = klass._meta
+    for model in app_models:
+        opts = model._meta
         for f in opts.many_to_many:
             if cursor and f.m2m_db_table() in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
@@ -360,8 +357,8 @@ def get_sql_initial_data(app):
     app_models = get_models(app)
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
-    for klass in app_models:
-        output.extend(get_sql_initial_data_for_model(klass))
+    for model in app_models:
+        output.extend(get_sql_initial_data_for_model(model))
 
     return output
 get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
@@ -371,18 +368,18 @@ def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
     from django.db import backend, models
     output = []
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if isinstance(f, models.AutoField):
                 output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (klass._meta.db_table, f.column)),
+                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
                     style.SQL_KEYWORD('SELECT'),
                     style.SQL_FIELD(backend.quote_name(f.column)),
                     style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table))))
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
                 break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in klass._meta.many_to_many:
+        for f in model._meta.many_to_many:
             output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                 (style.SQL_KEYWORD('SELECT'),
                 style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
@@ -399,15 +396,15 @@ def get_sql_indexes(app):
     from django.db import backend, models
     output = []
 
-    for klass in models.get_models(app):
-        for f in klass._meta.fields:
+    for model in models.get_models(app):
+        for f in model._meta.fields:
             if f.db_index:
                 unique = f.unique and 'UNIQUE ' or ''
                 output.append(
                     style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                    style.SQL_TABLE('%s_%s' % (klass._meta.db_table, f.column)) + ' ' + \
+                    style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
                     style.SQL_KEYWORD('ON') + ' ' + \
-                    style.SQL_TABLE(backend.quote_name(klass._meta.db_table)) + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                     "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
                 )
     return output
@@ -517,14 +514,14 @@ def get_admin_index(app):
     app_label = app_models[0]._meta.app_label
     output.append('{%% if perms.%s %%}' % app_label)
     output.append('<div class="module"><h2>%s</h2><table>' % app_label.title())
-    for klass in app_models:
-        if klass._meta.admin:
+    for model in app_models:
+        if model._meta.admin:
             output.append(MODULE_TEMPLATE % {
                 'app': app_label,
-                'mod': klass._meta.module_name,
-                'name': capfirst(klass._meta.verbose_name_plural),
-                'addperm': klass._meta.get_add_permission(),
-                'changeperm': klass._meta.get_change_permission(),
+                'mod': model._meta.module_name,
+                'name': capfirst(model._meta.verbose_name_plural),
+                'addperm': model._meta.get_add_permission(),
+                'changeperm': model._meta.get_change_permission(),
             })
     output.append('</table></div>')
     output.append('{% endif %}')
@@ -592,7 +589,6 @@ install.args = APP_ARGS
 def reset(app):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
-    from cStringIO import StringIO
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -692,7 +688,6 @@ startapp.args = "[appname]"
 def inspectdb():
     "Generator that introspects the tables in the given database name and returns a Django model, one line at a time."
     from django.db import connection, get_introspection_module
-    from django.conf import settings
     import keyword
 
     introspection_module = get_introspection_module()
@@ -803,9 +798,9 @@ class ModelErrorCollection:
         self.errors = []
         self.outfile = outfile
 
-    def add(self, opts, error):
-        self.errors.append((opts, error))
-        self.outfile.write(style.ERROR("%s.%s: %s\n" % (opts.app_label, opts.module_name, error)))
+    def add(self, context, error):
+        self.errors.append((context, error))
+        self.outfile.write(style.ERROR("%s: %s\n" % (context, error)))
 
 def get_validation_errors(outfile, app=None):
     """
@@ -814,9 +809,14 @@ def get_validation_errors(outfile, app=None):
     Returns number of errors.
     """
     from django.db import models
+    from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
     e = ModelErrorCollection(outfile)
+
+    for (app_name, error) in get_app_errors().items():
+        e.add(app_name, error)
+
     for cls in models.get_models(app):
         opts = cls._meta
 
@@ -858,18 +858,29 @@ def get_validation_errors(outfile, app=None):
                     e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, rel_opts.object_name))
 
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+                rel_query_name = f.related_query_name()
                 for r in rel_opts.fields:
                     if r.name == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                        e.add(opts, "Accessor for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    if r.name == rel_query_name:
+                        e.add(opts, "Reverse query name for field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                 for r in rel_opts.many_to_many:
                     if r.name == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                        e.add(opts, "Accessor for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    if r.name == rel_query_name:
+                        e.add(opts, "Reverse query name for field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
                 for r in rel_opts.get_all_related_many_to_many_objects():
                     if r.get_accessor_name() == rel_name:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                        e.add(opts, "Accessor for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    if r.get_accessor_name() == rel_query_name:
+                        e.add(opts, "Reverse query name for field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
                 for r in rel_opts.get_all_related_objects():
-                    if r.get_accessor_name() == rel_name and r.field is not f:
-                        e.add(opts, "'%s' accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    if r.field is not f:
+                        if r.get_accessor_name() == rel_name:
+                            e.add(opts, "Accessor for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                        if r.get_accessor_name() == rel_query_name:
+                            e.add(opts, "Reverse query name for field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+
 
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
@@ -879,18 +890,28 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, "'%s' has m2m relation with model %s, which has not been installed" % (f.name, rel_opts.object_name))
 
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
+            rel_query_name = f.related_query_name()
             for r in rel_opts.fields:
                 if r.name == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    e.add(opts, "Accessor for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                if r.name == rel_query_name:
+                    e.add(opts, "Reverse query name for m2m field '%s' clashes with field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
             for r in rel_opts.many_to_many:
                 if r.name == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                    e.add(opts, "Accessor for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
+                if r.name == rel_query_name:
+                    e.add(opts, "Reverse query name for m2m field '%s' clashes with m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.name, f.name))
             for r in rel_opts.get_all_related_many_to_many_objects():
-                if r.get_accessor_name() == rel_name and r.field is not f:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with a related m2m field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                if r.field is not f:
+                    if r.get_accessor_name() == rel_name:
+                        e.add(opts, "Accessor for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    if r.get_accessor_name() == rel_query_name:
+                        e.add(opts, "Reverse query name for m2m field '%s' clashes with related m2m field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
             for r in rel_opts.get_all_related_objects():
                 if r.get_accessor_name() == rel_name:
-                    e.add(opts, "'%s' m2m accessor name '%s.%s' clashes with another related field. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                    e.add(opts, "Accessor for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
+                if r.get_accessor_name() == rel_query_name:
+                    e.add(opts, "Reverse query name for m2m field '%s' clashes with related field '%s.%s'. Add a related_name argument to the definition for '%s'." % (f.name, rel_opts.object_name, r.get_accessor_name(), f.name))
 
         # Check admin attribute.
         if opts.admin is not None:
@@ -910,6 +931,19 @@ def get_validation_errors(outfile, app=None):
                         else:
                             if isinstance(f, models.ManyToManyField):
                                 e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+                # list_display_links
+                if opts.admin.list_display_links and not opts.admin.list_display:
+                    e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
+                if not isinstance(opts.admin.list_display_links, (list, tuple)):
+                    e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
+                else:
+                    for fn in opts.admin.list_display_links:
+                        try:
+                            f = opts.get_field(fn)
+                        except models.FieldDoesNotExist:
+                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                        if fn not in opts.admin.list_display:
+                            e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
                 if not isinstance(opts.admin.list_filter, (list, tuple)):
                     e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
@@ -919,6 +953,12 @@ def get_validation_errors(outfile, app=None):
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
                             e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+                # date_hierarchy
+                if opts.admin.date_hierarchy:
+                    try:
+                        f = opts.get_field(opts.admin.date_hierarchy)
+                    except models.FieldDoesNotExist:
+                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
 
         # Check ordering attribute.
         if opts.ordering:
@@ -936,6 +976,8 @@ def get_validation_errors(outfile, app=None):
 
         # Check core=True, if needed.
         for related in opts.get_followed_related_objects():
+            if not related.edit_inline:
+                continue
             try:
                 for f in related.opts.fields:
                     if f.core:
@@ -975,12 +1017,15 @@ def _check_for_validation_errors(app=None):
     s = StringIO()
     num_errors = get_validation_errors(s, app)
     if num_errors:
-        sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
+        if app:
+            sys.stderr.write(style.ERROR("Error: %s couldn't be installed, because there were errors in your model:\n" % app))
+        else:
+            sys.stderr.write(style.ERROR("Error: Couldn't install apps, because there were errors in one or more models:\n"))
         s.seek(0)
         sys.stderr.write(s.read())
         sys.exit(1)
 
-def runserver(addr, port):
+def runserver(addr, port, use_reloader=True):
     "Starts a lightweight Web server for development."
     from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
     from django.core.handlers.wsgi import WSGIHandler
@@ -1014,9 +1059,12 @@ def runserver(addr, port):
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
-    from django.utils import autoreload
-    autoreload.main(inner_run)
-runserver.args = '[optional port number, or ipaddr:port]'
+    if use_reloader:
+        from django.utils import autoreload
+        autoreload.main(inner_run)
+    else:
+        inner_run()
+runserver.args = '[--noreload] [optional port number, or ipaddr:port]'
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
@@ -1165,6 +1213,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Lets you manually add a directory the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_option('--plain', action='store_true', dest='plain',
         help='Tells Django to use plain Python, not IPython, for "shell" command.')
+    parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
+        help='Tells Django to NOT use the auto-reloader when running the development server.')
     options, args = parser.parse_args(argv[1:])
 
     # Take care of options.
@@ -1220,7 +1270,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
                 addr, port = args[1].split(':')
             except ValueError:
                 addr, port = '', args[1]
-        action_mapping[action](addr, port)
+        action_mapping[action](addr, port, options.use_reloader)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
     else:

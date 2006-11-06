@@ -50,7 +50,7 @@ model that "knows" how to create or modify instances of that model and how to
 validate data for the object. Manipulators come in two flavors:
 ``AddManipulators`` and ``ChangeManipulators``. Functionally they are quite
 similar, but the former knows how to create new instances of the model, while
-the later modifies existing instances.  Both types of classes are automatically
+the latter modifies existing instances. Both types of classes are automatically
 created when you define a new class::
 
     >>> from mysite.myapp.models import Place
@@ -404,6 +404,43 @@ Here's a simple function that might drive the above form::
             errors = new_data = {}
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
+        
+``FileField`` and ``ImageField`` special cases
+==============================================
+
+Dealing with ``FileField`` and ``ImageField`` objects is a little more
+complicated.
+
+First, you'll need to make sure that your ``<form>`` element correctly defines
+the ``enctype`` as ``"multipart/form-data"``, in order to upload files::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+Next, you'll need to treat the field in the template slightly differently. A
+``FileField`` or ``ImageField`` is represented by *two* HTML form elements.
+
+For example, given this field in a model::
+
+   photo = model.ImageField('/path/to/upload/location')
+
+You'd need to display two formfields in the template::
+
+   <p><label for="id_photo">Photo:</label> {{ form.photo }}{{ form.photo_file }}</p>
+
+The first bit (``{{ form.photo }}``) displays the currently-selected file,
+while the second (``{{ form.photo_file }}``) actually contains the file upload
+form field. Thus, at the validation layer you need to check the ``photo_file``
+key.
+
+Finally, in your view, make sure to access ``request.FILES``, rather than
+``request.POST``, for the uploaded files. This is necessary because
+``request.POST`` does not contain file-upload data.
+
+For example, following the ``new_data`` convention, you might do something like
+this::
+
+   new_data = request.POST.copy()
+   new_data.update(request.FILES)
 
 Validators
 ==========

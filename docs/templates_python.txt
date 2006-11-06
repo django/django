@@ -198,21 +198,6 @@ some things to keep in mind:
 How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In Django 0.91, if a variable doesn't exist, the template system fails
-silently. The variable is replaced with an empty string::
-
-    >>> t = Template("My name is {{ my_name }}.")
-    >>> c = Context({"foo": "bar"})
-    >>> t.render(c)
-    "My name is ."
-
-This applies to any level of lookup::
-
-    >>> t = Template("My name is {{ person.fname }} {{ person.lname }}.")
-    >>> c = Context({"person": {"fname": "Stan"}})
-    >>> t.render(c)
-    "My name is Stan ."
-
 If a variable doesn't exist, the template system inserts the value of the
 ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
 string) by default.
@@ -357,7 +342,7 @@ django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``DjangoContext`` will contain a variable ``request``, which is the current
+``RequestContext`` will contain a variable ``request``, which is the current
 `HttpRequest object`_. Note that this processor is not enabled by default;
 you'll have to activate it.
 
@@ -643,7 +628,7 @@ the current date/time, formatted according to a parameter given in the tag, in
 `strftime syntax`_. It's a good idea to decide the tag syntax before anything
 else. In our case, let's say the tag should be used like this::
 
-    <p>The time is {% current_time "%Y-%M-%d %I:%M %p" %}.</p>
+    <p>The time is {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
 
 .. _`strftime syntax`: http://www.python.org/doc/current/lib/module-time.html#l2h-1941
 
@@ -653,10 +638,10 @@ object::
     from django import template
     def do_current_time(parser, token):
         try:
-            # Splitting by None == splitting by spaces.
-            tag_name, format_string = token.contents.split(None, 1)
+            # split_contents() knows not to split quoted strings.
+            tag_name, format_string = token.split_contents()
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires an argument" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return CurrentTimeNode(format_string[1:-1])
@@ -667,7 +652,13 @@ Notes:
       example.
 
     * ``token.contents`` is a string of the raw contents of the tag. In our
-      example, it's ``'current_time "%Y-%M-%d %I:%M %p"'``.
+      example, it's ``'current_time "%Y-%m-%d %I:%M %p"'``.
+
+    * The ``token.split_contents()`` method separates the arguments on spaces
+      while keeping quoted strings together. The more straightforward
+      ``token.contents.split()`` wouldn't be as robust, as it would naively
+      split on *all* spaces, including those within quoted strings. It's a good
+      idea to always use ``token.split_contents()``.
 
     * This function is responsible for raising
       ``django.template.TemplateSyntaxError``, with helpful messages, for
@@ -681,7 +672,7 @@ Notes:
 
     * The function returns a ``CurrentTimeNode`` with everything the node needs
       to know about this tag. In this case, it just passes the argument --
-      ``"%Y-%M-%d %I:%M %p"``. The leading and trailing quotes from the
+      ``"%Y-%m-%d %I:%M %p"``. The leading and trailing quotes from the
       template tag are removed in ``format_string[1:-1]``.
 
     * The parsing is very low-level. The Django developers have experimented
@@ -766,26 +757,23 @@ registers it with the template system.
 
 Our earlier ``current_time`` function could thus be written like this::
 
-    # This version of do_current_time takes only a single argument and returns
-    # a string.
+    def current_time(format_string):
+        return datetime.datetime.now().strftime(format_string)
 
-    def do_current_time(token):
-        try:
-            # Splitting by None == splitting by spaces.
-            tag_name, format_string = token.contents.split(None, 1)
-        except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires an argument" % token.contents[0]
-        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
-            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
-        return datetime.datetime.now().strftime(self.format_string[1:-1])
-
-    register.simple_tag(do_current_time)
+    register.simple_tag(current_time)
 
 In Python 2.4, the decorator syntax also works::
 
-    @simple_tag
-    def do_current_time(token):
+    @register.simple_tag
+    def current_time(token):
         ...
+
+A couple of things to note about the ``simple_tag`` helper function:
+    * Only the (single) argument is passed into our function.
+    * Checking for the required number of arguments, etc, has already been
+      done by the time our function is called, so we don't need to do that.
+    * The quotes around the argument (if any) have already been stripped away,
+      so we just receive a plain string.
 
 Inclusion tags
 ~~~~~~~~~~~~~~
@@ -844,7 +832,7 @@ loader, we'd register the tag like this::
 As always, Python 2.4 decorator syntax works as well, so we could have
 written::
 
-    @inclusion_tag('results.html')
+    @register.inclusion_tag('results.html')
     def show_results(poll):
         ...
 

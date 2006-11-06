@@ -10,7 +10,6 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
-import types
 
 DatabaseError = Database.Error
 
@@ -122,7 +121,6 @@ OPERATOR_MAPPING = {
     'iexact': 'LIKE %s',
     'contains': 'LIKE %s',
     'icontains': 'LIKE %s',
-    'ne': '!= %s',
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

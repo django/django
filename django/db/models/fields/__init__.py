@@ -4,9 +4,9 @@ from django.conf import settings
 from django.core import validators
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.functional import curry, lazy
+from django.utils.functional import curry
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy, ngettext
+from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
 
 class NOT_PROVIDED:
@@ -162,7 +162,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne', 'year', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'year', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -247,9 +247,9 @@ class Field(object):
         params['is_required'] = not self.blank and not self.primary_key and not rel
 
         # BooleanFields (CheckboxFields) are a special case. They don't take
-        # is_required or validator_list.
+        # is_required.
         if isinstance(self, BooleanField):
-            del params['validator_list'], params['is_required']
+            del params['is_required']
 
         # If this field is in a related context, check whether any other fields
         # in the related object have core=True. If so, add a validator --
@@ -289,8 +289,11 @@ class Field(object):
         if self.choices:
             return first_choice + list(self.choices)
         rel_model = self.rel.to
-        return first_choice + [(x._get_pk_val(), str(x))
-                               for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        if hasattr(self.rel, 'get_related_field'):
+            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        else:
+            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+        return first_choice + lst
 
     def get_choices_default(self):
         if self.radio_admin:
@@ -364,8 +367,8 @@ class BooleanField(Field):
 
     def to_python(self, value):
         if value in (True, False): return value
-        if value is 't': return True
-        if value is 'f': return False
+        if value in ('t', 'True'): return True
+        if value in ('f', 'False'): return False
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
@@ -406,12 +409,15 @@ class DateField(Field):
         if isinstance(value, datetime.date):
             return value
         validators.isValidANSIDate(value, None)
-        return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        try:
+            return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
+        except ValueError:
+            raise validators.ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
             value = [str(v) for v in value]
-        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'ne'):
+        elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
             value = str(value)

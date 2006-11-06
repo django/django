@@ -16,6 +16,18 @@ from django.utils.text import capfirst
 # Admin stages.
 ADD, CHANGE, BOTH = 1, 2, 3
 
+# Decorator. Takes a function that returns a tuple in this format:
+#     (viewname, viewargs, viewkwargs)
+# Returns a function that calls urlresolvers.reverse() on that data, to return
+# the URL for those parameters.
+def permalink(func):
+    from django.core.urlresolvers import reverse
+    def inner(*args, **kwargs):
+        bits = func(*args, **kwargs)
+        viewname = bits[0]
+        return reverse(bits[0], None, *bits[1:2])
+    return inner
+
 class LazyDate(object):
     """
     Use in limit_choices_to to compare the field to dates calculated at run time

@@ -156,7 +156,7 @@ logical to us.
 -----------------------------------------------------
 
 We're well aware that there are other awesome Web frameworks out there, and
-we're not adverse to borrowing ideas where appropriate. However, Django was
+we're not averse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X>" does it is not going to be sufficient reason
 to add a given feature to Django.
@@ -251,6 +251,16 @@ information than the docs that come with the latest Django release.
 
 .. _stored in revision control: http://code.djangoproject.com/browser/django/trunk/docs
 
+Where can I find Django developers for hire?
+--------------------------------------------
+
+Consult our `developers for hire page`_ for a list of Django developers who
+would be happy to help you.
+
+You might also be interested in posting a job to http://www.gypsyjobs.com/ .
+
+.. _developers for hire page: http://code.djangoproject.com/wiki/DevelopersForHire
+
 Installation questions
 ======================
 
@@ -301,16 +311,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 Do I have to use mod_python?
 ----------------------------
 
-Not if you just want to play around and develop things on your local computer.
-Django comes with its own Web server, and things should Just Work.
+Although we recommend mod_python for production use, you don't have to use it,
+thanks to the fact that Django uses an arrangement called WSGI_. Django can
+talk to any WSGI-enabled server. The most common non-mod_python deployment
+setup is FastCGI. See `How to use Django with FastCGI`_ for full information.
 
-For production use, though, we recommend mod_python. The Django developers have
-been running it on mod_python for several years, and it's quite stable.
+Also, see the `server arrangements wiki page`_ for other deployment strategies.
 
-However, if you don't want to use mod_python, you can use a different server,
-as long as that server has WSGI_ hooks. See the `server arrangements wiki page`_.
+If you just want to play around and develop things on your local computer, use
+the development Web server that comes with Django. Things should Just Work.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
+.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?
@@ -409,6 +421,36 @@ Using a ``FileField`` or an ``ImageField`` in a model takes a few steps:
        absolute URL to your image in a template with
        ``{{ object.get_mug_shot_url }}``.
 
+Databases and models
+====================
+
+How can I see the raw SQL queries Django is running?
+----------------------------------------------------
+
+Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
+this::
+
+    >>> from django.db import connection
+    >>> connection.queries
+    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
+    'time': '0.002'}]
+
+``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
+of dictionaries in order of query execution. Each dictionary has the following::
+
+    ``sql`` -- The raw SQL statement
+    ``time`` -- How long the statement took to execute, in seconds.
+
+``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
+SELECTs, etc. Each time your app hits the database, the query will be recorded.
+
+Can I use Django with a pre-existing database?
+----------------------------------------------
+
+Yes. See `Integrating with a legacy database`_.
+
+.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
 
@@ -437,35 +479,24 @@ uniqueness at that level. Single-column primary keys are needed for things such
 as the admin interface to work; e.g., you need a simple way of being able to
 specify an object to edit or delete.
 
-The database API
-================
+How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
+------------------------------------------------------------------------------------------------------------------
 
-How can I see the raw SQL queries Django is running?
-----------------------------------------------------
+We try to avoid adding special cases in the Django code to accomodate all the
+database-specific options such as table type, etc. If you'd like to use any of
+these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
+statements that do what you want to do. The initial data files are executed in
+your database after the ``CREATE TABLE`` statements.
 
-Make sure your Django ``DEBUG`` setting is set to ``True``. Then, just do
-this::
+For example, if you're using MySQL and want your tables to use the MyISAM table
+type, create an initial data file and put something like this in it::
 
-    >>> from django.db import connection
-    >>> connection.queries
-    [{'sql': 'SELECT polls_polls.id,polls_polls.question,polls_polls.pub_date FROM polls_polls',
-    'time': '0.002'}]
+    ALTER TABLE myapp_mytable ENGINE=MyISAM;
 
-``connection.queries`` is only available if ``DEBUG`` is ``True``. It's a list
-of dictionaries in order of query execution. Each dictionary has the following::
+As explained in the `SQL initial data file`_ documentation, this SQL file can
+contain arbitrary SQL, so you can make any sorts of changes you need to make.
 
-    ``sql`` -- The raw SQL statement
-    ``time`` -- How long the statement took to execute, in seconds.
-
-``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
-SELECTs, etc. Each time your app hits the database, the query will be recorded.
-
-Can I use Django with a pre-existing database?
-----------------------------------------------
-
-Yes. See `Integrating with a legacy database`_.
-
-.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+.. _SQL initial data file: http://www.djangoproject.com/documentation/model_api/#providing-initial-sql-data
 
 Why is Django leaking memory?
 -----------------------------
@@ -514,13 +545,26 @@ If you're sure your username and password are correct, make sure your user
 account has ``is_active`` and ``is_staff`` set to True. The admin site only
 allows access to users with those two fields both set to True.
 
+How can I prevent the cache middleware from caching the admin site?
+-------------------------------------------------------------------
+
+Set the ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting to ``True``. See the
+`cache documentation`_ for more information.
+
+.. _cache documentation: ../cache/#the-per-site-cache
+
 How do I automatically set a field's value to the user who last edited the object in the admin?
 -----------------------------------------------------------------------------------------------
 
-At this point, you can't do this. But it's an oft-requested feature, so we're
-discussing how it can be implemented. The problem is we don't want to couple
-the model layer with the admin layer with the request layer (to get the current
-user). It's a tricky problem.
+At this point, Django doesn't have an official way to do this. But it's an oft-requested
+feature, so we're discussing how it can be implemented. The problem is we don't want to couple
+the model layer with the admin layer with the request layer (to get the current user). It's a
+tricky problem.
+
+One person hacked up a `solution that doesn't require patching Django`_, but note that it's an
+unofficial solution, and there's no guarantee it won't break at some point.
+
+.. _solution that doesn't require patching Django: http://lukeplant.me.uk/blog.php?id=1107301634
 
 How do I limit admin access so that objects can only be edited by the users who created them?
 ---------------------------------------------------------------------------------------------
@@ -585,3 +629,21 @@ To create a user, you'll have to use the Python API. See `creating users`_ for
 full info.
 
 .. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+
+Contributing code
+=================
+
+I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
+--------------------------------------------------------------------------------------------
+
+Don't worry: We're not ignoring you!
+
+It's important to understand there is a difference between "a ticket is being
+ignored" and "a ticket has not been attended to yet." Django's ticket system
+contains hundreds of open tickets, of various degrees of impact on end-user
+functionality, and Django's developers have to review and prioritize.
+
+Besides, if your feature request stands no chance of inclusion in Django, we
+won't ignore it -- we'll just close the ticket. So if your ticket is still
+open, it doesn't mean we're ignoring you; it just means we haven't had time to
+look at it yet.

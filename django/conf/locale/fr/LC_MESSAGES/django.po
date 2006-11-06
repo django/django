@@ -514,7 +514,7 @@ msgstr "Supprimé %s."
 
 #: contrib/admin/views/main.py:343
 msgid "No fields changed."
-msgstr "Aucun champs modifié."
+msgstr "Aucun champ modifié."
 
 #: contrib/admin/views/main.py:346
 #, python-format
@@ -1906,7 +1906,7 @@ msgstr ""
 #: db/models/fields/__init__.py:40
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s avec le champs %(fieldname)s existe déjà."
+msgstr "%(optname)s avec le champ %(fieldname)s existe déjà."
 
 #: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553

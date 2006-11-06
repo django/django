@@ -1,8 +1,6 @@
-from django import template
 from django.conf import settings
-from django.contrib.admin.views.main import MAX_SHOW_ALL_ALLOWED, ALL_VAR
+from django.contrib.admin.views.main import ALL_VAR, EMPTY_CHANGELIST_VALUE
 from django.contrib.admin.views.main import ORDER_VAR, ORDER_TYPE_VAR, PAGE_VAR, SEARCH_VAR
-from django.contrib.admin.views.main import IS_POPUP_VAR, EMPTY_CHANGELIST_VALUE
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import dateformat
@@ -119,7 +117,7 @@ def items_for_result(cl, result):
                 if callable(attr):
                     attr = attr()
                 result_repr = str(attr)
-            except AttributeError, ObjectDoesNotExist:
+            except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
                 # Strip HTML tags in the resulting text, except if the
@@ -165,12 +163,14 @@ def items_for_result(cl, result):
                 result_repr = escape(str(field_val))
         if result_repr == '':
             result_repr = '&nbsp;'
-        if first: # First column is a special case
+        # If list_display_links not defined, add the link tag to the first field
+        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links: 
+            table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
             result_id = str(getattr(result, pk)) # str() is needed in case of 23L (long ints)
-            yield ('<th%s><a href="%s"%s>%s</a></th>' % \
-                (row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr))
+            yield ('<%s%s><a href="%s"%s>%s</a></%s>' % \
+                (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr, table_tag))
         else:
             yield ('<td%s>%s</td>' % (row_class, result_repr))
 
