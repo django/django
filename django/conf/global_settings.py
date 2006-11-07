@@ -228,6 +228,10 @@ MONTH_DAY_FORMAT = 'F j'
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
 
+# The User-Agent string to use when checking for URL validity through the
+# isExistingURL validator.
+URL_VALIDATOR_USER_AGENT = "Django/0.96pre (http://www.djangoproject.com)"
+
 ##############
 # MIDDLEWARE #
 ##############
