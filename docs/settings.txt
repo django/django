@@ -265,6 +265,14 @@ Default: ``''`` (Empty string)
 The name of the database to use. For SQLite, it's the full path to the database
 file.
 
+DATABASE_OPTIONS
+----------------
+
+Default: ``{}`` (Empty dictionary)
+
+Extra parameters to use when connecting to the database. Consult backend
+module's document for available keywords.
+
 DATABASE_PASSWORD
 -----------------
 

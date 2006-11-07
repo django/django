@@ -55,7 +55,7 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.connection = None
         self.queries = []
 

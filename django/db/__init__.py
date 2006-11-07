@@ -6,6 +6,8 @@ __all__ = ('backend', 'connection', 'DatabaseError')
 
 if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
+if not settings.DATABASE_OPTIONS:
+    settings.DATABASE_OPTIONS = {}
 
 try:
     backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
@@ -27,7 +29,7 @@ get_introspection_module = lambda: __import__('django.db.backends.%s.introspecti
 get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
 runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
 
-connection = backend.DatabaseWrapper()
+connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
 DatabaseError = backend.DatabaseError
 
 # Register an event that closes the database connection

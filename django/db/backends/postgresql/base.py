@@ -21,9 +21,10 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.connection = None
         self.queries = []
+        self.options = kwargs
 
     def cursor(self):
         from django.conf import settings
@@ -40,7 +41,7 @@ class DatabaseWrapper(local):
                 conn_string += " host=%s" % settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 conn_string += " port=%s" % settings.DATABASE_PORT
-            self.connection = Database.connect(conn_string)
+            self.connection = Database.connect(conn_string, **self.options)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
         cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
