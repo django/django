@@ -538,14 +538,14 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
             <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
         {% endfor %}
         
-2. If given a variable, check if that variable has changed. For example, the
-   following shows the date every time it changes, but only shows the hour if both
-   the hour and the date has changed::
+2. **New in Django development version.** If given a variable, check whether that
+   variable has changed. For example, the following shows the date every time it
+   changes, but only shows the hour if both the hour and the date has changed::
     
         {% for date in days %}
-            {% ifchanged date.date %} {{date.date}} {% endifchanged %}
+            {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
             {% ifchanged date.hour date.date %}
-                {{date.hour}}
+                {{ date.hour }}
             {% endifchanged %}
         {% endfor %}
 

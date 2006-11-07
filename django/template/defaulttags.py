@@ -657,14 +657,14 @@ def ifchanged(parser, token):
                 <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
             {% endfor %}
 
-    2. If given a variable, check if that variable has changed. For example, the
+    2. If given a variable, check whether that variable has changed. For example, the
        following shows the date every time it changes, but only shows the hour if both
-       the hour and the date has changed::
+       the hour and the date have changed::
 
             {% for date in days %}
-                {% ifchanged date.date %} {{date.date}} {% endifchanged %}
+                {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
                 {% ifchanged date.hour date.date %}
-                    {{date.hour}}
+                    {{ date.hour }}
                 {% endifchanged %}
             {% endfor %}
     """

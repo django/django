@@ -611,13 +611,13 @@ fails. If no message is passed in, a default message is used.
     string comparison here, you will need to write your own validator.
 
 ``NumberIsInRange``
-    Takes two boundary number, ``lower`` and ``upper`` and checks that the
+    Takes two boundary numbers, ``lower`` and ``upper``, and checks that the
     field is greater than ``lower`` (if given) and less than ``upper`` (if
     given).  
     
-    Both checks are inclusive; that is, ``NumberIsInRange(10, 20)`` will allow
-    values of both 10 and 20.  This validator only checks numeric fields
-    (i.e. floats and integer fields).
+    Both checks are inclusive. That is, ``NumberIsInRange(10, 20)`` will allow
+    values of both 10 and 20. This validator only checks numeric values
+    (e.g., float and integer values).
 
 ``IsAPowerOf``
     Takes an integer argument and when called as a validator, checks that the

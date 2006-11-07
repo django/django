@@ -6,8 +6,6 @@ __all__ = ('backend', 'connection', 'DatabaseError')
 
 if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
-if not settings.DATABASE_OPTIONS:
-    settings.DATABASE_OPTIONS = {}
 
 try:
     backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
