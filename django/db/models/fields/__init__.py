@@ -585,7 +585,7 @@ class FileField(Field):
         # If the raw path is passed in, validate it's under the MEDIA_ROOT.
         def isWithinMediaRoot(field_data, all_data):
             f = os.path.abspath(os.path.join(settings.MEDIA_ROOT, field_data))
-            if not f.startswith(os.path.normpath(settings.MEDIA_ROOT)):
+            if not f.startswith(os.path.abspath(os.path.normpath(settings.MEDIA_ROOT))):
                 raise validators.ValidationError, _("Enter a valid filename.")
         field_list[1].validator_list.append(isWithinMediaRoot)
         return field_list
