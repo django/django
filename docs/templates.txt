@@ -473,7 +473,7 @@ block are output::
 In the above, if ``athlete_list`` is not empty, the number of athletes will be
 displayed by the ``{{ athlete_list|length }}`` variable.
 
-As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
+As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
 will be displayed if the test fails.
 
 ``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
@@ -537,11 +537,11 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
             {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
             <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
         {% endfor %}
-        
+
 2. **New in Django development version.** If given a variable, check whether that
    variable has changed. For example, the following shows the date every time it
    changes, but only shows the hour if both the hour and the date has changed::
-    
+
         {% for date in days %}
             {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
             {% ifchanged date.hour date.date %}
