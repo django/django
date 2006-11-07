@@ -421,7 +421,11 @@ def filesizeformat(bytes):
     Format the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB, 102
     bytes, etc).
     """
-    bytes = float(bytes)
+    try:
+        bytes = float(bytes)
+    except TypeError:
+        return "0 bytes"
+        
     if bytes < 1024:
         return "%d byte%s" % (bytes, bytes != 1 and 's' or '')
     if bytes < 1024 * 1024:
