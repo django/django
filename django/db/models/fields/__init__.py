@@ -457,7 +457,9 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
+            value = value.date().strftime('%Y-%m-%d')
+        elif isinstance(value, datetime.date):
             value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
@@ -487,12 +489,19 @@ class DateTimeField(DateField):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if value is not None:
+        if isinstance(value, datetime.datetime):
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = str(value)
+        elif isinstance(value, datetime.date):
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+                value = datetime.datetime(value.year, value.month, value.day, microsecond=0)
+            value = str(value)
+            
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
@@ -576,7 +585,7 @@ class FileField(Field):
         # If the raw path is passed in, validate it's under the MEDIA_ROOT.
         def isWithinMediaRoot(field_data, all_data):
             f = os.path.abspath(os.path.join(settings.MEDIA_ROOT, field_data))
-            if not f.startswith(os.path.normpath(settings.MEDIA_ROOT)):
+            if not f.startswith(os.path.abspath(os.path.normpath(settings.MEDIA_ROOT))):
                 raise validators.ValidationError, _("Enter a valid filename.")
         field_list[1].validator_list.append(isWithinMediaRoot)
         return field_list

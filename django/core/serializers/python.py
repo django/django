@@ -76,7 +76,7 @@ def Deserializer(object_list, **options):
                 m2m_data[field.name] = field.rel.to._default_manager.in_bulk(field_value).values()
                 
             # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+            elif field.rel and isinstance(field.rel, models.ManyToOneRel) and field_value is not None:
                 try:
                     data[field.name] = field.rel.to._default_manager.get(pk=field_value)
                 except field.rel.to.DoesNotExist:

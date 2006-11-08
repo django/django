@@ -109,6 +109,21 @@ Some tags require beginning and ending tags (i.e.
 below describes all the built-in tags. You can create your own tags, if you
 know how to write Python code.
 
+Comments
+========
+
+**New in Django development version**
+
+To comment-out part of a template, use the comment syntax: ``{# #}``.
+
+For example, this template would render as ``'hello'``::
+
+    {# greeting #}hello
+
+A comment can contain any template code, invalid or not. For example::
+
+    {# {% if foo %}bar{% else %} #}
+
 Template inheritance
 ====================
 
@@ -458,7 +473,7 @@ block are output::
 In the above, if ``athlete_list`` is not empty, the number of athletes will be
 displayed by the ``{{ athlete_list|length }}`` variable.
 
-As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
+As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
 will be displayed if the test fails.
 
 ``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
@@ -510,16 +525,29 @@ ifchanged
 
 Check if a value has changed from the last iteration of a loop.
 
-The ``ifchanged`` block tag is used within a loop. It checks its own rendered
-contents against its previous state and only displays its content if the value
-has changed::
+The 'ifchanged' block tag is used within a loop. It has two possible uses.
 
-    <h1>Archive for {{ year }}</h1>
+1. Checks its own rendered contents against its previous state and only
+   displays the content if it has changed. For example, this displays a list of
+   days, only displaying the month if it changes::
 
-    {% for day in days %}
-    {% ifchanged %}<h3>{{ day|date:"F" }}</h3>{% endifchanged %}
-    <a href="{{ day|date:"M/d"|lower }}/">{{ day|date:"j" }}</a>
-    {% endfor %}
+        <h1>Archive for {{ year }}</h1>
+
+        {% for date in days %}
+            {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+            <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+        {% endfor %}
+
+2. **New in Django development version.** If given a variable, check whether that
+   variable has changed. For example, the following shows the date every time it
+   changes, but only shows the hour if both the hour and the date has changed::
+
+        {% for date in days %}
+            {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
+            {% ifchanged date.hour date.date %}
+                {{ date.hour }}
+            {% endifchanged %}
+        {% endfor %}
 
 ifequal
 ~~~~~~~
@@ -785,7 +813,11 @@ The argument tells which template bit to output:
     ``closevariable``   ``}}``
     ``openbrace``       ``{``
     ``closebrace``      ``}``
+    ``opencomment``     ``{#``
+    ``closecomment``    ``#}``
     ==================  =======
+
+Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
 
 widthratio
 ~~~~~~~~~~

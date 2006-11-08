@@ -41,6 +41,7 @@ class ModPythonRequest(http.HttpRequest):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')
 
     def is_secure(self):
+        # Note: modpython 3.2.10+ has req.is_https(), but we need to support previous versions
         return self._req.subprocess_env.has_key('HTTPS') and self._req.subprocess_env['HTTPS'] == 'on'
 
     def _load_post_and_files(self):
@@ -102,7 +103,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REQUEST_METHOD':    self._req.method,
                 'SCRIPT_NAME':       None, # Not supported
                 'SERVER_NAME':       self._req.server.server_hostname,
-                'SERVER_PORT':       str(self._req.connection.local_addr[1]),
+                'SERVER_PORT':       self._req.server.port,
                 'SERVER_PROTOCOL':   self._req.protocol,
                 'SERVER_SOFTWARE':   'mod_python'
             }

@@ -4,6 +4,9 @@ from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
 import smtplib, rfc822
+import socket
+import time
+import random
 
 class BadHeaderError(ValueError):
     pass
@@ -50,6 +53,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
         msg['Date'] = rfc822.formatdate()
+        msg['Message-ID'] = "<%d.%d@%s>" % (time.time(), random.getrandbits(64), socket.getfqdn())
         try:
             server.sendmail(from_email, recipient_list, msg.as_string())
             num_sent += 1

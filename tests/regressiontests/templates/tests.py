@@ -173,6 +173,22 @@ class Templates(unittest.TestCase):
             # Empty strings can be passed as arguments to filters
             'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
+            ### COMMENT SYNTAX ########################################################
+            'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
+            'comment-syntax02': ("{# this is hidden #}hello{# foo #}", {}, "hello"),
+
+            # Comments can contain invalid stuff.
+            'comment-syntax03': ("foo{#  {% if %}  #}", {}, "foo"),
+            'comment-syntax04': ("foo{#  {% endblock %}  #}", {}, "foo"),
+            'comment-syntax05': ("foo{#  {% somerandomtag %}  #}", {}, "foo"),
+            'comment-syntax06': ("foo{# {% #}", {}, "foo"),
+            'comment-syntax07': ("foo{# %} #}", {}, "foo"),
+            'comment-syntax08': ("foo{# %} #}bar", {}, "foobar"),
+            'comment-syntax09': ("foo{# {{ #}", {}, "foo"),
+            'comment-syntax10': ("foo{# }} #}", {}, "foo"),
+            'comment-syntax11': ("foo{# { #}", {}, "foo"),
+            'comment-syntax12': ("foo{# } #}", {}, "foo"),
+
             ### COMMENT TAG ###########################################################
             'comment-tag01': ("{% comment %}this is hidden{% endcomment %}hello", {}, "hello"),
             'comment-tag02': ("{% comment %}this is hidden{% endcomment %}hello{% comment %}foo{% endcomment %}", {}, "hello"),
@@ -312,6 +328,21 @@ class Templates(unittest.TestCase):
             'ifchanged05': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (1, 2, 3)}, '1123123123'),
             'ifchanged06': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (2, 2, 2)}, '1222'),
             'ifchanged07': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% for y in numy %}{% ifchanged %}{{ y }}{% endifchanged %}{% endfor %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (2, 2, 2), 'numy': (3, 3, 3)}, '1233323332333'),
+            
+            # Test one parameter given to ifchanged.
+            'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),
+            'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': (1,2,3), 'numx': (5,6,7) }, '..567..567..567'),
+            
+            # Test multiple parameters to ifchanged.
+            'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1,1,2), 'numx': (5,6,6) }, '156156256'),
+            
+            # Test a date+hour like construct, where the hour of the last day
+            # is the same but the date had changed, so print the hour anyway.
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
+            
+            # Logically the same as above, just written with explicit
+            # ifchanged for the day.
+            'ifchanged-param04': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
 
             ### IFEQUAL TAG ###########################################################
             'ifequal01': ("{% ifequal a b %}yes{% endifequal %}", {"a": 1, "b": 2}, ""),
@@ -473,7 +504,7 @@ class Templates(unittest.TestCase):
             'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 
             ### HANDLING OF TEMPLATE_TAG_IF_INVALID ###################################
-            
+
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
             'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
@@ -536,6 +567,8 @@ class Templates(unittest.TestCase):
             'templatetag08': ('{% templatetag closebrace %}', {}, '}'),
             'templatetag09': ('{% templatetag openbrace %}{% templatetag openbrace %}', {}, '{{'),
             'templatetag10': ('{% templatetag closebrace %}{% templatetag closebrace %}', {}, '}}'),
+            'templatetag11': ('{% templatetag opencomment %}', {}, '{#'),
+            'templatetag12': ('{% templatetag closecomment %}', {}, '#}'),
 
             ### WIDTHRATIO TAG ########################################################
             'widthratio01': ('{% widthratio a b 0 %}', {'a':50,'b':100}, '0'),
@@ -606,20 +639,20 @@ class Templates(unittest.TestCase):
 
         # Turn TEMPLATE_DEBUG off, because tests assume that.
         old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
-        
-        # Set TEMPLATE_STRING_IF_INVALID to a known string 
+
+        # Set TEMPLATE_STRING_IF_INVALID to a known string
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
-    
+
         for name, vals in tests:
             install()
-            
+
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
                 invalid_string_result = vals[2][1]
             else:
                 normal_string_result = vals[2]
                 invalid_string_result = vals[2]
-                
+
             if 'LANGUAGE_CODE' in vals[1]:
                 activate(vals[1]['LANGUAGE_CODE'])
             else:
@@ -636,10 +669,10 @@ class Templates(unittest.TestCase):
                     continue
                 if output != result:
                     failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
-                    
+
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
-            
+
         loader.template_source_loaders = old_template_loaders
         deactivate()
         settings.TEMPLATE_DEBUG = old_td

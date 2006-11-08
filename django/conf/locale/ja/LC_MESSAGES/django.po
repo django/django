@@ -1,14 +1,13 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Translation of django.po to japanese.
+# Copyright (C) 2005,2006 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# makoto tsuyuki <mtsuyuki@gmail.com>, 2005,2006.
 # 
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-10-05 23:35+0900\n"
+"POT-Creation-Date: 2006-10-21 20:42+0900\n"
 "PO-Revision-Date: 2006-05-18 00:28+0900\n"
 "Last-Translator: makoto tsuyuki <mtsuyuki@gmail.com>\n"
 "Language-Team: Japanese <django-ja@googlegroups.com>\n"
@@ -57,9 +56,8 @@ msgid "Argentinean Spanish"
 msgstr "アルゼンチンスペイン語"
 
 #: conf/global_settings.py:49
-#, fuzzy
 msgid "Finnish"
-msgstr "デンマーク語"
+msgstr "フィンランド語"
 
 #: conf/global_settings.py:50
 msgid "French"
@@ -98,52 +96,54 @@ msgid "Norwegian"
 msgstr "ノルウェー語"
 
 #: conf/global_settings.py:59
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: conf/global_settings.py:60
 msgid "Brazilian"
 msgstr "ブラジル語"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Russian"
 msgstr "ロシア語"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Slovak"
 msgstr "スロバキア語"
 
-#: conf/global_settings.py:63
-#, fuzzy
+#: conf/global_settings.py:64
 msgid "Slovenian"
 msgstr "スロヴェニア語"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Serbian"
 msgstr "セルビア語"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Tamil"
 msgstr "タミル語"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: conf/global_settings.py:68
-#, fuzzy
+#: conf/global_settings.py:69
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Simplified Chinese"
 msgstr "簡体字中国語"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Traditional Chinese"
 msgstr "繁体字中国語"
 
@@ -369,33 +369,33 @@ msgid "Delete"
 msgstr "削除"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"%(object_name)s '%(object)s' の削除時に関連づけられたオブジェクトも削除しよう"
-"としましたが、あなたのアカウントには以下のタイプのオブジェクトを削除するパー"
-"ミッションがありません:"
+"%(object_name)s '%(escaped_object)s' の削除時に関連づけられたオブジェクトも削"
+"除しようとしましたが、あなたのアカウントには以下のタイプのオブジェクトを削除"
+"するパーミッションがありません:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"%(object_name)s \"%(object)s\"を削除しますか？ 関連づけられている以下のオブ"
-"ジェクトも全て削除されます:"
+"%(object_name)s \"%(escaped_object)s\"を削除しますか？ 関連づけられている以下"
+"のオブジェクトも全て削除されます:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
 msgstr "はい。"
 
 #: contrib/admin/templates/admin/filter.html:2
-#, fuzzy, python-format
+#, python-format
 msgid " By %(filter_title)s "
-msgstr "%(title)s で絞り込む"
+msgstr "%(filter_title)s で絞り込む"
 
 #: contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
@@ -407,9 +407,9 @@ msgid "Models available in the %(name)s application."
 msgstr "%(name)s アプリケーションで利用可能なモデル"
 
 #: contrib/admin/templates/admin/index.html:18
-#, fuzzy, python-format
+#, python-format
 msgid "%(name)s"
-msgstr "%(name)s を追加"
+msgstr "%(name)s"
 
 #: contrib/admin/templates/admin/index.html:34
 msgid "Change"
@@ -436,9 +436,9 @@ msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
-msgstr "データベースの設定に問題があるようです。"
-"適切なテーブルが作られていること、適切なユーザで"
-"データベースのデータを読み込めることを確認してください。"
+msgstr ""
+"データベースの設定に問題があるようです。適切なテーブルが作られていること、適"
+"切なユーザでデータベースのデータを読み込めることを確認してください。"
 
 #: contrib/admin/templates/admin/login.html:17
 #: contrib/comments/templates/comments/form.html:6
@@ -525,23 +525,20 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"まずユーザ名とパスワードを登録してください。"
-"その後詳細情報が編集可能になります。"
+"まずユーザ名とパスワードを登録してください。その後詳細情報が編集可能になりま"
+"す。"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
-#, fuzzy
 msgid "Username"
-msgstr "ユーザ名:"
+msgstr "ユーザ名"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:18
-#, fuzzy
 msgid "Password"
-msgstr "パスワード:"
+msgstr "パスワード"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:23
-#, fuzzy
 msgid "Password (again)"
-msgstr "パスワードの変更"
+msgstr "パスワード(確認用)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
 msgid "Enter the same password as above, for verification."
@@ -761,9 +758,8 @@ msgid "You may edit it again below."
 msgstr "続けて編集できます。"
 
 #: contrib/admin/views/auth.py:28
-#, fuzzy
 msgid "Add user"
-msgstr "%s を追加"
+msgstr "ユーザを追加"
 
 #: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:59
 msgid ""
@@ -813,9 +809,9 @@ msgid "view:"
 msgstr "ビュー"
 
 #: contrib/admin/views/doc.py:164
-#, fuzzy, python-format
+#, python-format
 msgid "App %r not found"
-msgstr "ページが見つかりません"
+msgstr "アプリケーション %r が見つかりません"
 
 #: contrib/admin/views/doc.py:171
 #, python-format
@@ -1030,9 +1026,8 @@ msgid "The two password fields didn't match."
 msgstr "確認用パスワードが一致しません。"
 
 #: contrib/auth/forms.py:24
-#, fuzzy
 msgid "A user with that username already exists."
-msgstr "%(fieldname)s に %(optname)s は既に存在します。"
+msgstr "同じユーザ名が既に登録済みです。"
 
 #: contrib/auth/forms.py:52
 msgid ""
@@ -1048,11 +1043,9 @@ msgstr "アカウントが無効です。"
 
 #: contrib/auth/forms.py:84
 msgid ""
-"That e-mail address doesn't have an associated user acount. Are you sure "
+"That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr ""
-"メールアドレスの一致するユーザはいません。"
-"本当に登録しましたか？"
+msgstr "メールアドレスの一致するユーザはいません。本当に登録しましたか？"
 
 #: contrib/auth/forms.py:116
 msgid "The two 'new password' fields didn't match."
@@ -1071,22 +1064,18 @@ msgid "codename"
 msgstr "コード名"
 
 #: contrib/auth/models.py:42
-#, fuzzy
 msgid "permission"
 msgstr "パーミッション"
 
 #: contrib/auth/models.py:43 contrib/auth/models.py:58
-#, fuzzy
 msgid "permissions"
 msgstr "パーミッション"
 
 #: contrib/auth/models.py:60
-#, fuzzy
 msgid "group"
 msgstr "グループ"
 
 #: contrib/auth/models.py:61 contrib/auth/models.py:100
-#, fuzzy
 msgid "groups"
 msgstr "グループ"
 
@@ -1099,8 +1088,8 @@ msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
 msgstr ""
-"この項目は必須です。"
-"半角アルファベット、半角数字、半角アンダーバーで30文字以下にしてください。"
+"この項目は必須です。半角アルファベット、半角数字、半角アンダーバーで30文字以"
+"下にしてください。"
 
 #: contrib/auth/models.py:91
 msgid "first name"
@@ -1138,9 +1127,7 @@ msgstr "有効"
 msgid ""
 "Designates whether this user can log into the Django admin. Unselect this "
 "instead of deleting accounts."
-msgstr ""
-"ユーザが管理サイトにログイン可能か"
-"どうかを示します。"
+msgstr "ユーザが管理サイトにログイン可能かどうかを示します。"
 
 #: contrib/auth/models.py:97
 msgid "superuser status"
@@ -1169,17 +1156,14 @@ msgstr ""
 "パーミッションを獲得します。"
 
 #: contrib/auth/models.py:102
-#, fuzzy
 msgid "user permissions"
 msgstr "ユーザパーミッション"
 
 #: contrib/auth/models.py:105
-#, fuzzy
 msgid "user"
 msgstr "ユーザ"
 
 #: contrib/auth/models.py:106
-#, fuzzy
 msgid "users"
 msgstr "ユーザ"
 
@@ -1188,7 +1172,6 @@ msgid "Personal info"
 msgstr "個人情報"
 
 #: contrib/auth/models.py:112
-#, fuzzy
 msgid "Permissions"
 msgstr "パーミッション"
 
@@ -1201,12 +1184,10 @@ msgid "Groups"
 msgstr "グループ"
 
 #: contrib/auth/models.py:258
-#, fuzzy
 msgid "message"
 msgstr "メッセージ"
 
 #: contrib/auth/views.py:39
-#, fuzzy
 msgid "Logged out"
 msgstr "ログアウト"
 
@@ -1280,7 +1261,6 @@ msgstr ""
 "た」と表示されるようになります。"
 
 #: contrib/comments/models.py:91
-#, fuzzy
 msgid "comments"
 msgstr "コメント"
 
@@ -1316,12 +1296,10 @@ msgid "approved by staff"
 msgstr "スタッフの承認済み"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
 msgstr "フリーコメント"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
 msgstr "フリーコメント"
 
@@ -1334,12 +1312,10 @@ msgid "score date"
 msgstr "スコアされた日"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
 msgstr "カルマスコア"
 
 #: contrib/comments/models.py:238
-#, fuzzy
 msgid "karma scores"
 msgstr "カルマスコア"
 
@@ -1364,12 +1340,10 @@ msgid "flag date"
 msgstr "フラグ日"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
 msgstr "ユーザフラグ"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
 msgstr "ユーザフラグ"
 
@@ -1383,12 +1357,10 @@ msgid "deletion date"
 msgstr "削除日"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
 msgstr "モデレータ削除"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
 msgstr "モデレータ削除"
 
@@ -1398,12 +1370,10 @@ msgid "Moderator deletion by %r"
 msgstr "%r によるモデレータ削除"
 
 #: contrib/comments/templates/comments/form.html:8
-#, fuzzy
 msgid "Forgotten your password?"
 msgstr "パスワードをお忘れですか？"
 
 #: contrib/comments/templates/comments/form.html:12
-#, fuzzy
 msgid "Ratings"
 msgstr "レーティング"
 
@@ -1423,18 +1393,15 @@ msgstr "写真を登録"
 
 #: contrib/comments/templates/comments/form.html:28
 #: contrib/comments/templates/comments/freeform.html:5
-#, fuzzy
 msgid "Comment:"
 msgstr "コメント:"
 
 #: contrib/comments/templates/comments/form.html:35
 #: contrib/comments/templates/comments/freeform.html:10
-#, fuzzy
 msgid "Preview comment"
 msgstr "コメントをプレビュー"
 
 #: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
 msgid "Your name:"
 msgstr "ユーザ名:"
 
@@ -1512,7 +1479,6 @@ msgid "No voting for yourself"
 msgstr "自分には投票できません。"
 
 #: contrib/contenttypes/models.py:20
-#, fuzzy
 msgid "python model class name"
 msgstr "Python モデルクラス名"
 
@@ -1547,13 +1513,12 @@ msgid "template name"
 msgstr "テンプレート名"
 
 #: contrib/flatpages/models.py:13
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"例: 'flatpages/contact_page'. 指定しなければ、デフォルト設定の'flatpages/"
-"default' を使います。"
+"例: 'flatpages/contact_page.html'. 指定しなければ、デフォルト設定"
+"の'flatpages/default.html' を使います。"
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1640,16 +1605,15 @@ msgid "This value must contain only letters, numbers and underscores."
 msgstr "半角の英数字およびアンダースコア以外は使用できません。"
 
 #: core/validators.py:67
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr "半角の英数字、アンダースコア、ダッシュ、ラッシュ以外は使用できません。"
+msgstr ""
+"半角の英数字、アンダースコア、ダッシュ、スラッシュ以外は使用できません。"
 
 #: core/validators.py:71
-#, fuzzy
 msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "半角の英数字、アンダースコア、ダッシュ、ラッシュ以外は使用できません。"
+msgstr "半角の英数字、アンダースコア、ハイフン以外は使用できません。"
 
 #: core/validators.py:75
 msgid "Uppercase letters are not allowed here."
@@ -1696,9 +1660,9 @@ msgid "Year must be 1900 or later."
 msgstr "1900年以降を指定してください。"
 
 #: core/validators.py:142
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid date: %s."
-msgstr "無効なURL: %s"
+msgstr "無効な日付: %s"
 
 #: core/validators.py:146 db/models/fields/__init__.py:424
 msgid "Enter a valid date in YYYY-MM-DD format."
@@ -1718,7 +1682,8 @@ msgstr "有効なメールアドレスを入力してください。"
 
 #: core/validators.py:172 core/validators.py:401 forms/__init__.py:662
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "ファイルが取得できませんでした。formのencoding typeを確認してください。"
+msgstr ""
+"ファイルが取得できませんでした。formのencoding typeを確認してください。"
 
 #: core/validators.py:176
 msgid ""
@@ -1825,25 +1790,25 @@ msgstr "有効な 10 進数を入力してください。"
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "最大桁数 %s 桁以下の有効な 10 進数を入力してください。"
-msgstr[1] "最大桁数 %s 桁以下の有効な 10 進数を入力してください。"
+msgstr[0] "全体で %s 文字以下の数字を入力してください。"
+msgstr[1] "全体で %s 文字以下の数字を入力してください。"
 
 #: core/validators.py:381
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural ""
 "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "最大桁数 %s 桁以下の有効な 10 進数を入力してください。"
-msgstr[1] "最大桁数 %s 桁以下の有効な 10 進数を入力してください。"
+msgstr[0] "整数部は %s 文字以下の数字を入力してください。"
+msgstr[1] "整数部は %s 文字以下の数字を入力してください。"
 
 #: core/validators.py:384
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "小数点以下が %s 桁までの有効な 10 進数を入力してください。"
-msgstr[1] "小数点以下が %s 桁までの有効な 10 進数を入力してください。"
+msgstr[0] "小数部は %s 文字以下の数字を入力してください。"
+msgstr[1] "小数部は %s 文字以下の数字を入力してください。"
 
 #: core/validators.py:394
 #, python-format
@@ -1947,17 +1912,14 @@ msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
 #: db/models/fields/__init__.py:349
-#, fuzzy
 msgid "This value must be an integer."
 msgstr "値は整数でなければなりません。"
 
 #: db/models/fields/__init__.py:381
-#, fuzzy
 msgid "This value must be either True or False."
 msgstr "値は真: True または偽: False でなければなりません。"
 
 #: db/models/fields/__init__.py:397
-#, fuzzy
 msgid "This field cannot be null."
 msgstr "このフィールドには NULL を指定できません。"
 
@@ -1971,7 +1933,6 @@ msgid "Please enter a valid %s."
 msgstr "正しい %s を入力してください。"
 
 #: db/models/fields/related.py:618
-#, fuzzy
 msgid "Separate multiple IDs with commas."
 msgstr "複数の ID はカンマで区切ってください。"
 
@@ -1979,7 +1940,8 @@ msgstr "複数の ID はカンマで区切ってください。"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"複数選択するときには Control キーを押したまま選択してください。Mac は Command キーを使ってください"
+"複数選択するときには Control キーを押したまま選択してください。Mac は "
+"Command キーを使ってください"
 
 #: db/models/fields/related.py:664
 #, python-format
@@ -2102,7 +2064,6 @@ msgid "December"
 msgstr "12月"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
 msgstr "1月"
 
@@ -2119,7 +2080,6 @@ msgid "apr"
 msgstr "4月"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
 msgstr "5月"
 
@@ -2228,29 +2188,27 @@ msgid "TIME_FORMAT"
 msgstr "H:i"
 
 #: utils/translation/trans_real.py:380
-#, fuzzy
 msgid "YEAR_MONTH_FORMAT"
 msgstr "Y/m/d"
 
 #: utils/translation/trans_real.py:381
-#, fuzzy
 msgid "MONTH_DAY_FORMAT"
-msgstr "Y/m/d"
+msgstr "m/d"
 
 #: views/generic/create_update.py:43
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "%(name)s \"%(obj)s\" を変更しました。"
+msgstr "%(verbose_name)s を作成しました。"
 
 #: views/generic/create_update.py:117
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "%(name)s \"%(obj)s\" を削除しました。"
+msgstr "%(verbose_name)s を更新しました。"
 
 #: views/generic/create_update.py:184
-#, fuzzy, python-format
+#, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr " %(site_name)s チーム"
+msgstr " %(verbose_name)s を削除しました。"
 
 #~ msgid "String (up to 50)"
 #~ msgstr "文字列 (50 字まで)"

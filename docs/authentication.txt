@@ -745,7 +745,7 @@ messages are made available in the `template context`_ as the template variable
     {% if messages %}
     <ul>
         {% for message in messages %}
-        <li>{{ message.message }}</li>
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}

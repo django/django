@@ -1,7 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
 from django.template import Node, NodeList, Template, Context, resolve_variable
-from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END
+from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
@@ -124,17 +124,27 @@ class ForNode(Node):
         return nodelist.render(context)
 
 class IfChangedNode(Node):
-    def __init__(self, nodelist):
+    def __init__(self, nodelist, *varlist):
         self.nodelist = nodelist
         self._last_seen = None
+        self._varlist = varlist
 
     def render(self, context):
         if context.has_key('forloop') and context['forloop']['first']:
             self._last_seen = None
-        content = self.nodelist.render(context)
-        if content != self._last_seen:
+        try:
+            if self._varlist:
+                # Consider multiple parameters.
+                # This automatically behaves like a OR evaluation of the multiple variables.
+                compare_to = [resolve_variable(var, context) for var in self._varlist]
+            else:
+                compare_to = self.nodelist.render(context)
+        except VariableDoesNotExist:
+            compare_to = None        
+
+        if  compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
-            self._last_seen = content
+            self._last_seen = compare_to
             context.push()
             context['ifchanged'] = {'firstloop': firstloop}
             content = self.nodelist.render(context)
@@ -295,6 +305,8 @@ class TemplateTagNode(Node):
                'closevariable': VARIABLE_TAG_END,
                'openbrace': SINGLE_BRACE_START,
                'closebrace': SINGLE_BRACE_END,
+               'opencomment': COMMENT_TAG_START,
+               'closecomment': COMMENT_TAG_END,
                }
 
     def __init__(self, tagtype):
@@ -632,23 +644,34 @@ def ifchanged(parser, token):
     """
     Check if a value has changed from the last iteration of a loop.
 
-    The 'ifchanged' block tag is used within a loop. It checks its own rendered
-    contents against its previous state and only displays its content if the
-    value has changed::
+    The 'ifchanged' block tag is used within a loop. It has two possible uses.
 
-        <h1>Archive for {{ year }}</h1>
+    1. Checks its own rendered contents against its previous state and only
+       displays the content if it has changed. For example, this displays a list of
+       days, only displaying the month if it changes::
 
-        {% for date in days %}
-        {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
-        <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
-        {% endfor %}
+            <h1>Archive for {{ year }}</h1>
+
+            {% for date in days %}
+                {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+                <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+            {% endfor %}
+
+    2. If given a variable, check whether that variable has changed. For example, the
+       following shows the date every time it changes, but only shows the hour if both
+       the hour and the date have changed::
+
+            {% for date in days %}
+                {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
+                {% ifchanged date.hour date.date %}
+                    {{ date.hour }}
+                {% endifchanged %}
+            {% endfor %}
     """
     bits = token.contents.split()
-    if len(bits) != 1:
-        raise TemplateSyntaxError, "'ifchanged' tag takes no arguments"
     nodelist = parser.parse(('endifchanged',))
     parser.delete_first_token()
-    return IfChangedNode(nodelist)
+    return IfChangedNode(nodelist, *bits[1:])
 ifchanged = register.tag(ifchanged)
 
 #@register.tag
@@ -831,6 +854,8 @@ def templatetag(parser, token):
         ``closevariable``   ``}}``
         ``openbrace``       ``{``
         ``closebrace``      ``}``
+        ``opencomment``     ``{#``
+        ``closecomment``    ``#}``
         ==================  =======
     """
     bits = token.contents.split()

@@ -108,8 +108,13 @@ class FormWrapper(object):
     This allows dictionary-style lookups of formfields. It also handles feeding
     prepopulated data and validation error messages to the formfield objects.
     """
-    def __init__(self, manipulator, data, error_dict, edit_inline=True):
-        self.manipulator, self.data = manipulator, data
+    def __init__(self, manipulator, data=None, error_dict=None, edit_inline=True):
+        self.manipulator = manipulator
+        if data is None:
+            data = {}
+        if error_dict is None:
+            error_dict = {}
+        self.data = data
         self.error_dict = error_dict
         self._inline_collections = None
         self.edit_inline = edit_inline

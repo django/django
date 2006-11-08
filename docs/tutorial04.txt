@@ -192,13 +192,13 @@ objects" and "display a detail page for a particular type of object."
       ``object_id`` for the generic views.
 
 By default, the ``object_detail`` generic view uses a template called
-``<app name>/<module name>_detail.html``. In our case, it'll use the template
+``<app name>/<model name>_detail.html``. In our case, it'll use the template
 ``"polls/poll_detail.html"``. Thus, rename your ``polls/detail.html`` template to
 ``polls/poll_detail.html``, and change the ``render_to_response()`` line in
 ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app name>/<module name>_list.html``. Thus, rename ``polls/index.html`` to
+``<app name>/<model name>_list.html``. Thus, rename ``polls/index.html`` to
 ``polls/poll_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``

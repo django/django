@@ -26,7 +26,7 @@ class BaseHandler(object):
                 raise exceptions.ImproperlyConfigured, '%s isn\'t a middleware module' % middleware_path
             mw_module, mw_classname = middleware_path[:dot], middleware_path[dot+1:]
             try:
-                mod = __import__(mw_module, '', '', [''])
+                mod = __import__(mw_module, {}, {}, [''])
             except ImportError, e:
                 raise exceptions.ImproperlyConfigured, 'Error importing middleware %s: "%s"' % (mw_module, e)
             try:

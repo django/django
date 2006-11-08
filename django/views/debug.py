@@ -75,7 +75,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         loader_debug_info = []
         for loader in template_source_loaders:
             try:
-                source_list_func = getattr(__import__(loader.__module__, '', '', ['get_template_sources']), 'get_template_sources')
+                source_list_func = getattr(__import__(loader.__module__, {}, {}, ['get_template_sources']), 'get_template_sources')
                 # NOTE: This assumes exc_value is the name of the template that
                 # the loader attempted to load.
                 template_list = [{'name': t, 'exists': os.path.exists(t)} \
