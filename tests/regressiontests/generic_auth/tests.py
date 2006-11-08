@@ -109,7 +109,7 @@ created above.
 >>> article.save()
 
 
-Set up some convenient reverences to the various permission objects.
+Set up some convenient references to the various permission objects.
 
 >>> add_permission = Article._meta.get_add_permission()
 >>> change_permission = Article._meta.get_change_permission()
