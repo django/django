@@ -105,7 +105,7 @@ appropriate models (in this case User, Permision, and Article).
 Create an Article for our tests, and set it's `owner` attribute to the user we
 created above.
 
->>> article = Article(name='test', body='test', creator=user)
+>>> article = Article(title='test', body='test', creator=user)
 >>> article.save()
 
 
@@ -141,5 +141,69 @@ Make sure it worked.
 >>> has_permission(user, add_permission, article)
 True
 
+
+
+QuerySet Filtering by Permissions
+---------------------------------
+
+Checking permissions on a single object only solves half of the problem. We
+also need a way to get a list of objects for which a user has a given permission. 
+
+This is implemented as a function for now, but it might be more desirable to
+be a method of QuerySet. We'll just to use plain old functions to start with, 
+then we'll test the extensible function version.
+
+>>> def owner_filter(user, permission, queryset):
+...     return queryset.filter(creator=user)
+... 
+
+>>> user_2 = User.objects.create_user('user 2', 'test@example.com', 'password')
+>>> user_2.save()
+
+>>> article_1 = Article(title='article 1', body='article 1', creator=user_2)
+>>> article_1.save()
+>>> article_2 = Article(title='article 2', body='article 2', creator=user)
+>>> article_2.save()
+>>> article_3 = Article(title='article 3', body='article 3', creator=user)
+>>> article_3.save()
+
+>>> qs = owner_filter(user, change_permission, Article.objects.all())
+>>> qs.count()
+3
+>>> [a.title for a in qs]
+['test', 'article 2', 'article 3']
+
+
+QuerySetFilter is a craptacular name... let's change that.
+
+>>> class QuerySetFilter(object):
+...     def __init__(self):
+...         self.registry = {}
+...
+...     def __call__(self, user, permission, queryset):
+...         types = (type(user), type(permission), queryset.model)
+...         #print "Looking up types: " + types.__repr__()
+...         func = self.registry.get(types)
+...         if func:
+...             return func(user, permission, queryset)
+...         else:
+...             return queryset
+...
+...     def register(self, func, user_type, permission_type, qs_model_type):
+...         types = (user_type, permission_type, qs_model_type)
+...         #print "Registering types: " + types.__repr__()
+...         self.registry[types] = func
+...
+
+Now try the same stuff using the extensible function.
+
+>>> qs_filter = QuerySetFilter()
+>>> qs_filter.register(owner_filter, User, Permission, Article)
+
+>>> qs = qs_filter(user, change_permission, Article.objects.all())
+>>> qs.count()
+3
+>>> [a.title for a in qs]
+['test', 'article 2', 'article 3']
 
 """
