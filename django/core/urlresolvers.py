@@ -21,7 +21,10 @@ class NoReverseMatch(Exception):
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
     # ['django.views.news.stories', 'story_detail']
-    dot = callback.rindex('.')
+    try:
+        dot = callback.rindex('.')
+    except ValueError:
+        return callback, ''
     return callback[:dot], callback[dot+1:]
 
 def reverse_helper(regex, *args, **kwargs):

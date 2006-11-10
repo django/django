@@ -33,9 +33,9 @@ Optional Fcgi settings: (setting=value)
   method=IMPL          prefork or threaded (default prefork)
   maxrequests=NUMBER   number of requests a child handles before it is 
                        killed and a new child is forked (0 = no limit).
-  maxspare=NUMBER      max number of spare processes to keep running.
-  minspare=NUMBER      min number of spare processes to prefork.
-  maxchildren=NUMBER   hard limit number of processes in prefork mode.
+  maxspare=NUMBER      max number of spare processes / threads
+  minspare=NUMBER      min number of spare processes / threads.
+  maxchildren=NUMBER   hard limit number of processes / threads
   daemonize=BOOL       whether to detach from terminal.
   pidfile=FILE         write the spawned process-id to this file.
   workdir=DIRECTORY    change to this directory when daemonizing
@@ -110,7 +110,11 @@ def runfastcgi(argset=[], **kwargs):
         }
     elif options['method'] in ('thread', 'threaded'):
         from flup.server.fcgi import WSGIServer
-        wsgi_opts = {}
+        wsgi_opts = {
+            'maxSpare': int(options["maxspare"]),
+            'minSpare': int(options["minspare"]),
+            'maxThreads': int(options["maxchildren"]),
+        }
     else:
         return fastcgi_help("ERROR: Implementation must be one of prefork or thread.")
 

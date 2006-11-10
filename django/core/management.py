@@ -349,6 +349,8 @@ def get_sql_initial_data_for_model(model):
         if os.path.exists(sql_file):
             fp = open(sql_file, 'U')
             for statement in statements.split(fp.read()):
+                # Remove any comments from the file
+                statement = re.sub(r"--.*[\n\Z]", "", statement)
                 if statement.strip():
                     output.append(statement + ";")
             fp.close()

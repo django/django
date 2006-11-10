@@ -101,6 +101,7 @@ DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_OPTIONS = {}          # Set to empty dictionary for default.
 
 # Host for sending e-mail.
 EMAIL_HOST = 'localhost'
@@ -227,6 +228,10 @@ MONTH_DAY_FORMAT = 'F j'
 # Do you want to manage transactions manually?
 # Hint: you really don't!
 TRANSACTIONS_MANAGED = False
+
+# The User-Agent string to use when checking for URL validity through the
+# isExistingURL validator.
+URL_VALIDATOR_USER_AGENT = "Django/0.96pre (http://www.djangoproject.com)"
 
 ##############
 # MIDDLEWARE #

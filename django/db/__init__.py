@@ -27,7 +27,7 @@ get_introspection_module = lambda: __import__('django.db.backends.%s.introspecti
 get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
 runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
 
-connection = backend.DatabaseWrapper()
+connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
 DatabaseError = backend.DatabaseError
 
 # Register an event that closes the database connection
