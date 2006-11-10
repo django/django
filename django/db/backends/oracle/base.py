@@ -40,8 +40,8 @@ class DatabaseWrapper(local):
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string)
         # set oracle date to ansi date format
-        cursor =  self.connection.cursor()
-        cursor.execute("alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS'")
+        cursor = self.connection.cursor()
+        cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
         cursor.close()
         return FormatStylePlaceholderCursor(self.connection)
 
@@ -68,54 +68,62 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var" style.
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
-    """
-    def execute(self, query, params=None):
+    """    
+    def _rewrite_args(self, query, params=None):
         if params is None: 
             params = []
-        args = [(':arg%s' % i) for i in range(len(params))]
+        args = [(':arg%d' % i) for i in range(len(params))]
         query = query % tuple(args)
-        
-        # cx can not execute the query with the closing ';' 
+        # cx_Oracle cannot execute a query with the closing ';' 
         if query.endswith(';'):
             query = query[:-1]
+        return query, params
+    
+    def execute(self, query, params=None):
+        query, params = self._rewrite_args(query, params)
+        self.arraysize = 200
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
-        if params is None: params = []
-        query = self.convert_arguments(query, len(params[0]))
-        # cx can not execute the query with the closing ';' 
-        if query.endswith(';') :
-            query = query[0:len(query)-1]
+        query, params = self._rewrite_args(query, params)
+        self.arraysize = 200
         return Database.Cursor.executemany(self, query, params)
 
+    
 def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-        
-    # Oracle requires that quoted names be uppercase.
-    return '"%s"' % name.upper()
+    # Oracle requires that quoted names be uppercase.    
+    name = name.upper()
+    if not name.startswith('"') and not name.endswith('"'):
+        name = '"%s"' % util.truncate_name(name.upper(), get_max_name_length())
+    return name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
-    query = "SELECT %s_sq.currval from dual" % table_name
-    cursor.execute(query)
+    cursor.execute('SELECT %s_sq.currval FROM dual' % table_name)
     return cursor.fetchone()[0]
 
 def get_date_extract_sql(lookup_type, table_name):
     # lookup_type is 'year', 'month', 'day'
-    # http://www.psoug.org/reference/date_func.html
+    # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
     return "EXTRACT(%s FROM %s)" % (lookup_type, table_name)
 
 def get_date_trunc_sql(lookup_type, field_name):
-    return "EXTRACT(%s FROM TRUNC(%s))" % (lookup_type, field_name)
+    # lookup_type is 'year', 'month', 'day'
+    # Oracle uses TRUNC() for both dates and numbers.
+    # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151
+    if lookup_type == 'day':
+        sql = 'TRUNC(%s)' % (field_name,)
+    else:
+        sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
+    return sql
 
 def get_limit_offset_sql(limit, offset=None):
     # Limits and offset are too complicated to be handled here.
-    # Instead, they are handled in django/db/query.py.
-    pass
+    # Instead, they are handled in django/db/backends/oracle/query.py.
+    raise NotImplementedError
 
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"

@@ -203,15 +203,14 @@ def _get_sql_model_create(model, known_models=set()):
         sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
         final_output.append(sequence_statement)
         trigger_statement = '' + \
-            'CREATE OR REPLACE trigger %s\n'    % truncate_name('%s_tr' % opts.db_table, backend.get_max_name_length()) + \
-            '  before insert on %s\n'           % backend.quote_name(opts.db_table) + \
-            '    for each row\n'  + \
-            '      when (new.id is NULL)\n' + \
-            '        begin\n' + \
-            '         select %s.NEXTVAL into :new.id from DUAL;\n' % sequence_name + \
-            '      end;\n'
+            'CREATE OR REPLACE TRIGGER %s\n'    % truncate_name('%s_tr' % opts.db_table, backend.get_max_name_length()) + \
+            '  BEFORE INSERT ON %s\n'           % backend.quote_name(opts.db_table) + \
+            '  FOR EACH ROW\n'  + \
+            '  WHEN (new.id IS NULL)\n' + \
+            '    BEGIN\n' + \
+            '      SELECT %s.nextval INTO :new.id FROM dual;\n' % sequence_name + \
+            '    END;\n'
         final_output.append(trigger_statement)
-
 
     return final_output, pending_references
 
@@ -283,13 +282,13 @@ def _get_many_to_many_sql_for_model(model):
                 sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
                 final_output.append(sequence_statement)
                 trigger_statement = '' + \
-                'CREATE OR REPLACE trigger %s\n'    % truncate_name('%s_tr' % m_table, backend.get_max_name_length()) + \
-                '  before insert on %s\n'           % backend.quote_name(m_table) + \
-                '    for each row\n'  + \
-                '      when (new.id is NULL)\n' + \
-                '        begin\n' + \
-                '         select %s.NEXTVAL into :new.id from DUAL;\n' % sequence_name + \
-                '      end;\n'
+                    'CREATE OR REPLACE TRIGGER %s\n'    % truncate_name('%s_tr' % m_table, backend.get_max_name_length()) + \
+                    '  BEFORE INSERT ON %s\n'           % backend.quote_name(m_table) + \
+                    '  FOR EACH ROW\n'  + \
+                    '  WHEN (new.id IS NULL)\n' + \
+                    '    BEGIN\n' + \
+                    '      SELECT %s.nextval INTO :new.id FROM dual;\n' % sequence_name + \
+                    '    END;\n'
                 final_output.append(trigger_statement)
     return final_output
 

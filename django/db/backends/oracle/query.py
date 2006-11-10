@@ -67,7 +67,7 @@ def get_query_set_class(DefaultQuerySet):
 
             # so here's the logic;
             # 1. retrieve each row in turn
-            # 2. convert CLOBs
+            # 2. convert NCLOBs
 
             def resolve_lobs(row):
                 for field in row:

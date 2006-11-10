@@ -1,34 +1,40 @@
-import sys
+import sys, time
 
+# This dictionary maps Field objects to their associated Oracle column
+# types, as strings. Column-type strings can contain format strings; they'll
+# be interpolated against the values of Field.__dict__ before being output.
+# If a column type is set to None, it won't be included in the output.
 DATA_TYPES = {
-    'AutoField':                    'number(11)',
-    'BooleanField':                 'number(1) CHECK (%(column)s IN (0,1))',
-    'CharField':                    'varchar2(%(maxlength)s)',
-    'CommaSeparatedIntegerField':   'varchar2(%(maxlength)s)',
-    'DateField':                    'date',
-    'DateTimeField':                'timestamp with time zone',
-    'FileField':                    'varchar2(100)',
-    'FilePathField':                'varchar2(100)',
-    'FloatField':                   'number(%(max_digits)s, %(decimal_places)s)',
-    'ImageField':                   'varchar2(100)',
-    'IntegerField':                 'number(11)',
-    'IPAddressField':               'char(15)',
+    'AutoField':                    'NUMBER(11)',
+    'BooleanField':                 'NUMBER(1) CHECK (%(column)s IN (0,1))',
+    'CharField':                    'VARCHAR2(%(maxlength)s)',
+    'CommaSeparatedIntegerField':   'VARCHAR2(%(maxlength)s)',
+    'DateField':                    'DATE',
+    'DateTimeField':                'TIMESTAMP WITH TIME ZONE',
+    'FileField':                    'VARCHAR2(100)',
+    'FilePathField':                'VARCHAR2(100)',
+    'FloatField':                   'NUMBER(%(max_digits)s, %(decimal_places)s)',
+    'ImageField':                   'VARCHAR2(100)',
+    'IntegerField':                 'NUMBER(11)',
+    'IPAddressField':               'CHAR(15)',
     'ManyToManyField':              None,
-    'NullBooleanField':             'number(1) CHECK ((%(column)s IN (0,1)) OR (%(column)s IS NULL))',
-    'OneToOneField':                'number(11)',
-    'PhoneNumberField':             'varchar2(20)',
-    'PositiveIntegerField':         'number(11) CHECK (%(column)s >= 1)',
-    'PositiveSmallIntegerField':    'number(11) CHECK (%(column)s >= 1)',
-    'SlugField':                    'varchar2(50)',
-    'SmallIntegerField':            'number(11)',
-    'TextField':                    'clob',
-    'TimeField':                    'timestamp',
-    'URLField':                     'varchar2(200)',
-    'USStateField':                 'char(2)',
+    'NullBooleanField':             'NUMBER(1) CHECK ((%(column)s IN (0,1)) OR (%(column)s IS NULL))',
+    'OneToOneField':                'NUMBER(11)',
+    'PhoneNumberField':             'VARCHAR2(20)',
+    'PositiveIntegerField':         'NUMBER(11) CHECK (%(column)s >= 1)',
+    'PositiveSmallIntegerField':    'NUMBER(11) CHECK (%(column)s >= 1)',
+    'SlugField':                    'VARCHAR2(50)',
+    'SmallIntegerField':            'NUMBER(11)',
+    'TextField':                    'NCLOB',
+    'TimeField':                    'TIMESTAMP',
+    'URLField':                     'VARCHAR2(200)',
+    'USStateField':                 'CHAR(2)',
 }
 
 TEST_DATABASE_PREFIX = 'test_'
 PASSWORD = 'Im_a_lumberjack'
+OLD_DATABASE_USER = None
+OLD_DATABASE_PASSWORD = None
 
 def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False):
     if verbosity >= 1:
@@ -46,7 +52,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
         if autoclobber or confirm == 'yes':
             try:
                 if verbosity >= 1:
-                    print "Destroying old test database..."                
+                    print "Destroying old test database..."
                 _destroy_test_db(cursor, TEST_DATABASE_NAME, verbosity)
                 if verbosity >= 1:
                     print "Creating test database..."
@@ -66,13 +72,15 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     # the side effect of initializing the test database.
     cursor = connection.cursor()
         
-def destroy_test_db(settings, connection, old_database_name, verbosity=1):
+def destroy_test_db(settings, connection, backend, old_database_name, verbosity=1):
     if verbosity >= 1:
         print "Destroying test database..."
     connection.close()
 
     TEST_DATABASE_NAME = _test_database_name(settings)
     settings.DATABASE_NAME = old_database_name
+    #settings.DATABASE_USER = 'old_user'
+    #settings.DATABASE_PASSWORD = 'old_password'
 
     cursor = connection.cursor()
     time.sleep(1) # To avoid "database is being accessed by other users" errors.
@@ -83,19 +91,18 @@ def _create_test_db(cursor, dbname, verbosity):
     if verbosity >= 2:
         print "_create_test_db(): dbname = %s" % dbname
     statements = [
-        """create tablespace %(user)s
-           datafile '%(user)s.dbf' size 10M autoextend on next 10M  maxsize 20M
+        """CREATE TABLESPACE %(user)s
+           DATAFILE '%(user)s.dbf' SIZE 10M AUTOEXTEND ON NEXT 10M MAXSIZE 20M
         """,
-        """create temporary tablespace %(user)s_temp
-           tempfile '%(user)s_temp.dbf' size 10M autoextend on next 10M  maxsize 20M
+        """CREATE TEMPORARY TABLESPACE %(user)s_temp
+           TEMPFILE '%(user)s_temp.dbf' SIZE 10M AUTOEXTEND ON NEXT 10M MAXSIZE 20M
         """,
-        """create user %(user)s
-           identified by %(password)s
-           default tablespace %(user)s
-           temporary tablespace %(user)s_temp
+        """CREATE USER %(user)s
+           IDENTIFIED BY %(password)s
+           DEFAULT TABLESPACE %(user)s
+           TEMPORARY TABLESPACE %(user)s_temp
         """,
-        """grant resource to %(user)s""",
-        """grant connect to %(user)s""",
+        """GRANT CONNECT, RESOURCE TO %(user)s""",
     ]
     _execute_statements(cursor, statements, dbname, verbosity)
     
@@ -103,9 +110,9 @@ def _destroy_test_db(cursor, dbname, verbosity):
     if verbosity >= 2:
         print "_destroy_test_db(): dbname=%s" % dbname
     statements = [
-        """drop user %(user)s cascade""",
-        """drop tablespace %(user)s including contents and datafiles cascade constraints""",
-        """drop tablespace %(user)s_temp including contents and datafiles cascade constraints""",
+        'DROP USER %(user)s CASCADE',
+        'DROP TABLESPACE %(user)s INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
+        'DROP TABLESPACE %(user)s_TEMP INCLUDING CONTENTS AND DATAFILES CASCADE CONSTRAINTS',
         ]
     _execute_statements(cursor, statements, dbname, verbosity)
 
@@ -119,8 +126,7 @@ def _execute_statements(cursor, statements, dbname, verbosity):
             cursor.execute(stmt)
         except Exception, err:
             sys.stderr.write("Failed (%s)\n" % (err))
-            if required:
-                raise
+            raise
 
 def _test_database_name(settings):
     if settings.TEST_DATABASE_NAME:
@@ -128,4 +134,3 @@ def _test_database_name(settings):
     else:
         name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
     return name
-    

@@ -171,7 +171,7 @@ class _QuerySet(object):
         cursor = connection.cursor()
         
         full_query = None
-        select, sql, params = self._get_sql_clause() 
+        select, sql, params, full_query = self._get_sql_clause() 
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
 
         fill_cache = self._select_related
@@ -196,7 +196,7 @@ class _QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        select, sql, params = counter._get_sql_clause()[:3]
+        select, sql, params, full_query = counter._get_sql_clause()
         cursor = connection.cursor()
         if self._distinct:
             id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
@@ -535,7 +535,7 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        select, sql, params = self._get_sql_clause()[:3]
+        select, sql, params, full_query = self._get_sql_clause()
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -557,16 +557,26 @@ class DateQuerySet(QuerySet):
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
-        select, sql, params = self._get_sql_clause()
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
-            backend.quote_name(self._field.column))), sql, self._order)
-        cursor = connection.cursor()
-        cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+        select, sql, params, full_query = self._get_sql_clause()
+        table_name = backend.quote_name(self.model._meta.db_table)
+        field_name = backend.quote_name(self._field.column)
+        date_trunc_sql = backend.get_date_trunc_sql(self._kind,
+                                                    '%s.%s' % (table_name, field_name))
+        fmt = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s'
+
+        if settings.DATABASE_ENGINE == 'oracle':
+            sql = fmt % (date_trunc_sql, sql, date_trunc_sql, self._order)
+            cursor = connection.cursor()
+            cursor.execute(sql, params)
+            return [row[0] for row in cursor.fetchall()]  
+        else:
+            sql = fmt % (date_trunc_sql, sql, 1, self._order_by)
+            cursor = connection.cursor()
+            cursor.execute(sql, params)
+            # We have to manually run typecast_timestamp(str()) on the results, because
+            # MySQL doesn't automatically cast the result of date functions as datetime
+            # objects -- MySQL returns the values as strings, instead.
+            return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
 
     def _clone(self, klass=None, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, **kwargs)
