@@ -215,7 +215,7 @@ class URLField(RegexField):
                 "User-Agent": self.user_agent,
             }
             try:
-                req = urllib2.Request(field_data, None, headers)
+                req = urllib2.Request(value, None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
                 raise ValidationError(u'Enter a valid URL.')
