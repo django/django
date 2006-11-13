@@ -28,6 +28,7 @@ class Serializer(object):
         self.options = options
 
         self.stream = options.get("stream", StringIO())
+        self.selected_fields = options.get("fields")
 
         self.start_serialization()
         for obj in queryset:
@@ -36,11 +37,14 @@ class Serializer(object):
                 if field is obj._meta.pk:
                     continue
                 elif field.rel is None:
-                    self.handle_field(obj, field)
+                    if self.selected_fields is None or field.attname in self.selected_fields:
+                        self.handle_field(obj, field)
                 else:
-                    self.handle_fk_field(obj, field)
+                    if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
+                        self.handle_fk_field(obj, field)
             for field in obj._meta.many_to_many:
-                self.handle_m2m_field(obj, field)
+                if self.selected_fields is None or field.attname in self.selected_fields:
+                    self.handle_m2m_field(obj, field)
             self.end_object(obj)
         self.end_serialization()
         return self.getvalue()

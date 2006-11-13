@@ -321,7 +321,7 @@ Note::
 
         def some_view(request):
             # ...
-            return render_to_response('my_template'html',
+            return render_to_response('my_template.html',
                                       my_data_dictionary,
                                       context_instance=RequestContext(request))
 

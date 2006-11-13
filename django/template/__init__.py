@@ -868,8 +868,11 @@ class Library(object):
                     dict = func(*args)
 
                     if not getattr(self, 'nodelist', False):
-                        from django.template.loader import get_template
-                        t = get_template(file_name)
+                        from django.template.loader import get_template, select_template
+                        if hasattr(file_name, '__iter__'):
+                            t = select_template(file_name)
+                        else:
+                            t = get_template(file_name)
                         self.nodelist = t.nodelist
                     return self.nodelist.render(context_class(dict))
 

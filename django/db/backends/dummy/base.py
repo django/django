@@ -20,6 +20,9 @@ class DatabaseWrapper:
     _commit = complain
     _rollback = complain
 
+    def __init__(self, **kwargs):
+        pass
+
     def close(self):
         pass # close()
 

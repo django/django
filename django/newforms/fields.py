@@ -14,6 +14,7 @@ __all__ = (
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
     'ChoiceField', 'MultipleChoiceField',
+    'ComboField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -34,9 +35,9 @@ class Field(object):
             widget = widget()
         self.widget = widget
 
-    def to_python(self, value):
+    def clean(self, value):
         """
-        Validates the given value and returns its "normalized" value as an
+        Validates the given value and returns its "cleaned" value as an
         appropriate Python object.
 
         Raises ValidationError for any errors.
@@ -50,9 +51,9 @@ class CharField(Field):
         Field.__init__(self, required, widget)
         self.max_length, self.min_length = max_length, min_length
 
-    def to_python(self, value):
+    def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
-        Field.to_python(self, value)
+        Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         if not isinstance(value, basestring):
             value = unicode(str(value), DEFAULT_ENCODING)
@@ -65,12 +66,12 @@ class CharField(Field):
         return value
 
 class IntegerField(Field):
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that int() can be called on the input. Returns the result
         of int().
         """
-        super(IntegerField, self).to_python(value)
+        super(IntegerField, self).clean(value)
         try:
             return int(value)
         except (ValueError, TypeError):
@@ -89,12 +90,12 @@ class DateField(Field):
         Field.__init__(self, required, widget)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
 
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that the input can be converted to a date. Returns a Python
         datetime.date object.
         """
-        Field.to_python(self, value)
+        Field.clean(self, value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
@@ -125,12 +126,12 @@ class DateTimeField(Field):
         Field.__init__(self, required, widget)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
 
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that the input can be converted to a datetime. Returns a
         Python datetime.datetime object.
         """
-        Field.to_python(self, value)
+        Field.clean(self, value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
@@ -157,12 +158,12 @@ class RegexField(Field):
         self.regex = regex
         self.error_message = error_message or u'Enter a valid value.'
 
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that the input matches the regular expression. Returns a
         Unicode object.
         """
-        Field.to_python(self, value)
+        Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         if not isinstance(value, basestring):
             value = unicode(str(value), DEFAULT_ENCODING)
@@ -187,17 +188,35 @@ url_re = re.compile(
     r'(?::\d+)?' # optional port
     r'(?:/?|/\S+)$', re.IGNORECASE)
 
+try:
+    from django.conf import settings
+    URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
+except ImportError:
+    # It's OK if Django settings aren't configured.
+    URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
+
 class URLField(RegexField):
-    def __init__(self, required=True, verify_exists=False, widget=None):
+    def __init__(self, required=True, verify_exists=False, widget=None,
+            validator_user_agent=URL_VALIDATOR_USER_AGENT):
         RegexField.__init__(self, url_re, u'Enter a valid URL.', required, widget)
         self.verify_exists = verify_exists
+        self.user_agent = validator_user_agent
 
-    def to_python(self, value):
-        value = RegexField.to_python(self, value)
+    def clean(self, value):
+        value = RegexField.clean(self, value)
         if self.verify_exists:
             import urllib2
+            from django.conf import settings
+            headers = {
+                "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+                "Accept-Language": "en-us,en;q=0.5",
+                "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+                "Connection": "close",
+                "User-Agent": self.user_agent,
+            }
             try:
-                u = urllib2.urlopen(value)
+                req = urllib2.Request(value, None, headers)
+                u = urllib2.urlopen(req)
             except ValueError:
                 raise ValidationError(u'Enter a valid URL.')
             except: # urllib2.URLError, httplib.InvalidURL, etc.
@@ -207,9 +226,9 @@ class URLField(RegexField):
 class BooleanField(Field):
     widget = CheckboxInput
 
-    def to_python(self, value):
+    def clean(self, value):
         "Returns a Python boolean object."
-        Field.to_python(self, value)
+        Field.clean(self, value)
         return bool(value)
 
 class ChoiceField(Field):
@@ -219,11 +238,11 @@ class ChoiceField(Field):
         Field.__init__(self, required, widget)
         self.choices = choices
 
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that the input is in self.choices.
         """
-        value = Field.to_python(self, value)
+        value = Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         if not isinstance(value, basestring):
             value = unicode(str(value), DEFAULT_ENCODING)
@@ -238,7 +257,7 @@ class MultipleChoiceField(ChoiceField):
     def __init__(self, choices=(), required=True, widget=SelectMultiple):
         ChoiceField.__init__(self, choices, required, widget)
 
-    def to_python(self, value):
+    def clean(self, value):
         """
         Validates that the input is a list or tuple.
         """
@@ -259,3 +278,18 @@ class MultipleChoiceField(ChoiceField):
             if val not in valid_values:
                 raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % val)
         return new_value
+
+class ComboField(Field):
+    def __init__(self, fields=(), required=True, widget=None):
+        Field.__init__(self, required, widget)
+        self.fields = fields
+
+    def clean(self, value):
+        """
+        Validates the given value against all of self.fields, which is a
+        list of Field instances.
+        """
+        Field.clean(self, value)
+        for field in self.fields:
+            value = field.clean(value)
+        return value

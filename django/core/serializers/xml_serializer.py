@@ -166,7 +166,11 @@ class Deserializer(base.Deserializer):
         # If it doesn't exist, set the field to None (which might trigger 
         # validation error, but that's expected).
         RelatedModel = self._get_model_from_node(node, "to")
-        return RelatedModel.objects.get(pk=getInnerText(node).strip().encode(self.encoding))
+        # Check if there is a child node named 'None', returning None if so.
+        if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
+            return None
+        else:
+            return RelatedModel.objects.get(pk=getInnerText(node).strip().encode(self.encoding))
         
     def _handle_m2m_field_node(self, node):
         """

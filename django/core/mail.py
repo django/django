@@ -4,6 +4,11 @@ from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
 import smtplib, rfc822
+import socket
+import time
+import random
+
+DNS_NAME = socket.getfqdn() # Cache the hostname
 
 class BadHeaderError(ValueError):
     pass
@@ -50,6 +55,11 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
         msg['Date'] = rfc822.formatdate()
+        try:
+            random_bits = str(random.getrandbits(64))
+        except AttributeError: # Python 2.3 doesn't have random.getrandbits().
+            random_bits = ''.join([random.choice('1234567890') for i in range(19)])
+        msg['Message-ID'] = "<%d.%s@%s>" % (time.time(), random_bits, DNS_NAME)
         try:
             server.sendmail(from_email, recipient_list, msg.as_string())
             num_sent += 1

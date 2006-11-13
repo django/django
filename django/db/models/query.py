@@ -170,7 +170,6 @@ class _QuerySet(object):
 
         cursor = connection.cursor()
         
-        full_query = None
         select, sql, params, full_query = self._get_sql_clause() 
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
 

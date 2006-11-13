@@ -35,7 +35,8 @@ get_query_module = backend_module_accessor("query")
 get_client_module = backend_module_accessor("client")
 runshell = lambda: get_client_module().runshell()
 
-connection = backend.DatabaseWrapper()
+connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
+
 DatabaseError = backend.DatabaseError
 
 # Register an event that closes the database connection

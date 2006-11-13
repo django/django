@@ -6,6 +6,13 @@ from fields import Field
 from widgets import TextInput, Textarea
 from util import ErrorDict, ErrorList, ValidationError
 
+NON_FIELD_ERRORS = '__all__'
+
+def pretty_name(name):
+    "Converts 'first_name' to 'First name'"
+    name = name[0].upper() + name[1:]
+    return name.replace('_', ' ')
+
 class DeclarativeFieldsMetaclass(type):
     "Metaclass that converts Field attributes to a dictionary called 'fields'."
     def __new__(cls, name, bases, attrs):
@@ -18,22 +25,33 @@ class Form(object):
 
     def __init__(self, data=None): # TODO: prefix stuff
         self.data = data or {}
-        self.__data_python = None # Stores the data after to_python() has been called.
-        self.__errors = None # Stores the errors after to_python() has been called.
+        self.clean_data = None # Stores the data after clean() has been called.
+        self.__errors = None # Stores the errors after clean() has been called.
+
+    def __str__(self):
+        return self.as_table()
 
     def __iter__(self):
         for name, field in self.fields.items():
             yield BoundField(self, field, name)
 
-    def to_python(self):
+    def __getitem__(self, name):
+        "Returns a BoundField with the given name."
+        try:
+            field = self.fields[name]
+        except KeyError:
+            raise KeyError('Key %r not found in Form' % name)
+        return BoundField(self, field, name)
+
+    def clean(self):
         if self.__errors is None:
-            self._validate()
-        return self.__data_python
+            self.full_clean()
+        return self.clean_data
 
     def errors(self):
         "Returns an ErrorDict for self.data"
         if self.__errors is None:
-            self._validate()
+            self.full_clean()
         return self.__errors
 
     def is_valid(self):
@@ -44,26 +62,74 @@ class Form(object):
         """
         return not bool(self.errors())
 
-    def __getitem__(self, name):
-        "Returns a BoundField with the given name."
-        try:
-            field = self.fields[name]
-        except KeyError:
-            raise KeyError('Key %r not found in Form' % name)
-        return BoundField(self, field, name)
+    def as_table(self):
+        "Returns this form rendered as an HTML <table>."
+        output = u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
+        return '<table>\n%s\n</table>' % output
 
-    def _validate(self):
-        data_python = {}
+    def as_ul(self):
+        "Returns this form rendered as an HTML <ul>."
+        output = u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
+        return '<ul>\n%s\n</ul>' % output
+
+    def as_table_with_errors(self):
+        "Returns this form rendered as an HTML <table>, with errors."
+        output = []
+        if self.errors().get(NON_FIELD_ERRORS):
+            # Errors not corresponding to a particular field are displayed at the top.
+            output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+        for name, field in self.fields.items():
+            bf = BoundField(self, field, name)
+            if bf.errors:
+                output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors]))
+            output.append('<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
+        return '<table>\n%s\n</table>' % '\n'.join(output)
+
+    def as_ul_with_errors(self):
+        "Returns this form rendered as an HTML <ul>, with errors."
+        output = []
+        if self.errors().get(NON_FIELD_ERRORS):
+            # Errors not corresponding to a particular field are displayed at the top.
+            output.append('<li><ul>%s</ul></li>' % '\n'.join(['<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+        for name, field in self.fields.items():
+            bf = BoundField(self, field, name)
+            line = '<li>'
+            if bf.errors:
+                line += '<ul>%s</ul>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors])
+            line += '%s: %s</li>' % (pretty_name(name), bf)
+            output.append(line)
+        return '<ul>\n%s\n</ul>' % '\n'.join(output)
+
+    def full_clean(self):
+        """
+        Cleans all of self.data and populates self.__errors and self.clean_data.
+        """
+        self.clean_data = {}
         errors = ErrorDict()
         for name, field in self.fields.items():
+            value = self.data.get(name, None)
             try:
-                value = field.to_python(self.data.get(name, None))
-                data_python[name] = value
+                value = field.clean(value)
+                self.clean_data[name] = value
+                if hasattr(self, 'clean_%s' % name):
+                    value = getattr(self, 'clean_%s' % name)()
+                self.clean_data[name] = value
             except ValidationError, e:
                 errors[name] = e.messages
-        if not errors: # Only set self.data_python if there weren't errors.
-            self.__data_python = data_python
+        try:
+            self.clean_data = self.clean()
+        except ValidationError, e:
+            errors[NON_FIELD_ERRORS] = e.messages
+        if errors:
+            self.clean_data = None
         self.__errors = errors
+
+    def clean(self):
+        """
+        Hook for doing any extra form-wide cleaning after Field.clean() been
+        called on every field.
+        """
+        return self.clean_data
 
 class BoundField(object):
     "A Field plus data"

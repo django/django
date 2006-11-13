@@ -286,7 +286,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         # This is really not going to work for fields that have different
         # form fields, e.g. DateTime.
         # This validation needs to occur after html2python to be effective.
-        field_val = all_data.get(f.attname, None)
+        field_val = all_data.get(f.name, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.

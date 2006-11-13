@@ -34,7 +34,7 @@ class CommentManager(models.Manager):
         """
         Given a rating_string, this returns a tuple of (rating_range, options).
         >>> s = "scale:1-10|First_category|Second_category"
-        >>> get_rating_options(s)
+        >>> Comment.objects.get_rating_options(s)
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['First category', 'Second category'])
         """
         rating_range, options = rating_string.split('|', 1)
