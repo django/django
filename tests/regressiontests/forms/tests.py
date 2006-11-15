@@ -1194,8 +1194,22 @@ Form.clean() still needs to return a dictionary of all clean data:
 >>> f.clean()
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
-
-
+It's possible to construct a Form dynamically by adding to the self.fields
+dictionary in __init__(). Don't forget to call Form.__init__() within the
+subclass' __init__().
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     def __init__(self):
+...         super(Person, self).__init__()
+...         self.fields['birthday'] = DateField()
+>>> p = Person()
+>>> print p
+<table>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+</table>
 """
 
 if __name__ == "__main__":
