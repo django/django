@@ -23,8 +23,9 @@ class Form(object):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
-    def __init__(self, data=None): # TODO: prefix stuff
+    def __init__(self, data=None, auto_id=False): # TODO: prefix stuff
         self.data = data or {}
+        self.auto_id = auto_id
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
@@ -156,6 +157,10 @@ class BoundField(object):
     errors = property(_errors)
 
     def as_widget(self, widget, attrs=None):
+        attrs = attrs or {}
+        auto_id = self.auto_id
+        if not attrs.has_key('id') and not widget.attrs.has_key('id') and auto_id:
+            attrs['id'] = auto_id
         return widget.render(self._name, self._form.data.get(self._name, None), attrs=attrs)
 
     def as_text(self, attrs=None):
@@ -167,3 +172,16 @@ class BoundField(object):
     def as_textarea(self, attrs=None):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
+
+    def _auto_id(self):
+        """
+        Calculates and returns the ID attribute for this BoundField, if the
+        associated Form has specified auto_id. Returns an empty string otherwise.
+        """
+        auto_id = self._form.auto_id
+        if auto_id and '%s' in str(auto_id):
+            return str(auto_id) % self._name
+        elif auto_id:
+            return self._name
+        return ''
+    auto_id = property(_auto_id)

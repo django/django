@@ -973,6 +973,61 @@ u'* This field is required.'
 >>> print p['birthday']
 <input type="text" name="birthday" />
 
+"auto_id" tells the Form to add an "id" attribute to each form element.
+If it's a string that contains '%s', Django will use that as a format string
+into which the field's name will be inserted.
+>>> p = Person(auto_id='id_%s')
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" name="first_name" id="id_first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="id_last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="id_birthday" /></li>
+</ul>
+
+If auto_id is any True value whose str() does not contain '%s', the "id"
+attribute will be the name of the field.
+>>> p = Person(auto_id=True)
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" name="first_name" id="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
+</ul>
+
+If auto_id is any False value, an "id" attribute won't be output unless it
+was manually entered.
+>>> p = Person(auto_id=False)
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+</ul>
+
+In this example, auto_id is False, but the "id" attribute for the "first_name"
+field is given.
+>>> class PersonNew(Form):
+...     first_name = CharField(widget=TextInput(attrs={'id': 'first_name_id'}))
+...     last_name = CharField()
+...     birthday = DateField()
+>>> p = PersonNew(auto_id=False)
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+</ul>
+
+If the "id" attribute is specified in the Form and auto_id is True, the "id"
+attribute in the Form gets precedence.
+>>> p = PersonNew(auto_id=True)
+>>> print p.as_ul()
+<ul>
+<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
+</ul>
+
 >>> class SignupForm(Form):
 ...     email = EmailField()
 ...     get_spam = BooleanField()
