@@ -340,6 +340,117 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+# RadioSelect Widget ##########################################################
+
+>>> w = RadioSelect()
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+If the value is None, none of the options are checked:
+>>> print w.render('beatle', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+If the value corresponds to a label (but not to an option value), none of the options are checked:
+>>> print w.render('beatle', 'John', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+The value is compared to its str():
+>>> print w.render('num', 2, choices=[('1', '1'), ('2', '2'), ('3', '3')])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+>>> print w.render('num', '2', choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+>>> print w.render('num', 2, choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+
+The 'choices' argument can be any iterable:
+>>> def get_choices():
+...     for i in range(5):
+...         yield (i, i)
+>>> print w.render('num', 2, choices=get_choices())
+<ul>
+<li><label><input type="radio" name="num" value="0" /> 0</label></li>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+<li><label><input type="radio" name="num" value="4" /> 4</label></li>
+</ul>
+
+You can also pass 'choices' to the constructor:
+>>> w = RadioSelect(choices=[(1, 1), (2, 2), (3, 3)])
+>>> print w.render('num', 2)
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+
+If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
+>>> print w.render('num', 2, choices=[(4, 4), (5, 5)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+<li><label><input type="radio" name="num" value="4" /> 4</label></li>
+<li><label><input type="radio" name="num" value="5" /> 5</label></li>
+</ul>
+
+The render() method returns a RadioFieldRenderer object, whose str() is a <ul>.
+You can manipulate that object directly to customize the way the RadioSelect
+is rendered.
+>>> w = RadioSelect()
+>>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> for inp in r:
+...     print inp
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
+<label><input type="radio" name="beatle" value="P" /> Paul</label>
+<label><input type="radio" name="beatle" value="G" /> George</label>
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>
+>>> for inp in r:
+...     print '%s<br />' % inp
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label><br />
+<label><input type="radio" name="beatle" value="P" /> Paul</label><br />
+<label><input type="radio" name="beatle" value="G" /> George</label><br />
+<label><input type="radio" name="beatle" value="R" /> Ringo</label><br />
+>>> for inp in r:
+...     print '<p>%s %s</p>' % (inp.tag(), inp.choice_label)
+<p><input checked="checked" type="radio" name="beatle" value="J" /> John</p>
+<p><input type="radio" name="beatle" value="P" /> Paul</p>
+<p><input type="radio" name="beatle" value="G" /> George</p>
+<p><input type="radio" name="beatle" value="R" /> Ringo</p>
+>>> for inp in r:
+...     print '%s %s %s %s %s' % (inp.name, inp.value, inp.choice_value, inp.choice_label, inp.is_checked())
+beatle J J John True
+beatle J P Paul False
+beatle J G George False
+beatle J R Ringo False
+
 # CharField ###################################################################
 
 >>> f = CharField(required=False)

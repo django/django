@@ -5,7 +5,7 @@ HTML Widget classes
 __all__ = (
     'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'FileInput',
     'Textarea', 'CheckboxInput',
-    'Select', 'SelectMultiple',
+    'Select', 'SelectMultiple', 'RadioSelect',
 )
 
 from django.utils.html import escape
@@ -35,7 +35,10 @@ class Widget(object):
         return attrs
 
 class Input(Widget):
-    "Base class for all <input> widgets (except type='checkbox', which is special)"
+    """
+    Base class for all <input> widgets (except type='checkbox' and
+    type='radio', which are special).
+    """
     input_type = None # Subclasses must define this.
     def render(self, name, value, attrs=None):
         if value is None: value = ''
@@ -102,8 +105,45 @@ class SelectMultiple(Widget):
         output.append(u'</select>')
         return u'\n'.join(output)
 
-class RadioSelect(Widget):
-    pass
+class RadioInput(object):
+    "An object used by RadioFieldRenderer that represents a single <input type='radio'>."
+    def __init__(self, name, value, attrs, choice):
+        self.name, self.value = name, value
+        self.attrs = attrs or {}
+        self.choice_value, self.choice_label = choice
+
+    def __str__(self):
+        return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
+
+    def is_checked(self):
+        return self.value == str(self.choice_value)
+
+    def tag(self):
+        final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
+        if self.is_checked():
+            final_attrs['checked'] = 'checked'
+        return u'<input%s />' % flatatt(final_attrs)
+
+class RadioFieldRenderer(object):
+    "An object used by RadioSelect to enable customization of radio widgets."
+    def __init__(self, name, value, attrs, choices):
+        self.name, self.value, self.attrs = name, value, attrs
+        self.choices = choices
+
+    def __iter__(self):
+        for choice in self.choices:
+            yield RadioInput(self.name, self.value, self.attrs, choice)
+
+    def __str__(self):
+        "Outputs a <ul> for this set of radio fields."
+        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % w for w in self])
+
+class RadioSelect(Select):
+    def render(self, name, value, attrs=None, choices=()):
+        "Returns a RadioFieldRenderer instance rather than a Unicode string."
+        if value is None: value = ''
+        str_value = str(value) # Normalize to string.
+        return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
 
 class CheckboxSelectMultiple(Widget):
     pass
