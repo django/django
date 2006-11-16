@@ -10,7 +10,7 @@ DATA_TYPES = {
     'CharField':                    'VARCHAR2(%(maxlength)s)',
     'CommaSeparatedIntegerField':   'VARCHAR2(%(maxlength)s)',
     'DateField':                    'DATE',
-    'DateTimeField':                'TIMESTAMP WITH TIME ZONE',
+    'DateTimeField':                'TIMESTAMP',
     'FileField':                    'VARCHAR2(100)',
     'FilePathField':                'VARCHAR2(100)',
     'FloatField':                   'NUMBER(%(max_digits)s, %(decimal_places)s)',

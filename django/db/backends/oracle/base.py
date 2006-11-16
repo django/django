@@ -4,6 +4,7 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
+from django.conf import settings
 from django.db.backends import util
 try:
     import cx_Oracle as Database
@@ -30,7 +31,6 @@ class DatabaseWrapper(local):
         return self.connection is not None
 
     def cursor(self):
-        from django.conf import settings
         if not self._valid_connection():
             if len(settings.DATABASE_HOST.strip()) == 0:
                 settings.DATABASE_HOST = 'localhost'
@@ -40,21 +40,19 @@ class DatabaseWrapper(local):
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
+        cursor = FormatStylePlaceholderCursor(self.connection)
+        # default arraysize of 1 is highly sub-optimal
+        cursor.arraysize = 256
         # set oracle date to ansi date format
-        cursor = self.connection.cursor()
-        cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
-        cursor.close()
-        return FormatStylePlaceholderCursor(self.connection)
+        cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
+        cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
+        return cursor
 
     def _commit(self):
         self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
-            try:
-                self.connection.rollback()
-            except Database.NotSupportedError:
-                pass
+        self.connection.rollback()
 
     def close(self):
         if self.connection is not None:
@@ -82,12 +80,10 @@ class FormatStylePlaceholderCursor(Database.Cursor):
 
     def execute(self, query, params=None):
         query, params = self._rewrite_args(query, params)
-        self.arraysize = 200
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
         query, params = self._rewrite_args(query, params)
-        self.arraysize = 200
         return Database.Cursor.executemany(self, query, params)
 
 
