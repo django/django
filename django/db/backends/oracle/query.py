@@ -1,3 +1,4 @@
+import datetime
 from django.db import backend, connection
 # TODO: Why the frack can't I just import get_cached_row?
 #from django.db.models.query import get_cached_row
@@ -70,15 +71,23 @@ def get_query_set_class(DefaultQuerySet):
             # 1. retrieve each row in turn
             # 2. convert NCLOBs
 
-            def resolve_lobs(row):
+            def resolve_cols(row):
                 for field in row:
                     if isinstance(field, Database.LOB):
                         yield str(field)
+                    # cx_Oracle returns datetime.datetime objects for DATE
+                    # columns, but Django wants a datetime.date.
+                    # A workaround is to return a date if time fields are 0.
+                    # A safer fix would involve either patching cx_Oracle,
+                    # or checking the Model here, neither of which is good.
+                    elif isinstance(field, datetime.datetime) and \
+                        field.hour == field.minute == field.second == field.microsecond == 0:
+                        yield field.date()
                     else:
                         yield field
 
             for unresolved_row in cursor:
-                row = list(resolve_lobs(unresolved_row))
+                row = list(resolve_cols(unresolved_row))
                 if fill_cache:
                     obj, index_end = get_cached_row(self.model, row, 0)
                 else:
