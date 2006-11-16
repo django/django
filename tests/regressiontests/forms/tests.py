@@ -881,38 +881,28 @@ ValidationError: [u'This field is required.']
 ...     birthday = DateField()
 >>> p = Person()
 >>> print p
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_table()
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 >>> print p.as_table_with_errors()
-<table>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_ul_with_errors()
-<ul>
 <li><ul><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
 <li><ul><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
 <li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
 >>> p.errors()
@@ -937,11 +927,9 @@ u''
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
 >>> print p
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
-</table>
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors()
@@ -978,31 +966,25 @@ If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted.
 >>> p = Person(auto_id='id_%s')
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" name="first_name" id="id_first_name" /></li>
 <li>Last name: <input type="text" name="last_name" id="id_last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" id="id_birthday" /></li>
-</ul>
 
 If auto_id is any True value whose str() does not contain '%s', the "id"
 attribute will be the name of the field.
 >>> p = Person(auto_id=True)
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" name="first_name" id="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" id="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
-</ul>
 
 If auto_id is any False value, an "id" attribute won't be output unless it
 was manually entered.
 >>> p = Person(auto_id=False)
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 
 In this example, auto_id is False, but the "id" attribute for the "first_name"
 field is given.
@@ -1012,21 +994,17 @@ field is given.
 ...     birthday = DateField()
 >>> p = PersonNew(auto_id=False)
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 
 If the "id" attribute is specified in the Form and auto_id is True, the "id"
 attribute in the Form gets precedence.
 >>> p = PersonNew(auto_id=True)
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" id="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
-</ul>
 
 >>> class SignupForm(Form):
 ...     email = EmailField()
@@ -1158,36 +1136,28 @@ Form.clean() still needs to return a dictionary of all clean data:
 ...        return self.clean_data
 >>> f = UserRegistration()
 >>> print f.as_table()
-<table>
 <tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
-</table>
 >>> f.errors()
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
 >>> f.errors()
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
-<table>
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
-</table>
 >>> print f.as_table_with_errors()
-<table>
 <tr><td colspan="2"><ul><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
-</table>
 >>> print f.as_ul_with_errors()
-<ul>
 <li><ul><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" /></li>
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
 <li>Password2: <input type="password" name="password2" value="bar" /></li>
-</ul>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
 >>> f.errors()
 {}
@@ -1205,11 +1175,9 @@ subclass' __init__().
 ...         self.fields['birthday'] = DateField()
 >>> p = Person()
 >>> print p
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 """
 
 if __name__ == "__main__":

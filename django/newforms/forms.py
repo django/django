@@ -64,17 +64,15 @@ class Form(object):
         return not bool(self.errors())
 
     def as_table(self):
-        "Returns this form rendered as an HTML <table>."
-        output = u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-        return '<table>\n%s\n</table>' % output
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_ul(self):
-        "Returns this form rendered as an HTML <ul>."
-        output = u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-        return '<ul>\n%s\n</ul>' % output
+        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
+        return u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_table_with_errors(self):
-        "Returns this form rendered as an HTML <table>, with errors."
+        "Returns this form rendered as HTML <tr>s, with errors."
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -84,10 +82,10 @@ class Form(object):
             if bf.errors:
                 output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors]))
             output.append('<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
-        return '<table>\n%s\n</table>' % '\n'.join(output)
+        return u'\n'.join(output)
 
     def as_ul_with_errors(self):
-        "Returns this form rendered as an HTML <ul>, with errors."
+        "Returns this form rendered as HTML <li>s, with errors."
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -99,7 +97,7 @@ class Form(object):
                 line += '<ul>%s</ul>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors])
             line += '%s: %s</li>' % (pretty_name(name), bf)
             output.append(line)
-        return '<ul>\n%s\n</ul>' % '\n'.join(output)
+        return u'\n'.join(output)
 
     def full_clean(self):
         """
