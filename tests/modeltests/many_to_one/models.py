@@ -146,7 +146,7 @@ False
 
 # The underlying query only makes one join when a related table is referenced twice.
 >>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
->>> null, sql, null = query._get_sql_clause()
+>>> null, sql, null, null = query._get_sql_clause()
 >>> sql.count('INNER JOIN')
 1
 
@@ -155,7 +155,7 @@ False
 [<Article: John's second story>, <Article: This is a test>]
 
 # Find all Articles for the Reporter whose ID is 1.
-# Use direct ID check, pk check, and object comparison 
+# Use direct ID check, pk check, and object comparison
 >>> Article.objects.filter(reporter__id__exact=1)
 [<Article: John's second story>, <Article: This is a test>]
 >>> Article.objects.filter(reporter__pk=1)

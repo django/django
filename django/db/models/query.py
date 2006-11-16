@@ -169,9 +169,9 @@ class _QuerySet(object):
         extra_select = self._select.items()
 
         cursor = connection.cursor()
-        
-        select, sql, params, full_query = self._get_sql_clause() 
-        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params) 
+
+        select, sql, params, full_query = self._get_sql_clause()
+        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
 
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
@@ -518,7 +518,7 @@ if hasattr(backend_query_module, "get_query_set_class"):
     QuerySet = db.get_query_module().get_query_set_class(_QuerySet)
 else:
     QuerySet = _QuerySet
-            
+
 class ValuesQuerySet(QuerySet):
     def iterator(self):
         # select_related and select aren't supported in values().
@@ -567,7 +567,7 @@ class DateQuerySet(QuerySet):
             sql = fmt % (date_trunc_sql, sql, date_trunc_sql, self._order)
             cursor = connection.cursor()
             cursor.execute(sql, params)
-            return [row[0] for row in cursor.fetchall()]  
+            return [row[0] for row in cursor.fetchall()]
         else:
             sql = fmt % (date_trunc_sql, sql, 1, self._order_by)
             cursor = connection.cursor()
@@ -660,10 +660,10 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     # TODO: move this into django.db.backends.oracle somehow
     if settings.DATABASE_ENGINE == 'oracle':
         if lookup_type == 'icontains':
-            return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))             
+            return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
         elif type(value) == datetime.datetime:
             return "%s%s %s" % (table_prefix, field_name,
-                 (backend.OPERATOR_MAPPING[lookup_type] % "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"))       
+                 (backend.OPERATOR_MAPPING[lookup_type] % "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"))
     try:
         return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
     except KeyError:
@@ -695,7 +695,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
-    from django.db.models.fields import AutoField 
+    from django.db.models.fields import AutoField
     qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
@@ -709,7 +709,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
             cache_tables_seen.append(db_table)
             where.append('%s.%s = %s.%s' % \
                 (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
-            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields]) 
+            select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
             fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
 
 def parse_lookup(kwarg_items, opts):
@@ -754,7 +754,7 @@ def parse_lookup(kwarg_items, opts):
 
         if len(path) < 1:
             raise TypeError, "Cannot parse keyword query %r" % kwarg
-        
+
         if value is None:
             # Interpret '__exact=None' as the sql '= NULL'; otherwise, reject
             # all uses of None as a query value.

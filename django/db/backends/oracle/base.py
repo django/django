@@ -69,17 +69,17 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var" style.
     This fixes it -- but note that if you want to use a literal "%s" in a query,
     you'll need to use "%%s".
-    """    
+    """
     def _rewrite_args(self, query, params=None):
-        if params is None: 
+        if params is None:
             params = []
         args = [(':arg%d' % i) for i in range(len(params))]
         query = query % tuple(args)
-        # cx_Oracle cannot execute a query with the closing ';' 
+        # cx_Oracle cannot execute a query with the closing ';'
         if query.endswith(';'):
             query = query[:-1]
         return query, params
-    
+
     def execute(self, query, params=None):
         query, params = self._rewrite_args(query, params)
         self.arraysize = 200
@@ -90,9 +90,9 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         self.arraysize = 200
         return Database.Cursor.executemany(self, query, params)
 
-    
+
 def quote_name(name):
-    # Oracle requires that quoted names be uppercase.    
+    # Oracle requires that quoted names be uppercase.
     name = name.upper()
     if not name.startswith('"') and not name.endswith('"'):
         name = '"%s"' % util.truncate_name(name.upper(), get_max_name_length())
@@ -143,15 +143,15 @@ def get_max_name_length():
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
-    'iexact': 'LIKE %s',
-    'contains': 'LIKE %s',
-    'icontains': 'LIKE %s',
+    'iexact': "LIKE %s ESCAPE '\\'",
+    'contains': "LIKE %s ESCAPE '\\'",
+    'icontains': "LIKE %s ESCAPE '\\'",
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',
     'lte': '<= %s',
-    'startswith': 'LIKE %s',
-    'endswith': 'LIKE %s',
-    'istartswith': 'LIKE %s',
-    'iendswith': 'LIKE %s',
+    'startswith': "LIKE %s ESCAPE '\\'",
+    'endswith': "LIKE %s ESCAPE '\\'",
+    'istartswith': "LIKE %s ESCAPE '\\'",
+    'iendswith': "LIKE %s ESCAPE '\\'",
 }

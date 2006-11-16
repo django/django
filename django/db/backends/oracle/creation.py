@@ -45,7 +45,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     cursor = connection.cursor()
     try:
         _create_test_db(cursor, TEST_DATABASE_NAME, verbosity)
-    except Exception, e:            
+    except Exception, e:
         sys.stderr.write("Got an error creating the test database: %s\n" % e)
         if not autoclobber:
             confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
@@ -63,7 +63,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
         else:
             print "Tests cancelled."
             sys.exit(1)
-               
+
     connection.close()
     settings.DATABASE_USER = TEST_DATABASE_NAME
     settings.DATABASE_PASSWORD = PASSWORD
@@ -71,7 +71,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
     cursor = connection.cursor()
-        
+
 def destroy_test_db(settings, connection, backend, old_database_name, verbosity=1):
     if verbosity >= 1:
         print "Destroying test database..."
@@ -105,7 +105,7 @@ def _create_test_db(cursor, dbname, verbosity):
         """GRANT CONNECT, RESOURCE TO %(user)s""",
     ]
     _execute_statements(cursor, statements, dbname, verbosity)
-    
+
 def _destroy_test_db(cursor, dbname, verbosity):
     if verbosity >= 2:
         print "_destroy_test_db(): dbname=%s" % dbname
