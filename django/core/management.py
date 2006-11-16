@@ -199,11 +199,12 @@ def _get_sql_model_create(model, known_models=set()):
 
     # To simulate auto-incrementing primary keys in Oracle -- creating primary tables
     if settings.DATABASE_ENGINE == 'oracle' and opts.has_auto_field:
-        sequence_name = truncate_name('%s_sq' % opts.db_table, backend.get_max_name_length())
+        name_length = backend.get_max_name_length() - 3
+        sequence_name = '%s_sq' % truncate_name(opts.db_table, name_length)
         sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
         final_output.append(sequence_statement)
         trigger_statement = '' + \
-            'CREATE OR REPLACE TRIGGER %s\n'    % truncate_name('%s_tr' % opts.db_table, backend.get_max_name_length()) + \
+            'CREATE OR REPLACE TRIGGER %s\n'    % ('%s_tr' % truncate_name(opts.db_table, name_length)) + \
             '  BEFORE INSERT ON %s\n'           % backend.quote_name(opts.db_table) + \
             '  FOR EACH ROW\n'  + \
             '  WHEN (new.id IS NULL)\n' + \
@@ -277,12 +278,13 @@ def _get_many_to_many_sql_for_model(model):
 
             # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
             if settings.DATABASE_ENGINE == 'oracle':
+                name_length = backend.get_max_name_length() - 3
                 m_table = f.m2m_db_table()
-                sequence_name = truncate_name('%s_sq' % m_table, backend.get_max_name_length())
+                sequence_name = '%s_sq' % truncate_name(m_table, name_length)
                 sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
                 final_output.append(sequence_statement)
                 trigger_statement = '' + \
-                    'CREATE OR REPLACE TRIGGER %s\n'    % truncate_name('%s_tr' % m_table, backend.get_max_name_length()) + \
+                    'CREATE OR REPLACE TRIGGER %s\n'    % ('%s_tr' % truncate_name(m_table, name_length)) + \
                     '  BEFORE INSERT ON %s\n'           % backend.quote_name(m_table) + \
                     '  FOR EACH ROW\n'  + \
                     '  WHEN (new.id IS NULL)\n' + \

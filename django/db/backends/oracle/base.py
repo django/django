@@ -99,7 +99,8 @@ dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
-    cursor.execute('SELECT %s_sq.currval FROM dual' % table_name)
+    sq_name = util.truncate_name(table_name, get_max_name_length()-3)
+    cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
     return cursor.fetchone()[0]
 
 def get_date_extract_sql(lookup_type, table_name):
