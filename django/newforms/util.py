@@ -2,6 +2,8 @@
 DEFAULT_ENCODING = 'utf-8' # TODO: First look at django.conf.settings, then fall back to this.
 
 def smart_unicode(s):
+    if not isinstance(s, basestring):
+        s = unicode(str(s))
     if not isinstance(s, unicode):
         s = unicode(s, DEFAULT_ENCODING)
     return s

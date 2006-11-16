@@ -1,4 +1,5 @@
-"""
+# -*- coding: utf-8 -*-
+r"""
 >>> from django.newforms import *
 >>> import datetime
 >>> import re
@@ -16,6 +17,11 @@ u'<input type="text" name="email" value="test@example.com" />'
 u'<input type="text" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
 >>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
 u'<input type="text" name="email" value="test@example.com" class="fun" />'
+
+# Note that doctest in Python 2.4 (and maybe 2.5?) doesn't support non-ascii
+# characters in output, so we're displaying the repr() here.
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="text" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" class="fun" />'
 
 You can also pass 'attrs' to the constructor:
 >>> w = TextInput(attrs={'class': 'fun'})
@@ -55,6 +61,9 @@ u'<input type="password" class="fun" value="foo@example.com" name="email" />'
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="password" class="special" name="email" />'
 
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+
 # HiddenInput Widget ############################################################
 
 >>> w = HiddenInput()
@@ -75,6 +84,14 @@ You can also pass 'attrs' to the constructor:
 u'<input type="hidden" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
 u'<input type="hidden" class="fun" value="foo@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = HiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', '', attrs={'class': 'special'})
+u'<input type="hidden" class="special" name="email" />'
+
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
 'attrs' passed to render() get precedence over those passed to the constructor:
 >>> w = HiddenInput(attrs={'class': 'pretty'})
@@ -102,10 +119,8 @@ u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
 u'<input type="file" class="fun" value="foo@example.com" name="email" />'
 
-'attrs' passed to render() get precedence over those passed to the constructor:
->>> w = HiddenInput(attrs={'class': 'pretty'})
->>> w.render('email', '', attrs={'class': 'special'})
-u'<input type="hidden" class="special" name="email" />'
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
 # Textarea Widget #############################################################
 
@@ -132,6 +147,9 @@ u'<textarea class="pretty" name="msg">example</textarea>'
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '', attrs={'class': 'special'})
 u'<textarea class="special" name="msg"></textarea>'
+
+>>> w.render('msg', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<textarea class="fun" name="msg">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
 
 # CheckboxInput Widget ########################################################
 
@@ -236,6 +254,9 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+>>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
+u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
+
 # SelectMultiple Widget #######################################################
 
 >>> w = SelectMultiple()
@@ -339,6 +360,9 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="4">4</option>
 <option value="5">5</option>
 </select>
+
+>>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
+u'<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
 # RadioSelect Widget ##########################################################
 

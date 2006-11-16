@@ -8,6 +8,7 @@ __all__ = (
     'Select', 'SelectMultiple', 'RadioSelect',
 )
 
+from util import smart_unicode
 from django.utils.html import escape
 from itertools import chain
 
@@ -18,7 +19,7 @@ except NameError:
 
 # Converts a dictionary to a single string with key="value", XML-style with
 # a leading space. Assumes keys do not need to be XML-escaped.
-flatatt = lambda attrs: ''.join([' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
+flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 class Widget(object):
     requires_data_list = False # Determines whether render()'s 'value' argument should be a list.
@@ -43,7 +44,7 @@ class Input(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        if value != '': final_attrs['value'] = value # Only add the 'value' attribute if a value is non-empty.
+        if value != '': final_attrs['value'] = smart_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
 
 class TextInput(Input):
@@ -61,6 +62,7 @@ class FileInput(Input):
 class Textarea(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
+        value = smart_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
 
@@ -80,10 +82,11 @@ class Select(Widget):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select%s>' % flatatt(final_attrs)]
-        str_value = str(value) # Normalize to string.
+        str_value = smart_unicode(value) # Normalize to string.
         for option_value, option_label in chain(self.choices, choices):
-            selected_html = (str(option_value) == str_value) and ' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(option_label)))
+            option_value = smart_unicode(option_value)
+            selected_html = (option_value == str_value) and u' selected="selected"' or ''
+            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
 
@@ -98,10 +101,11 @@ class SelectMultiple(Widget):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
-        str_values = set([str(v) for v in value]) # Normalize to strings.
+        str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
         for option_value, option_label in chain(self.choices, choices):
-            selected_html = (str(option_value) in str_values) and ' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(option_label)))
+            option_value = smart_unicode(option_value)
+            selected_html = (option_value in str_values) and ' selected="selected"' or ''
+            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
 
@@ -116,7 +120,7 @@ class RadioInput(object):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
 
     def is_checked(self):
-        return self.value == str(self.choice_value)
+        return self.value == smart_unicode(self.choice_value)
 
     def tag(self):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
@@ -142,7 +146,7 @@ class RadioSelect(Select):
     def render(self, name, value, attrs=None, choices=()):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
-        str_value = str(value) # Normalize to string.
+        str_value = smart_unicode(value) # Normalize to string.
         return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
 
 class CheckboxSelectMultiple(Widget):
