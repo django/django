@@ -74,6 +74,14 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     def _rewrite_args(self, query, params=None):
         if params is None:
             params = []
+        else:
+            # cx_Oracle can't handle unicode parameters, so cast to str for now
+            for i, param in enumerate(params):
+                if type(param) == unicode:
+                    try:
+                        params[i] = param.encode('utf-8')
+                    except UnicodeError:
+                        params[i] = str(param)
         args = [(':arg%d' % i) for i in range(len(params))]
         query = query % tuple(args)
         # cx_Oracle cannot execute a query with the closing ';'

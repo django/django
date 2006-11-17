@@ -81,8 +81,6 @@ def destroy_test_db(settings, connection, backend, old_database_name, verbosity=
     settings.DATABASE_NAME = old_database_name
     #settings.DATABASE_USER = 'old_user'
     #settings.DATABASE_PASSWORD = 'old_password'
-    settings.DATABASE_USER = 'mboersma'
-    settings.DATABASE_PASSWORD = 'password'
 
     cursor = connection.cursor()
     time.sleep(1) # To avoid "database is being accessed by other users" errors.

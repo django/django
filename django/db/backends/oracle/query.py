@@ -199,14 +199,15 @@ def get_query_set_class(DefaultQuerySet):
                 limit_and_offset_clause = "WHERE rn > %s" % (offset)
 
             if len(limit_and_offset_clause) > 0:
-                full_query = """SELECT * FROM
-                    (SELECT %s
-                    %s,
-                    ROW_NUMBER() %s AS rn
-                    %s
-                    )
-                    %s
-                    """ % (distinct, select_clause, order_by_clause, " ".join(sql), limit_and_offset_clause)
+                fmt = \
+"""SELECT * FROM
+  (SELECT %s%s,
+          ROW_NUMBER()%s AS rn
+   %s)
+%s"""
+                full_query = fmt % (distinct, select_clause,
+                                    order_by_clause, ' '.join(sql).strip(),
+                                    limit_and_offset_clause)
             else:
                 full_query = None
 
