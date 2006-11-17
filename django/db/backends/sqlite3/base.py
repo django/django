@@ -98,6 +98,9 @@ class SQLiteCursorWrapper(Database.Cursor):
     def convert_query(self, query, num_params):
         return query % tuple("?" * num_params)
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+returns_dates_as_strings = True
 supports_constraints = False
 uses_case_insensitive_names = False
 
@@ -131,6 +134,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     # sqlite doesn't support DATE_TRUNC, so we fake it as above.
     return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:
@@ -150,6 +156,9 @@ def get_pk_default_value():
     return "NULL"
 
 def get_max_name_length():
+    return None
+
+def get_autoinc_sql(table):
     return None
 
 def _sqlite_date_trunc(lookup_type, dt):

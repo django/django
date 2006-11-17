@@ -6,7 +6,6 @@ from django.core.exceptions import ImproperlyConfigured
 import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
-from django.conf import settings
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
@@ -56,7 +55,7 @@ def _is_valid_dir_name(s):
 
 def _get_installed_models(table_list):
     "Gets a set of all models that are installed, given a list of existing tables"
-    from django.db import models, backend
+    from django.db import backend, models
     all_models = []
     for app in models.get_apps():
         for model in models.get_models(app):
@@ -89,7 +88,8 @@ def get_version():
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import models, get_creation_module, backend
+    from django.db import get_creation_module, models
+
     data_types = get_creation_module().DATA_TYPES
 
     if not data_types:
@@ -145,7 +145,6 @@ def _get_sql_model_create(model, known_models=set()):
     Returns list_of_sql, pending_references_dict
     """
     from django.db import backend, get_creation_module, models
-    from django.db.backends.util import truncate_name
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
@@ -165,13 +164,10 @@ def _get_sql_model_create(model, known_models=set()):
             field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
                 style.SQL_COLTYPE(col_type % rel_field.__dict__)]
             field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-            if f.unique:
+            if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if settings.DATABASE_ENGINE == 'oracle' and f.unique and f.primary_key:
-                # Suppress UNIQUE/PRIMARY KEY for Oracle (ORA-02259)
-                field_output.remove(style.SQL_KEYWORD('UNIQUE'))
             if f.rel:
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
@@ -197,21 +193,12 @@ def _get_sql_model_create(model, known_models=set()):
     full_statement.append(');')
     final_output.append('\n'.join(full_statement))
 
-    # To simulate auto-incrementing primary keys in Oracle -- creating primary tables
-    if settings.DATABASE_ENGINE == 'oracle' and opts.has_auto_field:
-        name_length = backend.get_max_name_length() - 3
-        sequence_name = '%s_sq' % truncate_name(opts.db_table, name_length)
-        sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
-        final_output.append(sequence_statement)
-        trigger_statement = '' + \
-            'CREATE OR REPLACE TRIGGER %s\n'    % ('%s_tr' % truncate_name(opts.db_table, name_length)) + \
-            '  BEFORE INSERT ON %s\n'           % backend.quote_name(opts.db_table) + \
-            '  FOR EACH ROW\n'  + \
-            '  WHEN (new.id IS NULL)\n' + \
-            '    BEGIN\n' + \
-            '      SELECT %s.nextval INTO :new.id FROM dual;\n' % sequence_name + \
-            '    END;\n'
-        final_output.append(trigger_statement)
+    if opts.has_auto_field:
+        # Add any extra SQL needed to support auto-incrementing primary keys
+        autoinc_sql = backend.get_autoinc_sql(opts.db_table)
+        if autoinc_sql:
+            for stmt in autoinc_sql:
+                final_output.append(stmt)
 
     return final_output, pending_references
 
@@ -243,7 +230,6 @@ def _get_sql_for_pending_references(model, pending_references):
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
     from django.db.models import GenericRel
-    from django.db.backends.util import truncate_name
 
     data_types = get_creation_module().DATA_TYPES
 
@@ -276,22 +262,12 @@ def _get_many_to_many_sql_for_model(model):
             table_output.append(');')
             final_output.append('\n'.join(table_output))
 
-            # To simulate auto-incrementing primary keys in Oracle -- creating m2m tables
-            if settings.DATABASE_ENGINE == 'oracle':
-                name_length = backend.get_max_name_length() - 3
-                m_table = f.m2m_db_table()
-                sequence_name = '%s_sq' % truncate_name(m_table, name_length)
-                sequence_statement = 'CREATE SEQUENCE %s;' % sequence_name
-                final_output.append(sequence_statement)
-                trigger_statement = '' + \
-                    'CREATE OR REPLACE TRIGGER %s\n'    % ('%s_tr' % truncate_name(m_table, name_length)) + \
-                    '  BEFORE INSERT ON %s\n'           % backend.quote_name(m_table) + \
-                    '  FOR EACH ROW\n'  + \
-                    '  WHEN (new.id IS NULL)\n' + \
-                    '    BEGIN\n' + \
-                    '      SELECT %s.nextval INTO :new.id FROM dual;\n' % sequence_name + \
-                    '    END;\n'
-                final_output.append(trigger_statement)
+            # Add any extra SQL needed to support auto-incrementing PKs
+            autoinc_sql = backend.get_autoinc_sql(f.m2m_db_table())
+            if autoinc_sql:
+                for stmt in autoinc_sql:
+                    final_output.append(stmt)
+
     return final_output
 
 def get_sql_delete(app):
@@ -1450,8 +1426,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if not mod_list:
             parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
-            if settings.DATABASE_ENGINE != 'oracle':
-                print style.SQL_KEYWORD("BEGIN;")
+            print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
             if action == 'reset':
                 output = action_mapping[action](mod, options.interactive)
@@ -1460,8 +1435,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:
-            if settings.DATABASE_ENGINE != 'oracle':
-                print style.SQL_KEYWORD("COMMIT;")
+            print style.SQL_KEYWORD("COMMIT;")
 
 def setup_environ(settings_mod):
     """

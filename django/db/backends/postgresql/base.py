@@ -61,6 +61,9 @@ class DatabaseWrapper(local):
             self.connection.close()
             self.connection = None
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+returns_dates_as_strings = False
 supports_constraints = True
 uses_case_insensitive_names = False
 
@@ -95,6 +98,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:
@@ -114,6 +120,9 @@ def get_pk_default_value():
     return "DEFAULT"
 
 def get_max_name_length():
+    return None
+
+def get_autoinc_sql(table):
     return None
 
 # Register these custom typecasts, because Django expects dates/times to be

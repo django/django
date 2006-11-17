@@ -1,5 +1,4 @@
-from django import db
-from django.db import backend, connection, transaction
+from django.db import backend, connection, get_query_module, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -509,13 +508,12 @@ class _QuerySet(object):
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
-        return select, " ".join(sql), params
+        return select, " ".join(sql), params, None
 
-# Check to see if the DB backend would like to define its own QuerySet class
-# and otherwise use the default.
-backend_query_module = db.get_query_module()
-if hasattr(backend_query_module, "get_query_set_class"):
-    QuerySet = db.get_query_module().get_query_set_class(_QuerySet)
+# Use the backend's QuerySet class if it defines one, otherwise use _QuerySet.
+backend_query_module = get_query_module()
+if hasattr(backend_query_module, 'get_query_set_class'):
+    QuerySet = backend_query_module.get_query_set_class(_QuerySet)
 else:
     QuerySet = _QuerySet
 
@@ -561,21 +559,18 @@ class DateQuerySet(QuerySet):
         field_name = backend.quote_name(self._field.column)
         date_trunc_sql = backend.get_date_trunc_sql(self._kind,
                                                     '%s.%s' % (table_name, field_name))
-        fmt = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s'
-
-        if settings.DATABASE_ENGINE == 'oracle':
-            sql = fmt % (date_trunc_sql, sql, date_trunc_sql, self._order)
-            cursor = connection.cursor()
-            cursor.execute(sql, params)
-            return [row[0] for row in cursor.fetchall()]
+        if backend.allows_group_by_ordinal:
+            group_by = '1'
         else:
-            sql = fmt % (date_trunc_sql, sql, 1, self._order_by)
-            cursor = connection.cursor()
-            cursor.execute(sql, params)
-            # We have to manually run typecast_timestamp(str()) on the results, because
-            # MySQL doesn't automatically cast the result of date functions as datetime
-            # objects -- MySQL returns the values as strings, instead.
+            group_by = date_trunc_sql
+        fmt = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s'
+        stmt = fmt % (date_trunc_sql, sql, group_by, self._order)
+        cursor = connection.cursor()
+        cursor.execute(stmt, params)
+        if backend.returns_dates_as_strings:
             return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+        else:
+            return [row[0] for row in cursor.fetchall()]
 
     def _clone(self, klass=None, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, **kwargs)
@@ -657,15 +652,13 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
-    # TODO: move this into django.db.backends.oracle somehow
-    if settings.DATABASE_ENGINE == 'oracle':
-        if lookup_type == 'icontains':
-            return 'lower(%s%s) %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
-        elif type(value) == datetime.datetime:
-            return "%s%s %s" % (table_prefix, field_name,
-                 (backend.OPERATOR_MAPPING[lookup_type] % "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"))
+    if type(value) == datetime.datetime and backend.get_datetime_cast_sql():
+        cast_sql = backend.get_datetime_cast_sql()
+    else:
+        cast_sql = '%s'
     try:
-        return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
+        return '%s%s %s' % (table_prefix, field_name,
+                            backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':

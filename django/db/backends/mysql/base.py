@@ -130,6 +130,9 @@ class DatabaseWrapper(local):
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+returns_dates_as_strings = True     # MySQLdb requires a typecast for dates
 supports_constraints = True
 uses_case_insensitive_names = False
 
@@ -164,6 +167,9 @@ def get_date_trunc_sql(lookup_type, field_name):
         sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
     return sql
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
     if offset and offset != 0:
@@ -184,6 +190,9 @@ def get_pk_default_value():
 
 def get_max_name_length():
     return 64;
+
+def get_autoinc_sql(table):
+    return None
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

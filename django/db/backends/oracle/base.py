@@ -59,6 +59,9 @@ class DatabaseWrapper(local):
             self.connection.close()
             self.connection = None
 
+allows_group_by_ordinal = False
+allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
+returns_dates_as_strings = False
 supports_constraints = True
 uses_case_insensitive_names = True
 
@@ -118,6 +121,9 @@ def get_date_trunc_sql(lookup_type, field_name):
         sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
     return sql
 
+def get_datetime_cast_sql():
+    return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"
+
 def get_limit_offset_sql(limit, offset=None):
     # Limits and offset are too complicated to be handled here.
     # Instead, they are handled in django/db/backends/oracle/query.py.
@@ -138,11 +144,27 @@ def get_pk_default_value():
 def get_max_name_length():
     return 30
 
+def get_autoinc_sql(table):
+    # To simulate auto-incrementing primary keys in Oracle, we have to
+    # create a sequence and a trigger.
+    name_length = get_max_name_length() - 3
+    sq_name = '%s_sq' % util.truncate_name(table, name_length)
+    tr_name = '%s_tr' % util.truncate_name(table, name_length)
+    sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
+    trigger_sql = """CREATE OR REPLACE TRIGGER %s
+  BEFORE INSERT ON %s
+  FOR EACH ROW
+  WHEN (new.id IS NULL)
+    BEGIN
+      SELECT %s.nextval INTO :new.id FROM dual;
+    END;\n""" % (tr_name, quote_name(table), sq_name)
+    return sequence_sql, trigger_sql
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': "LIKE %s ESCAPE '\\'",
     'contains': "LIKE %s ESCAPE '\\'",
-    'icontains': "LIKE %s ESCAPE '\\'",
+    'icontains': "LIKE LOWER(%s) ESCAPE '\\'",
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

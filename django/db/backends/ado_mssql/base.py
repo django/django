@@ -87,6 +87,9 @@ class DatabaseWrapper(local):
             self.connection.close()
             self.connection = None
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+returns_dates_as_strings = False
 supports_constraints = True
 uses_case_insensitive_names = False
 
@@ -116,6 +119,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     if lookup_type=='day':
         return "Convert(datetime, Convert(varchar(12), %s))" % field_name
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     # TODO: This is a guess. Make sure this is correct.
     sql = "LIMIT %s" % limit
@@ -136,6 +142,9 @@ def get_pk_default_value():
     return "DEFAULT"
 
 def get_max_name_length():
+    return None
+
+def get_autoinc_sql(table):
     return None
 
 OPERATOR_MAPPING = {
