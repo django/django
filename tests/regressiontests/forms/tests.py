@@ -1,4 +1,5 @@
-"""
+# -*- coding: utf-8 -*-
+r"""
 >>> from django.newforms import *
 >>> import datetime
 >>> import re
@@ -16,6 +17,11 @@ u'<input type="text" name="email" value="test@example.com" />'
 u'<input type="text" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
 >>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
 u'<input type="text" name="email" value="test@example.com" class="fun" />'
+
+# Note that doctest in Python 2.4 (and maybe 2.5?) doesn't support non-ascii
+# characters in output, so we're displaying the repr() here.
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="text" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" class="fun" />'
 
 You can also pass 'attrs' to the constructor:
 >>> w = TextInput(attrs={'class': 'fun'})
@@ -55,6 +61,9 @@ u'<input type="password" class="fun" value="foo@example.com" name="email" />'
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="password" class="special" name="email" />'
 
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+
 # HiddenInput Widget ############################################################
 
 >>> w = HiddenInput()
@@ -75,6 +84,14 @@ You can also pass 'attrs' to the constructor:
 u'<input type="hidden" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
 u'<input type="hidden" class="fun" value="foo@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = HiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', '', attrs={'class': 'special'})
+u'<input type="hidden" class="special" name="email" />'
+
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
 'attrs' passed to render() get precedence over those passed to the constructor:
 >>> w = HiddenInput(attrs={'class': 'pretty'})
@@ -102,10 +119,8 @@ u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
 u'<input type="file" class="fun" value="foo@example.com" name="email" />'
 
-'attrs' passed to render() get precedence over those passed to the constructor:
->>> w = HiddenInput(attrs={'class': 'pretty'})
->>> w.render('email', '', attrs={'class': 'special'})
-u'<input type="hidden" class="special" name="email" />'
+>>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
 # Textarea Widget #############################################################
 
@@ -132,6 +147,9 @@ u'<textarea class="pretty" name="msg">example</textarea>'
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '', attrs={'class': 'special'})
 u'<textarea class="special" name="msg"></textarea>'
+
+>>> w.render('msg', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
+u'<textarea class="fun" name="msg">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
 
 # CheckboxInput Widget ########################################################
 
@@ -236,6 +254,9 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+>>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
+u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
+
 # SelectMultiple Widget #######################################################
 
 >>> w = SelectMultiple()
@@ -339,6 +360,120 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="4">4</option>
 <option value="5">5</option>
 </select>
+
+>>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
+u'<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
+
+# RadioSelect Widget ##########################################################
+
+>>> w = RadioSelect()
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+If the value is None, none of the options are checked:
+>>> print w.render('beatle', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+If the value corresponds to a label (but not to an option value), none of the options are checked:
+>>> print w.render('beatle', 'John', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="radio" name="beatle" value="J" /> John</label></li>
+<li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
+<li><label><input type="radio" name="beatle" value="G" /> George</label></li>
+<li><label><input type="radio" name="beatle" value="R" /> Ringo</label></li>
+</ul>
+
+The value is compared to its str():
+>>> print w.render('num', 2, choices=[('1', '1'), ('2', '2'), ('3', '3')])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+>>> print w.render('num', '2', choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+>>> print w.render('num', 2, choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+
+The 'choices' argument can be any iterable:
+>>> def get_choices():
+...     for i in range(5):
+...         yield (i, i)
+>>> print w.render('num', 2, choices=get_choices())
+<ul>
+<li><label><input type="radio" name="num" value="0" /> 0</label></li>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+<li><label><input type="radio" name="num" value="4" /> 4</label></li>
+</ul>
+
+You can also pass 'choices' to the constructor:
+>>> w = RadioSelect(choices=[(1, 1), (2, 2), (3, 3)])
+>>> print w.render('num', 2)
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+</ul>
+
+If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
+>>> print w.render('num', 2, choices=[(4, 4), (5, 5)])
+<ul>
+<li><label><input type="radio" name="num" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="radio" name="num" value="2" /> 2</label></li>
+<li><label><input type="radio" name="num" value="3" /> 3</label></li>
+<li><label><input type="radio" name="num" value="4" /> 4</label></li>
+<li><label><input type="radio" name="num" value="5" /> 5</label></li>
+</ul>
+
+The render() method returns a RadioFieldRenderer object, whose str() is a <ul>.
+You can manipulate that object directly to customize the way the RadioSelect
+is rendered.
+>>> w = RadioSelect()
+>>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> for inp in r:
+...     print inp
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
+<label><input type="radio" name="beatle" value="P" /> Paul</label>
+<label><input type="radio" name="beatle" value="G" /> George</label>
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>
+>>> for inp in r:
+...     print '%s<br />' % inp
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label><br />
+<label><input type="radio" name="beatle" value="P" /> Paul</label><br />
+<label><input type="radio" name="beatle" value="G" /> George</label><br />
+<label><input type="radio" name="beatle" value="R" /> Ringo</label><br />
+>>> for inp in r:
+...     print '<p>%s %s</p>' % (inp.tag(), inp.choice_label)
+<p><input checked="checked" type="radio" name="beatle" value="J" /> John</p>
+<p><input type="radio" name="beatle" value="P" /> Paul</p>
+<p><input type="radio" name="beatle" value="G" /> George</p>
+<p><input type="radio" name="beatle" value="R" /> Ringo</p>
+>>> for inp in r:
+...     print '%s %s %s %s %s' % (inp.name, inp.value, inp.choice_value, inp.choice_label, inp.is_checked())
+beatle J J John True
+beatle J P Paul False
+beatle J G George False
+beatle J R Ringo False
 
 # CharField ###################################################################
 
@@ -770,38 +905,28 @@ ValidationError: [u'This field is required.']
 ...     birthday = DateField()
 >>> p = Person()
 >>> print p
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_table()
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_ul()
-<ul>
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 >>> print p.as_table_with_errors()
-<table>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
-</table>
 >>> print p.as_ul_with_errors()
-<ul>
 <li><ul><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
 <li><ul><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
 <li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
-</ul>
 
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
 >>> p.errors()
@@ -826,11 +951,9 @@ u''
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
 >>> print p
-<table>
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
-</table>
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors()
@@ -861,6 +984,51 @@ u'* This field is required.'
 <input type="text" name="last_name" />
 >>> print p['birthday']
 <input type="text" name="birthday" />
+
+"auto_id" tells the Form to add an "id" attribute to each form element.
+If it's a string that contains '%s', Django will use that as a format string
+into which the field's name will be inserted.
+>>> p = Person(auto_id='id_%s')
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" id="id_first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="id_last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="id_birthday" /></li>
+
+If auto_id is any True value whose str() does not contain '%s', the "id"
+attribute will be the name of the field.
+>>> p = Person(auto_id=True)
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" id="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
+
+If auto_id is any False value, an "id" attribute won't be output unless it
+was manually entered.
+>>> p = Person(auto_id=False)
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+
+In this example, auto_id is False, but the "id" attribute for the "first_name"
+field is given.
+>>> class PersonNew(Form):
+...     first_name = CharField(widget=TextInput(attrs={'id': 'first_name_id'}))
+...     last_name = CharField()
+...     birthday = DateField()
+>>> p = PersonNew(auto_id=False)
+>>> print p.as_ul()
+<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+
+If the "id" attribute is specified in the Form and auto_id is True, the "id"
+attribute in the Form gets precedence.
+>>> p = PersonNew(auto_id=True)
+>>> print p.as_ul()
+<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
 
 >>> class SignupForm(Form):
 ...     email = EmailField()
@@ -992,44 +1160,48 @@ Form.clean() still needs to return a dictionary of all clean data:
 ...        return self.clean_data
 >>> f = UserRegistration()
 >>> print f.as_table()
-<table>
 <tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
-</table>
 >>> f.errors()
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
 >>> f.errors()
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
-<table>
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
-</table>
 >>> print f.as_table_with_errors()
-<table>
 <tr><td colspan="2"><ul><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
-</table>
 >>> print f.as_ul_with_errors()
-<ul>
 <li><ul><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" /></li>
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
 <li>Password2: <input type="password" name="password2" value="bar" /></li>
-</ul>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
 >>> f.errors()
 {}
 >>> f.clean()
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
-
-
+It's possible to construct a Form dynamically by adding to the self.fields
+dictionary in __init__(). Don't forget to call Form.__init__() within the
+subclass' __init__().
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     def __init__(self):
+...         super(Person, self).__init__()
+...         self.fields['birthday'] = DateField()
+>>> p = Person()
+>>> print p
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
 """
 
 if __name__ == "__main__":

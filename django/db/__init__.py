@@ -18,7 +18,7 @@ except ImportError, e:
     available_backends = [f for f in os.listdir(backend_dir) if not f.startswith('_') and not f.startswith('.') and not f.endswith('.py') and not f.endswith('.pyc')]
     available_backends.sort()
     if settings.DATABASE_ENGINE not in available_backends:
-        raise ImproperlyConfigured, "%r isn't an available database backend. vailable options are: %s" % \
+        raise ImproperlyConfigured, "%r isn't an available database backend. Available options are: %s" % \
             (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
     else:
         raise # If there's some other error, this must be an error in Django itself.
