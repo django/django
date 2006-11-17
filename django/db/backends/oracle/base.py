@@ -61,7 +61,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = False
 allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
-returns_dates_as_strings = False
+needs_datetime_string_cast = False
 supports_constraints = True
 uses_case_insensitive_names = True
 

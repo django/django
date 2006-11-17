@@ -567,7 +567,7 @@ class DateQuerySet(QuerySet):
         stmt = fmt % (date_trunc_sql, sql, group_by, self._order)
         cursor = connection.cursor()
         cursor.execute(stmt, params)
-        if backend.returns_dates_as_strings:
+        if backend.needs_datetime_string_cast:
             return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
         else:
             return [row[0] for row in cursor.fetchall()]

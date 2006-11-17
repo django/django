@@ -100,7 +100,7 @@ class SQLiteCursorWrapper(Database.Cursor):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
-returns_dates_as_strings = True
+needs_datetime_string_cast = True
 supports_constraints = False
 uses_case_insensitive_names = False
 

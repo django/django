@@ -132,7 +132,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
-returns_dates_as_strings = True     # MySQLdb requires a typecast for dates
+needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
 supports_constraints = True
 uses_case_insensitive_names = False
 

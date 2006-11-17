@@ -63,7 +63,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
-returns_dates_as_strings = False
+needs_datetime_string_cast = True
 supports_constraints = True
 uses_case_insensitive_names = False
 
