@@ -271,10 +271,10 @@ class ConnectionInfoDescriptor(object):
 
     def __set__(self, instance, value):
         try:
-            self.local.cnx[instance] = instance_connection
+            self.local.cnx[instance] = value
         except AttributeError:
             # First access in thread
-            self.local.cnx = {instance: instance_connection}
+            self.local.cnx = {instance: value}
 
     def __delete__(self, instance):
         try:
