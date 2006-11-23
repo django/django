@@ -2,6 +2,7 @@
 Form classes
 """
 
+from django.utils.datastructures import SortedDict
 from fields import Field
 from widgets import TextInput, Textarea
 from util import ErrorDict, ErrorList, ValidationError
@@ -13,10 +14,21 @@ def pretty_name(name):
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
 
+class SortedDictFromList(SortedDict):
+    "A dictionary that keeps its keys in the order in which they're inserted."
+    # This is different than django.utils.datastructures.SortedDict, because
+    # this takes a list/tuple as the argument to __init__().
+    def __init__(self, data=None):
+        if data is None: data = []
+        self.keyOrder = [d[0] for d in data]
+        dict.__init__(self, dict(data))
+
 class DeclarativeFieldsMetaclass(type):
     "Metaclass that converts Field attributes to a dictionary called 'fields'."
     def __new__(cls, name, bases, attrs):
-        attrs['fields'] = dict([(name, attrs.pop(name)) for name, obj in attrs.items() if isinstance(obj, Field)])
+        fields = [(name, attrs.pop(name)) for name, obj in attrs.items() if isinstance(obj, Field)]
+        fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+        attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
 class Form(object):

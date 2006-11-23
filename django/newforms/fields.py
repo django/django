@@ -28,12 +28,19 @@ except NameError:
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
 
+    # Tracks each time a Field instance is created. Used to retain order.
+    creation_counter = 0
+
     def __init__(self, required=True, widget=None):
         self.required = required
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
         self.widget = widget
+
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = Field.creation_counter
+        Field.creation_counter += 1
 
     def clean(self, value):
         """
