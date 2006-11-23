@@ -158,7 +158,7 @@ class WSGIRequest(http.HttpRequest):
         except AttributeError:
             buf = StringIO()
             # CONTENT_LENGTH might be absent if POST doesn't have content at all (lighttpd)
-            content_length = int(self.environ.get('CONTENT_LENGTH', ))
+            content_length = int(self.environ.get('CONTENT_LENGTH', 0))
             safe_copyfileobj(self.environ['wsgi.input'], buf, size=content_length)
             self._raw_post_data = buf.getvalue()
             buf.close()
