@@ -1202,6 +1202,39 @@ subclass' __init__().
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+
+A Form's fields are displayed in the same order in which they were defined.
+>>> class TestForm(Form):
+...     field1 = CharField()
+...     field2 = CharField()
+...     field3 = CharField()
+...     field4 = CharField()
+...     field5 = CharField()
+...     field6 = CharField()
+...     field7 = CharField()
+...     field8 = CharField()
+...     field9 = CharField()
+...     field10 = CharField()
+...     field11 = CharField()
+...     field12 = CharField()
+...     field13 = CharField()
+...     field14 = CharField()
+>>> p = TestForm()
+>>> print p
+<tr><td>Field1:</td><td><input type="text" name="field1" /></td></tr>
+<tr><td>Field2:</td><td><input type="text" name="field2" /></td></tr>
+<tr><td>Field3:</td><td><input type="text" name="field3" /></td></tr>
+<tr><td>Field4:</td><td><input type="text" name="field4" /></td></tr>
+<tr><td>Field5:</td><td><input type="text" name="field5" /></td></tr>
+<tr><td>Field6:</td><td><input type="text" name="field6" /></td></tr>
+<tr><td>Field7:</td><td><input type="text" name="field7" /></td></tr>
+<tr><td>Field8:</td><td><input type="text" name="field8" /></td></tr>
+<tr><td>Field9:</td><td><input type="text" name="field9" /></td></tr>
+<tr><td>Field10:</td><td><input type="text" name="field10" /></td></tr>
+<tr><td>Field11:</td><td><input type="text" name="field11" /></td></tr>
+<tr><td>Field12:</td><td><input type="text" name="field12" /></td></tr>
+<tr><td>Field13:</td><td><input type="text" name="field13" /></td></tr>
+<tr><td>Field14:</td><td><input type="text" name="field14" /></td></tr>
 """
 
 if __name__ == "__main__":
