@@ -77,7 +77,7 @@ class Settings(object):
         self.SETTINGS_MODULE = settings_module
 
         try:
-            mod = __import__(self.SETTINGS_MODULE, '', '', [''])
+            mod = __import__(self.SETTINGS_MODULE, {}, {}, [''])
         except ImportError, e:
             raise EnvironmentError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
 
@@ -97,7 +97,7 @@ class Settings(object):
         new_installed_apps = []
         for app in self.INSTALLED_APPS:
             if app.endswith('.*'):
-                appdir = os.path.dirname(__import__(app[:-2], '', '', ['']).__file__)
+                appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
                 for d in os.listdir(appdir):
                     if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))

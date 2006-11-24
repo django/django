@@ -32,6 +32,7 @@ class dummy: pass
 style = dummy()
 style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
 style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
+style.NOTICE = termcolors.make_style(fg='red')
 style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
 style.SQL_COLTYPE = termcolors.make_style(fg='green')
 style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
@@ -348,6 +349,8 @@ def get_sql_initial_data_for_model(model):
         if os.path.exists(sql_file):
             fp = open(sql_file, 'U')
             for statement in statements.split(fp.read()):
+                # Remove any comments from the file
+                statement = re.sub(r"--.*[\n\Z]", "", statement)
                 if statement.strip():
                     output.append(statement + ";")
             fp.close()
@@ -445,7 +448,7 @@ def syncdb(verbosity=1, interactive=True):
     # dispatcher events.
     for app_name in settings.INSTALLED_APPS:
         try:
-            __import__(app_name + '.management', '', '', [''])
+            __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
 
@@ -696,7 +699,10 @@ def _start_helper(app_or_project, name, directory, other_name=''):
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
             fp_old.close()
             fp_new.close()
-            shutil.copymode(path_old, path_new)
+            try:
+                shutil.copymode(path_old, path_new)
+            except OSError:
+                sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
@@ -1226,7 +1232,7 @@ def test(app_labels, verbosity=1):
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, [],[],test_path[-1])
+    test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
     test_runner(app_list, verbosity)
@@ -1415,7 +1421,7 @@ def setup_environ(settings_mod):
     project_directory = os.path.dirname(settings_mod.__file__)
     project_name = os.path.basename(project_directory)
     sys.path.append(os.path.join(project_directory, '..'))
-    project_module = __import__(project_name, '', '', [''])
+    project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.

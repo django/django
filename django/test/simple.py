@@ -28,7 +28,7 @@ def build_suite(app_module):
     # models module
     try:
         app_path = app_module.__name__.split('.')[:-1]
-        test_module = __import__('.'.join(app_path + [TEST_MODULE]), [], [], TEST_MODULE)
+        test_module = __import__('.'.join(app_path + [TEST_MODULE]), {}, {}, TEST_MODULE)
         
         suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(test_module))
         try:            

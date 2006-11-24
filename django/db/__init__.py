@@ -8,7 +8,7 @@ if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
 
 try:
-    backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, '', '', [''])
+    backend = __import__('django.db.backends.%s.base' % settings.DATABASE_ENGINE, {}, {}, [''])
 except ImportError, e:
     # The database backend wasn't found. Display a helpful error message
     # listing all possible database backends.
@@ -18,16 +18,16 @@ except ImportError, e:
     available_backends = [f for f in os.listdir(backend_dir) if not f.startswith('_') and not f.startswith('.') and not f.endswith('.py') and not f.endswith('.pyc')]
     available_backends.sort()
     if settings.DATABASE_ENGINE not in available_backends:
-        raise ImproperlyConfigured, "%r isn't an available database backend. vailable options are: %s" % \
+        raise ImproperlyConfigured, "%r isn't an available database backend. Available options are: %s" % \
             (settings.DATABASE_ENGINE, ", ".join(map(repr, available_backends)))
     else:
         raise # If there's some other error, this must be an error in Django itself.
 
-get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, '', '', [''])
-get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, '', '', [''])
-runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, '', '', ['']).runshell()
+get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, {}, {}, [''])
+get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
+runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
 
-connection = backend.DatabaseWrapper()
+connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
 DatabaseError = backend.DatabaseError
 
 # Register an event that closes the database connection

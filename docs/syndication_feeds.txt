@@ -95,7 +95,7 @@ latest five news items::
     from django.contrib.syndication.feeds import Feed
     from chicagocrime.models import NewsItem
 
-    class SiteNewsFeed(Feed):
+    class LatestEntries(Feed):
         title = "Chicagocrime.org site news"
         link = "/sitenews/"
         description = "Updates on changes and additions to chicagocrime.org."
@@ -120,14 +120,14 @@ One thing's left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 put into those elements.
 
     * To specify the contents of ``<title>`` and ``<description>``, create
-      `Django templates`_ called ``feeds/sitenews_title.html`` and
-      ``feeds/sitenews_description.html``, where ``sitenews`` is the ``slug``
+      `Django templates`_ called ``feeds/latest_title.html`` and
+      ``feeds/latest_description.html``, where ``latest`` is the ``slug``
       specified in the URLconf for the given feed. Note the ``.html`` extension
       is required. The RSS system renders that template for each item, passing
       it two template context variables:
 
           * ``{{ obj }}`` -- The current object (one of whichever objects you
-            returned in ``items()``).
+            returned in ``items()``). 
           * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
             representing the current site. This is useful for
             ``{{ site.domain }}`` or ``{{ site.name }}``.
@@ -144,6 +144,16 @@ put into those elements.
       passing it a single parameter, ``item``, which is the object itself.
       Both ``get_absolute_url()`` and ``item_link()`` should return the item's
       URL as a normal Python string.
+
+    * For the LatestEntries example above, we could have very simple feed templates:
+
+          * latest_title.html::
+
+             {{ obj.title }}
+
+          * latest_description.html::
+
+             {{ obj.description }}
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
 .. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/

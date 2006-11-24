@@ -119,12 +119,20 @@ Date.prototype.getTwoDigitMinute = function() {
     return (this.getMinutes() < 10) ? '0' + this.getMinutes() : this.getMinutes();
 }
 
+Date.prototype.getTwoDigitSecond = function() {
+    return (this.getSeconds() < 10) ? '0' + this.getSeconds() : this.getSeconds();
+}
+
 Date.prototype.getISODate = function() {
     return this.getCorrectYear() + '-' + this.getTwoDigitMonth() + '-' + this.getTwoDigitDate();
 }
 
 Date.prototype.getHourMinute = function() {
     return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute();
+}
+
+Date.prototype.getHourMinuteSecond = function() {
+    return this.getTwoDigitHour() + ':' + this.getTwoDigitMinute() + ':' + this.getTwoDigitSecond();
 }
 
 // ----------------------------------------------------------------------------

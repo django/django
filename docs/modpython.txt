@@ -43,6 +43,11 @@ This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``
 so mod_python knows which settings to use.
 
+Note that we're using the ``<Location>`` directive, not the ``<Directory>``
+directive. The latter is used for pointing at places on your filesystem,
+whereas ``<Location>`` points at places in the URL structure of a Web site.
+``<Directory>`` would be meaningless here.
+
 Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
 on it, you'll need to tell mod_python::
 

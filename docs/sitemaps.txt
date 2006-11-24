@@ -5,9 +5,9 @@ The sitemap framework
 **New in Django development version**.
 
 Django comes with a high-level sitemap-generating framework that makes
-creating `Google Sitemap`_ XML files easy.
+creating sitemap_ XML files easy.
 
-.. _Google Sitemap: http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
+.. _sitemap: http://www.sitemaps.org/
 
 Overview
 ========
@@ -55,11 +55,12 @@ URLconf_:
 
 This tells Django to build a sitemap when a client accesses ``/sitemap.xml``.
 
-The name of the sitemap file is not important, but the location is. Google will
-only index links in your sitemap for the current URL level and below. For
-instance, if ``sitemap.xml`` lives in your root directory, it may reference any
-URL in your site. However, if your sitemap lives at ``/content/sitemap.xml``,
-it may only reference URLs that begin with ``/content/``.
+The name of the sitemap file is not important, but the location is. Search
+engines will only index links in your sitemap for the current URL level and
+below. For instance, if ``sitemap.xml`` lives in your root directory, it may
+reference any URL in your site. However, if your sitemap lives at
+``/content/sitemap.xml``, it may only reference URLs that begin with
+``/content/``.
 
 The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 ``sitemaps`` should be a dictionary that maps a short section label (e.g.,
@@ -199,9 +200,9 @@ If it's an attribute, its value should be either a string or float representing
 the priority of *every* object returned by ``items()``.
 
 Example values for ``priority``: ``0.4``, ``1.0``. The default priority of a
-page is ``0.5``. See Google's documentation for more documentation.
+page is ``0.5``. See the `sitemaps.org documentation`_ for more.
 
-.. _Google's documentation: http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
+.. _sitemaps.org documentation: http://www.sitemaps.org/protocol.html#prioritydef
 
 Shortcuts
 =========
