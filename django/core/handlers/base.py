@@ -55,14 +55,14 @@ class BaseHandler:
         # Reset query list per request.
         db.db.queries = []
 
-        # Apply request middleware
-        for middleware_method in self._request_middleware:
-            response = middleware_method(request)
-            if response:
-                return response
-
         resolver = urlresolvers.RegexURLResolver(r'^/', ROOT_URLCONF)
         try:
+            # Apply request middleware
+            for middleware_method in self._request_middleware:
+                response = middleware_method(request)
+                if response:
+                    return response
+            
             callback, callback_args, callback_kwargs = resolver.resolve(path)
 
             # Apply view middleware
