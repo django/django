@@ -49,54 +49,48 @@ class Permission(models.Model):
 
 class RowLevelPermissionManager(models.Manager):
     def create_row_level_permission(self, model_instance, owner, permission, negative=False):
-        model_ct=ContentType.objects.get_for_model(model_instance)        
+        model_ct = ContentType.objects.get_for_model(model_instance)
         if isinstance(permission, str):
-            permission = Permission.objects.get(codename__exact=permission, content_type=model_ct.id)
+            permission = Permission.objects.get(codename=permission, content_type=model_ct.id)
         if model_ct != permission.content_type:
-            raise TypeError, "Invalid value: Permission content type(%s) and object content type(%s) do not match" % (permission.content_type, type_ct)
+            raise TypeError, "Permission content type (%s) and object content type (%s) do not match" % (permission.content_type, type_ct)
         model_id = model_instance._get_pk_val()
-        rowLvlPerm = self.model(model_id=model_id, model_ct=model_ct,
-                                                 owner_id=owner.id, owner_ct=ContentType.objects.get_for_model(owner),
-                                                 permission=permission, negative=negative)
-        rowLvlPerm.save()
-        return rowLvlPerm
-    
+        row_lvl_perm = self.model(model_id=model_id, model_ct=model_ct, owner_id=owner.id,
+            owner_ct=ContentType.objects.get_for_model(owner),
+            permission=permission, negative=negative)
+        row_lvl_perm.save()
+        return row_lvl_perm
+
     def create_default_row_permissions(self, model_instance, owner, change=True, delete=True, negChange=False, negDel=False):
         ret_dict = {}
         model_ct = ContentType.objects.get_for_model(model_instance)
         if change:
             change_str = "change_%s" % (model_ct.model)
-            ret_dict[change_str]=self.create_row_level_permission(model_instance, owner, change_str, negative=negChange)
+            ret_dict[change_str] = self.create_row_level_permission(model_instance, owner, change_str, negative=negChange)
         if delete:
             delete_str = "delete_%s" % (model_ct.model)
-            ret_dict[delete_str]=self.create_row_level_permission(model_instance, owner, delete_str, negative=negDel)
-        return ret_dict    
-    
-    def get_model_list(self,user, model, perm):
-        model_ct=ContentType.objects.get_for_model(model)
+            ret_dict[delete_str] = self.create_row_level_permission(model_instance, owner, delete_str, negative=negDel)
+        return ret_dict
+
+    def get_model_list(self, user, model, perm):
+        model_ct = ContentType.objects.get_for_model(model)
         if isinstance(perm, str):
             perm = Permission.objects.get(codename__exact=perm, content_type=model_ct.id)
-        user_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(User), 
-                                          owner_id=user.id, permission=perm.id, 
-                                          model_ct=model_ct
-                                          ).values('model_id')   
-        id_list = [o['model_id'] for o in user_model_ids]        
-        
-        user_group_list = [g['id'] for g in user.groups.select_related().values('id')]        
+        user_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(User),
+            owner_id=user.id, permission=perm.id, model_ct=model_ct).values('model_id')
+        id_list = [o['model_id'] for o in user_model_ids]
+        user_group_list = [g['id'] for g in user.groups.select_related().values('id')]
         if user_group_list:
             group_model_ids = RowLevelPermission.objects.filter(owner_ct=ContentType.objects.get_for_model(Group).id,
-                                                  owner_id__in=user_group_list,
-                                                  model_ct = model_ct
-                                                  ).values('model_id')
-            id_list=id_list + [o['model_id'] for o in group_model_ids]
+                owner_id__in=user_group_list, model_ct = model_ct).values('model_id')
+            id_list = id_list + [o['model_id'] for o in group_model_ids]
         return id_list
 
 class RowLevelPermission(models.Model):
-    """ 
+    """
     Similiar to permissions but works on instances of objects instead of types.
-    This uses generic relations to minimize the number of tables, and connects to the 
+    This uses generic relations to minimize the number of tables, and connects to the
     permissions table using a many to one relation.
-    
     """
     model_id = models.PositiveIntegerField("'Model' ID")
     model_ct = models.ForeignKey(ContentType, verbose_name="'Model' content type", related_name="model_ct")
@@ -104,26 +98,23 @@ class RowLevelPermission(models.Model):
     owner_ct = models.ForeignKey(ContentType, verbose_name="'Owner' content type", related_name="owner_ct")
     negative = models.BooleanField()
     permission = models.ForeignKey(Permission)
-    
     model = models.GenericForeignKey(fk_field='model_id', ct_field='model_ct')
     owner = models.GenericForeignKey(fk_field='owner_id', ct_field='owner_ct')
-    
     objects = RowLevelPermissionManager()
-    
+
     class Meta:
         verbose_name = _('row level permission')
         verbose_name_plural = _('row level permissions')
-        unique_together = (('model_ct', 'model_id', 'owner_id', 'owner_ct', 'permission'),)        
+        unique_together = (('model_ct', 'model_id', 'owner_id', 'owner_ct', 'permission'),)
 
     class Admin:
         hidden = True
 
     def __str__(self):
         return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.model_ct, self.model)
-    
+
     def __repr__(self):
         return "%s | %s:%s | %s:%s" % (self.permission, self.owner_ct, self.owner, self.model_ct, self.model)
-
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -179,7 +170,7 @@ class User(models.Model):
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
-    
+
     row_level_permissions_owned = models.GenericRelation(RowLevelPermission, object_id_field="owner_id", content_type_field="owner_ct", related_name="owner")
 
     objects = UserManager()
@@ -283,32 +274,23 @@ class User(models.Model):
         return self._perm_cache
 
     def check_row_level_permission(self, permission, object):
-        object_ct=ContentType.objects.get_for_model(object)
+        object_ct = ContentType.objects.get_for_model(object)
         if isinstance(permission, str):
             try:
-                permission = Permission.objects.get(codename__exact=permission, content_type=object_ct.id)
+                permission = Permission.objects.get(codename=permission, content_type=object_ct.id)
             except Permission.DoesNotExist:
                 return False
         try:
             model_id = object._get_pk_val()
-            row_level_perm=self.row_level_permissions_owned.get(model_id=model_id, 
-                                                                    model_ct=object_ct.id, 
-                                                                    permission=permission.id)
+            row_level_perm = self.row_level_permissions_owned.get(model_id=model_id,
+                model_ct=object_ct.id, permission=permission.id)
         except RowLevelPermission.DoesNotExist:
             return self.check_group_row_level_permissions(permission, object)
         return not row_level_perm.negative
 
     def check_group_row_level_permissions(self, permission, object):
-        #SELECT rlp."negative" 
-        #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp 
-        #WHERE rlp."owner_id"=ug."group_id" 
-        #AND ug."user_id"=%s        
-        #AND rlp."owner_ct_id"=%s
-        #AND rlp."model_id"=%s
-        #AND rlp."model_ct_id"=%s
-        #AND rlp."permission_id"=%s;
         model_id = object._get_pk_val()
-        cursor = connection.cursor()        
+        cursor = connection.cursor()
         sql = """
             SELECT rlp.%s
             FROM %s ug, %s rlp
@@ -325,17 +307,15 @@ class User(models.Model):
             backend.quote_name('owner_ct_id'), backend.quote_name('model_id'),
             backend.quote_name('model_ct_id'), backend.quote_name('permission_id'),
             backend.quote_name('negative'))
-        cursor.execute(sql, [self.id, 
-                             ContentType.objects.get_for_model(Group).id, 
+        cursor.execute(sql, [self.id,
+                             ContentType.objects.get_for_model(Group).id,
                              model_id,
                              ContentType.objects.get_for_model(object).id,
                              permission.id,])
         row = cursor.fetchone()
-
         if row is None:
             return None
         return not row[0]
-        
 
     def has_perm(self, perm, object=None):
         "Returns True if the user has the specified permission."
@@ -344,7 +324,7 @@ class User(models.Model):
         if self.is_superuser:
             return True
         if object and object._meta.row_level_permissions:
-            #Since we use the content type for row level perms, we don't need the application name
+            # Since we use the content type for row level perms, we don't need the application name.
             permission_str = perm[perm.index('.')+1:]
             row_level_permission = self.check_row_level_permission(permission_str, object)
             if row_level_permission is not None:
@@ -360,7 +340,7 @@ class User(models.Model):
 
     def contains_permission(self, perm, model=None):
         """
-        This checks if the user has the given permission for any instance 
+        This checks if the user has the given permission for any instance
         of the given model.
         """
         if self.has_perm(perm):
@@ -369,29 +349,20 @@ class User(models.Model):
             perm = perm[perm.index('.')+1:]
             return self.contains_row_level_perm(perm, model)
         return False
-        
+
     def contains_row_level_perm(self, perm, model):
         model_ct = ContentType.objects.get_for_model(model)
         if isinstance(perm, str):
             permission = Permission.objects.get(codename__exact=perm, content_type=model_ct.id)
         else:
             permission = perm
-        count = self.row_level_permissions_owned.filter(model_ct=model_ct.id, permission=permission.id).count() 
-
-        if count>0:
+        count = self.row_level_permissions_owned.filter(model_ct=model_ct.id, permission=permission.id).count()
+        if count > 0:
             return True
-        return self.contains_group_row_level_perms(permission, model_ct)        
+        return self.contains_group_row_level_perms(permission, model_ct)
 
     def contains_group_row_level_perms(self, perm, ct):
-        #SELECT COUNT(*)
-         #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp, "django_content_type" ct
-         #WHERE rlp."owner_id" = ug."group_id"
-             #AND ug."user_id"=%s
-             #AND rlp."negative" = False
-             #AND rlp."owner_ct_id" = %s
-             #AND rlp."model_ct_id" = %s
-        
-        cursor = connection.cursor() 
+        cursor = connection.cursor()
         sql = """
             SELECT COUNT(*)
             FROM %s ug, %s rlp, %s ct
@@ -401,14 +372,14 @@ class User(models.Model):
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s""" % (
-            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
+            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'),
             backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
             backend.quote_name('group_id'), backend.quote_name('user_id'),
             backend.quote_name('negative'),  backend.quote_name('owner_ct_id'),
             backend.quote_name('model_ct_id'), backend.quote_name('permission_id'))
         cursor.execute(sql, [self.id, False, ContentType.objects.get_for_model(Group).id, ct.id, perm.id])
         count = int(cursor.fetchone()[0])
-        return (count>0)
+        return count > 0
 
     def has_module_perms(self, app_label):
         "Returns True if the user has any permissions in the given app label."
@@ -416,19 +387,12 @@ class User(models.Model):
             return False
         if self.is_superuser:
             return True
-        if bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label])):
+        if [p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]:
             return True
         return self.has_module_row_level_perms(app_label)
 
     def has_module_row_level_perms(self, app_label):
-        #SELECT COUNT(*)
-        #FROM "django_content_type" ct, "auth_rowlevelpermission" rlp
-        #WHERE rlp."model_ct_id" = ct."id"
-            #AND ct."app_label"=%s
-            #AND rlp."negative" = False
-            #AND rlp."owner_ct_id" = %s
-            #AND rlp."owner_id" = %s
-        cursor = connection.cursor()        
+        cursor = connection.cursor()
         sql = """
             SELECT COUNT(*)
             FROM %s ct, %s rlp
@@ -437,30 +401,20 @@ class User(models.Model):
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s
-                """ % (                    
+                """ % (
             backend.quote_name('django_content_type'), backend.quote_name('auth_rowlevelpermission'),
             backend.quote_name('model_ct_id'), backend.quote_name('id'),
-            backend.quote_name('app_label'), 
+            backend.quote_name('app_label'),
             backend.quote_name('owner_ct_id'),
             backend.quote_name('owner_id'),backend.quote_name('negative'), )
-        #import pdb
-        #pdb.set_trace()
-        cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id, False]) 
+        cursor.execute(sql, [app_label, ContentType.objects.get_for_model(User).id, self.id, False])
         count = int(cursor.fetchone()[0])
-        if count>0:
+        if count > 0:
             return True
         return self.has_module_group_row_level_perms(app_label)
-        
+
     def has_module_group_row_level_perms(self, app_label):
-        #SELECT COUNT(*)
-        #FROM "auth_user_groups" ug, "auth_rowlevelpermission" rlp, "django_content_type" ct
-        #WHERE rlp."owner_id" = ug."group_id"
-            #AND ug."user_id"=%s
-            #AND rlp."model_ct_id" = ct."id"
-            #AND ct."app_label"=%s
-            #AND rlp."negative" = False
-            #AND rlp."owner_ct_id" = %s
-        cursor = connection.cursor() 
+        cursor = connection.cursor()
         sql = """
             SELECT COUNT(*)
             FROM %s ug, %s rlp, %s ct
@@ -470,7 +424,7 @@ class User(models.Model):
                 AND ct.%s=%%s
                 AND rlp.%s = %%s
                 AND rlp.%s = %%s""" % (
-            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'), 
+            backend.quote_name('auth_user_groups'), backend.quote_name('auth_rowlevelpermission'),
             backend.quote_name('django_content_type'), backend.quote_name('owner_id'),
             backend.quote_name('group_id'), backend.quote_name('user_id'),
             backend.quote_name('model_ct_id'), backend.quote_name('id'),
@@ -478,8 +432,7 @@ class User(models.Model):
             backend.quote_name('owner_ct_id'))
         cursor.execute(sql, [self.id, app_label, False, ContentType.objects.get_for_model(Group).id])
         count = int(cursor.fetchone()[0])
-        return (count>0)        
-            
+        return (count>0)
 
     def get_and_delete_messages(self):
         messages = []

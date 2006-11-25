@@ -100,22 +100,19 @@ if docutils_is_available:
 
     for name, urlbase in ROLES.items():
         create_reference_role(name, urlbase)
-        
-#Based off work by Ian Holsman
-#http://svn.zyons.python-hosting.com/trunk/zilbo/common/utils/misc.py
+
+# Based off work by Ian Holsman
+# http://svn.zyons.python-hosting.com/trunk/zilbo/common/utils/misc.py
 
 import sha
-from django.conf import settings 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
-def verify_objref_hash( content_type_id, object_id, hash ):
+def verify_objref_hash(content_type_id, object_id, hash_):
     hash_match = sha.new("%s/%s" % (content_type_id, object_id) + settings.SECRET_KEY).hexdigest()
-    if hash == hash_match:
-        return True
-    else:
-        return False
+    return hash_ == hash_match
 
 def create_objref(object):
-    content_type_id = ContentType.objects.get_for_model( object ).id
+    content_type_id = ContentType.objects.get_for_model(object).id
     object_id = object.id
-    return "%s/%d/%s" % ( content_type_id, object_id, sha.new("%s/%d" % (content_type_id, object_id) + settings.SECRET_KEY).hexdigest())
+    return "%s/%d/%s" % (content_type_id, object_id, sha.new("%s/%d" % (content_type_id, object_id) + settings.SECRET_KEY).hexdigest())

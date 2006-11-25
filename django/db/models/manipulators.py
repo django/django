@@ -233,7 +233,6 @@ class AutomaticManipulator(forms.Manipulator):
                         new_rel_obj.delete()
                         self.fields_deleted.append('%s "%s"' % (related.opts.verbose_name, old_rel_obj))
 
-
         # Save the order, if applicable.
         if self.change and self.opts.get_ordered_objects():
             order = new_data['order_'] and map(int, new_data['order_'].split(',')) or []
