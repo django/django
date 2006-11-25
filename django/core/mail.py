@@ -59,7 +59,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
             random_bits = str(random.getrandbits(64))
         except AttributeError: # Python 2.3 doesn't have random.getrandbits().
             random_bits = ''.join([random.choice('1234567890') for i in range(19)])
-        msg['Message-ID'] = "<%d.%d@%s>" % (time.time(), random_bits, DNS_NAME)
+        msg['Message-ID'] = "<%d.%s@%s>" % (time.time(), random_bits, DNS_NAME)
         try:
             server.sendmail(from_email, recipient_list, msg.as_string())
             num_sent += 1

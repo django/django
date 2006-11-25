@@ -2,7 +2,7 @@
 Field classes
 """
 
-from util import ValidationError, DEFAULT_ENCODING
+from util import ValidationError, DEFAULT_ENCODING, smart_unicode
 from widgets import TextInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
@@ -28,12 +28,19 @@ except NameError:
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
 
+    # Tracks each time a Field instance is created. Used to retain order.
+    creation_counter = 0
+
     def __init__(self, required=True, widget=None):
         self.required = required
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
         self.widget = widget
+
+        # Increase the creation counter, and save our local copy.
+        self.creation_counter = Field.creation_counter
+        Field.creation_counter += 1
 
     def clean(self, value):
         """
@@ -55,10 +62,7 @@ class CharField(Field):
         "Validates max_length and min_length. Returns a Unicode object."
         Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
-        if not isinstance(value, basestring):
-            value = unicode(str(value), DEFAULT_ENCODING)
-        elif not isinstance(value, unicode):
-            value = unicode(value, DEFAULT_ENCODING)
+        value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(u'Ensure this value has at most %d characters.' % self.max_length)
         if self.min_length is not None and len(value) < self.min_length:
@@ -165,10 +169,7 @@ class RegexField(Field):
         """
         Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
-        if not isinstance(value, basestring):
-            value = unicode(str(value), DEFAULT_ENCODING)
-        elif not isinstance(value, unicode):
-            value = unicode(value, DEFAULT_ENCODING)
+        value = smart_unicode(value)
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
@@ -244,10 +245,7 @@ class ChoiceField(Field):
         """
         value = Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
-        if not isinstance(value, basestring):
-            value = unicode(str(value), DEFAULT_ENCODING)
-        elif not isinstance(value, unicode):
-            value = unicode(value, DEFAULT_ENCODING)
+        value = smart_unicode(value)
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
             raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % value)
@@ -267,11 +265,8 @@ class MultipleChoiceField(ChoiceField):
             raise ValidationError(u'This field is required.')
         new_value = []
         for val in value:
-            if not isinstance(val, basestring):
-                value = unicode(str(val), DEFAULT_ENCODING)
-            elif not isinstance(val, unicode):
-                value = unicode(val, DEFAULT_ENCODING)
-            new_value.append(value)
+            val = smart_unicode(val)
+            new_value.append(val)
         # Validate that each value in the value list is in self.choices.
         valid_values = set([k for k, v in self.choices])
         for val in new_value:
