@@ -77,23 +77,23 @@ class Form(object):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
+        return u'\n'.join([u'<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        return u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
+        return u'\n'.join([u'<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_table_with_errors(self):
         "Returns this form rendered as HTML <tr>s, with errors."
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+            output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             if bf.errors:
-                output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors]))
-            output.append('<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
+                output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors]))
+            output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
         return u'\n'.join(output)
 
     def as_ul_with_errors(self):
@@ -101,13 +101,13 @@ class Form(object):
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append('<li><ul>%s</ul></li>' % '\n'.join(['<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+            output.append(u'<li><ul>%s</ul></li>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            line = '<li>'
+            line = u'<li>'
             if bf.errors:
-                line += '<ul>%s</ul>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors])
-            line += '%s: %s</li>' % (pretty_name(name), bf)
+                line += u'<ul>%s</ul>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors])
+            line += u'%s: %s</li>' % (pretty_name(name), bf)
             output.append(line)
         return u'\n'.join(output)
 
@@ -153,7 +153,13 @@ class BoundField(object):
         "Renders this field as an HTML widget."
         # Use the 'widget' attribute on the field to determine which type
         # of HTML widget to use.
-        return self.as_widget(self._field.widget)
+        value = self.as_widget(self._field.widget)
+        if not isinstance(value, basestring):
+            # Some Widget render() methods -- notably RadioSelect -- return a
+            # "special" object rather than a string. Call the __str__() on that
+            # object to get its rendered value.
+            value = value.__str__()
+        return value
 
     def _errors(self):
         """

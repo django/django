@@ -955,6 +955,13 @@ u''
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
 
+Unicode values are handled properly.
+>>> p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'})
+>>> p.as_table()
+u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>\n<tr><td>Last name:</td><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></td></tr>\n<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>'
+>>> p.as_ul()
+u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" /></li>'
+
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors()
 {'first_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
@@ -1094,6 +1101,16 @@ For a form with a <select>, use ChoiceField:
 <option value="P" selected="selected">Python</option>
 <option value="J">Java</option>
 </select>
+
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
+>>> f = FrameworkForm()
+>>> print f['language']
+<ul>
+<li><label><input type="radio" name="language" value="P" /> Python</label></li>
+<li><label><input type="radio" name="language" value="J" /> Java</label></li>
+</ul>
 
 MultipleChoiceField is a special case, as its data is required to be a list:
 >>> class SongForm(Form):
