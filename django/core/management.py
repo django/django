@@ -134,8 +134,8 @@ def get_sql_create(app):
             builder = model._default_manager.db.get_creation_module().builder
             
             for rel_class, f in pending[model]:
-                sql = builder._ref_sql(model, rel_class, f, style)
-                alter_sql.extend(['-- ', str(sql)])
+                sql = builder.get_ref_sql(model, rel_class, f, style)
+                alter_sql.append('-- '+ str(sql))
         if alter_sql:
             final_output.append('-- The following references should be added '
                                 'but depend on non-existent tables:')
