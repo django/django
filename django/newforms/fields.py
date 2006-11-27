@@ -170,7 +170,7 @@ class RegexField(Field):
         Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         value = smart_unicode(value)
-        if not self.regex.search(value):
+        if (value or self.required) and not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
 

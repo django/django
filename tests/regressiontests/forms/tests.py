@@ -484,13 +484,13 @@ u'1'
 u'hello'
 >>> f.clean(None)
 u''
+>>> f.clean('')
+u''
 >>> f.clean([1, 2, 3])
 u'[1, 2, 3]'
 
 CharField accepts an optional max_length parameter:
 >>> f = CharField(max_length=10, required=False)
->>> f.clean('')
-u''
 >>> f.clean('12345')
 u'12345'
 >>> f.clean('1234567890')
@@ -700,6 +700,22 @@ ValidationError: [u'Enter a valid value.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid value.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = RegexField('^\d[A-F]\d$', required=False)
+>>> f.clean('2A2')
+u'2A2'
+>>> f.clean('3F3')
+u'3F3'
+>>> f.clean('3G3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid value.']
+>>> f.clean('')
+u''
 
 Alternatively, RegexField can take a compiled regular expression:
 >>> f = RegexField(re.compile('^\d[A-F]\d$'))
