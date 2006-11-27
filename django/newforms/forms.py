@@ -99,6 +99,13 @@ class Form(object):
             output.append(line)
         return u'\n'.join(output)
 
+    def non_field_errors(self):
+        """
+        Returns a list of errors that aren't associated with a particular
+        field -- i.e., from Form.clean().
+        """
+        return self.errors.get(NON_FIELD_ERRORS, [])
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self.__errors and self.clean_data.
@@ -129,7 +136,9 @@ class Form(object):
     def clean(self):
         """
         Hook for doing any extra form-wide cleaning after Field.clean() been
-        called on every field.
+        called on every field. Any ValidationError raised by this method will
+        not be associated with a particular field; it will have a special-case
+        association with the field named '__all__'.
         """
         return self.clean_data
 

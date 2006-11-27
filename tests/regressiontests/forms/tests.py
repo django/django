@@ -1520,7 +1520,7 @@ A Form's fields are displayed in the same order in which they were defined.
 <tr><td>Field13:</td><td><input type="text" name="field13" /></td></tr>
 <tr><td>Field14:</td><td><input type="text" name="field14" /></td></tr>
 
-# Sample form processing (as if in a view) ####################################
+# Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
 >>> class UserRegistration(Form):
@@ -1568,6 +1568,70 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 Case 3: POST with valid data (the success message).
 >>> print my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'})
 VALID
+
+# Some ideas for using templates with forms ###################################
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput)
+...    def clean(self):
+...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...            raise ValidationError(u'Please make sure your passwords match.')
+...        return self.clean_data
+
+You have full flexibility in displaying form fields in a template. Just pass a
+Form instance to the template, and use "dot" access to refer to individual
+fields. Note, however, that this flexibility comes with the responsibility of
+displaying all the errors, including any that might not be associated with a
+particular field.
+>>> t = Template('''<form action="">
+... {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
+... {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
+... {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration()}))
+<form action="">
+<p><label>Your username: <input type="text" name="username" /></label></p>
+<p><label>Password: <input type="password" name="password1" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" /></label></p>
+<input type="submit" />
+</form>
+>>> print t.render(Context({'form': UserRegistration({'username': 'django'})}))
+<form action="">
+<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<ul class="errorlist"><li>This field is required.</li></ul><p><label>Password: <input type="password" name="password1" /></label></p>
+<ul class="errorlist"><li>This field is required.</li></ul><p><label>Password (again): <input type="password" name="password2" /></label></p>
+<input type="submit" />
+</form>
+
+To display the errors that aren't associated with a particular field -- e.g.,
+the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
+template. If used on its own, it is displayed as a <ul> (or an empty string, if
+the list of errors is empty). You can also use it in {% if %} statements.
+>>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
+<form action="">
+<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<input type="submit" />
+</form>
+>>> t = Template('''<form action="">
+... {{ form.non_field_errors }}
+... {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
+... {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
+... {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
+<form action="">
+<ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
+<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
+<p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
+<input type="submit" />
+</form>
 """
 
 if __name__ == "__main__":
