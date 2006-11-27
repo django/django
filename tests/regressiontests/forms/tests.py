@@ -1137,31 +1137,8 @@ u''
 ...     first_name = CharField()
 ...     last_name = CharField()
 ...     birthday = DateField()
->>> p = Person()
->>> print p
-<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
-<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
-<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
->>> print p.as_table()
-<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
-<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
-<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
->>> print p.as_ul()
-<li>First name: <input type="text" name="first_name" /></li>
-<li>Last name: <input type="text" name="last_name" /></li>
-<li>Birthday: <input type="text" name="birthday" /></li>
->>> print p.as_table_with_errors()
-<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
-<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
-<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
-<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
-<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
-<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
->>> print p.as_ul_with_errors()
-<li><ul><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
-<li><ul><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
-<li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
 
+Pass a dictionary to a Form's __init__().
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
 >>> p.errors
 {}
@@ -1189,12 +1166,58 @@ u''
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
 
+Empty dictionaries are valid, too.
+>>> p = Person({})
+>>> p.errors
+{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p.is_valid()
+False
+>>> print p
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+>>> print p.as_table()
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+>>> print p.as_ul()
+<li><ul><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
+<li><ul><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
+<li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
+
+If you don't pass any values to the Form's __init__(), or if you pass None,
+the Form won't do any validation. Form.errors will be an empty dictionary *but*
+Form.is_valid() will return False.
+>>> p = Person()
+>>> p.errors
+{}
+>>> p.is_valid()
+False
+>>> print p
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+>>> print p.as_table()
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+
 Unicode values are handled properly.
->>> p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'})
+>>> p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111', 'birthday': '1940-10-9'})
 >>> p.as_table()
-u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>\n<tr><td>Last name:</td><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></td></tr>\n<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>'
+u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>\n<tr><td>Last name:</td><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></td></tr>\n<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>'
 >>> p.as_ul()
-u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" /></li>'
+u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>'
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors
@@ -1375,7 +1398,10 @@ MultipleChoiceField is a special case, as its data is required to be a list:
 There are a couple of ways to do multiple-field validation. If you want the
 validation message to be associated with a particular field, implement the
 clean_XXX() method on the Form, where XXX is the field name. As in
-Field.clean(), the clean_XXX() method should return the cleaned value:
+Field.clean(), the clean_XXX() method should return the cleaned value. In the
+clean_XXX() method, you have access to self.clean_data, which is a dictionary
+of all the data that has been cleaned *so far*, in order by the fields,
+including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> class UserRegistration(Form):
 ...    username = CharField(max_length=10)
 ...    password1 = CharField(widget=PasswordInput)
@@ -1385,6 +1411,9 @@ Field.clean(), the clean_XXX() method should return the cleaned value:
 ...            raise ValidationError(u'Please make sure your passwords match.')
 ...        return self.clean_data['password2']
 >>> f = UserRegistration()
+>>> f.errors
+{}
+>>> f = UserRegistration({})
 >>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
@@ -1399,8 +1428,10 @@ Field.clean(), the clean_XXX() method should return the cleaned value:
 Another way of doing multiple-field validation is by implementing the
 Form's clean() method. If you do this, any ValidationError raised by that
 method will not be associated with a particular field; it will have a
-special-case association with the field named '__all__'. Note that
-Form.clean() still needs to return a dictionary of all clean data:
+special-case association with the field named '__all__'.
+Note that in Form.clean(), you have access to self.clean_data, a dictionary of
+all the fields/values that have *not* raised a ValidationError. Also note
+Form.clean() is required to return a dictionary of all clean data.
 >>> class UserRegistration(Form):
 ...    username = CharField(max_length=10)
 ...    password1 = CharField(widget=PasswordInput)
@@ -1410,9 +1441,15 @@ Form.clean() still needs to return a dictionary of all clean data:
 ...            raise ValidationError(u'Please make sure your passwords match.')
 ...        return self.clean_data
 >>> f = UserRegistration()
+>>> f.errors
+{}
+>>> f = UserRegistration({})
 >>> print f.as_table()
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
+<tr><td colspan="2"><ul><li>This field is required.</li></ul></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
 >>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
@@ -1420,15 +1457,11 @@ Form.clean() still needs to return a dictionary of all clean data:
 >>> f.errors
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
-<tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
-<tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
-<tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
->>> print f.as_table_with_errors()
 <tr><td colspan="2"><ul><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
->>> print f.as_ul_with_errors()
+>>> print f.as_ul()
 <li><ul><li>Please make sure your passwords match.</li></ul></li>
 <li>Username: <input type="text" name="username" value="adrian" /></li>
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
@@ -1486,6 +1519,55 @@ A Form's fields are displayed in the same order in which they were defined.
 <tr><td>Field12:</td><td><input type="text" name="field12" /></td></tr>
 <tr><td>Field13:</td><td><input type="text" name="field13" /></td></tr>
 <tr><td>Field14:</td><td><input type="text" name="field14" /></td></tr>
+
+# Sample form processing (as if in a view) ####################################
+
+>>> from django.template import Template, Context
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput)
+...    def clean(self):
+...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...            raise ValidationError(u'Please make sure your passwords match.')
+...        return self.clean_data
+>>> def my_function(method, post_data):
+...     if method == 'POST':
+...         form = UserRegistration(post_data)
+...     else:
+...         form = UserRegistration()
+...     if form.is_valid():
+...         return 'VALID'
+...     t = Template('<form action="" method="post">\n<table>\n{{ form }}\n</table>\n<input type="submit" />\n</form>')
+...     return t.render(Context({'form': form}))
+
+Case 1: GET (an empty form, with no errors).
+>>> print my_function('GET', {})
+<form action="" method="post">
+<table>
+<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
+<tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
+</table>
+<input type="submit" />
+</form>
+
+Case 2: POST with erroneous data (a redisplayed form, with errors).
+>>> print my_function('POST', {'username': 'this-is-a-long-username', 'password1': 'foo', 'password2': 'bar'})
+<form action="" method="post">
+<table>
+<tr><td colspan="2"><ul><li>Please make sure your passwords match.</li></ul></td></tr>
+<tr><td colspan="2"><ul><li>Ensure this value has at most 10 characters.</li></ul></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="this-is-a-long-username" /></td></tr>
+<tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
+<tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
+</table>
+<input type="submit" />
+</form>
+
+Case 3: POST with valid data (the success message).
+>>> print my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'})
+VALID
 """
 
 if __name__ == "__main__":

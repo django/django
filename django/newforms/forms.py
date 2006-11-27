@@ -36,6 +36,7 @@ class Form(object):
     __metaclass__ = DeclarativeFieldsMetaclass
 
     def __init__(self, data=None, auto_id=False): # TODO: prefix stuff
+        self.ignore_errors = data is None
         self.data = data or {}
         self.auto_id = auto_id
         self.clean_data = None # Stores the data after clean() has been called.
@@ -65,22 +66,13 @@ class Form(object):
 
     def is_valid(self):
         """
-        Returns True if the form has no errors. Otherwise, False. This exists
-        solely for convenience, so client code can use positive logic rather
-        than confusing negative logic ("if not form.errors").
+        Returns True if the form has no errors. Otherwise, False. If errors are
+        being ignored, returns False.
         """
-        return not bool(self.errors)
+        return not self.ignore_errors and not bool(self.errors)
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return u'\n'.join([u'<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-
-    def as_ul(self):
-        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        return u'\n'.join([u'<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-
-    def as_table_with_errors(self):
-        "Returns this form rendered as HTML <tr>s, with errors."
         output = []
         if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -92,8 +84,8 @@ class Form(object):
             output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
         return u'\n'.join(output)
 
-    def as_ul_with_errors(self):
-        "Returns this form rendered as HTML <li>s, with errors."
+    def as_ul(self):
+        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
         output = []
         if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -113,6 +105,9 @@ class Form(object):
         """
         self.clean_data = {}
         errors = ErrorDict()
+        if self.ignore_errors: # Stop further processing.
+            self.__errors = errors
+            return
         for name, field in self.fields.items():
             value = self.data.get(name, None)
             try:
