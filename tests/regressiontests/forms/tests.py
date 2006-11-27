@@ -477,6 +477,22 @@ beatle J R Ringo False
 
 # CharField ###################################################################
 
+>>> f = CharField()
+>>> f.clean(1)
+u'1'
+>>> f.clean('hello')
+u'hello'
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean([1, 2, 3])
+u'[1, 2, 3]'
+
 >>> f = CharField(required=False)
 >>> f.clean(1)
 u'1'
@@ -518,6 +534,40 @@ u'1234567890a'
 # IntegerField ################################################################
 
 >>> f = IntegerField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('1')
+1
+>>> isinstance(f.clean('1'), int)
+True
+>>> f.clean('23')
+23
+>>> f.clean('a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a whole number.']
+>>> f.clean('1 ')
+1
+>>> f.clean(' 1')
+1
+>>> f.clean(' 1 ')
+1
+>>> f.clean('1a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a whole number.']
+
+>>> f = IntegerField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
 >>> f.clean('1')
 1
 >>> isinstance(f.clean('1'), int)
@@ -681,6 +731,14 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date/time.']
 
+>>> f = DateTimeField(required=False)
+>>> f.clean(None)
+>>> repr(f.clean(None))
+'None'
+>>> f.clean('')
+>>> repr(f.clean(''))
+'None'
+
 # RegexField ##################################################################
 
 >>> f = RegexField('^\d[A-F]\d$')
@@ -752,6 +810,34 @@ ValidationError: [u'Enter a four-digit number.']
 # EmailField ##################################################################
 
 >>> f = EmailField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('person@example.com')
+u'person@example.com'
+>>> f.clean('foo')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid e-mail address.']
+>>> f.clean('foo@')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid e-mail address.']
+>>> f.clean('foo@bar')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid e-mail address.']
+
+>>> f = EmailField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
 >>> f.clean('person@example.com')
 u'person@example.com'
 >>> f.clean('foo')
@@ -770,6 +856,48 @@ ValidationError: [u'Enter a valid e-mail address.']
 # URLField ##################################################################
 
 >>> f = URLField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('http://example.com')
+u'http://example.com'
+>>> f.clean('http://www.example.com')
+u'http://www.example.com'
+>>> f.clean('foo')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('example.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://example')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://example.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+>>> f.clean('http://.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid URL.']
+
+>>> f = URLField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://www.example.com')
@@ -820,6 +948,30 @@ ValidationError: [u'This URL appears to be a broken link.']
 # BooleanField ################################################################
 
 >>> f = BooleanField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(True)
+True
+>>> f.clean(False)
+False
+>>> f.clean(1)
+True
+>>> f.clean(0)
+False
+>>> f.clean('Django rocks')
+True
+
+>>> f = BooleanField(required=False)
+>>> f.clean('')
+False
+>>> f.clean(None)
+False
 >>> f.clean(True)
 True
 >>> f.clean(False)
@@ -834,18 +986,32 @@ True
 # ChoiceField #################################################################
 
 >>> f = ChoiceField(choices=[('1', '1'), ('2', '2')])
->>> f.clean(1)
-u'1'
->>> f.clean('1')
-u'1'
->>> f.clean(None)
-Traceback (most recent call last):
-...
-ValidationError: [u'This field is required.']
 >>> f.clean('')
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+u'1'
+>>> f.clean('1')
+u'1'
+>>> f.clean('3')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
+>>> f = ChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
+>>> f.clean(1)
+u'1'
+>>> f.clean('1')
+u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
@@ -862,6 +1028,14 @@ ValidationError: [u'Select a valid choice. John is not one of the available choi
 # MultipleChoiceField #########################################################
 
 >>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')])
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean([1])
 [u'1']
 >>> f.clean(['1'])
@@ -889,10 +1063,38 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
 
+>>> f = MultipleChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
+>>> f.clean('')
+[]
+>>> f.clean(None)
+[]
+>>> f.clean([1])
+[u'1']
+>>> f.clean(['1'])
+[u'1']
+>>> f.clean(['1', '2'])
+[u'1', u'2']
+>>> f.clean([1, '2'])
+[u'1', u'2']
+>>> f.clean((1, '2'))
+[u'1', u'2']
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.clean([])
+[]
+>>> f.clean(())
+[]
+>>> f.clean(['3'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+
 # ComboField ##################################################################
 
 ComboField takes a list of fields that should be used to validate a value,
-in that order:
+in that order.
 >>> f = ComboField(fields=[CharField(max_length=20), EmailField()])
 >>> f.clean('test@example.com')
 u'test@example.com'
@@ -912,6 +1114,22 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+
+>>> f = ComboField(fields=[CharField(max_length=20), EmailField()], required=False)
+>>> f.clean('test@example.com')
+u'test@example.com'
+>>> f.clean('longemailaddress@example.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 20 characters.']
+>>> f.clean('not an e-mail')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid e-mail address.']
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
 
 # Form ########################################################################
 
