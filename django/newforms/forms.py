@@ -56,11 +56,6 @@ class Form(object):
             raise KeyError('Key %r not found in Form' % name)
         return BoundField(self, field, name)
 
-    def clean(self):
-        if self.__errors is None:
-            self.full_clean()
-        return self.clean_data
-
     def errors(self):
         "Returns an ErrorDict for self.data"
         if self.__errors is None:
