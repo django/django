@@ -56,19 +56,20 @@ class Form(object):
             raise KeyError('Key %r not found in Form' % name)
         return BoundField(self, field, name)
 
-    def errors(self):
+    def _errors(self):
         "Returns an ErrorDict for self.data"
         if self.__errors is None:
             self.full_clean()
         return self.__errors
+    errors = property(_errors)
 
     def is_valid(self):
         """
         Returns True if the form has no errors. Otherwise, False. This exists
         solely for convenience, so client code can use positive logic rather
-        than confusing negative logic ("if not form.errors()").
+        than confusing negative logic ("if not form.errors").
         """
-        return not bool(self.errors())
+        return not bool(self.errors)
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
@@ -81,9 +82,9 @@ class Form(object):
     def as_table_with_errors(self):
         "Returns this form rendered as HTML <tr>s, with errors."
         output = []
-        if self.errors().get(NON_FIELD_ERRORS):
+        if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+            output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors[NON_FIELD_ERRORS]]))
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             if bf.errors:
@@ -94,9 +95,9 @@ class Form(object):
     def as_ul_with_errors(self):
         "Returns this form rendered as HTML <li>s, with errors."
         output = []
-        if self.errors().get(NON_FIELD_ERRORS):
+        if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<li><ul>%s</ul></li>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors()[NON_FIELD_ERRORS]]))
+            output.append(u'<li><ul>%s</ul></li>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors[NON_FIELD_ERRORS]]))
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             line = u'<li>'
@@ -162,7 +163,7 @@ class BoundField(object):
         if there are none.
         """
         try:
-            return self._form.errors()[self._name]
+            return self._form.errors[self._name]
         except KeyError:
             return ErrorList()
     errors = property(_errors)

@@ -1163,13 +1163,13 @@ u''
 <li><ul><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
 
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
->>> p.errors()
+>>> p.errors
 {}
 >>> p.is_valid()
 True
->>> p.errors().as_ul()
+>>> p.errors.as_ul()
 u''
->>> p.errors().as_text()
+>>> p.errors.as_text()
 u''
 >>> p.clean()
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
@@ -1197,13 +1197,13 @@ u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" 
 u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" /></li>'
 
 >>> p = Person({'last_name': u'Lennon'})
->>> p.errors()
+>>> p.errors
 {'first_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
 >>> p.is_valid()
 False
->>> p.errors().as_ul()
+>>> p.errors.as_ul()
 u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is required.</li></ul></li><li>birthday<ul class="errorlist"><li>This field is required.</li></ul></li></ul>'
->>> print p.errors().as_text()
+>>> print p.errors.as_text()
 * first_name
   * This field is required.
 * birthday
@@ -1385,13 +1385,13 @@ Field.clean(), the clean_XXX() method should return the cleaned value:
 ...            raise ValidationError(u'Please make sure your passwords match.')
 ...        return self.clean_data['password2']
 >>> f = UserRegistration()
->>> f.errors()
+>>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
->>> f.errors()
+>>> f.errors
 {'password2': [u'Please make sure your passwords match.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
->>> f.errors()
+>>> f.errors
 {}
 >>> f.clean()
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
@@ -1414,10 +1414,10 @@ Form.clean() still needs to return a dictionary of all clean data:
 <tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
->>> f.errors()
+>>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'})
->>> f.errors()
+>>> f.errors
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
 <tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
@@ -1434,7 +1434,7 @@ Form.clean() still needs to return a dictionary of all clean data:
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
 <li>Password2: <input type="password" name="password2" value="bar" /></li>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
->>> f.errors()
+>>> f.errors
 {}
 >>> f.clean()
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
