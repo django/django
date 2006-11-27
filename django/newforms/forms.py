@@ -176,7 +176,7 @@ class BoundField(object):
     def as_widget(self, widget, attrs=None):
         attrs = attrs or {}
         auto_id = self.auto_id
-        if not attrs.has_key('id') and not widget.attrs.has_key('id') and auto_id:
+        if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
         return widget.render(self._name, self._form.data.get(self._name, None), attrs=attrs)
 
