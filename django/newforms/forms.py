@@ -76,11 +76,11 @@ class Form(object):
         output = []
         if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors[NON_FIELD_ERRORS]]))
+            output.append(u'<tr><td colspan="2">%s</td></tr>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             if bf.errors:
-                output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors]))
+                output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
             output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (bf.label, bf))
         return u'\n'.join(output)
 
@@ -89,22 +89,23 @@ class Form(object):
         output = []
         if self.errors.get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<li><ul>%s</ul></li>' % u'\n'.join([u'<li>%s</li>' % e for e in self.errors[NON_FIELD_ERRORS]]))
+            output.append(u'<li>%s</li>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             line = u'<li>'
             if bf.errors:
-                line += u'<ul>%s</ul>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors])
+                line += str(bf.errors)
             line += u'%s: %s</li>' % (bf.label, bf)
             output.append(line)
         return u'\n'.join(output)
 
     def non_field_errors(self):
         """
-        Returns a list of errors that aren't associated with a particular
-        field -- i.e., from Form.clean().
+        Returns an ErrorList of errors that aren't associated with a particular
+        field -- i.e., from Form.clean(). Returns an empty ErrorList if there
+        are none.
         """
-        return self.errors.get(NON_FIELD_ERRORS, [])
+        return self.errors.get(NON_FIELD_ERRORS, ErrorList())
 
     def full_clean(self):
         """
