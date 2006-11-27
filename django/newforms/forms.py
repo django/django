@@ -81,7 +81,7 @@ class Form(object):
             bf = BoundField(self, field, name)
             if bf.errors:
                 output.append(u'<tr><td colspan="2"><ul>%s</ul></td></tr>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors]))
-            output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
+            output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (bf.label, bf))
         return u'\n'.join(output)
 
     def as_ul(self):
@@ -95,7 +95,7 @@ class Form(object):
             line = u'<li>'
             if bf.errors:
                 line += u'<ul>%s</ul>' % u'\n'.join([u'<li>%s</li>' % e for e in bf.errors])
-            line += u'%s: %s</li>' % (pretty_name(name), bf)
+            line += u'%s: %s</li>' % (bf.label, bf)
             output.append(line)
         return u'\n'.join(output)
 
@@ -179,6 +179,10 @@ class BoundField(object):
     def as_textarea(self, attrs=None):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
+
+    def _label(self):
+        return pretty_name(self._name)
+    label = property(_label)
 
     def _auto_id(self):
         """
