@@ -131,7 +131,7 @@ def get_sql_create(app):
     if not_installed_models:
         alter_sql = []
         for model in not_installed_models:
-            builder = model._default_manager.db.builder.get_creation_module().builder
+            builder = model._default_manager.db.get_creation_module().builder
             
             for rel_class, f in pending[model]:
                 sql = builder._ref_sql(model, rel_class, f, style)
