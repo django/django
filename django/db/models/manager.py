@@ -166,8 +166,8 @@ class Manager(object):
         for app in get_apps():
             for model in get_models(app):
                 all_models.append(model)
-                return set([m for m in all_models
-                            if m._meta.db_table in table_list])
+        return set([m for m in all_models
+                    if m._meta.db_table in table_list])
 
     def get_table_list(self):
         """Get list of tables accessible via my model's connection.
