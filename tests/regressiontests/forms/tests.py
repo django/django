@@ -1148,7 +1148,7 @@ True
 u''
 >>> p.errors.as_text()
 u''
->>> p.clean()
+>>> p.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> print p['first_name']
 <input type="text" name="first_name" value="John" />
@@ -1231,8 +1231,8 @@ u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is re
   * This field is required.
 * birthday
   * This field is required.
->>> p.clean()
->>> repr(p.clean())
+>>> p.clean_data
+>>> repr(p.clean_data)
 'None'
 >>> p['first_name'].errors
 [u'This field is required.']
@@ -1422,7 +1422,7 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
 >>> f.errors
 {}
->>> f.clean()
+>>> f.clean_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
 Another way of doing multiple-field validation is by implementing the
@@ -1469,7 +1469,7 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
 >>> f.errors
 {}
->>> f.clean()
+>>> f.clean_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
 It's possible to construct a Form dynamically by adding to the self.fields
@@ -1537,7 +1537,7 @@ A Form's fields are displayed in the same order in which they were defined.
 ...     else:
 ...         form = UserRegistration()
 ...     if form.is_valid():
-...         return 'VALID'
+...         return 'VALID: %r' % form.clean_data
 ...     t = Template('<form action="" method="post">\n<table>\n{{ form }}\n</table>\n<input type="submit" />\n</form>')
 ...     return t.render(Context({'form': form}))
 
@@ -1567,7 +1567,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 
 Case 3: POST with valid data (the success message).
 >>> print my_function('POST', {'username': 'adrian', 'password1': 'secret', 'password2': 'secret'})
-VALID
+VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}
 
 # Some ideas for using templates with forms ###################################
 
