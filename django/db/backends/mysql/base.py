@@ -91,7 +91,8 @@ class DatabaseWrapper(object):
         return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection:
+            self.connection.commit()
 
     def _rollback(self):
         if self.connection:
