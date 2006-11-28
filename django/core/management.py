@@ -292,13 +292,20 @@ def syncdb(verbosity=2, interactive=True):
             pass
 
     # Install each app
+    pending = None
     for app in models.get_apps():
         # Install each application (models already installed will be skipped)
-        created = _install(app, commit=False, initial_data=False)
+        created, pending = _install(app, commit=False, initial_data=False,
+                                    pending_allowed=True, pending=pending)
         if verbosity >= 2:
             for model in created:
                 print "Created table %s" % model._meta.db_table
         created_models.extend(created)
+    if pending:
+        transaction.rollback_unless_managed()
+        raise Exception("All apps were installed, but there were still "
+                        "pending references to: " + ",".join(pending.keys()) +
+                        ". Transaction rolled back.")
     transaction.commit_unless_managed()
 
     # Send the post_syncdb signal, so individual apps can do whatever they need
@@ -383,7 +390,8 @@ def install(app):
     # doesn't complain about unprintable output.    
     _install(app)
 
-def _install(app, commit=True, initial_data=True):
+def _install(app, commit=True, initial_data=True, pending_allowed=False,
+             pending=None):
     from django.db import connection, models, transaction
     import sys
     
@@ -396,7 +404,8 @@ def _install(app, commit=True, initial_data=True):
 
     created_models = []
     try:
-        pending = {}
+        if pending is None:
+            pending = {}
         for model in models.get_models(app, creation_order=True):
             manager = model._default_manager
             tables = manager.get_table_list()
@@ -417,7 +426,7 @@ def _install(app, commit=True, initial_data=True):
                         for statement in manager.get_pending(rel_class, f):
                             statement.execute()
                     pending.pop(model)
-                else:
+                elif not pending_allowed:
                     raise Exception("%s is not installed, but it has pending "
                                     "references" % model)
     except Exception, e:
@@ -433,7 +442,7 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
         sys.exit(1)
     if commit:
         transaction.commit_unless_managed()
-    return created_models
+    return created_models, pending
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
