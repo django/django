@@ -62,7 +62,7 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
     data in the body.
     """
     if not size:
-        return copyfileobj(fsrc, fdst, length)
+        return
     while size > 0:
         buf = fsrc.read(min(length, size))
         if not buf:
