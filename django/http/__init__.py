@@ -208,7 +208,7 @@ class HttpResponse(object):
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:
-            self.cookies[key]['domain'] = path
+            self.cookies[key]['domain'] = domain
         self.cookies[key]['expires'] = 0
         self.cookies[key]['max-age'] = 0
 
