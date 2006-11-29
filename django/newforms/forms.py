@@ -3,6 +3,7 @@ Form classes
 """
 
 from django.utils.datastructures import SortedDict
+from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea
 from util import ErrorDict, ErrorList, ValidationError
@@ -81,7 +82,7 @@ class Form(object):
             bf = BoundField(self, field, name)
             if bf.errors:
                 output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
-            output.append(u'<tr><td>%s:</td><td>%s</td></tr>' % (bf.label, bf))
+            output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(bf.verbose_name+':'), bf))
         return u'\n'.join(output)
 
     def as_ul(self):
@@ -95,7 +96,7 @@ class Form(object):
             line = u'<li>'
             if bf.errors:
                 line += str(bf.errors)
-            line += u'%s: %s</li>' % (bf.label, bf)
+            line += u'%s %s</li>' % (bf.label_tag(bf.verbose_name+':'), bf)
             output.append(line)
         return u'\n'.join(output)
 
@@ -190,9 +191,21 @@ class BoundField(object):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
 
-    def _label(self):
+    def _verbose_name(self):
         return pretty_name(self._name)
-    label = property(_label)
+    verbose_name = property(_verbose_name)
+
+    def label_tag(self, contents=None):
+        """
+        Wraps the given contents in a <label>, if the field has an ID attribute.
+        Does not HTML-escape the contents. If contents aren't given, uses the
+        field's HTML-escaped verbose_name.
+        """
+        contents = contents or escape(self.verbose_name)
+        id_ = self._field.widget.attrs.get('id') or self.auto_id
+        if id_:
+            contents = '<label for="%s">%s</label>' % (id_, contents)
+        return contents
 
     def _auto_id(self):
         """

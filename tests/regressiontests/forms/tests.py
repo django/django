@@ -1251,20 +1251,25 @@ u'* This field is required.'
 
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
-into which the field's name will be inserted.
+into which the field's name will be inserted. It will also put a <label> around
+the human-readable labels for a field.
 >>> p = Person(auto_id='id_%s')
 >>> print p.as_ul()
-<li>First name: <input type="text" name="first_name" id="id_first_name" /></li>
-<li>Last name: <input type="text" name="last_name" id="id_last_name" /></li>
-<li>Birthday: <input type="text" name="birthday" id="id_birthday" /></li>
+<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+>>> print p.as_table()
+<tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
 
 If auto_id is any True value whose str() does not contain '%s', the "id"
 attribute will be the name of the field.
 >>> p = Person(auto_id=True)
 >>> print p.as_ul()
-<li>First name: <input type="text" name="first_name" id="first_name" /></li>
-<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
-<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
+<li><label for="first_name">First name:</label> <input type="text" name="first_name" id="first_name" /></li>
+<li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
+<li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>
 
 If auto_id is any False value, an "id" attribute won't be output unless it
 was manually entered.
@@ -1275,14 +1280,14 @@ was manually entered.
 <li>Birthday: <input type="text" name="birthday" /></li>
 
 In this example, auto_id is False, but the "id" attribute for the "first_name"
-field is given.
+field is given. Also note that field gets a <label>, while the others don't.
 >>> class PersonNew(Form):
 ...     first_name = CharField(widget=TextInput(attrs={'id': 'first_name_id'}))
 ...     last_name = CharField()
 ...     birthday = DateField()
 >>> p = PersonNew(auto_id=False)
 >>> print p.as_ul()
-<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
+<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
 
@@ -1290,9 +1295,9 @@ If the "id" attribute is specified in the Form and auto_id is True, the "id"
 attribute in the Form gets precedence.
 >>> p = PersonNew(auto_id=True)
 >>> print p.as_ul()
-<li>First name: <input type="text" id="first_name_id" name="first_name" /></li>
-<li>Last name: <input type="text" name="last_name" id="last_name" /></li>
-<li>Birthday: <input type="text" name="birthday" id="birthday" /></li>
+<li><label for="first_name_id">First name:</label> <input type="text" id="first_name_id" name="first_name" /></li>
+<li><label for="last_name">Last name:</label> <input type="text" name="last_name" id="last_name" /></li>
+<li><label for="birthday">Birthday:</label> <input type="text" name="birthday" id="birthday" /></li>
 
 >>> class SignupForm(Form):
 ...     email = EmailField()
@@ -1606,10 +1611,57 @@ particular field.
 <input type="submit" />
 </form>
 
+Use form.[field].verbose_name to output a field's "verbose name" -- its field
+name with underscores converted to spaces, and the initial letter capitalized.
+>>> t = Template('''<form action="">
+... <p><label>{{ form.username.verbose_name }}: {{ form.username }}</label></p>
+... <p><label>{{ form.password1.verbose_name }}: {{ form.password1 }}</label></p>
+... <p><label>{{ form.password2.verbose_name }}: {{ form.password2 }}</label></p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration()}))
+<form action="">
+<p><label>Username: <input type="text" name="username" /></label></p>
+<p><label>Password1: <input type="password" name="password1" /></label></p>
+<p><label>Password2: <input type="password" name="password2" /></label></p>
+<input type="submit" />
+</form>
+
+User form.[field].label_tag to output a field's verbose_name with a <label>
+tag wrapped around it, but *only* if the given field has an "id" attribute.
+Recall from above that passing the "auto_id" argument to a Form gives each
+field an "id" attribute.
+>>> t = Template('''<form action="">
+... <p>{{ form.username.label_tag }}: {{ form.username }}</p>
+... <p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
+... <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration()}))
+<form action="">
+<p>Username: <input type="text" name="username" /></p>
+<p>Password1: <input type="password" name="password1" /></p>
+<p>Password2: <input type="password" name="password2" /></p>
+<input type="submit" />
+</form>
+>>> print t.render(Context({'form': UserRegistration(auto_id='id_%s')}))
+<form action="">
+<p><label for="id_username">Username</label>: <input type="text" name="username" id="id_username" /></p>
+<p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
+<p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
+<input type="submit" />
+</form>
+
 To display the errors that aren't associated with a particular field -- e.g.,
 the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
 template. If used on its own, it is displayed as a <ul> (or an empty string, if
 the list of errors is empty). You can also use it in {% if %} statements.
+>>> t = Template('''<form action="">
+... {{ form.username.errors.as_ul }}<p><label>Your username: {{ form.username }}</label></p>
+... {{ form.password1.errors.as_ul }}<p><label>Password: {{ form.password1 }}</label></p>
+... {{ form.password2.errors.as_ul }}<p><label>Password (again): {{ form.password2 }}</label></p>
+... <input type="submit" />
+... </form>''')
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
 <form action="">
 <p><label>Your username: <input type="text" name="username" value="django" /></label></p>
