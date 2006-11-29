@@ -16,9 +16,26 @@ class ModPythonRequest(http.HttpRequest):
         self.path = req.uri
 
     def __repr__(self):
+        # Since this is called as part of error handling, we need to be very
+        # robust against potentially malformed input.
+        try:
+            get = pformat(self.GET)
+        except:
+            get = '<could not parse>'
+        try:
+            post = pformat(self.POST)
+        except:
+            post = '<could not parse>'
+        try:
+            cookies = pformat(self.COOKIES)
+        except:
+            cookies = '<could not parse>'
+        try:
+            meta = pformat(self.META)
+        except:
+            meta = '<could not parse>'
         return '<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (self.path, pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META))
+            (self.path, get, post, cookies, meta)
 
     def get_full_path(self):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')

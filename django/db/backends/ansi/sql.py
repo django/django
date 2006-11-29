@@ -286,7 +286,7 @@ class SchemaBuilder(object):
                                   opts.object_name.lower())]
         for sql_file in sql_files:
             if os.path.exists(sql_file):
-                fp = open(sql_file)
+                fp = open(sql_file, 'U')
                 if backend.supports_compound_statements:
                     output.append(BoundStatement(fp.read(), db.connection))
                 else:                                 

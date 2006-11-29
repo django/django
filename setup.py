@@ -26,6 +26,7 @@ setup(
                                  'media/js/*.js',
                                  'media/js/admin/*js'],
         'django.contrib.comments': ['templates/comments/*.html'],
+        'django.contrib.sitemaps': ['templates/*.xml'],
     },
     scripts = ['django/bin/django-admin.py'],
     zip_safe = False,

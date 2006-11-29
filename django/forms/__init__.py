@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf import settings
-from django.utils.translation import gettext, gettext_lazy, ngettext
+from django.utils.translation import gettext, ngettext
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -343,7 +343,7 @@ class FormField(object):
     def get_validation_errors(self, new_data):
         errors = {}
         if self.is_required and not new_data.get(self.field_name, False):
-            errors.setdefault(self.field_name, []).append(gettext_lazy('This field is required.'))
+            errors.setdefault(self.field_name, []).append(gettext('This field is required.'))
             return errors
         try:
             for validator in self.validator_list:

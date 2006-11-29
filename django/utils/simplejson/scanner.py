@@ -3,12 +3,11 @@ Iterator based sre token scanner
 """
 import sre_parse, sre_compile, sre_constants
 from sre_constants import BRANCH, SUBPATTERN
-from sre import VERBOSE, MULTILINE, DOTALL
 import re
 
 __all__ = ['Scanner', 'pattern']
 
-FLAGS = (VERBOSE | MULTILINE | DOTALL)
+FLAGS = (re.VERBOSE | re.MULTILINE | re.DOTALL)
 class Scanner(object):
     def __init__(self, lexicon, flags=FLAGS):
         self.actions = [None]
