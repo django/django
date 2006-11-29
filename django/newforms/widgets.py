@@ -36,6 +36,13 @@ class Widget(object):
             attrs.update(extra_attrs)
         return attrs
 
+    def value_from_datadict(self, data, name):
+        """
+        Given a dictionary of data and this widget's name, returns the value
+        of this widget. Returns None if it's not provided.
+        """
+        return data.get(name, None)
+
     def id_for_label(self, id_):
         """
         Returns the HTML ID attribute of this Widget for use by a <label>,
@@ -186,11 +193,15 @@ class CheckboxSelectMultiple(SelectMultiple):
         cb = CheckboxInput(final_attrs)
         for option_value, option_label in chain(self.choices, choices):
             option_value = smart_unicode(option_value)
-            field_name = unicode(name + option_value)
+            field_name = name + option_value
             rendered_cb = cb.render(field_name, (option_value in str_values))
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
         output.append(u'</ul>')
         return u'\n'.join(output)
+
+    def value_from_datadict(self, data, name):
+        data_list = [k for k, v in self.choices if data.get(name + k)]
+        return data_list or None
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()

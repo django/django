@@ -1471,6 +1471,7 @@ For a form with a <select>, use ChoiceField:
 <option value="J">Java</option>
 </select>
 
+Add widget=RadioSelect to use that widget with a ChoiceField.
 >>> class FrameworkForm(Form):
 ...     name = CharField()
 ...     language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=RadioSelect)
@@ -1544,6 +1545,46 @@ MultipleChoiceField is a special case, as its data is required to be a list:
 <option value="J">John Lennon</option>
 <option value="P" selected="selected">Paul McCartney</option>
 </select>
+
+MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
+>>> class SongForm(Form):
+...     name = CharField()
+...     composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
+>>> f = SongForm()
+>>> print f['composers']
+<ul>
+<li><label><input type="checkbox" name="composersJ" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composersP" /> Paul McCartney</label></li>
+</ul>
+>>> f = SongForm({'composers': ['J']})
+>>> print f['composers']
+<ul>
+<li><label><input checked="checked" type="checkbox" name="composersJ" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composersP" /> Paul McCartney</label></li>
+</ul>
+>>> f = SongForm({'composers': ['J', 'P']})
+>>> print f['composers']
+<ul>
+<li><label><input checked="checked" type="checkbox" name="composersJ" /> John Lennon</label></li>
+<li><label><input checked="checked" type="checkbox" name="composersP" /> Paul McCartney</label></li>
+</ul>
+
+When using CheckboxSelectMultiple, the framework automatically converts the
+data in clean_data to a list of values, rather than the underlying HTML form
+field name.
+>>> f = SongForm({'name': 'Yesterday'})
+>>> f.errors
+{'composers': [u'This field is required.']}
+>>> f = SongForm({'name': 'Yesterday', 'composersJ': 'on'})
+>>> f.errors
+{}
+>>> f.clean_data
+{'composers': [u'J'], 'name': u'Yesterday'}
+>>> f = SongForm({'name': 'Yesterday', 'composersJ': 'on', 'composersP': 'on'})
+>>> f.errors
+{}
+>>> f.clean_data
+{'composers': [u'J', u'P'], 'name': u'Yesterday'}
 
 There are a couple of ways to do multiple-field validation. If you want the
 validation message to be associated with a particular field, implement the

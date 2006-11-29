@@ -118,7 +118,10 @@ class Form(object):
             self.__errors = errors
             return
         for name, field in self.fields.items():
-            value = self.data.get(name, None)
+            # value_from_datadict() gets the data from the dictionary.
+            # Each widget type knows how to retrieve its own data, because some
+            # widgets split data over several HTML fields.
+            value = field.widget.value_from_datadict(self.data, name)
             try:
                 value = field.clean(value)
                 self.clean_data[name] = value
