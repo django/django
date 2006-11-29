@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 class UserCreationForm(forms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
@@ -13,7 +14,7 @@ class UserCreationForm(forms.Manipulator):
                 validator_list=[validators.isAlphaNumeric, self.isValidUsername]),
             forms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
             forms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
-                validator_list=[validators.AlwaysMatchesOtherField('password1', "The two password fields didn't match.")]),
+                validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 
     def isValidUsername(self, field_data, all_data):
@@ -21,7 +22,7 @@ class UserCreationForm(forms.Manipulator):
             User.objects.get(username=field_data)
         except User.DoesNotExist:
             return
-        raise validators.ValidationError, 'A user with that username already exists.'
+        raise validators.ValidationError, _('A user with that username already exists.')
 
     def save(self, new_data):
         "Creates the user."
@@ -81,7 +82,7 @@ class PasswordResetForm(forms.Manipulator):
         try:
             self.user_cache = User.objects.get(email__iexact=new_data)
         except User.DoesNotExist:
-            raise validators.ValidationError, "That e-mail address doesn't have an associated user acount. Are you sure you've registered?"
+            raise validators.ValidationError, _("That e-mail address doesn't have an associated user acount. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
@@ -113,14 +114,14 @@ class PasswordChangeForm(forms.Manipulator):
             forms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
                 validator_list=[self.isValidOldPassword]),
             forms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
-                validator_list=[validators.AlwaysMatchesOtherField('new_password2', "The two 'new password' fields didn't match.")]),
+                validator_list=[validators.AlwaysMatchesOtherField('new_password2', _("The two 'new password' fields didn't match."))]),
             forms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
         )
 
     def isValidOldPassword(self, new_data, all_data):
         "Validates that the old_password field is correct."
         if not self.user.check_password(new_data):
-            raise validators.ValidationError, "Your old password was entered incorrectly. Please enter it again."
+            raise validators.ValidationError, _("Your old password was entered incorrectly. Please enter it again.")
 
     def save(self, new_data):
         "Saves the new password."

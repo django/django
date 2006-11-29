@@ -3,12 +3,12 @@ Serializing Django objects
 ==========================
 
 .. note::
-    
+
     This API is currently under heavy development and may change --
     perhaps drastically -- in the future.
-    
+
     You have been warned.
-    
+
 Django's serialization framework provides a mechanism for "translating" Django
 objects into other formats. Usually these other formats will be text-based and
 used for sending Django objects over a wire, but it's possible for a
@@ -21,7 +21,7 @@ At the highest level, serializing data is a very simple operation::
 
     from django.core import serializers
     data = serializers.serialize("xml", SomeModel.objects.all())
-    
+
 The arguments to the ``serialize`` function are the format to serialize the
 data to (see `Serialization formats`_) and a QuerySet_ to serialize.
 (Actually, the second argument can be any iterator that yields Django objects,
@@ -34,7 +34,7 @@ You can also use a serializer object directly::
     xml_serializer = serializers.get_serializer("xml")
     xml_serializer.serialize(queryset)
     data = xml_serializer.getvalue()
-    
+
 This is useful if you want to serialize data directly to a file-like object
 (which includes a HTTPResponse_)::
 
@@ -50,7 +50,7 @@ Deserializing data is also a fairly simple operation::
 
     for obj in serializers.deserialize("xml", data):
         do_something_with(obj)
-    
+
 As you can see, the ``deserialize`` function takes the same format argument as
 ``serialize``, a string or stream of data, and returns an iterator.
 
@@ -69,7 +69,7 @@ something like::
     for deserialized_object in serializers.deserialize("xml", data):
         if object_should_be_saved(deserialized_object):
             obj.save()
-            
+
 In other words, the usual use is to examine the deserialized objects to make
 sure that they are "appropriate" for saving before doing so.  Of course, if you trust your data source you could just save the object and move on.
 
@@ -89,22 +89,22 @@ Django "ships" with a few included serializers:
                 bundled with Django).
 
     ``python``  Translates to and from "simple" Python objects (lists, dicts,
-                strings, etc.).  Not really all that useful on its own, but 
+                strings, etc.).  Not really all that useful on its own, but
                 used as a base for other serializers.
     ==========  ==============================================================
 
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson
 
-Notes For Specific Serialization Formats
+Notes for specific serialization formats
 ----------------------------------------
 
 json
 ~~~~
 
-If you are using UTF-8 (or any other non-ASCII encoding) data with the JSON
+If you're using UTF-8 (or any other non-ASCII encoding) data with the JSON
 serializer, you must pass ``ensure_ascii=False`` as a parameter to the
-``serialize()`` call. Otherwise the output will not be encoded correctly.
+``serialize()`` call. Otherwise, the output won't be encoded correctly.
 
 For example::
 

@@ -392,10 +392,10 @@ and `2` is verbose output.
 Example usage::
     django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
 
-Tell Django where to find the various stylesheets and Javascript files for the
-admin interface when running the development server. Normally these files are
-served out of the Django source tree, but since some designers change these
-files for their site, this option allows you to test against custom versions.
+Tells Django where to find the various CSS and JavaScript files for the admin
+interface when running the development server. Normally these files are served
+out of the Django source tree, but because some designers customize these files
+for their site, this option allows you to test against custom versions.
 
 Extra niceties
 ==============

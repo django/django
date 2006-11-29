@@ -73,7 +73,7 @@ class SchemaBuilder(object):
         table_output = []
 
         for f in opts.fields:
-            if isinstance(f, models.ForeignKey):
+            if isinstance(f, (models.ForeignKey, models.OneToOneField)):
                 rel_field = f.rel.get_related_field()
                 data_type = self.get_rel_data_type(rel_field)
             else:

@@ -54,6 +54,7 @@ class Manipulator(object):
     def get_validation_errors(self, new_data):
         "Returns dictionary mapping field_names to error-message lists"
         errors = {}
+        self.prepare(new_data)
         for field in self.fields:
             errors.update(field.get_validation_errors(new_data))
             val_name = 'validate_%s' % field.field_name
@@ -638,7 +639,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
             if str(value) in str_data_list:
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
-            output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
+            output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s value="on" /> <label for="%s">%s</label></li>' % \
                 (self.get_id() + escape(value), self.__class__.__name__, field_name, checked_html,
                 self.get_id() + escape(value), choice))
         output.append('</ul>')

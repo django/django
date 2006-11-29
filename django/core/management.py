@@ -1128,7 +1128,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
     parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
         type='choice', choices=['0', '1', '2'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
-    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Lets you manually specify the directory to serve admin media from when running the development server.'),
+    parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Specifies the directory from which to serve admin media for runserver.'),
 
     options, args = parser.parse_args(argv[1:])
 
