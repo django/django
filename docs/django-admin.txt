@@ -295,6 +295,8 @@ give you the option of creating a superuser immediately.
 test
 ----
 
+**New in Django development version**
+
 Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
 
 .. _testing django applications: ../testing/
@@ -348,6 +350,8 @@ options.
 --noinput
 ---------
 
+**New in Django development version**
+
 Inform django-admin that the user should NOT be prompted for any input. Useful if
 the django-admin script will be executed as an unattended, automated script.
 
@@ -368,6 +372,8 @@ Example output::
 
 --verbosity
 -----------
+
+**New in Django development version**
 
 Example usage::
 
