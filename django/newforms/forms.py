@@ -182,7 +182,7 @@ class BoundField(object):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self._name, self._form.data.get(self._name, None), attrs=attrs)
+        return widget.render(self._name, self.data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -193,6 +193,11 @@ class BoundField(object):
     def as_textarea(self, attrs=None):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
+
+    def _data(self):
+        "Returns the data for this BoundField, or None if it wasn't given."
+        return self._form.data.get(self._name, None)
+    data = property(_data)
 
     def _verbose_name(self):
         return pretty_name(self._name)

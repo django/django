@@ -1268,6 +1268,11 @@ u''
 <input type="text" name="first_name" value="John" />
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
+>>> for boundfield in p:
+...     print boundfield.verbose_name, boundfield.data
+First name John
+Last name Lennon
+Birthday 1940-10-9
 >>> print p
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
