@@ -30,6 +30,7 @@ class Widget(object):
         raise NotImplementedError
 
     def build_attrs(self, extra_attrs=None, **kwargs):
+        "Helper function for building an attribute dictionary."
         attrs = dict(self.attrs, **kwargs)
         if extra_attrs:
             attrs.update(extra_attrs)
