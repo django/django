@@ -423,8 +423,7 @@ def _install(app, commit=True, initial_data=True, pending_allowed=False,
                 manager = model._default_manager
                 if model in models_installed:
                     for rel_class, f in pending[model]:
-                        for statement in manager.get_pending(rel_class, f):
-                            statement.execute()
+                        manager.get_pending(rel_class, f).execute()
                     pending.pop(model)
                 elif not pending_allowed:
                     raise Exception("%s is not installed, but it has pending "

@@ -147,6 +147,9 @@ class Manager(object):
         return pending
 
     def get_pending(self, rel_class, f):
+        """Get list pending statement relating my model to rel_class via
+        field f
+        """
         builder = self.db.get_creation_module().builder
         return builder.get_ref_sql(self.model, rel_class, f)
 
