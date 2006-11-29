@@ -1373,6 +1373,44 @@ For a form with a <select>, use ChoiceField:
 <li><label><input type="radio" name="language" value="P" /> Python</label></li>
 <li><label><input type="radio" name="language" value="J" /> Java</label></li>
 </ul>
+>>> print f
+<tr><td>Name:</td><td><input type="text" name="name" /></td></tr>
+<tr><td>Language:</td><td><ul>
+<li><label><input type="radio" name="language" value="P" /> Python</label></li>
+<li><label><input type="radio" name="language" value="J" /> Java</label></li>
+</ul></td></tr>
+>>> print f.as_ul()
+<li>Name: <input type="text" name="name" /></li>
+<li>Language: <ul>
+<li><label><input type="radio" name="language" value="P" /> Python</label></li>
+<li><label><input type="radio" name="language" value="J" /> Java</label></li>
+</ul></li>
+
+Regarding auto_id and <label>, RadioSelect is a special case. Each radio button
+gets a distinct ID, formed by appending an underscore plus the button's
+zero-based index.
+>>> f = FrameworkForm(auto_id='id_%s')
+>>> print f['language']
+<ul>
+<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul>
+
+When RadioSelect is used with auto_id, and the whole form is printed using
+either as_table() or as_ul(), the label for the RadioSelect will point to the
+ID of the *first* radio button.
+>>> print f
+<tr><td><label for="id_name">Name:</label></td><td><input type="text" name="name" id="id_name" /></td></tr>
+<tr><td><label for="id_language_0">Language:</label></td><td><ul>
+<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul></td></tr>
+>>> print f.as_ul()
+<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
+<li><label for="id_language_0">Language:</label> <ul>
+<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul></li>
 
 MultipleChoiceField is a special case, as its data is required to be a list:
 >>> class SongForm(Form):

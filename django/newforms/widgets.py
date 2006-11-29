@@ -35,6 +35,19 @@ class Widget(object):
             attrs.update(extra_attrs)
         return attrs
 
+    def id_for_label(self, id_):
+        """
+        Returns the HTML ID attribute of this Widget for use by a <label>,
+        given the ID of the field. Returns None if no ID is available.
+
+        This hook is necessary because some widgets have multiple HTML
+        elements and, thus, multiple IDs. In that case, this method should
+        return an ID value that corresponds to the first ID in the widget's
+        tags.
+        """
+        return id_
+    id_for_label = classmethod(id_for_label)
+
 class Input(Widget):
     """
     Base class for all <input> widgets (except type='checkbox' and
@@ -111,10 +124,11 @@ class SelectMultiple(Widget):
 
 class RadioInput(object):
     "An object used by RadioFieldRenderer that represents a single <input type='radio'>."
-    def __init__(self, name, value, attrs, choice):
+    def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
-        self.attrs = attrs or {}
+        self.attrs = attrs
         self.choice_value, self.choice_label = choice
+        self.index = index
 
     def __str__(self):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
@@ -123,6 +137,8 @@ class RadioInput(object):
         return self.value == smart_unicode(self.choice_value)
 
     def tag(self):
+        if self.attrs.has_key('id'):
+            self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
@@ -135,8 +151,8 @@ class RadioFieldRenderer(object):
         self.choices = choices
 
     def __iter__(self):
-        for choice in self.choices:
-            yield RadioInput(self.name, self.value, self.attrs, choice)
+        for i, choice in enumerate(self.choices):
+            yield RadioInput(self.name, self.value, self.attrs.copy(), choice, i)
 
     def __str__(self):
         "Outputs a <ul> for this set of radio fields."
@@ -147,7 +163,18 @@ class RadioSelect(Select):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
         str_value = smart_unicode(value) # Normalize to string.
+        attrs = attrs or {}
         return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
+
+    def id_for_label(self, id_):
+        # RadioSelect is represented by multiple <input type="radio"> fields,
+        # each of which has a distinct ID. The IDs are made distinct by a "_X"
+        # suffix, where X is the zero-based index of the radio field. Thus,
+        # the label for a RadioSelect should reference the first one ('_0').
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
 
 class CheckboxSelectMultiple(Widget):
     pass

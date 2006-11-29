@@ -202,9 +202,10 @@ class BoundField(object):
         field's HTML-escaped verbose_name.
         """
         contents = contents or escape(self.verbose_name)
-        id_ = self._field.widget.attrs.get('id') or self.auto_id
+        widget = self._field.widget
+        id_ = widget.attrs.get('id') or self.auto_id
         if id_:
-            contents = '<label for="%s">%s</label>' % (id_, contents)
+            contents = '<label for="%s">%s</label>' % (widget.id_for_label(id_), contents)
         return contents
 
     def _auto_id(self):
