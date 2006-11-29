@@ -434,11 +434,11 @@ class HiddenField(FormField):
             (self.get_id(), self.field_name, escape(data))
 
 class CheckboxField(FormField):
-    def __init__(self, field_name, checked_by_default=False, validator_list=None):
+    def __init__(self, field_name, checked_by_default=False, validator_list=None, is_required=False):
         if validator_list is None: validator_list = []
         self.field_name = field_name
         self.checked_by_default = checked_by_default
-        self.is_required = False # because the validator looks for these
+        self.is_required = is_required
         self.validator_list = validator_list[:]
 
     def render(self, data):
@@ -639,8 +639,8 @@ class CheckboxSelectMultipleField(SelectMultipleField):
                 checked_html = ' checked="checked"'
             field_name = '%s%s' % (self.field_name, value)
             output.append('<li><input type="checkbox" id="%s" class="v%s" name="%s"%s /> <label for="%s">%s</label></li>' % \
-                (self.get_id() + value , self.__class__.__name__, field_name, checked_html,
-                self.get_id() + value, choice))
+                (self.get_id() + escape(value), self.__class__.__name__, field_name, checked_html,
+                self.get_id() + escape(value), choice))
         output.append('</ul>')
         return '\n'.join(output)
 
@@ -743,7 +743,7 @@ class FloatField(TextField):
         if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
         validator_list = [self.isValidFloat] + validator_list
-        TextField.__init__(self, field_name, max_digits+1, max_digits+1, is_required, validator_list)
+        TextField.__init__(self, field_name, max_digits+2, max_digits+2, is_required, validator_list)
 
     def isValidFloat(self, field_data, all_data):
         v = validators.IsValidFloat(self.max_digits, self.decimal_places)
@@ -952,10 +952,7 @@ class USStateField(TextField):
             raise validators.CriticalValidationError, e.messages
 
     def html2python(data):
-        if data:
-            return data.upper() # Should always be stored in upper case
-        else:
-            return None
+        return data.upper() # Should always be stored in upper case
     html2python = staticmethod(html2python)
 
 class CommaSeparatedIntegerField(TextField):
@@ -972,9 +969,19 @@ class CommaSeparatedIntegerField(TextField):
         except validators.ValidationError, e:
             raise validators.CriticalValidationError, e.messages
 
+    def render(self, data):
+        if data is None:
+            data = ''
+        elif isinstance(data, (list, tuple)):
+            data = ','.join(data)
+        return super(CommaSeparatedIntegerField, self).render(data)
+
 class RawIdAdminField(CommaSeparatedIntegerField):
     def html2python(data):
-        return data.split(',')
+        if data:
+            return data.split(',')
+        else:
+            return []
     html2python = staticmethod(html2python)
 
 class XMLLargeTextField(LargeTextField):

@@ -727,6 +727,8 @@ class ChangeList(object):
             for bit in self.query.split():
                 or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
                 other_qs = QuerySet(self.model)
+                if qs._select_related:
+                    other_qs = other_qs.select_related()
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
 

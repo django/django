@@ -275,6 +275,10 @@ CACHE_MIDDLEWARE_KEY_PREFIX = ''
 
 COMMENTS_ALLOW_PROFANITIES = False
 
+# The profanities that will trigger a validation error in the
+# 'hasNoProfanities' validator. All of these should be in lower-case.
+PROFANITIES_LIST = ['asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit']
+
 # The group ID that designates which users are banned.
 # Set to None if you're not using it.
 COMMENTS_BANNED_USERS_GROUP = None

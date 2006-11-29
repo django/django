@@ -110,9 +110,11 @@ def dictfetchone(cursor):
 def dictfetchmany(cursor, number):
     "Returns a certain number of rows from a cursor as a dict"
     desc = cursor.description
-    return [_dict_helper(desc, row) for row in cursor.fetchmany(number)]
+    for row in cursor.fetchmany(number):
+        yield _dict_helper(desc, row)
 
 def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
     desc = cursor.description
-    return [_dict_helper(desc, row) for row in cursor.fetchall()]
+    for row in cursor.fetchall():
+        yield _dict_helper(desc, row)
