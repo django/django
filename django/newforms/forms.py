@@ -82,7 +82,7 @@ class Form(object):
             bf = BoundField(self, field, name)
             if bf.errors:
                 output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
-            output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(bf.verbose_name+':'), bf))
+            output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
         return u'\n'.join(output)
 
     def as_ul(self):
@@ -96,7 +96,7 @@ class Form(object):
             line = u'<li>'
             if bf.errors:
                 line += str(bf.errors)
-            line += u'%s %s</li>' % (bf.label_tag(bf.verbose_name+':'), bf)
+            line += u'%s %s</li>' % (bf.label_tag(escape(bf.verbose_name+':')), bf)
             output.append(line)
         return u'\n'.join(output)
 
