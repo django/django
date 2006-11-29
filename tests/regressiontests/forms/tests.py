@@ -475,6 +475,113 @@ beatle J P Paul False
 beatle J G George False
 beatle J R Ringo False
 
+# CheckboxSelectMultiple Widget ###############################################
+
+>>> w = CheckboxSelectMultiple()
+>>> print w.render('beatles', ['J'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+>>> print w.render('beatles', ['J', 'P'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+>>> print w.render('beatles', ['J', 'P', 'R'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+
+If the value is None, none of the options are selected:
+>>> print w.render('beatles', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+
+If the value corresponds to a label (but not to an option value), none of the options are selected:
+>>> print w.render('beatles', ['John'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+
+If multiple values are given, but some of them are not valid, the valid ones are selected:
+>>> print w.render('beatles', ['J', 'G', 'foo'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
+<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatlesG" /> George</label></li>
+<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+</ul>
+
+The value is compared to its str():
+>>> print w.render('nums', [2], choices=[('1', '1'), ('2', '2'), ('3', '3')])
+<ul>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+</ul>
+>>> print w.render('nums', ['2'], choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+</ul>
+>>> print w.render('nums', [2], choices=[(1, 1), (2, 2), (3, 3)])
+<ul>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+</ul>
+
+The 'choices' argument can be any iterable:
+>>> def get_choices():
+...     for i in range(5):
+...         yield (i, i)
+>>> print w.render('nums', [2], choices=get_choices())
+<ul>
+<li><label><input type="checkbox" name="nums0" /> 0</label></li>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums4" /> 4</label></li>
+</ul>
+
+You can also pass 'choices' to the constructor:
+>>> w = CheckboxSelectMultiple(choices=[(1, 1), (2, 2), (3, 3)])
+>>> print w.render('nums', [2])
+<ul>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+</ul>
+
+If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
+>>> print w.render('nums', [2], choices=[(4, 4), (5, 5)])
+<ul>
+<li><label><input type="checkbox" name="nums1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums4" /> 4</label></li>
+<li><label><input type="checkbox" name="nums5" /> 5</label></li>
+</ul>
+
+>>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
+u'<ul>\n<li><label><input type="checkbox" name="nums1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+
 # CharField ###################################################################
 
 >>> f = CharField()

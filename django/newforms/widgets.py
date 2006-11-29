@@ -5,7 +5,7 @@ HTML Widget classes
 __all__ = (
     'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'FileInput',
     'Textarea', 'CheckboxInput',
-    'Select', 'SelectMultiple', 'RadioSelect',
+    'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
 )
 
 from util import smart_unicode
@@ -176,5 +176,24 @@ class RadioSelect(Select):
         return id_
     id_for_label = classmethod(id_for_label)
 
-class CheckboxSelectMultiple(Widget):
-    pass
+class CheckboxSelectMultiple(SelectMultiple):
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = [u'<ul>']
+        str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
+        cb = CheckboxInput(final_attrs)
+        for option_value, option_label in chain(self.choices, choices):
+            option_value = smart_unicode(option_value)
+            field_name = unicode(name + option_value)
+            rendered_cb = cb.render(field_name, (option_value in str_values))
+            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
+        output.append(u'</ul>')
+        return u'\n'.join(output)
+
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
