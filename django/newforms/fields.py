@@ -76,6 +76,8 @@ class IntegerField(Field):
         of int().
         """
         super(IntegerField, self).clean(value)
+        if not self.required and value in EMPTY_VALUES:
+            return u''
         try:
             return int(value)
         except (ValueError, TypeError):
@@ -170,6 +172,8 @@ class RegexField(Field):
         Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         value = smart_unicode(value)
+        if not self.required and value == u'':
+            return value
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
@@ -246,6 +250,8 @@ class ChoiceField(Field):
         value = Field.clean(self, value)
         if value in EMPTY_VALUES: value = u''
         value = smart_unicode(value)
+        if not self.required and value == u'':
+            return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
             raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % value)
@@ -259,10 +265,12 @@ class MultipleChoiceField(ChoiceField):
         """
         Validates that the input is a list or tuple.
         """
-        if not isinstance(value, (list, tuple)):
-            raise ValidationError(u'Enter a list of values.')
         if self.required and not value:
             raise ValidationError(u'This field is required.')
+        elif not self.required and not value:
+            return []
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(u'Enter a list of values.')
         new_value = []
         for val in value:
             val = smart_unicode(val)
@@ -277,6 +285,11 @@ class MultipleChoiceField(ChoiceField):
 class ComboField(Field):
     def __init__(self, fields=(), required=True, widget=None):
         Field.__init__(self, required, widget)
+        # Set 'required' to False on the individual fields, because the
+        # required validation will be handled by ComboField, not by those
+        # individual fields.
+        for f in fields:
+            f.required = False
         self.fields = fields
 
     def clean(self, value):
