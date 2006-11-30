@@ -1436,11 +1436,14 @@ Any Field can have a Widget class passed to its constructor:
 >>> print f['message']
 <textarea name="message"></textarea>
 
-as_textarea() and as_text() are shortcuts for changing the output widget type:
+as_textarea(), as_text() and as_hidden() are shortcuts for changing the output
+widget type:
 >>> f['subject'].as_textarea()
 u'<textarea name="subject"></textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" />'
+>>> f['message'].as_hidden()
+u'<input type="hidden" name="message" />'
 
 The 'widget' parameter to a Field can also be an instance:
 >>> class ContactForm(Form):
@@ -1450,7 +1453,8 @@ The 'widget' parameter to a Field can also be an instance:
 >>> print f['message']
 <textarea rows="80" cols="20" name="message"></textarea>
 
-Instance-level attrs are *not* carried over to as_textarea() and as_text():
+Instance-level attrs are *not* carried over to as_textarea(), as_text() and
+as_hidden():
 >>> f['message'].as_text()
 u'<input type="text" name="message" />'
 >>> f = ContactForm({'subject': 'Hello', 'message': 'I love you.'})
@@ -1458,6 +1462,8 @@ u'<input type="text" name="message" />'
 u'<textarea name="subject">Hello</textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" value="I love you." />'
+>>> f['message'].as_hidden()
+u'<input type="hidden" name="message" value="I love you." />'
 
 For a form with a <select>, use ChoiceField:
 >>> class FrameworkForm(Form):

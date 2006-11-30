@@ -5,7 +5,7 @@ Form classes
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from fields import Field
-from widgets import TextInput, Textarea
+from widgets import TextInput, Textarea, HiddenInput
 from util import ErrorDict, ErrorList, ValidationError
 
 NON_FIELD_ERRORS = '__all__'
@@ -193,6 +193,12 @@ class BoundField(object):
     def as_textarea(self, attrs=None):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
+
+    def as_hidden(self, attrs=None):
+        """
+        Returns a string of HTML for representing this as an <input type="hidden">.
+        """
+        return self.as_widget(HiddenInput(), attrs)
 
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
