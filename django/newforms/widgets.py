@@ -23,6 +23,8 @@ flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs
 
 class Widget(object):
     requires_data_list = False # Determines whether render()'s 'value' argument should be a list.
+    is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
+
     def __init__(self, attrs=None):
         self.attrs = attrs or {}
 
@@ -76,6 +78,7 @@ class PasswordInput(Input):
 
 class HiddenInput(Input):
     input_type = 'hidden'
+    is_hidden = True
 
 class FileInput(Input):
     input_type = 'file'

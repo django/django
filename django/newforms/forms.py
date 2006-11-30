@@ -80,9 +80,15 @@ class Form(object):
             output.append(u'<tr><td colspan="2">%s</td></tr>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            if bf.errors:
-                output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
-            output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
+            if bf.is_hidden:
+                if bf.errors:
+                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
+                    output.append(u'<tr><td colspan="2">%s</td></tr>' % new_errors)
+                output.append(str(bf))
+            else:
+                if bf.errors:
+                    output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
+                output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
         return u'\n'.join(output)
 
     def as_ul(self):
@@ -93,11 +99,13 @@ class Form(object):
             output.append(u'<li>%s</li>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            line = u'<li>'
-            if bf.errors:
-                line += str(bf.errors)
-            line += u'%s %s</li>' % (bf.label_tag(escape(bf.verbose_name+':')), bf)
-            output.append(line)
+            if bf.is_hidden:
+                if bf.errors:
+                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
+                    output.append(u'<li>%s</li>' % new_errors)
+                output.append(str(bf))
+            else:
+                output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
         return u'\n'.join(output)
 
     def non_field_errors(self):
@@ -221,6 +229,11 @@ class BoundField(object):
         if id_:
             contents = '<label for="%s">%s</label>' % (widget.id_for_label(id_), contents)
         return contents
+
+    def _is_hidden(self):
+        "Returns True if this BoundField's widget is hidden."
+        return self._field.widget.is_hidden
+    is_hidden = property(_is_hidden)
 
     def _auto_id(self):
         """

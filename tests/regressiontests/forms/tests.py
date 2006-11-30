@@ -1689,6 +1689,56 @@ subclass' __init__().
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
 
+HiddenInput widgets are displayed differently in the as_table() and as_ul()
+output of a Form -- their verbose names are not displayed, and a separate
+<tr>/<li> is not displayed.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     hidden_text = CharField(widget=HiddenInput)
+...     birthday = DateField()
+>>> p = Person()
+>>> print p
+<tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
+<input type="hidden" name="hidden_text" />
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<input type="hidden" name="hidden_text" />
+<li>Birthday: <input type="text" name="birthday" /></li>
+
+With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
+>>> p = Person(auto_id='id_%s')
+>>> print p
+<tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<input type="hidden" name="hidden_text" id="id_hidden_text" />
+<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+>>> print p.as_ul()
+<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<input type="hidden" name="hidden_text" id="id_hidden_text" />
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+
+If a field with a HiddenInput has errors, the as_table() and as_ul() output
+will include the error message(s) with the text "(Hidden field [fieldname]) "
+prepended.
+>>> p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'})
+>>> print p
+<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
+<tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
+<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
+<input type="hidden" name="hidden_text" />
+<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" value="John" /></li>
+<li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
+<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
+<input type="hidden" name="hidden_text" />
+<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>
+
 A Form's fields are displayed in the same order in which they were defined.
 >>> class TestForm(Form):
 ...     field1 = CharField()
