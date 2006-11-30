@@ -164,10 +164,18 @@ u'<textarea class="fun" name="msg">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0
 >>> w = CheckboxInput()
 >>> w.render('is_cool', '')
 u'<input type="checkbox" name="is_cool" />'
+>>> w.render('is_cool', None)
+u'<input type="checkbox" name="is_cool" />'
 >>> w.render('is_cool', False)
 u'<input type="checkbox" name="is_cool" />'
 >>> w.render('is_cool', True)
 u'<input checked="checked" type="checkbox" name="is_cool" />'
+
+Using any value that's not in ('', None, False, True) will check the checkbox
+and set the 'value' attribute.
+>>> w.render('is_cool', 'foo')
+u'<input checked="checked" type="checkbox" name="is_cool" value="foo" />'
+
 >>> w.render('is_cool', False, attrs={'class': 'pretty'})
 u'<input type="checkbox" name="is_cool" class="pretty" />'
 
@@ -180,6 +188,29 @@ u'<input type="checkbox" class="pretty" name="is_cool" />'
 >>> w = CheckboxInput(attrs={'class': 'pretty'})
 >>> w.render('is_cool', '', attrs={'class': 'special'})
 u'<input type="checkbox" class="special" name="is_cool" />'
+
+You can pass 'check_test' to the constructor. This is a callable that takes the
+value and returns True if the box should be checked.
+>>> w = CheckboxInput(check_test=lambda value: value.startswith('hello'))
+>>> w.render('greeting', '')
+u'<input type="checkbox" name="greeting" />'
+>>> w.render('greeting', 'hello')
+u'<input checked="checked" type="checkbox" name="greeting" value="hello" />'
+>>> w.render('greeting', 'hello there')
+u'<input checked="checked" type="checkbox" name="greeting" value="hello there" />'
+>>> w.render('greeting', 'hello & goodbye')
+u'<input checked="checked" type="checkbox" name="greeting" value="hello &amp; goodbye" />'
+
+A subtlety: If the 'check_test' argument cannot handle a value and raises any
+exception during its __call__, then the exception will be swallowed and the box
+will not be checked. In this example, the 'check_test' assumes the value has a
+startswith() method, which fails for the values True, False and None.
+>>> w.render('greeting', True)
+u'<input type="checkbox" name="greeting" />'
+>>> w.render('greeting', False)
+u'<input type="checkbox" name="greeting" />'
+>>> w.render('greeting', None)
+u'<input type="checkbox" name="greeting" />'
 
 # Select Widget ###############################################################
 
@@ -488,71 +519,71 @@ beatle J R Ringo False
 >>> w = CheckboxSelectMultiple()
 >>> print w.render('beatles', ['J'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 >>> print w.render('beatles', ['J', 'P'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input checked="checked" type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 >>> print w.render('beatles', ['J', 'P', 'R'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input checked="checked" type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input checked="checked" type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 
 If the value is None, none of the options are selected:
 >>> print w.render('beatles', None, choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 
 If the value corresponds to a label (but not to an option value), none of the options are selected:
 >>> print w.render('beatles', ['John'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 
 If multiple values are given, but some of them are not valid, the valid ones are selected:
 >>> print w.render('beatles', ['J', 'G', 'foo'], choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 <ul>
-<li><label><input checked="checked" type="checkbox" name="beatlesJ" /> John</label></li>
-<li><label><input type="checkbox" name="beatlesP" /> Paul</label></li>
-<li><label><input checked="checked" type="checkbox" name="beatlesG" /> George</label></li>
-<li><label><input type="checkbox" name="beatlesR" /> Ringo</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
+<li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
+<li><label><input checked="checked" type="checkbox" name="beatles" value="G" /> George</label></li>
+<li><label><input type="checkbox" name="beatles" value="R" /> Ringo</label></li>
 </ul>
 
 The value is compared to its str():
 >>> print w.render('nums', [2], choices=[('1', '1'), ('2', '2'), ('3', '3')])
 <ul>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
 </ul>
 >>> print w.render('nums', ['2'], choices=[(1, 1), (2, 2), (3, 3)])
 <ul>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
 </ul>
 >>> print w.render('nums', [2], choices=[(1, 1), (2, 2), (3, 3)])
 <ul>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
 </ul>
 
 The 'choices' argument can be any iterable:
@@ -561,34 +592,34 @@ The 'choices' argument can be any iterable:
 ...         yield (i, i)
 >>> print w.render('nums', [2], choices=get_choices())
 <ul>
-<li><label><input type="checkbox" name="nums0" /> 0</label></li>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
-<li><label><input type="checkbox" name="nums4" /> 4</label></li>
+<li><label><input type="checkbox" name="nums" value="0" /> 0</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="4" /> 4</label></li>
 </ul>
 
 You can also pass 'choices' to the constructor:
 >>> w = CheckboxSelectMultiple(choices=[(1, 1), (2, 2), (3, 3)])
 >>> print w.render('nums', [2])
 <ul>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
 </ul>
 
 If 'choices' is passed to both the constructor and render(), then they'll both be in the output:
 >>> print w.render('nums', [2], choices=[(4, 4), (5, 5)])
 <ul>
-<li><label><input type="checkbox" name="nums1" /> 1</label></li>
-<li><label><input checked="checked" type="checkbox" name="nums2" /> 2</label></li>
-<li><label><input type="checkbox" name="nums3" /> 3</label></li>
-<li><label><input type="checkbox" name="nums4" /> 4</label></li>
-<li><label><input type="checkbox" name="nums5" /> 5</label></li>
+<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>
+<li><label><input checked="checked" type="checkbox" name="nums" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>
+<li><label><input type="checkbox" name="nums" value="4" /> 4</label></li>
+<li><label><input type="checkbox" name="nums" value="5" /> 5</label></li>
 </ul>
 
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
-u'<ul>\n<li><label><input type="checkbox" name="nums1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
 
 ##########
 # Fields #
@@ -1599,34 +1630,33 @@ MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 >>> f = SongForm()
 >>> print f['composers']
 <ul>
-<li><label><input type="checkbox" name="composersJ" /> John Lennon</label></li>
-<li><label><input type="checkbox" name="composersP" /> Paul McCartney</label></li>
+<li><label><input type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 >>> f = SongForm({'composers': ['J']})
 >>> print f['composers']
 <ul>
-<li><label><input checked="checked" type="checkbox" name="composersJ" /> John Lennon</label></li>
-<li><label><input type="checkbox" name="composersP" /> Paul McCartney</label></li>
+<li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 >>> f = SongForm({'composers': ['J', 'P']})
 >>> print f['composers']
 <ul>
-<li><label><input checked="checked" type="checkbox" name="composersJ" /> John Lennon</label></li>
-<li><label><input checked="checked" type="checkbox" name="composersP" /> Paul McCartney</label></li>
+<li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
+<li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 
-When using CheckboxSelectMultiple, the framework automatically converts the
-data in clean_data to a list of values, rather than the underlying HTML form
-field name.
+When using CheckboxSelectMultiple, the framework expects a list of input and
+returns a list of input.
 >>> f = SongForm({'name': 'Yesterday'})
 >>> f.errors
 {'composers': [u'This field is required.']}
->>> f = SongForm({'name': 'Yesterday', 'composersJ': 'on'})
+>>> f = SongForm({'name': 'Yesterday', 'composers': ['J']})
 >>> f.errors
 {}
 >>> f.clean_data
 {'composers': [u'J'], 'name': u'Yesterday'}
->>> f = SongForm({'name': 'Yesterday', 'composersJ': 'on', 'composersP': 'on'})
+>>> f = SongForm({'name': 'Yesterday', 'composers': ['J', 'P']})
 >>> f.errors
 {}
 >>> f.clean_data

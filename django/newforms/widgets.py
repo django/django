@@ -91,9 +91,22 @@ class Textarea(Widget):
         return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
 
 class CheckboxInput(Widget):
+    def __init__(self, attrs=None, check_test=bool):
+        # check_test is a callable that takes a value and returns True
+        # if the checkbox should be checked for that value.
+        self.attrs = attrs or {}
+        self.check_test = check_test
+
     def render(self, name, value, attrs=None):
         final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
-        if value: final_attrs['checked'] = 'checked'
+        try:
+            result = self.check_test(value)
+        except: # Silently catch exceptions
+            result = False
+        if result:
+            final_attrs['checked'] = 'checked'
+        if value not in ('', True, False, None):
+            final_attrs['value'] = smart_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
 
 class Select(Widget):
@@ -193,18 +206,13 @@ class CheckboxSelectMultiple(SelectMultiple):
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
-        cb = CheckboxInput(final_attrs)
+        cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
         for option_value, option_label in chain(self.choices, choices):
             option_value = smart_unicode(option_value)
-            field_name = name + option_value
-            rendered_cb = cb.render(field_name, (option_value in str_values))
+            rendered_cb = cb.render(name, option_value)
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
         output.append(u'</ul>')
         return u'\n'.join(output)
-
-    def value_from_datadict(self, data, name):
-        data_list = [k for k, v in self.choices if data.get(name + k)]
-        return data_list or None
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
