@@ -4,6 +4,14 @@ r"""
 >>> import datetime
 >>> import re
 
+###########
+# Widgets #
+###########
+
+Each Widget class corresponds to an HTML form widget. A Widget knows how to
+render itself, given a field name and some data. Widgets don't perform
+validation.
+
 # TextInput Widget ############################################################
 
 >>> w = TextInput()
@@ -581,6 +589,25 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+
+##########
+# Fields #
+##########
+
+Each Field class does some sort of validation. Each Field has a clean() method,
+which either raises django.newforms.ValidationError or returns the "clean"
+data -- usually a Unicode object, but, in some rare cases, a list.
+
+Each Field's __init__() takes at least these parameters:
+    required -- Boolean that specifies whether the field is required.
+                True by default.
+    widget -- A Widget class, or instance of a Widget class, that should be
+              used for this Field when displaying it. Each Field has a default
+              Widget that it'll use if you don't specify this. In most cases,
+              the default widget is TextInput.
+
+Other than that, the Field subclasses have class-specific options for
+__init__(). For example, CharField has a max_length option.
 
 # CharField ###################################################################
 
@@ -1237,6 +1264,14 @@ ValidationError: [u'Enter a valid e-mail address.']
 u''
 >>> f.clean(None)
 u''
+
+#########
+# Forms #
+#########
+
+A Form is a collection of Fields. It knows how to validate a set of data and it
+knows how to render itself in a couple of default ways (e.g., an HTML table).
+You can pass it data in __init__(), as a dictionary.
 
 # Form ########################################################################
 
