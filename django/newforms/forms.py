@@ -2,6 +2,7 @@
 Form classes
 """
 
+from django.utils.datastructures import SortedDict
 from fields import Field
 from widgets import TextInput, Textarea
 from util import ErrorDict, ErrorList, ValidationError
@@ -13,18 +14,30 @@ def pretty_name(name):
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
 
+class SortedDictFromList(SortedDict):
+    "A dictionary that keeps its keys in the order in which they're inserted."
+    # This is different than django.utils.datastructures.SortedDict, because
+    # this takes a list/tuple as the argument to __init__().
+    def __init__(self, data=None):
+        if data is None: data = []
+        self.keyOrder = [d[0] for d in data]
+        dict.__init__(self, dict(data))
+
 class DeclarativeFieldsMetaclass(type):
     "Metaclass that converts Field attributes to a dictionary called 'fields'."
     def __new__(cls, name, bases, attrs):
-        attrs['fields'] = dict([(name, attrs.pop(name)) for name, obj in attrs.items() if isinstance(obj, Field)])
+        fields = [(name, attrs.pop(name)) for name, obj in attrs.items() if isinstance(obj, Field)]
+        fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+        attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
 class Form(object):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
-    def __init__(self, data=None): # TODO: prefix stuff
+    def __init__(self, data=None, auto_id=False): # TODO: prefix stuff
         self.data = data or {}
+        self.auto_id = auto_id
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
@@ -63,17 +76,15 @@ class Form(object):
         return not bool(self.errors())
 
     def as_table(self):
-        "Returns this form rendered as an HTML <table>."
-        output = u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-        return '<table>\n%s\n</table>' % output
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return u'\n'.join(['<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_ul(self):
-        "Returns this form rendered as an HTML <ul>."
-        output = u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
-        return '<ul>\n%s\n</ul>' % output
+        "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
+        return u'\n'.join(['<li>%s: %s</li>' % (pretty_name(name), BoundField(self, field, name)) for name, field in self.fields.items()])
 
     def as_table_with_errors(self):
-        "Returns this form rendered as an HTML <table>, with errors."
+        "Returns this form rendered as HTML <tr>s, with errors."
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -83,10 +94,10 @@ class Form(object):
             if bf.errors:
                 output.append('<tr><td colspan="2"><ul>%s</ul></td></tr>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors]))
             output.append('<tr><td>%s:</td><td>%s</td></tr>' % (pretty_name(name), bf))
-        return '<table>\n%s\n</table>' % '\n'.join(output)
+        return u'\n'.join(output)
 
     def as_ul_with_errors(self):
-        "Returns this form rendered as an HTML <ul>, with errors."
+        "Returns this form rendered as HTML <li>s, with errors."
         output = []
         if self.errors().get(NON_FIELD_ERRORS):
             # Errors not corresponding to a particular field are displayed at the top.
@@ -98,7 +109,7 @@ class Form(object):
                 line += '<ul>%s</ul>' % '\n'.join(['<li>%s</li>' % e for e in bf.errors])
             line += '%s: %s</li>' % (pretty_name(name), bf)
             output.append(line)
-        return '<ul>\n%s\n</ul>' % '\n'.join(output)
+        return u'\n'.join(output)
 
     def full_clean(self):
         """
@@ -156,6 +167,10 @@ class BoundField(object):
     errors = property(_errors)
 
     def as_widget(self, widget, attrs=None):
+        attrs = attrs or {}
+        auto_id = self.auto_id
+        if not attrs.has_key('id') and not widget.attrs.has_key('id') and auto_id:
+            attrs['id'] = auto_id
         return widget.render(self._name, self._form.data.get(self._name, None), attrs=attrs)
 
     def as_text(self, attrs=None):
@@ -167,3 +182,16 @@ class BoundField(object):
     def as_textarea(self, attrs=None):
         "Returns a string of HTML for representing this as a <textarea>."
         return self.as_widget(Textarea(), attrs)
+
+    def _auto_id(self):
+        """
+        Calculates and returns the ID attribute for this BoundField, if the
+        associated Form has specified auto_id. Returns an empty string otherwise.
+        """
+        auto_id = self._form.auto_id
+        if auto_id and '%s' in str(auto_id):
+            return str(auto_id) % self._name
+        elif auto_id:
+            return self._name
+        return ''
+    auto_id = property(_auto_id)
