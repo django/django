@@ -230,7 +230,6 @@ def get_sql_indexes(app):
     from django.db import model_connection_name
     from django.db.models import get_models
     connection_output = {}
-
     for model in get_models(app):
         opts = model._meta
         connection_name = model_connection_name(model)
@@ -241,6 +240,23 @@ def get_sql_indexes(app):
 
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
+
+def _get_sql_index(model):
+    "Returns the CREATE INDEX SQL statements for a specific model"
+    from django.db import backend
+    output = []
+
+    for f in model._meta.fields:
+        if f.db_index:
+            unique = f.unique and 'UNIQUE ' or ''
+            output.append(
+                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
+                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_KEYWORD('ON') + ' ' + \
+                style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
+                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+            )
+    return output
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
@@ -269,7 +285,7 @@ def _collate(connection_output, reverse=False):
                                 connection_name)
     return map(str, final_output)
 
-def syncdb(verbosity=2, interactive=True):
+def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.conf import settings
     from django.db import models, transaction
@@ -296,8 +312,9 @@ def syncdb(verbosity=2, interactive=True):
     for app in models.get_apps():
         # Install each application (models already installed will be skipped)
         created, pending = _install(app, commit=False, initial_data=False,
-                                    pending_allowed=True, pending=pending)
-        if verbosity >= 2:
+                                    pending_allowed=True, pending=pending,
+                                    verbosity=verbosity)
+        if verbosity >= 1:
             for model in created:
                 print "Created table %s" % model._meta.db_table
         created_models.extend(created)
@@ -311,6 +328,8 @@ def syncdb(verbosity=2, interactive=True):
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
+        if verbosity >= 2:
+            print "Sending post-syncdb signal for application", app.__name__.split('.')[-2]
         dispatcher.send(signal=signals.post_syncdb, sender=app,
             app=app, created_models=created_models,
             verbosity=verbosity, interactive=interactive)
@@ -322,7 +341,7 @@ def syncdb(verbosity=2, interactive=True):
             if model in created_models:
                 try:
                     if (model._default_manager.load_initial_data() 
-                        and verbosity >= 2):
+                        and verbosity >= 1):
                         print "Installed initial data for %s model" % model._meta.object_name
                 except Exception, e:
                     sys.stderr.write("Failed to install initial SQL data for %s model: %s" % \
@@ -391,7 +410,7 @@ def install(app):
     _install(app)
 
 def _install(app, commit=True, initial_data=True, pending_allowed=False,
-             pending=None):
+             pending=None, verbosity=1):
     from django.db import connection, models, transaction
     import sys
     
@@ -407,6 +426,9 @@ def _install(app, commit=True, initial_data=True, pending_allowed=False,
         if pending is None:
             pending = {}
         for model in models.get_models(app, creation_order=True):
+            if verbosity >= 2:
+                print "Processing %s.%s model" % (app_name,
+                                                  model._meta.object_name)
             manager = model._default_manager
             tables = manager.get_table_list()
             models_installed = manager.get_installed_models(tables)
@@ -445,7 +467,7 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
 
-def reset(app):
+def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
     app_name = app.__name__.split('.')[-2]
@@ -456,21 +478,25 @@ def reset(app):
     _check_for_validation_errors(app)
     sql_list = get_sql_reset(app)
 
-    confirm = raw_input("""
+    if interactive:
+        confirm = raw_input("""
 You have requested a database reset.
 This will IRREVERSIBLY DESTROY any data in your database.
 Are you sure you want to do this?
 
 Type 'yes' to continue, or 'no' to cancel: """)
+    else:
+        confirm = 'yes'
+        
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
             for sql in sql_list:
                 cursor.execute(sql)
         except Exception, e:
-            sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
+            sys.stderr.write(style.ERROR("""Error: %s couldn't be reset. Possible reasons:
   * The database isn't running or isn't configured correctly.
-  * At least one of the database tables already exists.
+  * At least one of the database tables doesn't exist.
   * The SQL was invalid.
 Hint: Look at the output of 'django-admin.py sqlreset %s'. That's the SQL this command wasn't able to run.
 The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
@@ -1031,7 +1057,7 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(verbosity, app_labels):
+def test(app_labels, verbosity=1):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
@@ -1133,7 +1159,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
-    parser.add_option('--verbosity', action='store', dest='verbosity', default='2',
+    parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
     parser.add_option('--adminmedia', dest='admin_media_path', default='', help='Specifies the directory from which to serve admin media for runserver.'),
@@ -1182,7 +1208,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
     elif action == 'test':
         try:
-            action_mapping[action](int(options.verbosity), args[1:])
+            action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
@@ -1216,7 +1242,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if action not in NO_SQL_TRANSACTION:
             print style.SQL_KEYWORD("BEGIN;")
         for mod in mod_list:
-            output = action_mapping[action](mod)
+            if action == 'reset':
+                output = action_mapping[action](mod, options.interactive)
+            else:
+                output = action_mapping[action](mod)
             if output:
                 print '\n'.join(output)
         if action not in NO_SQL_TRANSACTION:

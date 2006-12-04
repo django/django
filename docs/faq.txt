@@ -499,7 +499,7 @@ specify an object to edit or delete.
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
-We try to avoid adding special cases in the Django code to accomodate all the
+We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
 statements that do what you want to do. The initial data files are executed in

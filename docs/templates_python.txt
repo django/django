@@ -817,7 +817,7 @@ Inclusion tags
 
 Another common type of template tag is the type that displays some data by
 rendering *another* template. For example, Django's admin interface uses custom
-template tags to display the buttons along the botton of the "add/change" form
+template tags to display the buttons along the bottom of the "add/change" form
 pages. Those buttons always look the same, but the link targets change depending
 on the object being edited -- so they're a perfect case for using a small
 template that is filled with details from the current object. (In the admin's
