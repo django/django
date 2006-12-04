@@ -289,7 +289,7 @@ def syncdb(verbosity=1, interactive=True):
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
         try:
-            __import__(app_name + '.management', '', '', [''])
+            __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
 
@@ -1078,7 +1078,7 @@ def test(app_labels, verbosity=1):
         test_module_name = '.'.join(test_path[:-1])
     else:
         test_module_name = '.'
-    test_module = __import__(test_module_name, [],[],test_path[-1])
+    test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
     test_runner(app_list, verbosity)
@@ -1267,7 +1267,7 @@ def setup_environ(settings_mod):
     project_directory = os.path.dirname(settings_mod.__file__)
     project_name = os.path.basename(project_directory)
     sys.path.append(os.path.join(project_directory, '..'))
-    project_module = __import__(project_name, '', '', [''])
+    project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.

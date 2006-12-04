@@ -98,13 +98,13 @@ def view_index(request):
         return missing_docutils_page(request)
 
     if settings.ADMIN_FOR:
-        settings_modules = [__import__(m, '', '', ['']) for m in settings.ADMIN_FOR]
+        settings_modules = [__import__(m, {}, {}, ['']) for m in settings.ADMIN_FOR]
     else:
         settings_modules = [settings]
 
     views = []
     for settings_mod in settings_modules:
-        urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
+        urlconf = __import__(settings_mod.ROOT_URLCONF, {}, {}, [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         if Site._meta.installed:
             site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
@@ -127,7 +127,7 @@ def view_detail(request, view):
 
     mod, func = urlresolvers.get_mod_func(view)
     try:
-        view_func = getattr(__import__(mod, '', '', ['']), func)
+        view_func = getattr(__import__(mod, {}, {}, ['']), func)
     except (ImportError, AttributeError):
         raise Http404
     title, body, metadata = utils.parse_docstring(view_func.__doc__)
@@ -235,7 +235,7 @@ model_detail = staff_member_required(model_detail)
 def template_detail(request, template):
     templates = []
     for site_settings_module in settings.ADMIN_FOR:
-        settings_mod = __import__(site_settings_module, '', '', [''])
+        settings_mod = __import__(site_settings_module, {}, {}, [''])
         if Site._meta.installed:
             site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
         else:

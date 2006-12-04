@@ -883,7 +883,7 @@ def get_library(module_name):
     lib = libraries.get(module_name, None)
     if not lib:
         try:
-            mod = __import__(module_name, '', '', [''])
+            mod = __import__(module_name, {}, {}, [''])
         except ImportError, e:
             raise InvalidTemplateLibrary, "Could not load template library from %s, %s" % (module_name, e)
         try:

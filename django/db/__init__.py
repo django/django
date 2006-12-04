@@ -73,16 +73,16 @@ class ConnectionInfo(object):
 
     def get_introspection_module(self):
         return __import__('django.db.backends.%s.introspection' % 
-                          self.settings.DATABASE_ENGINE, '', '', [''])
+                          self.settings.DATABASE_ENGINE, {}, {}, [''])
 
     def get_creation_module(self):
         return __import__('django.db.backends.%s.creation' % 
-                          self.settings.DATABASE_ENGINE, '', '', [''])
+                          self.settings.DATABASE_ENGINE, {}, {}, [''])
 
     def load_backend(self):
         try:
             backend = __import__('django.db.backends.%s.base' %
-                                 self.settings.DATABASE_ENGINE, '', '', [''])
+                                 self.settings.DATABASE_ENGINE, {}, {}, [''])
         except ImportError, e:
             # The database backend wasn't found. Display a helpful error
             # message listing all possible database backends.
@@ -108,7 +108,7 @@ class ConnectionInfo(object):
 
     def runshell(self):
         __import__('django.db.backends.%s.client' %
-                   self.settings.DATABASE_ENGINE, '', '', ['']
+                   self.settings.DATABASE_ENGINE, {}, {}, ['']
                    ).runshell(self.settings)
         
     def reset_queries(self):

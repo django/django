@@ -383,27 +383,6 @@ class Model(object):
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
 
-    # Handles setting many-to-many related objects.
-    # Example: Album.set_songs()
-    def _set_related_many_to_many(self, rel_class, rel_field, id_list):
-        id_list = map(int, id_list) # normalize to integers
-        rel = rel_field.rel.to
-        m2m_table = rel_field.m2m_db_table()
-        this_id = self._get_pk_val()
-        db = self._default_manager.db
-        connection = db.connection
-        qn = db.backend.quote_name
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
-            (qn(m2m_table),
-            qn(rel_field.m2m_column_name())), [this_id])
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-            (qn(m2m_table),
-            qn(rel_field.m2m_column_name()),
-            qn(rel_field.m2m_reverse_name()))
-        cursor.executemany(sql, [(this_id, i) for i in id_list])
-        transaction.commit_unless_managed([connection])
-
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
 ############################################

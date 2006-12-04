@@ -15,9 +15,9 @@ for app in settings.INSTALLED_APPS:
         m, a = app[:i], app[i+1:]
     try:
         if a is None:
-            mod = __import__(m, '', '', [])
+            mod = __import__(m, {}, {}, [])
         else:
-            mod = getattr(__import__(m, '', '', [a]), a)
+            mod = getattr(__import__(m, {}, {}, [a]), a)
     except ImportError, e:
         raise ImproperlyConfigured, 'ImportError %s: %s' % (app, e.args[0])
     template_dir = os.path.join(os.path.dirname(mod.__file__), 'templates')
