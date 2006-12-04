@@ -46,13 +46,17 @@ class DatabaseWrapper(local):
         self.settings = settings
         self.connection = None
         self.queries = []
+        self.options = settings.DATABASE_OPTIONS
 
     def cursor(self):
         settings = self.settings
         if self.connection is None:
-            self.connection = Database.connect(settings.DATABASE_NAME,
-                detect_types=Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES)
-
+            kwargs = {
+                'database': settings.DATABASE_NAME,
+                'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+            }
+            kwargs.update(self.options)
+            self.connection = Database.connect(**kwargs)
             # Register extract and date_trunc functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)

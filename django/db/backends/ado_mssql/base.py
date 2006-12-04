@@ -50,6 +50,7 @@ Database.convertVariantToPython = variantToPython
 class DatabaseWrapper(object):
     def __init__(self, settings):
         self.settings = settings
+        self.options = settings.DATABASE_OPTIONS
         self.connection = None
         self.queries = []
 

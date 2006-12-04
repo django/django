@@ -18,6 +18,7 @@ class DatabaseWrapper(object):
         self.settings = settings
         self.connection = None
         self.queries = []
+        self.options = settings.DATABASE_OPTIONS
 
     def _valid_connection(self):
         return self.connection is not None
@@ -29,10 +30,10 @@ class DatabaseWrapper(object):
                 settings.DATABASE_HOST = 'localhost'
             if len(settings.DATABASE_PORT.strip()) != 0:
                 dsn = Database.makedsn(settings.DATABASE_HOST, int(settings.DATABASE_PORT), settings.DATABASE_NAME)
-                self.connection = Database.connect(settings.DATABASE_USER, settings.DATABASE_PASSWORD, dsn)
+                self.connection = Database.connect(settings.DATABASE_USER, settings.DATABASE_PASSWORD, dsn, **self.options)
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
-                self.connection = Database.connect(conn_string)
+                self.connection = Database.connect(conn_string, **self.options)
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):

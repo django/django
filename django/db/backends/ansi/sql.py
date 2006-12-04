@@ -291,6 +291,8 @@ class SchemaBuilder(object):
                     output.append(BoundStatement(fp.read(), db.connection))
                 else:                                 
                     for statement in statements.split(fp.read()):
+                        # Remove any comments from the file
+                        statement = re.sub(r"--.*[\n\Z]", "", statement)
                         if statement.strip():
                             output.append(BoundStatement(statement + ";",
                                                          db.connection))

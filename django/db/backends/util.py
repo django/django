@@ -17,7 +17,7 @@ class CursorDebugWrapper(object):
             if not isinstance(params, (tuple, dict)):
                 params = tuple(params)
             self.db.queries.append({
-                'sql': sql % tuple(params),
+                'sql': sql % params,
                 'time': "%.3f" % (stop - start),
             })
 

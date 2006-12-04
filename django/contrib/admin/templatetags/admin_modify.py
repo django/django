@@ -177,8 +177,8 @@ def output_all(form_fields):
 output_all = register.simple_tag(output_all)
 
 def auto_populated_field_script(auto_pop_fields, change = False):
+    t = []
     for field in auto_pop_fields:
-        t = []
         if change:
             t.append('document.getElementById("id_%s")._changed = true;' % field.name)
         else:

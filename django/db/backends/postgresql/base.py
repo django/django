@@ -18,6 +18,7 @@ class DatabaseWrapper(object):
         self.settings = settings
         self.connection = None
         self.queries = []
+        self.options = settings.DATABASE_OPTIONS
 
     def cursor(self):
         settings = self.settings
@@ -34,7 +35,7 @@ class DatabaseWrapper(object):
                 conn_string += " host=%s" % settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 conn_string += " port=%s" % settings.DATABASE_PORT
-            self.connection = Database.connect(conn_string)
+            self.connection = Database.connect(conn_string, **self.options)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
         cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])

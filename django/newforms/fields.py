@@ -188,17 +188,35 @@ url_re = re.compile(
     r'(?::\d+)?' # optional port
     r'(?:/?|/\S+)$', re.IGNORECASE)
 
+try:
+    from django.conf import settings
+    URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
+except ImportError:
+    # It's OK if Django settings aren't configured.
+    URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
+
 class URLField(RegexField):
-    def __init__(self, required=True, verify_exists=False, widget=None):
+    def __init__(self, required=True, verify_exists=False, widget=None,
+            validator_user_agent=URL_VALIDATOR_USER_AGENT):
         RegexField.__init__(self, url_re, u'Enter a valid URL.', required, widget)
         self.verify_exists = verify_exists
+        self.user_agent = validator_user_agent
 
     def clean(self, value):
         value = RegexField.clean(self, value)
         if self.verify_exists:
             import urllib2
+            from django.conf import settings
+            headers = {
+                "Accept": "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+                "Accept-Language": "en-us,en;q=0.5",
+                "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+                "Connection": "close",
+                "User-Agent": self.user_agent,
+            }
             try:
-                u = urllib2.urlopen(value)
+                req = urllib2.Request(field_data, None, headers)
+                u = urllib2.urlopen(req)
             except ValueError:
                 raise ValidationError(u'Enter a valid URL.')
             except: # urllib2.URLError, httplib.InvalidURL, etc.

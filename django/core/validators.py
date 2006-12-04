@@ -8,6 +8,7 @@ validator will *always* be run, regardless of whether its associated
 form field is required.
 """
 
+import urllib2
 from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
@@ -223,18 +224,26 @@ def isWellFormedXmlFragment(field_data, all_data):
     isWellFormedXml('<root>%s</root>' % field_data, all_data)
 
 def isExistingURL(field_data, all_data):
-    import urllib2
     try:
-        u = urllib2.urlopen(field_data)
+        headers = {
+            "Accept" : "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+            "Accept-Language" : "en-us,en;q=0.5",
+            "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+            "Connection" : "close",
+            "User-Agent": settings.URL_VALIDATOR_USER_AGENT
+            }
+        req = urllib2.Request(field_data,None, headers)
+        u = urllib2.urlopen(req)
     except ValueError:
-        raise ValidationError, gettext("Invalid URL: %s") % field_data
+        raise ValidationError, _("Invalid URL: %s") % field_data
     except urllib2.HTTPError, e:
         # 401s are valid; they just mean authorization is required.
-        if e.code not in ('401',):
-            raise ValidationError, gettext("The URL %s is a broken link.") % field_data
+        # 301 and 302 are redirects; they just mean look somewhere else.
+        if str(e.code) not in ('401','301','302'):
+            raise ValidationError, _("The URL %s is a broken link.") % field_data
     except: # urllib2.URLError, httplib.InvalidURL, etc.
-        raise ValidationError, gettext("The URL %s is a broken link.") % field_data
-
+        raise ValidationError, _("The URL %s is a broken link.") % field_data
+        
 def isValidUSState(field_data, all_data):
     "Checks that the given string is a valid two-letter U.S. state abbreviation"
     states = ['AA', 'AE', 'AK', 'AL', 'AP', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'FM', 'GA', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MH', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'PW', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
@@ -343,6 +352,38 @@ class UniqueAmongstFieldsWithPrefix(object):
         for field_name, value in all_data.items():
             if field_name != self.field_name and value == field_data:
                 raise ValidationError, self.error_message
+
+class NumberIsInRange(object):
+    """
+    Validator that tests if a value is in a range (inclusive).
+    """
+    def __init__(self, lower=None, upper=None, error_message=''):
+        self.lower, self.upper = lower, upper
+        if not error_message:
+            if lower and upper:
+                self.error_message = gettext("This value must be between %s and %s.") % (lower, upper)
+            elif lower:
+                self.error_message = gettext("This value must be at least %s.") % lower
+            elif upper:
+                self.error_message = gettext("This value must be no more than %s.") % upper
+        else:
+            self.error_message = error_message
+
+    def __call__(self, field_data, all_data):
+        # Try to make the value numeric. If this fails, we assume another 
+        # validator will catch the problem.
+        try:
+            val = float(field_data)
+        except ValueError:
+            return
+            
+        # Now validate
+        if self.lower and self.upper and (val < self.lower or val > self.upper):
+            raise ValidationError(self.error_message)
+        elif self.lower and val < self.lower:
+            raise ValidationError(self.error_message)
+        elif self.upper and val > self.upper:
+            raise ValidationError(self.error_message)
 
 class IsAPowerOf(object):
     """

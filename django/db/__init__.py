@@ -28,7 +28,7 @@ _local = local()
 
 if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
-
+    
 
 def connect(settings, **kw):
     """Connect to the database specified in settings. Returns a
@@ -48,6 +48,8 @@ class ConnectionInfo(object):
         super(ConnectionInfo, self).__init__(**kw)
         if settings is None:
             from django.conf import settings
+        if not settings.DATABASE_OPTIONS:
+            settings.DATABASE_OPTIONS = {}
         self.settings = settings
         self.backend = self.load_backend()
         self.connection = self.backend.DatabaseWrapper(settings)

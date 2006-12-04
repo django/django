@@ -64,6 +64,7 @@ class DatabaseWrapper(object):
         self.connection = None
         self.queries = []
         self.server_version = None
+        self.options = settings.DATABASE_OPTIONS
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -90,6 +91,7 @@ class DatabaseWrapper(object):
                 kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
+            kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
         cursor = self.connection.cursor()
         if self.connection.get_server_info() >= '4.1':
