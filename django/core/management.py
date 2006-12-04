@@ -289,8 +289,6 @@ def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.conf import settings
     from django.db import models, transaction
-    from django.db.models import signals
-    from django.dispatch import dispatcher
     
     disable_termcolors()
 
@@ -313,7 +311,8 @@ def syncdb(verbosity=1, interactive=True):
         # Install each application (models already installed will be skipped)
         created, pending = _install(app, commit=False, initial_data=False,
                                     pending_allowed=True, pending=pending,
-                                    verbosity=verbosity)
+                                    verbosity=verbosity, signal=False,
+                                    interactive=interactive)
         if verbosity >= 1:
             for model in created:
                 print "Created table %s" % model._meta.db_table
@@ -328,12 +327,9 @@ def syncdb(verbosity=1, interactive=True):
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
     for app in models.get_apps():
-        if verbosity >= 2:
-            print "Sending post-syncdb signal for application", app.__name__.split('.')[-2]
-        dispatcher.send(signal=signals.post_syncdb, sender=app,
-            app=app, created_models=created_models,
-            verbosity=verbosity, interactive=interactive)
-
+        _post_syncdb(app, created_models=created_models,
+                     verbosity=verbosity, interactive=interactive)
+        
     # Install initial data for the app (but only if this is a model we've
     # just created)
     for app in models.get_apps():
@@ -410,7 +406,7 @@ def install(app):
     _install(app)
 
 def _install(app, commit=True, initial_data=True, pending_allowed=False,
-             pending=None, verbosity=1):
+             pending=None, verbosity=1, signal=True, interactive=True):
     from django.db import connection, models, transaction
     import sys
     
@@ -463,9 +459,25 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
         sys.exit(1)
     if commit:
         transaction.commit_unless_managed()
+
+    if signal:
+        _post_syncdb(app, created_models=created_models,
+                     verbosity=verbosity, interactive=interactive)
+        
     return created_models, pending
 install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
 install.args = APP_ARGS
+
+def _post_syncdb(app, created_models, verbosity=1, interactive=True):
+    """Send the post_syncdb signal for an application."""
+    from django.dispatch import dispatcher
+    from django.db.models import signals
+    
+    if verbosity >= 2:
+        print "Sending post-syncdb signal for application", app.__name__.split('.')[-2]
+    dispatcher.send(signal=signals.post_syncdb, sender=app,
+                    app=app, created_models=created_models,
+                    verbosity=verbosity, interactive=interactive)
 
 def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
