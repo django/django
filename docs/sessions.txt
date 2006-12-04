@@ -141,7 +141,7 @@ Do this after you've verified that the test cookie worked.
 Here's a typical usage example::
 
     def login(request):
-        if request.POST:
+        if request.method == 'POST':
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")

@@ -133,7 +133,7 @@ together, picking the test system to match the type of tests you need to
 write.
 
 For developers new to testing, however, this choice can seem
-confusing, so here are a few key differences to help you decide weather
+confusing, so here are a few key differences to help you decide whether
 doctests or unit tests are right for you.
 
 If you've been using Python for a while, ``doctest`` will probably feel more
