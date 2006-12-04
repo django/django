@@ -16,9 +16,9 @@ class MockHandler(WSGIHandler):
         self.test = test
         super(MockHandler, self).__init__()
         
-    def get_response(self, path, request):
+    def get_response(self, request):
         # debug("mock handler answering %s, %s", path, request)
-        return HttpResponse(self.test(path, request))
+        return HttpResponse(self.test(request))
 
 
 def debug(*arg):
@@ -50,7 +50,7 @@ class TestRequestIsolation(unittest.TestCase):
         env['PATH_INFO'] = '/'
         env['REQUEST_METHOD'] = 'GET'
 
-        def request_one(path, request):
+        def request_one(request):
             """Start out with settings as originally configured"""
             self.assertEqual(model_connection_name(MX), '_a')
             self.assertEqual(
@@ -61,7 +61,7 @@ class TestRequestIsolation(unittest.TestCase):
                 MY._default_manager.db.connection.settings.DATABASE_NAME,
                 settings.OTHER_DATABASES['_b']['DATABASE_NAME'])
 
-        def request_two(path, request):
+        def request_two(request):
             """Between the first and second requests, settings change to assign
             model MY to a different connection
             """
@@ -74,7 +74,7 @@ class TestRequestIsolation(unittest.TestCase):
                 MY._default_manager.db.connection.settings.DATABASE_NAME,
                 settings.DATABASE_NAME)
 
-        def request_three(path, request):
+        def request_three(request):
             """Between the 2nd and 3rd requests, the settings at the names in
             OTHER_DATABASES have changed.
             """

@@ -32,6 +32,7 @@ class dummy: pass
 style = dummy()
 style.ERROR = termcolors.make_style(fg='red', opts=('bold',))
 style.ERROR_OUTPUT = termcolors.make_style(fg='red', opts=('bold',))
+style.NOTICE = termcolors.make_style(fg='red')
 style.SQL_FIELD = termcolors.make_style(fg='green', opts=('bold',))
 style.SQL_COLTYPE = termcolors.make_style(fg='green')
 style.SQL_KEYWORD = termcolors.make_style(fg='yellow')
@@ -234,8 +235,7 @@ def get_sql_indexes(app):
         opts = model._meta
         connection_name = model_connection_name(model)
         output = connection_output.setdefault(connection_name, [])
-        builder = model._default_manager.db.get_creation_module().builder
-        output.extend(map(str, builder.get_create_indexes(model, style)))
+        output.extend(map(str, get_sql_indexes_for_model(model)))
     return _collate(connection_output)
 
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
@@ -243,21 +243,9 @@ get_sql_indexes.args = APP_ARGS
 
 def get_sql_indexes_for_model(model):
     "Returns the CREATE INDEX SQL statements for a single model"
-    from django.db import backend
-    output = []
-
-    for f in model._meta.fields:
-        if f.db_index:
-            unique = f.unique and 'UNIQUE ' or ''
-            output.append(
-                style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
-                style.SQL_KEYWORD('ON') + ' ' + \
-                style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
-                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
-            )
-    return output
-
+    builder = model._default_manager.db.get_creation_module().builder
+    return builder.get_create_indexes(model, style)
+    
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
     return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
@@ -346,25 +334,6 @@ def syncdb(verbosity=1, interactive=True):
                 else:
                     transaction.commit_unless_managed()
 
-    # Install SQL indicies for all newly created models
-    for app in models.get_apps():
-        app_name = app.__name__.split('.')[-2]
-        for model in models.get_models(app):
-            if model in created_models:
-                index_sql = get_sql_indexes_for_model(model)
-                if index_sql:
-                    if verbosity >= 1:
-                        print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
-                    try:
-                        for sql in index_sql:
-                            cursor.execute(sql)
-                    except Exception, e:
-                        sys.stderr.write("Failed to install index for %s.%s model: %s" % \
-                                            (app_name, model._meta.object_name, e))
-                        transaction.rollback_unless_managed()
-                    else:
-                        transaction.commit_unless_managed()
-                
 syncdb.args = ''
 
 def get_admin_index(app):
@@ -501,6 +470,7 @@ def _post_syncdb(app, created_models, verbosity=1, interactive=True):
 def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
+    from django.conf import settings
     app_name = app.__name__.split('.')[-2]
 
     disable_termcolors()
@@ -512,13 +482,14 @@ def reset(app, interactive=True):
     if interactive:
         confirm = raw_input("""
 You have requested a database reset.
-This will IRREVERSIBLY DESTROY any data in your database.
+This will IRREVERSIBLY DESTROY any data for
+the "%s" application in the database "%s".
 Are you sure you want to do this?
 
-Type 'yes' to continue, or 'no' to cancel: """)
+Type 'yes' to continue, or 'no' to cancel: """ % (app_name, settings.DATABASE_NAME))
     else:
         confirm = 'yes'
-        
+
     if confirm == 'yes':
         try:
             cursor = connection.cursor()
@@ -568,7 +539,10 @@ def _start_helper(app_or_project, name, directory, other_name=''):
             fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
             fp_old.close()
             fp_new.close()
-            shutil.copymode(path_old, path_new)
+            try:
+                shutil.copymode(path_old, path_new)
+            except OSError:
+                sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
 
 def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."

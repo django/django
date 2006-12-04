@@ -2,7 +2,7 @@ from django.db import transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
-from django.utils.translation import gettext_lazy, string_concat
+from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
 from django import forms

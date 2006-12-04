@@ -1,6 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django import forms, template
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect

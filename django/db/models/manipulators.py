@@ -303,7 +303,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         pass
     else:
         raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
-            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list([f.verbose_name for f in field_list[1:]], 'and')}
+            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list([f.verbose_name for f in field_list[1:]], _('and'))}
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOneRel

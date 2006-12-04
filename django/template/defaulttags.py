@@ -1,7 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
 from django.template import Node, NodeList, Template, Context, resolve_variable
-from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END
+from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
@@ -295,6 +295,8 @@ class TemplateTagNode(Node):
                'closevariable': VARIABLE_TAG_END,
                'openbrace': SINGLE_BRACE_START,
                'closebrace': SINGLE_BRACE_END,
+               'opencomment': COMMENT_TAG_START,
+               'closecomment': COMMENT_TAG_END,
                }
 
     def __init__(self, tagtype):
@@ -831,6 +833,8 @@ def templatetag(parser, token):
         ``closevariable``   ``}}``
         ``openbrace``       ``{``
         ``closebrace``      ``}``
+        ``opencomment``     ``{#``
+        ``closecomment``    ``#}``
         ==================  =======
     """
     bits = token.contents.split()

@@ -876,15 +876,18 @@ The database API supports the following lookup types:
 exact
 ~~~~~
 
-Exact match.
+Exact match. If the value provided for comparison is ``None``, it will 
+be interpreted as an SQL ``NULL`` (See isnull_ for more details).  
 
-Example::
+Examples::
 
     Entry.objects.get(id__exact=14)
+    Entry.objects.get(id__exact=None)
 
-SQL equivalent::
+SQL equivalents::
 
     SELECT ... WHERE id = 14;
+    SELECT ... WHERE id = NULL;
 
 iexact
 ~~~~~~
@@ -1103,8 +1106,8 @@ such as January 3, July 3, etc.
 isnull
 ~~~~~~
 
-``NULL`` or ``IS NOT NULL`` match. Takes either ``True`` or ``False``, which
-correspond to ``IS NULL`` and ``IS NOT NULL``, respectively.
+Takes either ``True`` or ``False``, which correspond to SQL queries of 
+``IS NULL`` and ``IS NOT NULL``, respectively.
 
 Example::
 
@@ -1113,6 +1116,14 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
+
+.. admonition:: ``__isnull=True`` vs ``__exact=None``
+
+    There is an important difference between ``__isnull=True`` and 
+    ``__exact=None``. ``__exact=None`` will *always* return an empty result
+    set, because SQL requires that no value is equal to ``NULL``. 
+    ``__isnull`` determines if the field is currently holding the value 
+    of ``NULL`` without performing a comparison.
 
 search
 ~~~~~~

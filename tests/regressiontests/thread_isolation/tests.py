@@ -147,7 +147,7 @@ class TestThreadIsolation(unittest.TestCase):
         finally:
             self.lock.release()
             
-    def request_one(self, path, request):
+    def request_one(self, request):
         """Start out with settings as originally configured"""
         from django.conf import settings
         debug("request_one: %s", settings.OTHER_DATABASES)
@@ -169,7 +169,7 @@ class TestThreadIsolation(unittest.TestCase):
         self.assertEqual(connection.settings.DATABASE_NAME,
                          settings.DATABASE_NAME)
 
-    def request_two(self, path, request):
+    def request_two(self, request):
         """Between the first and second requests, settings change to assign
         model MY to a different connection
         """
@@ -196,7 +196,7 @@ class TestThreadIsolation(unittest.TestCase):
         except:
             self.add_thread_error(sys.exc_info())
 
-    def request_three(self, path, request):
+    def request_three(self, request):
         """Between the 2nd and 3rd requests, the settings at the names in
         OTHER_DATABASES have changed.
         """

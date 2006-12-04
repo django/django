@@ -528,7 +528,7 @@ any code that uses ``LANGUAGES`` at runtime.
 MANAGERS
 --------
 
-Default: ``ADMINS`` (Whatever ``ADMINS`` is set to)
+Default: ``()`` (Empty tuple)
 
 A tuple in the same format as ``ADMINS`` that specifies who should get
 broken-link notifications when ``SEND_BROKEN_LINK_EMAILS=True``.

@@ -92,6 +92,13 @@ which is a dictionary of the parameters captured in the URL.
 
     * ``template``: The full name of a template to use.
 
+**Optional arguments:**
+
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template.
+      
 **Example:**
 
 Given the following URL patterns::
@@ -171,7 +178,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
       template. By default, it's ``django.template.loader``.
 
     * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary.
+      context. By default, this is an empty dictionary. If a value in the
       dictionary is callable, the generic view will call it
       just before rendering the template.
 
@@ -184,7 +191,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
       the view's template. See the `RequestContext docs`_.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -270,7 +277,7 @@ to ``True``.
       this is ``False``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -357,7 +364,7 @@ date in the *future* are not displayed unless you set ``allow_future`` to
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -438,7 +445,7 @@ in the *future* are not displayed unless you set ``allow_future`` to ``True``.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -523,7 +530,7 @@ you set ``allow_future`` to ``True``.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -633,7 +640,7 @@ future, the view will throw a 404 error by default, unless you set
        to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -707,7 +714,7 @@ A page representing a list of objects.
        determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 
@@ -819,7 +826,7 @@ A page representing an individual object.
        to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 

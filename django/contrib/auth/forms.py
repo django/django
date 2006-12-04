@@ -81,7 +81,7 @@ class PasswordResetForm(forms.Manipulator):
         try:
             self.user_cache = User.objects.get(email__iexact=new_data)
         except User.DoesNotExist:
-            raise validators.ValidationError, _("That e-mail address doesn't have an associated user acount. Are you sure you've registered?")
+            raise validators.ValidationError, _("That e-mail address doesn't have an associated user account. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"

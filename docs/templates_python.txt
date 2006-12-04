@@ -212,6 +212,21 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+.. admonition:: For debug purposes only!
+
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
+    it is a bad idea to turn it on as a 'development default'. 
+    
+    Many templates, including those in the Admin site, rely upon the 
+    silence of the template system when a non-existent variable is 
+    encountered. If you assign a value other than ``''`` to
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    problems with these templates and sites.
+    
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
+    in order to debug a specific template problem, then cleared 
+    once debugging is complete.
+        
 Playing with Context objects
 ----------------------------
 
@@ -295,6 +310,20 @@ optional, third positional argument, ``processors``. In this example, the
         return RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
+
+Note::
+    If you're using Django's ``render_to_response()`` shortcut to populate a
+    template with the contents of a dictionary, your template will be passed a
+    ``Context`` instance by default (not a ``RequestContext``). To use a
+    ``RequestContext`` in your template rendering, pass an optional third
+    argument to ``render_to_response()``: a ``RequestContext``
+    instance. Your code might look like this::
+
+        def some_view(request):
+            # ...
+            return render_to_response('my_template'html',
+                                      my_data_dictionary,
+                                      context_instance=RequestContext(request))
 
 Here's what each of the default processors does:
 
@@ -1063,7 +1092,7 @@ Configuring the template system in standalone mode
 .. note::
 
     This section is only of interest to people trying to use the template
-    system as an output component in another application. If you are using the
+    system as an output component in another application. If you're using the
     template system as part of a Django application, nothing here applies to
     you.
 
@@ -1080,7 +1109,7 @@ described in the `settings file`_ documentation. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
 templating functions, call ``django.conf.settings.configure()`` with any
 settings you wish to specify. You might want to consider setting at least
-``TEMPLATE_DIRS`` (if you are going to use template loaders),
+``TEMPLATE_DIRS`` (if you're going to use template loaders),
 ``DEFAULT_CHARSET`` (although the default of ``utf-8`` is probably fine) and
 ``TEMPLATE_DEBUG``. All available settings are described in the
 `settings documentation`_, and any setting starting with *TEMPLATE_*
