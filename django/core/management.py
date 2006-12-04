@@ -226,7 +226,7 @@ get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting Postg
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
-    "Returns a list of the CREATE INDEX SQL statements for the given app."
+    "Returns a list of the CREATE INDEX SQL statements for all models in the given app."
     from django.db import model_connection_name
     from django.db.models import get_models
     connection_output = {}
@@ -241,8 +241,8 @@ def get_sql_indexes(app):
 get_sql_indexes.help_doc = "Prints the CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_indexes.args = APP_ARGS
 
-def _get_sql_index(model):
-    "Returns the CREATE INDEX SQL statements for a specific model"
+def get_sql_indexes_for_model(model):
+    "Returns the CREATE INDEX SQL statements for a single model"
     from django.db import backend
     output = []
 
@@ -346,6 +346,25 @@ def syncdb(verbosity=1, interactive=True):
                 else:
                     transaction.commit_unless_managed()
 
+    # Install SQL indicies for all newly created models
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        for model in models.get_models(app):
+            if model in created_models:
+                index_sql = get_sql_indexes_for_model(model)
+                if index_sql:
+                    if verbosity >= 1:
+                        print "Installing index for %s.%s model" % (app_name, model._meta.object_name)
+                    try:
+                        for sql in index_sql:
+                            cursor.execute(sql)
+                    except Exception, e:
+                        sys.stderr.write("Failed to install index for %s.%s model: %s" % \
+                                            (app_name, model._meta.object_name, e))
+                        transaction.rollback_unless_managed()
+                    else:
+                        transaction.commit_unless_managed()
+                
 syncdb.args = ''
 
 def get_admin_index(app):
