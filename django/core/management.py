@@ -669,7 +669,8 @@ def get_validation_errors(outfile, app=None):
     validates all models of all installed apps. Writes errors, if any, to outfile.
     Returns number of errors.
     """
-    from django.db import models, model_connection_name
+    from django.conf import settings
+    from django.db import connections, models, model_connection_name
     from django.db.models.loading import get_app_errors
     from django.db.models.fields.related import RelatedObject
 
@@ -681,6 +682,7 @@ def get_validation_errors(outfile, app=None):
     for cls in models.get_models(app):
         opts = cls._meta
         connection_name = model_connection_name(cls)
+        connection = connections[connection_name]
         
         # Do field-specific validation.
         for f in opts.fields:
@@ -711,6 +713,12 @@ def get_validation_errors(outfile, app=None):
                             e.add(opts, '"%s": "choices" should be a sequence of two-tuples.' % f.name)
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
+
+            # Check that maxlength <= 255 if using older MySQL versions.
+            if settings.DATABASE_ENGINE == 'mysql':
+                db_version = connection.connection.get_server_version()
+                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
+                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects

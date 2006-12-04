@@ -21,22 +21,22 @@ r"""
 '7'
 >>> format(my_birthday, 'N')
 'July'
->>> format(my_birthday, 'O')
-'+0100'
+>>> no_tz or format(my_birthday, 'O') == '+0100'
+True
 >>> format(my_birthday, 'P')
 '10 p.m.'
->>> format(my_birthday, 'r')
-'Sun, 8 Jul 1979 22:00:00 +0100'
+>>> no_tz or format(my_birthday, 'r') == 'Sun, 8 Jul 1979 22:00:00 +0100'
+True
 >>> format(my_birthday, 's')
 '00'
 >>> format(my_birthday, 'S')
 'th'
 >>> format(my_birthday, 't')
 '31'
->>> format(my_birthday, 'T')
-'CET'
->>> format(my_birthday, 'U')
-'300531600'
+>>> no_tz or format(my_birthday, 'T') == 'CET'
+True
+>>> no_tz or format(my_birthday, 'U') == '300531600'
+True
 >>> format(my_birthday, 'w')
 '0'
 >>> format(my_birthday, 'W')
@@ -47,17 +47,17 @@ r"""
 '1979'
 >>> format(my_birthday, 'z')
 '189'
->>> format(my_birthday, 'Z')
-'3600'
+>>> no_tz or format(my_birthday, 'Z') == '3600'
+True
 
->>> format(summertime, 'I')
-'1'
->>> format(summertime, 'O')
-'+0200'
->>> format(wintertime, 'I')
-'0'
->>> format(wintertime, 'O')
-'+0100'
+>>> no_tz or format(summertime, 'I') == '1'
+True
+>>> no_tz or format(summertime, 'O') == '+0200'
+True
+>>> no_tz or format(wintertime, 'I') == '0'
+True
+>>> no_tz or format(wintertime, 'O') == '+0100'
+True
 
 >>> format(my_birthday, r'Y z \C\E\T')
 '1979 189 CET'
@@ -73,7 +73,11 @@ format = dateformat.format
 os.environ['TZ'] = 'Europe/Copenhagen'
 translation.activate('en-us')
 
-time.tzset()
+try:
+    time.tzset()
+    no_tz = False
+except AttributeError:
+    no_tz = True
 
 my_birthday = datetime.datetime(1979, 7, 8, 22, 00)
 summertime = datetime.datetime(2005, 10, 30, 1, 00)

@@ -8,7 +8,7 @@ from django.utils.functional import curry
 
 class ClientHandler(BaseHandler):
     """
-    A HTTP Handler that can be used for testing purposes. 
+    A HTTP Handler that can be used for testing purposes.
     Uses the WSGI interface to compose requests, but returns
     the raw HttpResponse object
     """
@@ -24,7 +24,7 @@ class ClientHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
-            response = self.get_response(request.path, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:
@@ -32,7 +32,7 @@ class ClientHandler(BaseHandler):
 
         finally:
             dispatcher.send(signal=signals.request_finished)
-        
+
         return response
 
 def store_rendered_templates(store, signal, sender, template, context):
@@ -44,7 +44,7 @@ def encode_multipart(boundary, data):
     """
     A simple method for encoding multipart POST data from a dictionary of
     form values.
-    
+
     The key will be used as the form data name; the value will be transmitted
     as content. If the value is a file, the contents of the file will be sent
     as an application/octet-stream; otherwise, str(value) will be sent.
@@ -69,7 +69,7 @@ def encode_multipart(boundary, data):
                 '',
                 str(value)
             ])
-        
+
     lines.extend([
         '--' + boundary + '--',
         '',
@@ -78,8 +78,8 @@ def encode_multipart(boundary, data):
 
 class Client:
     """
-    A class that can act as a client for testing purposes. 
-      
+    A class that can act as a client for testing purposes.
+
     It allows the user to compose GET and POST requests, and
     obtain the response that the server gave to those requests.
     The server Response objects are annotated with the details
@@ -88,7 +88,7 @@ class Client:
 
     Client objects are stateful - they will retain cookie (and
     thus session) details for the lifetime of the Client instance.
-    
+
     This is not intended as a replacement for Twill/Selenium or
     the like - it is here to allow testing against the
     contexts and templates produced by a view, rather than the
@@ -98,10 +98,10 @@ class Client:
         self.handler = ClientHandler()
         self.defaults = defaults
         self.cookie = SimpleCookie()
-        
+
     def request(self, **request):
         """
-        The master request method. Composes the environment dictionary 
+        The master request method. Composes the environment dictionary
         and passes to the handler, returning the result of the handler.
         Assumes defaults for the query environment, which can be overridden
         using the arguments to the request.
@@ -112,24 +112,24 @@ class Client:
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
             'REQUEST_METHOD':    'GET',
-            'SCRIPT_NAME':       None, 
+            'SCRIPT_NAME':       None,
             'SERVER_NAME':       'testserver',
             'SERVER_PORT':       80,
             'SERVER_PROTOCOL':   'HTTP/1.1',
-        }        
+        }
         environ.update(self.defaults)
-        environ.update(request)        
+        environ.update(request)
 
         # Curry a data dictionary into an instance of
         # the template renderer callback function
         data = {}
         on_template_render = curry(store_rendered_templates, data)
         dispatcher.connect(on_template_render, signal=signals.template_rendered)
-        
+
         response = self.handler(environ)
-        
+
         # Add any rendered template detail to the response
-        # If there was only one template rendered (the most likely case), 
+        # If there was only one template rendered (the most likely case),
         # flatten the list to a single element
         for detail in ('template', 'context'):
             if data.get(detail):
@@ -139,12 +139,12 @@ class Client:
                     setattr(response, detail, data[detail])
             else:
                 setattr(response, detail, None)
-        
+
         if response.cookies:
             self.cookie.update(response.cookies)
 
         return response
-        
+
     def get(self, path, data={}, **extra):
         "Request a response from the server using GET."
         r = {
@@ -155,12 +155,12 @@ class Client:
             'REQUEST_METHOD': 'GET',
         }
         r.update(extra)
-        
+
         return self.request(**r)
-    
+
     def post(self, path, data={}, **extra):
         "Request a response from the server using POST."
-        
+
         BOUNDARY = 'BoUnDaRyStRiNg'
 
         encoded = encode_multipart(BOUNDARY, data)
@@ -173,25 +173,25 @@ class Client:
             'wsgi.input':     stream,
         }
         r.update(extra)
-        
+
         return self.request(**r)
 
     def login(self, path, username, password, **extra):
         """
         A specialized sequence of GET and POST to log into a view that
         is protected by a @login_required access decorator.
-        
+
         path should be the URL of the page that is login protected.
-        
-        Returns the response from GETting the requested URL after 
+
+        Returns the response from GETting the requested URL after
         login is complete. Returns False if login process failed.
         """
-        # First, GET the page that is login protected. 
+        # First, GET the page that is login protected.
         # This page will redirect to the login page.
         response = self.get(path)
         if response.status_code != 302:
             return False
-            
+
         login_path, data = response['Location'].split('?')
         next = data.split('=')[1]
 
@@ -199,7 +199,7 @@ class Client:
         response = self.get(login_path, **extra)
         if response.status_code != 200:
             return False
-            
+
         # Last, POST the login data.
         form_data = {
             'username': username,

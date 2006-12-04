@@ -102,7 +102,7 @@ class ModPythonRequest(http.HttpRequest):
                 'REQUEST_METHOD':    self._req.method,
                 'SCRIPT_NAME':       None, # Not supported
                 'SERVER_NAME':       self._req.server.server_hostname,
-                'SERVER_PORT':       self._req.server.port,
+                'SERVER_PORT':       str(self._req.connection.local_addr[1]),
                 'SERVER_PROTOCOL':   self._req.protocol,
                 'SERVER_SOFTWARE':   'mod_python'
             }
@@ -150,7 +150,7 @@ class ModPythonHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = ModPythonRequest(req)
-            response = self.get_response(req.uri, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:
