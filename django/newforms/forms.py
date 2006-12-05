@@ -6,7 +6,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
-from util import ErrorDict, ErrorList, ValidationError
+from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
 NON_FIELD_ERRORS = '__all__'
 
@@ -32,7 +32,7 @@ class DeclarativeFieldsMetaclass(type):
         attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
-class Form(object):
+class Form(StrAndUnicode):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
@@ -43,7 +43,7 @@ class Form(object):
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
-    def __str__(self):
+    def __unicode__(self):
         return self.as_table()
 
     def __iter__(self):
@@ -155,14 +155,14 @@ class Form(object):
         """
         return self.clean_data
 
-class BoundField(object):
+class BoundField(StrAndUnicode):
     "A Field plus data"
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
         self.name = name
 
-    def __str__(self):
+    def __unicode__(self):
         "Renders this field as an HTML widget."
         # Use the 'widget' attribute on the field to determine which type
         # of HTML widget to use.
