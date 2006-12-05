@@ -158,15 +158,15 @@ class Form(object):
 class BoundField(object):
     "A Field plus data"
     def __init__(self, form, field, name):
-        self._form = form
-        self._field = field
-        self._name = name
+        self.form = form
+        self.field = field
+        self.name = name
 
     def __str__(self):
         "Renders this field as an HTML widget."
         # Use the 'widget' attribute on the field to determine which type
         # of HTML widget to use.
-        value = self.as_widget(self._field.widget)
+        value = self.as_widget(self.field.widget)
         if not isinstance(value, basestring):
             # Some Widget render() methods -- notably RadioSelect -- return a
             # "special" object rather than a string. Call the __str__() on that
@@ -180,7 +180,7 @@ class BoundField(object):
         if there are none.
         """
         try:
-            return self._form.errors[self._name]
+            return self.form.errors[self.name]
         except KeyError:
             return ErrorList()
     errors = property(_errors)
@@ -190,7 +190,7 @@ class BoundField(object):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self._name, self.data, attrs=attrs)
+        return widget.render(self.name, self.data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -210,11 +210,11 @@ class BoundField(object):
 
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
-        return self._form.data.get(self._name, None)
+        return self.form.data.get(self.name, None)
     data = property(_data)
 
     def _verbose_name(self):
-        return pretty_name(self._name)
+        return pretty_name(self.name)
     verbose_name = property(_verbose_name)
 
     def label_tag(self, contents=None):
@@ -224,7 +224,7 @@ class BoundField(object):
         field's HTML-escaped verbose_name.
         """
         contents = contents or escape(self.verbose_name)
-        widget = self._field.widget
+        widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             contents = '<label for="%s">%s</label>' % (widget.id_for_label(id_), contents)
@@ -232,7 +232,7 @@ class BoundField(object):
 
     def _is_hidden(self):
         "Returns True if this BoundField's widget is hidden."
-        return self._field.widget.is_hidden
+        return self.field.widget.is_hidden
     is_hidden = property(_is_hidden)
 
     def _auto_id(self):
@@ -240,10 +240,10 @@ class BoundField(object):
         Calculates and returns the ID attribute for this BoundField, if the
         associated Form has specified auto_id. Returns an empty string otherwise.
         """
-        auto_id = self._form.auto_id
+        auto_id = self.form.auto_id
         if auto_id and '%s' in str(auto_id):
-            return str(auto_id) % self._name
+            return str(auto_id) % self.name
         elif auto_id:
-            return self._name
+            return self.name
         return ''
     auto_id = property(_auto_id)
