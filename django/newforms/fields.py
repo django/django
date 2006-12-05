@@ -2,7 +2,7 @@
 Field classes
 """
 
-from util import ValidationError, DEFAULT_ENCODING, smart_unicode
+from util import ValidationError, smart_unicode
 from widgets import TextInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
