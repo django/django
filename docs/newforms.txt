@@ -3,10 +3,8 @@ The newforms library
 ====================
 
 ``django.newforms`` is a new replacement for ``django.forms``, the old Django
-form/manipulator/validation framework. This functionality is new in the Django
-development version -- i.e., it's not available in the Django 0.95 release.
-
-This document explains how to use this new form library.
+form/manipulator/validation framework. This document explains how to use this
+new form library.
 
 Migration plan
 ==============
@@ -25,7 +23,7 @@ release, our plan is to do the following:
     * Move the current ``django.newforms`` to ``django.forms``.
 
     * We will remove ``django.oldforms`` in the release *after* the next Django
-      release -- i.e., the release that comes after the release in which we're
+      release -- the release that comes after the release in which we're
       creating ``django.oldforms``.
 
 With this in mind, we recommend you use the following import statement when
@@ -55,9 +53,12 @@ want to perform server-side validation for an HTML form.
 The library deals with these concepts:
 
     * **Widget** -- A class that corresponds to an HTML form widget, e.g.
-      ``<input type="text">`` or ``<textarea>``.
+      ``<input type="text">`` or ``<textarea>``. This handles rendering of the
+      widget as HTML.
+
     * **Field** -- A class that is responsible for doing validation, e.g.
       an ``EmailField`` that makes sure its data is a valid e-mail address.
+
     * **Form** -- A collection of fields that knows how to validate itself and
       display itself as HTML.
 
