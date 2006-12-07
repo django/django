@@ -179,10 +179,7 @@ class BoundField(StrAndUnicode):
         Returns an ErrorList for this field. Returns an empty ErrorList
         if there are none.
         """
-        try:
-            return self.form.errors[self.name]
-        except KeyError:
-            return ErrorList()
+        return self.form.errors.get(self.name, ErrorList())
     errors = property(_errors)
 
     def as_widget(self, widget, attrs=None):
