@@ -124,6 +124,33 @@ class Form(StrAndUnicode):
                 output.append(str_hidden)
         return u'\n'.join(output)
 
+    def as_p(self):
+        "Returns this form rendered as HTML <p>s."
+        top_errors = self.non_field_errors()
+        output, hidden_fields = [], []
+        for name, field in self.fields.items():
+            bf = BoundField(self, field, name)
+            bf_errors = bf.errors # Cache in local variable.
+            if bf.is_hidden:
+                if bf_errors:
+                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
+                hidden_fields.append(unicode(bf))
+            else:
+                if bf_errors:
+                    output.append(u'<p>%s</p>' % bf_errors)
+                output.append(u'<p>%s %s</p>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
+        if top_errors:
+            output.insert(0, u'<p>%s</p>' % top_errors)
+        if hidden_fields: # Insert any hidden fields in the last <p>.
+            str_hidden = u''.join(hidden_fields)
+            if output:
+                last_td = output[-1]
+                # Chop off the trailing '</p>' and insert the hidden fields.
+                output[-1] = last_td[:-4] + str_hidden + '</p>'
+            else: # If there aren't any '<p>'s in the output, just append the hidden fields.
+                output.append(str_hidden)
+        return u'\n'.join(output)
+
     def non_field_errors(self):
         """
         Returns an ErrorList of errors that aren't associated with a particular
