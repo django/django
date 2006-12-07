@@ -1756,8 +1756,8 @@ subclass' __init__().
 
 HiddenInput widgets are displayed differently in the as_table() and as_ul()
 output of a Form -- their verbose names are not displayed, and a separate
-<tr>/<li> is not displayed. They're displayed in the last <td> of the form,
-directly after that <td>'s form element.
+<tr>/<li> is not displayed. They're displayed in the last <td>/<li> of the
+form, directly after that row's form element.
 >>> class Person(Form):
 ...     first_name = CharField()
 ...     last_name = CharField()
@@ -1771,8 +1771,7 @@ directly after that <td>'s form element.
 >>> print p.as_ul()
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></li>
 
 With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
 >>> p = Person(auto_id='id_%s')
@@ -1783,8 +1782,7 @@ With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
 >>> print p.as_ul()
 <li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<input type="hidden" name="hidden_text" id="id_hidden_text" />
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>
 
 If a field with a HiddenInput has errors, the as_table() and as_ul() output
 will include the error message(s) with the text "(Hidden field [fieldname]) "
@@ -1800,8 +1798,7 @@ its field's order in the form.
 <li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>
+<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>
 
 A corner case: It's possible for a form to have only HiddenInputs.
 >>> class TestForm(Form):
@@ -1811,8 +1808,7 @@ A corner case: It's possible for a form to have only HiddenInputs.
 >>> print p.as_table()
 <input type="hidden" name="foo" /><input type="hidden" name="bar" />
 >>> print p.as_ul()
-<input type="hidden" name="foo" />
-<input type="hidden" name="bar" />
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
 
 A Form's fields are displayed in the same order in which they were defined.
 >>> class TestForm(Form):

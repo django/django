@@ -102,18 +102,26 @@ class Form(StrAndUnicode):
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
         top_errors = self.non_field_errors()
-        output = []
+        output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             if bf.is_hidden:
                 new_errors = bf.errors # Cache in local variable.
                 if new_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in new_errors])
-                output.append(unicode(bf))
+                hidden_fields.append(unicode(bf))
             else:
                 output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
         if top_errors:
             output.insert(0, u'<li>%s</li>' % top_errors)
+        if hidden_fields: # Insert any hidden fields in the last <li>.
+            str_hidden = u''.join(hidden_fields)
+            if output:
+                last_li = output[-1]
+                # Chop off the trailing '</li>' and insert the hidden fields.
+                output[-1] = last_li[:-5] + str_hidden + '</li>'
+            else: # If there aren't any '<li>'s in the output, just append the hidden fields.
+                output.append(str_hidden)
         return u'\n'.join(output)
 
     def non_field_errors(self):
