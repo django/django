@@ -75,20 +75,28 @@ class Form(StrAndUnicode):
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         top_errors = self.non_field_errors()
-        output = []
+        output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             bf_errors = bf.errors # Cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
-                output.append(str(bf))
+                hidden_fields.append(str(bf))
             else:
                 if bf_errors:
                     output.append(u'<tr><td colspan="2">%s</td></tr>' % bf_errors)
                 output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
         if top_errors:
             output.insert(0, u'<tr><td colspan="2">%s</td></tr>' % top_errors)
+        if hidden_fields: # Insert any hidden fields in the last <td>.
+            str_hidden = u''.join(hidden_fields)
+            if output:
+                last_td = output[-1]
+                # Chop off the trailing '</td></tr>' and insert the hidden fields.
+                output[-1] = last_td[:-10] + str_hidden + '</td></tr>'
+            else: # If there aren't any '<td>'s in the output, just append the hidden fields.
+                output.append(str_hidden)
         return u'\n'.join(output)
 
     def as_ul(self):
