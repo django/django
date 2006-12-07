@@ -82,7 +82,7 @@ class Form(StrAndUnicode):
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
-                hidden_fields.append(str(bf))
+                hidden_fields.append(unicode(bf))
             else:
                 if bf_errors:
                     output.append(u'<tr><td colspan="2">%s</td></tr>' % bf_errors)
