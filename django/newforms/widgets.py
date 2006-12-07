@@ -8,7 +8,7 @@ __all__ = (
     'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
 )
 
-from util import smart_unicode
+from util import StrAndUnicode, smart_unicode
 from django.utils.html import escape
 from itertools import chain
 
@@ -146,7 +146,7 @@ class SelectMultiple(Widget):
         output.append(u'</select>')
         return u'\n'.join(output)
 
-class RadioInput(object):
+class RadioInput(StrAndUnicode):
     "An object used by RadioFieldRenderer that represents a single <input type='radio'>."
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
@@ -154,7 +154,7 @@ class RadioInput(object):
         self.choice_value, self.choice_label = choice
         self.index = index
 
-    def __str__(self):
+    def __unicode__(self):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
 
     def is_checked(self):
@@ -168,7 +168,7 @@ class RadioInput(object):
             final_attrs['checked'] = 'checked'
         return u'<input%s />' % flatatt(final_attrs)
 
-class RadioFieldRenderer(object):
+class RadioFieldRenderer(StrAndUnicode):
     "An object used by RadioSelect to enable customization of radio widgets."
     def __init__(self, name, value, attrs, choices):
         self.name, self.value, self.attrs = name, value, attrs
@@ -178,7 +178,7 @@ class RadioFieldRenderer(object):
         for i, choice in enumerate(self.choices):
             yield RadioInput(self.name, self.value, self.attrs.copy(), choice, i)
 
-    def __str__(self):
+    def __unicode__(self):
         "Outputs a <ul> for this set of radio fields."
         return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % w for w in self])
 

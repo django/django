@@ -48,6 +48,23 @@ See the `csrf documentation`_.
 
 .. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
 
+formtools
+=========
+
+**New in Django development version**
+
+A set of high-level abstractions for Django forms (django.newforms).
+
+django.contrib.formtools.preview
+--------------------------------
+
+An abstraction of the following workflow:
+
+"Display an HTML form, force a preview, then do something with the submission."
+
+Full documentation for this feature does not yet exist, but you can read the
+code and docstrings in ``django/contrib/formtools/preview.py`` for a start.
+
 humanize
 ========
 

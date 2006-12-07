@@ -227,7 +227,7 @@ index = staff_member_required(never_cache(index))
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not has_permission(request.user, opts.get_add_permission()):
@@ -307,7 +307,7 @@ def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if request.POST and request.POST.has_key("_saveasnew"):
@@ -315,8 +315,8 @@ def change_stage(request, app_label, model_name, object_id):
 
     try:
         manipulator = model.ChangeManipulator(object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except model.DoesNotExist:
+        raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
     if not has_permission(request.user, opts.get_change_permission(), manipulator.original_object):
         raise PermissionDenied
@@ -492,7 +492,7 @@ def delete_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
     obj = get_object_or_404(model, pk=object_id)
     if not has_permission(request.user, opts.get_delete_permission(), obj):
@@ -529,7 +529,7 @@ def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     action_list = LogEntry.objects.filter(object_id=object_id,
         content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
@@ -745,7 +745,7 @@ class ChangeList(object):
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     # There isn't a specific object to check here, so don't pass one to 
     # has_permission. There should be a has_permission implementation 
     # registered that knows when the obj arg is missing.

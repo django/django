@@ -2,7 +2,8 @@
 Field classes
 """
 
-from util import ValidationError, DEFAULT_ENCODING, smart_unicode
+from django.utils.translation import gettext
+from util import ValidationError, smart_unicode
 from widgets import TextInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
@@ -50,7 +51,7 @@ class Field(object):
         Raises ValidationError for any errors.
         """
         if self.required and value in EMPTY_VALUES:
-            raise ValidationError(u'This field is required.')
+            raise ValidationError(gettext(u'This field is required.'))
         return value
 
 class CharField(Field):
@@ -64,9 +65,9 @@ class CharField(Field):
         if value in EMPTY_VALUES: value = u''
         value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(u'Ensure this value has at most %d characters.' % self.max_length)
+            raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
         if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(u'Ensure this value has at least %d characters.' % self.min_length)
+            raise ValidationError(gettext(u'Ensure this value has at least %d characters.') % self.min_length)
         return value
 
 class IntegerField(Field):
@@ -81,7 +82,7 @@ class IntegerField(Field):
         try:
             return int(value)
         except (ValueError, TypeError):
-            raise ValidationError(u'Enter a whole number.')
+            raise ValidationError(gettext(u'Enter a whole number.'))
 
 DEFAULT_DATE_INPUT_FORMATS = (
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
@@ -113,7 +114,7 @@ class DateField(Field):
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
                 continue
-        raise ValidationError(u'Enter a valid date.')
+        raise ValidationError(gettext(u'Enter a valid date.'))
 
 DEFAULT_DATETIME_INPUT_FORMATS = (
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
@@ -149,7 +150,7 @@ class DateTimeField(Field):
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:
                 continue
-        raise ValidationError(u'Enter a valid date/time.')
+        raise ValidationError(gettext(u'Enter a valid date/time.'))
 
 class RegexField(Field):
     def __init__(self, regex, error_message=None, required=True, widget=None):
@@ -162,7 +163,7 @@ class RegexField(Field):
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
-        self.error_message = error_message or u'Enter a valid value.'
+        self.error_message = error_message or gettext(u'Enter a valid value.')
 
     def clean(self, value):
         """
@@ -185,7 +186,7 @@ email_re = re.compile(
 
 class EmailField(RegexField):
     def __init__(self, required=True, widget=None):
-        RegexField.__init__(self, email_re, u'Enter a valid e-mail address.', required, widget)
+        RegexField.__init__(self, email_re, gettext(u'Enter a valid e-mail address.'), required, widget)
 
 url_re = re.compile(
     r'^https?://' # http:// or https://
@@ -203,7 +204,7 @@ except ImportError:
 class URLField(RegexField):
     def __init__(self, required=True, verify_exists=False, widget=None,
             validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        RegexField.__init__(self, url_re, u'Enter a valid URL.', required, widget)
+        RegexField.__init__(self, url_re, gettext(u'Enter a valid URL.'), required, widget)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
@@ -223,9 +224,9 @@ class URLField(RegexField):
                 req = urllib2.Request(value, None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
-                raise ValidationError(u'Enter a valid URL.')
+                raise ValidationError(gettext(u'Enter a valid URL.'))
             except: # urllib2.URLError, httplib.InvalidURL, etc.
-                raise ValidationError(u'This URL appears to be a broken link.')
+                raise ValidationError(gettext(u'This URL appears to be a broken link.'))
         return value
 
 class BooleanField(Field):
@@ -254,7 +255,7 @@ class ChoiceField(Field):
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
-            raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % value)
+            raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % value)
         return value
 
 class MultipleChoiceField(ChoiceField):
@@ -266,11 +267,11 @@ class MultipleChoiceField(ChoiceField):
         Validates that the input is a list or tuple.
         """
         if self.required and not value:
-            raise ValidationError(u'This field is required.')
+            raise ValidationError(gettext(u'This field is required.'))
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(u'Enter a list of values.')
+            raise ValidationError(gettext(u'Enter a list of values.'))
         new_value = []
         for val in value:
             val = smart_unicode(val)
@@ -279,7 +280,7 @@ class MultipleChoiceField(ChoiceField):
         valid_values = set([k for k, v in self.choices])
         for val in new_value:
             if val not in valid_values:
-                raise ValidationError(u'Select a valid choice. %s is not one of the available choices.' % val)
+                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
         return new_value
 
 class ComboField(Field):

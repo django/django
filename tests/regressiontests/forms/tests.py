@@ -1368,6 +1368,13 @@ False
 <li><ul class="errorlist"><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
+>>> print p.as_p()
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>First name: <input type="text" name="first_name" /></p>
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>Birthday: <input type="text" name="birthday" /></p>
 
 If you don't pass any values to the Form's __init__(), or if you pass None,
 the Form won't do any validation. Form.errors will be an empty dictionary *but*
@@ -1389,6 +1396,10 @@ False
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
+>>> print p.as_p()
+<p>First name: <input type="text" name="first_name" /></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p>Birthday: <input type="text" name="birthday" /></p>
 
 Unicode values are handled properly.
 >>> p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111', 'birthday': '1940-10-9'})
@@ -1396,6 +1407,8 @@ Unicode values are handled properly.
 u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>\n<tr><td>Last name:</td><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></td></tr>\n<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>'
 >>> p.as_ul()
 u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>'
+>>> p.as_p()
+u'<p>First name: <input type="text" name="first_name" value="John" /></p>\n<p>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></p>\n<p>Birthday: <input type="text" name="birthday" value="1940-10-9" /></p>'
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors
@@ -1432,14 +1445,18 @@ If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted. It will also put a <label> around
 the human-readable labels for a field.
 >>> p = Person(auto_id='id_%s')
->>> print p.as_ul()
-<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
-<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
 >>> print p.as_table()
 <tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+>>> print p.as_ul()
+<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+>>> print p.as_p()
+<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>
 
 If auto_id is any True value whose str() does not contain '%s', the "id"
 attribute will be the name of the field.
@@ -1596,6 +1613,12 @@ ID of the *first* radio button.
 <li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>
+>>> print f.as_p()
+<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+<p><label for="id_language_0">Language:</label> <ul>
+<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul></p>
 
 MultipleChoiceField is a special case, as its data is required to be a list:
 >>> class SongForm(Form):
@@ -1754,9 +1777,10 @@ subclass' __init__().
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
 
-HiddenInput widgets are displayed differently in the as_table() and as_ul()
-output of a Form -- their verbose names are not displayed, and a separate
-<tr>/<li> is not displayed.
+HiddenInput widgets are displayed differently in the as_table(), as_ul()
+and as_p() output of a Form -- their verbose names are not displayed, and a
+separate row is not displayed. They're displayed in the last row of the
+form, directly after that row's form element.
 >>> class Person(Form):
 ...     first_name = CharField()
 ...     last_name = CharField()
@@ -1766,43 +1790,63 @@ output of a Form -- their verbose names are not displayed, and a separate
 >>> print p
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
-<input type="hidden" name="hidden_text" />
-<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></td></tr>
 >>> print p.as_ul()
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></li>
+>>> print p.as_p()
+<p>First name: <input type="text" name="first_name" /></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></p>
 
 With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
 >>> p = Person(auto_id='id_%s')
 >>> print p
 <tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<input type="hidden" name="hidden_text" id="id_hidden_text" />
-<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></td></tr>
 >>> print p.as_ul()
 <li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<input type="hidden" name="hidden_text" id="id_hidden_text" />
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>
+>>> print p.as_p()
+<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></p>
 
 If a field with a HiddenInput has errors, the as_table() and as_ul() output
 will include the error message(s) with the text "(Hidden field [fieldname]) "
-prepended.
+prepended. This message is displayed at the top of the output, regardless of
+its field's order in the form.
 >>> p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'})
 >>> print p
+<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
-<input type="hidden" name="hidden_text" />
-<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></td></tr>
 >>> print p.as_ul()
+<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
-<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>
+<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>
+>>> print p.as_p()
+<p><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></p>
+<p>First name: <input type="text" name="first_name" value="John" /></p>
+<p>Last name: <input type="text" name="last_name" value="Lennon" /></p>
+<p>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></p>
+
+A corner case: It's possible for a form to have only HiddenInputs.
+>>> class TestForm(Form):
+...     foo = CharField(widget=HiddenInput)
+...     bar = CharField(widget=HiddenInput)
+>>> p = TestForm()
+>>> print p.as_table()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
+>>> print p.as_ul()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
+>>> print p.as_p()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
 
 A Form's fields are displayed in the same order in which they were defined.
 >>> class TestForm(Form):

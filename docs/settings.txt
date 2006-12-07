@@ -830,7 +830,7 @@ Default: ``Django/<version> (http://www.djangoproject.com/)``
 The string to use as the ``User-Agent`` header when checking to see if URLs
 exist (see the ``verify_exists`` option on URLField_).
 
-.. URLField: ../model_api/#urlfield
+.. _URLField: ../model_api/#urlfield
 
 USE_ETAGS
 ---------
