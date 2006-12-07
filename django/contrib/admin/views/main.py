@@ -314,7 +314,7 @@ def change_stage(request, app_label, model_name, object_id):
     try:
         manipulator = model.ChangeManipulator(object_id)
     except model.DoesNotExist:
-        raise Http404('%s object with primary key %r does not exist' % (model_name, object_id))
+        raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
     if request.POST:
         new_data = request.POST.copy()
