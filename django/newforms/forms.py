@@ -78,7 +78,7 @@ class Form(StrAndUnicode):
         output = []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            bf_errors = bf.errors
+            bf_errors = bf.errors # Cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
@@ -101,7 +101,7 @@ class Form(StrAndUnicode):
                 new_errors = bf.errors # Cache in local variable.
                 if new_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in new_errors])
-                output.append(str(bf))
+                output.append(unicode(bf))
             else:
                 output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
         if top_errors:
