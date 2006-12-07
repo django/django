@@ -72,9 +72,9 @@ class Form(StrAndUnicode):
         """
         return not self.ignore_errors and not bool(self.errors)
 
-    def as_table(self):
-        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        top_errors = self.non_field_errors()
+    def _html_output(self, normal_row, error_row, row_ender, errors_on_separate_row):
+        "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
+        top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
         output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
@@ -84,72 +84,36 @@ class Form(StrAndUnicode):
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
                 hidden_fields.append(unicode(bf))
             else:
-                if bf_errors:
-                    output.append(u'<tr><td colspan="2">%s</td></tr>' % bf_errors)
-                output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
+                label = bf.label_tag(escape(bf.verbose_name+':'))
+                if errors_on_separate_row:
+                    if bf_errors:
+                        output.append(error_row % bf_errors)
+                    output.append(normal_row % (label, bf))
+                else:
+                    output.append(normal_row % ((bf_errors, label, bf)))
         if top_errors:
-            output.insert(0, u'<tr><td colspan="2">%s</td></tr>' % top_errors)
-        if hidden_fields: # Insert any hidden fields in the last <td>.
+            output.insert(0, error_row % top_errors)
+        if hidden_fields: # Insert any hidden fields in the last row.
             str_hidden = u''.join(hidden_fields)
             if output:
-                last_td = output[-1]
-                # Chop off the trailing '</td></tr>' and insert the hidden fields.
-                output[-1] = last_td[:-10] + str_hidden + '</td></tr>'
-            else: # If there aren't any '<td>'s in the output, just append the hidden fields.
+                last_row = output[-1]
+                # Chop off the trailing row_ender (e.g. '</td></tr>') and insert the hidden fields.
+                output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
+            else: # If there aren't any rows in the output, just append the hidden fields.
                 output.append(str_hidden)
         return u'\n'.join(output)
+
+    def as_table(self):
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return self._html_output(u'<tr><td>%s</td><td>%s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        top_errors = self.non_field_errors()
-        output, hidden_fields = [], []
-        for name, field in self.fields.items():
-            bf = BoundField(self, field, name)
-            if bf.is_hidden:
-                new_errors = bf.errors # Cache in local variable.
-                if new_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in new_errors])
-                hidden_fields.append(unicode(bf))
-            else:
-                output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
-        if top_errors:
-            output.insert(0, u'<li>%s</li>' % top_errors)
-        if hidden_fields: # Insert any hidden fields in the last <li>.
-            str_hidden = u''.join(hidden_fields)
-            if output:
-                last_li = output[-1]
-                # Chop off the trailing '</li>' and insert the hidden fields.
-                output[-1] = last_li[:-5] + str_hidden + '</li>'
-            else: # If there aren't any '<li>'s in the output, just append the hidden fields.
-                output.append(str_hidden)
-        return u'\n'.join(output)
+        return self._html_output(u'<li>%s%s %s</li>', u'<li>%s</li>', '</li>', False)
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
-        top_errors = self.non_field_errors()
-        output, hidden_fields = [], []
-        for name, field in self.fields.items():
-            bf = BoundField(self, field, name)
-            bf_errors = bf.errors # Cache in local variable.
-            if bf.is_hidden:
-                if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
-                hidden_fields.append(unicode(bf))
-            else:
-                if bf_errors:
-                    output.append(u'<p>%s</p>' % bf_errors)
-                output.append(u'<p>%s %s</p>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
-        if top_errors:
-            output.insert(0, u'<p>%s</p>' % top_errors)
-        if hidden_fields: # Insert any hidden fields in the last <p>.
-            str_hidden = u''.join(hidden_fields)
-            if output:
-                last_td = output[-1]
-                # Chop off the trailing '</p>' and insert the hidden fields.
-                output[-1] = last_td[:-4] + str_hidden + '</p>'
-            else: # If there aren't any '<p>'s in the output, just append the hidden fields.
-                output.append(str_hidden)
-        return u'\n'.join(output)
+        return self._html_output(u'<p>%s %s</p>', u'<p>%s</p>', '</p>', True)
 
     def non_field_errors(self):
         """
