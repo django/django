@@ -84,13 +84,9 @@ class Form(StrAndUnicode):
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
                 hidden_fields.append(unicode(bf))
             else:
-                label = bf.label_tag(escape(bf.verbose_name+':'))
-                if errors_on_separate_row:
-                    if bf_errors:
-                        output.append(error_row % bf_errors)
-                    output.append(normal_row % (label, bf))
-                else:
-                    output.append(normal_row % ((bf_errors, label, bf)))
+                if errors_on_separate_row and bf_errors:
+                    output.append(error_row % bf_errors)
+                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.verbose_name+':')), 'field': bf})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
@@ -105,15 +101,15 @@ class Form(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(u'<tr><td>%s</td><td>%s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
+        return self._html_output(u'<tr><td>%(label)s</td><td>%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        return self._html_output(u'<li>%s%s %s</li>', u'<li>%s</li>', '</li>', False)
+        return self._html_output(u'<li>%(errors)s%(label)s %(field)s</li>', u'<li>%s</li>', '</li>', False)
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
-        return self._html_output(u'<p>%s %s</p>', u'<p>%s</p>', '</p>', True)
+        return self._html_output(u'<p>%(label)s %(field)s</p>', u'<p>%s</p>', '</p>', True)
 
     def non_field_errors(self):
         """
