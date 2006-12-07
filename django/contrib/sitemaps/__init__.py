@@ -29,7 +29,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 
     from django.contrib.sites.models import Site
     current_site = Site.objects.get_current()
-    url = "%s%s" % (current_site.domain, sitemap)
+    url = "%s%s" % (current_site.domain, sitemap_url)
     params = urllib.urlencode({'sitemap':url})
     urllib.urlopen("%s?%s" % (ping_url, params))
 
