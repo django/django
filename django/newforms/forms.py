@@ -74,38 +74,38 @@ class Form(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        top_errors = self.non_field_errors()
         output = []
-        if self.errors.get(NON_FIELD_ERRORS):
-            # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<tr><td colspan="2">%s</td></tr>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
+            bf_errors = bf.errors
             if bf.is_hidden:
-                if bf.errors:
-                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
-                    output.append(u'<tr><td colspan="2">%s</td></tr>' % new_errors)
+                if bf_errors:
+                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
                 output.append(str(bf))
             else:
-                if bf.errors:
-                    output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
+                if bf_errors:
+                    output.append(u'<tr><td colspan="2">%s</td></tr>' % bf_errors)
                 output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
+        if top_errors:
+            output.insert(0, u'<tr><td colspan="2">%s</td></tr>' % top_errors)
         return u'\n'.join(output)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
+        top_errors = self.non_field_errors()
         output = []
-        if self.errors.get(NON_FIELD_ERRORS):
-            # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<li>%s</li>' % self.non_field_errors())
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
             if bf.is_hidden:
-                if bf.errors:
-                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
-                    output.append(u'<li>%s</li>' % new_errors)
+                new_errors = bf.errors # Cache in local variable.
+                if new_errors:
+                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in new_errors])
                 output.append(str(bf))
             else:
                 output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
+        if top_errors:
+            output.insert(0, u'<li>%s</li>' % top_errors)
         return u'\n'.join(output)
 
     def non_field_errors(self):

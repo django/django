@@ -1789,18 +1789,19 @@ With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
 
 If a field with a HiddenInput has errors, the as_table() and as_ul() output
 will include the error message(s) with the text "(Hidden field [fieldname]) "
-prepended.
+prepended. This message is displayed at the top of the output, regardless of
+its field's order in the form.
 >>> p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'})
 >>> print p
+<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <input type="hidden" name="hidden_text" />
 <tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
 >>> print p.as_ul()
+<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
-<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <input type="hidden" name="hidden_text" />
 <li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>
 
