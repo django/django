@@ -86,7 +86,7 @@ class Form(StrAndUnicode):
             else:
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
-                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.verbose_name+':')), 'field': bf})
+                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.label+':')), 'field': bf})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
@@ -164,6 +164,7 @@ class BoundField(StrAndUnicode):
         self.form = form
         self.field = field
         self.name = name
+        self.label = self.field.label or pretty_name(name)
 
     def __unicode__(self):
         "Renders this field as an HTML widget."
@@ -213,17 +214,13 @@ class BoundField(StrAndUnicode):
         return self.form.data.get(self.name, None)
     data = property(_data)
 
-    def _verbose_name(self):
-        return pretty_name(self.name)
-    verbose_name = property(_verbose_name)
-
     def label_tag(self, contents=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         Does not HTML-escape the contents. If contents aren't given, uses the
-        field's HTML-escaped verbose_name.
+        field's HTML-escaped label.
         """
-        contents = contents or escape(self.verbose_name)
+        contents = contents or escape(self.label)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:

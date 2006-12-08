@@ -636,6 +636,9 @@ Each Field's __init__() takes at least these parameters:
               used for this Field when displaying it. Each Field has a default
               Widget that it'll use if you don't specify this. In most cases,
               the default widget is TextInput.
+    label -- A verbose name for this field, for use in displaying this field in
+             a form. By default, Django will use a "pretty" version of the form
+             field name, if the Field is part of a Form.
 
 Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
@@ -1335,7 +1338,7 @@ u''
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
 >>> for boundfield in p:
-...     print boundfield.verbose_name, boundfield.data
+...     print boundfield.label, boundfield.data
 First name John
 Last name Lennon
 Birthday 1940-10-9
@@ -1908,6 +1911,19 @@ in "attrs".
 <li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 
+You can specify the label for a field by using the 'label' argument to a Field
+class. If you don't specify 'label', Django will use the field name with
+underscores converted to spaces, and the initial letter capitalized.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='Your username')
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput, label='Password (again)')
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Your username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password1: <input type="password" name="password1" /></li>
+<li>Password (again): <input type="password" name="password2" /></li>
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
@@ -1994,12 +2010,14 @@ particular field.
 <input type="submit" />
 </form>
 
-Use form.[field].verbose_name to output a field's "verbose name" -- its field
-name with underscores converted to spaces, and the initial letter capitalized.
+Use form.[field].label to output a field's label. You can specify the label for
+a field by using the 'label' argument to a Field class. If you don't specify
+'label', Django will use the field name with underscores converted to spaces,
+and the initial letter capitalized.
 >>> t = Template('''<form action="">
-... <p><label>{{ form.username.verbose_name }}: {{ form.username }}</label></p>
-... <p><label>{{ form.password1.verbose_name }}: {{ form.password1 }}</label></p>
-... <p><label>{{ form.password2.verbose_name }}: {{ form.password2 }}</label></p>
+... <p><label>{{ form.username.label }}: {{ form.username }}</label></p>
+... <p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>
+... <p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>
 ... <input type="submit" />
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
@@ -2010,8 +2028,8 @@ name with underscores converted to spaces, and the initial letter capitalized.
 <input type="submit" />
 </form>
 
-User form.[field].label_tag to output a field's verbose_name with a <label>
-tag wrapped around it, but *only* if the given field has an "id" attribute.
+User form.[field].label_tag to output a field's label with a <label> tag
+wrapped around it, but *only* if the given field has an "id" attribute.
 Recall from above that passing the "auto_id" argument to a Form gives each
 field an "id" attribute.
 >>> t = Template('''<form action="">
