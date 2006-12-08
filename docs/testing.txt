@@ -10,7 +10,7 @@ used to validate that code behaves as expected. When refactoring or
 modifying code, tests serve as a guide to ensure that behavior hasn't
 changed unexpectedly as a result of the refactor.
 
-Testing an web application is a complex task, as there are many
+Testing a web application is a complex task, as there are many
 components of a web application that must be validated and tested. To
 help you test your application, Django provides a test execution
 framework, and range of utilities that can be used to stimulate and
@@ -133,7 +133,7 @@ together, picking the test system to match the type of tests you need to
 write.
 
 For developers new to testing, however, this choice can seem
-confusing, so here are a few key differences to help you decide weather
+confusing, so here are a few key differences to help you decide whether
 doctests or unit tests are right for you.
 
 If you've been using Python for a while, ``doctest`` will probably feel more
