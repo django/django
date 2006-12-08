@@ -62,6 +62,14 @@ The library deals with these concepts:
     * **Form** -- A collection of fields that knows how to validate itself and
       display itself as HTML.
 
+
+
+Using forms with templates
+==========================
+
+Using forms in views
+====================
+
 More coming soon
 ================
 

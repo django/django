@@ -277,7 +277,7 @@ class MultipleChoiceField(ChoiceField):
             val = smart_unicode(val)
             new_value.append(val)
         # Validate that each value in the value list is in self.choices.
-        valid_values = set([k for k, v in self.choices])
+        valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:
             if val not in valid_values:
                 raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
