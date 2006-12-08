@@ -1736,7 +1736,7 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({})
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
@@ -1748,12 +1748,12 @@ Form.clean() is required to return a dictionary of all clean data.
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
 >>> print f.as_ul()
 <li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
-<li>Username: <input type="text" name="username" value="adrian" /></li>
+<li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
 <li>Password2: <input type="password" name="password2" value="bar" /></li>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
@@ -1881,6 +1881,33 @@ A Form's fields are displayed in the same order in which they were defined.
 <tr><td>Field13:</td><td><input type="text" name="field13" /></td></tr>
 <tr><td>Field14:</td><td><input type="text" name="field14" /></td></tr>
 
+Some Field classes have an effect on the HTML attributes of their associated
+Widget. If you set max_length in a CharField and its associated widget is
+either a TextInput or PasswordInput, then the widget's rendered HTML will
+include the "maxlength" attribute.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)                   # uses TextInput by default
+...    password = CharField(max_length=10, widget=PasswordInput)
+...    realname = CharField(max_length=10, widget=TextInput) # redundantly define widget, just to test
+...    address = CharField()                                 # no max_length defined here
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" maxlength="10" /></li>
+<li>Realname: <input type="text" name="realname" maxlength="10" /></li>
+<li>Address: <input type="text" name="address" /></li>
+
+If you specify a custom "attrs" that includes the "maxlength" attribute,
+the Field's max_length attribute will override whatever "maxlength" you specify
+in "attrs".
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, widget=TextInput(attrs={'maxlength': 20}))
+...    password = CharField(max_length=10, widget=PasswordInput)
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" maxlength="10" /></li>
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
@@ -1906,7 +1933,7 @@ Case 1: GET (an empty form, with no errors).
 >>> print my_function('GET', {})
 <form action="" method="post">
 <table>
-<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
 </table>
@@ -1919,7 +1946,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" value="this-is-a-long-username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>
@@ -1954,14 +1981,14 @@ particular field.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" /></label></p>
+<p><label>Your username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 >>> print t.render(Context({'form': UserRegistration({'username': 'django'})}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password: <input type="password" name="password1" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
@@ -1977,7 +2004,7 @@ name with underscores converted to spaces, and the initial letter capitalized.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p><label>Username: <input type="text" name="username" /></label></p>
+<p><label>Username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password1: <input type="password" name="password1" /></label></p>
 <p><label>Password2: <input type="password" name="password2" /></label></p>
 <input type="submit" />
@@ -1995,14 +2022,14 @@ field an "id" attribute.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p>Username: <input type="text" name="username" /></p>
+<p>Username: <input type="text" name="username" maxlength="10" /></p>
 <p>Password1: <input type="password" name="password1" /></p>
 <p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />
 </form>
 >>> print t.render(Context({'form': UserRegistration(auto_id='id_%s')}))
 <form action="">
-<p><label for="id_username">Username</label>: <input type="text" name="username" id="id_username" /></p>
+<p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
 <p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
 <p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
 <input type="submit" />
@@ -2020,7 +2047,7 @@ the list of errors is empty). You can also use it in {% if %} statements.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />
@@ -2035,7 +2062,7 @@ the list of errors is empty). You can also use it in {% if %} statements.
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
 <form action="">
 <ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />

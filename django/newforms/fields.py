@@ -4,7 +4,7 @@ Field classes
 
 from django.utils.translation import gettext
 from util import ValidationError, smart_unicode
-from widgets import TextInput, CheckboxInput, Select, SelectMultiple
+from widgets import TextInput, PasswordInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
 import time
@@ -37,6 +37,12 @@ class Field(object):
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
+
+        # Hook into self.widget_attrs() for any Field-specific HTML attributes.
+        extra_attrs = self.widget_attrs(widget)
+        if extra_attrs:
+            widget.attrs.update(extra_attrs)
+
         self.widget = widget
 
         # Increase the creation counter, and save our local copy.
@@ -54,10 +60,18 @@ class Field(object):
             raise ValidationError(gettext(u'This field is required.'))
         return value
 
+    def widget_attrs(self, widget):
+        """
+        Given a Widget instance (*not* a Widget class), returns a dictionary of
+        any HTML attributes that should be added to the Widget, based on this
+        Field.
+        """
+        return {}
+
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, required=True, widget=None):
-        Field.__init__(self, required, widget)
         self.max_length, self.min_length = max_length, min_length
+        Field.__init__(self, required, widget)
 
     def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
@@ -69,6 +83,10 @@ class CharField(Field):
         if self.min_length is not None and len(value) < self.min_length:
             raise ValidationError(gettext(u'Ensure this value has at least %d characters.') % self.min_length)
         return value
+
+    def widget_attrs(self, widget):
+        if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
+            return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
     def clean(self, value):
