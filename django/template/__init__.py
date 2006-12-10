@@ -742,7 +742,11 @@ class VariableNode(Node):
     def encode_output(self, output):
         # Check type so that we don't run str() on a Unicode object
         if not isinstance(output, basestring):
-            return str(output)
+            try:
+                return str(output)
+            except UnicodeEncodeError:
+                # If __str__() returns a Unicode object, convert it to bytestring.
+                return unicode(output).encode(settings.DEFAULT_CHARSET)
         elif isinstance(output, unicode):
             return output.encode(settings.DEFAULT_CHARSET)
         else:

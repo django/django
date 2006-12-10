@@ -6,7 +6,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
-from util import ErrorDict, ErrorList, ValidationError
+from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
 NON_FIELD_ERRORS = '__all__'
 
@@ -32,7 +32,7 @@ class DeclarativeFieldsMetaclass(type):
         attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
-class Form(object):
+class Form(StrAndUnicode):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
@@ -43,7 +43,7 @@ class Form(object):
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
-    def __str__(self):
+    def __unicode__(self):
         return self.as_table()
 
     def __iter__(self):
@@ -72,41 +72,44 @@ class Form(object):
         """
         return not self.ignore_errors and not bool(self.errors)
 
-    def as_table(self):
-        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        output = []
-        if self.errors.get(NON_FIELD_ERRORS):
-            # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<tr><td colspan="2">%s</td></tr>' % self.non_field_errors())
+    def _html_output(self, normal_row, error_row, row_ender, errors_on_separate_row):
+        "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
+        top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
+        output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
+            bf_errors = bf.errors # Cache in local variable.
             if bf.is_hidden:
-                if bf.errors:
-                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
-                    output.append(u'<tr><td colspan="2">%s</td></tr>' % new_errors)
-                output.append(str(bf))
+                if bf_errors:
+                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
+                hidden_fields.append(unicode(bf))
             else:
-                if bf.errors:
-                    output.append(u'<tr><td colspan="2">%s</td></tr>' % bf.errors)
-                output.append(u'<tr><td>%s</td><td>%s</td></tr>' % (bf.label_tag(escape(bf.verbose_name+':')), bf))
+                if errors_on_separate_row and bf_errors:
+                    output.append(error_row % bf_errors)
+                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.label+':')), 'field': bf})
+        if top_errors:
+            output.insert(0, error_row % top_errors)
+        if hidden_fields: # Insert any hidden fields in the last row.
+            str_hidden = u''.join(hidden_fields)
+            if output:
+                last_row = output[-1]
+                # Chop off the trailing row_ender (e.g. '</td></tr>') and insert the hidden fields.
+                output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
+            else: # If there aren't any rows in the output, just append the hidden fields.
+                output.append(str_hidden)
         return u'\n'.join(output)
+
+    def as_table(self):
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return self._html_output(u'<tr><td>%(label)s</td><td>%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
-        output = []
-        if self.errors.get(NON_FIELD_ERRORS):
-            # Errors not corresponding to a particular field are displayed at the top.
-            output.append(u'<li>%s</li>' % self.non_field_errors())
-        for name, field in self.fields.items():
-            bf = BoundField(self, field, name)
-            if bf.is_hidden:
-                if bf.errors:
-                    new_errors = ErrorList(['(Hidden field %s) %s' % (name, e) for e in bf.errors])
-                    output.append(u'<li>%s</li>' % new_errors)
-                output.append(str(bf))
-            else:
-                output.append(u'<li>%s%s %s</li>' % (bf.errors, bf.label_tag(escape(bf.verbose_name+':')), bf))
-        return u'\n'.join(output)
+        return self._html_output(u'<li>%(errors)s%(label)s %(field)s</li>', u'<li>%s</li>', '</li>', False)
+
+    def as_p(self):
+        "Returns this form rendered as HTML <p>s."
+        return self._html_output(u'<p>%(label)s %(field)s</p>', u'<p>%s</p>', '</p>', True)
 
     def non_field_errors(self):
         """
@@ -155,18 +158,19 @@ class Form(object):
         """
         return self.clean_data
 
-class BoundField(object):
+class BoundField(StrAndUnicode):
     "A Field plus data"
     def __init__(self, form, field, name):
-        self._form = form
-        self._field = field
-        self._name = name
+        self.form = form
+        self.field = field
+        self.name = name
+        self.label = self.field.label or pretty_name(name)
 
-    def __str__(self):
+    def __unicode__(self):
         "Renders this field as an HTML widget."
         # Use the 'widget' attribute on the field to determine which type
         # of HTML widget to use.
-        value = self.as_widget(self._field.widget)
+        value = self.as_widget(self.field.widget)
         if not isinstance(value, basestring):
             # Some Widget render() methods -- notably RadioSelect -- return a
             # "special" object rather than a string. Call the __str__() on that
@@ -179,10 +183,7 @@ class BoundField(object):
         Returns an ErrorList for this field. Returns an empty ErrorList
         if there are none.
         """
-        try:
-            return self._form.errors[self._name]
-        except KeyError:
-            return ErrorList()
+        return self.form.errors.get(self.name, ErrorList())
     errors = property(_errors)
 
     def as_widget(self, widget, attrs=None):
@@ -190,7 +191,7 @@ class BoundField(object):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self._name, self.data, attrs=attrs)
+        return widget.render(self.name, self.data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -210,21 +211,17 @@ class BoundField(object):
 
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
-        return self._form.data.get(self._name, None)
+        return self.form.data.get(self.name, None)
     data = property(_data)
-
-    def _verbose_name(self):
-        return pretty_name(self._name)
-    verbose_name = property(_verbose_name)
 
     def label_tag(self, contents=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         Does not HTML-escape the contents. If contents aren't given, uses the
-        field's HTML-escaped verbose_name.
+        field's HTML-escaped label.
         """
-        contents = contents or escape(self.verbose_name)
-        widget = self._field.widget
+        contents = contents or escape(self.label)
+        widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
             contents = '<label for="%s">%s</label>' % (widget.id_for_label(id_), contents)
@@ -232,7 +229,7 @@ class BoundField(object):
 
     def _is_hidden(self):
         "Returns True if this BoundField's widget is hidden."
-        return self._field.widget.is_hidden
+        return self.field.widget.is_hidden
     is_hidden = property(_is_hidden)
 
     def _auto_id(self):
@@ -240,10 +237,10 @@ class BoundField(object):
         Calculates and returns the ID attribute for this BoundField, if the
         associated Form has specified auto_id. Returns an empty string otherwise.
         """
-        auto_id = self._form.auto_id
+        auto_id = self.form.auto_id
         if auto_id and '%s' in str(auto_id):
-            return str(auto_id) % self._name
+            return str(auto_id) % self.name
         elif auto_id:
-            return self._name
+            return self.name
         return ''
     auto_id = property(_auto_id)

@@ -636,6 +636,9 @@ Each Field's __init__() takes at least these parameters:
               used for this Field when displaying it. Each Field has a default
               Widget that it'll use if you don't specify this. In most cases,
               the default widget is TextInput.
+    label -- A verbose name for this field, for use in displaying this field in
+             a form. By default, Django will use a "pretty" version of the form
+             field name, if the Field is part of a Form.
 
 Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
@@ -1335,7 +1338,7 @@ u''
 <input type="text" name="last_name" value="Lennon" />
 <input type="text" name="birthday" value="1940-10-9" />
 >>> for boundfield in p:
-...     print boundfield.verbose_name, boundfield.data
+...     print boundfield.label, boundfield.data
 First name John
 Last name Lennon
 Birthday 1940-10-9
@@ -1368,6 +1371,13 @@ False
 <li><ul class="errorlist"><li>This field is required.</li></ul>First name: <input type="text" name="first_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Last name: <input type="text" name="last_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul>Birthday: <input type="text" name="birthday" /></li>
+>>> print p.as_p()
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>First name: <input type="text" name="first_name" /></p>
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<p>Birthday: <input type="text" name="birthday" /></p>
 
 If you don't pass any values to the Form's __init__(), or if you pass None,
 the Form won't do any validation. Form.errors will be an empty dictionary *but*
@@ -1389,6 +1399,10 @@ False
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
 <li>Birthday: <input type="text" name="birthday" /></li>
+>>> print p.as_p()
+<p>First name: <input type="text" name="first_name" /></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p>Birthday: <input type="text" name="birthday" /></p>
 
 Unicode values are handled properly.
 >>> p = Person({'first_name': u'John', 'last_name': u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111', 'birthday': '1940-10-9'})
@@ -1396,6 +1410,8 @@ Unicode values are handled properly.
 u'<tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>\n<tr><td>Last name:</td><td><input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></td></tr>\n<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>'
 >>> p.as_ul()
 u'<li>First name: <input type="text" name="first_name" value="John" /></li>\n<li>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></li>\n<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>'
+>>> p.as_p()
+u'<p>First name: <input type="text" name="first_name" value="John" /></p>\n<p>Last name: <input type="text" name="last_name" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /></p>\n<p>Birthday: <input type="text" name="birthday" value="1940-10-9" /></p>'
 
 >>> p = Person({'last_name': u'Lennon'})
 >>> p.errors
@@ -1432,14 +1448,18 @@ If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted. It will also put a <label> around
 the human-readable labels for a field.
 >>> p = Person(auto_id='id_%s')
->>> print p.as_ul()
-<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
-<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
 >>> print p.as_table()
 <tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
 <tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+>>> print p.as_ul()
+<li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
+<li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+>>> print p.as_p()
+<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>
 
 If auto_id is any True value whose str() does not contain '%s', the "id"
 attribute will be the name of the field.
@@ -1596,6 +1616,12 @@ ID of the *first* radio button.
 <li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
 <li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></li>
+>>> print f.as_p()
+<p><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></p>
+<p><label for="id_language_0">Language:</label> <ul>
+<li><label><input type="radio" id="id_language_0" value="P" name="language" /> Python</label></li>
+<li><label><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
+</ul></p>
 
 MultipleChoiceField is a special case, as its data is required to be a list:
 >>> class SongForm(Form):
@@ -1713,7 +1739,7 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({})
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
@@ -1725,12 +1751,12 @@ Form.clean() is required to return a dictionary of all clean data.
 {'__all__': [u'Please make sure your passwords match.']}
 >>> print f.as_table()
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" value="adrian" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="adrian" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
 >>> print f.as_ul()
 <li><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></li>
-<li>Username: <input type="text" name="username" value="adrian" /></li>
+<li>Username: <input type="text" name="username" value="adrian" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" value="foo" /></li>
 <li>Password2: <input type="password" name="password2" value="bar" /></li>
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'})
@@ -1754,9 +1780,10 @@ subclass' __init__().
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
 <tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
 
-HiddenInput widgets are displayed differently in the as_table() and as_ul()
-output of a Form -- their verbose names are not displayed, and a separate
-<tr>/<li> is not displayed.
+HiddenInput widgets are displayed differently in the as_table(), as_ul()
+and as_p() output of a Form -- their verbose names are not displayed, and a
+separate row is not displayed. They're displayed in the last row of the
+form, directly after that row's form element.
 >>> class Person(Form):
 ...     first_name = CharField()
 ...     last_name = CharField()
@@ -1766,43 +1793,63 @@ output of a Form -- their verbose names are not displayed, and a separate
 >>> print p
 <tr><td>First name:</td><td><input type="text" name="first_name" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" /></td></tr>
-<input type="hidden" name="hidden_text" />
-<tr><td>Birthday:</td><td><input type="text" name="birthday" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></td></tr>
 >>> print p.as_ul()
 <li>First name: <input type="text" name="first_name" /></li>
 <li>Last name: <input type="text" name="last_name" /></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></li>
+>>> print p.as_p()
+<p>First name: <input type="text" name="first_name" /></p>
+<p>Last name: <input type="text" name="last_name" /></p>
+<p>Birthday: <input type="text" name="birthday" /><input type="hidden" name="hidden_text" /></p>
 
 With auto_id set, a HiddenInput still gets an ID, but it doesn't get a label.
 >>> p = Person(auto_id='id_%s')
 >>> print p
 <tr><td><label for="id_first_name">First name:</label></td><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><td><label for="id_last_name">Last name:</label></td><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<input type="hidden" name="hidden_text" id="id_hidden_text" />
-<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><td><label for="id_birthday">Birthday:</label></td><td><input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></td></tr>
 >>> print p.as_ul()
 <li><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
-<input type="hidden" name="hidden_text" id="id_hidden_text" />
-<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
+<li><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></li>
+>>> print p.as_p()
+<p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
+<p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
+<p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /><input type="hidden" name="hidden_text" id="id_hidden_text" /></p>
 
 If a field with a HiddenInput has errors, the as_table() and as_ul() output
 will include the error message(s) with the text "(Hidden field [fieldname]) "
-prepended.
+prepended. This message is displayed at the top of the output, regardless of
+its field's order in the form.
 >>> p = Person({'first_name': 'John', 'last_name': 'Lennon', 'birthday': '1940-10-9'})
 >>> print p
+<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
 <tr><td>First name:</td><td><input type="text" name="first_name" value="John" /></td></tr>
 <tr><td>Last name:</td><td><input type="text" name="last_name" value="Lennon" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></td></tr>
-<input type="hidden" name="hidden_text" />
-<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /></td></tr>
+<tr><td>Birthday:</td><td><input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></td></tr>
 >>> print p.as_ul()
+<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
 <li>First name: <input type="text" name="first_name" value="John" /></li>
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
-<li><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></li>
-<input type="hidden" name="hidden_text" />
-<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /></li>
+<li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>
+>>> print p.as_p()
+<p><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></p>
+<p>First name: <input type="text" name="first_name" value="John" /></p>
+<p>Last name: <input type="text" name="last_name" value="Lennon" /></p>
+<p>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></p>
+
+A corner case: It's possible for a form to have only HiddenInputs.
+>>> class TestForm(Form):
+...     foo = CharField(widget=HiddenInput)
+...     bar = CharField(widget=HiddenInput)
+>>> p = TestForm()
+>>> print p.as_table()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
+>>> print p.as_ul()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
+>>> print p.as_p()
+<input type="hidden" name="foo" /><input type="hidden" name="bar" />
 
 A Form's fields are displayed in the same order in which they were defined.
 >>> class TestForm(Form):
@@ -1837,6 +1884,46 @@ A Form's fields are displayed in the same order in which they were defined.
 <tr><td>Field13:</td><td><input type="text" name="field13" /></td></tr>
 <tr><td>Field14:</td><td><input type="text" name="field14" /></td></tr>
 
+Some Field classes have an effect on the HTML attributes of their associated
+Widget. If you set max_length in a CharField and its associated widget is
+either a TextInput or PasswordInput, then the widget's rendered HTML will
+include the "maxlength" attribute.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)                   # uses TextInput by default
+...    password = CharField(max_length=10, widget=PasswordInput)
+...    realname = CharField(max_length=10, widget=TextInput) # redundantly define widget, just to test
+...    address = CharField()                                 # no max_length defined here
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" maxlength="10" /></li>
+<li>Realname: <input type="text" name="realname" maxlength="10" /></li>
+<li>Address: <input type="text" name="address" /></li>
+
+If you specify a custom "attrs" that includes the "maxlength" attribute,
+the Field's max_length attribute will override whatever "maxlength" you specify
+in "attrs".
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, widget=TextInput(attrs={'maxlength': 20}))
+...    password = CharField(max_length=10, widget=PasswordInput)
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" maxlength="10" /></li>
+
+You can specify the label for a field by using the 'label' argument to a Field
+class. If you don't specify 'label', Django will use the field name with
+underscores converted to spaces, and the initial letter capitalized.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='Your username')
+...    password1 = CharField(widget=PasswordInput)
+...    password2 = CharField(widget=PasswordInput, label='Password (again)')
+>>> p = UserRegistration()
+>>> print p.as_ul()
+<li>Your username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password1: <input type="password" name="password1" /></li>
+<li>Password (again): <input type="password" name="password2" /></li>
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
@@ -1862,7 +1949,7 @@ Case 1: GET (an empty form, with no errors).
 >>> print my_function('GET', {})
 <form action="" method="post">
 <table>
-<tr><td>Username:</td><td><input type="text" name="username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" /></td></tr>
 </table>
@@ -1875,7 +1962,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
 <tr><td colspan="2"><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul></td></tr>
-<tr><td>Username:</td><td><input type="text" name="username" value="this-is-a-long-username" /></td></tr>
+<tr><td>Username:</td><td><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><td>Password1:</td><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><td>Password2:</td><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>
@@ -1910,37 +1997,39 @@ particular field.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" /></label></p>
+<p><label>Your username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 >>> print t.render(Context({'form': UserRegistration({'username': 'django'})}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password: <input type="password" name="password1" /></label></p>
 <ul class="errorlist"><li>This field is required.</li></ul><p><label>Password (again): <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 
-Use form.[field].verbose_name to output a field's "verbose name" -- its field
-name with underscores converted to spaces, and the initial letter capitalized.
+Use form.[field].label to output a field's label. You can specify the label for
+a field by using the 'label' argument to a Field class. If you don't specify
+'label', Django will use the field name with underscores converted to spaces,
+and the initial letter capitalized.
 >>> t = Template('''<form action="">
-... <p><label>{{ form.username.verbose_name }}: {{ form.username }}</label></p>
-... <p><label>{{ form.password1.verbose_name }}: {{ form.password1 }}</label></p>
-... <p><label>{{ form.password2.verbose_name }}: {{ form.password2 }}</label></p>
+... <p><label>{{ form.username.label }}: {{ form.username }}</label></p>
+... <p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>
+... <p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>
 ... <input type="submit" />
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p><label>Username: <input type="text" name="username" /></label></p>
+<p><label>Username: <input type="text" name="username" maxlength="10" /></label></p>
 <p><label>Password1: <input type="password" name="password1" /></label></p>
 <p><label>Password2: <input type="password" name="password2" /></label></p>
 <input type="submit" />
 </form>
 
-User form.[field].label_tag to output a field's verbose_name with a <label>
-tag wrapped around it, but *only* if the given field has an "id" attribute.
+User form.[field].label_tag to output a field's label with a <label> tag
+wrapped around it, but *only* if the given field has an "id" attribute.
 Recall from above that passing the "auto_id" argument to a Form gives each
 field an "id" attribute.
 >>> t = Template('''<form action="">
@@ -1951,14 +2040,14 @@ field an "id" attribute.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration()}))
 <form action="">
-<p>Username: <input type="text" name="username" /></p>
+<p>Username: <input type="text" name="username" maxlength="10" /></p>
 <p>Password1: <input type="password" name="password1" /></p>
 <p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />
 </form>
 >>> print t.render(Context({'form': UserRegistration(auto_id='id_%s')}))
 <form action="">
-<p><label for="id_username">Username</label>: <input type="text" name="username" id="id_username" /></p>
+<p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
 <p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
 <p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
 <input type="submit" />
@@ -1976,7 +2065,7 @@ the list of errors is empty). You can also use it in {% if %} statements.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
 <form action="">
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />
@@ -1991,7 +2080,7 @@ the list of errors is empty). You can also use it in {% if %} statements.
 >>> print t.render(Context({'form': UserRegistration({'username': 'django', 'password1': 'foo', 'password2': 'bar'})}))
 <form action="">
 <ul class="errorlist"><li>Please make sure your passwords match.</li></ul>
-<p><label>Your username: <input type="text" name="username" value="django" /></label></p>
+<p><label>Your username: <input type="text" name="username" value="django" maxlength="10" /></label></p>
 <p><label>Password: <input type="password" name="password1" value="foo" /></label></p>
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />

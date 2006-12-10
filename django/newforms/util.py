@@ -1,12 +1,21 @@
-# Default encoding for input byte strings.
-DEFAULT_ENCODING = 'utf-8' # TODO: First look at django.conf.settings, then fall back to this.
+from django.conf import settings
 
 def smart_unicode(s):
     if not isinstance(s, basestring):
         s = unicode(str(s))
     elif not isinstance(s, unicode):
-        s = unicode(s, DEFAULT_ENCODING)
+        s = unicode(s, settings.DEFAULT_CHARSET)
     return s
+
+class StrAndUnicode(object):
+    """
+    A class whose __str__ returns its __unicode__ as a bytestring
+    according to settings.DEFAULT_CHARSET.
+
+    Useful as a mix-in.
+    """
+    def __str__(self):
+        return self.__unicode__().encode(settings.DEFAULT_CHARSET)
 
 class ErrorDict(dict):
     """
