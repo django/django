@@ -137,34 +137,34 @@ Patch style
 Non-trivial patches
 -------------------
 
-If a patch is non-trivial, there should be some evidence that there 
-has been discussion on `django-developers`_ of any alternatives. 
-Note that 'non-trivial' doesn't just mean 'only affects 1-2 lines
-of code' - it also includes the fact that the lines that are being
-modified don't have a significant follow-on effect on the overall
-design of Django. If in doubt, ask.
+A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
+that introduces Django functionality and makes some sort of design decision.
+
+If you provide a non-trivial patch, include evidence that alternatives have
+been discussed on `django-developers`_. If you're not sure whether your patch
+should be considered non-trivial, just ask.
 
 Ticket triage
 =============
 
 Unfortunately, not all bug reports in the `ticket tracker`_ provide all 
-the `required details`_. Other tickets have patches, but those patches
-do not meet all the requirements of a `good patch`_.
+the `required details`_. A number of tickets have patches, but those patches
+don't meet all the requirements of a `good patch`_.
 
-One way to help out is to triage bugs that have been reported by other users. 
+One way to help out is to *triage* bugs that have been reported by other users.
 Pick an open ticket that is missing some details, and try to replicate the 
 problem. Fill in the missing pieces of the report. If the ticket doesn't have
-a patch, create one. 
+a patch, create one.
 
-Once you have completed all the missing details on the ticket and you have a
-patch with all the required features, mail `django-developers`_. Indicate that 
-you have triaged a ticket, and recommend a course of action for dealing with
-that ticket. 
+Once you've completed all the missing details on the ticket and you have a
+patch with all the required features, e-mail `django-developers`_. Indicate
+that you have triaged a ticket, and recommend a course of action for dealing
+with that ticket. 
 
-At first, this may require you to be persistent - if you find that your triaged
-ticket still isn't getting attention, occasional polite requests for eyeballs to 
-look at your ticket may be necessary. However, as you earn a reputation for
-quality triage work, you should find that it is easier to get the developers
+At first, this may require you to be persistent. If you find that your triaged
+ticket still isn't getting attention, occasional polite requests for eyeballs
+to look at your ticket may be necessary. However, as you earn a reputation for
+quality triage work, you should find that it is easier to get the developers'
 attention.
 
 .. _required details: `Reporting bugs`_
