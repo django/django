@@ -36,7 +36,7 @@ class Form(StrAndUnicode):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
-    def __init__(self, data=None, auto_id=False): # TODO: prefix stuff
+    def __init__(self, data=None, auto_id='id_%s'): # TODO: prefix stuff
         self.ignore_errors = data is None
         self.data = data or {}
         self.auto_id = auto_id
