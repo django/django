@@ -22,6 +22,9 @@ of the community, so there are many ways you can help Django's development:
       likely to be skeptical of large-scale suggestions without some code to
       back it up.
 
+    * Triage patches that have been submitted by other users. Please read
+      `Ticket triage`_ below, for details on the triage process.
+
 That's all you need to know if you'd like to join the Django development
 community. The rest of this document describes the details of how our community
 works and how it handles bugs, mailing lists, and all the other minutiae of
@@ -44,8 +47,10 @@ particular:
 
     * **Do** write complete, reproducible, specific bug reports. Include as
       much information as you possibly can, complete with code snippets, test
-      cases, etc.  A minimal example that illustrates the bug in a nice small
-      test case is the best possible bug report.
+      cases, etc. This means including a clear, concise description of the
+      problem, and a clear set of instructions for replicating the problem.
+      A minimal example that illustrates the bug in a nice small test case 
+      is the best possible bug report.
 
     * **Don't** use the ticket system to ask support questions.  Use the
       `django-users`_ list, or the `#django`_ IRC channel for that.
@@ -120,6 +125,50 @@ Patch style
     * Put the prefix "[patch] " before the title of your ticket. This will make
       it obvious that the ticket includes a patch, and it will add the ticket
       to the `list of tickets with patches`_.
+      
+    * The code required to fix a problem or add a feature is an essential part 
+      of a patch, but it is not the only part. A good patch should also include
+      a regression test to validate the behavior that has been fixed (and prevent
+      the problem from arising again). 
+      
+    * If the code associated with a patch adds a new feature, or modifies behavior 
+      of an existing feature, the patch should also contain documentation.
+
+Non-trivial patches
+-------------------
+
+If a patch is non-trivial, there should be some evidence that there 
+has been discussion on `django-developers`_ of any alternatives. 
+Note that 'non-trivial' doesn't just mean 'only affects 1-2 lines
+of code' - it also includes the fact that the lines that are being
+modified don't have a significant follow-on effect on the overall
+design of Django. If in doubt, ask.
+
+Ticket triage
+=============
+
+Unfortunately, not all bug reports in the `ticket tracker`_ provide all 
+the `required details`_. Other tickets have patches, but those patches
+do not meet all the requirements of a `good patch`_.
+
+One way to help out is to triage bugs that have been reported by other users. 
+Pick an open ticket that is missing some details, and try to replicate the 
+problem. Fill in the missing pieces of the report. If the ticket doesn't have
+a patch, create one. 
+
+Once you have completed all the missing details on the ticket and you have a
+patch with all the required features, mail `django-developers`_. Indicate that 
+you have triaged a ticket, and recommend a course of action for dealing with
+that ticket. 
+
+At first, this may require you to be persistent - if you find that your triaged
+ticket still isn't getting attention, occasional polite requests for eyeballs to 
+look at your ticket may be necessary. However, as you earn a reputation for
+quality triage work, you should find that it is easier to get the developers
+attention.
+
+.. _required details: `Reporting bugs`_
+.. _good patch: `Patch style`_
 
 Submitting and maintaining translations
 =======================================
