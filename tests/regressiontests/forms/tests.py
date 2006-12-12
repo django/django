@@ -1924,6 +1924,91 @@ underscores converted to spaces, and the initial letter capitalized.
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>
 
+# Forms with prefixes #########################################################
+
+Sometimes it's necessary to have multiple forms display on the same HTML page,
+or multiple copies of the same form. We can accomplish this with form prefixes.
+Pass the keyword argument 'prefix' to the Form constructor to use this feature.
+This value will be prepended to each HTML form field name. One way to think
+about this is "namespaces for HTML forms". Notice that in the data argument,
+each field's key has the prefix, in this case 'person1', prepended to the
+actual field name.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> data = {
+...     'person1-first_name': u'John',
+...     'person1-last_name': u'Lennon',
+...     'person1-birthday': u'1940-10-9'
+... }
+>>> p = Person(data, prefix='person1')
+>>> print p.as_ul()
+<li><label for="id_person1-first_name">First name:</label> <input type="text" name="person1-first_name" value="John" id="id_person1-first_name" /></li>
+<li><label for="id_person1-last_name">Last name:</label> <input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" /></li>
+<li><label for="id_person1-birthday">Birthday:</label> <input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" /></li>
+>>> print p['first_name']
+<input type="text" name="person1-first_name" value="John" id="id_person1-first_name" />
+>>> print p['last_name']
+<input type="text" name="person1-last_name" value="Lennon" id="id_person1-last_name" />
+>>> print p['birthday']
+<input type="text" name="person1-birthday" value="1940-10-9" id="id_person1-birthday" />
+>>> p.errors
+{}
+>>> p.is_valid()
+True
+
+This is pretty unremarkable in and of itself, but let's create some data that
+contains info for two different people.
+>>> data = {
+...     'person1-first_name': u'John',
+...     'person1-last_name': u'Lennon',
+...     'person1-birthday': u'1940-10-9',
+...     'person2-first_name': u'Jim',
+...     'person2-last_name': u'Morrison',
+...     'person2-birthday': u'1943-12-8'
+... }
+
+If we use the correct prefix argument, we can create two different forms that
+will only use and validate the data for fields with a matching prefix.
+>>> p1 = Person(data, prefix='person1')
+>>> p1.is_valid()
+True
+>>> p1.clean_data
+{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
+>>> p2 = Person(data, prefix='person2')
+>>> p2.is_valid()
+True
+>>> p2.clean_data
+{'first_name': u'Jim', 'last_name': u'Morrison', 'birthday': datetime.date(1943, 12, 8)}
+
+By default, forms append a hyphen between the prefix and the field name, but a
+form can alter that behavior by implementing the add_prefix() method. This
+method takes a field name and returns the prefixed field, according to
+self.prefix.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+...     def add_prefix(self, field_name):
+...         return self.prefix and '%s-prefix-%s' % (self.prefix, field_name) or field_name
+>>> p = Person(prefix='foo')
+>>> print p.as_ul()
+<li><label for="id_foo-prefix-first_name">First name:</label> <input type="text" name="foo-prefix-first_name" id="id_foo-prefix-first_name" /></li>
+<li><label for="id_foo-prefix-last_name">Last name:</label> <input type="text" name="foo-prefix-last_name" id="id_foo-prefix-last_name" /></li>
+<li><label for="id_foo-prefix-birthday">Birthday:</label> <input type="text" name="foo-prefix-birthday" id="id_foo-prefix-birthday" /></li>
+>>> data = {
+...     'foo-prefix-first_name': u'John',
+...     'foo-prefix-last_name': u'Lennon',
+...     'foo-prefix-birthday': u'1940-10-9'
+... }
+>>> p = Person(data, prefix='foo')
+>>> p.is_valid()
+True
+>>> p.clean_data
+{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context

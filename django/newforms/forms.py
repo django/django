@@ -36,10 +36,11 @@ class Form(StrAndUnicode):
     "A collection of Fields, plus their associated data."
     __metaclass__ = DeclarativeFieldsMetaclass
 
-    def __init__(self, data=None, auto_id='id_%s'): # TODO: prefix stuff
+    def __init__(self, data=None, auto_id='id_%s', prefix=None):
         self.ignore_errors = data is None
         self.data = data or {}
         self.auto_id = auto_id
+        self.prefix = prefix
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
@@ -71,6 +72,15 @@ class Form(StrAndUnicode):
         being ignored, returns False.
         """
         return not self.ignore_errors and not bool(self.errors)
+
+    def add_prefix(self, field_name):
+        """
+        Returns the field name with a prefix appended, if this Form has a
+        prefix set.
+
+        Subclasses may wish to override.
+        """
+        return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
 
     def _html_output(self, normal_row, error_row, row_ender, errors_on_separate_row):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
@@ -132,7 +142,7 @@ class Form(StrAndUnicode):
             # value_from_datadict() gets the data from the dictionary.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, name)
+            value = field.widget.value_from_datadict(self.data, self.add_prefix(name))
             try:
                 value = field.clean(value)
                 self.clean_data[name] = value
@@ -163,7 +173,7 @@ class BoundField(StrAndUnicode):
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
-        self.name = name
+        self.name = form.add_prefix(name)
         self.label = self.field.label or pretty_name(name)
 
     def __unicode__(self):
