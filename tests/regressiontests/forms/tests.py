@@ -1332,6 +1332,11 @@ u''
 <input type="text" name="last_name" value="Lennon" id="id_last_name" />
 >>> print p['birthday']
 <input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
+>>> print p['nonexistentfield']
+Traceback (most recent call last):
+...
+KeyError: "Key 'nonexistentfield' not found in Form"
+
 >>> for boundfield in p:
 ...     print boundfield
 <input type="text" name="first_name" value="John" id="id_first_name" />
@@ -1974,9 +1979,39 @@ actual field name.
 {}
 >>> p.is_valid()
 True
+>>> p.clean_data
+{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
-This is pretty unremarkable in and of itself, but let's create some data that
-contains info for two different people.
+Let's try submitting some bad data to make sure form.errors and field.errors
+work as expected.
+>>> data = {
+...     'person1-first_name': u'',
+...     'person1-last_name': u'',
+...     'person1-birthday': u''
+... }
+>>> p = Person(data, prefix='person1')
+>>> p.errors
+{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+>>> p['first_name'].errors
+[u'This field is required.']
+>>> p['person1-first_name'].errors
+Traceback (most recent call last):
+...
+KeyError: "Key 'person1-first_name' not found in Form"
+
+In this example, the data doesn't have a prefix, but the form requires it, so
+the form doesn't "see" the fields.
+>>> data = {
+...     'first_name': u'John',
+...     'last_name': u'Lennon',
+...     'birthday': u'1940-10-9'
+... }
+>>> p = Person(data, prefix='person1')
+>>> p.errors
+{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
+
+With prefixes, a single data dictionary can hold data for multiple instances
+of the same form.
 >>> data = {
 ...     'person1-first_name': u'John',
 ...     'person1-last_name': u'Lennon',
@@ -1985,15 +2020,11 @@ contains info for two different people.
 ...     'person2-last_name': u'Morrison',
 ...     'person2-birthday': u'1943-12-8'
 ... }
-
-If we use the correct prefix argument, we can create two different forms that
-will only use and validate the data for fields with a matching prefix.
 >>> p1 = Person(data, prefix='person1')
 >>> p1.is_valid()
 True
 >>> p1.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
-
 >>> p2 = Person(data, prefix='person2')
 >>> p2.is_valid()
 True

@@ -173,7 +173,8 @@ class BoundField(StrAndUnicode):
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
-        self.name = form.add_prefix(name)
+        self.name = name
+        self.html_name = form.add_prefix(name)
         self.label = self.field.label or pretty_name(name)
 
     def __unicode__(self):
@@ -201,7 +202,7 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self.name, self.data, attrs=attrs)
+        return widget.render(self.html_name, self.data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -222,8 +223,8 @@ class BoundField(StrAndUnicode):
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
         if self.field.widget.requires_data_list and isinstance(self.form.data, MultiValueDict):
-            return self.form.data.getlist(self.name)
-        return self.form.data.get(self.name, None)
+            return self.form.data.getlist(self.html_name)
+        return self.form.data.get(self.html_name, None)
     data = property(_data)
 
     def label_tag(self, contents=None):
@@ -251,8 +252,8 @@ class BoundField(StrAndUnicode):
         """
         auto_id = self.form.auto_id
         if auto_id and '%s' in str(auto_id):
-            return str(auto_id) % self.name
+            return str(auto_id) % self.html_name
         elif auto_id:
-            return self.name
+            return self.html_name
         return ''
     auto_id = property(_auto_id)
