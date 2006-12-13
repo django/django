@@ -2,7 +2,7 @@
 Form classes
 """
 
-from django.utils.datastructures import SortedDict
+from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
@@ -221,6 +221,8 @@ class BoundField(StrAndUnicode):
 
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
+        if self.field.widget.requires_data_list and isinstance(self.form.data, MultiValueDict):
+            return self.form.data.getlist(self.name)
         return self.form.data.get(self.name, None)
     data = property(_data)
 

@@ -9,6 +9,7 @@ __all__ = (
 )
 
 from util import StrAndUnicode, smart_unicode
+from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from itertools import chain
 
@@ -64,6 +65,7 @@ class Input(Widget):
     type='radio', which are special).
     """
     input_type = None # Subclasses must define this.
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
@@ -145,6 +147,11 @@ class SelectMultiple(Widget):
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
+
+    def value_from_datadict(self, data, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)
 
 class RadioInput(StrAndUnicode):
     "An object used by RadioFieldRenderer that represents a single <input type='radio'>."

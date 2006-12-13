@@ -1672,6 +1672,23 @@ MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 
+Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict
+conveniently work with this.
+>>> data = {'name': 'Yesterday', 'composers': ['J', 'P']}
+>>> f = SongForm(data)
+>>> f.errors
+{}
+>>> from django.http import QueryDict
+>>> data = QueryDict('name=Yesterday&composers=J&composers=P')
+>>> f = SongForm(data)
+>>> f.errors
+{}
+>>> from django.utils.datastructures import MultiValueDict
+>>> data = MultiValueDict(dict(name='Yesterday', composers=['J', 'P']))
+>>> f = SongForm(data)
+>>> f.errors
+{}
+
 When using CheckboxSelectMultiple, the framework expects a list of input and
 returns a list of input.
 >>> f = SongForm({'name': 'Yesterday'}, auto_id=False)
