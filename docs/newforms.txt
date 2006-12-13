@@ -268,6 +268,15 @@ include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
 
+Notes on field ordering
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
+displayed in the order in which you define them in your form class. For
+example, in the ``ContactForm`` example, the fields are defined in the order
+``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
+output, just change the order in which those fields are listed in the class.
+
 More coming soon
 ================
 
