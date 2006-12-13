@@ -100,10 +100,10 @@ it and ``print`` it::
 
     >>> f = ContactForm()
     >>> print f
-    <tr><td><label for="id_subject">Subject:</label></td><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><td><label for="id_message">Message:</label></td><td><input type="text" name="message" id="id_message" /></td></tr>
-    <tr><td><label for="id_sender">Sender:</label></td><td><input type="text" name="sender" id="id_sender" /></td></tr>
-    <tr><td><label for="id_cc_myself">Cc myself:</label></td><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 This default output is a two-column HTML table, with a ``<tr>`` for each field.
 Notice the following:
@@ -176,12 +176,12 @@ calls its ``as_table()`` method behind the scenes::
 
     >>> f = ContactForm()
     >>> f.as_table()
-    u'<tr><td><label for="id_subject">Subject:</label></td><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><td><label for="id_message">Message:</label></td><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><td><label for="id_sender">Sender:</label></td><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><td><label for="id_cc_myself">Cc myself:</label></td><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
+    u'<tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>\n<tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>\n<tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>\n<tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>'
     >>> print f.as_table()
-    <tr><td><label for="id_subject">Subject:</label></td><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><td><label for="id_message">Message:</label></td><td><input type="text" name="message" id="id_message" /></td></tr>
-    <tr><td><label for="id_sender">Sender:</label></td><td><input type="text" name="sender" id="id_sender" /></td></tr>
-    <tr><td><label for="id_cc_myself">Cc myself:</label></td><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
 
 Configuring HTML ``<label>`` tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,10 +204,10 @@ tags nor ``id`` attributes::
 
     >>> f = ContactForm(auto_id=False)
     >>> print f.as_table()
-    <tr><td>Subject:</td><td><input type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><td>Message:</td><td><input type="text" name="message" /></td></tr>
-    <tr><td>Sender:</td><td><input type="text" name="sender" /></td></tr>
-    <tr><td>Cc myself:</td><td><input type="checkbox" name="cc_myself" /></td></tr>
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" /></td></tr>
+    <tr><th>Sender:</th><td><input type="text" name="sender" /></td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself" /></td></tr>
     >>> print f.as_ul()
     <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
     <li>Message: <input type="text" name="message" /></li>
@@ -225,10 +225,10 @@ field::
 
     >>> f = ContactForm(auto_id=True)
     >>> print f.as_table()
-    <tr><td><label for="subject">Subject:</label></td><td><input id="subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><td><label for="message">Message:</label></td><td><input type="text" name="message" id="message" /></td></tr>
-    <tr><td><label for="sender">Sender:</label></td><td><input type="text" name="sender" id="sender" /></td></tr>
-    <tr><td><label for="cc_myself">Cc myself:</label></td><td><input type="checkbox" name="cc_myself" id="cc_myself" /></td></tr>
+    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" /></td></tr>
+    <tr><th><label for="sender">Sender:</label></th><td><input type="text" name="sender" id="sender" /></td></tr>
+    <tr><th><label for="cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="cc_myself" /></td></tr>
     >>> print f.as_ul()
     <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" /></li>
     <li><label for="message">Message:</label> <input type="text" name="message" id="message" /></li>
@@ -248,10 +248,10 @@ attributes based on the format string. For example, for a format string
 
     >>> f = ContactForm(auto_id='id_for_%s')
     >>> print f.as_table()
-    <tr><td><label for="id_for_subject">Subject:</label></td><td><input id="id_for_subject" type="text" name="subject" maxlength="100" /></td></tr>
-    <tr><td><label for="id_for_message">Message:</label></td><td><input type="text" name="message" id="id_for_message" /></td></tr>
-    <tr><td><label for="id_for_sender">Sender:</label></td><td><input type="text" name="sender" id="id_for_sender" /></td></tr>
-    <tr><td><label for="id_for_cc_myself">Cc myself:</label></td><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></td></tr>
+    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" /></td></tr>
+    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="text" name="sender" id="id_for_sender" /></td></tr>
+    <tr><th><label for="id_for_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></td></tr>
     >>> print f.as_ul()
     <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
     <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" /></li>
