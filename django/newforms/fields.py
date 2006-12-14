@@ -12,6 +12,7 @@ import time
 __all__ = (
     'Field', 'CharField', 'IntegerField',
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
+    'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
     'ChoiceField', 'MultipleChoiceField',
@@ -133,6 +134,33 @@ class DateField(Field):
             except ValueError:
                 continue
         raise ValidationError(gettext(u'Enter a valid date.'))
+
+DEFAULT_TIME_INPUT_FORMATS = (
+    '%H:%M:%S',     # '14:30:59'
+    '%H:%M',        # '14:30'
+)
+
+class TimeField(Field):
+    def __init__(self, input_formats=None, required=True, widget=None, label=None):
+        Field.__init__(self, required, widget, label)
+        self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
+
+    def clean(self, value):
+        """
+        Validates that the input can be converted to a time. Returns a Python
+        datetime.time object.
+        """
+        Field.clean(self, value)
+        if value in EMPTY_VALUES:
+            return None
+        if isinstance(value, datetime.time):
+            return value
+        for format in self.input_formats:
+            try:
+                return datetime.time(*time.strptime(value, format)[3:6])
+            except ValueError:
+                continue
+        raise ValidationError(gettext(u'Enter a valid time.'))
 
 DEFAULT_DATETIME_INPUT_FORMATS = (
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'

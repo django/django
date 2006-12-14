@@ -834,6 +834,45 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid date.']
 
+# TimeField ###################################################################
+
+>>> import datetime
+>>> f = TimeField()
+>>> f.clean(datetime.time(14, 25))
+datetime.time(14, 25)
+>>> f.clean(datetime.time(14, 25, 59))
+datetime.time(14, 25, 59)
+>>> f.clean('14:25')
+datetime.time(14, 25)
+>>> f.clean('14:25:59')
+datetime.time(14, 25, 59)
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+>>> f.clean('1:24 p.m.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+
+TimeField accepts an optional input_formats parameter:
+>>> f = TimeField(input_formats=['%I:%M %p'])
+>>> f.clean(datetime.time(14, 25))
+datetime.time(14, 25)
+>>> f.clean(datetime.time(14, 25, 59))
+datetime.time(14, 25, 59)
+>>> f.clean('4:25 AM')
+datetime.time(4, 25)
+>>> f.clean('4:25 PM')
+datetime.time(16, 25)
+
+The input_formats parameter overrides all default input formats,
+so the default formats won't work unless you specify them:
+>>> f.clean('14:30:45')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+
 # DateTimeField ###############################################################
 
 >>> import datetime
