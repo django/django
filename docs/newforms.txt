@@ -13,18 +13,23 @@ Migration plan
 -- i.e., it's not available in the Django 0.95 release. For the next Django
 release, our plan is to do the following:
 
-    * Move the current ``django.forms`` to ``django.oldforms``. This will allow
-      for an eased migration of form code. You'll just have to change your
-      import statements::
+    * As of revision [4208], we've copied the current ``django.forms`` to
+      ``django.oldforms``. This allows you to upgrade your code *now* rather
+      than waiting for the backwards-incompatible change and rushing to fix
+      your code after the fact. Just change your import statements like this::
 
           from django import forms             # old
           from django import oldforms as forms # new
 
-    * Move the current ``django.newforms`` to ``django.forms``.
+    * At an undecided future date, we will move the current ``django.newforms``
+      to ``django.forms``. This will be a backwards-incompatible change, and 
+      anybody who is still using the old version of ``django.forms`` at that
+      time will need to change their import statements, as described in the
+      previous bullet.
 
     * We will remove ``django.oldforms`` in the release *after* the next Django
       release -- the release that comes after the release in which we're
-      creating ``django.oldforms``.
+      creating the new ``django.forms``.
 
 With this in mind, we recommend you use the following import statement when
 using ``django.newforms``::
