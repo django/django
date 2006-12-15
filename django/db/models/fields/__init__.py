@@ -3,6 +3,7 @@ from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
+from django import newforms as forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
@@ -335,9 +336,8 @@ class Field(object):
 
     def formfield(self):
         "Returns a django.newforms.Field instance for this database Field."
-        from django.newforms import CharField
         # TODO: This is just a temporary default during development.
-        return CharField(label=capfirst(self.verbose_name))
+        return forms.CharField(label=capfirst(self.verbose_name))
 
 class AutoField(Field):
     empty_strings_allowed = False
