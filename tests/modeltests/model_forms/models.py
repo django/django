@@ -8,7 +8,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(maxlength=20)
-    url = models.CharField('The URL', maxlength=20)
+    url = models.CharField('The URL', maxlength=40)
 
     def __str__(self):
         return self.name
@@ -27,18 +27,18 @@ __test__ = {'API_TESTS': """
 >>> f = CategoryForm()
 >>> print f
 <tr><th><label for="id_id">ID:</label></th><td><input type="text" name="id" id="id_id" /></td></tr>
-<tr><th><label for="id_name">Name:</label></th><td><input type="text" name="name" id="id_name" /></td></tr>
-<tr><th><label for="id_url">The URL:</label></th><td><input type="text" name="url" id="id_url" /></td></tr>
+<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
+<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
 >>> print f.as_ul()
 <li><label for="id_id">ID:</label> <input type="text" name="id" id="id_id" /></li>
-<li><label for="id_name">Name:</label> <input type="text" name="name" id="id_name" /></li>
-<li><label for="id_url">The URL:</label> <input type="text" name="url" id="id_url" /></li>
+<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
+<li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>
 >>> print f['name']
-<input type="text" name="name" id="id_name" />
+<input id="id_name" type="text" name="name" maxlength="20" />
 
 >>> f = CategoryForm(auto_id=False)
 >>> print f.as_ul()
 <li>ID: <input type="text" name="id" /></li>
-<li>Name: <input type="text" name="name" /></li>
-<li>The URL: <input type="text" name="url" /></li>
+<li>Name: <input type="text" name="name" maxlength="20" /></li>
+<li>The URL: <input type="text" name="url" maxlength="40" /></li>
 """}

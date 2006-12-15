@@ -337,7 +337,7 @@ class Field(object):
     def formfield(self):
         "Returns a django.newforms.Field instance for this database Field."
         # TODO: This is just a temporary default during development.
-        return forms.CharField(label=capfirst(self.verbose_name))
+        return forms.CharField(required=not self.blank, label=capfirst(self.verbose_name))
 
 class AutoField(Field):
     empty_strings_allowed = False
@@ -389,6 +389,9 @@ class BooleanField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
 
+    def formfield(self):
+        return forms.BooleanField(required=not self.blank, label=capfirst(self.verbose_name))
+
 class CharField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.TextField]
@@ -402,6 +405,9 @@ class CharField(Field):
             else:
                 raise validators.ValidationError, gettext_lazy("This field cannot be null.")
         return str(value)
+
+    def formfield(self):
+        return forms.CharField(max_length=self.maxlength, required=not self.blank, label=capfirst(self.verbose_name))
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
@@ -474,6 +480,9 @@ class DateField(Field):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
+    def formfield(self):
+        return forms.DateField(required=not self.blank, label=capfirst(self.verbose_name))
+
 class DateTimeField(DateField):
     def to_python(self, value):
         if isinstance(value, datetime.datetime):
@@ -532,6 +541,9 @@ class DateTimeField(DateField):
         return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
+    def formfield(self):
+        return forms.DateTimeField(required=not self.blank, label=capfirst(self.verbose_name))
+
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 75
@@ -545,6 +557,9 @@ class EmailField(CharField):
 
     def validate(self, field_data, all_data):
         validators.isValidEmail(field_data, all_data)
+
+    def formfield(self):
+        return forms.EmailField(required=not self.blank, label=capfirst(self.verbose_name))
 
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
@@ -678,6 +693,9 @@ class IntegerField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.IntegerField]
 
+    def formfield(self):
+        return forms.IntegerField(required=not self.blank, label=capfirst(self.verbose_name))
+
 class IPAddressField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 15
@@ -772,14 +790,21 @@ class TimeField(Field):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
 
+    def formfield(self):
+        return forms.TimeField(required=not self.blank, label=capfirst(self.verbose_name))
+
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
+        self.verify_exists = verify_exists
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [oldforms.URLField]
+
+    def formfield(self):
+        return forms.URLField(required=not self.blank, verify_exists=self.verify_exists, label=capfirst(self.verbose_name))
 
 class USStateField(Field):
     def get_manipulator_field_objs(self):
