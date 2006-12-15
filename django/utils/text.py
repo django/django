@@ -8,17 +8,28 @@ capfirst = lambda x: x and x[0].upper() + x[1:]
 def wrap(text, width):
     """
     A word-wrap function that preserves existing line breaks and most spaces in
-    the text. Expects that existing line breaks are posix newlines (\n).
-    See http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/148061
+    the text. Expects that existing line breaks are posix newlines.
     """
-    return reduce(lambda line, word, width=width: '%s%s%s' %
-                  (line,
-                   ' \n'[(len(line[line.rfind('\n')+1:])
-                         + len(word.split('\n',1)[0]
-                              ) >= width)],
-                   word),
-                  text.split(' ')
-                 )
+    def _generator():
+        it = iter(text.split(' '))
+        word = it.next()
+        yield word
+        pos = len(word) - word.rfind('\n') - 1
+        for word in it:
+            if "\n" in word:
+                lines = word.splitlines()
+            else:
+                lines = (word,)
+            pos += len(lines[0]) + 1
+            if pos > width:
+                yield '\n'
+                pos = len(lines[-1])
+            else:
+                yield ' '
+                if len(lines) > 1:
+                    pos = len(lines[-1])
+            yield word
+    return "".join(_generator())
 
 def truncate_words(s, num):
     "Truncates a string after a certain number of words."
