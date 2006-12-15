@@ -2,6 +2,13 @@
 34. Generating HTML forms from models
 
 Django provides shortcuts for creating Form objects from a model class.
+
+The function django.newforms.form_for_model() takes a model class and returns
+a Form that is tied to the model. This Form works just like any other Form,
+with one additional method: create(). The create() method creates an instance
+of the model and returns that newly created instance. It saves the instance to
+the database if create(save=True), which is default. If you pass
+create(save=False), then you'll get the object without saving it.
 """
 
 from django.db import models
@@ -23,6 +30,10 @@ class Article(models.Model):
 
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model
+
+>>> Category.objects.all()
+[]
+
 >>> CategoryForm = form_for_model(Category)
 >>> f = CategoryForm()
 >>> print f
@@ -44,4 +55,50 @@ __test__ = {'API_TESTS': """
 {}
 >>> f.clean_data
 {'url': u'entertainment', 'name': u'Entertainment'}
+>>> obj = f.create()
+>>> obj
+<Category: Entertainment>
+>>> Category.objects.all()
+[<Category: Entertainment>]
+
+>>> f = CategoryForm({'name': "It's a test", 'url': 'test'})
+>>> f.errors
+{}
+>>> f.clean_data
+{'url': u'test', 'name': u"It's a test"}
+>>> obj = f.create()
+>>> obj
+<Category: It's a test>
+>>> Category.objects.all()
+[<Category: Entertainment>, <Category: It's a test>]
+
+>>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
+>>> f.errors
+{}
+>>> f.clean_data
+{'url': u'third', 'name': u'Third test'}
+>>> obj = f.create(save=False)
+>>> obj
+<Category: Third test>
+>>> Category.objects.all()
+[<Category: Entertainment>, <Category: It's a test>]
+>>> obj.save()
+>>> Category.objects.all()
+[<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
+
+>>> f = CategoryForm({'name': '', 'url': 'foo'})
+>>> f.errors
+{'name': [u'This field is required.']}
+>>> f.clean_data
+>>> f.create()
+Traceback (most recent call last):
+...
+ValueError: The Category could not be created because the data didn't validate.
+
+>>> f = CategoryForm({'name': '', 'url': 'foo'})
+>>> f.create()
+Traceback (most recent call last):
+...
+ValueError: The Category could not be created because the data didn't validate.
+
 """}
