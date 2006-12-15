@@ -32,10 +32,11 @@ class DeclarativeFieldsMetaclass(type):
         attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
-class Form(StrAndUnicode):
-    "A collection of Fields, plus their associated data."
-    __metaclass__ = DeclarativeFieldsMetaclass
-
+class BaseForm(StrAndUnicode):
+    # This is the main implementation of all the Form logic. Note that this
+    # class is different than Form. See the comments by the Form class for more
+    # information. Any improvements to the form API should be made to *this*
+    # class, not to the Form class.
     def __init__(self, data=None, auto_id='id_%s', prefix=None):
         self.ignore_errors = data is None
         self.data = data or {}
@@ -167,6 +168,15 @@ class Form(StrAndUnicode):
         association with the field named '__all__'.
         """
         return self.clean_data
+
+class Form(BaseForm):
+    "A collection of Fields, plus their associated data."
+    # This is a separate class from BaseForm in order to abstract the way
+    # self.fields is specified. This class (Form) is the one that does the
+    # fancy metaclass stuff purely for the semantic sugar -- it allows one
+    # to define a form using declarative syntax.
+    # BaseForm itself has no way of designating self.fields.
+    __metaclass__ = DeclarativeFieldsMetaclass
 
 class BoundField(StrAndUnicode):
     "A Field plus data"
