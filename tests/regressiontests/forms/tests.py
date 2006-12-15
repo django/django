@@ -687,9 +687,21 @@ ValidationError: [u'Ensure this value has at most 10 characters.']
 CharField accepts an optional min_length parameter:
 >>> f = CharField(min_length=10, required=False)
 >>> f.clean('')
+u''
+>>> f.clean('12345')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at least 10 characters.']
+>>> f.clean('1234567890')
+u'1234567890'
+>>> f.clean('1234567890a')
+u'1234567890a'
+
+>>> f = CharField(min_length=10, required=True)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...

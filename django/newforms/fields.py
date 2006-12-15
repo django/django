@@ -77,7 +77,10 @@ class CharField(Field):
     def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
         Field.clean(self, value)
-        if value in EMPTY_VALUES: value = u''
+        if value in EMPTY_VALUES:
+            value = u''
+            if not self.required:
+                return value
         value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
