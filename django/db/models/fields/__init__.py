@@ -375,6 +375,9 @@ class AutoField(Field):
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
 
+    def formfield(self):
+        return None
+
 class BooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True

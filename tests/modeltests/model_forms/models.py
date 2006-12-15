@@ -26,11 +26,9 @@ __test__ = {'API_TESTS': """
 >>> CategoryForm = form_for_model(Category)
 >>> f = CategoryForm()
 >>> print f
-<tr><th><label for="id_id">ID:</label></th><td><input type="text" name="id" id="id_id" /></td></tr>
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
 >>> print f.as_ul()
-<li><label for="id_id">ID:</label> <input type="text" name="id" id="id_id" /></li>
 <li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
 <li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>
 >>> print f['name']
@@ -38,7 +36,12 @@ __test__ = {'API_TESTS': """
 
 >>> f = CategoryForm(auto_id=False)
 >>> print f.as_ul()
-<li>ID: <input type="text" name="id" /></li>
 <li>Name: <input type="text" name="name" maxlength="20" /></li>
 <li>The URL: <input type="text" name="url" maxlength="40" /></li>
+
+>>> f = CategoryForm({'name': 'Entertainment', 'url': 'entertainment'})
+>>> f.errors
+{}
+>>> f.clean_data
+{'url': u'entertainment', 'name': u'Entertainment'}
 """}
