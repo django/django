@@ -1,4 +1,4 @@
-from django import forms, template
+from django import oldforms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
@@ -283,7 +283,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
 
     c = template.RequestContext(request, {
         'title': _('Add %s') % opts.verbose_name,
@@ -374,7 +374,7 @@ def change_stage(request, app_label, model_name, object_id):
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 
