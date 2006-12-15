@@ -2,7 +2,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django import forms, template
+from django import oldforms, template
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 
@@ -24,7 +24,7 @@ def user_add_stage(request):
                 return HttpResponseRedirect('../%s/' % new_user.id)
     else:
         errors = new_data = {}
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     return render_to_response('admin/auth/user/add_form.html', {
         'title': _('Add user'),
         'form': form,

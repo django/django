@@ -11,19 +11,26 @@ for scheme in INSTALL_SCHEMES.values():
 # Compile the list of packages available, because distutils doesn't have
 # an easy way to do this.
 packages, data_files = [], []
-root_dir = os.path.join(os.path.dirname(__file__), 'django')
-for dirpath, dirnames, filenames in os.walk(root_dir):
+root_dir = os.path.dirname(__file__)
+len_root_dir = len(root_dir)
+django_dir = os.path.join(root_dir, 'django')
+
+for dirpath, dirnames, filenames in os.walk(django_dir):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
         if dirname.startswith('.'): del dirnames[i]
     if '__init__.py' in filenames:
-        packages.append(dirpath.replace('/', '.'))
+        package = dirpath[len_root_dir:].lstrip('/').replace('/', '.')
+        packages.append(package)
     else:
         data_files.append((dirpath, [os.path.join(dirpath, f) for f in filenames]))
 
+# Dynamically calculate the version based on django.VERSION.
+version = "%d.%d-%s" % (__import__('django').VERSION)
+
 setup(
     name = "Django",
-    version = "0.95",
+    version = version,
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',

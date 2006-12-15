@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
-from django import forms
+from django import oldforms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.sites.models import Site
@@ -26,7 +26,7 @@ def login(request, template_name='registration/login.html'):
         errors = {}
     request.session.set_test_cookie()
     return render_to_response(template_name, {
-        'form': forms.FormWrapper(manipulator, request.POST, errors),
+        'form': oldforms.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
         'site_name': Site.objects.get_current().name,
     }, context_instance=RequestContext(request))
@@ -62,7 +62,7 @@ def password_reset(request, is_admin_site=False, template_name='registration/pas
             else:
                 form.save(email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response(template_name, {'form': forms.FormWrapper(form, new_data, errors)},
+    return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 
 def password_reset_done(request, template_name='registration/password_reset_done.html'):
@@ -77,7 +77,7 @@ def password_change(request, template_name='registration/password_change_form.ht
         if not errors:
             form.save(new_data)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response(template_name, {'form': forms.FormWrapper(form, new_data, errors)},
+    return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
         context_instance=RequestContext(request))
 password_change = login_required(password_change)
 

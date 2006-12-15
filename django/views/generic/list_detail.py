@@ -84,7 +84,7 @@ def object_detail(request, queryset, object_id=None, slug=None,
         context_processors=None, template_object_name='object',
         mimetype=None):
     """
-    Generic list of objects.
+    Generic detail of an object.
 
     Templates: ``<app_label>/<model_name>_detail.html``
     Context:
