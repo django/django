@@ -93,6 +93,10 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
+    def __init__(self, max_value=None, min_value=None, required=True, widget=None, label=None):
+        self.max_value, self.min_value = max_value, min_value
+        Field.__init__(self, required, widget, label)
+
     def clean(self, value):
         """
         Validates that int() can be called on the input. Returns the result
@@ -102,9 +106,14 @@ class IntegerField(Field):
         if not self.required and value in EMPTY_VALUES:
             return u''
         try:
-            return int(value)
+            value = int(value)
         except (ValueError, TypeError):
             raise ValidationError(gettext(u'Enter a whole number.'))
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(gettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(gettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
+        return value
 
 DEFAULT_DATE_INPUT_FORMATS = (
     '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'

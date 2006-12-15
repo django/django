@@ -769,6 +769,71 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
 
+IntegerField accepts an optional max_value parameter:
+>>> f = IntegerField(max_value=10)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+1
+>>> f.clean(10)
+10
+>>> f.clean(11)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 10.']
+>>> f.clean('10')
+10
+>>> f.clean('11')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 10.']
+
+IntegerField accepts an optional min_value parameter:
+>>> f = IntegerField(min_value=10)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 10.']
+>>> f.clean(10)
+10
+>>> f.clean(11)
+11
+>>> f.clean('10')
+10
+>>> f.clean('11')
+11
+
+min_value and max_value can be used together:
+>>> f = IntegerField(min_value=10, max_value=20)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 10.']
+>>> f.clean(10)
+10
+>>> f.clean(11)
+11
+>>> f.clean('10')
+10
+>>> f.clean('11')
+11
+>>> f.clean(20)
+20
+>>> f.clean(21)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 20.']
+
 # DateField ###################################################################
 
 >>> import datetime
