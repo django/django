@@ -34,6 +34,8 @@ class Field(object):
     creation_counter = 0
 
     def __init__(self, required=True, widget=None, label=None):
+        if label is not None:
+            label = smart_unicode(label)
         self.required, self.label = required, label
         widget = widget or self.widget
         if isinstance(widget, type):

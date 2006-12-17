@@ -2062,6 +2062,14 @@ underscores converted to spaces, and the initial letter capitalized.
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>
 
+A label can be a Unicode object or a bytestring with special characters.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='ŠĐĆŽćžšđ')
+...    password = CharField(widget=PasswordInput, label=u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+>>> p = UserRegistration(auto_id=False)
+>>> p.as_ul()
+u'<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>'
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,
