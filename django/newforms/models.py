@@ -16,8 +16,12 @@ def create(self, save=True):
         obj.save()
     return obj
 
-def form_for_model(model):
-    "Returns a Form class for the given Django model class."
+def form_for_model(model, form=None):
+    """
+    Returns a Form class for the given Django model class.
+
+    Provide 'form' if you want to use a custom BaseForm subclass.
+    """
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
@@ -25,7 +29,8 @@ def form_for_model(model):
         if formfield:
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (BaseForm,), {'fields': fields, '_model': model, 'create': create})
+    form = form or BaseForm
+    return type(opts.object_name + 'Form', (form,), {'fields': fields, '_model': model, 'create': create})
 
 def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."

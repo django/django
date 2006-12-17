@@ -29,7 +29,7 @@ class Article(models.Model):
         return self.headline
 
 __test__ = {'API_TESTS': """
->>> from django.newforms import form_for_model
+>>> from django.newforms import form_for_model, BaseForm
 
 >>> Category.objects.all()
 []
@@ -101,4 +101,13 @@ Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
 
+You can pass a custom Form class to form_for_model. Make sure it's a
+subclass of BaseForm, not Form.
+>>> class CustomForm(BaseForm):
+...     def say_hello(self):
+...         print 'hello'
+>>> CategoryForm = form_for_model(Category, form=CustomForm)
+>>> f = CategoryForm()
+>>> f.say_hello()
+hello
 """}
