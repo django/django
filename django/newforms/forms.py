@@ -8,6 +8,8 @@ from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
 from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
+__all__ = ('BaseForm', 'Form')
+
 NON_FIELD_ERRORS = '__all__'
 
 def pretty_name(name):
