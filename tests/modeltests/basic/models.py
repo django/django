@@ -9,6 +9,8 @@ from django.db import models
 class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
+    class Meta:
+        ordering = ('pub_date',)
 
     def __str__(self):
         return self.headline
