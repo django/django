@@ -256,8 +256,7 @@ class ForeignRelatedObjectsDescriptor(object):
         # Otherwise, just move the named objects into the set.
         if self.related.field.null:
             manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 def create_many_related_manager(superclass):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
@@ -405,8 +404,7 @@ class ManyRelatedObjectsDescriptor(object):
 
         manager = self.__get__(instance)
         manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 class ReverseManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -447,8 +445,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         manager = self.__get__(instance)
         manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
