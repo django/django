@@ -319,6 +319,10 @@ def create_many_related_manager(superclass):
 
             # If there aren't any objects, there is nothing to do.
             if objs:
+                # Check that all the objects are of the right type
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise ValueError, "objects to add() must be %s instances" % self.model._meta.object_name
                 # Add the newly created or already existing objects to the join table.
                 # First find out which items are already added, to avoid adding them twice
                 new_ids = set([obj._get_pk_val() for obj in objs])
@@ -345,16 +349,20 @@ def create_many_related_manager(superclass):
             # *objs - objects to remove
             from django.db import connection
 
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
-            # Remove the specified objects from the join table
-            cursor = connection.cursor()
-            for obj in objs:
-                cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
-                    (self.join_table, source_col_name, target_col_name),
-                    [self._pk_val, obj._get_pk_val()])
-            transaction.commit_unless_managed()
+            # If there aren't any objects, there is nothing to do.
+            if objs:
+                # Check that all the objects are of the right type
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+                # Remove the specified objects from the join table
+                old_ids = set([obj._get_pk_val() for obj in objs])
+                cursor = connection.cursor()
+                cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                    (self.join_table, source_col_name, 
+                    target_col_name, ",".join(['%s'] * len(old_ids))),
+                    [self._pk_val] + list(old_ids))
+                transaction.commit_unless_managed()
 
         def _clear_items(self, source_col_name):
             # source_col_name: the PK colname in join_table for the source object
