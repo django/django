@@ -317,25 +317,27 @@ def create_many_related_manager(superclass):
             # *objs - objects to add
             from django.db import connection
 
-            # Add the newly created or already existing objects to the join table.
-            # First find out which items are already added, to avoid adding them twice
-            new_ids = set([obj._get_pk_val() for obj in objs])
-            cursor = connection.cursor()
-            cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                (target_col_name, self.join_table, source_col_name,
-                target_col_name, ",".join(['%s'] * len(new_ids))),
-                [self._pk_val] + list(new_ids))
-            if cursor.rowcount is not None and cursor.rowcount != 0:
-                existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
-            else:
-                existing_ids = set()
+            # If there aren't any objects, there is nothing to do.
+            if objs:
+                # Add the newly created or already existing objects to the join table.
+                # First find out which items are already added, to avoid adding them twice
+                new_ids = set([obj._get_pk_val() for obj in objs])
+                cursor = connection.cursor()
+                cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                    (target_col_name, self.join_table, source_col_name,
+                    target_col_name, ",".join(['%s'] * len(new_ids))),
+                    [self._pk_val] + list(new_ids))
+                if cursor.rowcount is not None and cursor.rowcount != 0:
+                    existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
+                else:
+                    existing_ids = set()
 
-            # Add the ones that aren't there already
-            for obj_id in (new_ids - existing_ids):
-                cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-                    (self.join_table, source_col_name, target_col_name),
-                    [self._pk_val, obj_id])
-            transaction.commit_unless_managed()
+                # Add the ones that aren't there already
+                for obj_id in (new_ids - existing_ids):
+                    cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+                        (self.join_table, source_col_name, target_col_name),
+                        [self._pk_val, obj_id])
+                transaction.commit_unless_managed()
 
         def _remove_items(self, source_col_name, target_col_name, *objs):
             # source_col_name: the PK colname in join_table for the source object
