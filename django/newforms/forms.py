@@ -234,9 +234,7 @@ class BoundField(StrAndUnicode):
 
     def _data(self):
         "Returns the data for this BoundField, or None if it wasn't given."
-        if self.field.widget.requires_data_list and isinstance(self.form.data, MultiValueDict):
-            return self.form.data.getlist(self.html_name)
-        return self.form.data.get(self.html_name, None)
+        return self.field.widget.value_from_datadict(self.form.data, self.html_name)
     data = property(_data)
 
     def label_tag(self, contents=None):

@@ -23,13 +23,18 @@ except NameError:
 flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 class Widget(object):
-    requires_data_list = False # Determines whether render()'s 'value' argument should be a list.
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
         self.attrs = attrs or {}
 
-    def render(self, name, value):
+    def render(self, name, value, attrs=None):
+        """
+        Returns this Widget rendered as HTML, as a Unicode string.
+
+        The 'value' given is not guaranteed to be valid input, so subclass
+        implementations should program defensively.
+        """
         raise NotImplementedError
 
     def build_attrs(self, extra_attrs=None, **kwargs):
@@ -130,7 +135,6 @@ class Select(Widget):
         return u'\n'.join(output)
 
 class SelectMultiple(Widget):
-    requires_data_list = True
     def __init__(self, attrs=None, choices=()):
         # choices can be any iterable
         self.attrs = attrs or {}
