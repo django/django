@@ -1494,19 +1494,13 @@ Empty dictionaries are valid, too.
 >>> p.is_valid()
 False
 >>> print p
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>
 >>> print p.as_table()
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>
 >>> print p.as_ul()
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
@@ -1895,12 +1889,9 @@ Form.clean() is required to return a dictionary of all clean data.
 {}
 >>> f = UserRegistration({}, auto_id=False)
 >>> print f.as_table()
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="username" maxlength="10" /></td></tr>
+<tr><th>Password1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password2" /></td></tr>
 >>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
@@ -2237,8 +2228,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul></td></tr>
-<tr><th>Username:</th><td><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>

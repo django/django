@@ -114,7 +114,7 @@ class BaseForm(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(u'<tr><th>%(label)s</th><td>%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
+        return self._html_output(u'<tr><th>%(label)s</th><td>%(errors)s%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
