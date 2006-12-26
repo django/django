@@ -213,7 +213,8 @@ class DateTimeField(Field):
         raise ValidationError(gettext(u'Enter a valid date/time.'))
 
 class RegexField(Field):
-    def __init__(self, regex, error_message=None, required=True, widget=None, label=None):
+    def __init__(self, regex, max_length=None, min_length=None, error_message=None,
+            required=True, widget=None, label=None):
         """
         regex can be either a string or a compiled regular expression object.
         error_message is an optional error message to use, if
@@ -223,6 +224,7 @@ class RegexField(Field):
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
+        self.max_length, self.min_length = max_length, min_length
         self.error_message = error_message or gettext(u'Enter a valid value.')
 
     def clean(self, value):
@@ -235,6 +237,10 @@ class RegexField(Field):
         value = smart_unicode(value)
         if not self.required and value == u'':
             return value
+        if self.max_length is not None and len(value) > self.max_length:
+            raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
+        if self.min_length is not None and len(value) < self.min_length:
+            raise ValidationError(gettext(u'Ensure this value has at least %d characters.') % self.min_length)
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
@@ -245,8 +251,8 @@ email_re = re.compile(
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 class EmailField(RegexField):
-    def __init__(self, required=True, widget=None, label=None):
-        RegexField.__init__(self, email_re, gettext(u'Enter a valid e-mail address.'), required, widget, label)
+    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None):
+        RegexField.__init__(self, email_re, max_length, min_length, gettext(u'Enter a valid e-mail address.'), required, widget, label)
 
 url_re = re.compile(
     r'^https?://' # http:// or https://
@@ -262,9 +268,9 @@ except ImportError:
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
 class URLField(RegexField):
-    def __init__(self, required=True, verify_exists=False, widget=None, label=None,
+    def __init__(self, max_length=None, min_length=None, required=True, verify_exists=False, widget=None, label=None,
             validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        RegexField.__init__(self, url_re, gettext(u'Enter a valid URL.'), required, widget, label)
+        RegexField.__init__(self, url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 

@@ -1098,7 +1098,7 @@ Traceback (most recent call last):
 ValidationError: [u'Enter a valid value.']
 
 RegexField takes an optional error_message argument:
->>> f = RegexField('^\d\d\d\d$', 'Enter a four-digit number.')
+>>> f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
 >>> f.clean('1234')
 u'1234'
 >>> f.clean('123')
@@ -1109,6 +1109,29 @@ ValidationError: [u'Enter a four-digit number.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a four-digit number.']
+
+RegexField also access min_length and max_length parameters, for convenience.
+>>> f = RegexField('^\d+$', min_length=5, max_length=10)
+>>> f.clean('123')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 5 characters.']
+>>> f.clean('abc')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 5 characters.']
+>>> f.clean('12345')
+u'12345'
+>>> f.clean('1234567890')
+u'1234567890'
+>>> f.clean('12345678901')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 10 characters.']
+>>> f.clean('12345a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid value.']
 
 # EmailField ##################################################################
 
@@ -1155,6 +1178,19 @@ ValidationError: [u'Enter a valid e-mail address.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
+
+EmailField also access min_length and max_length parameters, for convenience.
+>>> f = EmailField(min_length=10, max_length=15)
+>>> f.clean('a@foo.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 10 characters.']
+>>> f.clean('alf@foo.com')
+u'alf@foo.com'
+>>> f.clean('alf123456788@foo.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 15 characters.']
 
 # URLField ##################################################################
 
@@ -1247,6 +1283,19 @@ ValidationError: [u'This URL appears to be a broken link.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
+
+EmailField also access min_length and max_length parameters, for convenience.
+>>> f = URLField(min_length=15, max_length=20)
+>>> f.clean('http://f.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 15 characters.']
+>>> f.clean('http://example.com')
+u'http://example.com'
+>>> f.clean('http://abcdefghijklmnopqrstuvwxyz.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 20 characters.']
 
 # BooleanField ################################################################
 
