@@ -99,7 +99,8 @@ class BaseForm(StrAndUnicode):
             else:
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
-                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.label+':')), 'field': bf})
+                label = bf.label and bf.label_tag(escape(bf.label + ':')) or ''
+                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': bf})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
@@ -187,7 +188,10 @@ class BoundField(StrAndUnicode):
         self.field = field
         self.name = name
         self.html_name = form.add_prefix(name)
-        self.label = self.field.label or pretty_name(name)
+        if self.field.label is None:
+            self.label = pretty_name(name)
+        else:
+            self.label = self.field.label
 
     def __unicode__(self):
         "Renders this field as an HTML widget."

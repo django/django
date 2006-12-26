@@ -2080,6 +2080,33 @@ A label can be a Unicode object or a bytestring with special characters.
 >>> p.as_ul()
 u'<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>'
 
+If a label is set to the empty string for a field, that field won't get a label.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='')
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li> <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(auto_id='id_%s')
+>>> print p.as_ul()
+<li> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
+
+If label is None, Django will auto-create the label from the field name. This
+is default behavior.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label=None)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(auto_id='id_%s')
+>>> print p.as_ul()
+<li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,
