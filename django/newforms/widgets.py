@@ -189,6 +189,10 @@ class RadioFieldRenderer(StrAndUnicode):
         for i, choice in enumerate(self.choices):
             yield RadioInput(self.name, self.value, self.attrs.copy(), choice, i)
 
+    def __getitem__(self, idx):
+        choice = self.choices[idx] # Let the IndexError propogate
+        return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
+
     def __unicode__(self):
         "Outputs a <ul> for this set of radio fields."
         return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % w for w in self])

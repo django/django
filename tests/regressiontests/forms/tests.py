@@ -514,6 +514,25 @@ beatle J P Paul False
 beatle J G George False
 beatle J R Ringo False
 
+A RadioFieldRenderer object also allows index access to individual RadioInput
+objects.
+>>> w = RadioSelect()
+>>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> print r[1]
+<label><input type="radio" name="beatle" value="P" /> Paul</label>
+>>> print r[0]
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
+>>> r[0].is_checked()
+True
+>>> r[1].is_checked()
+False
+>>> r[1].name, r[1].value, r[1].choice_value, r[1].choice_label
+('beatle', u'J', 'P', 'Paul')
+>>> r[10]
+Traceback (most recent call last):
+...
+IndexError: list index out of range
+
 # CheckboxSelectMultiple Widget ###############################################
 
 >>> w = CheckboxSelectMultiple()
