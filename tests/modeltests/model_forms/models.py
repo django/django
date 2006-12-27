@@ -20,9 +20,16 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class Writer(models.Model):
+    name = models.CharField(maxlength=50)
+
+    def __str__(self):
+        return self.name
+
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateTimeField()
+    writer = models.ForeignKey(Writer)
     categories = models.ManyToManyField(Category)
 
     def __str__(self):
@@ -101,12 +108,24 @@ Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
 
-ManyToManyFields are represented by a MultipleChoiceField.
+Create a couple of Writers.
+>>> w = Writer(name='Mike Royko')
+>>> w.save()
+>>> w = Writer(name='Bob Woodward')
+>>> w.save()
+
+ManyToManyFields are represented by a MultipleChoiceField, and ForeignKeys are
+represented by a ChoiceField.
 >>> ArticleForm = form_for_model(Article)
 >>> f = ArticleForm(auto_id=False)
 >>> print f
 <tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
+<tr><th>Writer:</th><td><select name="writer">
+<option value="" selected="selected">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+</select></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>

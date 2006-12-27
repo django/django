@@ -361,7 +361,7 @@ def create_many_related_manager(superclass):
                 old_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                    (self.join_table, source_col_name, 
+                    (self.join_table, source_col_name,
                     target_col_name, ",".join(['%s'] * len(old_ids))),
                     [self._pk_val] + list(old_ids))
                 transaction.commit_unless_managed()
@@ -547,6 +547,9 @@ class ForeignKey(RelatedField, Field):
 
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
+
+    def formfield(self):
+        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
