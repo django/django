@@ -902,7 +902,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.FormWrapper`` instance representing the form
+    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 
@@ -984,7 +984,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.FormWrapper`` instance representing the form
+    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 

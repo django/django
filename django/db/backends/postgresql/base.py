@@ -118,7 +118,7 @@ def get_pk_default_value():
 try:
     Database.register_type(Database.new_type((1082,), "DATE", util.typecast_date))
 except AttributeError:
-    raise Exception, "You appear to be using psycopg version 2, which isn't supported yet, because it's still in beta. Use psycopg version 1 instead: http://initd.org/projects/psycopg1"
+    raise Exception, "You appear to be using psycopg version 2. Set your DATABASE_ENGINE to 'postgresql_psycopg2' instead of 'postgresql'."
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))

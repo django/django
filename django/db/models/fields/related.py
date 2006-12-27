@@ -5,7 +5,7 @@ from django.db.models.related import RelatedObject
 from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
-from django import forms
+from django import oldforms
 from django.dispatch import dispatcher
 
 # For Python 2.3
@@ -256,8 +256,7 @@ class ForeignRelatedObjectsDescriptor(object):
         # Otherwise, just move the named objects into the set.
         if self.related.field.null:
             manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 def create_many_related_manager(superclass):
     """Creates a manager that subclasses 'superclass' (which is a Manager)
@@ -318,25 +317,31 @@ def create_many_related_manager(superclass):
             # *objs - objects to add
             from django.db import connection
 
-            # Add the newly created or already existing objects to the join table.
-            # First find out which items are already added, to avoid adding them twice
-            new_ids = set([obj._get_pk_val() for obj in objs])
-            cursor = connection.cursor()
-            cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                (target_col_name, self.join_table, source_col_name,
-                target_col_name, ",".join(['%s'] * len(new_ids))),
-                [self._pk_val] + list(new_ids))
-            if cursor.rowcount is not None and cursor.rowcount != 0:
-                existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
-            else:
-                existing_ids = set()
+            # If there aren't any objects, there is nothing to do.
+            if objs:
+                # Check that all the objects are of the right type
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise ValueError, "objects to add() must be %s instances" % self.model._meta.object_name
+                # Add the newly created or already existing objects to the join table.
+                # First find out which items are already added, to avoid adding them twice
+                new_ids = set([obj._get_pk_val() for obj in objs])
+                cursor = connection.cursor()
+                cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                    (target_col_name, self.join_table, source_col_name,
+                    target_col_name, ",".join(['%s'] * len(new_ids))),
+                    [self._pk_val] + list(new_ids))
+                if cursor.rowcount is not None and cursor.rowcount != 0:
+                    existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
+                else:
+                    existing_ids = set()
 
-            # Add the ones that aren't there already
-            for obj_id in (new_ids - existing_ids):
-                cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-                    (self.join_table, source_col_name, target_col_name),
-                    [self._pk_val, obj_id])
-            transaction.commit_unless_managed()
+                # Add the ones that aren't there already
+                for obj_id in (new_ids - existing_ids):
+                    cursor.execute("INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
+                        (self.join_table, source_col_name, target_col_name),
+                        [self._pk_val, obj_id])
+                transaction.commit_unless_managed()
 
         def _remove_items(self, source_col_name, target_col_name, *objs):
             # source_col_name: the PK colname in join_table for the source object
@@ -344,16 +349,20 @@ def create_many_related_manager(superclass):
             # *objs - objects to remove
             from django.db import connection
 
-            for obj in objs:
-                if not isinstance(obj, self.model):
-                    raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
-            # Remove the specified objects from the join table
-            cursor = connection.cursor()
-            for obj in objs:
-                cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s = %%s" % \
-                    (self.join_table, source_col_name, target_col_name),
-                    [self._pk_val, obj._get_pk_val()])
-            transaction.commit_unless_managed()
+            # If there aren't any objects, there is nothing to do.
+            if objs:
+                # Check that all the objects are of the right type
+                for obj in objs:
+                    if not isinstance(obj, self.model):
+                        raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+                # Remove the specified objects from the join table
+                old_ids = set([obj._get_pk_val() for obj in objs])
+                cursor = connection.cursor()
+                cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
+                    (self.join_table, source_col_name, 
+                    target_col_name, ",".join(['%s'] * len(old_ids))),
+                    [self._pk_val] + list(old_ids))
+                transaction.commit_unless_managed()
 
         def _clear_items(self, source_col_name):
             # source_col_name: the PK colname in join_table for the source object
@@ -405,8 +414,7 @@ class ManyRelatedObjectsDescriptor(object):
 
         manager = self.__get__(instance)
         manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 class ReverseManyRelatedObjectsDescriptor(object):
     # This class provides the functionality that makes the related-object
@@ -447,8 +455,7 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
         manager = self.__get__(instance)
         manager.clear()
-        for obj in value:
-            manager.add(obj)
+        manager.add(*value)
 
 class ForeignKey(RelatedField, Field):
     empty_strings_allowed = False
@@ -493,13 +500,13 @@ class ForeignKey(RelatedField, Field):
             params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
         else:
             if self.radio_admin:
-                field_objs = [forms.RadioSelectField]
+                field_objs = [oldforms.RadioSelectField]
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
                 if self.null:
-                    field_objs = [forms.NullSelectField]
+                    field_objs = [oldforms.NullSelectField]
                 else:
-                    field_objs = [forms.SelectField]
+                    field_objs = [oldforms.SelectField]
             params['choices'] = self.get_choices_default()
         return field_objs, params
 
@@ -508,7 +515,7 @@ class ForeignKey(RelatedField, Field):
         if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
             return rel_field.get_manipulator_field_objs()
         else:
-            return [forms.IntegerField]
+            return [oldforms.IntegerField]
 
     def get_db_prep_save(self, value):
         if value == '' or value == None:
@@ -581,13 +588,13 @@ class OneToOneField(RelatedField, IntegerField):
             params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
         else:
             if self.radio_admin:
-                field_objs = [forms.RadioSelectField]
+                field_objs = [oldforms.RadioSelectField]
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
                 if self.null:
-                    field_objs = [forms.NullSelectField]
+                    field_objs = [oldforms.NullSelectField]
                 else:
-                    field_objs = [forms.SelectField]
+                    field_objs = [oldforms.SelectField]
             params['choices'] = self.get_choices_default()
         return field_objs, params
 
@@ -622,10 +629,10 @@ class ManyToManyField(RelatedField, Field):
 
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
-            return [forms.RawIdAdminField]
+            return [oldforms.RawIdAdminField]
         else:
             choices = self.get_choices_default()
-            return [curry(forms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+            return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)

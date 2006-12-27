@@ -60,7 +60,10 @@ class BaseHandler(object):
             if response:
                 return response
 
-        resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
+        # Get urlconf from request object, if available.  Otherwise use default.
+        urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
+
+        resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
         try:
             callback, callback_args, callback_kwargs = resolver.resolve(request.path)
 
@@ -84,7 +87,11 @@ class BaseHandler(object):
 
             # Complain if the view returned None (a common error).
             if response is None:
-                raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, callback.func_name)
+                try:
+                    view_name = callback.func_name # If it's a function
+                except AttributeError:
+                    view_name = callback.__class__.__name__ + '.__call__' # If it's a class
+                raise ValueError, "The view %s.%s didn't return an HttpResponse object." % (callback.__module__, view_name)
 
             return response
         except http.Http404, e:

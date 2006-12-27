@@ -143,9 +143,9 @@ or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Django
 follows this algorithm:
 
     * If the object's primary key attribute is set to a value that evaluates to
-      ``False`` (such as ``None`` or the empty string), Django executes a
-      ``SELECT`` query to determine whether a record with the given primary key
-      already exists.
+      ``True`` (i.e., a value other than ``None`` or the empty string), Django 
+      executes a ``SELECT`` query to determine whether a record with the given 
+      primary key already exists.
     * If the record with the given primary key does already exist, Django
       executes an ``UPDATE`` query.
     * If the object's primary key attribute is *not* set, or if it's set but a

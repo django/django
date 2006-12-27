@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.conf import settings
 
 if __name__ == '__main__':
@@ -61,6 +62,11 @@ class SomeClass:
 class OtherClass:
     def method(self):
         return "OtherClass.method"
+
+class UnicodeInStrClass:
+    "Class whose __str__ returns a Unicode object."
+    def __str__(self):
+        return u'ŠĐĆŽćžšđ'
 
 class Templates(unittest.TestCase):
     def test_templates(self):
@@ -172,6 +178,10 @@ class Templates(unittest.TestCase):
 
             # Empty strings can be passed as arguments to filters
             'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
+
+            # If a variable has a __str__() that returns a Unicode object, the value
+            # will be converted to a bytestring.
+            'basic-syntax37': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
@@ -328,18 +338,18 @@ class Templates(unittest.TestCase):
             'ifchanged05': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (1, 2, 3)}, '1123123123'),
             'ifchanged06': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (2, 2, 2)}, '1222'),
             'ifchanged07': ('{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% for x in numx %}{% ifchanged %}{{ x }}{% endifchanged %}{% for y in numy %}{% ifchanged %}{{ y }}{% endifchanged %}{% endfor %}{% endfor %}{% endfor %}', { 'num': (1, 1, 1), 'numx': (2, 2, 2), 'numy': (3, 3, 3)}, '1233323332333'),
-            
+
             # Test one parameter given to ifchanged.
             'ifchanged-param01': ('{% for n in num %}{% ifchanged n %}..{% endifchanged %}{{ n }}{% endfor %}', { 'num': (1,2,3) }, '..1..2..3'),
             'ifchanged-param02': ('{% for n in num %}{% for x in numx %}{% ifchanged n %}..{% endifchanged %}{{ x }}{% endfor %}{% endfor %}', { 'num': (1,2,3), 'numx': (5,6,7) }, '..567..567..567'),
-            
+
             # Test multiple parameters to ifchanged.
             'ifchanged-param03': ('{% for n in num %}{{ n }}{% for x in numx %}{% ifchanged x n %}{{ x }}{% endifchanged %}{% endfor %}{% endfor %}', { 'num': (1,1,2), 'numx': (5,6,6) }, '156156256'),
-            
+
             # Test a date+hour like construct, where the hour of the last day
             # is the same but the date had changed, so print the hour anyway.
             'ifchanged-param04': ('{% for d in days %}{% ifchanged %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),
-            
+
             # Logically the same as above, just written with explicit
             # ifchanged for the day.
             'ifchanged-param04': ('{% for d in days %}{% ifchanged d.day %}{{ d.day }}{% endifchanged %}{% for h in d.hours %}{% ifchanged d.day h %}{{ h }}{% endifchanged %}{% endfor %}{% endfor %}', {'days':[{'day':1, 'hours':[1,2,3]},{'day':2, 'hours':[3]},] }, '112323'),

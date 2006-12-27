@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django import forms
+from django import oldforms
 from django.core import validators
 from django.db.models.fields import FileField, AutoField
 from django.dispatch import dispatcher
@@ -40,7 +40,7 @@ class ManipulatorDescriptor(object):
                 self.man._prepare(model)
             return self.man
 
-class AutomaticManipulator(forms.Manipulator):
+class AutomaticManipulator(oldforms.Manipulator):
     def _prepare(cls, model):
         cls.model = model
         cls.manager = model._default_manager
@@ -76,7 +76,7 @@ class AutomaticManipulator(forms.Manipulator):
 
         # Add field for ordering.
         if self.change and self.opts.get_ordered_objects():
-            self.fields.append(forms.CommaSeparatedIntegerField(field_name="order_"))
+            self.fields.append(oldforms.CommaSeparatedIntegerField(field_name="order_"))
 
     def save(self, new_data):
         # TODO: big cleanup when core fields go -> use recursive manipulators.
@@ -313,7 +313,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOneRel
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
-    date_val = forms.DateField.html2python(date_str)
+    date_val = oldforms.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
     lookup_kwargs = {'%s__year' % date_field.name: date_val.year}

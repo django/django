@@ -1,4 +1,4 @@
-from django import forms, template
+from django import oldforms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
@@ -227,7 +227,7 @@ index = staff_member_required(never_cache(index))
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -299,7 +299,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
 
     c = template.RequestContext(request, {
         'title': _('Add %s') % opts.verbose_name,
@@ -318,21 +318,19 @@ def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     try:
         manipulator = model.ChangeManipulator(object_id)
     except ObjectDoesNotExist:
-        raise Http404
+        raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission(), object=manipulator.original_object):
         raise PermissionDenied
 
     if request.POST and request.POST.has_key("_saveasnew"):
         return add_stage(request, app_label, model_name, form_url='../../add/')
-
-
 
     if request.POST:
         new_data = request.POST.copy()
@@ -400,7 +398,7 @@ def change_stage(request, app_label, model_name, object_id):
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 
@@ -519,7 +517,7 @@ def delete_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     obj = get_object_or_404(model, pk=object_id)
@@ -558,7 +556,7 @@ def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     action_list = LogEntry.objects.filter(object_id=object_id,
         content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
@@ -788,7 +786,7 @@ class ChangeList(object):
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     if not request.user.contains_permission(app_label + '.' + model._meta.get_change_permission(), model):
         raise PermissionDenied
     try:

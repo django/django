@@ -16,12 +16,14 @@
 </div>
 {% endif %}{% endblock %}
 {% block content %}<div id="content-main">
+{% block object-tools %}
 {% if change %}{% if not is_popup %}
   <ul class="object-tools"><li><a href="history/" class="historylink">{% trans "History" %}</a></li>
   {% if object_has_row_level_permissions and has_row_level_permissions %}<li><a href="row_level_permissions/" class="rowlevelpermissions">{% trans "Edit Row Level Permissions" %}</a></li>{% endif %}
   {% if has_absolute_url %}<li><a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
   </ul>
 {% endif %}{% endif %}
+{% endblock %}
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
