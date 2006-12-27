@@ -101,6 +101,18 @@ Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
 
+ManyToManyFields are represented by a MultipleChoiceField.
+>>> ArticleForm = form_for_model(Article)
+>>> f = ArticleForm(auto_id=False)
+>>> print f
+<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
+<tr><th>Categories:</th><td><select multiple="multiple" name="categories">
+<option value="1">Entertainment</option>
+<option value="2">It&#39;s a test</option>
+<option value="3">Third test</option>
+</select></td></tr>
+
 You can pass a custom Form class to form_for_model. Make sure it's a
 subclass of BaseForm, not Form.
 >>> class CustomForm(BaseForm):

@@ -2,10 +2,12 @@ from django.db import backend, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
 from django import oldforms
+from django import newforms as forms
 from django.dispatch import dispatcher
 
 # For Python 2.3
@@ -712,6 +714,9 @@ class ManyToManyField(RelatedField, Field):
 
     def set_attributes_from_rel(self):
         pass
+
+    def formfield(self):
+        return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
