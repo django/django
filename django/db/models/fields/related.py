@@ -612,6 +612,9 @@ class OneToOneField(RelatedField, IntegerField):
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
 
+    def formfield(self):
+        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
+
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
