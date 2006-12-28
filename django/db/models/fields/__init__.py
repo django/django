@@ -334,10 +334,10 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
-    def formfield(self):
+    def formfield(self, initial=None):
         "Returns a django.newforms.Field instance for this database Field."
         # TODO: This is just a temporary default during development.
-        return forms.CharField(required=not self.blank, label=capfirst(self.verbose_name))
+        return forms.CharField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class AutoField(Field):
     empty_strings_allowed = False
@@ -375,7 +375,7 @@ class AutoField(Field):
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
 
-    def formfield(self):
+    def formfield(self, initial=None):
         return None
 
 class BooleanField(Field):
@@ -392,8 +392,8 @@ class BooleanField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
 
-    def formfield(self):
-        return forms.BooleanField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.BooleanField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class CharField(Field):
     def get_manipulator_field_objs(self):
@@ -409,8 +409,8 @@ class CharField(Field):
                 raise validators.ValidationError, gettext_lazy("This field cannot be null.")
         return str(value)
 
-    def formfield(self):
-        return forms.CharField(max_length=self.maxlength, required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.CharField(max_length=self.maxlength, required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
@@ -483,8 +483,8 @@ class DateField(Field):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
-    def formfield(self):
-        return forms.DateField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.DateField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class DateTimeField(DateField):
     def to_python(self, value):
@@ -544,8 +544,8 @@ class DateTimeField(DateField):
         return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
-    def formfield(self):
-        return forms.DateTimeField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.DateTimeField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
@@ -561,8 +561,8 @@ class EmailField(CharField):
     def validate(self, field_data, all_data):
         validators.isValidEmail(field_data, all_data)
 
-    def formfield(self):
-        return forms.EmailField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.EmailField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
@@ -696,8 +696,8 @@ class IntegerField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.IntegerField]
 
-    def formfield(self):
-        return forms.IntegerField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.IntegerField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class IPAddressField(Field):
     def __init__(self, *args, **kwargs):
@@ -793,8 +793,8 @@ class TimeField(Field):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
 
-    def formfield(self):
-        return forms.TimeField(required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.TimeField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
@@ -806,8 +806,8 @@ class URLField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.URLField]
 
-    def formfield(self):
-        return forms.URLField(required=not self.blank, verify_exists=self.verify_exists, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.URLField(required=not self.blank, verify_exists=self.verify_exists, label=capfirst(self.verbose_name), initial=initial)
 
 class USStateField(Field):
     def get_manipulator_field_objs(self):

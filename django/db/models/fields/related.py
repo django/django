@@ -548,8 +548,8 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
-    def formfield(self):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -612,8 +612,8 @@ class OneToOneField(RelatedField, IntegerField):
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
 
-    def formfield(self):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -721,8 +721,8 @@ class ManyToManyField(RelatedField, Field):
     def set_attributes_from_rel(self):
         pass
 
-    def formfield(self):
-        return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name))
+    def formfield(self, initial=None):
+        return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,

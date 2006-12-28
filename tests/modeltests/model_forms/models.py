@@ -36,7 +36,7 @@ class Article(models.Model):
         return self.headline
 
 __test__ = {'API_TESTS': """
->>> from django.newforms import form_for_model, BaseForm
+>>> from django.newforms import form_for_model, form_for_instance, BaseForm
 
 >>> Category.objects.all()
 []
@@ -141,4 +141,13 @@ subclass of BaseForm, not Form.
 >>> f = CategoryForm()
 >>> f.say_hello()
 hello
+
+Use form_for_instance to create a Form from a model instance. The difference
+between this Form and one created via form_for_model is that the object's
+current values are inserted as 'initial' data in each Field.
+>>> w = Writer.objects.get(name='Mike Royko')
+>>> RoykoForm = form_for_instance(w)
+>>> f = RoykoForm(auto_id=False)
+>>> print f
+<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /></td></tr>
 """}
