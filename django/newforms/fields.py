@@ -33,10 +33,21 @@ class Field(object):
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
 
-    def __init__(self, required=True, widget=None, label=None):
+    def __init__(self, required=True, widget=None, label=None, initial=None):
+        # required -- Boolean that specifies whether the field is required.
+        #             True by default.
+        # widget -- A Widget class, or instance of a Widget class, that should be
+        #         used for this Field when displaying it. Each Field has a default
+        #         Widget that it'll use if you don't specify this. In most cases,
+        #         the default widget is TextInput.
+        # label -- A verbose name for this field, for use in displaying this field in
+        #         a form. By default, Django will use a "pretty" version of the form
+        #         field name, if the Field is part of a Form.
+        # initial -- A value to use in this Field's initial display. This value is
+        #            *not* used as a fallback if data isn't given.
         if label is not None:
             label = smart_unicode(label)
-        self.required, self.label = required, label
+        self.required, self.label, self.initial = required, label, initial
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -72,9 +83,9 @@ class Field(object):
         return {}
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None):
+    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None, initial=None):
         self.max_length, self.min_length = max_length, min_length
-        Field.__init__(self, required, widget, label)
+        Field.__init__(self, required, widget, label, initial)
 
     def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
@@ -95,9 +106,9 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
-    def __init__(self, max_value=None, min_value=None, required=True, widget=None, label=None):
+    def __init__(self, max_value=None, min_value=None, required=True, widget=None, label=None, initial=None):
         self.max_value, self.min_value = max_value, min_value
-        Field.__init__(self, required, widget, label)
+        Field.__init__(self, required, widget, label, initial)
 
     def clean(self, value):
         """
@@ -126,8 +137,8 @@ DEFAULT_DATE_INPUT_FORMATS = (
 )
 
 class DateField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None):
-        Field.__init__(self, required, widget, label)
+    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
+        Field.__init__(self, required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
 
     def clean(self, value):
@@ -155,8 +166,8 @@ DEFAULT_TIME_INPUT_FORMATS = (
 )
 
 class TimeField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None):
-        Field.__init__(self, required, widget, label)
+    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
+        Field.__init__(self, required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -189,8 +200,8 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 )
 
 class DateTimeField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None):
-        Field.__init__(self, required, widget, label)
+    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
+        Field.__init__(self, required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -214,13 +225,13 @@ class DateTimeField(Field):
 
 class RegexField(Field):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None,
-            required=True, widget=None, label=None):
+            required=True, widget=None, label=None, initial=None):
         """
         regex can be either a string or a compiled regular expression object.
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
-        Field.__init__(self, required, widget, label)
+        Field.__init__(self, required, widget, label, initial)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
@@ -251,8 +262,8 @@ email_re = re.compile(
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 class EmailField(RegexField):
-    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None):
-        RegexField.__init__(self, email_re, max_length, min_length, gettext(u'Enter a valid e-mail address.'), required, widget, label)
+    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None, initial=None):
+        RegexField.__init__(self, email_re, max_length, min_length, gettext(u'Enter a valid e-mail address.'), required, widget, label, initial)
 
 url_re = re.compile(
     r'^https?://' # http:// or https://
@@ -269,8 +280,8 @@ except ImportError:
 
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, required=True, verify_exists=False, widget=None, label=None,
-            validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        RegexField.__init__(self, url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label)
+            initial=None, validator_user_agent=URL_VALIDATOR_USER_AGENT):
+        RegexField.__init__(self, url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label, initial)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
@@ -304,10 +315,10 @@ class BooleanField(Field):
         return bool(value)
 
 class ChoiceField(Field):
-    def __init__(self, choices=(), required=True, widget=Select, label=None):
+    def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
         if isinstance(widget, type):
             widget = widget(choices=choices)
-        Field.__init__(self, required, widget, label)
+        Field.__init__(self, required, widget, label, initial)
         self.choices = choices
 
     def clean(self, value):
@@ -325,8 +336,8 @@ class ChoiceField(Field):
         return value
 
 class MultipleChoiceField(ChoiceField):
-    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None):
-        ChoiceField.__init__(self, choices, required, widget, label)
+    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None):
+        ChoiceField.__init__(self, choices, required, widget, label, initial)
 
     def clean(self, value):
         """
@@ -350,8 +361,8 @@ class MultipleChoiceField(ChoiceField):
         return new_value
 
 class ComboField(Field):
-    def __init__(self, fields=(), required=True, widget=None, label=None):
-        Field.__init__(self, required, widget, label)
+    def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
+        Field.__init__(self, required, widget, label, initial)
         # Set 'required' to False on the individual fields, because the
         # required validation will be handled by ComboField, not by those
         # individual fields.

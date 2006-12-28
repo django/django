@@ -658,6 +658,8 @@ Each Field's __init__() takes at least these parameters:
     label -- A verbose name for this field, for use in displaying this field in
              a form. By default, Django will use a "pretty" version of the form
              field name, if the Field is part of a Form.
+    initial -- A value to use in this Field's initial display. This value is
+               *not* used as a fallback if data isn't given.
 
 Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
@@ -2108,6 +2110,8 @@ in "attrs".
 <li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 
+# Specifying labels ###########################################################
+
 You can specify the label for a field by using the 'label' argument to a Field
 class. If you don't specify 'label', Django will use the field name with
 underscores converted to spaces, and the initial letter capitalized.
@@ -2155,6 +2159,46 @@ is default behavior.
 >>> print p.as_ul()
 <li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
 <li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
+
+# Initial data ################################################################
+
+You can specify initial data for a field by using the 'initial' argument to a
+Field class. This initial data is displayed when a Form is rendered with *no*
+data. It is not displayed when a Form is rendered with any data (including an
+empty dictionary). Also, the initial value is *not* used if data for a
+particular required field isn't provided.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial='django')
+...    password = CharField(widget=PasswordInput)
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+Here, we're submitting data, so the initial value will *not* be displayed.
+>>> p = UserRegistration({}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+An 'initial' value is *not* used as a fallback if data is not provided. In this
+example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
 
 # Forms with prefixes #########################################################
 

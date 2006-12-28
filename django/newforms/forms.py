@@ -218,7 +218,11 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self.html_name, self.data, attrs=attrs)
+        if self.form.ignore_errors:
+            data = self.field.initial
+        else:
+            data = self.data
+        return widget.render(self.html_name, data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -237,7 +241,9 @@ class BoundField(StrAndUnicode):
         return self.as_widget(HiddenInput(), attrs)
 
     def _data(self):
-        "Returns the data for this BoundField, or None if it wasn't given."
+        """
+        Returns the data for this BoundField, or None if it wasn't given.
+        """
         return self.field.widget.value_from_datadict(self.form.data, self.html_name)
     data = property(_data)
 
