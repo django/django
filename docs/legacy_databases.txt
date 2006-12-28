@@ -22,7 +22,6 @@ what the name of the database is. Do that by editing these settings in your
     * `DATABASE_ENGINE`_
     * `DATABASE_USER`_
     * `DATABASE_PASSWORD`_
-    * `DATABASE_NAME`_
     * `DATABASE_HOST`_
     * `DATABASE_PORT`_
 
@@ -31,7 +30,6 @@ what the name of the database is. Do that by editing these settings in your
 .. _DATABASE_ENGINE: http://www.djangoproject.com/documentation/settings/#database-engine
 .. _DATABASE_USER: http://www.djangoproject.com/documentation/settings/#database-user
 .. _DATABASE_PASSWORD: http://www.djangoproject.com/documentation/settings/#database-password
-.. _DATABASE_NAME: http://www.djangoproject.com/documentation/settings/#database-name
 .. _DATABASE_HOST: http://www.djangoproject.com/documentation/settings/#database-host
 .. _DATABASE_PORT: http://www.djangoproject.com/documentation/settings/#database-port
 

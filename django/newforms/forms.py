@@ -8,6 +8,8 @@ from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
 from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
+__all__ = ('BaseForm', 'Form')
+
 NON_FIELD_ERRORS = '__all__'
 
 def pretty_name(name):
@@ -97,7 +99,8 @@ class BaseForm(StrAndUnicode):
             else:
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
-                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.label+':')), 'field': bf})
+                label = bf.label and bf.label_tag(escape(bf.label + ':')) or ''
+                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': bf})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
@@ -112,7 +115,7 @@ class BaseForm(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(u'<tr><th>%(label)s</th><td>%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
+        return self._html_output(u'<tr><th>%(label)s</th><td>%(errors)s%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
@@ -185,7 +188,10 @@ class BoundField(StrAndUnicode):
         self.field = field
         self.name = name
         self.html_name = form.add_prefix(name)
-        self.label = self.field.label or pretty_name(name)
+        if self.field.label is None:
+            self.label = pretty_name(name)
+        else:
+            self.label = self.field.label
 
     def __unicode__(self):
         "Renders this field as an HTML widget."
@@ -212,7 +218,11 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self.html_name, self.data, attrs=attrs)
+        if self.form.ignore_errors:
+            data = self.field.initial
+        else:
+            data = self.data
+        return widget.render(self.html_name, data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -231,10 +241,10 @@ class BoundField(StrAndUnicode):
         return self.as_widget(HiddenInput(), attrs)
 
     def _data(self):
-        "Returns the data for this BoundField, or None if it wasn't given."
-        if self.field.widget.requires_data_list and isinstance(self.form.data, MultiValueDict):
-            return self.form.data.getlist(self.html_name)
-        return self.form.data.get(self.html_name, None)
+        """
+        Returns the data for this BoundField, or None if it wasn't given.
+        """
+        return self.field.widget.value_from_datadict(self.form.data, self.html_name)
     data = property(_data)
 
     def label_tag(self, contents=None):

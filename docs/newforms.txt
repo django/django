@@ -22,7 +22,7 @@ release, our plan is to do the following:
           from django import oldforms as forms # new
 
     * At an undecided future date, we will move the current ``django.newforms``
-      to ``django.forms``. This will be a backwards-incompatible change, and 
+      to ``django.forms``. This will be a backwards-incompatible change, and
       anybody who is still using the old version of ``django.forms`` at that
       time will need to change their import statements, as described in the
       previous bullet.
@@ -282,6 +282,13 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
+Using forms to validate data
+----------------------------
+
+In addition to HTML form display, a ``Form`` class is responsible for
+validating data.
+
+
 More coming soon
 ================
 
@@ -289,9 +296,6 @@ That's all the documentation for now. For more, see the file
 http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/tests.py
 -- the unit tests for ``django.newforms``. This can give you a good idea of
 what's possible.
-
-Using forms to validate data
-----------------------------
 
 Using forms with templates
 ==========================

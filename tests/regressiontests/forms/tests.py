@@ -514,6 +514,25 @@ beatle J P Paul False
 beatle J G George False
 beatle J R Ringo False
 
+A RadioFieldRenderer object also allows index access to individual RadioInput
+objects.
+>>> w = RadioSelect()
+>>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> print r[1]
+<label><input type="radio" name="beatle" value="P" /> Paul</label>
+>>> print r[0]
+<label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
+>>> r[0].is_checked()
+True
+>>> r[1].is_checked()
+False
+>>> r[1].name, r[1].value, r[1].choice_value, r[1].choice_label
+('beatle', u'J', 'P', 'Paul')
+>>> r[10]
+Traceback (most recent call last):
+...
+IndexError: list index out of range
+
 # CheckboxSelectMultiple Widget ###############################################
 
 >>> w = CheckboxSelectMultiple()
@@ -639,6 +658,8 @@ Each Field's __init__() takes at least these parameters:
     label -- A verbose name for this field, for use in displaying this field in
              a form. By default, Django will use a "pretty" version of the form
              field name, if the Field is part of a Form.
+    initial -- A value to use in this Field's initial display. This value is
+               *not* used as a fallback if data isn't given.
 
 Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
@@ -687,9 +708,21 @@ ValidationError: [u'Ensure this value has at most 10 characters.']
 CharField accepts an optional min_length parameter:
 >>> f = CharField(min_length=10, required=False)
 >>> f.clean('')
+u''
+>>> f.clean('12345')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at least 10 characters.']
+>>> f.clean('1234567890')
+u'1234567890'
+>>> f.clean('1234567890a')
+u'1234567890a'
+
+>>> f = CharField(min_length=10, required=True)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...
@@ -756,6 +789,71 @@ ValidationError: [u'Enter a whole number.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
+
+IntegerField accepts an optional max_value parameter:
+>>> f = IntegerField(max_value=10)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+1
+>>> f.clean(10)
+10
+>>> f.clean(11)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 10.']
+>>> f.clean('10')
+10
+>>> f.clean('11')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 10.']
+
+IntegerField accepts an optional min_value parameter:
+>>> f = IntegerField(min_value=10)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 10.']
+>>> f.clean(10)
+10
+>>> f.clean(11)
+11
+>>> f.clean('10')
+10
+>>> f.clean('11')
+11
+
+min_value and max_value can be used together:
+>>> f = IntegerField(min_value=10, max_value=20)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(1)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 10.']
+>>> f.clean(10)
+10
+>>> f.clean(11)
+11
+>>> f.clean('10')
+10
+>>> f.clean('11')
+11
+>>> f.clean(20)
+20
+>>> f.clean(21)
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 20.']
 
 # DateField ###################################################################
 
@@ -1002,7 +1100,7 @@ Traceback (most recent call last):
 ValidationError: [u'Enter a valid value.']
 
 RegexField takes an optional error_message argument:
->>> f = RegexField('^\d\d\d\d$', 'Enter a four-digit number.')
+>>> f = RegexField('^\d\d\d\d$', error_message='Enter a four-digit number.')
 >>> f.clean('1234')
 u'1234'
 >>> f.clean('123')
@@ -1013,6 +1111,29 @@ ValidationError: [u'Enter a four-digit number.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a four-digit number.']
+
+RegexField also access min_length and max_length parameters, for convenience.
+>>> f = RegexField('^\d+$', min_length=5, max_length=10)
+>>> f.clean('123')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 5 characters.']
+>>> f.clean('abc')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 5 characters.']
+>>> f.clean('12345')
+u'12345'
+>>> f.clean('1234567890')
+u'1234567890'
+>>> f.clean('12345678901')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 10 characters.']
+>>> f.clean('12345a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid value.']
 
 # EmailField ##################################################################
 
@@ -1059,6 +1180,19 @@ ValidationError: [u'Enter a valid e-mail address.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid e-mail address.']
+
+EmailField also access min_length and max_length parameters, for convenience.
+>>> f = EmailField(min_length=10, max_length=15)
+>>> f.clean('a@foo.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 10 characters.']
+>>> f.clean('alf@foo.com')
+u'alf@foo.com'
+>>> f.clean('alf123456788@foo.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 15 characters.']
 
 # URLField ##################################################################
 
@@ -1151,6 +1285,19 @@ ValidationError: [u'This URL appears to be a broken link.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
+
+EmailField also access min_length and max_length parameters, for convenience.
+>>> f = URLField(min_length=15, max_length=20)
+>>> f.clean('http://f.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 15 characters.']
+>>> f.clean('http://example.com')
+u'http://example.com'
+>>> f.clean('http://abcdefghijklmnopqrstuvwxyz.com')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 20 characters.']
 
 # BooleanField ################################################################
 
@@ -1398,19 +1545,13 @@ Empty dictionaries are valid, too.
 >>> p.is_valid()
 False
 >>> print p
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>
 >>> print p.as_table()
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th><label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" id="id_birthday" /></td></tr>
+<tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
+<tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
+<tr><th><label for="id_birthday">Birthday:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="birthday" id="id_birthday" /></td></tr>
 >>> print p.as_ul()
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
@@ -1799,12 +1940,9 @@ Form.clean() is required to return a dictionary of all clean data.
 {}
 >>> f = UserRegistration({}, auto_id=False)
 >>> print f.as_table()
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Password1:</th><td><input type="password" name="password1" /></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>This field is required.</li></ul></td></tr>
-<tr><th>Password2:</th><td><input type="password" name="password2" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="username" maxlength="10" /></td></tr>
+<tr><th>Password1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password1" /></td></tr>
+<tr><th>Password2:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="password" name="password2" /></td></tr>
 >>> f.errors
 {'username': [u'This field is required.'], 'password1': [u'This field is required.'], 'password2': [u'This field is required.']}
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'bar'}, auto_id=False)
@@ -1972,6 +2110,8 @@ in "attrs".
 <li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 
+# Specifying labels ###########################################################
+
 You can specify the label for a field by using the 'label' argument to a Field
 class. If you don't specify 'label', Django will use the field name with
 underscores converted to spaces, and the initial letter capitalized.
@@ -1984,6 +2124,81 @@ underscores converted to spaces, and the initial letter capitalized.
 <li>Your username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>
+
+A label can be a Unicode object or a bytestring with special characters.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='ŠĐĆŽćžšđ')
+...    password = CharField(widget=PasswordInput, label=u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
+>>> p = UserRegistration(auto_id=False)
+>>> p.as_ul()
+u'<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="text" name="username" maxlength="10" /></li>\n<li>\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111: <input type="password" name="password" /></li>'
+
+If a label is set to the empty string for a field, that field won't get a label.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label='')
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li> <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(auto_id='id_%s')
+>>> print p.as_ul()
+<li> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
+
+If label is None, Django will auto-create the label from the field name. This
+is default behavior.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, label=None)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(auto_id='id_%s')
+>>> print p.as_ul()
+<li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
+<li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
+
+# Initial data ################################################################
+
+You can specify initial data for a field by using the 'initial' argument to a
+Field class. This initial data is displayed when a Form is rendered with *no*
+data. It is not displayed when a Form is rendered with any data (including an
+empty dictionary). Also, the initial value is *not* used if data for a
+particular required field isn't provided.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial='django')
+...    password = CharField(widget=PasswordInput)
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+Here, we're submitting data, so the initial value will *not* be displayed.
+>>> p = UserRegistration({}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+An 'initial' value is *not* used as a fallback if data is not provided. In this
+example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
 
 # Forms with prefixes #########################################################
 
@@ -2133,8 +2348,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><td colspan="2"><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul></td></tr>
-<tr><th>Username:</th><td><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>
@@ -2257,6 +2471,141 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <p><label>Password (again): <input type="password" name="password2" value="bar" /></label></p>
 <input type="submit" />
 </form>
+
+#################
+# Extra widgets #
+#################
+
+The newforms library comes with some extra, higher-level Widget classes that
+demonstrate some of the library's abilities.
+
+# SelectDateWidget ############################################################
+
+>>> from django.newforms.extras import SelectDateWidget
+>>> w = SelectDateWidget()
+>>> print w.render('mydate', '')
+<select name="mydate_month">
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select>
+<select name="mydate_day">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+</select>
+<select name="mydate_year">
+<option value="2006">2006</option>
+<option value="2007">2007</option>
+<option value="2008">2008</option>
+<option value="2009">2009</option>
+<option value="2010">2010</option>
+<option value="2011">2011</option>
+<option value="2012">2012</option>
+<option value="2013">2013</option>
+<option value="2014">2014</option>
+<option value="2015">2015</option>
+</select>
+>>> w.render('mydate', None) == w.render('mydate', '')
+True
+>>> print w.render('mydate', '2010-04-15')
+<select name="mydate_month">
+<option value="1">January</option>
+<option value="2">February</option>
+<option value="3">March</option>
+<option value="4" selected="selected">April</option>
+<option value="5">May</option>
+<option value="6">June</option>
+<option value="7">July</option>
+<option value="8">August</option>
+<option value="9">September</option>
+<option value="10">October</option>
+<option value="11">November</option>
+<option value="12">December</option>
+</select>
+<select name="mydate_day">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15" selected="selected">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+</select>
+<select name="mydate_year">
+<option value="2006">2006</option>
+<option value="2007">2007</option>
+<option value="2008">2008</option>
+<option value="2009">2009</option>
+<option value="2010" selected="selected">2010</option>
+<option value="2011">2011</option>
+<option value="2012">2012</option>
+<option value="2013">2013</option>
+<option value="2014">2014</option>
+<option value="2015">2015</option>
+</select>
+
 """
 
 if __name__ == "__main__":
