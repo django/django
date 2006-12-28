@@ -479,7 +479,7 @@ class DateField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.DateField]
 
-    def flatten_data(self, follow, obj = None):
+    def flatten_data(self, follow, obj=None):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
