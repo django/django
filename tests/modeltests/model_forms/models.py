@@ -30,13 +30,14 @@ class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateTimeField()
     writer = models.ForeignKey(Writer)
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField(Category, blank=True)
 
     def __str__(self):
         return self.headline
 
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model, form_for_instance, BaseForm
+>>> import datetime
 
 >>> Category.objects.all()
 []
@@ -142,12 +143,42 @@ subclass of BaseForm, not Form.
 >>> f.say_hello()
 hello
 
-Use form_for_instance to create a Form from a model instance. The difference
-between this Form and one created via form_for_model is that the object's
-current values are inserted as 'initial' data in each Field.
+Use form_for_instance to create a Form from a model instance. There are two
+differences between this Form and one created via form_for_model. First, the
+object's current values are inserted as 'initial' data in each Field. Second,
+the Form gets an apply_changes() method instead of a create() method.
 >>> w = Writer.objects.get(name='Mike Royko')
 >>> RoykoForm = form_for_instance(w)
 >>> f = RoykoForm(auto_id=False)
 >>> print f
 <tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /></td></tr>
+
+>>> art = Article(headline='Test article', pub_date=datetime.date(1988, 1, 4), writer=w)
+>>> art.save()
+>>> art.id
+1
+>>> TestArticleForm = form_for_instance(art)
+>>> f = TestArticleForm(auto_id=False)
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
+<li>Writer: <select name="writer">
+<option value="">---------</option>
+<option value="1" selected="selected">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+</select></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="1">Entertainment</option>
+<option value="2">It&#39;s a test</option>
+<option value="3">Third test</option>
+</select></li>
+>>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1'})
+>>> f.is_valid()
+True
+>>> new_art = f.apply_changes()
+>>> new_art.id
+1
+>>> new_art = Article.objects.get(id=1)
+>>> new_art.headline
+'New headline'
 """}
