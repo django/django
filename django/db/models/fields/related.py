@@ -721,6 +721,10 @@ class ManyToManyField(RelatedField, Field):
     def set_attributes_from_rel(self):
         pass
 
+    def value_from_object(self, obj):
+        "Returns the value of this field in the given model instance."
+        return getattr(obj, self.attname).all()
+
     def formfield(self, initial=None):
         return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 

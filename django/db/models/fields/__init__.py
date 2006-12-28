@@ -339,6 +339,10 @@ class Field(object):
         # TODO: This is just a temporary default during development.
         return forms.CharField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
+    def value_from_object(self, obj):
+        "Returns the value of this field in the given model instance."
+        return getattr(obj, self.attname)
+
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
