@@ -2,14 +2,26 @@
 Forms, fields, and manipulators
 ===============================
 
+Forwards-compatibility note
+===========================
+
+The legacy forms/manipulators system described in this document is going to be
+replaced in the next Django release. If you're starting from scratch, we
+strongly encourage you not to waste your time learning this. Instead, learn and
+use the django.newforms system, which we have begun to document in the
+`newforms documentation`_.
+
+If you have legacy form/manipulator code, read the "Migration plan" section in
+that document to understand how we're making the switch.
+
+.. _newforms documentation: http://www.djangoproject.com/documentation/newforms/
+
+Introduction
+============
+
 Once you've got a chance to play with Django's admin interface, you'll probably
 wonder if the fantastic form validation framework it uses is available to user
 code. It is, and this document explains how the framework works.
-
-    .. admonition:: A note to the lazy
-
-        If all you want to do is present forms for a user to create and/or
-        update a given object, you may be able to use `generic views`_.
 
 We'll take a top-down approach to examining Django's form validation framework,
 because much of the time you won't need to use the lower-level APIs. Throughout
@@ -41,17 +53,17 @@ this document, we'll be working with the following model, a "place" object::
 Defining the above class is enough to create an admin interface to a ``Place``,
 but what if you want to allow public users to submit places?
 
-Manipulators
-============
+Automatic Manipulators
+======================
 
 The highest-level interface for object creation and modification is the
-**Manipulator** framework. A manipulator is a utility class tied to a given
-model that "knows" how to create or modify instances of that model and how to
-validate data for the object. Manipulators come in two flavors:
-``AddManipulators`` and ``ChangeManipulators``. Functionally they are quite
-similar, but the former knows how to create new instances of the model, while
-the latter modifies existing instances. Both types of classes are automatically
-created when you define a new class::
+**automatic Manipulator** framework. An automatic manipulator is a utility
+class tied to a given model that "knows" how to create or modify instances of
+that model and how to validate data for the object. Automatic Manipulators come
+in two flavors: ``AddManipulators`` and ``ChangeManipulators``. Functionally
+they are quite similar, but the former knows how to create new instances of the
+model, while the latter modifies existing instances. Both types of classes are
+automatically created when you define a new class::
 
     >>> from mysite.myapp.models import Place
     >>> Place.AddManipulator

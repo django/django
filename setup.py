@@ -25,9 +25,12 @@ for dirpath, dirnames, filenames in os.walk(django_dir):
     else:
         data_files.append((dirpath, [os.path.join(dirpath, f) for f in filenames]))
 
+# Dynamically calculate the version based on django.VERSION.
+version = "%d.%d-%s" % (__import__('django').VERSION)
+
 setup(
     name = "Django",
-    version = "0.95",
+    version = version,
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',

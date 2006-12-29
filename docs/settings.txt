@@ -871,7 +871,7 @@ TIME_FORMAT and MONTH_DAY_FORMAT.
 .. _cache docs: http://www.djangoproject.com/documentation/cache/
 .. _middleware docs: http://www.djangoproject.com/documentation/middleware/
 .. _session docs: http://www.djangoproject.com/documentation/sessions/
-.. _See available choices: http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+.. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 .. _template documentation: http://www.djangoproject.com/documentation/templates_python/
 
 Creating your own settings

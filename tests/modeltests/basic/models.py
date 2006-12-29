@@ -10,6 +10,9 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
+    class Meta:
+        ordering = ('pub_date','headline')
+        
     def __str__(self):
         return self.headline
 
@@ -245,7 +248,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>]
 
 # Slicing again works:
 >>> Article.objects.all()[0:5][0:2]
@@ -253,17 +256,17 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.all()[0:5][:2]
 [<Article: Area woman programs in Python>, <Article: Second article>]
 >>> Article.objects.all()[0:5][4:]
-[<Article: Article 6>]
+[<Article: Default headline>]
 >>> Article.objects.all()[0:5][5:]
 []
 
 # Some more tests!
 >>> Article.objects.all()[2:][0:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][2:3]
-[<Article: Article 6>]
+[<Article: Default headline>]
 
 # Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
 >>> Article.objects.all()[2:]
@@ -312,7 +315,7 @@ AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
 >>> Article.objects.all()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>, <Article: Fourth article>, <Article: Article 7>, <Article: Updated article 8>]
 >>> Article.objects.filter(id__lte=4).delete()
 >>> Article.objects.all()
 [<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]

@@ -2,11 +2,13 @@
 Form classes
 """
 
-from django.utils.datastructures import SortedDict
+from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput
 from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
+
+__all__ = ('BaseForm', 'Form')
 
 NON_FIELD_ERRORS = '__all__'
 
@@ -32,14 +34,16 @@ class DeclarativeFieldsMetaclass(type):
         attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
-class Form(StrAndUnicode):
-    "A collection of Fields, plus their associated data."
-    __metaclass__ = DeclarativeFieldsMetaclass
-
-    def __init__(self, data=None, auto_id=False): # TODO: prefix stuff
+class BaseForm(StrAndUnicode):
+    # This is the main implementation of all the Form logic. Note that this
+    # class is different than Form. See the comments by the Form class for more
+    # information. Any improvements to the form API should be made to *this*
+    # class, not to the Form class.
+    def __init__(self, data=None, auto_id='id_%s', prefix=None):
         self.ignore_errors = data is None
         self.data = data or {}
         self.auto_id = auto_id
+        self.prefix = prefix
         self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
@@ -72,6 +76,15 @@ class Form(StrAndUnicode):
         """
         return not self.ignore_errors and not bool(self.errors)
 
+    def add_prefix(self, field_name):
+        """
+        Returns the field name with a prefix appended, if this Form has a
+        prefix set.
+
+        Subclasses may wish to override.
+        """
+        return self.prefix and ('%s-%s' % (self.prefix, field_name)) or field_name
+
     def _html_output(self, normal_row, error_row, row_ender, errors_on_separate_row):
         "Helper function for outputting HTML. Used by as_table(), as_ul(), as_p()."
         top_errors = self.non_field_errors() # Errors that should be displayed above all fields.
@@ -86,7 +99,8 @@ class Form(StrAndUnicode):
             else:
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
-                output.append(normal_row % {'errors': bf_errors, 'label': bf.label_tag(escape(bf.verbose_name+':')), 'field': bf})
+                label = bf.label and bf.label_tag(escape(bf.label + ':')) or ''
+                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': bf})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
@@ -101,7 +115,7 @@ class Form(StrAndUnicode):
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
-        return self._html_output(u'<tr><td>%(label)s</td><td>%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', True)
+        return self._html_output(u'<tr><th>%(label)s</th><td>%(errors)s%(field)s</td></tr>', u'<tr><td colspan="2">%s</td></tr>', '</td></tr>', False)
 
     def as_ul(self):
         "Returns this form rendered as HTML <li>s -- excluding the <ul></ul>."
@@ -132,7 +146,7 @@ class Form(StrAndUnicode):
             # value_from_datadict() gets the data from the dictionary.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, name)
+            value = field.widget.value_from_datadict(self.data, self.add_prefix(name))
             try:
                 value = field.clean(value)
                 self.clean_data[name] = value
@@ -158,12 +172,26 @@ class Form(StrAndUnicode):
         """
         return self.clean_data
 
+class Form(BaseForm):
+    "A collection of Fields, plus their associated data."
+    # This is a separate class from BaseForm in order to abstract the way
+    # self.fields is specified. This class (Form) is the one that does the
+    # fancy metaclass stuff purely for the semantic sugar -- it allows one
+    # to define a form using declarative syntax.
+    # BaseForm itself has no way of designating self.fields.
+    __metaclass__ = DeclarativeFieldsMetaclass
+
 class BoundField(StrAndUnicode):
     "A Field plus data"
     def __init__(self, form, field, name):
         self.form = form
         self.field = field
         self.name = name
+        self.html_name = form.add_prefix(name)
+        if self.field.label is None:
+            self.label = pretty_name(name)
+        else:
+            self.label = self.field.label
 
     def __unicode__(self):
         "Renders this field as an HTML widget."
@@ -190,7 +218,11 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        return widget.render(self.name, self.data, attrs=attrs)
+        if self.form.ignore_errors:
+            data = self.field.initial
+        else:
+            data = self.data
+        return widget.render(self.html_name, data, attrs=attrs)
 
     def as_text(self, attrs=None):
         """
@@ -209,21 +241,19 @@ class BoundField(StrAndUnicode):
         return self.as_widget(HiddenInput(), attrs)
 
     def _data(self):
-        "Returns the data for this BoundField, or None if it wasn't given."
-        return self.form.data.get(self.name, None)
+        """
+        Returns the data for this BoundField, or None if it wasn't given.
+        """
+        return self.field.widget.value_from_datadict(self.form.data, self.html_name)
     data = property(_data)
-
-    def _verbose_name(self):
-        return pretty_name(self.name)
-    verbose_name = property(_verbose_name)
 
     def label_tag(self, contents=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         Does not HTML-escape the contents. If contents aren't given, uses the
-        field's HTML-escaped verbose_name.
+        field's HTML-escaped label.
         """
-        contents = contents or escape(self.verbose_name)
+        contents = contents or escape(self.label)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
@@ -242,8 +272,8 @@ class BoundField(StrAndUnicode):
         """
         auto_id = self.form.auto_id
         if auto_id and '%s' in str(auto_id):
-            return str(auto_id) % self.name
+            return str(auto_id) % self.html_name
         elif auto_id:
-            return self.name
+            return self.html_name
         return ''
     auto_id = property(_auto_id)

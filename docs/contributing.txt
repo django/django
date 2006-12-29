@@ -22,6 +22,9 @@ of the community, so there are many ways you can help Django's development:
       likely to be skeptical of large-scale suggestions without some code to
       back it up.
 
+    * Triage patches that have been submitted by other users. Please read
+      `Ticket triage`_ below, for details on the triage process.
+
 That's all you need to know if you'd like to join the Django development
 community. The rest of this document describes the details of how our community
 works and how it handles bugs, mailing lists, and all the other minutiae of
@@ -44,8 +47,10 @@ particular:
 
     * **Do** write complete, reproducible, specific bug reports. Include as
       much information as you possibly can, complete with code snippets, test
-      cases, etc.  A minimal example that illustrates the bug in a nice small
-      test case is the best possible bug report.
+      cases, etc. This means including a clear, concise description of the
+      problem, and a clear set of instructions for replicating the problem.
+      A minimal example that illustrates the bug in a nice small test case
+      is the best possible bug report.
 
     * **Don't** use the ticket system to ask support questions.  Use the
       `django-users`_ list, or the `#django`_ IRC channel for that.
@@ -120,6 +125,50 @@ Patch style
     * Put the prefix "[patch] " before the title of your ticket. This will make
       it obvious that the ticket includes a patch, and it will add the ticket
       to the `list of tickets with patches`_.
+
+    * The code required to fix a problem or add a feature is an essential part
+      of a patch, but it is not the only part. A good patch should also include
+      a regression test to validate the behavior that has been fixed (and prevent
+      the problem from arising again).
+
+    * If the code associated with a patch adds a new feature, or modifies behavior
+      of an existing feature, the patch should also contain documentation.
+
+Non-trivial patches
+-------------------
+
+A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
+that introduces Django functionality and makes some sort of design decision.
+
+If you provide a non-trivial patch, include evidence that alternatives have
+been discussed on `django-developers`_. If you're not sure whether your patch
+should be considered non-trivial, just ask.
+
+Ticket triage
+=============
+
+Unfortunately, not all bug reports in the `ticket tracker`_ provide all
+the `required details`_. A number of tickets have patches, but those patches
+don't meet all the requirements of a `good patch`_.
+
+One way to help out is to *triage* bugs that have been reported by other users.
+Pick an open ticket that is missing some details, and try to replicate the
+problem. Fill in the missing pieces of the report. If the ticket doesn't have
+a patch, create one.
+
+Once you've completed all the missing details on the ticket and you have a
+patch with all the required features, e-mail `django-developers`_. Indicate
+that you have triaged a ticket, and recommend a course of action for dealing
+with that ticket.
+
+At first, this may require you to be persistent. If you find that your triaged
+ticket still isn't getting attention, occasional polite requests for eyeballs
+to look at your ticket may be necessary. However, as you earn a reputation for
+quality triage work, you should find that it is easier to get the developers'
+attention.
+
+.. _required details: `Reporting bugs`_
+.. _good patch: `Patch style`_
 
 Submitting and maintaining translations
 =======================================
@@ -338,21 +387,63 @@ trunk more than once.
 Using branches
 --------------
 
-To test a given branch, you can simply check out the entire branch, like so::
+To use a branch, you'll need to do two things:
+
+    * Get the branch's code through Subversion.
+
+    * Point your Python ``site-packages`` directory at the branch's version of
+      the ``django`` package rather than the version you already have
+      installed.
+
+Getting the code from Subversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get the latest version of a branch's code, check it out using Subversion::
 
     svn co http://code.djangoproject.com/svn/django/branches/<branch>/
 
-Or, if you've got a working directory you'd like to switch to use a branch,
-you can use::
+...where ``<branch>`` is the branch's name. See the `list of branch names`_.
+
+Alternatively, you can automatically convert an existing directory of the
+Django source code as long as you've checked it out via Subversion. To do the
+conversion, execute this command from within your ``django`` directory::
 
     svn switch http://code.djangoproject.com/svn/django/branches/<branch>/
 
-...in the root of your Django sandbox (the directory that contains ``django``,
-``docs``, and ``tests``).
-
 The advantage of using ``svn switch`` instead of ``svn co`` is that the
 ``switch`` command retains any changes you might have made to your local copy
-of the code. It attempts to merge those changes into the "switched" code.
+of the code. It attempts to merge those changes into the "switched" code. The
+disadvantage is that it may cause conflicts with your local changes if the
+"switched" code has altered the same lines of code.
+
+(Note that if you use ``svn switch``, you don't need to point Python at the new
+version, as explained in the next section.)
+
+.. _list of branch names: http://code.djangoproject.com/browser/django/branches
+
+Pointing Python at the new Django version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've retrieved the branch's code, you'll need to change your Python
+``site-packages`` directory so that it points to the branch version of the
+``django`` directory. (The ``site-packages`` directory is somewhere such as
+``/usr/lib/python2.4/site-packages`` or
+``/usr/local/lib/python2.4/site-packages`` or ``C:\Python\site-packages``.)
+
+The simplest way to do this is by renaming the old ``django`` directory to
+``django.OLD`` and moving the trunk version of the code into the directory
+and calling it ``django``.
+
+Alternatively, you can use a symlink called ``django`` that points to the
+location of the branch's ``django`` package. If you want to switch back, just
+change the symlink to point to the old code.
+
+If you're using Django 0.95 or earlier and installed it using
+``python setup.py install``, you'll have a directory called something like
+``Django-0.95-py2.4.egg`` instead of ``django``. In this case, edit the file
+``setuptools.pth`` and remove the line that references the Django ``.egg``
+file. Then copy the branch's version of the ``django`` directory into
+``site-packages``.
 
 Official releases
 =================

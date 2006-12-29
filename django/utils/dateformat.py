@@ -11,7 +11,7 @@ Usage:
 >>>
 """
 
-from django.utils.dates import MONTHS, MONTHS_AP, WEEKDAYS
+from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS
 from django.utils.tzinfo import LocalTimezone
 from calendar import isleap, monthrange
 import re, time
@@ -147,7 +147,7 @@ class DateFormat(TimeFormat):
 
     def M(self):
         "Month, textual, 3 letters; e.g. 'Jan'"
-        return MONTHS[self.data.month][0:3]
+        return MONTHS_3[self.data.month].title()
 
     def n(self):
         "Month without leading zeros; i.e. '1' to '12'"

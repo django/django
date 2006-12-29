@@ -9,6 +9,7 @@ __all__ = (
 )
 
 from util import StrAndUnicode, smart_unicode
+from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from itertools import chain
 
@@ -22,13 +23,18 @@ except NameError:
 flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 class Widget(object):
-    requires_data_list = False # Determines whether render()'s 'value' argument should be a list.
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
         self.attrs = attrs or {}
 
-    def render(self, name, value):
+    def render(self, name, value, attrs=None):
+        """
+        Returns this Widget rendered as HTML, as a Unicode string.
+
+        The 'value' given is not guaranteed to be valid input, so subclass
+        implementations should program defensively.
+        """
         raise NotImplementedError
 
     def build_attrs(self, extra_attrs=None, **kwargs):
@@ -64,6 +70,7 @@ class Input(Widget):
     type='radio', which are special).
     """
     input_type = None # Subclasses must define this.
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
@@ -128,7 +135,6 @@ class Select(Widget):
         return u'\n'.join(output)
 
 class SelectMultiple(Widget):
-    requires_data_list = True
     def __init__(self, attrs=None, choices=()):
         # choices can be any iterable
         self.attrs = attrs or {}
@@ -145,6 +151,11 @@ class SelectMultiple(Widget):
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
+
+    def value_from_datadict(self, data, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)
 
 class RadioInput(StrAndUnicode):
     "An object used by RadioFieldRenderer that represents a single <input type='radio'>."
@@ -177,6 +188,10 @@ class RadioFieldRenderer(StrAndUnicode):
     def __iter__(self):
         for i, choice in enumerate(self.choices):
             yield RadioInput(self.name, self.value, self.attrs.copy(), choice, i)
+
+    def __getitem__(self, idx):
+        choice = self.choices[idx] # Let the IndexError propogate
+        return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __unicode__(self):
         "Outputs a <ul> for this set of radio fields."

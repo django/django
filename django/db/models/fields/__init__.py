@@ -2,7 +2,8 @@ from django.db.models import signals
 from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
-from django import forms
+from django import oldforms
+from django import newforms as forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
@@ -206,10 +207,10 @@ class Field(object):
 
         if self.choices:
             if self.radio_admin:
-                field_objs = [forms.RadioSelectField]
+                field_objs = [oldforms.RadioSelectField]
                 params['ul_class'] = get_ul_class(self.radio_admin)
             else:
-                field_objs = [forms.SelectField]
+                field_objs = [oldforms.SelectField]
 
             params['choices'] = self.get_choices_default()
         else:
@@ -218,7 +219,7 @@ class Field(object):
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         """
-        Returns a list of forms.FormField instances for this field. It
+        Returns a list of oldforms.FormField instances for this field. It
         calculates the choices at runtime, not at compile time.
 
         name_prefix is a prefix to prepend to the "field_name" argument.
@@ -333,6 +334,15 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
+    def formfield(self, initial=None):
+        "Returns a django.newforms.Field instance for this database Field."
+        # TODO: This is just a temporary default during development.
+        return forms.CharField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+
+    def value_from_object(self, obj):
+        "Returns the value of this field in the given model instance."
+        return getattr(obj, self.attname)
+
 class AutoField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
@@ -354,7 +364,7 @@ class AutoField(Field):
         return Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
 
     def get_manipulator_field_objs(self):
-        return [forms.HiddenField]
+        return [oldforms.HiddenField]
 
     def get_manipulator_new_data(self, new_data, rel=False):
         # Never going to be called
@@ -369,6 +379,9 @@ class AutoField(Field):
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
 
+    def formfield(self, initial=None):
+        return None
+
 class BooleanField(Field):
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
@@ -381,11 +394,14 @@ class BooleanField(Field):
         raise validators.ValidationError, gettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
-        return [forms.CheckboxField]
+        return [oldforms.CheckboxField]
+
+    def formfield(self, initial=None):
+        return forms.BooleanField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class CharField(Field):
     def get_manipulator_field_objs(self):
-        return [forms.TextField]
+        return [oldforms.TextField]
 
     def to_python(self, value):
         if isinstance(value, basestring):
@@ -397,10 +413,13 @@ class CharField(Field):
                 raise validators.ValidationError, gettext_lazy("This field cannot be null.")
         return str(value)
 
+    def formfield(self, initial=None):
+        return forms.CharField(max_length=self.maxlength, required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
     def get_manipulator_field_objs(self):
-        return [forms.CommaSeparatedIntegerField]
+        return [oldforms.CommaSeparatedIntegerField]
 
 class DateField(Field):
     empty_strings_allowed = False
@@ -462,11 +481,14 @@ class DateField(Field):
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
-        return [forms.DateField]
+        return [oldforms.DateField]
 
-    def flatten_data(self, follow, obj = None):
+    def flatten_data(self, follow, obj=None):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
+
+    def formfield(self, initial=None):
+        return forms.DateField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class DateTimeField(DateField):
     def to_python(self, value):
@@ -503,7 +525,7 @@ class DateTimeField(DateField):
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def get_manipulator_field_objs(self):
-        return [forms.DateField, forms.TimeField]
+        return [oldforms.DateField, oldforms.TimeField]
 
     def get_manipulator_field_names(self, name_prefix):
         return [name_prefix + self.name + '_date', name_prefix + self.name + '_time']
@@ -526,6 +548,9 @@ class DateTimeField(DateField):
         return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
+    def formfield(self, initial=None):
+        return forms.DateTimeField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 75
@@ -535,10 +560,13 @@ class EmailField(CharField):
         return "CharField"
 
     def get_manipulator_field_objs(self):
-        return [forms.EmailField]
+        return [oldforms.EmailField]
 
     def validate(self, field_data, all_data):
         validators.isValidEmail(field_data, all_data)
+
+    def formfield(self, initial=None):
+        return forms.EmailField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
@@ -599,7 +627,7 @@ class FileField(Field):
                 os.remove(file_name)
 
     def get_manipulator_field_objs(self):
-        return [forms.FileUploadField, forms.HiddenField]
+        return [oldforms.FileUploadField, oldforms.HiddenField]
 
     def get_manipulator_field_names(self, name_prefix):
         return [name_prefix + self.name + '_file', name_prefix + self.name]
@@ -627,7 +655,7 @@ class FilePathField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [curry(forms.FilePathField, path=self.path, match=self.match, recursive=self.recursive)]
+        return [curry(oldforms.FilePathField, path=self.path, match=self.match, recursive=self.recursive)]
 
 class FloatField(Field):
     empty_strings_allowed = False
@@ -636,7 +664,7 @@ class FloatField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [curry(forms.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
+        return [curry(oldforms.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
 
 class ImageField(FileField):
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
@@ -644,7 +672,7 @@ class ImageField(FileField):
         FileField.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [forms.ImageUploadField, forms.HiddenField]
+        return [oldforms.ImageUploadField, oldforms.HiddenField]
 
     def contribute_to_class(self, cls, name):
         super(ImageField, self).contribute_to_class(cls, name)
@@ -670,7 +698,10 @@ class ImageField(FileField):
 class IntegerField(Field):
     empty_strings_allowed = False
     def get_manipulator_field_objs(self):
-        return [forms.IntegerField]
+        return [oldforms.IntegerField]
+
+    def formfield(self, initial=None):
+        return forms.IntegerField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class IPAddressField(Field):
     def __init__(self, *args, **kwargs):
@@ -678,7 +709,7 @@ class IPAddressField(Field):
         Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [forms.IPAddressField]
+        return [oldforms.IPAddressField]
 
     def validate(self, field_data, all_data):
         validators.isValidIPAddress4(field_data, None)
@@ -689,22 +720,22 @@ class NullBooleanField(Field):
         Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [forms.NullBooleanField]
+        return [oldforms.NullBooleanField]
 
 class PhoneNumberField(IntegerField):
     def get_manipulator_field_objs(self):
-        return [forms.PhoneNumberField]
+        return [oldforms.PhoneNumberField]
 
     def validate(self, field_data, all_data):
         validators.isValidPhone(field_data, all_data)
 
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
-        return [forms.PositiveIntegerField]
+        return [oldforms.PositiveIntegerField]
 
 class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
-        return [forms.PositiveSmallIntegerField]
+        return [oldforms.PositiveSmallIntegerField]
 
 class SlugField(Field):
     def __init__(self, *args, **kwargs):
@@ -716,15 +747,15 @@ class SlugField(Field):
         Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [forms.TextField]
+        return [oldforms.TextField]
 
 class SmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
-        return [forms.SmallIntegerField]
+        return [oldforms.SmallIntegerField]
 
 class TextField(Field):
     def get_manipulator_field_objs(self):
-        return [forms.LargeTextField]
+        return [oldforms.LargeTextField]
 
 class TimeField(Field):
     empty_strings_allowed = False
@@ -760,24 +791,31 @@ class TimeField(Field):
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
-        return [forms.TimeField]
+        return [oldforms.TimeField]
 
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
 
+    def formfield(self, initial=None):
+        return forms.TimeField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+
 class URLField(Field):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
+        self.verify_exists = verify_exists
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [forms.URLField]
+        return [oldforms.URLField]
+
+    def formfield(self, initial=None):
+        return forms.URLField(required=not self.blank, verify_exists=self.verify_exists, label=capfirst(self.verbose_name), initial=initial)
 
 class USStateField(Field):
     def get_manipulator_field_objs(self):
-        return [forms.USStateField]
+        return [oldforms.USStateField]
 
 class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
@@ -788,7 +826,7 @@ class XMLField(TextField):
         return "TextField"
 
     def get_manipulator_field_objs(self):
-        return [curry(forms.XMLLargeTextField, schema_path=self.schema_path)]
+        return [curry(oldforms.XMLLargeTextField, schema_path=self.schema_path)]
 
 class OrderingField(IntegerField):
     empty_strings_allowed=False
@@ -801,4 +839,4 @@ class OrderingField(IntegerField):
         return "IntegerField"
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
-        return [forms.HiddenField(name_prefix + self.name)]
+        return [oldforms.HiddenField(name_prefix + self.name)]

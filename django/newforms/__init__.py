@@ -13,5 +13,5 @@ TODO:
 from util import ValidationError
 from widgets import *
 from fields import *
-from forms import Form
+from forms import *
 from models import *

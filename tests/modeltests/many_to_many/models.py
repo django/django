@@ -231,4 +231,16 @@ __test__ = {'API_TESTS':"""
 >>> p1.article_set.all()
 [<Article: NASA uses Python>]
 
+# An alternate to calling clear() is to assign the empty set
+>>> p1.article_set = []
+>>> p1.article_set.all()
+[]
+
+>>> a2.publications = [p1, new_publication]
+>>> a2.publications.all()
+[<Publication: Highlights for Children>, <Publication: The Python Journal>]
+>>> a2.publications = []
+>>> a2.publications.all()
+[]
+
 """}
