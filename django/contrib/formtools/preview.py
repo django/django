@@ -91,7 +91,9 @@ class FormPreview(object):
     def preview_get(self, request):
         "Displays the form"
         f = self.form(auto_id=AUTO_ID)
-        return render_to_response(self.form_template, {'form': f, 'stage_field': self.unused_name('stage'), 'state': self.state})
+        return render_to_response(self.form_template,
+            {'form': f, 'stage_field': self.unused_name('stage'), 'state': self.state},
+            context_instance=RequestContext(request))
 
     def preview_post(self, request):
         "Validates the POST data. If valid, displays the preview page. Else, redisplays form."
@@ -100,9 +102,9 @@ class FormPreview(object):
         if f.is_valid():
             context['hash_field'] = self.unused_name('hash')
             context['hash_value'] = self.security_hash(request, f)
-            return render_to_response(self.preview_template, context)
+            return render_to_response(self.preview_template, context, context_instance=RequestContext(request))
         else:
-            return render_to_response(self.form_template, context)
+            return render_to_response(self.form_template, context, context_instance=RequestContext(request))
 
     def post_post(self, request):
         "Validates the POST data. If valid, calls done(). Else, redisplays form."
@@ -112,7 +114,9 @@ class FormPreview(object):
                 return self.failed_hash(request) # Security hash failed.
             return self.done(request, f.clean_data)
         else:
-            return render_to_response(self.form_template, {'form': f, 'stage_field': self.unused_name('stage'), 'state': self.state})
+            return render_to_response(self.form_template,
+                {'form': f, 'stage_field': self.unused_name('stage'), 'state': self.state},
+                context_instance=RequestContext(request))
 
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE ########################
 
