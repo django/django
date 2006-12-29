@@ -28,11 +28,11 @@ class AdminApplistNode(template.Node):
                 model_list = []
                 for m in app_models:
                     if m._meta.admin:
-                        opts = m._meta
+                        # TODO: convert this to use Permission objects instead of strings
                         perms = {
-                            'add': has_permission(user, opts.get_add_permission()),
-                            'change': has_permission(user, opts.get_change_permission()),
-                            'delete': has_permission(user, opts.get_delete_permission()),
+                            'add': user.has_perm("%s.%s" % (app_label, m._meta.get_add_permission())),
+                            'change': user.has_perm("%s.%s" % (app_label, m._meta.get_change_permission())),
+                            'delete': user.has_perm("%s.%s" % (app_label, m._meta.get_delete_permission())),
                         }
 
                         # Check whether user has any perm for this module.

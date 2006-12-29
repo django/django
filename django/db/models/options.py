@@ -106,25 +106,43 @@ class Options(object):
         return 'ORDER BY ' + orderlist2sql(self.ordering, self, pre)
 
     def get_add_permission(self):
+        return 'add_%s' % self.object_name.lower()
+
+    def get_change_permission(self):
+        return 'change_%s' % self.object_name.lower()
+
+    def get_delete_permission(self):
+        return 'delete_%s' % self.object_name.lower()
+
+    def _get_add_permission(self):
+        # import goes here because models aren't necessarily set up when this 
+        # module is imported
         from django.contrib.auth.models import Permission
         codename = 'add_%s' % self.object_name.lower()
         return Permission.objects.get(
             content_type__app_label__exact=self.app_label,
             codename=codename)
+    add_permission = property(_get_add_permission)
 
-    def get_change_permission(self):
+    def _get_change_permission(self):
+        # import goes here because models aren't necessarily set up when this 
+        # module is imported
         from django.contrib.auth.models import Permission
         codename = 'change_%s' % self.object_name.lower()
         return Permission.objects.get(
             content_type__app_label__exact=self.app_label,
             codename=codename)
+    change_permission = property(_get_change_permission)
 
-    def get_delete_permission(self):
+    def _get_delete_permission(self):
+        # import goes here because models aren't necessarily set up when this 
+        # module is imported
         from django.contrib.auth.models import Permission
         codename = 'delete_%s' % self.object_name.lower()
         return Permission.objects.get(
             content_type__app_label__exact=self.app_label,
             codename=codename)
+    delete_permission = property(_get_delete_permission)
 
     def get_all_related_objects(self):
         try: # Try the cache first.

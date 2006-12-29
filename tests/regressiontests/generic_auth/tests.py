@@ -39,9 +39,9 @@ Create a Person that we'll check from access to.
 Get permissions from the model
 
 >>> opts = Person._meta
->>> add_permission = opts.get_add_permission()
->>> change_permission = opts.get_change_permission()
->>> delete_permission = opts.get_delete_permission()
+>>> add_permission = opts.add_permission
+>>> change_permission = opts.change_permission
+>>> delete_permission = opts.delete_permission
 
 
 Give the user add and change permissions for Person models.
@@ -111,9 +111,9 @@ created above.
 
 Set up some convenient references to the various permission objects.
 
->>> add_permission = Article._meta.get_add_permission()
->>> change_permission = Article._meta.get_change_permission()
->>> delete_permission = Article._meta.get_delete_permission()
+>>> add_permission = Article._meta.add_permission
+>>> change_permission = Article._meta.change_permission
+>>> delete_permission = Article._meta.delete_permission
 
 Adding isn't tied to a particular object, and we haven't given the user
 permission to add Articles yet, so this should fail.

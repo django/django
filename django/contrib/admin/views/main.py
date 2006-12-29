@@ -200,8 +200,8 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
     extra_context = {
         'add': add,
         'change': change,
-        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission().codename],
-        'has_change_permission': context['perms'][app_label][opts.get_change_permission().codename],
+        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
+        'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
@@ -230,7 +230,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
-    if not has_permission(request.user, opts.get_add_permission()):
+    if not has_permission(request.user, opts.add_permission):
         raise PermissionDenied
 
     manipulator = model.AddManipulator()
@@ -253,7 +253,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                 # We want to call has permission WITHOUT passing it the new
                 # object here. We're concerned with whether the user can edit
                 # ANY instances of this model, not just the one we created.
-                if has_permission(request.user, opts.get_change_permission()):
+                if has_permission(request.user, opts.change_permission):
                     # redirect to list view
                     post_url = '../'
                 else:
@@ -318,7 +318,7 @@ def change_stage(request, app_label, model_name, object_id):
     except model.DoesNotExist:
         raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
-    if not has_permission(request.user, opts.get_change_permission(), manipulator.original_object):
+    if not has_permission(request.user, opts.change_permission, manipulator.original_object):
         raise PermissionDenied
 
     if request.POST:
@@ -426,7 +426,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 pass
             else:
                 if related.opts.admin:
-                    if not has_permission(user, related.opts.get_delete_permission(), related):
+                    if not has_permission(user, related.opts.delete_permission, related):
                         perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
@@ -456,7 +456,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
             if related.opts.admin and has_related_objs:
-                if not has_permission(user, related.opts.get_delete_permission(), related):
+                if not has_permission(user, related.opts.delete_permission, related):
                     perms_needed.add(related.opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
@@ -484,7 +484,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
-            if not has_permission(user, related.opts.get_delete_permission(), related):
+            if not has_permission(user, related.opts.delete_permission, related):
                 perms_needed.add(related.opts.verbose_name)
 
 def delete_stage(request, app_label, model_name, object_id):
@@ -495,7 +495,7 @@ def delete_stage(request, app_label, model_name, object_id):
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
     obj = get_object_or_404(model, pk=object_id)
-    if not has_permission(request.user, opts.get_delete_permission(), obj):
+    if not has_permission(request.user, opts.delete_permission, obj):
         raise PermissionDenied
 
     # Populate deleted_objects, a data structure of all related objects that
@@ -749,7 +749,7 @@ def change_list(request, app_label, model_name):
     # There isn't a specific object to check here, so don't pass one to 
     # has_permission. There should be a has_permission implementation 
     # registered that knows when the obj arg is missing.
-    if not has_permission(request.user, model._meta.get_change_permission()):
+    if not has_permission(request.user, model._meta.change_permission):
         raise PermissionDenied
     try:
         cl = ChangeList(request, model)
