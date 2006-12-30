@@ -1,6 +1,7 @@
 from distutils.core import setup
 from distutils.command.install import INSTALL_SCHEMES
 import os
+import sys
 
 # Tell distutils to put the data_files in platform-specific installation
 # locations. See here for an explanation:
@@ -23,7 +24,13 @@ for dirpath, dirnames, filenames in os.walk(django_dir):
         package = dirpath[len_root_dir:].lstrip('/').replace('/', '.')
         packages.append(package)
     else:
-        data_files.append((dirpath, [os.path.join(dirpath, f) for f in filenames]))
+        data_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
+
+# Small hack for working with bdist_wininst.
+# See http://mail.python.org/pipermail/distutils-sig/2004-August/004134.html
+if sys.argv[1] == 'bdist_wininst':
+    for file_info in data_files:
+        file_info[0] = '/PURELIB/%s' % file_info[0]
 
 # Dynamically calculate the version based on django.VERSION.
 version = "%d.%d-%s" % (__import__('django').VERSION)
