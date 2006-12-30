@@ -72,6 +72,10 @@ The library deals with these concepts:
     * **Form** -- A collection of fields that knows how to validate itself and
       display itself as HTML.
 
+The library is decoupled from the other Django components, such as the database
+layer, views and templates. It relies only on Django settings, a couple of
+``django.utils`` helper functions and Django's internationalization system.
+
 Form objects
 ============
 
