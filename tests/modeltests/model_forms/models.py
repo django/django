@@ -1,7 +1,8 @@
 """
 34. Generating HTML forms from models
 
-Django provides shortcuts for creating Form objects from a model class.
+Django provides shortcuts for creating Form objects from a model class and a
+model instance.
 
 The function django.newforms.form_for_model() takes a model class and returns
 a Form that is tied to the model. This Form works just like any other Form,
@@ -9,6 +10,13 @@ with one additional method: create(). The create() method creates an instance
 of the model and returns that newly created instance. It saves the instance to
 the database if create(save=True), which is default. If you pass
 create(save=False), then you'll get the object without saving it.
+
+The function django.newforms.form_for_instance() takes a model instance and
+returns a Form that is tied to the instance. This form works just like any
+other Form, with one additional method: apply_changes(). The apply_changes()
+method updates the model instance. It saves the changes to the database if
+apply_changes(save=True), which is default. If you pass save=False, then you'll
+get the object without saving it.
 """
 
 from django.db import models
