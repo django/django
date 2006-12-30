@@ -726,6 +726,10 @@ class ManyToManyField(RelatedField, Field):
         return getattr(obj, self.attname).all()
 
     def formfield(self, initial=None):
+        # If initial is passed in, it's a list of related objects, but the
+        # MultipleChoiceField takes a list of IDs.
+        if initial is not None:
+            initial = [i._get_pk_val() for i in initial]
         return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
 class ManyToOneRel(object):
