@@ -2482,7 +2482,7 @@ demonstrate some of the library's abilities.
 # SelectDateWidget ############################################################
 
 >>> from django.newforms.extras import SelectDateWidget
->>> w = SelectDateWidget()
+>>> w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
 >>> print w.render('mydate', '')
 <select name="mydate_month">
 <option value="1">January</option>
@@ -2532,7 +2532,6 @@ demonstrate some of the library's abilities.
 <option value="31">31</option>
 </select>
 <select name="mydate_year">
-<option value="2006">2006</option>
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
@@ -2542,6 +2541,7 @@ demonstrate some of the library's abilities.
 <option value="2013">2013</option>
 <option value="2014">2014</option>
 <option value="2015">2015</option>
+<option value="2016">2016</option>
 </select>
 >>> w.render('mydate', None) == w.render('mydate', '')
 True
@@ -2594,7 +2594,6 @@ True
 <option value="31">31</option>
 </select>
 <select name="mydate_year">
-<option value="2006">2006</option>
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
@@ -2604,6 +2603,7 @@ True
 <option value="2013">2013</option>
 <option value="2014">2014</option>
 <option value="2015">2015</option>
+<option value="2016">2016</option>
 </select>
 
 """
