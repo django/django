@@ -157,13 +157,13 @@ ABSOLUTE_URL_OVERRIDES
 
 Default: ``{}`` (Empty dictionary)
 
-A dictionary mapping ``"app_label.module_name"`` strings to functions that take
+A dictionary mapping ``"app_label.model_name"`` strings to functions that take
 a model object and return its URL. This is a way of overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.blogs': lambda o: "/blogs/%s/" % o.slug,
-        'news.stories': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        'blogs.Weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.Story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
 ADMIN_FOR
