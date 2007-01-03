@@ -94,7 +94,7 @@ Django places only two restrictions on model field names:
        the way Django's query lookup syntax works. For example::
 
            class Example(models.Model):
-               foo__bar = models.IntegerField() 'foo__bar' has two underscores!
+               foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
 
 These limitations can be worked around, though, because your field name doesn't
 necessarily have to match your database column name. See `db_column`_ below.
