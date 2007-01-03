@@ -134,6 +134,16 @@ def get_query_set_class(DefaultQuerySet):
             if order_by:
                 sql.append("ORDER BY " + ", ".join(order_by))
 
+            # Look for column name collisions in the select elements
+            # and fix them with an AS alias.  This allows us to do a
+            # SELECT * later in the paging query.
+            cols = [clause.split('.')[-1] for clause in select]
+            for index, col in enumerate(cols):
+                if cols.count(col) > 1:
+                    col = '%s%d' % (col.replace('"', ''), index)
+                    cols[index] = col
+                    select[index] = '%s AS %s' % (select[index], col)
+
             # LIMIT and OFFSET clauses
             # To support limits and offsets, Oracle requires some funky rewriting of an otherwise normal looking query.
             select_clause = ",".join(select)
