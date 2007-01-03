@@ -121,36 +121,18 @@ objects, when you're confident you won't have primary-key collision.
 Saving changes to objects
 =========================
 
-``save()``
-----------
+To save changes to an object that's already in the database, use ``save()``.
 
-Use the ``save()`` method to save an object to the database after making
-changes to it::
+Given a ``Blog`` instance ``b5`` that has already been saved to the database,
+this example changes its name and updates its record in the database::
 
-    newblog.name = "Brave New World"
-    newblog.save()
+    b5.name = 'New name'
+    b5.save()
 
-This performs an ``UPDATE`` SQL statement behind the scenes (see the
-`How Django knows to UPDATE vs. INSERT`_ section below).  Django doesn't hit
+This performs an ``UPDATE`` SQL statement behind the scenes. Django doesn't hit
 the database until you explicitly call ``save()``.
 
 The ``save()`` method has no return value.
-
-``update(**kwargs)``
---------------------
-
-**New in Django development version**
-
-A convenience method for updating and saving an object all in one step, where
-(``**kwargs``) are the attributes to update.  Like ``save()``, the
-``update()`` method has no return value.
-
-Using ``update()``, the above code example could be rewritten as::
-
-    newblog.update(name="Brave New World")
-
-Since ``update()`` calls ``save()`` behind the scenes, Django will hit the
-database every time ``update()`` is called.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
@@ -799,54 +781,6 @@ to use ``get_or_create()`` in a view, please make sure to use it only in
 ``POST`` requests unless you have a good reason not to. ``GET`` requests
 shouldn't have any effect on data; use ``POST`` whenever a request to a page
 has a side effect on your data. For more, see `Safe methods`_ in the HTTP spec.
-
-.. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
-
-``update_or_create(**kwargs)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**New in Django development version**
-
-A convenience method for looking up an object with the given kwargs, and then
-either updating the values of the object if one is found or creating an
-object if one was not found.
-
-This method calls ``get_or_create()`` behind the scenes, and similarly
-returns a tuple of ``(object, created)``, where``object`` is the updated or
-created object and ``created`` is a boolean specifying whether a new object
-was created.
-
-This is meant as a shortcut to the following type of code::
-
-    obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
-                       defaults={'birthday': date(1940, 10, 9)})
-    if not created:
-	    obj.update('birthday'=date(1940, 10, 9))
-
-This pattern gets quite unwieldy as the number of fields in a model goes up.
-The above example can be rewritten using ``update_or_create()`` like so::
-
-    obj, created = Person.objects.update_or_create(first_name='John', last_name='Lennon',
-                       defaults={'birthday': date(1940, 10, 9)})
-
-Any keyword arguments passed to ``update_or_create()`` will be used in a
-call to ``get_or_create()``. If ``get_or_create()`` creates an object, then
-nothing needs to be done by ``update_or_create()`` and a tuple of the created
-object and ``True`` is returned. If, on the other hand, ``get_or_create()``
-does not create a new object, then ``update_or_create()`` will update the
-object with the values passed in the ``defaults`` parameter and a tuple of
-the updated object and ``True`` is returned.
-
-The ``defaults`` parameter should be a dict of attribute-value pairs that
-you want to update. If ``defaults`` is empty or not specified, then
-``update_or_create()`` will act exactly like ``get_or_create()`` since there
-would be nothing to update.
-
-As with ``get_or_create()``, if you need to use ``update_or_create()`` in a
-view, please make sure to use it only in ``POST`` requests unless you have a
-good reason not to. ``GET`` requests shouldn't have any effect on data; use
-``POST`` whenever a request to a page has a side effect on your data. For
-more, see `Safe methods`_ in the HTTP spec.
 
 .. _Safe methods: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.1.1
 
