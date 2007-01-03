@@ -924,12 +924,30 @@ Replaces ampersands with ``&amp;`` entities.
 floatformat
 ~~~~~~~~~~~
 
-Rounds a floating-point number to one decimal place -- but only if there's a
-decimal part to be displayed. For example:
+When used without an argument, rounds a floating-point number to one decimal
+place -- but only if there's a decimal part to be displayed. For example:
 
     * ``36.123`` gets converted to ``36.1``
     * ``36.15`` gets converted to ``36.2``
     * ``36`` gets converted to ``36``
+
+**New in Django development version**
+
+If used with a numeric integer argument, ``floatformat`` rounds a number to that 
+many decimal places.  For example:
+
+    * ``36.1234`` with floatformat:3 gets converted to ``36.123``
+    * ``36`` with floatformat:4 gets converted to ``36.0000``
+
+If the argument passed to ``floatformat`` is negative, it will round a number to
+that many decimal places -- but only if there's a decimal part to be displayed.
+For example:
+
+    * ``36.1234`` with floatformat:-3 gets converted to ``36.123``
+    * ``36`` with floatformat:-4 gets converted to ``36``
+
+Using ``floatformat`` with no argument is equivalent to using ``floatformat`` with 
+an argument of ``-1``.
 
 get_digit
 ~~~~~~~~~

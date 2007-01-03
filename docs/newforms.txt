@@ -72,6 +72,10 @@ The library deals with these concepts:
     * **Form** -- A collection of fields that knows how to validate itself and
       display itself as HTML.
 
+The library is decoupled from the other Django components, such as the database
+layer, views and templates. It relies only on Django settings, a couple of
+``django.utils`` helper functions and Django's internationalization system.
+
 Form objects
 ============
 
@@ -282,12 +286,41 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
-Using forms to validate data
-----------------------------
+More granular output
+~~~~~~~~~~~~~~~~~~~~
 
-In addition to HTML form display, a ``Form`` class is responsible for
-validating data.
+The ``as_p()``, ``as_ul()`` and ``as_table()`` methods are simply shortcuts for
+lazy developers -- they're not the only way a form object can be displayed.
 
+To display the HTML for a single field in your form, use dictionary lookup
+syntax using the field's name as the key, and print the resulting object::
+
+    >>> f = ContactForm()
+    >>> print f['subject']
+    <input id="id_subject" type="text" name="subject" maxlength="100" />
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
+    >>> print f['sender']
+    <input type="text" name="sender" id="id_sender" />
+    >>> print f['cc_myself']
+    <input type="checkbox" name="cc_myself" id="id_cc_myself" />
+
+Call ``str()`` or ``unicode()`` on the field to get its rendered HTML as a
+string or Unicode object, respectively::
+
+    >>> str(f['subject'])
+    '<input id="id_subject" type="text" name="subject" maxlength="100" />'
+    >>> unicode(f['subject'])
+    u'<input id="id_subject" type="text" name="subject" maxlength="100" />'
+
+The field-specific output honors the form object's ``auto_id`` setting::
+
+    >>> f = ContactForm(auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f = ContactForm(auto_id='id_%s')
+    >>> print f['message']
+    <input type="text" name="message" id="id_message" />
 
 More coming soon
 ================
@@ -296,6 +329,9 @@ That's all the documentation for now. For more, see the file
 http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/tests.py
 -- the unit tests for ``django.newforms``. This can give you a good idea of
 what's possible.
+
+If you're really itching to learn and use this library, please be patient.
+We're working hard on finishing both the code and documentation.
 
 Using forms with templates
 ==========================

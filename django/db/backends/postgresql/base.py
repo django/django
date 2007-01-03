@@ -43,7 +43,7 @@ class UnicodeCursorWrapper(object):
         return self.cursor.execute(sql, [smart_basestring(p, self.charset) for p in params])
 
     def executemany(self, sql, param_list):
-        new_param_list = [[smart_basestring(p, self.charset) for p in params] for params in param_list]
+        new_param_list = [tuple([smart_basestring(p, self.charset) for p in params]) for params in param_list]
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):

@@ -1,7 +1,8 @@
 """
 34. Generating HTML forms from models
 
-Django provides shortcuts for creating Form objects from a model class.
+Django provides shortcuts for creating Form objects from a model class and a
+model instance.
 
 The function django.newforms.form_for_model() takes a model class and returns
 a Form that is tied to the model. This Form works just like any other Form,
@@ -9,6 +10,13 @@ with one additional method: create(). The create() method creates an instance
 of the model and returns that newly created instance. It saves the instance to
 the database if create(save=True), which is default. If you pass
 create(save=False), then you'll get the object without saving it.
+
+The function django.newforms.form_for_instance() takes a model instance and
+returns a Form that is tied to the instance. This form works just like any
+other Form, with one additional method: apply_changes(). The apply_changes()
+method updates the model instance. It saves the changes to the database if
+apply_changes(save=True), which is default. If you pass save=False, then you'll
+get the object without saving it.
 """
 
 from django.db import models
@@ -28,7 +36,7 @@ class Writer(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
-    pub_date = models.DateTimeField()
+    pub_date = models.DateField()
     writer = models.ForeignKey(Writer)
     categories = models.ManyToManyField(Category, blank=True)
 
@@ -80,6 +88,8 @@ __test__ = {'API_TESTS': """
 >>> Category.objects.all()
 [<Category: Entertainment>, <Category: It's a test>]
 
+If you call create() with save=False, then it will return an object that hasn't
+yet been saved. In this case, it's up to you to save it.
 >>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
 >>> f.errors
 {}
@@ -94,6 +104,7 @@ __test__ = {'API_TESTS': """
 >>> Category.objects.all()
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
+If you call create() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
 >>> f.errors
 {'name': [u'This field is required.']}
@@ -102,7 +113,6 @@ __test__ = {'API_TESTS': """
 Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
-
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
 >>> f.create()
 Traceback (most recent call last):
@@ -181,4 +191,27 @@ True
 >>> new_art = Article.objects.get(id=1)
 >>> new_art.headline
 'New headline'
+
+Add some categories and test the many-to-many form output.
+>>> new_art.categories.all()
+[]
+>>> new_art.categories.add(Category.objects.get(name='Entertainment'))
+>>> new_art.categories.all()
+[<Category: Entertainment>]
+>>> TestArticleForm = form_for_instance(new_art)
+>>> f = TestArticleForm(auto_id=False)
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
+<li>Writer: <select name="writer">
+<option value="">---------</option>
+<option value="1" selected="selected">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+</select></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="1" selected="selected">Entertainment</option>
+<option value="2">It&#39;s a test</option>
+<option value="3">Third test</option>
+</select></li>
+
 """}

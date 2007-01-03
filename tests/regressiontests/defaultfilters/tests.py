@@ -11,6 +11,26 @@ r"""
 '0.0'
 >>> floatformat(0.0)
 '0'
+>>> floatformat(7.7,3)
+'7.700'
+>>> floatformat(6.000000,3)
+'6.000'
+>>> floatformat(13.1031,-3)
+'13.103'
+>>> floatformat(11.1197, -2)
+'11.12'
+>>> floatformat(11.0000, -2)
+'11'
+>>> floatformat(11.000001, -2)
+'11.00'
+>>> floatformat(8.2798, 3)
+'8.280'
+>>> floatformat('foo')
+''
+>>> floatformat(13.1031, 'bar')
+'13.1031'
+>>> floatformat('foo', 'bar')
+''
 
 >>> addslashes('"double quotes" and \'single quotes\'')
 '\\"double quotes\\" and \\\'single quotes\\\''

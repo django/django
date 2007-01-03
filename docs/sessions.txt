@@ -217,6 +217,23 @@ browser-length cookies -- cookies that expire as soon as the user closes his or
 her browser. Use this if you want people to have to log in every time they open
 a browser.
 
+Clearing the session table
+==========================
+
+Note that session data can accumulate in the ``django_session`` database table
+and Django does *not* provide automatic purging. Therefore, it's your job to
+purge expired sessions on a regular basis.
+
+To understand this problem, consider what happens when a user uses a session.
+When a user logs in, Django adds a row to the ``django_session`` database
+table. Django updates this row each time the session data changes. If the user
+logs out manually, Django deletes the row. But if the user does *not* log out,
+the row never gets deleted.
+
+Django provides a sample clean-up script in ``django/bin/daily_cleanup.py``.
+That script deletes any session in the session table whose ``expire_date`` is
+in the past -- but your application may have different requirements.
+
 Settings
 ========
 
