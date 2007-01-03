@@ -106,9 +106,10 @@ django.middleware.http.SetRemoteAddrFromForwardedFor
 
 **New in Django development version**
 
-Sets ``request['REMOTE_ADDR']`` based on ``request.['HTTP_X_FORWARDED_FOR']``,
-if the latter is set. This is useful if you're sitting behind a reverse proxy
-that causes each request's ``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+Sets ``request.META['REMOTE_ADDR']`` based on
+``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
+if you're sitting behind a reverse proxy that causes each request's
+``REMOTE_ADDR`` to be set to ``127.0.0.1``.
 
 **Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
 not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
