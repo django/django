@@ -27,20 +27,38 @@ def fix_ampersands(value):
     from django.utils.html import fix_ampersands
     return fix_ampersands(value)
 
-def floatformat(text):
+def floatformat(text, arg=-1):
     """
-    Displays a floating point number as 34.2 (with one decimal place) -- but
-    only if there's a point to be displayed
+    If called without an argument, displays a floating point
+    number as 34.2 -- but only if there's a point to be displayed.
+    With a positive numeric argument, it displays that many decimal places
+    always.
+    With a negative numeric argument, it will display that many decimal
+    places -- but only if there's places to be displayed.
+    Examples:
+        num1 = 34.23234
+        num2 = 34.00000
+        num1|floatformat results in 34.2
+        num2|floatformat is 34
+        num1|floatformat:3 is 34.232
+        num2|floatformat:3 is 34.000
+        num1|floatformat:-3 is 34.232
+        num2|floatformat:-3 is 34
     """
     try:
         f = float(text)
     except ValueError:
         return ''
+    try:
+        d = int(arg)
+    except ValueError:
+        return str(f)
     m = f - int(f)
-    if m:
-        return '%.1f' % f
-    else:
+    if not m and d < 0:
         return '%d' % int(f)
+    else:
+        formatstr = '%%.%df' % abs(d)
+        return formatstr % f
 
 def linenumbers(value):
     "Displays text with line numbers"
