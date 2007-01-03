@@ -4,20 +4,29 @@
 
 from django.template import loader
 from django.http import HttpResponse, Http404
-
+from django.db.models.manager import Manager
 
 def render_to_response(*args, **kwargs):
     return HttpResponse(loader.render_to_string(*args, **kwargs))
 load_and_render = render_to_response # For backwards compatibility.
 
 def get_object_or_404(klass, *args, **kwargs):
+    if isinstance(klass, Manager):
+        manager = klass
+        klass = manager.model
+    else:
+        manager = klass._default_manager
     try:
-        return klass._default_manager.get(*args, **kwargs)
+        return manager.get(*args, **kwargs)
     except klass.DoesNotExist:
         raise Http404
 
 def get_list_or_404(klass, *args, **kwargs):
-    obj_list = list(klass._default_manager.filter(*args, **kwargs))
+    if isinstance(klass, Manager):
+        manager = klass
+    else:
+        manager = klass._default_manager
+    obj_list = list(manager.filter(*args, **kwargs))
     if not obj_list:
         raise Http404
     return obj_list

@@ -300,7 +300,7 @@ rewritten::
 
 The ``get_object_or_404()`` function takes a Django model module as its first
 argument and an arbitrary number of keyword arguments, which it passes to the
-module's ``get_object()`` function. It raises ``Http404`` if the object doesn't
+module's ``get()`` function. It raises ``Http404`` if the object doesn't
 exist.
 
 .. admonition:: Philosophy

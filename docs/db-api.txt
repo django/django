@@ -1704,6 +1704,46 @@ For every ``ImageField``, the object will have ``get_FOO_height()`` and
 ``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
 returns the height (or width) of the image, as an integer, in pixels.
 
+Shortcuts
+=========
+
+As you develop views, you will discover a number of common idioms in the
+way you use the database API. Django encodes some of these idioms as
+shortcuts that can be used to simplify the process of writing views.
+
+get_object_or_404()
+-------------------
+
+One common idiom to use ``get()`` and raise ``Http404`` if the
+object doesn't exist. This idiom is captured by ``get_object_or_404()``. 
+This function takes a Django model as its first argument and an 
+arbitrary number of keyword arguments, which it passes to the manager's 
+``get()`` function. It raises ``Http404`` if the object doesn't
+exist. For example:: 
+    
+    # Get the Entry with a primary key of 3
+    e = get_object_or_404(Entry, pk=3)
+
+When you provide a model to this shortcut function, the default manager 
+is used to execute the underlying ``get()`` query. If you don't want to 
+use the default manager, or you want to search a list of related objects, 
+you can provide ``get_object_or_404()`` with a manager object, instead. 
+For example::
+
+    # Get the author of blog instance `e` with a name of 'Fred'
+    a = get_object_or_404(e.authors, name='Fred')
+
+    # Use a custom manager 'recent_entries' in the search for an
+    # entry with a primary key of 3
+    e = get_object_or_404(Entry.recent_entries, pk=3)
+
+get_list_or_404()
+-----------------
+
+``get_list_or_404`` behaves the same was as ``get_object_or_404()`` 
+-- except the it uses using ``filter()`` instead of ``get()``. It raises 
+``Http404`` if the list is empty.
+
 Falling back to raw SQL
 =======================
 
