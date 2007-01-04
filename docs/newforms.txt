@@ -74,7 +74,9 @@ The library deals with these concepts:
 
 The library is decoupled from the other Django components, such as the database
 layer, views and templates. It relies only on Django settings, a couple of
-``django.utils`` helper functions and Django's internationalization system.
+``django.utils`` helper functions and Django's internationalization hooks (but
+you're not required to be using internationalization features to use this
+library).
 
 Form objects
 ============
@@ -321,6 +323,50 @@ The field-specific output honors the form object's ``auto_id`` setting::
     >>> f = ContactForm(auto_id='id_%s')
     >>> print f['message']
     <input type="text" name="message" id="id_message" />
+
+Using forms to validate data
+----------------------------
+
+In addition to HTML form display, a ``Form`` class is responsible for
+validating data. To validate data, pass it as a dictionary as the first
+parameter to your ``Form`` class' constructor::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+
+From then on, the ``Form`` instance is bound to that data. If you want to
+change the data somehow, or validate other data, create another ``Form``
+instance.
+
+Once you have a ``Form`` instance that's bound to data, call the ``is_valid()``
+method to run validation and return a boolean designating whether the data was
+valid::
+
+    >>> f.is_valid()
+    True
+
+Let's try with some invalid data::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+
+Access the ``Form`` attribute ``errors`` to get a dictionary of error messages,
+keyed by the field name::
+
+    >>> f.errors
+    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
+
+You can access ``errors`` without having to call ``is_valid()`` first. The
+form's data will be validated the first time either you call ``is_valid()`` or
+access ``errors``.
 
 More coming soon
 ================
