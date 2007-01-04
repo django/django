@@ -1544,6 +1544,10 @@ Empty dictionaries are valid, too.
 {'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
 >>> p.is_valid()
 False
+>>> p.clean_data
+Traceback (most recent call last):
+...
+AttributeError: 'birthday' object has no attribute 'clean_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1572,6 +1576,10 @@ Form.is_valid() will return False.
 {}
 >>> p.is_valid()
 False
+>>> p.clean_data
+Traceback (most recent call last):
+...
+AttributeError: 'birthday' object has no attribute 'clean_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1611,8 +1619,9 @@ u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is re
 * birthday
   * This field is required.
 >>> p.clean_data
->>> repr(p.clean_data)
-'None'
+Traceback (most recent call last):
+...
+AttributeError: 'birthday' object has no attribute 'clean_data'
 >>> p['first_name'].errors
 [u'This field is required.']
 >>> p['first_name'].errors.as_ul()

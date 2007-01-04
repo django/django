@@ -44,7 +44,6 @@ class BaseForm(StrAndUnicode):
         self.data = data or {}
         self.auto_id = auto_id
         self.prefix = prefix
-        self.clean_data = None # Stores the data after clean() has been called.
         self.__errors = None # Stores the errors after clean() has been called.
 
     def __unicode__(self):
@@ -137,11 +136,11 @@ class BaseForm(StrAndUnicode):
         """
         Cleans all of self.data and populates self.__errors and self.clean_data.
         """
-        self.clean_data = {}
         errors = ErrorDict()
         if self.ignore_errors: # Stop further processing.
             self.__errors = errors
             return
+        self.clean_data = {}
         for name, field in self.fields.items():
             # value_from_datadict() gets the data from the dictionary.
             # Each widget type knows how to retrieve its own data, because some
@@ -160,7 +159,7 @@ class BaseForm(StrAndUnicode):
         except ValidationError, e:
             errors[NON_FIELD_ERRORS] = e.messages
         if errors:
-            self.clean_data = None
+            delattr(self, 'clean_data')
         self.__errors = errors
 
     def clean(self):
