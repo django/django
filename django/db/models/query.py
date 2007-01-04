@@ -641,7 +641,15 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     except KeyError:
         pass
     if lookup_type == 'in':
-        return '%s%s IN (%s)' % (table_prefix, field_name, ','.join(['%s' for v in value]))
+        in_string = ','.join(['%s' for id in value])
+        if in_string:
+            return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
+        else:
+            # Most backends do not accept an empty string inside the IN
+            # expression, i.e. cannot do "WHERE ... IN ()".  Since there are
+            # also some backends that do not accept "WHERE false", we instead
+            # use an expression that always evaluates to False.
+            return '0=1'
     elif lookup_type == 'range':
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('year', 'month', 'day'):
