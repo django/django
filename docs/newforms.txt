@@ -2,9 +2,9 @@
 The newforms library
 ====================
 
-``django.newforms`` is a new replacement for ``django.forms``, the old Django
-form/manipulator/validation framework. This document explains how to use this
-new form library.
+``django.newforms`` is Django's fantastic new form-handling library. It's a
+replacement for ``django.forms``, the old form/manipulator/validation
+framework. This document explains how to use this new library.
 
 Migration plan
 ==============
@@ -103,10 +103,10 @@ fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. We'll explain
 the different types of fields -- e.g., ``CharField`` and ``EmailField`` --
 shortly.
 
-Creating form instances
------------------------
+Creating ``Form`` instances
+---------------------------
 
-A form instance is either **bound** or **unbound** to a set of data.
+A ``Form`` instance is either **bound** or **unbound** to a set of data.
 
     * If it's **bound** to a set of data, it's capable of validating that data
       and rendering the form as HTML with the data displayed in the HTML.
@@ -114,7 +114,7 @@ A form instance is either **bound** or **unbound** to a set of data.
     * If it's **unbound**, it cannot do validation (because there's no data to
       validate!), but it can still render the blank form as HTML.
 
-To create an unbound form instance, simply instantiate the class::
+To create an unbound ``Form`` instance, simply instantiate the class::
 
     >>> f = ContactForm()
 
@@ -155,11 +155,122 @@ if you want to bind an unbound ``Form`` instance to some data, create another
 a ``Form`` instance has been created, you should consider its data immutable,
 whether it has data or not.
 
+Using forms to validate data
+----------------------------
+
+The primary task of a ``Form`` object is to validate data. With a bound
+``Form`` instance, call the ``is_valid()`` method to run validation and return
+a boolean designating whether the data was valid::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+
+Let's try with some invalid data. In this case, ``subject`` is blank (an error,
+because all fields are required by default) and ``sender`` is not a valid
+e-mail address::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+
+Access the ``Form`` attribute ``errors`` to get a dictionary of error messages::
+
+    >>> f.errors
+    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
+
+In this dictionary, the keys are the field names, and the values are lists of
+Unicode strings representing the error messages. The error messages are stored
+in lists because a field can have multiple error messages.
+
+You can access ``errors`` without having to call ``is_valid()`` first. The
+form's data will be validated the first time either you call ``is_valid()`` or
+access ``errors``.
+
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's meaningless to validate a form with no data, but, for the record, here's
+what happens with unbound forms::
+
+    >>> f = ContactForm()
+    >>> f.is_valid()
+    False
+    >>> f.errors
+    {}
+
+Accessing "clean" data
+----------------------
+
+Each ``Field`` in a ``Form`` class is responsible not only for validating data,
+but also for "cleaning" it -- normalizing it to a consistent format. This is a
+nice feature, because it allows data for a particular field to be input in
+a variety of ways, always resulting in consistent output.
+
+For example, ``DateField`` normalizes input into a Python ``datetime.date``
+object. Regardless of whether you pass it a string in the format
+``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
+``DateField`` will always normalize it to a ``datetime.date`` object as long as
+it's valid.
+
+Once you've created a ``Form`` instance with a set of data and validated it,
+you can access the clean data via the ``clean_data`` attribute of the ``Form``
+object::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
+always cleans the input into a Unicode string. We'll cover the encoding
+implications later in this document.
+
+If your data does *not* validate, your ``Form`` instance will not have a
+``clean_data`` attribute::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's meaningless to request "clean" data in a form with no data, but, for the
+record, here's what happens with unbound forms::
+
+    >>> f = ContactForm()
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+
 Outputting forms as HTML
 ------------------------
 
-The first thing we can do with a form is output it as HTML. To do so, instantiate
-it and ``print`` it.
+The second task of a ``Form`` object is to render itself as HTML. To do so,
+simply ``print`` it::
 
     >>> f = ContactForm()
     >>> print f
@@ -357,6 +468,37 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
+How errors are displayed
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you render a bound ``Form`` object, the act of rendering will automatically
+run the form's validation if it hasn't already happened, and the HTML output
+will include the validation errors as a ``<ul>`` near the field. The particular
+positioning of the error messages depends on the output method you're using::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f.as_table()
+    <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" /></td></tr>
+    <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul><input type="text" name="sender" value="invalid e-mail address" /></td></tr>
+    <tr><th>Cc myself:</th><td><input checked="checked" type="checkbox" name="cc_myself" /></td></tr>
+    >>> print f.as_ul()
+    <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" value="Hi there" /></li>
+    <li><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul>Sender: <input type="text" name="sender" value="invalid e-mail address" /></li>
+    <li>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></li>
+    >>> print f.as_p()
+    <p><ul class="errorlist"><li>This field is required.</li></ul></p>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
 More granular output
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -393,116 +535,186 @@ The field-specific output honors the form object's ``auto_id`` setting::
     >>> print f['message']
     <input type="text" name="message" id="id_message" />
 
-Using forms to validate data
-----------------------------
+For a field's list of errors, access the field's ``errors`` attribute. This
+is a list-like object that is displayed as an HTML ``<ul>`` when printed::
 
-In addition to HTML form display, a ``Form`` class is responsible for
-validating data. With a bound ``Form`` instance, call the ``is_valid()``
-method to run validation and return a boolean designating whether the data was
-valid::
+    >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+    >>> f = ContactForm(data, auto_id=False)
+    >>> print f['message']
+    <input type="text" name="message" />
+    >>> f['message'].errors
+    [u'This field is required.']
+    >>> print f['message'].errors
+    <ul class="errorlist"><li>This field is required.</li></ul>
+    >>> f['subject'].errors
+    []
+    >>> print f['subject'].errors
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
-    >>> f = ContactForm(data)
-    >>> f.is_valid()
-    True
+    >>> str(f['subject'].errors)
+    ''
 
-Let's try with some invalid data. In this case, ``subject`` is blank (an error,
-because all fields are required by default) and ``sender`` is not a valid
-e-mail address::
+Fields
+======
 
-    >>> data = {'subject': '',
-    ...         'message': 'Hi there',
-    ...         'sender': 'invalid e-mail address',
-    ...         'cc_myself': True}
-    >>> f = ContactForm(data)
-    >>> f.is_valid()
-    False
+When you create a ``Form`` class, the most important part is defining the
+fields of the form. Each field has custom validation logic, along with a few
+other hooks.
 
-Access the ``Form`` attribute ``errors`` to get a dictionary of error messages::
+Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
+you can also instantiate them and use them directly to get a better idea of
+how they work. Each ``Field`` instance has a ``clean()`` method, which takes
+a single argument and either raises a ``django.newforms.ValidationError``
+exception or returns the clean value::
 
-    >>> f.errors
-    {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
-
-In this dictionary, the keys are the field names, and the values are lists of
-Unicode strings representing the error messages.
-
-You can access ``errors`` without having to call ``is_valid()`` first. The
-form's data will be validated the first time either you call ``is_valid()`` or
-access ``errors``.
-
-Behavior of unbound forms
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-It's meaningless to validate a form with no data, but, for the record, here's
-what happens with unbound forms::
-
-    >>> f = ContactForm()
-    >>> f.is_valid()
-    False
-    >>> f.errors
-    {}
-
-Accessing "clean" data
-----------------------
-
-Each ``Field`` in a ``Form`` class is responsible not only for validating data,
-but also for "cleaning" it -- normalizing it to a consistent format. This is a
-nice feature, because it allows data for a particular field to be input in
-a variety of ways, always resulting in consistent output.
-
-For example, ``DateField`` normalizes input into a Python ``datetime.date``
-object. Regardless of whether you pass it a string in the format
-``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
-``DateField`` will always normalize it to a ``datetime.date`` object as long as
-it's valid.
-
-Once you've created a ``Form`` instance with a set of data and validated it,
-you can access the clean data via the ``clean_data`` attribute of the ``Form``
-object::
-
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
-    >>> f = ContactForm(data)
-    >>> f.is_valid()
-    True
-    >>> f.clean_data
-    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
-
-Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
-always cleans the input into a Unicode string. We'll cover the encoding
-implications later in this document.
-
-If your data does *not* validate, your ``Form`` instance will not have a
-``clean_data`` attribute::
-
-    >>> data = {'subject': '',
-    ...         'message': 'Hi there',
-    ...         'sender': 'invalid e-mail address',
-    ...         'cc_myself': True}
-    >>> f = ContactForm(data)
-    >>> f.is_valid()
-    False
-    >>> f.clean_data
+    >>> f = forms.EmailField()
+    >>> f.clean('foo@example.com')
+    u'foo@example.com'
+    >>> f.clean(u'foo@example.com')
+    u'foo@example.com'
+    >>> f.clean('invalid e-mail address')
     Traceback (most recent call last):
     ...
-    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+    ValidationError: [u'Enter a valid e-mail address.']
 
-Behavior of unbound forms
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Core field arguments
+--------------------
 
-It's meaningless to request "clean" data in a form with no data, but, for the
-record, here's what happens with unbound forms::
+Each ``Field`` class constructor takes at least these arguments. Some
+``Field`` classes take additional, field-specific arguments, but the following
+should *always* be available:
 
-    >>> f = ContactForm()
-    >>> f.clean_data
+``required``
+~~~~~~~~~~~~
+
+By default, each ``Field`` class assumes the value is required, so if you pass
+an empty value -- either ``None`` or the empty string (``""``) -- then
+``clean()`` will raise a ``ValidationError`` exception::
+
+    >>> f = forms.CharField()
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
     Traceback (most recent call last):
     ...
-    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+    ValidationError: [u'This field is required.']
+    >>> f.clean(None)
+    Traceback (most recent call last):
+    ...
+    ValidationError: [u'This field is required.']
+    >>> f.clean(' ')
+    u' '
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+To specify that a field is *not* required, pass ``required=False`` to the
+``Field`` constructor::
+
+    >>> f = forms.CharField(required=False)
+    >>> f.clean('foo')
+    u'foo'
+    >>> f.clean('')
+    u''
+    >>> f.clean(None)
+    u''
+    >>> f.clean(0)
+    u'0'
+    >>> f.clean(True)
+    u'True'
+    >>> f.clean(False)
+    u'False'
+
+If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
+then ``clean()`` will return a *normalized* empty value rather than raising
+``ValidationError``. For ``CharField``, this will be a Unicode empty string.
+For other ``Field`` classes, it might be ``None``. (This varies from field to
+field.)
+
+``label``
+~~~~~~~~~
+
+The ``label`` argument lets you specify the "human-friendly" label for this
+field. This is used when the ``Field`` is displayed in a ``Form``.
+
+As explained in _`Outputting forms as HTML` above, the default label for a
+``Field`` is generated from the field name by converting all underscores to
+spaces and upper-casing the first letter. Specify ``label`` if that default
+behavior doesn't result in an adequate label.
+
+Here's a full example ``Form`` that implements ``label`` for two of its fields.
+We've specified ``auto_id=False`` to simplify the output::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(label='Your name')
+    ...     url = forms.URLField(label='Your Web site', required=False)
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Your Web site:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+``initial``
+~~~~~~~
+
+The ``initial`` argument lets you specify the initial value to use when
+rendering this ``Field`` in an unbound ``Form``.
+
+The use-case for this is when you want to display an "empty" form in which a
+field is initialized to a particular value. For example::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+You may be thinking, why not just pass a dictionary of the initial values as
+data when displaying the form? Well, if you do that, you'll trigger validation,
+and the HTML output will include any validation errors::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> default_data = {'name': 'Your name', 'url': 'http://'}
+    >>> f = CommentForm(default_data, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" /></td></tr>
+    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="text" name="url" value="http://" /></td></tr>
+    <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" /></td></tr>
+
+This is why ``initial`` values are only displayed for unbound forms. For bound
+forms, the HTML output will use the bound data.
+
+Also note that ``initial`` values are *not* used as "fallback" data in
+validation if a particular field's value is not given. ``initial`` values are
+*only* intended for initial form display::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='Your name')
+    ...     url = forms.URLField(initial='http://')
+    ...     comment = forms.CharField()
+    >>> data = {'name': '', 'url': '', 'comment': 'Foo'}
+    >>> f = CommentForm(data)
+    >>> f.is_valid()
+    False
+    # The form does *not* fall back to using the initial values.
+    >>> f.errors
+    {'url': [u'This field is required.'], 'name': [u'This field is required.']}
+
+``widget``
+~~~~~~~~~~
+
+The ``widget`` argument lets you specify a ``Widget`` class to use when
+rendering this ``Field``. See _`Widgets` below for more information.
 
 More coming soon
 ================
@@ -514,3 +726,6 @@ what's possible.
 
 If you're really itching to learn and use this library, please be patient.
 We're working hard on finishing both the code and documentation.
+
+Widgets
+=======
