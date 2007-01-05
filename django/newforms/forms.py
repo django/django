@@ -40,7 +40,7 @@ class BaseForm(StrAndUnicode):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, auto_id='id_%s', prefix=None):
-        self.ignore_errors = data is None
+        self.is_bound = data is not None
         self.data = data or {}
         self.auto_id = auto_id
         self.prefix = prefix
@@ -73,7 +73,7 @@ class BaseForm(StrAndUnicode):
         Returns True if the form has no errors. Otherwise, False. If errors are
         being ignored, returns False.
         """
-        return not self.ignore_errors and not bool(self.errors)
+        return self.is_bound and not bool(self.errors)
 
     def add_prefix(self, field_name):
         """
@@ -137,7 +137,7 @@ class BaseForm(StrAndUnicode):
         Cleans all of self.data and populates self.__errors and self.clean_data.
         """
         errors = ErrorDict()
-        if self.ignore_errors: # Stop further processing.
+        if not self.is_bound: # Stop further processing.
             self.__errors = errors
             return
         self.clean_data = {}
@@ -217,7 +217,7 @@ class BoundField(StrAndUnicode):
         auto_id = self.auto_id
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
-        if self.form.ignore_errors:
+        if not self.form.is_bound:
             data = self.field.initial
         else:
             data = self.data

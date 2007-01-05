@@ -1502,6 +1502,8 @@ You can pass it data in __init__(), as a dictionary.
 
 Pass a dictionary to a Form's __init__().
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
+>>> p.is_bound
+True
 >>> p.errors
 {}
 >>> p.is_valid()
@@ -1540,6 +1542,8 @@ Birthday 1940-10-9
 
 Empty dictionaries are valid, too.
 >>> p = Person({})
+>>> p.is_bound
+True
 >>> p.errors
 {'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
 >>> p.is_valid()
@@ -1569,9 +1573,11 @@ AttributeError: 'birthday' object has no attribute 'clean_data'
 <p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>
 
 If you don't pass any values to the Form's __init__(), or if you pass None,
-the Form won't do any validation. Form.errors will be an empty dictionary *but*
-Form.is_valid() will return False.
+the Form will be considered unbound and won't do any validation. Form.errors
+will be an empty dictionary *but* Form.is_valid() will return False.
 >>> p = Person()
+>>> p.is_bound
+False
 >>> p.errors
 {}
 >>> p.is_valid()
