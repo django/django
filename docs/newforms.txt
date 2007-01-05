@@ -103,11 +103,63 @@ fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. We'll explain
 the different types of fields -- e.g., ``CharField`` and ``EmailField`` --
 shortly.
 
+Creating form instances
+-----------------------
+
+A form instance is either **bound** or **unbound** to a set of data.
+
+    * If it's **bound** to a set of data, it's capable of validating that data
+      and rendering the form as HTML with the data displayed in the HTML.
+
+    * If it's **unbound**, it cannot do validation (because there's no data to
+      validate!), but it can still render the blank form as HTML.
+
+To create an unbound form instance, simply instantiate the class::
+
+    >>> f = ContactForm()
+
+To bind data to a form, pass the data as a dictionary as the first parameter to
+your ``Form`` class constructor::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+
+In this dictionary, the keys are the field names, which correspond to the
+attributes in your ``Form`` class. The values are the data you're trying
+to validate. These will usually be strings, but there's no requirement that
+they be strings; the type of data you pass depends on the ``Field``, as we'll
+see in a moment.
+
+If you need to distinguish between bound and unbound form instances at runtime,
+check the value of the form's ``is_bound`` attribute::
+
+    >>> f = ContactForm()
+    >>> f.is_bound
+    False
+    >>> f = ContactForm({'subject': 'hello'})
+    >>> f.is_bound
+    True
+
+Note that passing an empty dictionary creates a *bound* form with empty data::
+
+    >>> f = ContactForm({})
+    >>> f.is_bound
+    True
+
+If you have a bound ``Form`` instance and want to change the data somehow, or
+if you want to bind an unbound ``Form`` instance to some data, create another
+``Form`` instance. There is no way to change data in a ``Form`` instance. Once
+a ``Form`` instance has been created, you should consider its data immutable,
+whether it has data or not.
+
 Outputting forms as HTML
 ------------------------
 
-The first thing we can do with this is output it as HTML. To do so, instantiate
-it and ``print`` it::
+The first thing we can do with a form is output it as HTML. To do so, instantiate
+it and ``print`` it.
 
     >>> f = ContactForm()
     >>> print f
@@ -115,6 +167,23 @@ it and ``print`` it::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+If the form is bound to data, the HTML output will include that data
+appropriately. For example, if a field is represented by an
+``<input type="text">``, the data will be in the ``value`` attribute. If a
+field is represented by an ``<input type="checkbox">``, then that HTML will
+include ``checked="checked"`` if appropriate::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> print f
+    <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" /></td></tr>
+    <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" value="Hi there" /></td></tr>
+    <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" value="foo@example.com" /></td></tr>
+    <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" checked="checked" /></td></tr>
 
 This default output is a two-column HTML table, with a ``<tr>`` for each field.
 Notice the following:
@@ -328,27 +397,21 @@ Using forms to validate data
 ----------------------------
 
 In addition to HTML form display, a ``Form`` class is responsible for
-validating data. To validate data, pass it as a dictionary as the first
-parameter to your ``Form`` class' constructor::
+validating data. With a bound ``Form`` instance, call the ``is_valid()``
+method to run validation and return a boolean designating whether the data was
+valid::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
     ...         'cc_myself': True}
     >>> f = ContactForm(data)
-
-From then on, the ``Form`` instance is bound to that data. If you want to
-change the data somehow, or validate other data, create another ``Form``
-instance.
-
-Once you have a ``Form`` instance that's bound to data, call the ``is_valid()``
-method to run validation and return a boolean designating whether the data was
-valid::
-
     >>> f.is_valid()
     True
 
-Let's try with some invalid data::
+Let's try with some invalid data. In this case, ``subject`` is blank (an error,
+because all fields are required by default) and ``sender`` is not a valid
+e-mail address::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -358,15 +421,88 @@ Let's try with some invalid data::
     >>> f.is_valid()
     False
 
-Access the ``Form`` attribute ``errors`` to get a dictionary of error messages,
-keyed by the field name::
+Access the ``Form`` attribute ``errors`` to get a dictionary of error messages::
 
     >>> f.errors
     {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
 
+In this dictionary, the keys are the field names, and the values are lists of
+Unicode strings representing the error messages.
+
 You can access ``errors`` without having to call ``is_valid()`` first. The
 form's data will be validated the first time either you call ``is_valid()`` or
 access ``errors``.
+
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's meaningless to validate a form with no data, but, for the record, here's
+what happens with unbound forms::
+
+    >>> f = ContactForm()
+    >>> f.is_valid()
+    False
+    >>> f.errors
+    {}
+
+Accessing "clean" data
+----------------------
+
+Each ``Field`` in a ``Form`` class is responsible not only for validating data,
+but also for "cleaning" it -- normalizing it to a consistent format. This is a
+nice feature, because it allows data for a particular field to be input in
+a variety of ways, always resulting in consistent output.
+
+For example, ``DateField`` normalizes input into a Python ``datetime.date``
+object. Regardless of whether you pass it a string in the format
+``'1994-07-15'``, a ``datetime.date`` object or a number of other formats,
+``DateField`` will always normalize it to a ``datetime.date`` object as long as
+it's valid.
+
+Once you've created a ``Form`` instance with a set of data and validated it,
+you can access the clean data via the ``clean_data`` attribute of the ``Form``
+object::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
+always cleans the input into a Unicode string. We'll cover the encoding
+implications later in this document.
+
+If your data does *not* validate, your ``Form`` instance will not have a
+``clean_data`` attribute::
+
+    >>> data = {'subject': '',
+    ...         'message': 'Hi there',
+    ...         'sender': 'invalid e-mail address',
+    ...         'cc_myself': True}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    False
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+
+Behavior of unbound forms
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It's meaningless to request "clean" data in a form with no data, but, for the
+record, here's what happens with unbound forms::
+
+    >>> f = ContactForm()
+    >>> f.clean_data
+    Traceback (most recent call last):
+    ...
+    AttributeError: 'ContactForm' object has no attribute 'clean_data'
 
 More coming soon
 ================
@@ -378,9 +514,3 @@ what's possible.
 
 If you're really itching to learn and use this library, please be patient.
 We're working hard on finishing both the code and documentation.
-
-Using forms with templates
-==========================
-
-Using forms in views
-====================
