@@ -658,7 +658,7 @@ We've specified ``auto_id=False`` to simplify the output::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``initial``
-~~~~~~~
+~~~~~~~~~~~
 
 The ``initial`` argument lets you specify the initial value to use when
 rendering this ``Field`` in an unbound ``Form``.
