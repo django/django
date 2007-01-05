@@ -85,8 +85,8 @@ The primary way of using the ``newforms`` library is to create a form object.
 Do this by subclassing ``django.newforms.Form`` and specifying the form's
 fields, in a declarative style that you'll be familiar with if you've used
 Django database models. In this section, we'll iteratively develop a form
-object that you might to implement "contact me" functionality on your personal
-Web site.
+object that you might use to implement "contact me" functionality on your
+personal Web site.
 
 Start with this basic ``Form`` subclass, which we'll call ``ContactForm``::
 
@@ -307,13 +307,13 @@ Notice the following:
       ``EmailField`` are represented by an ``<input type="text">``.
       ``BooleanField`` is represented by an ``<input type="checkbox">``. Note
       these are merely sensible defaults; you can specify which HTML to use for
-      a given field by using ``widgets``, which we'll explain shortly.
+      a given field by using widgets, which we'll explain shortly.
 
     * The HTML ``name`` for each tag is taken directly from its attribute name
       in the ``ContactForm`` class.
 
     * The text label for each field -- e.g. ``'Subject:'``, ``'Message:'`` and
-      ``'CC myself:'`` is generated from the field name by converting all
+      ``'Cc myself:'`` is generated from the field name by converting all
       underscores to spaces and upper-casing the first letter. Again, note
       these are merely sensible defaults; you can also specify labels manually.
 
