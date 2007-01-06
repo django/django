@@ -120,7 +120,7 @@ latest bug fixes and improvements, follow these instructions:
    to the file.
 
 You *don't* have to run ``python setup.py install``, because that command
-takes care of steps 3 and 4 for you.
+takes care of steps 2 and 3 for you.
 
 When you want to update your copy of the Django source code, just run the
 command ``svn update`` from within the ``django`` directory. When you do this,
