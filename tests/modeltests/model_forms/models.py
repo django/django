@@ -67,8 +67,8 @@ __test__ = {'API_TESTS': """
 <li>The URL: <input type="text" name="url" maxlength="40" /></li>
 
 >>> f = CategoryForm({'name': 'Entertainment', 'url': 'entertainment'})
->>> f.errors
-{}
+>>> f.is_valid()
+True
 >>> f.clean_data
 {'url': u'entertainment', 'name': u'Entertainment'}
 >>> obj = f.create()
@@ -78,8 +78,8 @@ __test__ = {'API_TESTS': """
 [<Category: Entertainment>]
 
 >>> f = CategoryForm({'name': "It's a test", 'url': 'test'})
->>> f.errors
-{}
+>>> f.is_valid()
+True
 >>> f.clean_data
 {'url': u'test', 'name': u"It's a test"}
 >>> obj = f.create()
@@ -91,8 +91,8 @@ __test__ = {'API_TESTS': """
 If you call create() with save=False, then it will return an object that hasn't
 yet been saved. In this case, it's up to you to save it.
 >>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
->>> f.errors
-{}
+>>> f.is_valid()
+True
 >>> f.clean_data
 {'url': u'third', 'name': u'Third test'}
 >>> obj = f.create(save=False)
@@ -109,6 +109,9 @@ If you call create() with invalid data, you'll get a ValueError.
 >>> f.errors
 {'name': [u'This field is required.']}
 >>> f.clean_data
+Traceback (most recent call last):
+...
+AttributeError: 'CategoryForm' object has no attribute 'clean_data'
 >>> f.create()
 Traceback (most recent call last):
 ...
