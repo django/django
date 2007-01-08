@@ -800,15 +800,19 @@ class TimeField(Field):
     def formfield(self, initial=None):
         return forms.TimeField(required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
 
-class URLField(Field):
+class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
+        kwargs['maxlength'] = kwargs.get('maxlength', 200) 
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
         self.verify_exists = verify_exists
-        Field.__init__(self, verbose_name, name, **kwargs)
+        CharField.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
         return [oldforms.URLField]
+
+    def get_internal_type(self): 
+        return "CharField"
 
     def formfield(self, initial=None):
         return forms.URLField(required=not self.blank, verify_exists=self.verify_exists, label=capfirst(self.verbose_name), initial=initial)
