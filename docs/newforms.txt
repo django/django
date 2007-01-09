@@ -721,6 +721,53 @@ validation if a particular field's value is not given. ``initial`` values are
 The ``widget`` argument lets you specify a ``Widget`` class to use when
 rendering this ``Field``. See _`Widgets` below for more information.
 
+Dynamic initial values
+----------------------
+
+The ``initial`` argument to ``Field`` (explained above) lets you hard-code the
+initial value for a ``Field`` -- but what if you want to declare the initial
+value at runtime? For example, you might want to fill in a ``username`` field
+with the username of the current session.
+
+To accomplish this, use the ``initial`` argument to a ``Form``. This argument,
+if given, should be a dictionary mapping field names to initial values. Only
+include the fields for which you're specifying an initial value; it's not
+necessary to include every field in your form. For example::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField()
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'your username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="your username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+    >>> f = CommentForm(initial={'name': 'another username'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="another username" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+Just like the ``initial`` parameter to ``Field``, these values are only
+displayed for unbound forms, and they're not used as fallback values if a
+particular value isn't provided.
+
+Finally, note that if a ``Field`` defines ``initial`` *and* you include
+``initial`` when instantiating the ``Form``, then the latter ``initial`` will
+have precedence. In this example, ``initial`` is provided both at the field
+level and at the form instance level, and the latter gets precedence::
+
+    >>> class CommentForm(forms.Form):
+    ...     name = forms.CharField(initial='class')
+    ...     url = forms.URLField()
+    ...     comment = forms.CharField()
+    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    >>> print f
+    <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
 More coming soon
 ================
 

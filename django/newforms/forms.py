@@ -39,11 +39,12 @@ class BaseForm(StrAndUnicode):
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
-    def __init__(self, data=None, auto_id='id_%s', prefix=None):
+    def __init__(self, data=None, auto_id='id_%s', prefix=None, initial=None):
         self.is_bound = data is not None
         self.data = data or {}
         self.auto_id = auto_id
         self.prefix = prefix
+        self.initial = initial or {}
         self.__errors = None # Stores the errors after clean() has been called.
 
     def __unicode__(self):
@@ -218,7 +219,7 @@ class BoundField(StrAndUnicode):
         if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
             attrs['id'] = auto_id
         if not self.form.is_bound:
-            data = self.field.initial
+            data = self.form.initial.get(self.name, self.field.initial)
         else:
             data = self.data
         return widget.render(self.html_name, data, attrs=attrs)

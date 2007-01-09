@@ -2215,6 +2215,61 @@ validation error rather than using the initial value for 'username'.
 >>> p.is_valid()
 False
 
+# Dynamic initial data ########################################################
+
+The previous technique dealt with "hard-coded" initial data, but it's also
+possible to specify initial data after you've already created the Form class
+(i.e., at runtime). Use the 'initial' parameter to the Form constructor. This
+should be a dictionary containing initial values for one or more fields in the
+form, keyed by field name.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': 'stephane'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A dynamic 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': 'django'})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial='django')
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(initial={'username': 'babik'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,
