@@ -6,17 +6,18 @@ model instance.
 
 The function django.newforms.form_for_model() takes a model class and returns
 a Form that is tied to the model. This Form works just like any other Form,
-with one additional method: create(). The create() method creates an instance
+with one additional method: save(). The save() method creates an instance
 of the model and returns that newly created instance. It saves the instance to
-the database if create(save=True), which is default. If you pass
-create(save=False), then you'll get the object without saving it.
+the database if save(commit=True), which is default. If you pass
+commit=False, then you'll get the object without committing the changes to the
+database.
 
 The function django.newforms.form_for_instance() takes a model instance and
 returns a Form that is tied to the instance. This form works just like any
-other Form, with one additional method: apply_changes(). The apply_changes()
+other Form, with one additional method: save(). The save()
 method updates the model instance. It saves the changes to the database if
-apply_changes(save=True), which is default. If you pass save=False, then you'll
-get the object without saving it.
+save(commit=True), which is default. If you pass commit=False, then you'll
+get the object without committing the changes to the database.
 """
 
 from django.db import models
@@ -71,7 +72,7 @@ __test__ = {'API_TESTS': """
 True
 >>> f.clean_data
 {'url': u'entertainment', 'name': u'Entertainment'}
->>> obj = f.create()
+>>> obj = f.save()
 >>> obj
 <Category: Entertainment>
 >>> Category.objects.all()
@@ -82,20 +83,21 @@ True
 True
 >>> f.clean_data
 {'url': u'test', 'name': u"It's a test"}
->>> obj = f.create()
+>>> obj = f.save()
 >>> obj
 <Category: It's a test>
 >>> Category.objects.all()
 [<Category: Entertainment>, <Category: It's a test>]
 
-If you call create() with save=False, then it will return an object that hasn't
-yet been saved. In this case, it's up to you to save it.
+If you call save() with commit=False, then it will return an object that
+hasn't yet been saved to the database. In this case, it's up to you to call
+save() on the resulting model instance.
 >>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
 >>> f.is_valid()
 True
 >>> f.clean_data
 {'url': u'third', 'name': u'Third test'}
->>> obj = f.create(save=False)
+>>> obj = f.save(commit=False)
 >>> obj
 <Category: Third test>
 >>> Category.objects.all()
@@ -104,7 +106,7 @@ True
 >>> Category.objects.all()
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
-If you call create() with invalid data, you'll get a ValueError.
+If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
 >>> f.errors
 {'name': [u'This field is required.']}
@@ -112,12 +114,12 @@ If you call create() with invalid data, you'll get a ValueError.
 Traceback (most recent call last):
 ...
 AttributeError: 'CategoryForm' object has no attribute 'clean_data'
->>> f.create()
+>>> f.save()
 Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
->>> f.create()
+>>> f.save()
 Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
@@ -156,10 +158,9 @@ subclass of BaseForm, not Form.
 >>> f.say_hello()
 hello
 
-Use form_for_instance to create a Form from a model instance. There are two
-differences between this Form and one created via form_for_model. First, the
-object's current values are inserted as 'initial' data in each Field. Second,
-the Form gets an apply_changes() method instead of a create() method.
+Use form_for_instance to create a Form from a model instance. The difference
+between this Form and one created via form_for_model is that the object's
+current values are inserted as 'initial' data in each Field.
 >>> w = Writer.objects.get(name='Mike Royko')
 >>> RoykoForm = form_for_instance(w)
 >>> f = RoykoForm(auto_id=False)
@@ -188,7 +189,7 @@ the Form gets an apply_changes() method instead of a create() method.
 >>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1'})
 >>> f.is_valid()
 True
->>> new_art = f.apply_changes()
+>>> new_art = f.save()
 >>> new_art.id
 1
 >>> new_art = Article.objects.get(id=1)
