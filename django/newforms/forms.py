@@ -99,7 +99,7 @@ class BaseForm(StrAndUnicode):
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
                 label = bf.label and bf.label_tag(escape(bf.label + ':')) or ''
-                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': bf})
+                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': unicode(bf)})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
