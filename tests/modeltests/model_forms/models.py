@@ -15,9 +15,11 @@ database.
 The function django.newforms.form_for_instance() takes a model instance and
 returns a Form that is tied to the instance. This form works just like any
 other Form, with one additional method: save(). The save()
-method updates the model instance. It saves the changes to the database if
-save(commit=True), which is default. If you pass commit=False, then you'll
-get the object without committing the changes to the database.
+method updates the model instance. It also takes a commit=True parameter.
+
+The function django.newforms.save_instance() takes a bound form instance and a
+model instance and saves the form's clean_data into the instance. It also takes
+a commit=True parameter.
 """
 
 from django.db import models
@@ -45,7 +47,7 @@ class Article(models.Model):
         return self.headline
 
 __test__ = {'API_TESTS': """
->>> from django.newforms import form_for_model, form_for_instance, BaseForm
+>>> from django.newforms import form_for_model, form_for_instance, save_instance, BaseForm, Form, CharField
 >>> import datetime
 
 >>> Category.objects.all()
@@ -218,4 +220,20 @@ Add some categories and test the many-to-many form output.
 <option value="3">Third test</option>
 </select></li>
 
+Here, we define a custom Form. Because it happens to have the same fields as
+the Category model, we can use save_instance() to apply its changes to an
+existing Category instance.
+>>> class ShortCategory(Form):
+...     name = CharField(max_length=5)
+...     url = CharField(max_length=3)
+>>> cat = Category.objects.get(name='Third test')
+>>> cat
+<Category: Third test>
+>>> cat.id
+3
+>>> sc = ShortCategory({'name': 'Third', 'url': '3rd'})
+>>> save_instance(sc, cat)
+<Category: Third>
+>>> Category.objects.get(id=3)
+<Category: Third>
 """}
