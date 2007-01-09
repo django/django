@@ -4,7 +4,7 @@ Field classes
 
 from django.utils.translation import gettext
 from util import ValidationError, smart_unicode
-from widgets import TextInput, PasswordInput, CheckboxInput, Select, SelectMultiple
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
 import time
@@ -29,6 +29,7 @@ except NameError:
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
+    hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
@@ -336,6 +337,8 @@ class ChoiceField(Field):
         return value
 
 class MultipleChoiceField(ChoiceField):
+    hidden_widget = MultipleHiddenInput
+
     def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None):
         ChoiceField.__init__(self, choices, required, widget, label, initial)
 

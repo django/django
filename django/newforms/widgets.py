@@ -3,8 +3,8 @@ HTML Widget classes
 """
 
 __all__ = (
-    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'FileInput',
-    'Textarea', 'CheckboxInput',
+    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
+    'FileInput', 'Textarea', 'CheckboxInput',
     'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
 )
 
@@ -86,6 +86,16 @@ class PasswordInput(Input):
 class HiddenInput(Input):
     input_type = 'hidden'
     is_hidden = True
+
+class MultipleHiddenInput(HiddenInput):
+    """
+    A widget that handles <input type="hidden"> for fields that have a list
+    of values.
+    """
+    def render(self, name, value, attrs=None):
+        if value is None: value = []
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=smart_unicode(v), **final_attrs))) for v in value])
 
 class FileInput(Input):
     input_type = 'file'

@@ -5,7 +5,7 @@ Form classes
 from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from fields import Field
-from widgets import TextInput, Textarea, HiddenInput
+from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
 from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
 __all__ = ('BaseForm', 'Form')
@@ -238,7 +238,7 @@ class BoundField(StrAndUnicode):
         """
         Returns a string of HTML for representing this as an <input type="hidden">.
         """
-        return self.as_widget(HiddenInput(), attrs)
+        return self.as_widget(self.field.hidden_widget(), attrs)
 
     def _data(self):
         """

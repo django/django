@@ -1849,6 +1849,17 @@ MultipleChoiceField is a special case, as its data is required to be a list:
 <option value="P" selected="selected">Paul McCartney</option>
 </select>
 
+MultipleChoiceField rendered as_hidden() is a special case. Because it can
+have multiple values, its as_hidden() renders multiple <input type="hidden">
+tags.
+>>> f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
+>>> print f['composers'].as_hidden()
+<input type="hidden" name="composers" value="P" />
+>>> f = SongForm({'name': 'From Me To You', 'composers': ['P', 'J']}, auto_id=False)
+>>> print f['composers'].as_hidden()
+<input type="hidden" name="composers" value="P" />
+<input type="hidden" name="composers" value="J" />
+
 MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 >>> class SongForm(Form):
 ...     name = CharField()
@@ -1904,6 +1915,8 @@ returns a list of input.
 {}
 >>> f.clean_data
 {'composers': [u'J', u'P'], 'name': u'Yesterday'}
+
+# Validating multiple fields in relation to another ###########################
 
 There are a couple of ways to do multiple-field validation. If you want the
 validation message to be associated with a particular field, implement the
