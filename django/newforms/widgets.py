@@ -172,14 +172,15 @@ class RadioInput(StrAndUnicode):
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
-        self.choice_value, self.choice_label = choice
+        self.choice_value = smart_unicode(choice[0])
+        self.choice_label = smart_unicode(choice[1])
         self.index = index
 
     def __unicode__(self):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
 
     def is_checked(self):
-        return self.value == smart_unicode(self.choice_value)
+        return self.value == self.choice_value
 
     def tag(self):
         if self.attrs.has_key('id'):

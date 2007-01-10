@@ -527,11 +527,15 @@ True
 >>> r[1].is_checked()
 False
 >>> r[1].name, r[1].value, r[1].choice_value, r[1].choice_label
-('beatle', u'J', 'P', 'Paul')
+('beatle', u'J', u'P', u'Paul')
 >>> r[10]
 Traceback (most recent call last):
 ...
 IndexError: list index out of range
+
+>>> w = RadioSelect()
+>>> unicode(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]))
+u'<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
 
 # CheckboxSelectMultiple Widget ###############################################
 
