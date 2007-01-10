@@ -29,7 +29,7 @@ class SortedDictFromList(SortedDict):
 class DeclarativeFieldsMetaclass(type):
     "Metaclass that converts Field attributes to a dictionary called 'fields'."
     def __new__(cls, name, bases, attrs):
-        fields = [(name, attrs.pop(name)) for name, obj in attrs.items() if isinstance(obj, Field)]
+        fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
         fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
         attrs['fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
