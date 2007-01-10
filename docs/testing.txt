@@ -220,7 +220,7 @@ can be invoked on the ``Client`` instance.
 
     will result in the evaluation of a GET request equivalent to::
 
-        http://yoursite.com/customers/details/?name='fred'&age=7
+        http://yoursite.com/customers/details/?name=fred&age=7
 
 ``post(path, data={})``
     Make a POST request on the provided ``path``. The key-value pairs in the
@@ -415,7 +415,7 @@ arguments:
     tested. This is the same format returned by ``django.db.models.get_apps()``
 
     Verbosity determines the amount of notification and debug information that 
-    will be printed to the console; '0' is no output, '1' is normal output,
+    will be printed to the console; `0` is no output, `1` is normal output,
     and `2` is verbose output.
 
 Testing utilities
