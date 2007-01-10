@@ -41,6 +41,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateField()
     writer = models.ForeignKey(Writer)
+    article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
 
     def __str__(self):
@@ -144,6 +145,7 @@ represented by a ChoiceField.
 <option value="1">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></td></tr>
+<tr><th>Article:</th><td><textarea name="article"></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -169,7 +171,7 @@ current values are inserted as 'initial' data in each Field.
 >>> print f
 <tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /></td></tr>
 
->>> art = Article(headline='Test article', pub_date=datetime.date(1988, 1, 4), writer=w)
+>>> art = Article(headline='Test article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
 >>> art.save()
 >>> art.id
 1
@@ -183,12 +185,13 @@ current values are inserted as 'initial' data in each Field.
 <option value="1" selected="selected">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></li>
+<li>Article: <textarea name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select></li>
->>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1'})
+>>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1', 'article': 'Hello.'})
 >>> f.is_valid()
 True
 >>> new_art = f.save()
@@ -214,6 +217,7 @@ Add some categories and test the many-to-many form output.
 <option value="1" selected="selected">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></li>
+<li>Article: <textarea name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1" selected="selected">Entertainment</option>
 <option value="2">It&#39;s a test</option>

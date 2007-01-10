@@ -757,6 +757,9 @@ class TextField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.LargeTextField]
 
+    def formfield(self, initial=None):
+        return forms.CharField(required=not self.blank, widget=forms.Textarea, label=capfirst(self.verbose_name), initial=initial)
+
 class TimeField(Field):
     empty_strings_allowed = False
     def __init__(self, verbose_name=None, name=None, auto_now=False, auto_now_add=False, **kwargs):
@@ -802,7 +805,7 @@ class TimeField(Field):
 
 class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
-        kwargs['maxlength'] = kwargs.get('maxlength', 200) 
+        kwargs['maxlength'] = kwargs.get('maxlength', 200)
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
         self.verify_exists = verify_exists
@@ -811,7 +814,7 @@ class URLField(CharField):
     def get_manipulator_field_objs(self):
         return [oldforms.URLField]
 
-    def get_internal_type(self): 
+    def get_internal_type(self):
         return "CharField"
 
     def formfield(self, initial=None):
