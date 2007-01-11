@@ -1647,6 +1647,17 @@ u'* This field is required.'
 >>> print p['birthday']
 <input type="text" name="birthday" id="id_birthday" />
 
+clean_data will always *only* contain a key for fields defined in the
+Form, even if you pass extra data when you define the Form. In this
+example, we pass a bunch of extra fields to the form constructor,
+but clean_data contains only the form's fields.
+>>> data = {'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9', 'extra1': 'hello', 'extra2': 'hello'}
+>>> p = Person(data)
+>>> p.is_valid()
+True
+>>> p.clean_data
+{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted. It will also put a <label> around

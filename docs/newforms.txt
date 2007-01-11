@@ -254,6 +254,24 @@ If your data does *not* validate, your ``Form`` instance will not have a
     ...
     AttributeError: 'ContactForm' object has no attribute 'clean_data'
 
+``clean_data`` will always *only* contain a key for fields defined in the
+``Form``, even if you pass extra data when you define the ``Form``. In this
+example, we pass a bunch of extra fields to the ``ContactForm`` constructor,
+but ``clean_data`` contains only the form's fields::
+
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True,
+    ...         'extra_field_1': 'foo',
+    ...         'extra_field_2': 'bar',
+    ...         'extra_field_3': 'baz'}
+    >>> f = ContactForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data # Doesn't contain extra_field_1, etc.
+    {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
