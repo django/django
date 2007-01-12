@@ -1268,6 +1268,24 @@ A few special cases to note about ``list_display``:
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
 
+    * If the string given is a method of the model that returns True or False 
+      Django will display a pretty "on" or "off" icon if you give the method a 
+      ``boolean`` attribute whose value is ``True``.
+
+      Here's a full example model::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=50)
+              birthday = models.DateField()
+
+              class Admin:
+                  list_display = ('name', 'born_in_fifties')
+
+              def born_in_fifties(self):
+                  return self.birthday.strftime('%Y')[:3] == 5
+              born_in_fifties.boolean = True
+
+
     * The ``__str__()`` method is just as valid in ``list_display`` as any
       other model method, so it's perfectly OK to do this::
 
