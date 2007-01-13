@@ -114,11 +114,11 @@ class IntegerField(Field):
     def clean(self, value):
         """
         Validates that int() can be called on the input. Returns the result
-        of int().
+        of int(). Returns None for empty values.
         """
         super(IntegerField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
-            return u''
+            return None
         try:
             value = int(value)
         except (ValueError, TypeError):

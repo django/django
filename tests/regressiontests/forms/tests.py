@@ -810,9 +810,11 @@ ValidationError: [u'Enter a whole number.']
 
 >>> f = IntegerField(required=False)
 >>> f.clean('')
-u''
+>>> repr(f.clean(''))
+'None'
 >>> f.clean(None)
-u''
+>>> repr(f.clean(None))
+'None'
 >>> f.clean('1')
 1
 >>> isinstance(f.clean('1'), int)
