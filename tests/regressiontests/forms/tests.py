@@ -1950,10 +1950,19 @@ conveniently work with this.
 >>> f.errors
 {}
 >>> from django.utils.datastructures import MultiValueDict
->>> data = MultiValueDict(dict(name='Yesterday', composers=['J', 'P']))
+>>> data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
 >>> f = SongForm(data)
 >>> f.errors
 {}
+
+The MultipleHiddenInput widget renders multiple values as hidden fields.
+>>> class SongFormHidden(Form):
+...     name = CharField()
+...     composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=MultipleHiddenInput)
+>>> f = SongFormHidden(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])), auto_id=False)
+>>> print f.as_ul()
+<li>Name: <input type="text" name="name" value="Yesterday" /><input type="hidden" name="composers" value="J" />
+<input type="hidden" name="composers" value="P" /></li>
 
 When using CheckboxSelectMultiple, the framework expects a list of input and
 returns a list of input.

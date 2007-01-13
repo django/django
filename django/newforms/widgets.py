@@ -92,10 +92,20 @@ class MultipleHiddenInput(HiddenInput):
     A widget that handles <input type="hidden"> for fields that have a list
     of values.
     """
-    def render(self, name, value, attrs=None):
+    def __init__(self, attrs=None, choices=()):
+        # choices can be any iterable
+        self.attrs = attrs or {}
+        self.choices = choices
+
+    def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         return u'\n'.join([(u'<input%s />' % flatatt(dict(value=smart_unicode(v), **final_attrs))) for v in value])
+
+    def value_from_datadict(self, data, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)
 
 class FileInput(Input):
     input_type = 'file'
