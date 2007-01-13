@@ -288,6 +288,8 @@ class URLField(RegexField):
 
     def clean(self, value):
         value = RegexField.clean(self, value)
+        if not self.required and value == u'':
+            return value
         if self.verify_exists:
             import urllib2
             from django.conf import settings

@@ -1331,6 +1331,11 @@ ValidationError: [u'This URL appears to be a broken link.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
+>>> f = URLField(verify_exists=True, required=False)
+>>> f.clean('')
+u''
+>>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
+u'http://www.google.com'
 
 EmailField also access min_length and max_length parameters, for convenience.
 >>> f = URLField(min_length=15, max_length=20)
