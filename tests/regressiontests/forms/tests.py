@@ -106,6 +106,46 @@ u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="hidden" class="special" name="email" />'
 
+# MultipleHiddenInput Widget ##################################################
+
+>>> w = MultipleHiddenInput()
+>>> w.render('email', [])
+u''
+>>> w.render('email', None)
+u''
+>>> w.render('email', ['test@example.com'])
+u'<input type="hidden" name="email" value="test@example.com" />'
+>>> w.render('email', ['some "quoted" & ampersanded value'])
+u'<input type="hidden" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+>>> w.render('email', ['test@example.com', 'foo@example.com'])
+u'<input type="hidden" name="email" value="test@example.com" />\n<input type="hidden" name="email" value="foo@example.com" />'
+>>> w.render('email', ['test@example.com'], attrs={'class': 'fun'})
+u'<input type="hidden" name="email" value="test@example.com" class="fun" />'
+>>> w.render('email', ['test@example.com', 'foo@example.com'], attrs={'class': 'fun'})
+u'<input type="hidden" name="email" value="test@example.com" class="fun" />\n<input type="hidden" name="email" value="foo@example.com" class="fun" />'
+
+You can also pass 'attrs' to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'fun'})
+>>> w.render('email', [])
+u''
+>>> w.render('email', ['foo@example.com'])
+u'<input type="hidden" class="fun" value="foo@example.com" name="email" />'
+>>> w.render('email', ['foo@example.com', 'test@example.com'])
+u'<input type="hidden" class="fun" value="foo@example.com" name="email" />\n<input type="hidden" class="fun" value="test@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', ['foo@example.com'], attrs={'class': 'special'})
+u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
+
+>>> w.render('email', ['ŠĐĆŽćžšđ'], attrs={'class': 'fun'})
+u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', ['foo@example.com'], attrs={'class': 'special'})
+u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
+
 # FileInput Widget ############################################################
 
 >>> w = FileInput()
