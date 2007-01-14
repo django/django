@@ -124,11 +124,11 @@ class ModelAdminView(object):
         elif url.endswith('add'):
             return self.add_view(request)
         elif url.endswith('history'):
-            return self.history_view(request, url[:-8])
+            return self.history_view(request, unquote(url[:-8]))
         elif url.endswith('delete'):
-            return self.delete_view(request, url[:-7])
+            return self.delete_view(request, unquote(url[:-7]))
         else:
-            return self.change_view(request, url)
+            return self.change_view(request, unquote(url))
 
     def add_view(self, request):
         "The 'add' admin view for this model."
