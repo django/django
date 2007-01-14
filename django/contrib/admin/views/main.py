@@ -140,7 +140,30 @@ class ModelAdminView(object):
 
     def change_list_view(self, request):
         "The 'change list' admin view for this model."
-        raise NotImplementedError('Change list view')
+        opts = self.model._meta
+        app_label = opts.app_label
+        if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+            raise PermissionDenied
+        try:
+            cl = ChangeList(request, self.model)
+        except IncorrectLookupParameters:
+            # Wacky lookup parameters were given, so redirect to the main
+            # changelist page, without parameters, and pass an 'invalid=1'
+            # parameter via the query string. If wacky parameters were given and
+            # the 'invalid=1' parameter was already in the query string, something
+            # is screwed up with the database, so display an error page.
+            if ERROR_FLAG in request.GET.keys():
+                return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
+            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+        c = template.RequestContext(request, {
+            'title': cl.title,
+            'is_popup': cl.is_popup,
+            'cl': cl,
+        })
+        c.update({'has_add_permission': c['perms'][app_label][opts.get_add_permission()]}),
+        return render_to_response(['admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
+                                'admin/%s/change_list.html' % app_label,
+                                'admin/change_list.html'], context_instance=c)
 
     def delete_view(self, request, object_id):
         "The 'delete' admin view for this model."
@@ -157,7 +180,7 @@ class ModelAdminView(object):
         extra_context = {
             'title': _('Change history: %s') % obj,
             'action_list': action_list,
-            'module_name': capfirst(model._meta.verbose_name_plural),
+            'module_name': capfirst(opts.verbose_name_plural),
             'object': obj,
         }
         template_list = [
@@ -781,31 +804,3 @@ class ChangeList(object):
 
     def url_for_result(self, result):
         return "%s/" % quote(getattr(result, self.pk_attname))
-
-def change_list(request, app_label, model_name):
-    model = models.get_model(app_label, model_name)
-    if model is None:
-        raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
-        raise PermissionDenied
-    try:
-        cl = ChangeList(request, model)
-    except IncorrectLookupParameters:
-        # Wacky lookup parameters were given, so redirect to the main
-        # changelist page, without parameters, and pass an 'invalid=1'
-        # parameter via the query string. If wacky parameters were given and
-        # the 'invalid=1' parameter was already in the query string, something
-        # is screwed up with the database, so display an error page.
-        if ERROR_FLAG in request.GET.keys():
-            return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
-        return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-    c = template.RequestContext(request, {
-        'title': cl.title,
-        'is_popup': cl.is_popup,
-        'cl': cl,
-    })
-    c.update({'has_add_permission': c['perms'][app_label][cl.opts.get_add_permission()]}),
-    return render_to_response(['admin/%s/%s/change_list.html' % (app_label, cl.opts.object_name.lower()),
-                               'admin/%s/change_list.html' % app_label,
-                               'admin/change_list.html'], context_instance=c)
-change_list = staff_member_required(never_cache(change_list))
