@@ -13,6 +13,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 import operator
+import sets
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 if not LogEntry._meta.installed:
@@ -167,7 +168,37 @@ class ModelAdminView(object):
 
     def delete_view(self, request, object_id):
         "The 'delete' admin view for this model."
-        raise NotImplementedError('Delete view with object %r' % object_id)
+        opts = self.model._meta
+        app_label = opts.app_label
+        if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
+            raise PermissionDenied
+        obj = get_object_or_404(self.model, pk=object_id)
+
+        # Populate deleted_objects, a data structure of all related objects that
+        # will also be deleted.
+        deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
+        perms_needed = sets.Set()
+        _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
+
+        if request.POST: # The user has already confirmed the deletion.
+            if perms_needed:
+                raise PermissionDenied
+            obj_display = str(obj)
+            obj.delete()
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, object_id, obj_display, DELETION)
+            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
+            return HttpResponseRedirect("../../")
+        extra_context = {
+            "title": _("Are you sure?"),
+            "object_name": opts.verbose_name,
+            "object": obj,
+            "deleted_objects": deleted_objects,
+            "perms_lacking": perms_needed,
+            "opts": opts,
+        }
+        return render_to_response(["admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower() ),
+                                "admin/%s/delete_confirmation.html" % app_label ,
+                                "admin/delete_confirmation.html"], extra_context, context_instance=template.RequestContext(request))
 
     def history_view(self, request, object_id):
         "The 'history' admin view for this model."
@@ -569,44 +600,6 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             p = '%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
-
-def delete_stage(request, app_label, model_name, object_id):
-    import sets
-    model = models.get_model(app_label, model_name)
-    object_id = unquote(object_id)
-    if model is None:
-        raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    opts = model._meta
-    if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
-        raise PermissionDenied
-    obj = get_object_or_404(model, pk=object_id)
-
-    # Populate deleted_objects, a data structure of all related objects that
-    # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
-    perms_needed = sets.Set()
-    _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
-
-    if request.POST: # The user has already confirmed the deletion.
-        if perms_needed:
-            raise PermissionDenied
-        obj_display = str(obj)
-        obj.delete()
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
-        request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
-        return HttpResponseRedirect("../../")
-    extra_context = {
-        "title": _("Are you sure?"),
-        "object_name": opts.verbose_name,
-        "object": obj,
-        "deleted_objects": deleted_objects,
-        "perms_lacking": perms_needed,
-        "opts": model._meta,
-    }
-    return render_to_response(["admin/%s/%s/delete_confirmation.html" % (app_label, opts.object_name.lower() ),
-                               "admin/%s/delete_confirmation.html" % app_label ,
-                               "admin/delete_confirmation.html"], extra_context, context_instance=template.RequestContext(request))
-delete_stage = staff_member_required(never_cache(delete_stage))
 
 class ChangeList(object):
     def __init__(self, request, model):
