@@ -118,6 +118,7 @@ class ModelAdminView(object):
     "Class that encapsulates all admin views for a given model."
     def __init__(self, model):
         self.model = model
+        self.opts = model._meta
 
     def __call__(self, request, url):
         if url is None:
@@ -131,17 +132,38 @@ class ModelAdminView(object):
         else:
             return self.change_view(request, unquote(url))
 
+    def has_add_permission(self, request):
+        "Returns True if the given request has permission to add an object."
+        opts = self.opts
+        return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
+
+    def has_change_permission(self, request, object_id):
+        """
+        Returns True if the given request has permission to change the object
+        with the given object_id.
+        """
+        opts = self.opts
+        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+
+    def has_delete_permission(self, request, object_id):
+        """
+        Returns True if the given request has permission to change the object
+        with the given object_id.
+        """
+        opts = self.opts
+        return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+
     def add_view(self, request, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
         "The 'add' admin view for this model."
         model = self.model
         opts = model._meta
         app_label = opts.app_label
 
-        if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
+        if not self.has_add_permission(request):
             raise PermissionDenied
 
         if post_url is None:
-            if request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+            if self.has_change_permission(request, None):
                 # redirect to list view
                 post_url = '../'
             else:
@@ -211,7 +233,7 @@ class ModelAdminView(object):
         opts = model._meta
         app_label = opts.app_label
 
-        if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+        if not self.has_change_permission(request, object_id):
             raise PermissionDenied
 
         if request.POST and request.POST.has_key("_saveasnew"):
@@ -305,7 +327,7 @@ class ModelAdminView(object):
         "The 'change list' admin view for this model."
         opts = self.model._meta
         app_label = opts.app_label
-        if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+        if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
             cl = ChangeList(request, self.model)
@@ -332,7 +354,7 @@ class ModelAdminView(object):
         "The 'delete' admin view for this model."
         opts = self.model._meta
         app_label = opts.app_label
-        if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
+        if not self.has_delete_permission(request, object_id):
             raise PermissionDenied
         obj = get_object_or_404(self.model, pk=object_id)
 
