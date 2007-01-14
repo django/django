@@ -109,14 +109,14 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    mav = ModelAdminView(model._meta)
+    mav = ModelAdminView(model)
     return mav(request, rest_of_url)
 model_admin_view = staff_member_required(never_cache(model_admin_view))
 
 class ModelAdminView(object):
     "Class that encapsulates all admin views for a given model."
-    def __init__(self, opts):
-        self.opts = opts
+    def __init__(self, model):
+        self.model = model
 
     def __call__(self, request, url):
         if url is None:
@@ -148,7 +148,24 @@ class ModelAdminView(object):
 
     def history_view(self, request, object_id):
         "The 'history' admin view for this model."
-        raise NotImplementedError('History view with object %r' % object_id)
+        model = self.model
+        opts = model._meta
+        action_list = LogEntry.objects.filter(object_id=object_id,
+            content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
+        # If no history was found, see whether this object even exists.
+        obj = get_object_or_404(model, pk=object_id)
+        extra_context = {
+            'title': _('Change history: %s') % obj,
+            'action_list': action_list,
+            'module_name': capfirst(model._meta.verbose_name_plural),
+            'object': obj,
+        }
+        template_list = [
+            "admin/%s/%s/object_history.html" % (opts.app_label, opts.object_name.lower()),
+            "admin/%s/object_history.html" % opts.app_label,
+            "admin/object_history.html"
+        ]
+        return render_to_response(template_list, extra_context, context_instance=template.RequestContext(request))
 
 class AdminBoundField(object):
     def __init__(self, field, field_mapping, original):
@@ -567,26 +584,6 @@ def delete_stage(request, app_label, model_name, object_id):
                                "admin/%s/delete_confirmation.html" % app_label ,
                                "admin/delete_confirmation.html"], extra_context, context_instance=template.RequestContext(request))
 delete_stage = staff_member_required(never_cache(delete_stage))
-
-def history(request, app_label, model_name, object_id):
-    model = models.get_model(app_label, model_name)
-    object_id = unquote(object_id)
-    if model is None:
-        raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    action_list = LogEntry.objects.filter(object_id=object_id,
-        content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
-    # If no history was found, see whether this object even exists.
-    obj = get_object_or_404(model, pk=object_id)
-    extra_context = {
-        'title': _('Change history: %s') % obj,
-        'action_list': action_list,
-        'module_name': capfirst(model._meta.verbose_name_plural),
-        'object': obj,
-    }
-    return render_to_response(["admin/%s/%s/object_history.html" % (app_label, model._meta.object_name.lower()),
-                               "admin/%s/object_history.html" % app_label ,
-                               "admin/object_history.html"], extra_context, context_instance=template.RequestContext(request))
-history = staff_member_required(never_cache(history))
 
 class ChangeList(object):
     def __init__(self, request, model):
