@@ -113,6 +113,7 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
     return mav(request, rest_of_url)
 
 class ModelAdminView(object):
+    "Class that encapsulates all admin views for a given model."
     def __init__(self, opts):
         self.opts = opts
 
@@ -129,18 +130,23 @@ class ModelAdminView(object):
             return self.change_view(request, url)
 
     def add_view(self, request):
+        "The 'add' admin view for this model."
         raise NotImplementedError('Add view')
 
     def change_view(self, request, object_id):
+        "The 'change' admin view for this model."
         raise NotImplementedError('Change view with object %r' % object_id)
 
     def change_list_view(self, request):
+        "The 'change list' admin view for this model."
         raise NotImplementedError('Change list view')
 
     def delete_view(self, request, object_id):
+        "The 'delete' admin view for this model."
         raise NotImplementedError('Delete view with object %r' % object_id)
 
     def history_view(self, request, object_id):
+        "The 'history' admin view for this model."
         raise NotImplementedError('History view with object %r' % object_id)
 
 class AdminBoundField(object):
