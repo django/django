@@ -32,12 +32,8 @@ urlpatterns = patterns('',
     # "Change user password" -- another special-case view
     ('^auth/user/(\d+)/password/$', 'django.contrib.admin.views.auth.user_change_password'),
 
-    # Add/change/delete/history
-    ('^([^/]+)/([^/]+)/$', 'django.contrib.admin.views.main.change_list'),
-    ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
-    ('^([^/]+)/([^/]+)/(.+)/history/$', 'django.contrib.admin.views.main.history'),
-    ('^([^/]+)/([^/]+)/(.+)/delete/$', 'django.contrib.admin.views.main.delete_stage'),
-    ('^([^/]+)/([^/]+)/(.+)/$', 'django.contrib.admin.views.main.change_stage'),
+    # Model-specific admin pages.
+    ('^([^/]+)/([^/]+)/(?:(.+)/)?$', 'django.contrib.admin.views.main.model_admin_view'),
 )
 
 del i18n_view

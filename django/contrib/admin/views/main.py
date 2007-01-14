@@ -105,6 +105,44 @@ def get_javascript_imports(opts, auto_populated_fields, field_sets):
                 break
     return js
 
+def model_admin_view(request, app_label, model_name, rest_of_url):
+    model = models.get_model(app_label, model_name)
+    if model is None:
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
+    mav = ModelAdminView(model._meta)
+    return mav(request, rest_of_url)
+
+class ModelAdminView(object):
+    def __init__(self, opts):
+        self.opts = opts
+
+    def __call__(self, request, url):
+        if url is None:
+            return self.change_list_view(request)
+        elif url.endswith('add'):
+            return self.add_view(request)
+        elif url.endswith('history'):
+            return self.history_view(request, url[:-8])
+        elif url.endswith('delete'):
+            return self.delete_view(request, url[:-7])
+        else:
+            return self.change_view(request, url)
+
+    def add_view(self, request):
+        raise NotImplementedError('Add view')
+
+    def change_view(self, request, object_id):
+        raise NotImplementedError('Change view with object %r' % object_id)
+
+    def change_list_view(self, request):
+        raise NotImplementedError('Change list view')
+
+    def delete_view(self, request, object_id):
+        raise NotImplementedError('Delete view with object %r' % object_id)
+
+    def history_view(self, request, object_id):
+        raise NotImplementedError('History view with object %r' % object_id)
+
 class AdminBoundField(object):
     def __init__(self, field, field_mapping, original):
         self.field = field
