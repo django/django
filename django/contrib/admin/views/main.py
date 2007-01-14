@@ -111,6 +111,7 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
     mav = ModelAdminView(model._meta)
     return mav(request, rest_of_url)
+model_admin_view = staff_member_required(never_cache(model_admin_view))
 
 class ModelAdminView(object):
     "Class that encapsulates all admin views for a given model."
