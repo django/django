@@ -110,6 +110,8 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
     model = models.get_model(app_label, model_name)
     if model is None:
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
+    if not model._meta.admin:
+        raise Http404("This object has no admin interface.")
     mav = ModelAdminView(model)
     return mav(request, rest_of_url)
 model_admin_view = staff_member_required(never_cache(model_admin_view))
