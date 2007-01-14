@@ -131,9 +131,79 @@ class ModelAdminView(object):
         else:
             return self.change_view(request, unquote(url))
 
-    def add_view(self, request):
+    def add_view(self, request, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
         "The 'add' admin view for this model."
-        raise NotImplementedError('Add view')
+        model = self.model
+        opts = model._meta
+        app_label = opts.app_label
+
+        if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
+            raise PermissionDenied
+
+        if post_url is None:
+            if request.user.has_perm(app_label + '.' + opts.get_change_permission()):
+                # redirect to list view
+                post_url = '../'
+            else:
+                # Object list will give 'Permission Denied', so go back to admin home
+                post_url = '../../../'
+
+        manipulator = model.AddManipulator()
+        if request.POST:
+            new_data = request.POST.copy()
+
+            if opts.has_field_type(models.FileField):
+                new_data.update(request.FILES)
+
+            errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
+
+            if not errors:
+                new_object = manipulator.save(new_data)
+                pk_value = new_object._get_pk_val()
+                LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
+                msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+                # Here, we distinguish between different save types by checking for
+                # the presence of keys in request.POST.
+                if request.POST.has_key("_continue"):
+                    request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
+                    if request.POST.has_key("_popup"):
+                        post_url_continue += "?_popup=1"
+                    return HttpResponseRedirect(post_url_continue % pk_value)
+                if request.POST.has_key("_popup"):
+                    if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
+                        pk_value = '"%s"' % pk_value.replace('"', '\\"')
+                    return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
+                        (pk_value, str(new_object).replace('"', '\\"')))
+                elif request.POST.has_key("_addanother"):
+                    request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                    return HttpResponseRedirect(request.path)
+                else:
+                    request.user.message_set.create(message=msg)
+                    return HttpResponseRedirect(post_url)
+        else:
+            # Add default data.
+            new_data = manipulator.flatten_data()
+
+            # Override the defaults with GET params, if they exist.
+            new_data.update(dict(request.GET.items()))
+
+            errors = {}
+
+        # Populate the FormWrapper.
+        form = oldforms.FormWrapper(manipulator, new_data, errors)
+
+        c = template.RequestContext(request, {
+            'title': _('Add %s') % opts.verbose_name,
+            'form': form,
+            'is_popup': request.REQUEST.has_key('_popup'),
+            'show_delete': show_delete,
+        })
+
+        if object_id_override is not None:
+            c['object_id'] = object_id_override
+
+        return render_change_form(model, manipulator, c, add=True)
 
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
@@ -145,7 +215,7 @@ class ModelAdminView(object):
             raise PermissionDenied
 
         if request.POST and request.POST.has_key("_saveasnew"):
-            return add_stage(request, app_label, opts.object_name.lower(), form_url='../../add/')
+            return self.add_view(request, form_url='../../add/')
 
         try:
             manipulator = model.ChangeManipulator(object_id)
@@ -430,81 +500,6 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
 def index(request):
     return render_to_response('admin/index.html', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(never_cache(index))
-
-def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
-    model = models.get_model(app_label, model_name)
-    if model is None:
-        raise Http404("App %r, model %r, not found" % (app_label, model_name))
-    opts = model._meta
-
-    if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
-        raise PermissionDenied
-
-    if post_url is None:
-        if request.user.has_perm(app_label + '.' + opts.get_change_permission()):
-            # redirect to list view
-            post_url = '../'
-        else:
-            # Object list will give 'Permission Denied', so go back to admin home
-            post_url = '../../../'
-
-    manipulator = model.AddManipulator()
-    if request.POST:
-        new_data = request.POST.copy()
-
-        if opts.has_field_type(models.FileField):
-            new_data.update(request.FILES)
-
-        errors = manipulator.get_validation_errors(new_data)
-        manipulator.do_html2python(new_data)
-
-        if not errors:
-            new_object = manipulator.save(new_data)
-            pk_value = new_object._get_pk_val()
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-            # Here, we distinguish between different save types by checking for
-            # the presence of keys in request.POST.
-            if request.POST.has_key("_continue"):
-                request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                if request.POST.has_key("_popup"):
-                    post_url_continue += "?_popup=1"
-                return HttpResponseRedirect(post_url_continue % pk_value)
-            if request.POST.has_key("_popup"):
-                if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
-                    pk_value = '"%s"' % pk_value.replace('"', '\\"')
-                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (pk_value, str(new_object).replace('"', '\\"')))
-            elif request.POST.has_key("_addanother"):
-                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                return HttpResponseRedirect(request.path)
-            else:
-                request.user.message_set.create(message=msg)
-                return HttpResponseRedirect(post_url)
-    else:
-        # Add default data.
-        new_data = manipulator.flatten_data()
-
-        # Override the defaults with GET params, if they exist.
-        new_data.update(dict(request.GET.items()))
-
-        errors = {}
-
-    # Populate the FormWrapper.
-    form = oldforms.FormWrapper(manipulator, new_data, errors)
-
-    c = template.RequestContext(request, {
-        'title': _('Add %s') % opts.verbose_name,
-        'form': form,
-        'is_popup': request.REQUEST.has_key('_popup'),
-        'show_delete': show_delete,
-    })
-
-    if object_id_override is not None:
-        c['object_id'] = object_id_override
-
-    return render_change_form(model, manipulator, c, add=True)
-add_stage = staff_member_required(never_cache(add_stage))
 
 def _nest_help(obj, depth, val):
     current = obj
