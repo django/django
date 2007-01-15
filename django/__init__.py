@@ -1,1 +1,1 @@
-VERSION = (0, 96, 'pre')
+VERSION = (0, 96, 'newforms-admin')
