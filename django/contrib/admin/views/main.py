@@ -292,12 +292,13 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display):
+    def __init__(self, request, model, list_display, list_filter):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
         self.manager = self.opts.admin.manager
         self.list_display = list_display
+        self.list_filter = list_filter
 
         # Get search parameters from the query string.
         try:
@@ -322,9 +323,8 @@ class ChangeList(object):
 
     def get_filters(self, request):
         filter_specs = []
-        if self.lookup_opts.admin.list_filter and not self.opts.one_to_one_field:
-            filter_fields = [self.lookup_opts.get_field(field_name) \
-                              for field_name in self.lookup_opts.admin.list_filter]
+        if self.list_filter and not self.opts.one_to_one_field:
+            filter_fields = [self.lookup_opts.get_field(field_name) for field_name in self.list_filter]
             for f in filter_fields:
                 spec = FilterSpec.create(f, request, self.params, self.model)
                 if spec and spec.has_output():

@@ -983,10 +983,10 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
             else:
                 # list_display
-                if not isinstance(opts.admin.list_display, (list, tuple)):
+                if not isinstance(opts.ModelAdmin.list_display, (list, tuple)):
                     e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
                 else:
-                    for fn in opts.admin.list_display:
+                    for fn in opts.ModelAdmin.list_display:
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:
@@ -1010,10 +1010,10 @@ def get_validation_errors(outfile, app=None):
                         if fn not in opts.admin.list_display:
                             e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
                 # list_filter
-                if not isinstance(opts.admin.list_filter, (list, tuple)):
+                if not isinstance(opts.ModelAdmin.list_filter, (list, tuple)):
                     e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
                 else:
-                    for fn in opts.admin.list_filter:
+                    for fn in opts.ModelAdmin.list_filter:
                         try:
                             f = opts.get_field(fn)
                         except models.FieldDoesNotExist:

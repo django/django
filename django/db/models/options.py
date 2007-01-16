@@ -199,14 +199,12 @@ class Options(object):
         return self._field_types[field_type]
 
 class AdminOptions(object):
-    def __init__(self, fields=None, js=None, list_display=None, list_display_links=None, list_filter=None,
+    def __init__(self, fields=None, js=None, list_display_links=None,
         date_hierarchy=None, save_as=False, ordering=None, search_fields=None,
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
         self.fields = fields
         self.js = js or []
-        self.list_display = list_display or ['__str__']
         self.list_display_links = list_display_links or []
-        self.list_filter = list_filter or []
         self.date_hierarchy = date_hierarchy
         self.save_as, self.ordering = save_as, ordering
         self.search_fields = search_fields or []
