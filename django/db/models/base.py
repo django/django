@@ -137,7 +137,7 @@ class Model(object):
             # of ModelAdmin.
             cls._meta.ModelAdmin = type('ModelAdmin', (value, ModelAdmin), {})
             # This AdminOptions stuff is legacy and will eventually be removed.
-            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_') and k not in ('list_display', 'list_display_links', 'list_filter', 'date_hierarchy', 'save_as')]))
+            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_') and k not in ('list_display', 'list_display_links', 'list_filter', 'date_hierarchy', 'save_as', 'search_fields')]))
             value.contribute_to_class(cls, name)
         elif hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)

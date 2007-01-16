@@ -292,7 +292,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -301,6 +301,7 @@ class ChangeList(object):
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.date_hierarchy = date_hierarchy
+        self.search_fields = search_fields
 
         # Get search parameters from the query string.
         try:
@@ -474,9 +475,9 @@ class ChangeList(object):
             else:
                 return "%s__icontains" % field_name
 
-        if self.lookup_opts.admin.search_fields and self.query:
+        if self.search_fields and self.query:
             for bit in self.query.split():
-                or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
+                or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.search_fields]
                 other_qs = QuerySet(self.model)
                 if qs._select_related:
                     other_qs = other_qs.select_related()
