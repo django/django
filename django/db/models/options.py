@@ -200,11 +200,11 @@ class Options(object):
 
 class AdminOptions(object):
     def __init__(self, fields=None, js=None,
-        save_as=False, ordering=None, search_fields=None,
+        ordering=None, search_fields=None,
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
         self.fields = fields
         self.js = js or []
-        self.save_as, self.ordering = save_as, ordering
+        self.ordering = ordering
         self.search_fields = search_fields or []
         self.save_on_top = save_on_top
         self.list_select_related = list_select_related

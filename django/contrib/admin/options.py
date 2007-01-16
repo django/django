@@ -37,6 +37,7 @@ class ModelAdmin(object):
     list_display_links = ()
     list_filter = ()
     date_hierarchy = None
+    save_as = False
 
     def __init__(self, model):
         self.model = model
