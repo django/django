@@ -193,8 +193,8 @@ def result_list(cl):
 result_list = register.inclusion_tag("admin/change_list_results.html")(result_list)
 
 def date_hierarchy(cl):
-    if cl.lookup_opts.admin.date_hierarchy:
-        field_name = cl.lookup_opts.admin.date_hierarchy
+    if cl.date_hierarchy:
+        field_name = cl.date_hierarchy
         year_field = '%s__year' % field_name
         month_field = '%s__month' % field_name
         day_field = '%s__day' % field_name

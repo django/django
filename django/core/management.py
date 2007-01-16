@@ -1019,11 +1019,11 @@ def get_validation_errors(outfile, app=None):
                         except models.FieldDoesNotExist:
                             e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
                 # date_hierarchy
-                if opts.admin.date_hierarchy:
+                if opts.ModelAdmin.date_hierarchy:
                     try:
-                        f = opts.get_field(opts.admin.date_hierarchy)
+                        f = opts.get_field(opts.ModelAdmin.date_hierarchy)
                     except models.FieldDoesNotExist:
-                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
+                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.ModelAdmin.date_hierarchy)
 
         # Check ordering attribute.
         if opts.ordering:

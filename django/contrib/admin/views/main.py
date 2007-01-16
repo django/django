@@ -292,7 +292,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -300,6 +300,7 @@ class ChangeList(object):
         self.list_display = list_display
         self.list_display_links = list_display_links
         self.list_filter = list_filter
+        self.date_hierarchy = date_hierarchy
 
         # Get search parameters from the query string.
         try:
