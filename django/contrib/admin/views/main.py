@@ -192,6 +192,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'form_url': form_url,
         'opts': opts,
         'content_type_id': ContentType.objects.get_for_model(model).id,
+        'save_on_top': opts.ModelAdmin.save_on_top,
     }
     context.update(extra_context)
     return render_to_response([

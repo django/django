@@ -200,10 +200,9 @@ class Options(object):
 
 class AdminOptions(object):
     def __init__(self, fields=None, js=None,
-        save_on_top=False, manager=None):
+        manager=None):
         self.fields = fields
         self.js = js or []
-        self.save_on_top = save_on_top
         self.manager = manager or Manager()
 
     def get_field_sets(self, opts):

@@ -26,7 +26,7 @@
 <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form">{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-{% if opts.admin.save_on_top %}{% submit_row %}{% endif %}
+{% if save_on_top %}{% submit_row %}{% endif %}
 {% if form.error_dict %}
     <p class="errornote">
     {% blocktrans count form.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
