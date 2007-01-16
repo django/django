@@ -292,7 +292,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -302,6 +302,7 @@ class ChangeList(object):
         self.list_filter = list_filter
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
+        self.list_select_related = list_select_related
 
         # Get search parameters from the query string.
         try:
@@ -432,7 +433,7 @@ class ChangeList(object):
 
         # Use select_related() if one of the list_display options is a field
         # with a relationship.
-        if self.lookup_opts.admin.list_select_related:
+        if self.list_select_related:
             qs = qs.select_related()
         else:
             for field_name in self.list_display:

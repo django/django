@@ -36,6 +36,7 @@ class ModelAdmin(object):
     list_display = ('__str__',)
     list_display_links = ()
     list_filter = ()
+    list_select_related = False
     search_fields = ()
     date_hierarchy = None
     save_as = False
@@ -275,7 +276,7 @@ class ModelAdmin(object):
             raise PermissionDenied
         try:
             cl = ChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                self.date_hierarchy, self.search_fields)
+                self.date_hierarchy, self.search_fields, self.list_select_related)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'
