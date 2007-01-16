@@ -81,7 +81,7 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
     if not model._meta.admin:
         raise Http404("This object has no admin interface.")
-    mav = ModelAdmin(model)
+    mav = model._meta.ModelAdmin(model)
     return mav(request, rest_of_url)
 model_admin_view = staff_member_required(never_cache(model_admin_view))
 
@@ -292,11 +292,12 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model):
+    def __init__(self, request, model, list_display):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
         self.manager = self.opts.admin.manager
+        self.list_display = list_display
 
         # Get search parameters from the query string.
         try:
@@ -404,7 +405,7 @@ class ChangeList(object):
         if params.has_key(ORDER_VAR):
             try:
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(self.list_display[int(params[ORDER_VAR])])
                 except models.FieldDoesNotExist:
                     pass
                 else:
@@ -431,7 +432,7 @@ class ChangeList(object):
         if self.lookup_opts.admin.list_select_related:
             qs = qs.select_related()
         else:
-            for field_name in self.lookup_opts.admin.list_display:
+            for field_name in self.list_display:
                 try:
                     f = self.lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:

@@ -32,6 +32,9 @@ def unquote(s):
 
 class ModelAdmin(object):
     "Encapsulates all admin options and functionality for a given model."
+
+    list_display = ('__str__',)
+
     def __init__(self, model):
         self.model = model
         self.opts = model._meta
@@ -266,7 +269,7 @@ class ModelAdmin(object):
         if not self.has_change_permission(request, None):
             raise PermissionDenied
         try:
-            cl = ChangeList(request, self.model)
+            cl = ChangeList(request, self.model, self.list_display)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'

@@ -69,7 +69,7 @@ pagination = register.inclusion_tag('admin/pagination.html')(pagination)
 def result_headers(cl):
     lookup_opts = cl.lookup_opts
 
-    for i, field_name in enumerate(lookup_opts.admin.list_display):
+    for i, field_name in enumerate(cl.list_display):
         try:
             f = lookup_opts.get_field(field_name)
         except models.FieldDoesNotExist:
@@ -108,7 +108,7 @@ def _boolean_icon(field_val):
 def items_for_result(cl, result):
     first = True
     pk = cl.lookup_opts.pk.attname
-    for field_name in cl.lookup_opts.admin.list_display:
+    for field_name in cl.list_display:
         row_class = ''
         try:
             f = cl.lookup_opts.get_field(field_name)
@@ -172,7 +172,7 @@ def items_for_result(cl, result):
         if result_repr == '':
             result_repr = '&nbsp;'
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links: 
+        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)

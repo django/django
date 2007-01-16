@@ -87,10 +87,10 @@ class Options(object):
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-        
+
     def __str__(self):
         return "%s.%s" % (self.app_label, self.module_name)
-        
+
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
