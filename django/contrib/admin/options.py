@@ -41,6 +41,7 @@ class ModelAdmin(object):
     search_fields = ()
     date_hierarchy = None
     save_as = False
+    ordering = None
 
     def __init__(self, model):
         self.model = model

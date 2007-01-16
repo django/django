@@ -398,7 +398,7 @@ class ChangeList(object):
         # then check the object's default ordering. If neither of those exist,
         # order descending by ID by default. Finally, look for manually-specified
         # ordering from the query string.
-        ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
+        ordering = lookup_opts.ModelAdmin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
 
         # Normalize it to new-style ordering.
         ordering = handle_legacy_orderlist(ordering)
