@@ -292,7 +292,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -303,6 +303,7 @@ class ChangeList(object):
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
+        self.list_per_page = list_per_page
 
         # Get search parameters from the query string.
         try:
@@ -351,7 +352,7 @@ class ChangeList(object):
         return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
     def get_results(self, request):
-        paginator = ObjectPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
+        paginator = ObjectPaginator(self.query_set, self.list_per_page)
 
         # Get the number of objects, with admin filters applied.
         try:
@@ -373,7 +374,7 @@ class ChangeList(object):
             full_result_count = self.manager.count()
 
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
-        multi_page = result_count > self.lookup_opts.admin.list_per_page
+        multi_page = result_count > self.list_per_page
 
         # Get the list of objects to display on this page.
         if (self.show_all and can_show_all) or not multi_page:
