@@ -199,10 +199,8 @@ class Options(object):
         return self._field_types[field_type]
 
 class AdminOptions(object):
-    def __init__(self, fields=None, js=None,
-        manager=None):
+    def __init__(self, fields=None, manager=None):
         self.fields = fields
-        self.js = js or []
         self.manager = manager or Manager()
 
     def get_field_sets(self, opts):

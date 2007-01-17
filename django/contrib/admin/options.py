@@ -43,6 +43,7 @@ class ModelAdmin(object):
     save_as = False
     save_on_top = False
     ordering = None
+    js = None
 
     def __init__(self, model):
         self.model = model

@@ -57,8 +57,8 @@ def get_javascript_imports(opts, auto_populated_fields, field_sets):
         js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
     if opts.get_ordered_objects():
         js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
-    if opts.admin.js:
-        js.extend(opts.admin.js)
+    if opts.ModelAdmin.js:
+        js.extend(opts.ModelAdmin.js)
     seen_collapse = False
     for field_set in field_sets:
         if not seen_collapse and 'collapse' in field_set.classes:
