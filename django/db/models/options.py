@@ -4,7 +4,6 @@ from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
-from django.db.models import Manager
 from bisect import bisect
 import re
 
@@ -199,9 +198,8 @@ class Options(object):
         return self._field_types[field_type]
 
 class AdminOptions(object):
-    def __init__(self, fields=None, manager=None):
+    def __init__(self, fields=None):
         self.fields = fields
-        self.manager = manager or Manager()
 
     def get_field_sets(self, opts):
         "Returns a list of AdminFieldSet objects for this AdminOptions object."
@@ -220,8 +218,6 @@ class AdminOptions(object):
 
     def contribute_to_class(self, cls, name):
         cls._meta.admin = self
-        # Make sure the admin manager has access to the model
-        self.manager.model = cls
 
 class AdminFieldSet(object):
     def __init__(self, name, classes, field_locator_func, line_specs, description):

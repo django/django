@@ -95,6 +95,9 @@ class ModelAdmin(object):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
 
+    def change_list_queryset(self, request):
+        return self.model._default_manager.get_query_set()
+
     def add_view(self, request, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
         "The 'add' admin view for this model."
         from django.contrib.admin.views.main import render_change_form
@@ -280,7 +283,7 @@ class ModelAdmin(object):
             raise PermissionDenied
         try:
             cl = ChangeList(request, self.model, self.list_display, self.list_display_links, self.list_filter,
-                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page)
+                self.date_hierarchy, self.search_fields, self.list_select_related, self.list_per_page, self)
         except IncorrectLookupParameters:
             # Wacky lookup parameters were given, so redirect to the main
             # changelist page, without parameters, and pass an 'invalid=1'

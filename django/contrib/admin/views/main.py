@@ -293,11 +293,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
-    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page):
+    def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, model_admin):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
-        self.manager = self.opts.admin.manager
+        self.root_query_set = model_admin.change_list_queryset(request)
         self.list_display = list_display
         self.list_display_links = list_display_links
         self.list_filter = list_filter
@@ -372,7 +372,7 @@ class ChangeList(object):
         if isinstance(self.query_set._filters, models.Q) and not self.query_set._filters.kwargs:
             full_result_count = result_count
         else:
-            full_result_count = self.manager.count()
+            full_result_count = self.root_query_set.count()
 
         can_show_all = result_count <= MAX_SHOW_ALL_ALLOWED
         multi_page = result_count > self.list_per_page
@@ -424,7 +424,7 @@ class ChangeList(object):
         return order_field, order_type
 
     def get_query_set(self):
-        qs = self.manager.get_query_set()
+        qs = self.root_query_set
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if lookup_params.has_key(i):
