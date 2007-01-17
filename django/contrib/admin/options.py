@@ -30,6 +30,43 @@ def unquote(s):
             myappend('_' + item)
     return "".join(res)
 
+class AdminFieldSet(object):
+    def __init__(self, name, classes, field_locator_func, line_specs, description):
+        self.name = name
+        self.field_lines = [AdminFieldLine(field_locator_func, line_spec) for line_spec in line_specs]
+        self.classes = classes
+        self.description = description
+
+    def __repr__(self):
+        return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
+
+    def bind(self, field_mapping, original, bound_field_set_class):
+        return bound_field_set_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field_line in self.field_lines:
+            yield field_line
+
+    def __len__(self):
+        return len(self.field_lines)
+
+class AdminFieldLine(object):
+    def __init__(self, field_locator_func, linespec):
+        if isinstance(linespec, basestring):
+            self.fields = [field_locator_func(linespec)]
+        else:
+            self.fields = [field_locator_func(field_name) for field_name in linespec]
+
+    def bind(self, field_mapping, original, bound_field_line_class):
+        return bound_field_line_class(self, field_mapping, original)
+
+    def __iter__(self):
+        for field in self.fields:
+            yield field
+
+    def __len__(self):
+        return len(self.fields)
+
 class ModelAdmin(object):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -44,6 +81,7 @@ class ModelAdmin(object):
     save_on_top = False
     ordering = None
     js = None
+    fields = None
 
     def __init__(self, model):
         self.model = model
@@ -73,6 +111,21 @@ class ModelAdmin(object):
             return self.delete_view(request, unquote(url[:-7]))
         else:
             return self.change_view(request, unquote(url))
+
+    def get_field_sets(self, opts):
+        "Returns a list of AdminFieldSet objects."
+        if self.fields is None:
+            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]}),)
+        else:
+            field_struct = self.fields
+        new_fieldset_list = []
+        for fieldset in field_struct:
+            fs_options = fieldset[1]
+            classes = fs_options.get('classes', ())
+            description = fs_options.get('description', '')
+            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes,
+                opts.get_field, fs_options['fields'], description))
+        return new_fieldset_list
 
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
@@ -173,7 +226,7 @@ class ModelAdmin(object):
         if object_id_override is not None:
             c['object_id'] = object_id_override
 
-        return render_change_form(model, manipulator, c, add=True)
+        return render_change_form(self, model, manipulator, c, add=True)
 
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
@@ -272,7 +325,7 @@ class ModelAdmin(object):
             'original': manipulator.original_object,
             'is_popup': request.REQUEST.has_key('_popup'),
         })
-        return render_change_form(model, manipulator, c, change=True)
+        return render_change_form(self, model, manipulator, c, change=True)
 
     def change_list_view(self, request):
         "The 'change list' admin view for this model."

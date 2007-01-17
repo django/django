@@ -57,8 +57,8 @@ def get_javascript_imports(opts, auto_populated_fields, field_sets):
         js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
     if opts.get_ordered_objects():
         js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
-    if opts.ModelAdmin.js:
-        js.extend(opts.ModelAdmin.js)
+    if opts.admin.js:
+        js.extend(opts.admin.js)
     seen_collapse = False
     for field_set in field_sets:
         if not seen_collapse and 'collapse' in field_set.classes:
@@ -81,7 +81,7 @@ def model_admin_view(request, app_label, model_name, rest_of_url):
         raise Http404("App %r, model %r, not found" % (app_label, model_name))
     if not model._meta.admin:
         raise Http404("This object has no admin interface.")
-    mav = model._meta.ModelAdmin(model)
+    mav = model._meta.admin(model)
     return mav(request, rest_of_url)
 model_admin_view = staff_member_required(never_cache(model_admin_view))
 
@@ -166,11 +166,11 @@ class AdminBoundFieldSet(object):
     def __len__(self):
         return len(self.bound_field_lines)
 
-def render_change_form(model, manipulator, context, add=False, change=False, form_url=''):
+def render_change_form(model_admin, model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-    field_sets = opts.admin.get_field_sets(opts)
+    field_sets = model_admin.get_field_sets(opts)
     original = getattr(manipulator, 'original_object', None)
     bound_field_sets = [field_set.bind(context['form'], original, AdminBoundFieldSet) for field_set in field_sets]
     first_form_field_id = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
@@ -192,7 +192,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'form_url': form_url,
         'opts': opts,
         'content_type_id': ContentType.objects.get_for_model(model).id,
-        'save_on_top': opts.ModelAdmin.save_on_top,
+        'save_on_top': model_admin.save_on_top,
     }
     context.update(extra_context)
     return render_to_response([
@@ -305,6 +305,7 @@ class ChangeList(object):
         self.search_fields = search_fields
         self.list_select_related = list_select_related
         self.list_per_page = list_per_page
+        self.model_admin = model_admin
 
         # Get search parameters from the query string.
         try:
@@ -399,7 +400,7 @@ class ChangeList(object):
         # then check the object's default ordering. If neither of those exist,
         # order descending by ID by default. Finally, look for manually-specified
         # ordering from the query string.
-        ordering = lookup_opts.ModelAdmin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
+        ordering = self.model_admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
 
         # Normalize it to new-style ordering.
         ordering = handle_legacy_orderlist(ordering)

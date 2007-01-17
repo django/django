@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
 from django.db.models.query import delete_objects
-from django.db.models.options import Options, AdminOptions
+from django.db.models.options import Options
 from django.db import connection, backend, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
@@ -135,10 +135,7 @@ class Model(object):
             # of both ModelAdmin and the 'class Admin' on this model. The
             # resulting class is same as if the 'class Admin' were a subclass
             # of ModelAdmin.
-            cls._meta.ModelAdmin = type('ModelAdmin', (value, ModelAdmin), {})
-            # This AdminOptions stuff is legacy and will eventually be removed.
-            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_') and k not in ('list_display', 'list_display_links', 'list_filter', 'date_hierarchy', 'save_as', 'search_fields', 'list_select_related', 'list_per_page', 'ordering', 'save_on_top', 'js', 'manager')]))
-            value.contribute_to_class(cls, name)
+            cls._meta.admin = type('ModelAdmin', (value, ModelAdmin), {})
         elif hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:

@@ -8,18 +8,6 @@ model validation is working properly.
 from django.db import models
 model_errors = ""
 
-# TODO: Invalid admin options should not cause a metaclass error
-##This should fail gracefully but is causing a metaclass error
-#class BadAdminOption(models.Model):
-#    "Test nonexistent admin option"
-#    name = models.CharField(maxlength=30)
-#    
-#    class Admin:
-#        nonexistent = 'option'
-#
-#model_errors += """invalid_admin_options.badadminoption: "admin" attribute, if given, must be set to a models.AdminOptions() instance.
-#"""
-        
 class ListDisplayBadOne(models.Model):
     "Test list_display, list_display must be a list or tuple"
     first_name = models.CharField(maxlength=30)
