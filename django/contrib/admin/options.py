@@ -151,7 +151,7 @@ class ModelAdmin(object):
     def change_list_queryset(self, request):
         return self.model._default_manager.get_query_set()
 
-    def add_view(self, request, form_url='', post_url=None, post_url_continue='../%s/'):
+    def add_view(self, request, form_url='', post_url_continue='../%s/'):
         "The 'add' admin view for this model."
         from django.contrib.admin.views.main import render_change_form
         from django.contrib.contenttypes.models import ContentType
@@ -163,13 +163,12 @@ class ModelAdmin(object):
         if not self.has_add_permission(request):
             raise PermissionDenied
 
-        if post_url is None:
-            if self.has_change_permission(request, None):
-                # redirect to list view
-                post_url = '../'
-            else:
-                # Object list will give 'Permission Denied', so go back to admin home
-                post_url = '../../../'
+        if self.has_change_permission(request, None):
+            # redirect to list view
+            post_url = '../'
+        else:
+            # Object list will give 'Permission Denied', so go back to admin home
+            post_url = '../../../'
 
         manipulator = model.AddManipulator()
         if request.POST:
