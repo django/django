@@ -152,8 +152,8 @@ the `required details`_. A number of tickets have patches, but those patches
 don't meet all the requirements of a `good patch`_.
 
 One way to help out is to *triage* bugs that have been reported by other
-users. We have a couple of dedicated volunteers who work on this regularly,
-but more help is always appriciated.
+users. A couple of dedicated volunteers work on this regularly, but more help
+is always appreciated.
 
 Most of the workflow is based around the concept of a ticket's "triage stage".
 This stage describes where in its lifetime a given ticket is at any time.
@@ -170,43 +170,43 @@ Since a picture is worth a thousand words, let's start there:
 We've got two roles here:
 
     * Core developers: people with commit access who make the decisions and
-      write the bulk of the code
+      write the bulk of the code.
 
     * Ticket triagers: community members who keep track of tickets, making
-      sure that they're always categorized correctly.
+      sure the tickets are always categorized correctly.
 
 Second, note the four triage stages:
 
-    1. "Unreviewed", meaning that a triager has yet to examine the ticket and
-       move it along.
+    1. A ticket starts as "Unreviewed", meaning that a triager has yet to
+       examine the ticket and move it along.
 
-    2. "Design decision needed", meaning "this concept requires a design
+    2. "Design decision needed" means "this concept requires a design
        decision," which should be discussed either in the ticket comments or on
        django-developers.
 
-    3. Once a ticket is ruled to be approved for fixing, it's moved along into
-       the "Accepted" stage. This stage is where all the real work gets done.
+    3. Once a ticket is ruled to be approved for fixing, it's moved into the
+       "Accepted" stage. This stage is where all the real work gets done.
 
     4. If a ticket has an associated patch (see below), a triager will review the
        patch. If the patch is complete, it'll be marked as "ready for checkin" so
        that a core developer knows to review and check in the patches.
-       
+
 The second part of this workflow involves a set of flags the describe what the
 ticket has or needs in order to be "ready for checkin":
 
     "Has patch"
-        The means that the ticket has an associated patch_. These will be
+        The means the ticket has an associated patch_. These will be
         reviewed to see if the patch is "good".
-        
+
     "Needs documentation"
         This flag is used for tickets with patches that need associated
         documentation. Complete documentation of features is a prerequisite
         before we can check a fix into the codebase.
 
     "Needs tests"
-        This flags the patch as needing associated unit tests.  Again,
-        this is required part of a valid patch.
-        
+        This flags the patch as needing associated unit tests. Again, this is a
+        required part of a valid patch.
+
     "Patch needs improvement"
         This flag means that although the ticket *has* a patch, it's not quite
         ready for checkin. This could mean the patch no longer applies
