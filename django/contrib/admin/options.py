@@ -151,7 +151,7 @@ class ModelAdmin(object):
     def change_list_queryset(self, request):
         return self.model._default_manager.get_query_set()
 
-    def add_view(self, request, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
+    def add_view(self, request, form_url='', post_url=None, post_url_continue='../%s/'):
         "The 'add' admin view for this model."
         from django.contrib.admin.views.main import render_change_form
         from django.contrib.contenttypes.models import ContentType
@@ -220,11 +220,8 @@ class ModelAdmin(object):
             'title': _('Add %s') % opts.verbose_name,
             'form': form,
             'is_popup': request.REQUEST.has_key('_popup'),
-            'show_delete': show_delete,
+            'show_delete': False,
         })
-
-        if object_id_override is not None:
-            c['object_id'] = object_id_override
 
         return render_change_form(self, model, manipulator, c, add=True)
 
