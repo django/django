@@ -122,9 +122,9 @@ Patch style
     * Name the patch file with a ``.diff`` extension; this will let the ticket
       tracker apply correct syntax highlighting, which is quite helpful.
 
-    * Put the prefix "[patch] " before the title of your ticket. This will make
-      it obvious that the ticket includes a patch, and it will add the ticket
-      to the `list of tickets with patches`_.
+    * Check the "Has patch" box on the ticket details. This will make it
+      obvious that the ticket includes a patch, and it will add the ticket to
+      the `list of tickets with patches`_.
 
     * The code required to fix a problem or add a feature is an essential part
       of a patch, but it is not the only part. A good patch should also include
@@ -594,7 +594,7 @@ requests for commit access are potential flame-war starters, and will be ignored
 .. _search the tracker: http://code.djangoproject.com/search
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
-.. _list of tickets with patches: http://code.djangoproject.com/report/12
+.. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _PEP 8: http://www.python.org/peps/pep-0008.html
 .. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
