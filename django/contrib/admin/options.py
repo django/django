@@ -67,6 +67,13 @@ class AdminFieldLine(object):
     def __len__(self):
         return len(self.fields)
 
+# New implementation of Fieldset
+class Fieldset(object):
+    def __init__(self, name, field_list, classes=None, description=None):
+        self.name, self.field_list = name, field_list
+        self.classes = classes or ()
+        self.description = description
+
 class ModelAdmin(object):
     "Encapsulates all admin options and functionality for a given model."
 
@@ -125,6 +132,32 @@ class ModelAdmin(object):
             description = options.get('description', '')
             new_fieldset_list.append(AdminFieldSet(name, classes, opts.get_field, options['fields'], description))
         return new_fieldset_list
+
+    def fieldsets(self, request):
+        """
+        Generator that yields Fieldset objects for use on add and change admin
+        form pages.
+
+        This default implementation looks at self.fields, but subclasses can
+        override this implementation and do something special based on the
+        given HttpRequest object.
+        """
+        if self.fields is None:
+            default_fields = [f.name for f in self.opts.fields + self.opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]
+            yield Fieldset(fields=default_fields)
+        else:
+            for name, options in self.fields:
+                yield Fieldset(name, options['fields'], classes=options.get('classes'), description=options.get('description'))
+
+    def fieldsets_add(self, request):
+        "Hook for specifying Fieldsets for the add form."
+        for fs in self.fieldsets(request):
+            yield fs
+
+    def fieldsets_change(self, request, object_id):
+        "Hook for specifying Fieldsets for the change form."
+        for fs in self.fieldsets(request):
+            yield fs
 
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
