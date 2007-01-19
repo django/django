@@ -21,7 +21,18 @@
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}{% search_form cl %}{% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
-{% block filters %}{% filters cl %}{% endblock %}
+
+{% block filters %}
+{% if cl.has_filters %}
+<div id="changelist-filter">
+<h2>{% trans 'Filter' %}</h2>
+{% for spec in cl.filter_specs %}
+   {% filter cl spec %}
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
 {% block result_list %}{% result_list cl %}{% endblock %}
 {% block pagination %}{% pagination cl %}{% endblock %}
 </div>
