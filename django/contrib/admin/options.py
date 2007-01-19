@@ -102,7 +102,7 @@ class ModelAdmin(object):
 
         # Delegate to the appropriate method, based on the URL.
         if url is None:
-            return self.change_list_view(request)
+            return self.changelist_view(request)
         elif url.endswith('add'):
             return self.add_view(request)
         elif url.endswith('history'):
@@ -323,7 +323,7 @@ class ModelAdmin(object):
         })
         return render_change_form(self, model, manipulator, c, change=True)
 
-    def change_list_view(self, request):
+    def changelist_view(self, request):
         "The 'change list' admin view for this model."
         from django.contrib.admin.views.main import ChangeList, ERROR_FLAG
         opts = self.model._meta
