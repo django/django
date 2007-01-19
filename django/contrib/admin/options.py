@@ -112,8 +112,9 @@ class ModelAdmin(object):
         else:
             return self.change_view(request, unquote(url))
 
-    def get_field_sets(self, opts):
+    def get_field_sets(self):
         "Returns a list of AdminFieldSet objects."
+        opts = self.opts
         if self.fields is None:
             field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]}),)
         else:
