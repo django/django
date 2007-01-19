@@ -31,9 +31,9 @@ def unquote(s):
     return "".join(res)
 
 class AdminFieldSet(object):
-    def __init__(self, name, classes, field_locator_func, line_specs, description):
+    def __init__(self, name, classes, field_locator_func, field_list, description):
         self.name = name
-        self.field_lines = [AdminFieldLine(field_locator_func, line_spec) for line_spec in line_specs]
+        self.field_lines = [AdminFieldLine(field_locator_func, field) for field in field_list]
         self.classes = classes
         self.description = description
 
@@ -51,11 +51,11 @@ class AdminFieldSet(object):
         return len(self.field_lines)
 
 class AdminFieldLine(object):
-    def __init__(self, field_locator_func, linespec):
-        if isinstance(linespec, basestring):
-            self.fields = [field_locator_func(linespec)]
+    def __init__(self, field_locator_func, field_name):
+        if isinstance(field_name, basestring):
+            self.fields = [field_locator_func(field_name)]
         else:
-            self.fields = [field_locator_func(field_name) for field_name in linespec]
+            self.fields = [field_locator_func(name) for name in field_name]
 
     def bind(self, field_mapping, original, bound_field_line_class):
         return bound_field_line_class(self, field_mapping, original)
@@ -113,7 +113,7 @@ class ModelAdmin(object):
             return self.change_view(request, unquote(url))
 
     def get_field_sets(self):
-        "Returns a list of AdminFieldSet objects."
+        "Returns a list of AdminFieldSet objects according to self.fields."
         opts = self.opts
         if self.fields is None:
             field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]}),)
@@ -123,8 +123,7 @@ class ModelAdmin(object):
         for name, options in field_struct:
             classes = options.get('classes', ())
             description = options.get('description', '')
-            new_fieldset_list.append(AdminFieldSet(name, classes,
-                opts.get_field, options['fields'], description))
+            new_fieldset_list.append(AdminFieldSet(name, classes, opts.get_field, options['fields'], description))
         return new_fieldset_list
 
     def has_add_permission(self, request):
