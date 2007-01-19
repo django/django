@@ -120,12 +120,11 @@ class ModelAdmin(object):
         else:
             field_struct = self.fields
         new_fieldset_list = []
-        for fieldset in field_struct:
-            fs_options = fieldset[1]
-            classes = fs_options.get('classes', ())
-            description = fs_options.get('description', '')
-            new_fieldset_list.append(AdminFieldSet(fieldset[0], classes,
-                opts.get_field, fs_options['fields'], description))
+        for name, options in field_struct:
+            classes = options.get('classes', ())
+            description = options.get('description', '')
+            new_fieldset_list.append(AdminFieldSet(name, classes,
+                opts.get_field, options['fields'], description))
         return new_fieldset_list
 
     def has_add_permission(self, request):
