@@ -165,7 +165,7 @@ class EditInlineNode(template.Node):
         else:
             bound_related_object_class = relation.field.rel.edit_inline
         original = context.get('original', None)
-        bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
+        bound_related_object = relation.bind(context['oldform'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
         t = loader.get_template(bound_related_object.template_name())
         output = t.render(context)

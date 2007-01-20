@@ -34,9 +34,9 @@
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
-{% if form.error_dict %}
+{% if oldform.error_dict %}
     <p class="errornote">
-    {% blocktrans count form.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    {% blocktrans count oldform.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
     </p>
 {% endif %}
 {% for bound_field_set in bound_field_sets %}
@@ -55,9 +55,9 @@
 {% if change %}
    {% if ordered_objects %}
    <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
-   <div class="form-row{% if form.order_.errors %} error{% endif %} ">
-   {% if form.order_.errors %}{{ form.order_.html_error_list }}{% endif %}
-   <p><label for="id_order_">{% trans "Order:" %}</label> {{ form.order_ }}</p>
+   <div class="form-row{% if oldform.order_.errors %} error{% endif %} ">
+   {% if oldform.order_.errors %}{{ oldform.order_.html_error_list }}{% endif %}
+   <p><label for="id_order_">{% trans "Order:" %}</label> {{ oldform.order_ }}</p>
    </div></fieldset>
    {% endif %}
 {% endif %}

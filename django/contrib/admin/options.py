@@ -249,7 +249,7 @@ class ModelAdmin(object):
 
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
-            'form': form,
+            'oldform': form,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
         })
@@ -348,7 +348,7 @@ class ModelAdmin(object):
 
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
-            'form': form,
+            'oldform': form,
             'object_id': object_id,
             'original': manipulator.original_object,
             'is_popup': request.REQUEST.has_key('_popup'),
