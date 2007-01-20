@@ -8,7 +8,7 @@ __all__ = (
     'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
 )
 
-from util import StrAndUnicode, smart_unicode
+from util import flatatt, StrAndUnicode, smart_unicode
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from itertools import chain
@@ -17,10 +17,6 @@ try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
-
-# Converts a dictionary to a single string with key="value", XML-style with
-# a leading space. Assumes keys do not need to be XML-escaped.
-flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.

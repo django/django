@@ -5,8 +5,8 @@ Form classes
 from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from fields import Field
-from widgets import flatatt, TextInput, Textarea, HiddenInput, MultipleHiddenInput
-from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
+from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
+from util import flatatt, StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
 __all__ = ('BaseForm', 'Form')
 
