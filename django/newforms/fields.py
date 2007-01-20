@@ -92,9 +92,7 @@ class CharField(Field):
         "Validates max_length and min_length. Returns a Unicode object."
         super(CharField, self).clean(value)
         if value in EMPTY_VALUES:
-            value = u''
-            if not self.required:
-                return value
+            return u''
         value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
@@ -117,7 +115,7 @@ class IntegerField(Field):
         of int(). Returns None for empty values.
         """
         super(IntegerField, self).clean(value)
-        if not self.required and value in EMPTY_VALUES:
+        if value in EMPTY_VALUES:
             return None
         try:
             value = int(value)
@@ -245,9 +243,10 @@ class RegexField(Field):
         Unicode object.
         """
         super(RegexField, self).clean(value)
-        if value in EMPTY_VALUES: value = u''
+        if value in EMPTY_VALUES:
+            value = u''
         value = smart_unicode(value)
-        if not self.required and value == u'':
+        if value == u'':
             return value
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
@@ -288,7 +287,7 @@ class URLField(RegexField):
 
     def clean(self, value):
         value = super(URLField, self).clean(value)
-        if not self.required and value == u'':
+        if value == u'':
             return value
         if self.verify_exists:
             import urllib2
@@ -329,9 +328,10 @@ class ChoiceField(Field):
         Validates that the input is in self.choices.
         """
         value = super(ChoiceField, self).clean(value)
-        if value in EMPTY_VALUES: value = u''
+        if value in EMPTY_VALUES:
+            value = u''
         value = smart_unicode(value)
-        if not self.required and value == u'':
+        if value == u'':
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
