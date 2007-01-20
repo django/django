@@ -1,4 +1,5 @@
 from django import oldforms, template
+from django import newforms as forms
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -67,12 +68,62 @@ class AdminFieldLine(object):
     def __len__(self):
         return len(self.fields)
 
-# New implementation of Fieldset
+class AdminForm(object):
+    def __init__(self, form, fieldsets):
+        self.form, self.fieldsets = form, fieldsets
+
+    def __iter__(self):
+        for fieldset in self.fieldsets:
+            yield BoundFieldset(self.form, fieldset)
+
 class Fieldset(object):
     def __init__(self, name=None, fields=(), classes=(), description=None):
         self.name, self.fields = name, fields
         self.classes = ' '.join(classes)
         self.description = description
+
+class BoundFieldset(object):
+    def __init__(self, form, fieldset):
+        self.form, self.fieldset = form, fieldset
+
+    def __iter__(self):
+        for field in self.fieldset.fields:
+            yield BoundFieldline(self.form, field)
+
+class BoundFieldline(object):
+    def __init__(self, form, field):
+        self.form = form # A django.forms.Form instance
+        if isinstance(field, basestring):
+            self.fields = [field]
+        else:
+            self.fields = field
+
+    def __iter__(self):
+        for i, field in enumerate(self.fields):
+            yield BoundField(self.form, field, is_first=(i == 0))
+
+    def errors(self):
+        return u'\n'.join([self.form[f].errors.as_ul() for f in self.fields])
+
+class BoundField(object):
+    def __init__(self, form, field, is_first):
+        self.field = form[field] # A django.forms.BoundField instance
+        self.is_first = is_first # Whether this field is first on the line
+        self.is_checkbox = isinstance(self.field.field.widget, forms.CheckboxInput)
+
+    def label_tag(self):
+        classes = []
+        if self.is_checkbox:
+            classes.append('vCheckboxLabel')
+            contents = escape(self.field.label)
+        else:
+            contents = escape(self.field.label) + ':'
+        if self.field.field.required:
+            classes.append('required')
+        if not self.is_first:
+            classes.append('inline')
+        attrs = classes and {'class': ' '.join(classes)} or {}
+        return self.field.label_tag(contents=contents, attrs=attrs)
 
 class ModelAdmin(object):
     "Encapsulates all admin options and functionality for a given model."
@@ -202,18 +253,16 @@ class ModelAdmin(object):
             # Object list will give 'Permission Denied', so go back to admin home
             post_url = '../../../'
 
-        manipulator = model.AddManipulator()
+        ModelForm = forms.form_for_model(model)
+
         if request.POST:
             new_data = request.POST.copy()
-
             if opts.has_field_type(models.FileField):
                 new_data.update(request.FILES)
+            form = ModelForm(new_data)
 
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
-
-            if not errors:
-                new_object = manipulator.save(new_data)
+            if form.is_valid():
+                new_object = form.save(commit=True)
                 pk_value = new_object._get_pk_val()
                 LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
                 msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
@@ -236,25 +285,17 @@ class ModelAdmin(object):
                     request.user.message_set.create(message=msg)
                     return HttpResponseRedirect(post_url)
         else:
-            # Add default data.
-            new_data = manipulator.flatten_data()
-
-            # Override the defaults with GET params, if they exist.
-            new_data.update(dict(request.GET.items()))
-
-            errors = {}
-
-        # Populate the FormWrapper.
-        form = oldforms.FormWrapper(manipulator, new_data, errors)
+            form = ModelForm(initial=request.GET)
 
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
-            'oldform': form,
+            'adminform': AdminForm(form, self.fieldsets_add(request)),
+            'oldform': oldforms.FormWrapper(model.AddManipulator(), {}, {}),
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
         })
 
-        return render_change_form(self, model, manipulator, c, add=True)
+        return render_change_form(self, model, model.AddManipulator(), c, add=True)
 
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
@@ -272,32 +313,33 @@ class ModelAdmin(object):
             return self.add_view(request, form_url='../../add/')
 
         try:
-            manipulator = model.ChangeManipulator(object_id)
+            obj = model._default_manager.get(pk=object_id)
         except model.DoesNotExist:
             raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
+        ModelForm = forms.form_for_instance(obj)
+
         if request.POST:
             new_data = request.POST.copy()
-
             if opts.has_field_type(models.FileField):
                 new_data.update(request.FILES)
+            form = ModelForm(new_data)
 
-            errors = manipulator.get_validation_errors(new_data)
-            manipulator.do_html2python(new_data)
-
-            if not errors:
-                new_object = manipulator.save(new_data)
+            if form.is_valid():
+                new_object = form.save(commit=True)
                 pk_value = new_object._get_pk_val()
 
-                # Construct the change message.
+                # Construct the change message. TODO: Temporarily commented-out,
+                # as manipulator object doesn't exist anymore, and we don't yet
+                # have a way to get fields_added, fields_changed, fields_deleted.
                 change_message = []
-                if manipulator.fields_added:
-                    change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
-                if manipulator.fields_changed:
-                    change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
-                if manipulator.fields_deleted:
-                    change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
-                change_message = ' '.join(change_message)
+                #if manipulator.fields_added:
+                    #change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
+                #if manipulator.fields_changed:
+                    #change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
+                #if manipulator.fields_deleted:
+                    #change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
+                #change_message = ' '.join(change_message)
                 if not change_message:
                     change_message = _('No fields changed.')
                 LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
@@ -319,41 +361,31 @@ class ModelAdmin(object):
                     request.user.message_set.create(message=msg)
                     return HttpResponseRedirect("../")
         else:
-            # Populate new_data with a "flattened" version of the current data.
-            new_data = manipulator.flatten_data()
+            form = ModelForm()
 
-            # TODO: do this in flatten_data...
-            # If the object has ordered objects on its admin page, get the existing
-            # order and flatten it into a comma-separated list of IDs.
-            id_order_list = []
-            for rel_obj in opts.get_ordered_objects():
-                id_order_list.extend(getattr(manipulator.original_object, 'get_%s_order' % rel_obj.object_name.lower())())
-            if id_order_list:
-                new_data['order_'] = ','.join(map(str, id_order_list))
-            errors = {}
+        ## Populate the FormWrapper.
+        #oldform = oldforms.FormWrapper(manipulator, new_data, errors)
+        #oldform.original = manipulator.original_object
+        #oldform.order_objects = []
 
-        # Populate the FormWrapper.
-        form = oldforms.FormWrapper(manipulator, new_data, errors)
-        form.original = manipulator.original_object
-        form.order_objects = []
-
-        # TODO: Should be done in flatten_data  / FormWrapper construction
-        for related in opts.get_followed_related_objects():
-            wrt = related.opts.order_with_respect_to
-            if wrt and wrt.rel and wrt.rel.to == opts:
-                func = getattr(manipulator.original_object, 'get_%s_list' %
-                        related.get_accessor_name())
-                orig_list = func()
-                form.order_objects.extend(orig_list)
+        ## TODO: Should be done in flatten_data  / FormWrapper construction
+        #for related in opts.get_followed_related_objects():
+            #wrt = related.opts.order_with_respect_to
+            #if wrt and wrt.rel and wrt.rel.to == opts:
+                #func = getattr(manipulator.original_object, 'get_%s_list' %
+                        #related.get_accessor_name())
+                #orig_list = func()
+                #oldform.order_objects.extend(orig_list)
 
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
-            'oldform': form,
+            'adminform': AdminForm(form, self.fieldsets_change(request, object_id)),
+            'oldform': oldforms.FormWrapper(model.ChangeManipulator(object_id), {}, {}),
             'object_id': object_id,
-            'original': manipulator.original_object,
+            'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
         })
-        return render_change_form(self, model, manipulator, c, change=True)
+        return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
 
     def changelist_view(self, request):
         "The 'change list' admin view for this model."

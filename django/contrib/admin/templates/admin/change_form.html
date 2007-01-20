@@ -34,24 +34,34 @@
 <div>
 {% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
 {% if save_on_top %}{% submit_row %}{% endif %}
-{% if oldform.error_dict %}
+{% if adminform.form.errors %}
     <p class="errornote">
-    {% blocktrans count oldform.error_dict.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+    {% blocktrans count adminform.form.errors.items|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
     </p>
 {% endif %}
-{% for bound_field_set in bound_field_sets %}
-   <fieldset class="module aligned {{ bound_field_set.classes }}">
-    {% if bound_field_set.name %}<h2>{{ bound_field_set.name }}</h2>{% endif %}
-    {% if bound_field_set.description %}<div class="description">{{ bound_field_set.description }}</div>{% endif %}
-    {% for bound_field_line in bound_field_set %}
-        {% admin_field_line bound_field_line %}
-        {% for bound_field in bound_field_line %}
-            {% filter_interface_script_maybe bound_field %}
+
+{% for bfset in adminform %}
+    <fieldset class="module aligned {{ bfset.fieldset.classes }}">
+    {% if bfset.fieldset.name %}<h2>{{ bfset.fieldset.name }}</h2>{% endif %}
+    {% if bfset.fieldset.description %}<div class="description">{{ bfset.fieldset.description }}</div>{% endif %}
+    {% for line in bfset %}
+        <div class="form-row{% if line.errors %} errors{% endif %}">
+        {{ line.errors }}
+        {% for field in line %}
+            {% if field.is_checkbox %}
+                {{ field.field }}{{ field.label_tag }}
+            {% else %}
+                {{ field.label_tag }}{{ field.field }}
+            {% endif %}
+            {% if field.help_text %}<p class="help">{{ field.help_text }}</p>{% endif %}
         {% endfor %}
+        </div>
     {% endfor %}
-   </fieldset>
+    </fieldset>
 {% endfor %}
+
 {% block after_field_sets %}{% endblock %}
+
 {% if change %}
    {% if ordered_objects %}
    <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
@@ -61,17 +71,23 @@
    </div></fieldset>
    {% endif %}
 {% endif %}
+
 {% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
+
 {% block after_related_objects %}{% endblock %}
+
 {% submit_row %}
+
 {% if add %}
    <script type="text/javascript">document.getElementById("{{ first_form_field_id }}").focus();</script>
 {% endif %}
+
 {% if auto_populated_fields %}
    <script type="text/javascript">
    {% auto_populated_field_script auto_populated_fields change %}
    </script>
 {% endif %}
+
 </div>
 </form></div>
 {% endblock %}

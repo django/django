@@ -48,22 +48,6 @@ def submit_row(context):
     }
 submit_row = register.inclusion_tag('admin/submit_line.html', takes_context=True)(submit_row)
 
-def field_label(bound_field):
-    class_names = []
-    if isinstance(bound_field.field, models.BooleanField):
-        class_names.append("vCheckboxLabel")
-        colon = ""
-    else:
-        if not bound_field.field.blank:
-            class_names.append('required')
-        if not bound_field.first:
-            class_names.append('inline')
-        colon = ":"
-    class_str = class_names and ' class="%s"' % ' '.join(class_names) or ''
-    return '<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
-        capfirst(bound_field.field.verbose_name), colon)
-field_label = register.simple_tag(field_label)
-
 class FieldWidgetNode(template.Node):
     nodelists = {}
     default = None
@@ -216,30 +200,3 @@ def edit_inline(parser, token):
         raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
     return EditInlineNode(bits[1])
 edit_inline = register.tag(edit_inline)
-
-def admin_field_line(context, argument_val):
-    if isinstance(argument_val, AdminBoundField):
-        bound_fields = [argument_val]
-    else:
-        bound_fields = [bf for bf in argument_val]
-    add = context['add']
-    change = context['change']
-
-    class_names = ['form-row']
-    for bound_field in bound_fields:
-        for f in bound_field.form_fields:
-            if f.errors():
-                class_names.append('errors')
-                break
-
-    # Assumes BooleanFields won't be stacked next to each other!
-    if isinstance(bound_fields[0].field, models.BooleanField):
-        class_names.append('checkbox-row')
-
-    return {
-        'add': context['add'],
-        'change': context['change'],
-        'bound_fields': bound_fields,
-        'class_names': " ".join(class_names),
-    }
-admin_field_line = register.inclusion_tag('admin/field_line.html', takes_context=True)(admin_field_line)
