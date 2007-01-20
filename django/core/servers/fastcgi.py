@@ -108,7 +108,9 @@ def runfastcgi(argset):
         wsgi_opts = {}
     else:
         return fastcgi_help("ERROR: Implementation must be one of prefork or thread.")
-
+    
+    wsgi_opts['debug'] = False # Turn off flup tracebacks
+    
     # Prep up and go
     from django.core.handlers.wsgi import WSGIHandler
 
