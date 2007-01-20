@@ -69,9 +69,9 @@ class AdminFieldLine(object):
 
 # New implementation of Fieldset
 class Fieldset(object):
-    def __init__(self, name, field_list, classes=None, description=None):
-        self.name, self.field_list = name, field_list
-        self.classes = classes or ()
+    def __init__(self, name=None, fields=(), classes=(), description=None):
+        self.name, self.fields = name, fields
+        self.classes = ' '.join(classes)
         self.description = description
 
 class ModelAdmin(object):
@@ -147,7 +147,7 @@ class ModelAdmin(object):
             yield Fieldset(fields=default_fields)
         else:
             for name, options in self.fields:
-                yield Fieldset(name, options['fields'], classes=options.get('classes'), description=options.get('description'))
+                yield Fieldset(name, options['fields'], classes=options.get('classes', ()), description=options.get('description'))
 
     def fieldsets_add(self, request):
         "Hook for specifying Fieldsets for the add form."
