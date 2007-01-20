@@ -13,7 +13,7 @@ changed unexpectedly as a result of the refactor.
 Testing a web application is a complex task, as there are many
 components of a web application that must be validated and tested. To
 help you test your application, Django provides a test execution
-framework, and range of utilities that can be used to stimulate and
+framework, and range of utilities that can be used to simulate and
 inspect various facets of a web application.
 
     This testing framework is currently under development, and may change
