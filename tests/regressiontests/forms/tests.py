@@ -2593,6 +2593,15 @@ field an "id" attribute.
 <input type="submit" />
 </form>
 
+The label_tag() method takes an optional attrs argument: a dictionary of HTML
+attributes to add to the <label> tag.
+>>> f = UserRegistration(auto_id='id_%s')
+>>> for bf in f:
+...     print bf.label_tag(attrs={'class': 'pretty'})
+<label for="id_username" class="pretty">Username</label>
+<label for="id_password1" class="pretty">Password1</label>
+<label for="id_password2" class="pretty">Password2</label>
+
 To display the errors that aren't associated with a particular field -- e.g.,
 the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
 template. If used on its own, it is displayed as a <ul> (or an empty string, if
