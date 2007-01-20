@@ -286,7 +286,7 @@ With this in mind, the above example can be written more concisely as::
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
 that in automatically.
 
-.. _Django overview: http://www.djangoproject.com/documentation/overview/
+.. _Django overview: ../overview/
 
 Multiple view prefixes
 ----------------------

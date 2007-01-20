@@ -1,4 +1,9 @@
 from django.conf import settings
+from django.utils.html import escape
+
+# Converts a dictionary to a single string with key="value", XML-style with
+# a leading space. Assumes keys do not need to be XML-escaped.
+flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 def smart_unicode(s):
     if not isinstance(s, basestring):

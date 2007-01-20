@@ -6,7 +6,7 @@ from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
-from util import StrAndUnicode, ErrorDict, ErrorList, ValidationError
+from util import flatatt, StrAndUnicode, ErrorDict, ErrorList, ValidationError
 
 __all__ = ('BaseForm', 'Form')
 
@@ -247,17 +247,20 @@ class BoundField(StrAndUnicode):
         return self.field.widget.value_from_datadict(self.form.data, self.html_name)
     data = property(_data)
 
-    def label_tag(self, contents=None):
+    def label_tag(self, contents=None, attrs=None):
         """
         Wraps the given contents in a <label>, if the field has an ID attribute.
         Does not HTML-escape the contents. If contents aren't given, uses the
         field's HTML-escaped label.
+
+        If attrs are given, they're used as HTML attributes on the <label> tag.
         """
         contents = contents or escape(self.label)
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         if id_:
-            contents = '<label for="%s">%s</label>' % (widget.id_for_label(id_), contents)
+            attrs = attrs and flatatt(attrs) or ''
+            contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, contents)
         return contents
 
     def _is_hidden(self):

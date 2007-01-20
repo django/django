@@ -86,15 +86,13 @@ class Field(object):
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None, initial=None):
         self.max_length, self.min_length = max_length, min_length
-        Field.__init__(self, required, widget, label, initial)
+        super(CharField, self).__init__(required, widget, label, initial)
 
     def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
-        Field.clean(self, value)
+        super(CharField, self).clean(value)
         if value in EMPTY_VALUES:
-            value = u''
-            if not self.required:
-                return value
+            return u''
         value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
@@ -109,7 +107,7 @@ class CharField(Field):
 class IntegerField(Field):
     def __init__(self, max_value=None, min_value=None, required=True, widget=None, label=None, initial=None):
         self.max_value, self.min_value = max_value, min_value
-        Field.__init__(self, required, widget, label, initial)
+        super(IntegerField, self).__init__(required, widget, label, initial)
 
     def clean(self, value):
         """
@@ -117,7 +115,7 @@ class IntegerField(Field):
         of int(). Returns None for empty values.
         """
         super(IntegerField, self).clean(value)
-        if not self.required and value in EMPTY_VALUES:
+        if value in EMPTY_VALUES:
             return None
         try:
             value = int(value)
@@ -139,7 +137,7 @@ DEFAULT_DATE_INPUT_FORMATS = (
 
 class DateField(Field):
     def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        Field.__init__(self, required, widget, label, initial)
+        super(DateField, self).__init__(required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
 
     def clean(self, value):
@@ -147,7 +145,7 @@ class DateField(Field):
         Validates that the input can be converted to a date. Returns a Python
         datetime.date object.
         """
-        Field.clean(self, value)
+        super(DateField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
@@ -168,7 +166,7 @@ DEFAULT_TIME_INPUT_FORMATS = (
 
 class TimeField(Field):
     def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        Field.__init__(self, required, widget, label, initial)
+        super(TimeField, self).__init__(required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -176,7 +174,7 @@ class TimeField(Field):
         Validates that the input can be converted to a time. Returns a Python
         datetime.time object.
         """
-        Field.clean(self, value)
+        super(TimeField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.time):
@@ -202,7 +200,7 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 
 class DateTimeField(Field):
     def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        Field.__init__(self, required, widget, label, initial)
+        super(DateTimeField, self).__init__(required, widget, label, initial)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -210,7 +208,7 @@ class DateTimeField(Field):
         Validates that the input can be converted to a datetime. Returns a
         Python datetime.datetime object.
         """
-        Field.clean(self, value)
+        super(DateTimeField, self).clean(value)
         if value in EMPTY_VALUES:
             return None
         if isinstance(value, datetime.datetime):
@@ -232,7 +230,7 @@ class RegexField(Field):
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
-        Field.__init__(self, required, widget, label, initial)
+        super(RegexField, self).__init__(required, widget, label, initial)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
@@ -244,10 +242,11 @@ class RegexField(Field):
         Validates that the input matches the regular expression. Returns a
         Unicode object.
         """
-        Field.clean(self, value)
-        if value in EMPTY_VALUES: value = u''
+        super(RegexField, self).clean(value)
+        if value in EMPTY_VALUES:
+            value = u''
         value = smart_unicode(value)
-        if not self.required and value == u'':
+        if value == u'':
             return value
         if self.max_length is not None and len(value) > self.max_length:
             raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
@@ -282,13 +281,13 @@ except ImportError:
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, required=True, verify_exists=False, widget=None, label=None,
             initial=None, validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        RegexField.__init__(self, url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label, initial)
+        super(URLField, self).__init__(url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label, initial)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
     def clean(self, value):
-        value = RegexField.clean(self, value)
-        if not self.required and value == u'':
+        value = super(URLField, self).clean(value)
+        if value == u'':
             return value
         if self.verify_exists:
             import urllib2
@@ -314,24 +313,25 @@ class BooleanField(Field):
 
     def clean(self, value):
         "Returns a Python boolean object."
-        Field.clean(self, value)
+        super(BooleanField, self).clean(value)
         return bool(value)
 
 class ChoiceField(Field):
     def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
         if isinstance(widget, type):
             widget = widget(choices=choices)
-        Field.__init__(self, required, widget, label, initial)
+        super(ChoiceField, self).__init__(required, widget, label, initial)
         self.choices = choices
 
     def clean(self, value):
         """
         Validates that the input is in self.choices.
         """
-        value = Field.clean(self, value)
-        if value in EMPTY_VALUES: value = u''
+        value = super(ChoiceField, self).clean(value)
+        if value in EMPTY_VALUES:
+            value = u''
         value = smart_unicode(value)
-        if not self.required and value == u'':
+        if value == u'':
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
@@ -342,7 +342,7 @@ class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
 
     def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None):
-        ChoiceField.__init__(self, choices, required, widget, label, initial)
+        super(MultipleChoiceField, self).__init__(choices, required, widget, label, initial)
 
     def clean(self, value):
         """
@@ -367,7 +367,7 @@ class MultipleChoiceField(ChoiceField):
 
 class ComboField(Field):
     def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
-        Field.__init__(self, required, widget, label, initial)
+        super(ComboField, self).__init__(required, widget, label, initial)
         # Set 'required' to False on the individual fields, because the
         # required validation will be handled by ComboField, not by those
         # individual fields.
@@ -380,7 +380,7 @@ class ComboField(Field):
         Validates the given value against all of self.fields, which is a
         list of Field instances.
         """
-        Field.clean(self, value)
+        super(ComboField, self).clean(value)
         for field in self.fields:
             value = field.clean(value)
         return value
