@@ -319,7 +319,8 @@ class BooleanField(Field):
 class ChoiceField(Field):
     def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
         if isinstance(widget, type):
-            widget = widget(choices=choices)
+            widget = widget()
+        widget.choices = choices
         super(ChoiceField, self).__init__(required, widget, label, initial)
         self.choices = choices
 
