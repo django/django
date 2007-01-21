@@ -173,7 +173,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
     field_sets = model_admin.get_field_sets()
     original = getattr(manipulator, 'original_object', None)
     bound_field_sets = [field_set.bind(context['oldform'], original, AdminBoundFieldSet) for field_set in field_sets]
-    first_form_field_id = bound_field_sets[0].bound_field_lines[0].bound_fields[0].form_fields[0].get_id();
     ordered_objects = opts.get_ordered_objects()
     inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
     extra_context = {
@@ -185,7 +184,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
         'bound_field_sets': bound_field_sets,
-        'first_form_field_id': first_form_field_id,
         'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,

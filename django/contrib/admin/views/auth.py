@@ -38,7 +38,6 @@ def user_add_stage(request):
         'has_absolute_url': False,
         'auto_populated_fields': (),
         'bound_field_sets': (),
-        'first_form_field_id': 'id_username',
         'opts': User._meta,
         'username_help_text': User._meta.get_field('username').help_text,
     }, context_instance=template.RequestContext(request))
@@ -69,7 +68,6 @@ def user_change_password(request, id):
         'has_delete_permission': False,
         'has_change_permission': True,
         'has_absolute_url': False,
-        'first_form_field_id': 'id_password1',
         'opts': User._meta,
         'original': user,
         'show_save': True,

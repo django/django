@@ -76,6 +76,10 @@ class AdminForm(object):
         for fieldset in self.fieldsets:
             yield BoundFieldset(self.form, fieldset)
 
+    def first_field(self):
+        for bf in self.form:
+            return bf
+
 class Fieldset(object):
     def __init__(self, name=None, fields=(), classes=(), description=None):
         self.name, self.fields = name, fields

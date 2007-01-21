@@ -79,7 +79,7 @@
 {% submit_row %}
 
 {% if add %}
-   <script type="text/javascript">document.getElementById("{{ first_form_field_id }}").focus();</script>
+   <script type="text/javascript">document.getElementById("{{ adminform.first_field.auto_id }}").focus();</script>
 {% endif %}
 
 {% if auto_populated_fields %}
