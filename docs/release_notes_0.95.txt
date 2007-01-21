@@ -139,5 +139,5 @@ available at any hour of the day -- to help, or just to chat.
 Thanks for using Django!
 
 The Django Team
-July 2006
+January 2007
 
