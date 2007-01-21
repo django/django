@@ -138,41 +138,12 @@ class AdminBoundField(object):
                 return url_method()
         return ''
 
-class AdminBoundFieldLine(object):
-    def __init__(self, field_line, field_mapping, original):
-        self.bound_fields = [field.bind(field_mapping, original, AdminBoundField) for field in field_line]
-        for bound_field in self:
-            bound_field.first = True
-            break
-
-    def __iter__(self):
-        for bound_field in self.bound_fields:
-            yield bound_field
-
-    def __len__(self):
-        return len(self.bound_fields)
-
-class AdminBoundFieldSet(object):
-    def __init__(self, field_set, field_mapping, original):
-        self.name = field_set.name
-        self.classes = field_set.classes
-        self.description = field_set.description
-        self.bound_field_lines = [field_line.bind(field_mapping, original, AdminBoundFieldLine) for field_line in field_set]
-
-    def __iter__(self):
-        for bound_field_line in self.bound_field_lines:
-            yield bound_field_line
-
-    def __len__(self):
-        return len(self.bound_field_lines)
-
 def render_change_form(model_admin, model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
     field_sets = model_admin.get_field_sets()
     original = getattr(manipulator, 'original_object', None)
-    bound_field_sets = [field_set.bind(context['oldform'], original, AdminBoundFieldSet) for field_set in field_sets]
     ordered_objects = opts.get_ordered_objects()
     inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
     extra_context = {
@@ -183,7 +154,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
-        'bound_field_sets': bound_field_sets,
         'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,

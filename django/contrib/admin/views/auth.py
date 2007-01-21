@@ -37,7 +37,6 @@ def user_add_stage(request):
         'has_file_field': False,
         'has_absolute_url': False,
         'auto_populated_fields': (),
-        'bound_field_sets': (),
         'opts': User._meta,
         'username_help_text': User._meta.get_field('username').help_text,
     }, context_instance=template.RequestContext(request))
