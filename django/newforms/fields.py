@@ -319,9 +319,19 @@ class BooleanField(Field):
 class ChoiceField(Field):
     def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
         if isinstance(widget, type):
-            widget = widget(choices=choices)
+            widget = widget()
         super(ChoiceField, self).__init__(required, widget, label, initial)
         self.choices = choices
+
+    def _get_choices(self):
+        return self._choices
+
+    def _set_choices(self, value):
+        # Setting choices also sets the choices on the widget.
+        self._choices = value
+        self.widget.choices = value
+
+    choices = property(_get_choices, _set_choices)
 
     def clean(self, value):
         """
