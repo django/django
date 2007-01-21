@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "Django",
-    version = "0.95",
+    version = "0.95.1",
     url = 'http://www.djangoproject.com/',
     author = 'Lawrence Journal-World',
     author_email = 'holovaty@gmail.com',
