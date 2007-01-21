@@ -1866,6 +1866,21 @@ defined on the Field, not the ones defined on the Widget.
 <option value="J">Java</option>
 </select>
 
+You can set a ChoiceField's choices after the fact.
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField()
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select name="language">
+</select>
+>>> f.fields['language'].choices = [('P', 'Python'), ('J', 'Java')]
+>>> print f['language']
+<select name="language">
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+
 Add widget=RadioSelect to use that widget with a ChoiceField.
 >>> class FrameworkForm(Form):
 ...     name = CharField()
