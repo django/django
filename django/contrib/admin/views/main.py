@@ -48,33 +48,6 @@ def quote(s):
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
 
-def get_javascript_imports(opts, auto_populated_fields, field_sets):
-# Put in any necessary JavaScript imports.
-    js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
-    if auto_populated_fields:
-        js.append('js/urlify.js')
-    if opts.has_field_type(models.DateTimeField) or opts.has_field_type(models.TimeField) or opts.has_field_type(models.DateField):
-        js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
-    if opts.get_ordered_objects():
-        js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
-    if opts.admin.js:
-        js.extend(opts.admin.js)
-    seen_collapse = False
-    for field_set in field_sets:
-        if not seen_collapse and 'collapse' in field_set.classes:
-            seen_collapse = True
-            js.append('js/admin/CollapsedFieldsets.js')
-
-        for field_line in field_set:
-            try:
-                for f in field_line:
-                    if f.rel and isinstance(f, models.ManyToManyField) and f.rel.filter_interface:
-                        js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-                        raise StopIteration
-            except StopIteration:
-                break
-    return js
-
 def model_admin_view(request, app_label, model_name, rest_of_url):
     model = models.get_model(app_label, model_name)
     if model is None:
@@ -142,7 +115,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
     opts = model._meta
     app_label = opts.app_label
     auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
-    field_sets = model_admin.get_field_sets()
     original = getattr(manipulator, 'original_object', None)
     ordered_objects = opts.get_ordered_objects()
     inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
@@ -154,7 +126,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'auto_populated_fields': auto_populated_fields,
-        'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,
         'form_url': form_url,

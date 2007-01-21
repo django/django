@@ -3,7 +3,8 @@
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript" src="../../../jsi18n/"></script>
-{% for js in javascript_imports %}{% include_admin_script js %}{% endfor %}
+{% for js in javascript_imports %}<script type="text/javascript" src="{{ js }}"></script>
+{% endfor %}
 {% endblock %}
 
 {% block stylesheet %}{% admin_media_prefix %}css/forms.css{% endblock %}

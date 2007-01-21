@@ -31,43 +31,6 @@ def unquote(s):
             myappend('_' + item)
     return "".join(res)
 
-class AdminFieldSet(object):
-    def __init__(self, name, classes, field_locator_func, field_list, description):
-        self.name = name
-        self.field_lines = [AdminFieldLine(field_locator_func, field) for field in field_list]
-        self.classes = classes
-        self.description = description
-
-    def __repr__(self):
-        return "FieldSet: (%s, %s)" % (self.name, self.field_lines)
-
-    def bind(self, field_mapping, original, bound_field_set_class):
-        return bound_field_set_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field_line in self.field_lines:
-            yield field_line
-
-    def __len__(self):
-        return len(self.field_lines)
-
-class AdminFieldLine(object):
-    def __init__(self, field_locator_func, field_name):
-        if isinstance(field_name, basestring):
-            self.fields = [field_locator_func(field_name)]
-        else:
-            self.fields = [field_locator_func(name) for name in field_name]
-
-    def bind(self, field_mapping, original, bound_field_line_class):
-        return bound_field_line_class(self, field_mapping, original)
-
-    def __iter__(self):
-        for field in self.fields:
-            yield field
-
-    def __len__(self):
-        return len(self.fields)
-
 class AdminForm(object):
     def __init__(self, form, fieldsets):
         self.form, self.fieldsets = form, fieldsets
@@ -174,19 +137,37 @@ class ModelAdmin(object):
         else:
             return self.change_view(request, unquote(url))
 
-    def get_field_sets(self):
-        "Returns a list of AdminFieldSet objects according to self.fields."
-        opts = self.opts
-        if self.fields is None:
-            field_struct = ((None, {'fields': [f.name for f in opts.fields + opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]}),)
-        else:
-            field_struct = self.fields
-        new_fieldset_list = []
-        for name, options in field_struct:
-            classes = options.get('classes', ())
-            description = options.get('description', '')
-            new_fieldset_list.append(AdminFieldSet(name, classes, opts.get_field, options['fields'], description))
-        return new_fieldset_list
+    def javascript(self, request, fieldsets):
+        """
+        Returns a list of URLs to include via <script> statements.
+        """
+        from django.conf import settings
+        js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
+        # TODO: This.
+        #if auto_populated_fields:
+            #js.append('js/urlify.js')
+        if self.opts.has_field_type(models.DateTimeField) or self.opts.has_field_type(models.TimeField) or self.opts.has_field_type(models.DateField):
+            js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
+        if self.opts.get_ordered_objects():
+            js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
+        if self.js:
+            js.extend(self.js)
+        for f in self.opts.many_to_many:
+            if f.rel.filter_interface:
+                js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
+                break
+        for fs in fieldsets:
+            if 'collapse' in fs.classes:
+                js.append('js/admin/CollapsedFieldsets.js')
+                break
+        prefix = settings.ADMIN_MEDIA_PREFIX
+        return ['%s%s' % (prefix, url) for url in js]
+
+    def javascript_add(self, request):
+        return self.javascript(request, self.fieldsets_add(request))
+
+    def javascript_change(self, request, object_id):
+        return self.javascript(request, self.fieldsets_change(request, object_id))
 
     def fieldsets(self, request):
         """
@@ -297,6 +278,7 @@ class ModelAdmin(object):
             'oldform': oldforms.FormWrapper(model.AddManipulator(), {}, {}),
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
+            'javascript_imports': self.javascript_add(request),
         })
 
         return render_change_form(self, model, model.AddManipulator(), c, add=True)
@@ -388,6 +370,7 @@ class ModelAdmin(object):
             'object_id': object_id,
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
+            'javascript_imports': self.javascript_change(request, object_id),
         })
         return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
 

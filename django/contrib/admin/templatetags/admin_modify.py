@@ -15,23 +15,6 @@ word_re = re.compile('[A-Z][a-z]+')
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
-def include_admin_script(script_path):
-    """
-    Returns an HTML script element for including a script from the admin
-    media url.
-
-    Example usage::
-
-        {% include_admin_script js/calendar.js %}
-
-    could return::
-
-        <script type="text/javascript" src="/media/admin/js/calendar.js">
-    """
-
-    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
-include_admin_script = register.simple_tag(include_admin_script)
-
 def submit_row(context):
     opts = context['opts']
     change = context['change']
