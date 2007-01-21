@@ -202,7 +202,7 @@ class ModelAdmin(object):
             yield Fieldset(fields=default_fields)
         else:
             for name, options in self.fields:
-                yield Fieldset(name, options['fields'], classes=options.get('classes', ()), description=options.get('description'))
+                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
 
     def fieldsets_add(self, request):
         "Hook for specifying Fieldsets for the add form."
