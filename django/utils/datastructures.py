@@ -70,7 +70,7 @@ class SortedDict(dict):
         return self.keyOrder[:]
 
     def values(self):
-        return [dict.__getitem__(self,k) for k in self.keyOrder]
+        return [dict.__getitem__(self, k) for k in self.keyOrder]
 
     def update(self, dict):
         for k, v in dict.items():
@@ -80,6 +80,10 @@ class SortedDict(dict):
         if key not in self.keyOrder:
             self.keyOrder.append(key)
         return dict.setdefault(self, key, default)
+
+    def value_for_index(self, index):
+        "Returns the value of the item at the given zero-based index."
+        return self[self.keyOrder[index]]
 
 class MultiValueDictKeyError(KeyError):
     pass
