@@ -1,5 +1,6 @@
 from django import oldforms, template
 from django import newforms as forms
+from django.contrib.admin import widgets
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -195,6 +196,19 @@ class ModelAdmin(object):
         for fs in self.fieldsets(request):
             yield fs
 
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        """
+        Hook for specifying the form Field instance for a given database Field
+        instance.
+
+        If kwargs are given, they're passed to the form Field's constructor.
+        """
+        # For filter_interface ManyToManyFields, use a special Widget.
+        if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
+            widget = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
+            return db_field.formfield(widget=widget)
+        return db_field.formfield(**kwargs)
+
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
         opts = self.opts
@@ -238,7 +252,7 @@ class ModelAdmin(object):
             # Object list will give 'Permission Denied', so go back to admin home
             post_url = '../../../'
 
-        ModelForm = forms.form_for_model(model)
+        ModelForm = forms.form_for_model(model, formfield_callback=self.formfield_for_dbfield)
 
         if request.POST:
             new_data = request.POST.copy()
@@ -303,7 +317,7 @@ class ModelAdmin(object):
         except model.DoesNotExist:
             raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
-        ModelForm = forms.form_for_instance(obj)
+        ModelForm = forms.form_for_instance(obj, formfield_callback=self.formfield_for_dbfield)
 
         if request.POST:
             new_data = request.POST.copy()
