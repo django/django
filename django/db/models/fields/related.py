@@ -548,8 +548,10 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
-    def formfield(self, initial=None):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+    def formfield(self, **kwargs):
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults.update(kwargs)
+        return forms.ChoiceField(**defaults)
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -612,8 +614,10 @@ class OneToOneField(RelatedField, IntegerField):
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
 
-    def formfield(self, initial=None):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+    def formfield(self, **kwargs):
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults.update(kwargs)
+        return forms.ChoiceField(**kwargs)
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -725,12 +729,14 @@ class ManyToManyField(RelatedField, Field):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname).all()
 
-    def formfield(self, initial=None):
+    def formfield(self, **kwargs):
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
-        if initial is not None:
-            initial = [i._get_pk_val() for i in initial]
-        return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+        if kwargs.get('initial') is not None:
+            kwargs['initial'] = [i._get_pk_val() for i in kwargs['initial']]
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults.update(kwargs)
+        return forms.MultipleChoiceField(**defaults)
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
