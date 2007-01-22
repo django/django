@@ -47,33 +47,42 @@ def make_instance_save(instance):
         return save_instance(self, instance, commit)
     return save
 
-def form_for_model(model, form=BaseForm):
+def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield()):
     """
     Returns a Form class for the given Django model class.
 
     Provide ``form`` if you want to use a custom BaseForm subclass.
+
+    Provide ``formfield_callback`` if you want to define different logic for
+    determining the formfield for a given database field. It's a callable that
+    takes a database Field instance and returns a form Field instance.
     """
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
-        formfield = f.formfield()
+        formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
     return type(opts.object_name + 'Form', (form,), {'fields': fields, '_model': model, 'save': model_save})
 
-def form_for_instance(instance, form=BaseForm):
+def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
     Returns a Form class for the given Django model instance.
 
     Provide ``form`` if you want to use a custom BaseForm subclass.
+
+    Provide ``formfield_callback`` if you want to define different logic for
+    determining the formfield for a given database field. It's a callable that
+    takes a database Field instance, plus **kwargs, and returns a form Field
+    instance with the given kwargs (i.e. 'initial').
     """
     model = instance.__class__
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
         current_value = f.value_from_object(instance)
-        formfield = f.formfield(initial=current_value)
+        formfield = formfield_callback(f, initial=current_value)
         if formfield:
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
