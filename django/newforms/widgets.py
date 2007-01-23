@@ -6,6 +6,7 @@ __all__ = (
     'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
     'FileInput', 'Textarea', 'CheckboxInput',
     'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
+    'MultiWidget', 'SplitDateTimeWidget',
 )
 
 from util import flatatt, StrAndUnicode, smart_unicode
@@ -252,3 +253,66 @@ class CheckboxSelectMultiple(SelectMultiple):
             id_ += '_0'
         return id_
     id_for_label = classmethod(id_for_label)
+
+class MultiWidget(Widget):
+    """
+    A widget that is composed of multiple widgets.
+
+    Its render() method takes a "decompressed" list of values, not a single
+    value. Each value in this list is rendered in the corresponding widget --
+    the first value is rendered in the first widget, the second value is
+    rendered in the second widget, etc.
+
+    Subclasses should implement decompress(), which specifies how a single
+    value should be converted to a list of values. Subclasses should not
+    have to implement clean().
+
+    Subclasses may implement format_output(), which takes the list of rendered
+    widgets and returns HTML that formats them any way you'd like.
+
+    You'll probably want to use this with MultiValueField.
+    """
+    def __init__(self, widgets, attrs=None):
+        self.widgets = [isinstance(w, type) and w() or w for w in widgets]
+        super(MultiWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        # value is a list of values, each corresponding to a widget
+        # in self.widgets.
+        if not isinstance(value, list):
+            value = self.decompress(value)
+        output = []
+        for i, widget in enumerate(self.widgets):
+            try:
+                widget_value = value[i]
+            except KeyError:
+                widget_value = None
+            output.append(widget.render(name + '_%s' % i, widget_value, attrs))
+        return self.format_output(output)
+
+    def value_from_datadict(self, data, name):
+        return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]
+
+    def format_output(self, rendered_widgets):
+        return u''.join(rendered_widgets)
+
+    def decompress(self, value):
+        """
+        Returns a list of decompressed values for the given compressed value.
+        The given value can be assumed to be valid, but not necessarily
+        non-empty.
+        """
+        raise NotImplementedError('Subclasses must implement this method.')
+
+class SplitDateTimeWidget(MultiWidget):
+    """
+    A Widget that splits datetime input into two <input type="text"> boxes.
+    """
+    def __init__(self, attrs=None):
+        widgets = (TextInput(attrs=attrs), TextInput(attrs=attrs))
+        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.date(), value.time()]
+        return [None, None]

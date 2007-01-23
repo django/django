@@ -684,6 +684,39 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
 
+# MultiWidget #################################################################
+
+>>> class MyMultiWidget(MultiWidget):
+...     def decompress(self, value):
+...         if value:
+...             return value.split('__')
+...         return ['', '']
+...     def format_output(self, rendered_widgets):
+...         return u'<br />'.join(rendered_widgets)
+>>> w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})))
+>>> w.render('name', ['john', 'lennon'])
+u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
+>>> w.render('name', 'john__lennon')
+u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
+
+# SplitDateTimeWidget #########################################################
+
+>>> w = SplitDateTimeWidget()
+>>> w.render('date', '')
+u'<input type="text" name="date_0" /><input type="text" name="date_1" />'
+>>> w.render('date', None)
+u'<input type="text" name="date_0" /><input type="text" name="date_1" />'
+>>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
+u'<input type="text" name="date_0" value="2006-01-10" /><input type="text" name="date_1" value="07:30:00" />'
+>>> w.render('date', [datetime.date(2006, 1, 10), datetime.time(7, 30)])
+u'<input type="text" name="date_0" value="2006-01-10" /><input type="text" name="date_1" value="07:30:00" />'
+
+You can also pass 'attrs' to the constructor. In this case, the attrs will be
+included on both widgets.
+>>> w = SplitDateTimeWidget(attrs={'class': 'pretty'})
+>>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
+u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input type="text" class="pretty" value="07:30:00" name="date_1" />'
+
 ##########
 # Fields #
 ##########
@@ -1535,6 +1568,58 @@ ValidationError: [u'Enter a valid e-mail address.']
 u''
 >>> f.clean(None)
 u''
+
+# SplitDateTimeField ##########################################################
+
+>>> f = SplitDateTimeField()
+>>> f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)])
+datetime.datetime(2006, 1, 10, 7, 30)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.clean(['hello', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.', u'Enter a valid time.']
+>>> f.clean(['2006-01-10', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+>>> f.clean(['hello', '07:30'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+
+>>> f = SplitDateTimeField(required=False)
+>>> f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)])
+datetime.datetime(2006, 1, 10, 7, 30)
+>>> f.clean(None)
+>>> f.clean('')
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.clean(['hello', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.', u'Enter a valid time.']
+>>> f.clean(['2006-01-10', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+>>> f.clean(['hello', '07:30'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
 
 #########
 # Forms #
