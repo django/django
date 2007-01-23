@@ -260,8 +260,7 @@ provides a shortcut. Here's the full ``index()`` view, rewritten::
         latest_poll_list = Poll.objects.all().order_by('-pub_date')[:5]
         return render_to_response('polls/index.html', {'latest_poll_list': latest_poll_list})
 
-Note that we no longer need to import ``loader``, ``Context`` or
-``HttpResponse``.
+Note that once we've done this in all these views, we no longer need to import ``loader``, ``Context`` and ``HttpResponse``.
 
 The ``render_to_response()`` function takes a template name as its first
 argument and a dictionary as its optional second argument. It returns an
