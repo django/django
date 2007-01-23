@@ -191,4 +191,19 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.filter(headline__contains='\\')
 [<Article: Article with \ backslash>]
 
+# none() returns an EmptyQuerySet that behaves like any other QuerySet object
+>>> Article.objects.none()
+[]
+>>> Article.objects.none().filter(headline__startswith='Article')
+[]
+>>> Article.objects.none().count()
+0
+
+# using __in with an empty list should return an empty query set
+>>> Article.objects.filter(id__in=[])
+[]
+
+>>> Article.objects.exclude(id__in=[])
+[<Article: Article with \ backslash>, <Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
+
 """}
