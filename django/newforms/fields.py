@@ -3,7 +3,7 @@ Field classes
 """
 
 from django.utils.translation import gettext
-from util import ValidationError, smart_unicode
+from util import ErrorList, ValidationError, smart_unicode
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, SelectMultiple
 import datetime
 import re
@@ -16,7 +16,8 @@ __all__ = (
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
     'ChoiceField', 'MultipleChoiceField',
-    'ComboField',
+    'ComboField', 'MultiValueField',
+    'SplitDateTimeField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -376,6 +377,9 @@ class MultipleChoiceField(ChoiceField):
         return new_value
 
 class ComboField(Field):
+    """
+    A Field whose clean() method calls multiple Field clean() methods.
+    """
     def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
         super(ComboField, self).__init__(required, widget, label, initial)
         # Set 'required' to False on the individual fields, because the
@@ -394,3 +398,84 @@ class ComboField(Field):
         for field in self.fields:
             value = field.clean(value)
         return value
+
+class MultiValueField(Field):
+    """
+    A Field that is composed of multiple Fields.
+
+    Its clean() method takes a "decompressed" list of values. Each value in
+    this list is cleaned by the corresponding field -- the first value is
+    cleaned by the first field, the second value is cleaned by the second
+    field, etc. Once all fields are cleaned, the list of clean values is
+    "compressed" into a single value.
+
+    Subclasses should implement compress(), which specifies how a list of
+    valid values should be converted to a single value. Subclasses should not
+    have to implement clean().
+
+    You'll probably want to use this with MultiWidget.
+    """
+    def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
+        super(MultiValueField, self).__init__(required, widget, label, initial)
+        # Set 'required' to False on the individual fields, because the
+        # required validation will be handled by MultiValueField, not by those
+        # individual fields.
+        for f in fields:
+            f.required = False
+        self.fields = fields
+
+    def clean(self, value):
+        """
+        Validates every value in the given list. A value is validated against
+        the corresponding Field in self.fields.
+
+        For example, if this MultiValueField was instantiated with
+        fields=(DateField(), TimeField()), clean() would call
+        DateField.clean(value[0]) and TimeField.clean(value[1]).
+        """
+        clean_data = []
+        errors = ErrorList()
+        if self.required and not value:
+            raise ValidationError(gettext(u'This field is required.'))
+        elif not self.required and not value:
+            return self.compress([])
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(gettext(u'Enter a list of values.'))
+        for i, field in enumerate(self.fields):
+            try:
+                field_value = value[i]
+            except KeyError:
+                field_value = None
+            if self.required and field_value in EMPTY_VALUES:
+                raise ValidationError(gettext(u'This field is required.'))
+            try:
+                clean_data.append(field.clean(field_value))
+            except ValidationError, e:
+                # Collect all validation errors in a single list, which we'll
+                # raise at the end of clean(), rather than raising a single
+                # exception for the first error we encounter.
+                errors.extend(e.messages)
+        if errors:
+            raise ValidationError(errors)
+        return self.compress(clean_data)
+
+    def compress(self, data_list):
+        """
+        Returns a single value for the given list of values. The values can be
+        assumed to be valid.
+
+        For example, if this MultiValueField was instantiated with
+        fields=(DateField(), TimeField()), this might return a datetime
+        object created by combining the date and time in data_list.
+        """
+        raise NotImplementedError('Subclasses must implement this method.')
+
+class SplitDateTimeField(MultiValueField):
+    def __init__(self, required=True, widget=None, label=None, initial=None):
+        fields = (DateField(), TimeField())
+        super(SplitDateTimeField, self).__init__(fields, required, widget, label, initial)
+
+    def compress(self, data_list):
+        if data_list:
+            return datetime.datetime.combine(*data_list)
+        return None
