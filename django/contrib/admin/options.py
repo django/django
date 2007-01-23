@@ -207,6 +207,10 @@ class ModelAdmin(object):
         if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
             widget = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
             return db_field.formfield(widget=widget, **kwargs)
+        # For DateTimeFields, use a special field and widget.
+        if isinstance(db_field, models.DateTimeField):
+            return forms.SplitDateTimeField(required=not db_field.blank,
+                widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name), **kwargs)
         return db_field.formfield(**kwargs)
 
     def has_add_permission(self, request):
