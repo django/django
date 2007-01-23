@@ -99,7 +99,7 @@ which is a dictionary of the parameters captured in the URL.
       dictionary is callable, the generic view will call it
       just before rendering the template. (**This is new in the
       Django development version.**)
-      
+
 **Example:**
 
 Given the following URL patterns::
@@ -205,11 +205,11 @@ If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive.html`` by default, where:
 
     * ``<model_name>`` is your model's name in all lowercase. For a model
-        ``StaffMember``, that'd be ``staffmember``.
+      ``StaffMember``, that'd be ``staffmember``.
 
     * ``<app_label>`` is the right-most part of the full Python path to
-        your model's app. For example, if your model lives in
-        ``apps/blog/models.py``, that'd be ``blog``.
+      your model's app. For example, if your model lives in
+      ``apps/blog/models.py``, that'd be ``blog``.
 
 **Template context:**
 
@@ -638,7 +638,7 @@ future, the view will throw a 404 error by default, unless you set
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
       to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
@@ -824,7 +824,7 @@ A page representing an individual object.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
       to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
