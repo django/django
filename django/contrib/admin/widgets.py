@@ -3,7 +3,6 @@ Form Widget classes specific to the Django admin site.
 """
 
 from django import newforms as forms
-import datetime
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     """
