@@ -206,7 +206,7 @@ class ModelAdmin(object):
         # For filter_interface ManyToManyFields, use a special Widget.
         if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
             widget = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
-            return db_field.formfield(widget=widget)
+            return db_field.formfield(widget=widget, **kwargs)
         return db_field.formfield(**kwargs)
 
     def has_add_permission(self, request):
