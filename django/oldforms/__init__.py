@@ -569,7 +569,7 @@ class NullBooleanField(SelectField):
     "This SelectField provides 'Yes', 'No' and 'Unknown', mapping results to True, False or None"
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
-        SelectField.__init__(self, field_name, choices=[('1', 'Unknown'), ('2', 'Yes'), ('3', 'No')],
+        SelectField.__init__(self, field_name, choices=[('1', _('Unknown')), ('2', _('Yes')), ('3', _('No'))],
             is_required=is_required, validator_list=validator_list)
 
     def render(self, data):
