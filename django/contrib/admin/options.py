@@ -213,10 +213,10 @@ class ModelAdmin(object):
                 widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name), **kwargs)
         # For DateFields, add a custom CSS class.
         if isinstance(db_field, models.DateField):
-            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vDateField'}))
+            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vDateField', 'size': '10'}))
         # For TimeFields, add a custom CSS class.
         if isinstance(db_field, models.TimeField):
-            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vTimeField'}))
+            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'}))
         return db_field.formfield(**kwargs)
 
     def has_add_permission(self, request):
