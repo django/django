@@ -63,12 +63,10 @@ class AdminBoundField(object):
         self.field = field
         self.original = original
         self.form_fields = [field_mapping[name] for name in self.field.get_manipulator_field_names('')]
-        self.element_id = self.form_fields[0].get_id()
         self.has_label_first = not isinstance(self.field, models.BooleanField)
         self.raw_id_admin = use_raw_id_admin(field)
         self.is_date_time = isinstance(field, models.DateTimeField)
         self.is_file_field = isinstance(field, models.FileField)
-        self.needs_add_label = field.rel and (isinstance(field.rel, models.ManyToOneRel) or isinstance(field.rel, models.ManyToManyRel)) and field.rel.to._meta.admin
         self.hidden = isinstance(self.field, models.AutoField)
         self.first = False
 
@@ -80,9 +78,6 @@ class AdminBoundField(object):
         if classes:
             self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
-
-        if field.rel:
-            self.related_url = '../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
 
     def original_value(self):
         if self.original:

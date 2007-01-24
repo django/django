@@ -207,16 +207,29 @@ class ModelAdmin(object):
         if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
             widget = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
             return db_field.formfield(widget=widget, **kwargs)
+
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             return forms.SplitDateTimeField(required=not db_field.blank,
                 widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name), **kwargs)
+
         # For DateFields, add a custom CSS class.
         if isinstance(db_field, models.DateField):
             return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vDateField', 'size': '10'}))
+
         # For TimeFields, add a custom CSS class.
         if isinstance(db_field, models.TimeField):
             return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'}))
+
+        # For ForeignKey or ManyToManyFields, use a special widget.
+        if db_field.rel and isinstance(db_field.rel, (models.ManyToOneRel, models.ManyToManyRel)):
+            # Wrap the widget's render() method with a method that adds
+            # extra HTML to the end of the rendered output.
+            formfield = db_field.formfield()
+            formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
+            return formfield
+
+        # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
 
     def has_add_permission(self, request):
