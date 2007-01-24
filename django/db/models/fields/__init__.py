@@ -735,6 +735,11 @@ class NullBooleanField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]
 
+    def formfield(self, **kwargs):
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults.update(kwargs)
+        return forms.NullBooleanField(**defaults)
+
 class PhoneNumberField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PhoneNumberField]
