@@ -232,7 +232,7 @@ translated, here's what to do:
       `i18n documentation`_.
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+.. _i18n documentation: ../i18n/
 
 Coding style
 ============
@@ -357,7 +357,7 @@ The Django tests all use the testing infrastructure that ships with Django for
 testing applications. See `Testing Django applications`_ for an explanation of
 how to write new tests.
 
-.. _Testing Django applications: http://www.djangoproject.com/documentation/testing/
+.. _Testing Django applications: ../testing/
 
 Running the unit tests
 ----------------------

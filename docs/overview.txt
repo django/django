@@ -11,7 +11,7 @@ understand how Django works, but this isn't intended to be a tutorial or
 reference. Please see our more-detailed Django documentation_ when you're ready
 to start a project.
 
-.. _documentation: http://www.djangoproject.com/documentation/
+.. _documentation: ../
 
 Design your model
 =================

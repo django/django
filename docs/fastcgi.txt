@@ -17,7 +17,7 @@ served with no startup time. Unlike mod_python (or `mod_perl`_), a FastCGI
 process doesn't run inside the Web server process, but in a separate,
 persistent process.
 
-.. _current preferred setup: http://www.djangoproject.com/documentation/modpython/
+.. _current preferred setup: ../modpython/
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/

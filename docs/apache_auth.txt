@@ -65,7 +65,7 @@ are equivalent::
     SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     PythonOption DJANGO_SETTINGS_MODULE mysite.settings
 
-.. _authentication system: http://www.djangoproject.com/documentation/authentication/
+.. _authentication system: ../authentication/
 .. _Subversion: http://subversion.tigris.org/
 .. _mod_dav: http://httpd.apache.org/docs/2.0/mod/mod_dav.html
-.. _custom permissions: http://www.djangoproject.com/documentation/authentication/#custom-permissions
+.. _custom permissions: ../authentication/#custom-permissions

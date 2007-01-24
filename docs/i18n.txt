@@ -53,7 +53,7 @@ internationalization machinery. See the `documentation for USE_I18N`_.
 You'll probably also want to remove ``'django.core.context_processors.i18n'``
 from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
-.. _documentation for USE_I18N: http://www.djangoproject.com/documentation/settings/#use-i18n
+.. _documentation for USE_I18N: ../settings/#use-i18n
 
 How to specify translation strings
 ==================================
@@ -175,7 +175,7 @@ class, though::
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _Django models: http://www.djangoproject.com/documentation/model_api/
+.. _Django models: ../model_api/
 
 Pluralization
 ~~~~~~~~~~~~~
@@ -274,7 +274,7 @@ translation string. Example::
 In this case, both the tag and the filter will see the already-translated
 string, so they don't need to be aware of translations.
 
-.. _Django templates: http://www.djangoproject.com/documentation/templates_python/
+.. _Django templates: ../templates_python/
 
 How to create language files
 ============================
@@ -394,7 +394,7 @@ That's it. Your translations are ready for use.
     please let us know! See `Submitting and maintaining translations`_ for
     the steps to take.
 
-    .. _Submitting and maintaining translations: http://www.djangoproject.com/documentation/contributing/
+    .. _Submitting and maintaining translations: ../contributing/
 
 How Django discovers language preference
 ========================================
@@ -472,7 +472,7 @@ Notes:
       selection to German and English (and any sublanguage, like de-ch or
       en-us).
 
-      .. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
+      .. _LANGUAGES setting: ../settings/#languages
 
     * If you define a custom ``LANGUAGES`` setting, as explained in the
       previous bullet, it's OK to mark the languages as translation strings
@@ -530,10 +530,10 @@ Note that, with static (middleware-less) translation, the language is in
 ``settings.LANGUAGE_CODE``, while with dynamic (middleware) translation, it's
 in ``request.LANGUAGE_CODE``.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _middleware documentation: http://www.djangoproject.com/documentation/middleware/
-.. _session: http://www.djangoproject.com/documentation/sessions/
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _settings file: ../settings/
+.. _middleware documentation: ../middleware/
+.. _session: ../sessions/
+.. _request object: ../request_response/#httprequest-objects
 
 The ``set_language`` redirect view
 ==================================
@@ -599,7 +599,7 @@ message file. The choice is yours.
     of the settings file to determine this, and a settings file doesn't exist
     if you're manually configuring your settings.)
 
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
 
 All message file repositories are structured the same way. They are:
 

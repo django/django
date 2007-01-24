@@ -20,7 +20,7 @@ You may also be interested in `How to use Django with FastCGI`_.
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
-.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
+.. _How to use Django with FastCGI: ../fastcgi/
 
 Basic configuration
 ===================

@@ -11,7 +11,7 @@ If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
 the `configuration`_ section later in this document.
 
-.. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
+.. _`The Django template language: For template authors`: ../templates/
 
 Basics
 ======
@@ -327,8 +327,8 @@ Note::
 
 Here's what each of the default processors does:
 
-.. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _TEMPLATE_CONTEXT_PROCESSORS setting: http://www.djangoproject.com/documentation/settings/#template-context-processors
+.. _HttpRequest object: ../request_response/#httprequest-objects
+.. _TEMPLATE_CONTEXT_PROCESSORS setting: ../settings/#template-context-processors
 
 django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -353,9 +353,9 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
       permissions that the currently logged-in user has. See the `permissions
       docs`_.
 
-.. _user authentication docs: http://www.djangoproject.com/documentation/authentication/#users
-.. _message docs: http://www.djangoproject.com/documentation/authentication/#messages
-.. _permissions docs: http://www.djangoproject.com/documentation/authentication/#permissions
+.. _user authentication docs: ../authentication/#users
+.. _message docs: ../authentication/#messages
+.. _permissions docs: ../authentication/#permissions
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -383,9 +383,9 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 
 See the `internationalization docs`_ for more.
 
-.. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
-.. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
+.. _LANGUAGES setting: ../settings/#languages
+.. _LANGUAGE_CODE setting: ../settings/#language-code
+.. _internationalization docs: ../i18n/
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -944,7 +944,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
 
-.. _tutorials: http://www.djangoproject.com/documentation/tutorial1/#creating-models
+.. _tutorials: ../tutorial1/#creating-models
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1115,5 +1115,5 @@ settings you wish to specify. You might want to consider setting at least
 `settings documentation`_, and any setting starting with *TEMPLATE_*
 is of obvious interest.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/

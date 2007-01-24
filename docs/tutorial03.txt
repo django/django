@@ -5,7 +5,7 @@ Writing your first Django app, part 3
 This tutorial begins where `Tutorial 2`_ left off. We're continuing the Web-poll
 application and will focus on creating the public interface -- "views."
 
-.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
+.. _Tutorial 2: ../tutorial2/
 
 Philosophy
 ==========
@@ -117,8 +117,8 @@ time the URLconf module is loaded. They're super fast.
 
 .. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
 .. _Python documentation: http://www.python.org/doc/current/lib/module-re.html
-.. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
-.. _URLconf documentation: http://www.djangoproject.com/documentation/url_dispatch/
+.. _request and response documentation: ../request_response/
+.. _URLconf documentation: ../url_dispatch/
 
 Write your first view
 =====================
@@ -376,7 +376,7 @@ iterable of Choice objects and is suitable for use in the ``{% for %}`` tag.
 
 See the `template guide`_ for full details on how templates work.
 
-.. _template guide: http://www.djangoproject.com/documentation/templates/
+.. _template guide: ../templates/
 
 Simplifying the URLconfs
 ========================
@@ -463,4 +463,4 @@ All the poll app cares about is its relative URLs, not its absolute URLs.
 When you're comfortable with writing views, read `part 4 of this tutorial`_ to
 learn about simple form processing and generic views.
 
-.. _part 4 of this tutorial: http://www.djangoproject.com/documentation/tutorial4/
+.. _part 4 of this tutorial: ../tutorial4/

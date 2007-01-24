@@ -38,7 +38,7 @@ each platform.
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
+.. _How to use Django with mod_python: ../modpython/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 Get your database running
