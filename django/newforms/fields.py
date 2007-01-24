@@ -4,7 +4,7 @@ Field classes
 
 from django.utils.translation import gettext
 from util import ErrorList, ValidationError, smart_unicode
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, SelectMultiple
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 import datetime
 import re
 import time
@@ -15,7 +15,7 @@ __all__ = (
     'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
-    'ChoiceField', 'MultipleChoiceField',
+    'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField',
     'SplitDateTimeField',
 )
@@ -316,6 +316,16 @@ class BooleanField(Field):
         "Returns a Python boolean object."
         super(BooleanField, self).clean(value)
         return bool(value)
+
+class NullBooleanField(BooleanField):
+    """
+    A field whose valid values are None, True and False. Invalid values are
+    cleaned to None.
+    """
+    widget = NullBooleanSelect
+
+    def clean(self, value):
+        return {True: True, False: False}.get(value, None)
 
 class ChoiceField(Field):
     def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
