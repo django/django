@@ -336,6 +336,40 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
+# NullBooleanSelect Widget ####################################################
+
+>>> w = NullBooleanSelect()
+>>> print w.render('is_cool', True)
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', False)
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
+>>> print w.render('is_cool', None)
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', '2')
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', '3')
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
+
 # SelectMultiple Widget #######################################################
 
 >>> w = SelectMultiple()
@@ -1462,6 +1496,20 @@ u'J'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+
+# NullBooleanField ############################################################
+
+>>> f = NullBooleanField()
+>>> f.clean('')
+>>> f.clean(True)
+True
+>>> f.clean(False)
+False
+>>> f.clean(None)
+>>> f.clean('1')
+>>> f.clean('2')
+>>> f.clean('3')
+>>> f.clean('hello')
 
 # MultipleChoiceField #########################################################
 
@@ -2600,6 +2648,57 @@ self.prefix.
 True
 >>> p.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
+# Forms with NullBooleanFields ################################################
+
+NullBooleanField is a bit of a special case because its presentation (widget)
+is different than its data. This is handled transparently, though.
+
+>>> class Person(Form):
+...     name = CharField()
+...     is_cool = NullBooleanField()
+>>> p = Person({'name': u'Joe'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'1'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'2'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'3'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': True}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': False}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
 
 # Basic form processing in a view #############################################
 
