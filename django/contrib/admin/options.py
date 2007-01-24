@@ -205,8 +205,8 @@ class ModelAdmin(object):
         """
         # For filter_interface ManyToManyFields, use a special Widget.
         if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
-            widget = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
-            return db_field.formfield(widget=widget, **kwargs)
+            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
+            return db_field.formfield(**kwargs)
 
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
@@ -215,17 +215,19 @@ class ModelAdmin(object):
 
         # For DateFields, add a custom CSS class.
         if isinstance(db_field, models.DateField):
-            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vDateField', 'size': '10'}))
+            kwargs['widget'] = forms.TextInput(attrs={'class': 'vDateField', 'size': '10'})
+            return db_field.formfield(**kwargs)
 
         # For TimeFields, add a custom CSS class.
         if isinstance(db_field, models.TimeField):
-            return db_field.formfield(widget=forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'}))
+            kwargs['widget'] = forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'})
+            return db_field.formfield(**kwargs)
 
         # For ForeignKey or ManyToManyFields, use a special widget.
         if db_field.rel and isinstance(db_field.rel, (models.ManyToOneRel, models.ManyToManyRel)):
             # Wrap the widget's render() method with a method that adds
             # extra HTML to the end of the rendered output.
-            formfield = db_field.formfield()
+            formfield = db_field.formfield(**kwargs)
             formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
             return formfield
 
