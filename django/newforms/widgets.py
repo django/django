@@ -5,13 +5,14 @@ HTML Widget classes
 __all__ = (
     'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
     'FileInput', 'Textarea', 'CheckboxInput',
-    'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
+    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
     'MultiWidget', 'SplitDateTimeWidget',
 )
 
 from util import flatatt, StrAndUnicode, smart_unicode
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
+from django.utils.translation import gettext
 from itertools import chain
 
 try:
@@ -150,6 +151,25 @@ class Select(Widget):
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
+
+class NullBooleanSelect(Select):
+    """
+    A Select Widget intended to be used with NullBooleanField.
+    """
+    def __init__(self, attrs=None):
+        choices = ((u'1', gettext('Unknown')), (u'2', gettext('Yes')), (u'3', gettext('No')))
+        super(NullBooleanSelect, self).__init__(attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        try:
+            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
+        except KeyError:
+            value = u'1'
+        return super(NullBooleanSelect, self).render(name, value, attrs, choices)
+
+    def value_from_datadict(self, data, name):
+        value = data.get(name, None)
+        return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
