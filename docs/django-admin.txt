@@ -253,6 +253,8 @@ files are piped directly into the database after all of the models'
 table-creation statements have been executed. Use this SQL hook to populate
 tables with any necessary initial records, SQL functions or test data.
 
+Note that the order in which the SQL files are processed is undefined.
+
 sqlreset [appname appname ...]
 --------------------------------------
 
@@ -380,7 +382,7 @@ Example usage::
 
     django-admin.py syncdb --verbosity=2
 
-Verbosity determines the amount of notification and debug information that 
+Verbosity determines the amount of notification and debug information that
 will be printed to the console. '0' is no output, '1' is normal output,
 and `2` is verbose output.
 
