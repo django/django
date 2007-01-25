@@ -120,7 +120,7 @@ Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
-.. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
+.. _request and response documentation: ../request_response/
 
 Use generic views: Less code is better
 ======================================
@@ -226,7 +226,7 @@ Run the server, and use your new polling app based on generic views.
 
 For full details on generic views, see the `generic views documentation`_.
 
-.. _generic views documentation: http://www.djangoproject.com/documentation/generic_views/
+.. _generic views documentation: ../generic_views/
 
 Coming soon
 ===========
@@ -241,4 +241,4 @@ installments:
     * Advanced admin features: Permissions
     * Advanced admin features: Custom JavaScript
 
-.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial3/
+.. _Tutorial 3: ../tutorial3/

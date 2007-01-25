@@ -45,8 +45,8 @@ algorithm the system follows to determine which Python code to execute:
        `request object`_ as its first argument and any values captured in the
        regex as remaining arguments.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _settings file: ../settings/
+.. _request object: ../request_response/#httprequest-objects
 
 Example
 =======
@@ -387,8 +387,8 @@ In this example, for a request to ``/blog/2005/``, Django will call the
 This technique is used in `generic views`_ and in the `syndication framework`_
 to pass metadata and options to views.
 
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. _generic views: ../generic_views/
+.. _syndication framework: ../syndication/
 
 Passing extra options to ``include()``
 --------------------------------------

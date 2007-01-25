@@ -14,7 +14,7 @@ use the django.newforms system, which we have begun to document in the
 If you have legacy form/manipulator code, read the "Migration plan" section in
 that document to understand how we're making the switch.
 
-.. _newforms documentation: http://www.djangoproject.com/documentation/newforms/
+.. _newforms documentation: ../newforms/
 
 Introduction
 ============
@@ -665,6 +665,6 @@ fails. If no message is passed in, a default message is used.
     the executable specified in the ``JING_PATH`` setting (see the settings_
     document for more details).
 
-.. _`generic views`: http://www.djangoproject.com/documentation/generic_views/
-.. _`models API`: http://www.djangoproject.com/documentation/model_api/
-.. _settings: http://www.djangoproject.com/documentation/settings/
+.. _`generic views`: ../generic_views/
+.. _`models API`: ../model_api/
+.. _settings: ../settings/

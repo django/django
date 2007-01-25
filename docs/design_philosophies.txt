@@ -186,7 +186,7 @@ code.
 
 This is the philosophy behind `template inheritance`_.
 
-.. _template inheritance: http://www.djangoproject.com/documentation/templates/#template-inheritance
+.. _template inheritance: ./templates/#template-inheritance
 
 Be decoupled from HTML
 ----------------------

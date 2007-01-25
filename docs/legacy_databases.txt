@@ -9,7 +9,7 @@ utilities to automate as much of this process as possible.
 This document assumes you know the Django basics, as covered in the
 `official tutorial`_.
 
-.. _official tutorial: http://www.djangoproject.com/documentation/tutorial1/
+.. _official tutorial: ../tutorial1/
 
 Give Django your database parameters
 ====================================
@@ -25,13 +25,13 @@ what the name of the database is. Do that by editing these settings in your
     * `DATABASE_HOST`_
     * `DATABASE_PORT`_
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _DATABASE_NAME: http://www.djangoproject.com/documentation/settings/#database-name
-.. _DATABASE_ENGINE: http://www.djangoproject.com/documentation/settings/#database-engine
-.. _DATABASE_USER: http://www.djangoproject.com/documentation/settings/#database-user
-.. _DATABASE_PASSWORD: http://www.djangoproject.com/documentation/settings/#database-password
-.. _DATABASE_HOST: http://www.djangoproject.com/documentation/settings/#database-host
-.. _DATABASE_PORT: http://www.djangoproject.com/documentation/settings/#database-port
+.. _settings file: ../settings/
+.. _DATABASE_NAME: ../settings/#database-name
+.. _DATABASE_ENGINE: ../settings/#database-engine
+.. _DATABASE_USER: ../settings/#database-user
+.. _DATABASE_PASSWORD: ../settings/#database-password
+.. _DATABASE_HOST: ../settings/#database-host
+.. _DATABASE_PORT: ../settings/#database-port
 
 Auto-generate the models
 ========================
@@ -52,7 +52,7 @@ Once you've cleaned up your models, name the file ``models.py`` and put it in
 the Python package that holds your app. Then add the app to your
 ``INSTALLED_APPS`` setting.
 
-.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin.py documentation: ../django_admin/
 
 Install the core Django tables
 ==============================

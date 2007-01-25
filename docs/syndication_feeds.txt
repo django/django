@@ -26,7 +26,7 @@ to determine which feed to output.
 
 To create a feed, just write a ``Feed`` class and point to it in your URLconf_.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Initialization
 --------------
@@ -72,8 +72,8 @@ The above example registers two feeds:
 
 Once that's set up, you just need to define the ``Feed`` classes themselves.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _URLconf: ../url_dispatch/
+.. _settings file: ../settings/
 
 Feed classes
 ------------
@@ -156,8 +156,8 @@ put into those elements.
              {{ obj.description }}
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
-.. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
-.. _Django templates: http://www.djangoproject.com/documentation/templates/
+.. _object-relational mapper: ../db_api/
+.. _Django templates: ../templates/
 
 A complex example
 -----------------
@@ -277,7 +277,7 @@ Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). This
 comes directly from your `LANGUAGE_CODE setting`_.
 
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
+.. _LANGUAGE_CODE setting: ../settings/#language-code
 
 URLs
 ----
@@ -292,7 +292,7 @@ Atom feeds require a ``<link rel="self">`` that defines the feed's current
 location. The syndication framework populates this automatically, using the
 domain of the current site according to the SITE_ID setting.
 
-.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+.. _SITE_ID setting: ../settings/#site-id
 
 Publishing Atom and RSS feeds in tandem
 ---------------------------------------

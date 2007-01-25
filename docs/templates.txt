@@ -792,7 +792,7 @@ Note that if you use ``{% ssi %}``, you'll need to define
 
 See also: ``{% include %}``.
 
-.. _ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
+.. _ALLOWED_INCLUDE_ROOTS: ../settings/#allowed-include-roots
 
 templatetag
 ~~~~~~~~~~~
@@ -1218,7 +1218,7 @@ django.contrib.humanize
 A set of Django template filters useful for adding a "human touch" to data. See
 the `humanize documentation`_.
 
-.. _humanize documentation: http://www.djangoproject.com/documentation/add_ons/#humanize
+.. _humanize documentation: ../add_ons/#humanize
 
 django.contrib.markup
 ---------------------

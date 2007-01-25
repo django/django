@@ -232,7 +232,7 @@ translated, here's what to do:
       `i18n documentation`_.
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+.. _i18n documentation: ../i18n/
 
 Coding style
 ============
@@ -357,7 +357,7 @@ The Django tests all use the testing infrastructure that ships with Django for
 testing applications. See `Testing Django applications`_ for an explanation of
 how to write new tests.
 
-.. _Testing Django applications: http://www.djangoproject.com/documentation/testing/
+.. _Testing Django applications: ../testing/
 
 Running the unit tests
 ----------------------
@@ -596,6 +596,5 @@ requests for commit access are potential flame-war starters, and will be ignored
 .. _`#django`: irc://irc.freenode.net/django
 .. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _PEP 8: http://www.python.org/peps/pep-0008.html
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases

@@ -71,7 +71,7 @@ are first evaluated, so if you want to pass in a QuerySet via
 ``extra_context`` that is always fresh you need to wrap it in a function or
 lambda that returns the QuerySet.
 
-.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+.. _database API docs: ../db_api/
 
 "Simple" generic views
 ======================
@@ -223,7 +223,7 @@ In addition to ``extra_context``, the template's context will be:
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
       ``latest`` will be a list of the latest 10 objects in ``queryset``.
 
-.. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+.. _RequestContext docs: ../templates_python/#subclassing-context-djangocontext
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
@@ -916,8 +916,8 @@ In addition to ``extra_context``, the template's context will be:
       See the `manipulator and formfield documentation`_ for more information
       about using ``FormWrapper`` objects in templates.
 
-.. _authentication system: http://www.djangoproject.com/documentation/authentication/
-.. _manipulator and formfield documentation: http://www.djangoproject.com/documentation/forms/
+.. _authentication system: ../authentication/
+.. _manipulator and formfield documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------

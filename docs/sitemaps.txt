@@ -23,8 +23,8 @@ you express this information in Python code.
 It works much like Django's `syndication framework`_. To create a sitemap, just
 write a ``Sitemap`` class and point to it in your URLconf_.
 
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _syndication framework: ../syndication/
+.. _URLconf: ../url_dispatch/
 
 Installation
 ============
@@ -41,9 +41,9 @@ To install the sitemap app, follow these steps:
 reason it needs to go into ``INSTALLED_APPS`` is so that the
 ``load_template_source`` template loader can find the default templates.)
 
-.. _INSTALLED_APPS: http://www.djangoproject.com/documentation/settings/#installed-apps
-.. _TEMPLATE_LOADERS: http://www.djangoproject.com/documentation/settings/#template-loaders
-.. _sites framework: http://www.djangoproject.com/documentation/sites/
+.. _INSTALLED_APPS: ../settings/#installed-apps
+.. _TEMPLATE_LOADERS: ../settings/#template-loaders
+.. _sites framework: ../sites/
 
 Initialization
 ==============
@@ -68,7 +68,7 @@ The sitemap view takes an extra, required argument: ``{'sitemaps': sitemaps}``.
 ``NewsSitemap``). It may also map to an *instance* of a ``Sitemap`` class
 (e.g., ``BlogSitemap(some_var)``).
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Sitemap classes
 ===============
@@ -217,8 +217,8 @@ defined for the current ``SITE_ID`` (see the `sites documentation`_) and
 creates an entry in the sitemap. These entries include only the ``location``
 attribute -- not ``lastmod``, ``changefreq`` or ``priority``.
 
-.. _flatpages: http://www.djangoproject.com/documentation/flatpages/
-.. _sites documentation: http://www.djangoproject.com/documentation/sites/
+.. _flatpages: ../flatpages/
+.. _sites documentation: ../sites/
 
 ``GenericSitemap``
 ------------------
@@ -232,7 +232,7 @@ the ``lastmod`` attribute in the generated sitemap. You may also pass
 ``priority`` and ``changefreq`` keyword arguments to the ``GenericSitemap``
 constructor to specify these attributes for all URLs.
 
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
+.. _generic views: ../generic_views/
 
 Example
 -------
@@ -261,7 +261,7 @@ Here's an example of a URLconf_ using both::
         (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
     )
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Creating a sitemap index
 ========================

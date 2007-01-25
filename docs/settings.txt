@@ -59,7 +59,7 @@ Use the ``--settings`` command-line argument to specify the settings manually::
 
     django-admin.py runserver --settings=mysite.settings
 
-.. _django-admin.py: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin.py: ../django_admin/
 
 On the server (mod_python)
 --------------------------
@@ -75,7 +75,7 @@ settings file to use. Do that with ``SetEnv``::
 
 Read the `Django mod_python documentation`_ for more information.
 
-.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/
+.. _Django mod_python documentation: ../modpython/
 
 Default settings
 ================
@@ -102,7 +102,7 @@ between the current settings file and Django's default settings.
 
 For more, see the `diffsettings documentation`_.
 
-.. _diffsettings documentation: http://www.djangoproject.com/documentation/django_admin/#diffsettings
+.. _diffsettings documentation: ../django_admin/#diffsettings
 
 Using settings in Python code
 =============================
@@ -306,7 +306,7 @@ pages -- and, possibly, by other parts of the system. See
 
 See also DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
 
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 DATETIME_FORMAT
 ---------------
@@ -319,7 +319,7 @@ pages -- and, possibly, by other parts of the system. See
 
 See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
 
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 DEBUG
 -----
@@ -433,7 +433,7 @@ A tuple of strings designating all applications that are enabled in this Django
 installation. Each string should be a full Python path to a Python package that
 contains a Django application, as created by `django-admin.py startapp`_.
 
-.. _django-admin.py startapp: http://www.djangoproject.com/documentation/django_admin/#startapp-appname
+.. _django-admin.py startapp: ../django_admin/#startapp-appname
 
 INTERNAL_IPS
 ------------
@@ -464,7 +464,7 @@ A string representing the language code for this installation. This should be
 in standard language format. For example, U.S. English is ``"en-us"``. See the
 `internationalization docs`_.
 
-.. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
+.. _internationalization docs: ../i18n/
 
 LANGUAGES
 ---------
@@ -617,7 +617,7 @@ Default: Not defined
 A string representing the full Python import path to your root URLconf. For example:
 ``"mydjangoapps.urls"``. See `How Django processes a request`_.
 
-.. _How Django processes a request: http://www.djangoproject.com/documentation/url_dispatch/#how-django-processes-a-request
+.. _How Django processes a request: ../url_dispatch/#how-django-processes-a-request
 
 SECRET_KEY
 ----------
@@ -709,7 +709,7 @@ and a single database can manage content for multiple sites.
 
 See the `site framework docs`_.
 
-.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+.. _site framework docs: ../sites/
 
 TEMPLATE_CONTEXT_PROCESSORS
 ---------------------------
@@ -765,7 +765,7 @@ Default: ``''`` (Empty string)
 Output, as a string, that the template system should use for invalid (e.g.
 misspelled) variables. See `How invalid variables are handled`_.
 
-.. _How invalid variables are handled: http://www.djangoproject.com/documentation/templates_python/#how-invalid-variables-are-handled
+.. _How invalid variables are handled: ../templates_python/#how-invalid-variables-are-handled
 
 TEST_RUNNER
 -----------
@@ -803,7 +803,7 @@ pages -- and, possibly, by other parts of the system. See
 See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and
 MONTH_DAY_FORMAT.
 
-.. _allowed date format strings: http://www.djangoproject.com/documentation/templates/#now
+.. _allowed date format strings: ../templates/#now
 
 TIME_ZONE
 ---------
@@ -873,11 +873,11 @@ Different locales have different formats. For example, U.S. English would say
 See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
 TIME_FORMAT and MONTH_DAY_FORMAT.
 
-.. _cache docs: http://www.djangoproject.com/documentation/cache/
-.. _middleware docs: http://www.djangoproject.com/documentation/middleware/
-.. _session docs: http://www.djangoproject.com/documentation/sessions/
+.. _cache docs: ../cache/
+.. _middleware docs: ../middleware/
+.. _session docs: ../sessions/
 .. _See available choices: http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
-.. _template documentation: http://www.djangoproject.com/documentation/templates_python/
+.. _template documentation: ../templates_python/
 
 Creating your own settings
 ==========================
