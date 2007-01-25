@@ -629,6 +629,7 @@ class ManyToManyField(RelatedField, Field):
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             raw_id_admin=kwargs.pop('raw_id_admin', False),
             symmetrical=kwargs.pop('symmetrical', True))
+        self.db_table = kwargs.pop('db_table', None)
         if kwargs["rel"].raw_id_admin:
             kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
@@ -651,7 +652,10 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
-        return '%s_%s' % (opts.db_table, self.name)
+        if self.db_table:
+            return self.db_table
+        else:
+            return '%s_%s' % (opts.db_table, self.name)
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
