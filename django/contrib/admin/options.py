@@ -340,7 +340,7 @@ class ModelAdmin(object):
         try:
             obj = model._default_manager.get(pk=object_id)
         except model.DoesNotExist:
-            raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
+            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
 
         ModelForm = forms.form_for_instance(obj, formfield_callback=self.formfield_for_dbfield)
 
