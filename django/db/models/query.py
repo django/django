@@ -1,5 +1,6 @@
 from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
+from django.db.models.fields.generic import GenericRelation
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -979,18 +980,26 @@ def delete_objects(seen_objs):
 
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
-            for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (qn(related.field.m2m_db_table()),
-                        qn(related.field.m2m_reverse_name()),
-                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
-                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
+            if not isinstance(related.field, GenericRelation):
+                for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+                    cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                        (qn(related.field.m2m_db_table()),
+                            qn(related.field.m2m_reverse_name()),
+                            ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                        pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
+            if isinstance(f, GenericRelation):
+                from django.contrib.contenttypes.models import ContentType 
+                query_extra = 'AND %s=%%s' % f.rel.to._meta.get_field(f.content_type_field_name).column
+                args_extra = [ContentType.objects.get_for_model(cls).id]
+            else:
+                query_extra = ''
+                args_extra = []
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                cursor.execute(("DELETE FROM %s WHERE %s IN (%s)" % \
                     (qn(f.m2m_db_table()), qn(f.m2m_column_name()),
-                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
-                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
+                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]]))) + query_extra,
+                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE] + args_extra)
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
