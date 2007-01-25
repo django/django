@@ -3,7 +3,6 @@ Form Widget classes specific to the Django admin site.
 """
 
 from django import newforms as forms
-from django.newforms.util import smart_unicode
 from django.utils.text import capfirst
 
 class FilteredSelectMultiple(forms.SelectMultiple):
