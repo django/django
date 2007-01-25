@@ -62,7 +62,7 @@ class CommentManager(models.Manager):
         return False
 
 class Comment(models.Model):
-    user = models.ForeignKey(User, raw_id_admin=True)
+    user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
     headline = models.CharField(_('headline'), maxlength=255, blank=True)
@@ -101,6 +101,7 @@ class Comment(models.Model):
         list_filter = ('submit_date',)
         date_hierarchy = 'submit_date'
         search_fields = ('comment', 'user__username')
+        raw_id_fields = ('user',)
 
     def __repr__(self):
         return "%s: %s..." % (self.user.username, self.comment[:100])

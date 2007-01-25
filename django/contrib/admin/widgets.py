@@ -3,6 +3,8 @@ Form Widget classes specific to the Django admin site.
 """
 
 from django import newforms as forms
+from django.newforms.util import smart_unicode
+from django.utils.text import capfirst
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     """
@@ -41,6 +43,33 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         return u'<p class="datetime">%s %s<br />%s %s</p>' % \
             (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1])
 
+class ForeignKeyRawIdWidget(forms.TextInput):
+    """
+    A Widget for displaying ForeignKeys in the "raw_id" interface rather than
+    in a <select> box.
+    """
+    def __init__(self, rel, attrs=None):
+        self.rel = rel
+        super(ForeignKeyRawIdWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        from django.conf import settings
+        related_url = '../../../%s/%s/' % (self.rel.to._meta.app_label, self.rel.to._meta.object_name.lower())
+        if self.rel.limit_choices_to:
+            url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in self.rel.limit_choices_to.items()])
+        else:
+            url = ''
+        attrs['class'] = 'vRawIdAdminField' # The JavaScript looks for this hook.
+        output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
+        # TODO: "id_" is hard-coded here. This should instead use the correct
+        # API to determine the ID dynamically.
+        output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
+            (related_url, url, name))
+        output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
+        return u''.join(output)
+        #if self.change: # TODO
+            #output.append('&nbsp;<strong>TODO</strong>')
+
 class RelatedFieldWidgetWrapper(object):
     """
     This class is a wrapper whose __call__() method mimics the interface of a
@@ -54,19 +83,7 @@ class RelatedFieldWidgetWrapper(object):
         rel_to = self.rel.to
         related_url = '../../../%s/%s/' % (rel_to._meta.app_label, rel_to._meta.object_name.lower())
         output = [self.render_func(name, value, *args, **kwargs)]
-        if self.rel.raw_id_admin:
-            if self.rel.limit_choices_to:
-                url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in self.rel.limit_choices_to.items()])
-            else:
-                url = ''
-            # TODO: "id_" is hard-coded here. This should instead use the correct
-            # API to determine the ID dynamically.
-            output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
-                (related_url, url, name))
-            output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
-            #if self.change: # TODO
-                #output.append('&nbsp;<strong>TODO</strong>')
-        elif rel_to._meta.admin: # If the related object has an admin interface:
+        if rel_to._meta.admin: # If the related object has an admin interface:
             # TODO: "id_" is hard-coded here. This should instead use the correct
             # API to determine the ID dynamically.
             output.append(u'<a href="%sadd/" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \

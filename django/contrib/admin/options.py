@@ -108,6 +108,7 @@ class ModelAdmin(object):
     ordering = None
     js = None
     fields = None
+    raw_id_fields = ()
 
     def __init__(self, model):
         self.model = model
@@ -224,12 +225,16 @@ class ModelAdmin(object):
             return db_field.formfield(**kwargs)
 
         # For ForeignKey or ManyToManyFields, use a special widget.
-        if db_field.rel and isinstance(db_field.rel, (models.ManyToOneRel, models.ManyToManyRel)):
-            # Wrap the widget's render() method with a method that adds
-            # extra HTML to the end of the rendered output.
-            formfield = db_field.formfield(**kwargs)
-            formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
-            return formfield
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
+            if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
+                kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+                return db_field.formfield(**kwargs)
+            else:
+                # Wrap the widget's render() method with a method that adds
+                # extra HTML to the end of the rendered output.
+                formfield = db_field.formfield(**kwargs)
+                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
+                return formfield
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)

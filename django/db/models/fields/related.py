@@ -483,8 +483,7 @@ class ForeignKey(RelatedField, Field):
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            lookup_overrides=kwargs.pop('lookup_overrides', None))
         Field.__init__(self, **kwargs)
 
         self.db_index = True
@@ -497,27 +496,20 @@ class ForeignKey(RelatedField, Field):
 
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.rel.raw_id_admin:
-            field_objs = self.get_manipulator_field_objs()
-            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
+        if self.radio_admin:
+            field_objs = [oldforms.RadioSelectField]
+            params['ul_class'] = get_ul_class(self.radio_admin)
         else:
-            if self.radio_admin:
-                field_objs = [oldforms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
+            if self.null:
+                field_objs = [oldforms.NullSelectField]
             else:
-                if self.null:
-                    field_objs = [oldforms.NullSelectField]
-                else:
-                    field_objs = [oldforms.SelectField]
-            params['choices'] = self.get_choices_default()
+                field_objs = [oldforms.SelectField]
+        params['choices'] = self.get_choices_default()
         return field_objs, params
 
     def get_manipulator_field_objs(self):
         rel_field = self.rel.get_related_field()
-        if self.rel.raw_id_admin and not isinstance(rel_field, AutoField):
-            return rel_field.get_manipulator_field_objs()
-        else:
-            return [oldforms.IntegerField]
+        return [oldforms.IntegerField]
 
     def get_db_prep_save(self, value):
         if value == '' or value == None:
@@ -533,7 +525,7 @@ class ForeignKey(RelatedField, Field):
             # is *2*, not 1, because SelectFields always have an initial
             # "blank" value. Otherwise (radio_admin=True), we check that the
             # length is 1.
-            if not self.blank and (not self.rel.raw_id_admin or self.choices):
+            if not self.blank and self.choices:
                 choice_list = self.get_choices_default()
                 if self.radio_admin and len(choice_list) == 1:
                     return {self.attname: choice_list[0][0]}
@@ -573,8 +565,7 @@ class OneToOneField(RelatedField, IntegerField):
             edit_inline=kwargs.pop('edit_inline', False),
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            lookup_overrides=kwargs.pop('lookup_overrides', None))
         kwargs['primary_key'] = True
         IntegerField.__init__(self, **kwargs)
 
@@ -590,19 +581,15 @@ class OneToOneField(RelatedField, IntegerField):
     # ManyToManyField. This works for now.
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:], 'member_name': name_prefix + self.attname}
-        if self.rel.raw_id_admin:
-            field_objs = self.get_manipulator_field_objs()
-            params['validator_list'].append(curry(manipulator_valid_rel_key, self, manipulator))
+        if self.radio_admin:
+            field_objs = [oldforms.RadioSelectField]
+            params['ul_class'] = get_ul_class(self.radio_admin)
         else:
-            if self.radio_admin:
-                field_objs = [oldforms.RadioSelectField]
-                params['ul_class'] = get_ul_class(self.radio_admin)
+            if self.null:
+                field_objs = [oldforms.NullSelectField]
             else:
-                if self.null:
-                    field_objs = [oldforms.NullSelectField]
-                else:
-                    field_objs = [oldforms.SelectField]
-            params['choices'] = self.get_choices_default()
+                field_objs = [oldforms.SelectField]
+        params['choices'] = self.get_choices_default()
         return field_objs, params
 
     def contribute_to_class(self, cls, name):
@@ -627,24 +614,15 @@ class ManyToManyField(RelatedField, Field):
             related_name=kwargs.pop('related_name', None),
             filter_interface=kwargs.pop('filter_interface', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False),
             symmetrical=kwargs.pop('symmetrical', True))
-        if kwargs["rel"].raw_id_admin:
-            kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
 
-        if self.rel.raw_id_admin:
-            msg = gettext_lazy('Separate multiple IDs with commas.')
-        else:
-            msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
+        msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
     def get_manipulator_field_objs(self):
-        if self.rel.raw_id_admin:
-            return [oldforms.RawIdAdminField]
-        else:
-            choices = self.get_choices_default()
-            return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+        choices = self.get_choices_default()
+        return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
@@ -690,14 +668,11 @@ class ManyToManyField(RelatedField, Field):
         new_data = {}
         if obj:
             instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
-            if self.rel.raw_id_admin:
-                new_data[self.name] = ",".join([str(id) for id in instance_ids])
-            else:
-                new_data[self.name] = instance_ids
+            new_data[self.name] = instance_ids
         else:
             # In required many-to-many fields with only one available choice,
             # select that one available choice.
-            if not self.blank and not self.rel.edit_inline and not self.rel.raw_id_admin:
+            if not self.blank and not self.rel.edit_inline:
                 choices_list = self.get_choices_default()
                 if len(choices_list) == 1:
                     new_data[self.name] = [choices_list[0][0]]
@@ -741,7 +716,7 @@ class ManyToManyField(RelatedField, Field):
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
         max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
-        related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
+        related_name=None, limit_choices_to=None, lookup_overrides=None):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -754,7 +729,6 @@ class ManyToOneRel(object):
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
         self.lookup_overrides = lookup_overrides or {}
-        self.raw_id_admin = raw_id_admin
         self.multiple = True
 
     def get_related_field(self):
@@ -763,8 +737,7 @@ class ManyToOneRel(object):
 
 class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,
-        related_name=None, limit_choices_to=None, lookup_overrides=None,
-        raw_id_admin=False):
+        related_name=None, limit_choices_to=None, lookup_overrides=None):
         self.to, self.field_name = to, field_name
         self.num_in_admin, self.edit_inline = num_in_admin, edit_inline
         self.related_name = related_name
@@ -772,12 +745,11 @@ class OneToOneRel(ManyToOneRel):
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
         self.lookup_overrides = lookup_overrides or {}
-        self.raw_id_admin = raw_id_admin
         self.multiple = False
 
 class ManyToManyRel(object):
     def __init__(self, to, num_in_admin=0, related_name=None,
-        filter_interface=None, limit_choices_to=None, raw_id_admin=False, symmetrical=True):
+        filter_interface=None, limit_choices_to=None, symmetrical=True):
         self.to = to
         self.num_in_admin = num_in_admin
         self.related_name = related_name
@@ -786,8 +758,5 @@ class ManyToManyRel(object):
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
         self.edit_inline = False
-        self.raw_id_admin = raw_id_admin
         self.symmetrical = symmetrical
         self.multiple = True
-
-        assert not (self.raw_id_admin and self.filter_interface), "ManyToManyRels may not use both raw_id_admin and filter_interface"
