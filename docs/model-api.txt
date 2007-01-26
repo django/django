@@ -874,6 +874,10 @@ the relationship should work. All are optional:
                              force Django to add the descriptor for the reverse
                              relationship, allowing ``ManyToMany`` relationships to be
                              non-symmetrical.
+			     
+    ``db_table``             The name of the table to create for storing the many-to-many 
+                             data. If this is not provided, Django will assume a default
+                             name based upon the names of the two tables being joined.
 
     =======================  ============================================================
 

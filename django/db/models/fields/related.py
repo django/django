@@ -615,6 +615,7 @@ class ManyToManyField(RelatedField, Field):
             filter_interface=kwargs.pop('filter_interface', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', True))
+        self.db_table = kwargs.pop('db_table', None)
         Field.__init__(self, **kwargs)
 
         msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
@@ -629,7 +630,10 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
-        return '%s_%s' % (opts.db_table, self.name)
+        if self.db_table:
+            return self.db_table
+        else:
+            return '%s_%s' % (opts.db_table, self.name)
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
