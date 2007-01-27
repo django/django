@@ -2149,6 +2149,16 @@ MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 
+Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
+gets a distinct ID, formed by appending an underscore plus the checkbox's
+zero-based index.
+>>> f = SongForm(auto_id='%s_id')
+>>> print f['composers']
+<ul>
+<li><label><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
+</ul>
+
 Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict
 conveniently work with this.
 >>> data = {'name': 'Yesterday', 'composers': ['J', 'P']}
