@@ -136,9 +136,11 @@ class CheckboxInput(Widget):
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
-        # choices can be any iterable
         self.attrs = attrs or {}
-        self.choices = choices
+        # choices can be any iterable, but we may need to render this widget
+        # multiple times. Thus, collapse it into a list so it can be consumed
+        # more than once.
+        self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''

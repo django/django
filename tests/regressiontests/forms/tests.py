@@ -336,6 +336,26 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
+If choices is passed to the constructor and is a generator, it can be iterated
+over multiple times without getting consumed:
+>>> w = Select(choices=get_choices())
+>>> print w.render('num', 2)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+>>> print w.render('num', 3)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3" selected="selected">3</option>
+<option value="4">4</option>
+</select>
+
 # NullBooleanSelect Widget ####################################################
 
 >>> w = NullBooleanSelect()
