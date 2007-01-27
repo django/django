@@ -37,6 +37,13 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+class AuthorProfile(models.Model):
+    author = models.OneToOneField(Author)
+    date_of_birth = models.DateField()
+    
+    def __str__(self):
+        return "Profile of %s" % self.author
+
 __test__ = {'API_TESTS':"""
 # Create some data:
 >>> from datetime import datetime
@@ -117,5 +124,19 @@ __test__ = {'API_TESTS':"""
 
 >>> Article.objects.all()
 [<Article: Just kidding; I love TV poker>, <Article: Time to reform copyright>]
+
+# If you use your own primary key field (such as a OneToOneField), 
+# it doesn't appear in the serialized field list - it replaces the
+# pk identifier.
+>>> profile = AuthorProfile(author=joe, date_of_birth=datetime(1970,1,1))
+>>> profile.save()
+
+>>> json = serializers.serialize("json", AuthorProfile.objects.all())
+>>> json
+'[{"pk": "1", "model": "serializers.authorprofile", "fields": {"date_of_birth": "1970-01-01"}}]'
+
+>>> for obj in serializers.deserialize("json", json):
+...     print obj
+<DeserializedObject: Profile of Joe>
 
 """}
