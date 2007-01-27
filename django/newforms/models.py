@@ -64,7 +64,7 @@ def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfiel
         if formfield:
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (form,), {'fields': fields, '_model': model, 'save': model_save})
+    return type(opts.object_name + 'Form', (form,), {'base_fields': fields, '_model': model, 'save': model_save})
 
 def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
@@ -87,9 +87,9 @@ def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kw
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
-        {'fields': fields, '_model': model, 'save': make_instance_save(instance)})
+        {'base_fields': fields, '_model': model, 'save': make_instance_save(instance)})
 
 def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."
     fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list])
-    return type('FormForFields', (BaseForm,), {'fields': fields})
+    return type('FormForFields', (BaseForm,), {'base_fields': fields})

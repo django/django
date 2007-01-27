@@ -26,12 +26,15 @@ class SortedDictFromList(SortedDict):
         self.keyOrder = [d[0] for d in data]
         dict.__init__(self, dict(data))
 
+    def copy(self):
+        return SortedDictFromList(self.items())
+
 class DeclarativeFieldsMetaclass(type):
-    "Metaclass that converts Field attributes to a dictionary called 'fields'."
+    "Metaclass that converts Field attributes to a dictionary called 'base_fields'."
     def __new__(cls, name, bases, attrs):
         fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
         fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
-        attrs['fields'] = SortedDictFromList(fields)
+        attrs['base_fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
 class BaseForm(StrAndUnicode):
@@ -46,6 +49,12 @@ class BaseForm(StrAndUnicode):
         self.prefix = prefix
         self.initial = initial or {}
         self.__errors = None # Stores the errors after clean() has been called.
+        # The base_fields class attribute is the *class-wide* definition of
+        # fields. Because a particular *instance* of the class might want to
+        # alter self.fields, we create self.fields here by copying base_fields.
+        # Instances should always modify self.fields; they should not modify
+        # self.base_fields.
+        self.fields = self.base_fields.copy()
 
     def __unicode__(self):
         return self.as_table()

@@ -2277,6 +2277,8 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f.clean_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
+# Dynamic construction ########################################################
+
 It's possible to construct a Form dynamically by adding to the self.fields
 dictionary in __init__(). Don't forget to call Form.__init__() within the
 subclass' __init__().
@@ -2291,6 +2293,24 @@ subclass' __init__().
 <tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" /></td></tr>
+
+Instances of a dynamic Form do not persist fields from one Form instance to
+the next.
+>>> class MyForm(Form):
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
 
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
