@@ -2312,6 +2312,28 @@ the next.
 <tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
 
+>>> class MyForm(Form):
+...     default_field_1 = CharField()
+...     default_field_2 = CharField()
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
+
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
 separate row is not displayed. They're displayed in the last row of the
