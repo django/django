@@ -32,7 +32,7 @@ class Category(models.Model):
         return self.name
 
 class Writer(models.Model):
-    name = models.CharField(maxlength=50)
+    name = models.CharField(maxlength=50, help_text='Use both first and last names.')
 
     def __str__(self):
         return self.name
@@ -150,7 +150,7 @@ represented by a ChoiceField.
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select></td></tr>
+</select><br /> Hold down "Control", or "Command" on a Mac, to select more than one.</td></tr>
 
 You can pass a custom Form class to form_for_model. Make sure it's a
 subclass of BaseForm, not Form.
@@ -169,7 +169,7 @@ current values are inserted as 'initial' data in each Field.
 >>> RoykoForm = form_for_instance(w)
 >>> f = RoykoForm(auto_id=False)
 >>> print f
-<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /></td></tr>
+<tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br />Use both first and last names.</td></tr>
 
 >>> art = Article(headline='Test article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
 >>> art.save()
@@ -190,7 +190,7 @@ current values are inserted as 'initial' data in each Field.
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select></li>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 >>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1', 'article': 'Hello.'})
 >>> f.is_valid()
 True
@@ -222,7 +222,7 @@ Add some categories and test the many-to-many form output.
 <option value="1" selected="selected">Entertainment</option>
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
-</select></li>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 
 >>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']})
