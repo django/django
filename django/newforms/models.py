@@ -15,10 +15,7 @@ def model_save(self, commit=True):
     """
     if self.errors:
         raise ValueError("The %s could not be created because the data didn't validate." % self._model._meta.object_name)
-    obj = self._model(**self.clean_data)
-    if commit:
-        obj.save()
-    return obj
+    return save_instance(self, self._model(), commit)
 
 def save_instance(form, instance, commit=True):
     """
@@ -33,12 +30,18 @@ def save_instance(form, instance, commit=True):
     if form.errors:
         raise ValueError("The %s could not be changed because the data didn't validate." % opts.object_name)
     clean_data = form.clean_data
-    for f in opts.fields + opts.many_to_many:
+    for f in opts.fields:
         if isinstance(f, models.AutoField):
             continue
         setattr(instance, f.attname, clean_data[f.name])
     if commit:
         instance.save()
+        for f in opts.many_to_many:
+            setattr(instance, f.attname, getattr(instance, f.attname).model.objects.filter(pk__in = clean_data[f.name]))
+    # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
+    # data will be lost. This happens because a many-to-many options cannot be
+    # set on an object until after it's saved. Maybe we should raise an
+    # exception in that case.
     return instance
 
 def make_instance_save(instance):
@@ -64,7 +67,7 @@ def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfiel
         if formfield:
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (form,), {'fields': fields, '_model': model, 'save': model_save})
+    return type(opts.object_name + 'Form', (form,), {'base_fields': fields, '_model': model, 'save': model_save})
 
 def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
@@ -87,9 +90,9 @@ def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kw
             field_list.append((f.name, formfield))
     fields = SortedDictFromList(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
-        {'fields': fields, '_model': model, 'save': make_instance_save(instance)})
+        {'base_fields': fields, '_model': model, 'save': make_instance_save(instance)})
 
 def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."
     fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list])
-    return type('FormForFields', (BaseForm,), {'fields': fields})
+    return type('FormForFields', (BaseForm,), {'base_fields': fields})

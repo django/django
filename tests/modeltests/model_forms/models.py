@@ -224,6 +224,47 @@ Add some categories and test the many-to-many form output.
 <option value="3">Third test</option>
 </select></li>
 
+>>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04',
+...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']})
+>>> new_art = f.save()
+>>> new_art.id
+1
+>>> new_art = Article.objects.get(id=1)
+>>> new_art.categories.all()
+[<Category: Entertainment>, <Category: It's a test>]
+
+Now, submit form data with no categories. This deletes the existing categories.
+>>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04',
+...     'writer': u'1', 'article': u'Hello.'})
+>>> new_art = f.save()
+>>> new_art.id
+1
+>>> new_art = Article.objects.get(id=1)
+>>> new_art.categories.all()
+[]
+
+Create a new article, with categories, via the form.
+>>> ArticleForm = form_for_model(Article)
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
+>>> new_art = f.save()
+>>> new_art.id
+2
+>>> new_art = Article.objects.get(id=2)
+>>> new_art.categories.all()
+[<Category: Entertainment>, <Category: It's a test>]
+
+Create a new article, with no categories, via the form.
+>>> ArticleForm = form_for_model(Article)
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+...     'writer': u'1', 'article': u'Test.'})
+>>> new_art = f.save()
+>>> new_art.id
+3
+>>> new_art = Article.objects.get(id=3)
+>>> new_art.categories.all()
+[]
+
 Here, we define a custom Form. Because it happens to have the same fields as
 the Category model, we can use save_instance() to apply its changes to an
 existing Category instance.

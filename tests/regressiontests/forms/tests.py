@@ -336,6 +336,26 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
+If choices is passed to the constructor and is a generator, it can be iterated
+over multiple times without getting consumed:
+>>> w = Select(choices=get_choices())
+>>> print w.render('num', 2)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+>>> print w.render('num', 3)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3" selected="selected">3</option>
+<option value="4">4</option>
+</select>
+
 # NullBooleanSelect Widget ####################################################
 
 >>> w = NullBooleanSelect()
@@ -2129,6 +2149,16 @@ MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 
+Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
+gets a distinct ID, formed by appending an underscore plus the checkbox's
+zero-based index.
+>>> f = SongForm(auto_id='%s_id')
+>>> print f['composers']
+<ul>
+<li><label><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
+</ul>
+
 Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict
 conveniently work with this.
 >>> data = {'name': 'Yesterday', 'composers': ['J', 'P']}
@@ -2247,6 +2277,8 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f.clean_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
+# Dynamic construction ########################################################
+
 It's possible to construct a Form dynamically by adding to the self.fields
 dictionary in __init__(). Don't forget to call Form.__init__() within the
 subclass' __init__().
@@ -2261,6 +2293,46 @@ subclass' __init__().
 <tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" /></td></tr>
+
+Instances of a dynamic Form do not persist fields from one Form instance to
+the next.
+>>> class MyForm(Form):
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
+
+>>> class MyForm(Form):
+...     default_field_1 = CharField()
+...     default_field_2 = CharField()
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
 
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
@@ -2537,6 +2609,41 @@ then the latter will get precedence.
 >>> print p.as_ul()
 <li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
+
+# Help text ###################################################################
+
+You can specify descriptive text for a field by using the 'help_text' argument
+to a Field class. This help text is displayed when a Form is rendered.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput, help_text='Choose wisely.')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /> Choose wisely.</li>
+>>> print p.as_p()
+<p>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</p>
+<p>Password: <input type="password" name="password" /> Choose wisely.</p>
+>>> print p.as_table()
+<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br />e.g., user@example.com</td></tr>
+<tr><th>Password:</th><td><input type="password" name="password" /><br />Choose wisely.</td></tr>
+
+The help text is displayed whether or not data is provided for the form.
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> e.g., user@example.com</li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> Choose wisely.</li>
+
+help_text is not displayed for hidden fields. It can be used for documentation
+purposes, though.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput)
+...    next = CharField(widget=HiddenInput, initial='/', help_text='Redirect destination')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
 
 # Forms with prefixes #########################################################
 

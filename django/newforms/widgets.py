@@ -136,9 +136,11 @@ class CheckboxInput(Widget):
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
-        # choices can be any iterable
         self.attrs = attrs or {}
-        self.choices = choices
+        # choices can be any iterable, but we may need to render this widget
+        # multiple times. Thus, collapse it into a list so it can be consumed
+        # more than once.
+        self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
@@ -256,11 +258,16 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
+        has_id = attrs and attrs.has_key('id')
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
-        cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-        for option_value, option_label in chain(self.choices, choices):
+        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            # If an ID attribute was given, add a numeric index as a suffix,
+            # so that the checkboxes don't all have the same ID attribute.
+            if has_id:
+                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = smart_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
