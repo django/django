@@ -2610,6 +2610,41 @@ then the latter will get precedence.
 <li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 
+# Help text ###################################################################
+
+You can specify descriptive text for a field by using the 'help_text' argument
+to a Field class. This help text is displayed when a Form is rendered.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput, help_text='Choose wisely.')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /> Choose wisely.</li>
+>>> print p.as_p()
+<p>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</p>
+<p>Password: <input type="password" name="password" /> Choose wisely.</p>
+>>> print p.as_table()
+<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br />e.g., user@example.com</td></tr>
+<tr><th>Password:</th><td><input type="password" name="password" /><br />Choose wisely.</td></tr>
+
+The help text is displayed whether or not data is provided for the form.
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> e.g., user@example.com</li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> Choose wisely.</li>
+
+help_text is not displayed for hidden fields. It can be used for documentation
+purposes, though.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput)
+...    next = CharField(widget=HiddenInput, initial='/', help_text='Redirect destination')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,

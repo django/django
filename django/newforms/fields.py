@@ -35,7 +35,7 @@ class Field(object):
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
 
-    def __init__(self, required=True, widget=None, label=None, initial=None):
+    def __init__(self, required=True, widget=None, label=None, initial=None, help_text=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should be
@@ -47,9 +47,11 @@ class Field(object):
         #         field name, if the Field is part of a Form.
         # initial -- A value to use in this Field's initial display. This value is
         #            *not* used as a fallback if data isn't given.
+        # help_text -- An optional string to use as "help text" for this Field.
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
+        self.help_text = help_text
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -85,9 +87,9 @@ class Field(object):
         return {}
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None, initial=None):
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
-        super(CharField, self).__init__(required, widget, label, initial)
+        super(CharField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
         "Validates max_length and min_length. Returns a Unicode object."
@@ -106,9 +108,9 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
-    def __init__(self, max_value=None, min_value=None, required=True, widget=None, label=None, initial=None):
+    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
-        super(IntegerField, self).__init__(required, widget, label, initial)
+        super(IntegerField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
         """
@@ -137,8 +139,8 @@ DEFAULT_DATE_INPUT_FORMATS = (
 )
 
 class DateField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        super(DateField, self).__init__(required, widget, label, initial)
+    def __init__(self, input_formats=None, *args, **kwargs):
+        super(DateField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
 
     def clean(self, value):
@@ -166,8 +168,8 @@ DEFAULT_TIME_INPUT_FORMATS = (
 )
 
 class TimeField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        super(TimeField, self).__init__(required, widget, label, initial)
+    def __init__(self, input_formats=None, *args, **kwargs):
+        super(TimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -200,8 +202,8 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 )
 
 class DateTimeField(Field):
-    def __init__(self, input_formats=None, required=True, widget=None, label=None, initial=None):
-        super(DateTimeField, self).__init__(required, widget, label, initial)
+    def __init__(self, input_formats=None, *args, **kwargs):
+        super(DateTimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
 
     def clean(self, value):
@@ -224,14 +226,13 @@ class DateTimeField(Field):
         raise ValidationError(gettext(u'Enter a valid date/time.'))
 
 class RegexField(Field):
-    def __init__(self, regex, max_length=None, min_length=None, error_message=None,
-            required=True, widget=None, label=None, initial=None):
+    def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
         """
         regex can be either a string or a compiled regular expression object.
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
-        super(RegexField, self).__init__(required, widget, label, initial)
+        super(RegexField, self).__init__(*args, **kwargs)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
@@ -263,8 +264,9 @@ email_re = re.compile(
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 class EmailField(RegexField):
-    def __init__(self, max_length=None, min_length=None, required=True, widget=None, label=None, initial=None):
-        RegexField.__init__(self, email_re, max_length, min_length, gettext(u'Enter a valid e-mail address.'), required, widget, label, initial)
+    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
+        RegexField.__init__(self, email_re, max_length, min_length,
+            gettext(u'Enter a valid e-mail address.'), *args, **kwargs)
 
 url_re = re.compile(
     r'^https?://' # http:// or https://
@@ -280,9 +282,9 @@ except ImportError:
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
 class URLField(RegexField):
-    def __init__(self, max_length=None, min_length=None, required=True, verify_exists=False, widget=None, label=None,
-            initial=None, validator_user_agent=URL_VALIDATOR_USER_AGENT):
-        super(URLField, self).__init__(url_re, max_length, min_length, gettext(u'Enter a valid URL.'), required, widget, label, initial)
+    def __init__(self, max_length=None, min_length=None, verify_exists=False,
+            validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
+        super(URLField, self).__init__(url_re, max_length, min_length, gettext(u'Enter a valid URL.'), *args, **kwargs)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
@@ -328,10 +330,8 @@ class NullBooleanField(BooleanField):
         return {True: True, False: False}.get(value, None)
 
 class ChoiceField(Field):
-    def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None):
-        if isinstance(widget, type):
-            widget = widget()
-        super(ChoiceField, self).__init__(required, widget, label, initial)
+    def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None, help_text=None):
+        super(ChoiceField, self).__init__(required, widget, label, initial, help_text)
         self.choices = choices
 
     def _get_choices(self):
@@ -362,8 +362,8 @@ class ChoiceField(Field):
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
 
-    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None):
-        super(MultipleChoiceField, self).__init__(choices, required, widget, label, initial)
+    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None, help_text=None):
+        super(MultipleChoiceField, self).__init__(choices, required, widget, label, initial, help_text)
 
     def clean(self, value):
         """
@@ -390,8 +390,8 @@ class ComboField(Field):
     """
     A Field whose clean() method calls multiple Field clean() methods.
     """
-    def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
-        super(ComboField, self).__init__(required, widget, label, initial)
+    def __init__(self, fields=(), *args, **kwargs):
+        super(ComboField, self).__init__(*args, **kwargs)
         # Set 'required' to False on the individual fields, because the
         # required validation will be handled by ComboField, not by those
         # individual fields.
@@ -425,8 +425,8 @@ class MultiValueField(Field):
 
     You'll probably want to use this with MultiWidget.
     """
-    def __init__(self, fields=(), required=True, widget=None, label=None, initial=None):
-        super(MultiValueField, self).__init__(required, widget, label, initial)
+    def __init__(self, fields=(), *args, **kwargs):
+        super(MultiValueField, self).__init__(*args, **kwargs)
         # Set 'required' to False on the individual fields, because the
         # required validation will be handled by MultiValueField, not by those
         # individual fields.
@@ -481,9 +481,9 @@ class MultiValueField(Field):
         raise NotImplementedError('Subclasses must implement this method.')
 
 class SplitDateTimeField(MultiValueField):
-    def __init__(self, required=True, widget=None, label=None, initial=None):
+    def __init__(self, *args, **kwargs):
         fields = (DateField(), TimeField())
-        super(SplitDateTimeField, self).__init__(fields, required, widget, label, initial)
+        super(SplitDateTimeField, self).__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
         if data_list:
