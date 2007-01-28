@@ -336,7 +336,7 @@ class Field(object):
 
     def formfield(self, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.CharField(**defaults)
 
@@ -398,7 +398,7 @@ class BooleanField(Field):
         return [oldforms.CheckboxField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.BooleanField(**defaults)
 
@@ -417,7 +417,7 @@ class CharField(Field):
         return str(value)
 
     def formfield(self, **kwargs):
-        defaults = {'max_length': self.maxlength, 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'max_length': self.maxlength, 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.CharField(**defaults)
 
@@ -493,7 +493,7 @@ class DateField(Field):
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.DateField(**defaults)
 
@@ -556,7 +556,7 @@ class DateTimeField(DateField):
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.DateTimeField(**defaults)
 
@@ -575,7 +575,7 @@ class EmailField(CharField):
         validators.isValidEmail(field_data, all_data)
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.EmailField(**defaults)
 
@@ -712,7 +712,7 @@ class IntegerField(Field):
         return [oldforms.IntegerField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.IntegerField(**defaults)
 
@@ -771,7 +771,7 @@ class TextField(Field):
         return [oldforms.LargeTextField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'widget': forms.Textarea, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'widget': forms.Textarea, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.CharField(**defaults)
 
@@ -816,7 +816,7 @@ class TimeField(Field):
         return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.TimeField(**defaults)
 
@@ -835,7 +835,7 @@ class URLField(CharField):
         return "CharField"
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'verify_exists': self.verify_exists, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'verify_exists': self.verify_exists, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.URLField(**defaults)
 

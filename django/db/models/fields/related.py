@@ -549,7 +549,7 @@ class ForeignKey(RelatedField, Field):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
     def formfield(self, **kwargs):
-        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.ChoiceField(**defaults)
 
@@ -615,7 +615,7 @@ class OneToOneField(RelatedField, IntegerField):
             cls._meta.one_to_one_field = self
 
     def formfield(self, **kwargs):
-        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.ChoiceField(**kwargs)
 
@@ -738,7 +738,7 @@ class ManyToManyField(RelatedField, Field):
         # MultipleChoiceField takes a list of IDs.
         if kwargs.get('initial') is not None:
             kwargs['initial'] = [i._get_pk_val() for i in kwargs['initial']]
-        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.MultipleChoiceField(**defaults)
 
