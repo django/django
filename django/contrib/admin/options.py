@@ -212,7 +212,8 @@ class ModelAdmin(object):
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             return forms.SplitDateTimeField(required=not db_field.blank,
-                widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name), **kwargs)
+                widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name),
+                help_text=db_field.help_text, **kwargs)
 
         # For DateFields, add a custom CSS class.
         if isinstance(db_field, models.DateField):

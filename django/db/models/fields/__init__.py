@@ -736,7 +736,7 @@ class NullBooleanField(Field):
         return [oldforms.NullBooleanField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name)}
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return forms.NullBooleanField(**defaults)
 
