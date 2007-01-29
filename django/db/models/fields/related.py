@@ -316,18 +316,20 @@ def create_many_related_manager(superclass):
             # join_table: name of the m2m link table
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
-            # *objs - objects to add
+            # *objs - objects to add. Either object instances, or primary keys of object instances.
             from django.db import connection
 
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                new_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to add() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        new_ids.add(obj._get_pk_val())
+                    else:
+                        new_ids.add(obj)
                 # Add the newly created or already existing objects to the join table.
                 # First find out which items are already added, to avoid adding them twice
-                new_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                     (target_col_name, self.join_table, source_col_name,
@@ -354,11 +356,13 @@ def create_many_related_manager(superclass):
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                old_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        old_ids.add(obj._get_pk_val())
+                    else:
+                        old_ids.add(obj)
                 # Remove the specified objects from the join table
-                old_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                     (self.join_table, source_col_name,

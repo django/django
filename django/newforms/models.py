@@ -37,7 +37,7 @@ def save_instance(form, instance, commit=True):
     if commit:
         instance.save()
         for f in opts.many_to_many:
-            setattr(instance, f.attname, getattr(instance, f.attname).model.objects.filter(pk__in = clean_data[f.name]))
+            setattr(instance, f.attname, clean_data[f.name])
     # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
     # data will be lost. This happens because a many-to-many options cannot be
     # set on an object until after it's saved. Maybe we should raise an

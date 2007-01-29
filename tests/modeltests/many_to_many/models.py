@@ -203,7 +203,19 @@ __test__ = {'API_TESTS':"""
 >>> p2.article_set.all()
 [<Article: Oxygen-free diet works wonders>]
 
-# Recreate the article and Publication we just deleted.
+# Relation sets can also be set using primary key values
+>>> p2.article_set = [a4.id, a5.id]
+>>> p2.article_set.all()
+[<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]
+>>> a4.publications.all()
+[<Publication: Science News>]
+>>> a4.publications = [p3.id]
+>>> p2.article_set.all()
+[<Article: Oxygen-free diet works wonders>]
+>>> a4.publications.all()
+[<Publication: Science Weekly>]
+
+# Recreate the article and Publication we have deleted.
 >>> p1 = Publication(id=None, title='The Python Journal')
 >>> p1.save()
 >>> a2 = Article(id=None, headline='NASA uses Python')
