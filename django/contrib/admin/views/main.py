@@ -109,7 +109,6 @@ class AdminBoundField(object):
 def render_change_form(model_admin, model, manipulator, context, add=False, change=False, form_url=''):
     opts = model._meta
     app_label = opts.app_label
-    auto_populated_fields = [f for f in opts.fields if f.prepopulate_from]
     original = getattr(manipulator, 'original_object', None)
     ordered_objects = opts.get_ordered_objects()
     inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
@@ -120,7 +119,6 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
         'has_file_field': opts.has_field_type(models.FileField),
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
-        'auto_populated_fields': auto_populated_fields,
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,
         'form_url': form_url,

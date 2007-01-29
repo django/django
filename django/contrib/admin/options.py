@@ -33,8 +33,9 @@ def unquote(s):
     return "".join(res)
 
 class AdminForm(object):
-    def __init__(self, form, fieldsets):
+    def __init__(self, form, fieldsets, prepopulated_fields):
         self.form, self.fieldsets = form, fieldsets
+        self.prepopulated_fields = [{'field': form[field_name], 'dependencies': [form[f] for f in dependencies]} for field_name, dependencies in prepopulated_fields.items()]
 
     def __iter__(self):
         for fieldset in self.fieldsets:
@@ -109,6 +110,7 @@ class ModelAdmin(object):
     js = None
     fields = None
     raw_id_fields = ()
+    prepopulated_fields = {}
 
     def __init__(self, model):
         self.model = model
@@ -145,9 +147,8 @@ class ModelAdmin(object):
         """
         from django.conf import settings
         js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
-        # TODO: This.
-        #if auto_populated_fields:
-            #js.append('js/urlify.js')
+        if self.prepopulated_fields:
+            js.append('js/urlify.js')
         if self.opts.has_field_type(models.DateTimeField) or self.opts.has_field_type(models.TimeField) or self.opts.has_field_type(models.DateField):
             js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
         if self.opts.get_ordered_objects():
@@ -319,7 +320,7 @@ class ModelAdmin(object):
 
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
-            'adminform': AdminForm(form, self.fieldsets_add(request)),
+            'adminform': AdminForm(form, self.fieldsets_add(request), self.prepopulated_fields),
             'oldform': oldforms.FormWrapper(model.AddManipulator(), {}, {}),
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
@@ -410,7 +411,7 @@ class ModelAdmin(object):
 
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
-            'adminform': AdminForm(form, self.fieldsets_change(request, object_id)),
+            'adminform': AdminForm(form, self.fieldsets_change(request, object_id), self.prepopulated_fields),
             'oldform': oldforms.FormWrapper(model.ChangeManipulator(object_id), {}, {}),
             'object_id': object_id,
             'original': obj,

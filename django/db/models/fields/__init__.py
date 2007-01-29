@@ -68,9 +68,8 @@ class Field(object):
     def __init__(self, verbose_name=None, name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=False,
         core=False, rel=None, default=NOT_PROVIDED, editable=True,
-        prepopulate_from=None, unique_for_date=None, unique_for_month=None,
-        unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
-        help_text='', db_column=None):
+        unique_for_date=None, unique_for_month=None, unique_for_year=None,
+        validator_list=None, choices=None, radio_admin=None, help_text='', db_column=None):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
@@ -79,7 +78,6 @@ class Field(object):
         self.core, self.rel, self.default = core, rel, default
         self.editable = editable
         self.validator_list = validator_list or []
-        self.prepopulate_from = prepopulate_from
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
         self.unique_for_year = unique_for_year
         self._choices = choices or []

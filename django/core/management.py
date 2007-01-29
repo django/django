@@ -891,8 +891,6 @@ def get_validation_errors(outfile, app=None):
                     from PIL import Image
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
-            if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
                 if not hasattr(f.choices, '__iter__'):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
@@ -979,6 +977,14 @@ def get_validation_errors(outfile, app=None):
 
         # Check admin attribute.
         if opts.admin is not None:
+            # prepopulated_fields
+            if not isinstance(opts.admin.prepopulated_fields, dict):
+                e.add(opts, '"%s": prepopulated_fields should be a dictionary.' % f.name)
+            else:
+                for field_name, field_list in opts.admin.prepopulated_fields.items():
+                    if not isinstance(field_list, (list, tuple)):
+                        e.add(opts, '"%s": prepopulated_fields "%s" value should be a list or tuple.' % (f.name, field_name))
+
             # list_display
             if not isinstance(opts.admin.list_display, (list, tuple)):
                 e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
