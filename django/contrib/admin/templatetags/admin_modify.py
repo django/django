@@ -143,23 +143,6 @@ def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
 
-def auto_populated_field_script(auto_pop_fields, change = False):
-    t = []
-    for field in auto_pop_fields:
-        if change:
-            t.append('document.getElementById("id_%s")._changed = true;' % field.name)
-        else:
-            t.append('document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
-
-        add_values = ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from])
-        for f in field.prepopulate_from:
-            t.append('document.getElementById("id_%s").onkeyup = function() {' \
-                     ' var e = document.getElementById("id_%s");' \
-                     ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
-                     f, field.name, add_values, field.maxlength))
-    return ''.join(t)
-auto_populated_field_script = register.simple_tag(auto_populated_field_script)
-
 def field_widget(parser, token):
     bits = token.contents.split()
     if len(bits) != 2:
