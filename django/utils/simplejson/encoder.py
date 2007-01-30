@@ -3,11 +3,11 @@ Implementation of JSONEncoder
 """
 import re
 
-# this should match any kind of infinity
-INFCHARS = re.compile(r'[infINF]')
 ESCAPE = re.compile(r'[\x00-\x19\\"\b\f\n\r\t]')
-ESCAPE_ASCII = re.compile(r'([\\"]|[^\ -~])')
+ESCAPE_ASCII = re.compile(r'([\\"/]|[^\ -~])')
 ESCAPE_DCT = {
+    # escape all forward slashes to prevent </script> attack
+    '/': '\\/',
     '\\': '\\\\',
     '"': '\\"',
     '\b': '\\b',
@@ -16,31 +16,31 @@ ESCAPE_DCT = {
     '\r': '\\r',
     '\t': '\\t',
 }
-for i in range(20):
+for i in range(0x20):
     ESCAPE_DCT.setdefault(chr(i), '\\u%04x' % (i,))
 
+# assume this produces an infinity on all machines (probably not guaranteed)
+INFINITY = float('1e66666')
+
 def floatstr(o, allow_nan=True):
-    s = str(o)
-    # If the first non-sign is a digit then it's not a special value
-    if (o < 0.0 and s[1].isdigit()) or s[0].isdigit():
-        return s
-    elif not allow_nan:
+    # Check for specials.  Note that this type of test is processor- and/or
+    # platform-specific, so do tests which don't depend on the internals.
+
+    if o != o:
+        text = 'NaN'
+    elif o == INFINITY:
+        text = 'Infinity'
+    elif o == -INFINITY:
+        text = '-Infinity'
+    else:
+        return str(o)
+
+    if not allow_nan:
         raise ValueError("Out of range float values are not JSON compliant: %r"
             % (o,))
-    # These are the string representations on the platforms I've tried
-    if s == 'nan':
-        return 'NaN'
-    if s == 'inf':
-        return 'Infinity'
-    if s == '-inf':
-        return '-Infinity'
-    # NaN should either be inequal to itself, or equal to everything
-    if o != o or o == 0.0:
-        return 'NaN'
-    # Last ditch effort, assume inf
-    if o < 0:
-        return '-Infinity'
-    return 'Infinity'
+
+    return text
+
 
 def encode_basestring(s):
     """
@@ -90,8 +90,11 @@ class JSONEncoder(object):
     implementation (to raise ``TypeError``).
     """
     __all__ = ['__init__', 'default', 'encode', 'iterencode']
+    item_separator = ', '
+    key_separator = ': '
     def __init__(self, skipkeys=False, ensure_ascii=True,
-            check_circular=True, allow_nan=True, sort_keys=False):
+            check_circular=True, allow_nan=True, sort_keys=False,
+            indent=None, separators=None):
         """
         Constructor for JSONEncoder, with sensible defaults.
 
@@ -116,6 +119,15 @@ class JSONEncoder(object):
         If sort_keys is True, then the output of dictionaries will be
         sorted by key; this is useful for regression tests to ensure
         that JSON serializations can be compared on a day-to-day basis.
+
+        If indent is a non-negative integer, then JSON array
+        elements and object members will be pretty-printed with that
+        indent level.  An indent level of 0 will only insert newlines.
+        None is the most compact representation.
+
+        If specified, separators should be a (item_separator, key_separator)
+        tuple. The default is (', ', ': '). To get the most compact JSON
+        representation you should specify (',', ':') to eliminate whitespace.
         """
 
         self.skipkeys = skipkeys
@@ -123,6 +135,13 @@ class JSONEncoder(object):
         self.check_circular = check_circular
         self.allow_nan = allow_nan
         self.sort_keys = sort_keys
+        self.indent = indent
+        self.current_indent_level = 0
+        if separators is not None:
+            self.item_separator, self.key_separator = separators
+
+    def _newline_indent(self):
+        return '\n' + (' ' * (self.indent * self.current_indent_level))
 
     def _iterencode_list(self, lst, markers=None):
         if not lst:
@@ -134,14 +153,25 @@ class JSONEncoder(object):
                 raise ValueError("Circular reference detected")
             markers[markerid] = lst
         yield '['
+        if self.indent is not None:
+            self.current_indent_level += 1
+            newline_indent = self._newline_indent()
+            separator = self.item_separator + newline_indent
+            yield newline_indent
+        else:
+            newline_indent = None
+            separator = self.item_separator
         first = True
         for value in lst:
             if first:
                 first = False
             else:
-                yield ', '
+                yield separator
             for chunk in self._iterencode(value, markers):
                 yield chunk
+        if newline_indent is not None:
+            self.current_indent_level -= 1
+            yield self._newline_indent()
         yield ']'
         if markers is not None:
             del markers[markerid]
@@ -156,6 +186,15 @@ class JSONEncoder(object):
                 raise ValueError("Circular reference detected")
             markers[markerid] = dct
         yield '{'
+        key_separator = self.key_separator
+        if self.indent is not None:
+            self.current_indent_level += 1
+            newline_indent = self._newline_indent()
+            item_separator = self.item_separator + newline_indent
+            yield newline_indent
+        else:
+            newline_indent = None
+            item_separator = self.item_separator
         first = True
         if self.ensure_ascii:
             encoder = encode_basestring_ascii
@@ -165,7 +204,7 @@ class JSONEncoder(object):
         if self.sort_keys:
             keys = dct.keys()
             keys.sort()
-            items = [(k,dct[k]) for k in keys]
+            items = [(k, dct[k]) for k in keys]
         else:
             items = dct.iteritems()
         for key, value in items:
@@ -190,11 +229,14 @@ class JSONEncoder(object):
             if first:
                 first = False
             else:
-                yield ', '
+                yield item_separator
             yield encoder(key)
-            yield ': '
+            yield key_separator
             for chunk in self._iterencode(value, markers):
                 yield chunk
+        if newline_indent is not None:
+            self.current_indent_level -= 1
+            yield self._newline_indent()
         yield '}'
         if markers is not None:
             del markers[markerid]
