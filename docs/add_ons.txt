@@ -17,7 +17,7 @@ admin
 The automatic Django administrative interface. For more information, see
 `Tutorial 2`_.
 
-.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
+.. _Tutorial 2: ../tutorial2/
 
 auth
 ====
@@ -26,7 +26,7 @@ Django's authentication framework.
 
 See the `authentication documentation`_.
 
-.. _authentication documentation: http://www.djangoproject.com/documentation/authentication/
+.. _authentication documentation: ../authentication/
 
 comments
 ========
@@ -46,7 +46,7 @@ A middleware for preventing Cross Site Request Forgeries
 
 See the `csrf documentation`_.
 
-.. _csrf documentation: http://www.djangoproject.com/documentation/csrf/
+.. _csrf documentation: ../csrf/
 
 formtools
 =========
@@ -137,7 +137,7 @@ A framework for managing simple "flat" HTML content in a database.
 
 See the `flatpages documentation`_.
 
-.. _flatpages documentation: http://www.djangoproject.com/documentation/flatpages/
+.. _flatpages documentation: ../flatpages/
 
 markup
 ======
@@ -157,7 +157,7 @@ A framework for managing redirects.
 
 See the `redirects documentation`_.
 
-.. _redirects documentation: http://www.djangoproject.com/documentation/redirects/
+.. _redirects documentation: ../redirects/
 
 sites
 =====
@@ -168,7 +168,7 @@ one or more sites.
 
 See the `sites documentation`_.
 
-.. _sites documentation: http://www.djangoproject.com/documentation/sites/
+.. _sites documentation: ../sites/
 
 sitemaps
 ========
@@ -177,7 +177,7 @@ A framework for generating Google sitemap XML files.
 
 See the `sitemaps documentation`_.
 
-.. _sitemaps documentation: http://www.djangoproject.com/documentation/sitemaps/
+.. _sitemaps documentation: ../sitemaps/
 
 syndication
 ===========
@@ -186,7 +186,7 @@ A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the `syndication documentation`_.
 
-.. _syndication documentation: http://www.djangoproject.com/documentation/syndication/
+.. _syndication documentation: ../syndication/
 
 Other add-ons
 =============

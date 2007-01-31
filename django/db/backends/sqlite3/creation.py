@@ -24,6 +24,5 @@ DATA_TYPES = {
     'SmallIntegerField':            'smallint',
     'TextField':                    'text',
     'TimeField':                    'time',
-    'URLField':                     'varchar(200)',
     'USStateField':                 'varchar(2)',
 }

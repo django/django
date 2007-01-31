@@ -25,7 +25,7 @@ ADMINS = ()
 INTERNAL_IPS = ()
 
 # Local time zone for this installation. All choices can be found here:
-# http://www.postgresql.org/docs/current/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+# http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
 TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:

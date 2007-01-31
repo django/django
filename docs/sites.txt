@@ -276,8 +276,8 @@ you want your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you define
 ``CurrentSiteManager``.
 
-.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
-.. _manager documentation: http://www.djangoproject.com/documentation/model_api/#managers
+.. _manager: ../model_api/#managers
+.. _manager documentation: ../model_api/#managers
 
 How Django uses the sites framework
 ===================================
@@ -316,7 +316,7 @@ Here's how Django uses the sites framework:
     * The shortcut view (``django.views.defaults.shortcut``) uses the domain of
       the current ``Site`` object when calculating an object's URL.
 
-.. _redirects framework: http://www.djangoproject.com/documentation/redirects/
-.. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _authentication framework: http://www.djangoproject.com/documentation/authentication/
+.. _redirects framework: ../redirects/
+.. _flatpages framework: ../flatpages/
+.. _syndication framework: ../syndication/
+.. _authentication framework: ../authentication/

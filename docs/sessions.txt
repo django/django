@@ -27,7 +27,7 @@ If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
 from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 
-.. _middleware: http://www.djangoproject.com/documentation/middleware/
+.. _middleware: ../middleware/
 
 Using sessions in views
 =======================
@@ -217,6 +217,23 @@ browser-length cookies -- cookies that expire as soon as the user closes his or
 her browser. Use this if you want people to have to log in every time they open
 a browser.
 
+Clearing the session table
+==========================
+
+Note that session data can accumulate in the ``django_session`` database table
+and Django does *not* provide automatic purging. Therefore, it's your job to
+purge expired sessions on a regular basis.
+
+To understand this problem, consider what happens when a user uses a session.
+When a user logs in, Django adds a row to the ``django_session`` database
+table. Django updates this row each time the session data changes. If the user
+logs out manually, Django deletes the row. But if the user does *not* log out,
+the row never gets deleted.
+
+Django provides a sample clean-up script in ``django/bin/daily_cleanup.py``.
+That script deletes any session in the session table whose ``expire_date`` is
+in the past -- but your application may have different requirements.
+
 Settings
 ========
 
@@ -273,7 +290,7 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
-.. _Django settings: http://www.djangoproject.com/documentation/settings/
+.. _Django settings: ../settings/
 
 Technical details
 =================

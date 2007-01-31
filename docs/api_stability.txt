@@ -98,26 +98,26 @@ change:
      rewrite before Django 1.0. Even if the change isn't quite that drastic,
      there will at least be moderate changes.
      
-.. _caching: http://www.djangoproject.com/documentation/cache/
-.. _custom template tags and libraries: http://www.djangoproject.com/documentation/templates_python/
-.. _database lookup: http://www.djangoproject.com/documentation/db_api/
-.. _django-admin utility: http://www.djangoproject.com/documentation/django_admin/
-.. _fastcgi integration: http://www.djangoproject.com/documentation/fastcgi/
-.. _flatpages: http://www.djangoproject.com/documentation/flatpages/
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _internationalization: http://www.djangoproject.com/documentation/i18n/
-.. _legacy database integration: http://www.djangoproject.com/documentation/legacy_databases/
-.. _model definition: http://www.djangoproject.com/documentation/model_api/
-.. _mod_python integration: http://www.djangoproject.com/documentation/modpython/
-.. _redirects: http://www.djangoproject.com/documentation/redirects/
-.. _request/response objects: http://www.djangoproject.com/documentation/request_response/
-.. _sending email: http://www.djangoproject.com/documentation/email/
-.. _sessions: http://www.djangoproject.com/documentation/sessions/
-.. _settings: http://www.djangoproject.com/documentation/settings/
-.. _syndication: http://www.djangoproject.com/documentation/syndication/
-.. _template language: http://www.djangoproject.com/documentation/templates/
-.. _transactions: http://www.djangoproject.com/documentation/transactions/
-.. _url dispatch: http://www.djangoproject.com/documentation/url_dispatch/
-.. _forms and validation: http://www.djangoproject.com/documentation/forms/
-.. _serialization: http://www.djangoproject.com/documentation/serialization/
-.. _authentication: http://www.djangoproject.com/documentation/authentication/
+.. _caching: ../cache/
+.. _custom template tags and libraries: ../templates_python/
+.. _database lookup: ../db_api/
+.. _django-admin utility: ../django_admin/
+.. _fastcgi integration: ../fastcgi/
+.. _flatpages: ../flatpages/
+.. _generic views: ../generic_views/
+.. _internationalization: ../i18n/
+.. _legacy database integration: ../legacy_databases/
+.. _model definition: ../model_api/
+.. _mod_python integration: ../modpython/
+.. _redirects: ../redirects/
+.. _request/response objects: ../request_response/
+.. _sending email: ../email/
+.. _sessions: ../sessions/
+.. _settings: ../settings/
+.. _syndication: ../syndication/
+.. _template language: ../templates/
+.. _transactions: ../transactions/
+.. _url dispatch: ../url_dispatch/
+.. _forms and validation: ../forms/
+.. _serialization: ../serialization/
+.. _authentication: ../authentication/

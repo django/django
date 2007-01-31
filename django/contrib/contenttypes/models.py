@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+CONTENT_TYPE_CACHE = {}
 class ContentTypeManager(models.Manager):
     def get_for_model(self, model):
         """
@@ -8,10 +9,15 @@ class ContentTypeManager(models.Manager):
         ContentType if necessary.
         """
         opts = model._meta
-        # The str() is needed around opts.verbose_name because it's a
-        # django.utils.functional.__proxy__ object.
-        ct, created = self.model._default_manager.get_or_create(app_label=opts.app_label,
-            model=opts.object_name.lower(), defaults={'name': str(opts.verbose_name)})
+        key = (opts.app_label, opts.object_name.lower())
+        try:
+            ct = CONTENT_TYPE_CACHE[key]
+        except KeyError:
+            # The str() is needed around opts.verbose_name because it's a
+            # django.utils.functional.__proxy__ object.
+            ct, created = self.model._default_manager.get_or_create(app_label=key[0],
+                model=key[1], defaults={'name': str(opts.verbose_name)})
+            CONTENT_TYPE_CACHE[key] = ct
         return ct
 
 class ContentType(models.Model):

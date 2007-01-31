@@ -57,7 +57,7 @@ def Deserializer(object_list, **options):
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.name : d["pk"]}
+        data = {Model._meta.pk.attname : d["pk"]}
         m2m_data = {}
         
         # Handle each field

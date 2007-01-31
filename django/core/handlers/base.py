@@ -60,7 +60,10 @@ class BaseHandler(object):
             if response:
                 return response
 
-        resolver = urlresolvers.RegexURLResolver(r'^/', settings.ROOT_URLCONF)
+        # Get urlconf from request object, if available.  Otherwise use default.
+        urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
+
+        resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
         try:
             callback, callback_args, callback_kwargs = resolver.resolve(request.path)
 

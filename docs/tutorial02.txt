@@ -5,7 +5,7 @@ Writing your first Django app, part 2
 This tutorial begins where `Tutorial 1`_ left off. We're continuing the Web-poll
 application and will focus on Django's automatically-generated admin site.
 
-.. _Tutorial 1: http://www.djangoproject.com/documentation/tutorial1/
+.. _Tutorial 1: ../tutorial1/
 
 .. admonition:: Philosophy
 
@@ -64,7 +64,7 @@ tutorial, remember?) You should see the Django admin index page:
 By default, you should see two types of editable content: groups and users.
 These are core features Django ships with by default.
 
-.. _"I can't log in" questions: http://www.djangoproject.com/documentation/faq/#the-admin-site
+.. _"I can't log in" questions: ../faq/#the-admin-site
 
 Make the poll app modifiable in the admin
 =========================================
@@ -402,7 +402,7 @@ Django automatically looks for a ``templates/`` subdirectory within each app
 package, for use as a fallback. See the `loader types documentation`_ for full
 information.
 
-.. _loader types documentation: http://www.djangoproject.com/documentation/templates_python/#loader-types
+.. _loader types documentation: ../templates_python/#loader-types
 
 Customize the admin index page
 ==============================
@@ -433,5 +433,5 @@ general, see the `Django admin CSS guide`_.
 When you're comfortable with the admin site, read `part 3 of this tutorial`_ to
 start working on public poll views.
 
-.. _Django admin CSS guide: http://www.djangoproject.com/documentation/admin_css/
-.. _part 3 of this tutorial: http://www.djangoproject.com/documentation/tutorial3/
+.. _Django admin CSS guide: ../admin_css/
+.. _part 3 of this tutorial: ../tutorial3/

@@ -20,6 +20,38 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
+def smart_basestring(s, charset):
+    if isinstance(s, unicode):
+        return s.encode(charset)
+    return s
+
+class UnicodeCursorWrapper(object):
+    """
+    A thin wrapper around psycopg cursors that allows them to accept Unicode
+    strings as params.
+
+    This is necessary because psycopg doesn't apply any DB quoting to
+    parameters that are Unicode strings. If a param is Unicode, this will
+    convert it to a bytestring using DEFAULT_CHARSET before passing it to
+    psycopg.
+    """
+    def __init__(self, cursor, charset):
+        self.cursor = cursor
+        self.charset = charset
+
+    def execute(self, sql, params=()):
+        return self.cursor.execute(sql, [smart_basestring(p, self.charset) for p in params])
+
+    def executemany(self, sql, param_list):
+        new_param_list = [tuple([smart_basestring(p, self.charset) for p in params]) for params in param_list]
+        return self.cursor.executemany(sql, new_param_list)
+
+    def __getattr__(self, attr):
+        if self.__dict__.has_key(attr):
+            return self.__dict__[attr]
+        else:
+            return getattr(self.cursor, attr)
+
 class DatabaseWrapper(local):
     def __init__(self, **kwargs):
         self.connection = None
@@ -45,6 +77,7 @@ class DatabaseWrapper(local):
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
         cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+        cursor = UnicodeCursorWrapper(cursor, settings.DEFAULT_CHARSET)
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
@@ -118,7 +151,7 @@ def get_pk_default_value():
 try:
     Database.register_type(Database.new_type((1082,), "DATE", util.typecast_date))
 except AttributeError:
-    raise Exception, "You appear to be using psycopg version 2, which isn't supported yet, because it's still in beta. Use psycopg version 1 instead: http://initd.org/projects/psycopg1"
+    raise Exception, "You appear to be using psycopg version 2. Set your DATABASE_ENGINE to 'postgresql_psycopg2' instead of 'postgresql'."
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))

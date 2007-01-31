@@ -53,7 +53,7 @@ Prints the admin-index template snippet for the given appnames.
 Use admin-index template snippets if you want to customize the look and feel of
 your admin's index page. See `Tutorial 2`_ for more information.
 
-.. _Tutorial 2: http://www.djangoproject.com/documentation/tutorial2/
+.. _Tutorial 2: ../tutorial2/
 
 createcachetable [tablename]
 ----------------------------
@@ -61,7 +61,7 @@ createcachetable [tablename]
 Creates a cache table named ``tablename`` for use with the database cache
 backend.  See the `cache documentation`_ for more information.
 
-.. _cache documentation: http://www.djangoproject.com/documentation/cache/
+.. _cache documentation: ../cache/
 
 dbshell
 -------
@@ -190,7 +190,7 @@ By default, the development server doesn't serve any static files for your site
 you want to configure Django to serve static media, read the `serving static files`_
 documentation.
 
-.. _serving static files: http://www.djangoproject.com/documentation/static_files/
+.. _serving static files: ../static_files/
 
 Turning off auto-reload
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -252,6 +252,8 @@ Each of the SQL files, if given, is expected to contain valid SQL. The SQL
 files are piped directly into the database after all of the models'
 table-creation statements have been executed. Use this SQL hook to populate
 tables with any necessary initial records, SQL functions or test data.
+
+Note that the order in which the SQL files are processed is undefined.
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -380,7 +382,7 @@ Example usage::
 
     django-admin.py syncdb --verbosity=2
 
-Verbosity determines the amount of notification and debug information that 
+Verbosity determines the amount of notification and debug information that
 will be printed to the console. '0' is no output, '1' is normal output,
 and `2` is verbose output.
 

@@ -7,9 +7,11 @@
 {% block coltype %}flex{% endblock %}
 {% block content %}
 <div id="content-main">
+{% block object-tools %}
 {% if has_add_permission %}
 <ul class="object-tools"><li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name|escape as name %}Add {{ name }}{% endblocktrans %}</a></li></ul>
 {% endif %}
+{% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}{% search_form cl %}{% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
