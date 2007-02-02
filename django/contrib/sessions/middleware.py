@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.sessions.models import Session
+from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
 import datetime
 
@@ -55,7 +56,7 @@ class SessionWrapper(object):
                     s = Session.objects.get(session_key=self.session_key,
                         expire_date__gt=datetime.datetime.now())
                     self._session_cache = s.get_decoded()
-                except Session.DoesNotExist:
+                except (Session.DoesNotExist, SuspiciousOperation):
                     self._session_cache = {}
                     # Set the session_key to None to force creation of a new
                     # key, for extra security.

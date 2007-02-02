@@ -27,7 +27,7 @@ If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
 from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 
-.. _middleware: http://www.djangoproject.com/documentation/middleware/
+.. _middleware: ../middleware/
 
 Using sessions in views
 =======================
@@ -290,7 +290,7 @@ Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
 that is, if any of its dictionary values have been assigned or deleted.
 
-.. _Django settings: http://www.djangoproject.com/documentation/settings/
+.. _Django settings: ../settings/
 
 Technical details
 =================

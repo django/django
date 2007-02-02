@@ -316,18 +316,20 @@ def create_many_related_manager(superclass):
             # join_table: name of the m2m link table
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
-            # *objs - objects to add
+            # *objs - objects to add. Either object instances, or primary keys of object instances.
             from django.db import connection
 
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                new_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to add() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        new_ids.add(obj._get_pk_val())
+                    else:
+                        new_ids.add(obj)
                 # Add the newly created or already existing objects to the join table.
                 # First find out which items are already added, to avoid adding them twice
-                new_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                     (target_col_name, self.join_table, source_col_name,
@@ -354,11 +356,13 @@ def create_many_related_manager(superclass):
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                old_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        old_ids.add(obj._get_pk_val())
+                    else:
+                        old_ids.add(obj)
                 # Remove the specified objects from the join table
-                old_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                     (self.join_table, source_col_name,
@@ -548,8 +552,10 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
-    def formfield(self, initial=None):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+    def formfield(self, **kwargs):
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults.update(kwargs)
+        return forms.ChoiceField(**defaults)
 
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
@@ -612,8 +618,10 @@ class OneToOneField(RelatedField, IntegerField):
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
 
-    def formfield(self, initial=None):
-        return forms.ChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+    def formfield(self, **kwargs):
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults.update(kwargs)
+        return forms.ChoiceField(**kwargs)
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -625,6 +633,7 @@ class ManyToManyField(RelatedField, Field):
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             raw_id_admin=kwargs.pop('raw_id_admin', False),
             symmetrical=kwargs.pop('symmetrical', True))
+        self.db_table = kwargs.pop('db_table', None)
         if kwargs["rel"].raw_id_admin:
             kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
@@ -647,10 +656,10 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
-        from django.db import backend
-        from django.db.backends.util import truncate_name
-        name = '%s_%s' % (opts.db_table, self.name)
-        return truncate_name(name, backend.get_max_name_length())
+        if self.db_table:
+            return self.db_table
+        else:
+            return '%s_%s' % (opts.db_table, self.name)
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
@@ -728,12 +737,14 @@ class ManyToManyField(RelatedField, Field):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname).all()
 
-    def formfield(self, initial=None):
+    def formfield(self, **kwargs):
         # If initial is passed in, it's a list of related objects, but the
         # MultipleChoiceField takes a list of IDs.
-        if initial is not None:
-            initial = [i._get_pk_val() for i in initial]
-        return forms.MultipleChoiceField(choices=self.get_choices_default(), required=not self.blank, label=capfirst(self.verbose_name), initial=initial)
+        if kwargs.get('initial') is not None:
+            kwargs['initial'] = [i._get_pk_val() for i in kwargs['initial']]
+        defaults = {'choices': self.get_choices_default(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults.update(kwargs)
+        return forms.MultipleChoiceField(**defaults)
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,

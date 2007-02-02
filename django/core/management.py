@@ -25,7 +25,7 @@ APP_ARGS = '[appname ...]'
 # which has been installed.
 PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
-INVALID_PROJECT_NAMES = ('django', 'test')
+INVALID_PROJECT_NAMES = ('django', 'site', 'test')
 
 # Set up the terminal color scheme.
 class dummy: pass
@@ -735,7 +735,7 @@ def startproject(project_name, directory):
     "Creates a Django project for the given project_name in the given directory."
     from random import choice
     if project_name in INVALID_PROJECT_NAMES:
-        sys.stderr.write(style.ERROR("Error: %r isn't a valid project name. Please try another.\n" % project_name))
+        sys.stderr.write(style.ERROR("Error: '%r' conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name.\n" % project_name))
         sys.exit(1)
     _start_helper('project', project_name, directory)
     # Create a random SECRET_KEY hash, and put it in the main settings.

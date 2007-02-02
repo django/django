@@ -874,6 +874,10 @@ the relationship should work. All are optional:
                              force Django to add the descriptor for the reverse
                              relationship, allowing ``ManyToMany`` relationships to be
                              non-symmetrical.
+			     
+    ``db_table``             The name of the table to create for storing the many-to-many 
+                             data. If this is not provided, Django will assume a default
+                             name based upon the names of the two tables being joined.
 
     =======================  ============================================================
 
@@ -1268,6 +1272,24 @@ A few special cases to note about ``list_display``:
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
 
+    * If the string given is a method of the model that returns True or False 
+      Django will display a pretty "on" or "off" icon if you give the method a 
+      ``boolean`` attribute whose value is ``True``.
+
+      Here's a full example model::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=50)
+              birthday = models.DateField()
+
+              class Admin:
+                  list_display = ('name', 'born_in_fifties')
+
+              def born_in_fifties(self):
+                  return self.birthday.strftime('%Y')[:3] == 5
+              born_in_fifties.boolean = True
+
+
     * The ``__str__()`` method is just as valid in ``list_display`` as any
       other model method, so it's perfectly OK to do this::
 
@@ -1390,7 +1412,10 @@ This should be set to a list of field names that will be searched whenever
 somebody submits a search query in that text box.
 
 These fields should be some kind of text field, such as ``CharField`` or
-``TextField``.
+``TextField``. You can also perform a related lookup on a ``ForeignKey`` with 
+the lookup API "follow" notation::
+
+    search_fields = ['foreign_key__related_fieldname']
 
 When somebody does a search in the admin search box, Django splits the search
 query into words and returns all objects that contain each of the words, case

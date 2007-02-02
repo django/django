@@ -38,7 +38,7 @@ each platform.
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
+.. _How to use Django with mod_python: ../modpython/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 Get your database running
@@ -113,14 +113,14 @@ latest bug fixes and improvements, follow these instructions:
 
        svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
 
-4. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
+3. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
    system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
    (Windows). This step simply lets you type ``django-admin.py`` from within
    any directory, rather than having to qualify the command with the full path
    to the file.
 
 You *don't* have to run ``python setup.py install``, because that command
-takes care of steps 3 and 4 for you.
+takes care of steps 2 and 3 for you.
 
 When you want to update your copy of the Django source code, just run the
 command ``svn update`` from within the ``django`` directory. When you do this,

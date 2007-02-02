@@ -525,6 +525,21 @@ Examples::
     [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
+    
+``none()``
+~~~~~~~~~~
+
+**New in Django development version**
+
+Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to 
+an empty list. This can be used in cases where you know that you should
+return an empty result set and your caller is expecting a ``QuerySet``
+object (instead of returning an empty list, for example.)
+
+Examples::
+    
+    >>> Entry.objects.none()
+    []
 
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~

@@ -1,5 +1,6 @@
 from django.db import backend, connection, get_query_module, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
+from django.db.models.fields.generic import GenericRelation
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -24,6 +25,9 @@ QUERY_TERMS = (
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
+
+class EmptyResultSet(Exception):
+    pass
 
 ####################
 # HELPER FUNCTIONS #
@@ -169,7 +173,11 @@ class _QuerySet(object):
 
         cursor = connection.cursor()
 
-        select, sql, params, full_query = self._get_sql_clause()
+        try:
+            select, sql, params, full_query = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
+
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
 
         fill_cache = self._select_related
@@ -194,7 +202,12 @@ class _QuerySet(object):
         counter._offset = None
         counter._limit = None
         counter._select_related = False
-        select, sql, params, full_query = counter._get_sql_clause()
+
+        try:
+            select, sql, params, full_query = counter._get_sql_clause()
+        except EmptyResultSet:
+            return 0
+
         cursor = connection.cursor()
         if self._distinct:
             id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
@@ -532,7 +545,12 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in self.model._meta.fields]
 
         cursor = connection.cursor()
-        select, sql, params, full_query = self._get_sql_clause()
+
+        try:
+            select, sql, params, full_query = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
+
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
@@ -554,19 +572,25 @@ class DateQuerySet(QuerySet):
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
-        select, sql, params, full_query = self._get_sql_clause()
+        try:
+            select, sql, params, full_query = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
+
         table_name = backend.quote_name(self.model._meta.db_table)
         field_name = backend.quote_name(self._field.column)
-        date_trunc_sql = backend.get_date_trunc_sql(self._kind,
-                                                    '%s.%s' % (table_name, field_name))
+
         if backend.allows_group_by_ordinal:
             group_by = '1'
         else:
-            group_by = date_trunc_sql
-        fmt = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s'
-        stmt = fmt % (date_trunc_sql, sql, group_by, self._order)
+            group_by = backend.get_date_trunc_sql(self._kind,
+                                                  '%s.%s' % (table_name, field_name))
+
+        sql = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s' % \
+            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
+            backend.quote_name(self._field.column))), sql, group_by, self._order)
         cursor = connection.cursor()
-        cursor.execute(stmt, params)
+        cursor.execute(sql, params)
         if backend.needs_datetime_string_cast:
             return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
         else:
@@ -579,6 +603,25 @@ class DateQuerySet(QuerySet):
         c._order = self._order
         return c
 
+class EmptyQuerySet(QuerySet):
+    def __init__(self, model=None):
+        super(EmptyQuerySet, self).__init__(model)
+        self._result_cache = []
+
+    def iterator(self):
+        raise StopIteration
+
+    def count(self):
+        return 0
+
+    def delete(self):
+        pass
+
+    def _clone(self, klass=None, **kwargs):
+        c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
+        c._result_cache = []
+        return c
+
 class QOperator(object):
     "Base class for QAnd and QOr"
     def __init__(self, *args):
@@ -587,10 +630,14 @@ class QOperator(object):
     def get_sql(self, opts):
         joins, where, params = SortedDict(), [], []
         for val in self.args:
-            joins2, where2, params2 = val.get_sql(opts)
-            joins.update(joins2)
-            where.extend(where2)
-            params.extend(params2)
+            try:
+                joins2, where2, params2 = val.get_sql(opts)
+                joins.update(joins2)
+                where.extend(where2)
+                params.extend(params2)
+            except EmptyResultSet:
+                if not isinstance(self, QOr):
+                    raise EmptyResultSet
         if where:
             return joins, ['(%s)' % self.operator.join(where)], params
         return joins, [], params
@@ -644,8 +691,11 @@ class QNot(Q):
         self.q = q
 
     def get_sql(self, opts):
-        joins, where, params = self.q.get_sql(opts)
-        where2 = ['(NOT (%s))' % " AND ".join(where)]
+        try:
+            joins, where, params = self.q.get_sql(opts)
+            where2 = ['(NOT (%s))' % " AND ".join(where)]
+        except EmptyResultSet:
+            return SortedDict(), [], []
         return joins, where2, params
 
 def get_where_clause(lookup_type, table_prefix, field_name, value):
@@ -662,7 +712,11 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     except KeyError:
         pass
     if lookup_type == 'in':
-        return '%s%s IN (%s)' % (table_prefix, field_name, ','.join(['%s' for v in value]))
+        in_string = ','.join(['%s' for id in value])
+        if in_string:
+            return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
+        else:
+            raise EmptyResultSet
     elif lookup_type == 'range':
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('year', 'month', 'day'):
@@ -948,18 +1002,26 @@ def delete_objects(seen_objs):
 
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
-            for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
-                    (qn(related.field.m2m_db_table()),
-                        qn(related.field.m2m_reverse_name()),
-                        ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
-                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
+            if not isinstance(related.field, GenericRelation):
+                for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
+                    cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                        (qn(related.field.m2m_db_table()),
+                            qn(related.field.m2m_reverse_name()),
+                            ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
+                        pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
+            if isinstance(f, GenericRelation):
+                from django.contrib.contenttypes.models import ContentType
+                query_extra = 'AND %s=%%s' % f.rel.to._meta.get_field(f.content_type_field_name).column
+                args_extra = [ContentType.objects.get_for_model(cls).id]
+            else:
+                query_extra = ''
+                args_extra = []
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-                cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
+                cursor.execute(("DELETE FROM %s WHERE %s IN (%s)" % \
                     (qn(f.m2m_db_table()), qn(f.m2m_column_name()),
-                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
-                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
+                    ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]]))) + query_extra,
+                    pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE] + args_extra)
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):

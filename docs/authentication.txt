@@ -144,8 +144,8 @@ custom methods:
       Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
       doesn't allow profiles.
 
-.. _Django model: http://www.djangoproject.com/documentation/model_api/
-.. _DEFAULT_FROM_EMAIL: http://www.djangoproject.com/documentation/settings/#default-from-email
+.. _Django model: ../model_api/
+.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
 Manager functions
 ~~~~~~~~~~~~~~~~~
@@ -271,8 +271,8 @@ previous section). You can tell them apart with ``is_authenticated()``, like so:
     else:
         # Do something for anonymous users.
 
-.. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _session documentation: http://www.djangoproject.com/documentation/sessions/
+.. _request objects: ../request_response/#httprequest-objects
+.. _session documentation: ../sessions/
 
 How to log a user in
 --------------------
@@ -441,8 +441,8 @@ block::
 
     {% endblock %}
 
-.. _forms documentation: http://www.djangoproject.com/documentation/forms/
-.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+.. _forms documentation: ../forms/
+.. _site framework docs: ../sites/
 
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------
@@ -544,7 +544,7 @@ For example::
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
 
-.. _generic view: http://www.djangoproject.com/documentation/generic_views/
+.. _generic view: ../generic_views/
 
 Permissions
 ===========
@@ -606,7 +606,7 @@ This example model creates three custom permissions::
 The only thing this does is create those extra permissions when you run
 ``syncdb``.
 
-.. _model Meta attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
+.. _model Meta attribute: ../model_api/#meta-options
 
 API reference
 -------------
@@ -645,7 +645,7 @@ The currently logged-in user and his/her permissions are made available in the
    setting contains ``"django.core.context_processors.auth"``, which is default.
    For more, see the `RequestContext docs`_.
 
-   .. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
+   .. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
 Users
 -----
@@ -691,7 +691,7 @@ Thus, you can check permissions in template ``{% if %}`` statements::
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
 
-.. _template context: http://www.djangoproject.com/documentation/templates_python/
+.. _template context: ../templates_python/
 
 Groups
 ======
@@ -756,7 +756,7 @@ scenes, so any messages will be deleted even if you don't display them.
 Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the `session framework`_.
 
-.. _session framework: http://www.djangoproject.com/documentation/sessions/
+.. _session framework: ../sessions/
 
 Other authentication sources
 ============================

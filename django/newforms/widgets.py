@@ -3,24 +3,22 @@ HTML Widget classes
 """
 
 __all__ = (
-    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'FileInput',
-    'Textarea', 'CheckboxInput',
-    'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
+    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
+    'FileInput', 'Textarea', 'CheckboxInput',
+    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
+    'MultiWidget', 'SplitDateTimeWidget',
 )
 
-from util import StrAndUnicode, smart_unicode
+from util import flatatt, StrAndUnicode, smart_unicode
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
+from django.utils.translation import gettext
 from itertools import chain
 
 try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
-
-# Converts a dictionary to a single string with key="value", XML-style with
-# a leading space. Assumes keys do not need to be XML-escaped.
-flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
@@ -87,6 +85,26 @@ class HiddenInput(Input):
     input_type = 'hidden'
     is_hidden = True
 
+class MultipleHiddenInput(HiddenInput):
+    """
+    A widget that handles <input type="hidden"> for fields that have a list
+    of values.
+    """
+    def __init__(self, attrs=None, choices=()):
+        # choices can be any iterable
+        self.attrs = attrs or {}
+        self.choices = choices
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=smart_unicode(v), **final_attrs))) for v in value])
+
+    def value_from_datadict(self, data, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)
+
 class FileInput(Input):
     input_type = 'file'
 
@@ -118,9 +136,11 @@ class CheckboxInput(Widget):
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
-        # choices can be any iterable
         self.attrs = attrs or {}
-        self.choices = choices
+        # choices can be any iterable, but we may need to render this widget
+        # multiple times. Thus, collapse it into a list so it can be consumed
+        # more than once.
+        self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
@@ -133,6 +153,25 @@ class Select(Widget):
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
+
+class NullBooleanSelect(Select):
+    """
+    A Select Widget intended to be used with NullBooleanField.
+    """
+    def __init__(self, attrs=None):
+        choices = ((u'1', gettext('Unknown')), (u'2', gettext('Yes')), (u'3', gettext('No')))
+        super(NullBooleanSelect, self).__init__(attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        try:
+            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
+        except KeyError:
+            value = u'1'
+        return super(NullBooleanSelect, self).render(name, value, attrs, choices)
+
+    def value_from_datadict(self, data, name):
+        value = data.get(name, None)
+        return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -162,14 +201,15 @@ class RadioInput(StrAndUnicode):
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
-        self.choice_value, self.choice_label = choice
+        self.choice_value = smart_unicode(choice[0])
+        self.choice_label = smart_unicode(choice[1])
         self.index = index
 
     def __unicode__(self):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
 
     def is_checked(self):
-        return self.value == smart_unicode(self.choice_value)
+        return self.value == self.choice_value
 
     def tag(self):
         if self.attrs.has_key('id'):
@@ -218,11 +258,16 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
+        has_id = attrs and attrs.has_key('id')
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
-        cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-        for option_value, option_label in chain(self.choices, choices):
+        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            # If an ID attribute was given, add a numeric index as a suffix,
+            # so that the checkboxes don't all have the same ID attribute.
+            if has_id:
+                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = smart_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
@@ -235,3 +280,66 @@ class CheckboxSelectMultiple(SelectMultiple):
             id_ += '_0'
         return id_
     id_for_label = classmethod(id_for_label)
+
+class MultiWidget(Widget):
+    """
+    A widget that is composed of multiple widgets.
+
+    Its render() method takes a "decompressed" list of values, not a single
+    value. Each value in this list is rendered in the corresponding widget --
+    the first value is rendered in the first widget, the second value is
+    rendered in the second widget, etc.
+
+    Subclasses should implement decompress(), which specifies how a single
+    value should be converted to a list of values. Subclasses should not
+    have to implement clean().
+
+    Subclasses may implement format_output(), which takes the list of rendered
+    widgets and returns HTML that formats them any way you'd like.
+
+    You'll probably want to use this with MultiValueField.
+    """
+    def __init__(self, widgets, attrs=None):
+        self.widgets = [isinstance(w, type) and w() or w for w in widgets]
+        super(MultiWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        # value is a list of values, each corresponding to a widget
+        # in self.widgets.
+        if not isinstance(value, list):
+            value = self.decompress(value)
+        output = []
+        for i, widget in enumerate(self.widgets):
+            try:
+                widget_value = value[i]
+            except KeyError:
+                widget_value = None
+            output.append(widget.render(name + '_%s' % i, widget_value, attrs))
+        return self.format_output(output)
+
+    def value_from_datadict(self, data, name):
+        return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]
+
+    def format_output(self, rendered_widgets):
+        return u''.join(rendered_widgets)
+
+    def decompress(self, value):
+        """
+        Returns a list of decompressed values for the given compressed value.
+        The given value can be assumed to be valid, but not necessarily
+        non-empty.
+        """
+        raise NotImplementedError('Subclasses must implement this method.')
+
+class SplitDateTimeWidget(MultiWidget):
+    """
+    A Widget that splits datetime input into two <input type="text"> boxes.
+    """
+    def __init__(self, attrs=None):
+        widgets = (TextInput(attrs=attrs), TextInput(attrs=attrs))
+        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.date(), value.time()]
+        return [None, None]
