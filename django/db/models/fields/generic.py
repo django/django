@@ -249,7 +249,6 @@ class GenericRel(ManyToManyRel):
         self.to = to
         self.num_in_admin = 0
         self.related_name = related_name
-        self.filter_interface = None
         self.limit_choices_to = limit_choices_to or {}
         self.edit_inline = False
         self.symmetrical = symmetrical

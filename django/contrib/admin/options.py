@@ -111,6 +111,8 @@ class ModelAdmin(object):
     fields = None
     raw_id_fields = ()
     prepopulated_fields = {}
+    filter_vertical = ()
+    filter_horizontal = ()
 
     def __init__(self, model):
         self.model = model
@@ -155,10 +157,8 @@ class ModelAdmin(object):
             js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
         if self.js:
             js.extend(self.js)
-        for f in self.opts.many_to_many:
-            if f.rel.filter_interface:
-                js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-                break
+        if self.filter_vertical or self.filter_horizontal:
+            js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
         for fs in fieldsets:
             if 'collapse' in fs.classes:
                 js.append('js/admin/CollapsedFieldsets.js')
@@ -205,9 +205,9 @@ class ModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        # For filter_interface ManyToManyFields, use a special Widget.
-        if isinstance(db_field, models.ManyToManyField) and db_field.rel.filter_interface:
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, db_field.rel.filter_interface-1)
+        # For ManyToManyFields with a filter interface, use a special Widget.
+        if isinstance(db_field, models.ManyToManyField) and db_field.name in (self.filter_vertical + self.filter_horizontal):
+            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
             return db_field.formfield(**kwargs)
 
         # For DateTimeFields, use a special field and widget.

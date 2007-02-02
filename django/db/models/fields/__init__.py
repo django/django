@@ -14,7 +14,6 @@ import datetime, os, time
 class NOT_PROVIDED:
     pass
 
-# Values for filter_interface.
 HORIZONTAL, VERTICAL = 1, 2
 
 # The values to use for "blank" in SelectFields. Will be appended to the start of most "choices" lists.

@@ -616,7 +616,6 @@ class ManyToManyField(RelatedField, Field):
         kwargs['rel'] = ManyToManyRel(to,
             num_in_admin=kwargs.pop('num_in_admin', 0),
             related_name=kwargs.pop('related_name', None),
-            filter_interface=kwargs.pop('filter_interface', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             symmetrical=kwargs.pop('symmetrical', True))
         self.db_table = kwargs.pop('db_table', None)
@@ -757,11 +756,10 @@ class OneToOneRel(ManyToOneRel):
 
 class ManyToManyRel(object):
     def __init__(self, to, num_in_admin=0, related_name=None,
-        filter_interface=None, limit_choices_to=None, symmetrical=True):
+        limit_choices_to=None, symmetrical=True):
         self.to = to
         self.num_in_admin = num_in_admin
         self.related_name = related_name
-        self.filter_interface = filter_interface
         if limit_choices_to is None:
             limit_choices_to = {}
         self.limit_choices_to = limit_choices_to
