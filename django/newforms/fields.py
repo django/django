@@ -356,7 +356,7 @@ class ChoiceField(Field):
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
-            raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % value)
+            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class MultipleChoiceField(ChoiceField):
