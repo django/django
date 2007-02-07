@@ -167,8 +167,9 @@ class Model(object):
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val()
+        pk_set = bool(pk_val)
         record_exists = True
-        if pk_val is not None:
+        if pk_set:
             # Determine whether a record with the primary key already exists.
             cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
                 (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
@@ -183,11 +184,11 @@ class Model(object):
                         db_values + [pk_val])
             else:
                 record_exists = False
-        if pk_val is None or not record_exists:
+        if not pk_set or not record_exists:
             field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
             db_values = [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
-            if pk_val is not None:
+            if pk_set:
                 field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
                 db_values += [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
             placeholders = ['%s'] * len(field_names)
@@ -207,7 +208,7 @@ class Model(object):
                     (backend.quote_name(self._meta.db_table),
                      backend.quote_name(self._meta.pk.column),
                      backend.get_pk_default_value()))
-            if self._meta.has_auto_field and pk_val is None:
+            if self._meta.has_auto_field and not pk_set:
                 setattr(self, self._meta.pk.attname, backend.get_last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
         transaction.commit_unless_managed()
 
