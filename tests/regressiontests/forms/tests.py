@@ -1493,7 +1493,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
 >>> f.clean('')
@@ -1507,7 +1507,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
 >>> f.clean('J')
@@ -1515,7 +1515,7 @@ u'J'
 >>> f.clean('John')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
 # NullBooleanField ############################################################
 
