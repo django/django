@@ -123,7 +123,7 @@ class VariableDoesNotExist(Exception):
         self.params = params
     
     def __str__(self):
-        return self.mgs % self.params
+        return self.msg % self.params
     
 class InvalidTemplateLibrary(Exception):
     pass
