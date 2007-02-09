@@ -99,3 +99,19 @@ class ClientTest(unittest.TestCase):
 
         response = self.client.login('/test_client/login_protected_view/', 'otheruser', 'nopassword')
         self.assertFalse(response)
+
+    def test_session_modifying_view(self):
+        "Request a page that modifies the session"
+        # Session value isn't set initially
+        try:
+            self.client.session['tobacconist']
+            self.fail("Shouldn't have a session value")
+        except KeyError:
+            pass
+        
+        from django.contrib.sessions.models import Session
+        response = self.client.post('/test_client/session_view/')
+        
+        # Check that the session was modified
+        self.assertEquals(self.client.session['tobacconist'], 'hovercraft')
+        

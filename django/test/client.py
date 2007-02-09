@@ -1,4 +1,5 @@
 from cStringIO import StringIO
+from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.dispatch import dispatcher
@@ -97,7 +98,8 @@ class Client:
     def __init__(self, **defaults):
         self.handler = ClientHandler()
         self.defaults = defaults
-        self.cookie = SimpleCookie()
+        self.cookies = SimpleCookie()
+        self.session = {}
 
     def request(self, **request):
         """
@@ -108,7 +110,7 @@ class Client:
         """
 
         environ = {
-            'HTTP_COOKIE':      self.cookie,
+            'HTTP_COOKIE':      self.cookies,
             'PATH_INFO':         '/',
             'QUERY_STRING':      '',
             'REQUEST_METHOD':    'GET',
@@ -141,8 +143,14 @@ class Client:
                 setattr(response, detail, None)
 
         if response.cookies:
-            self.cookie.update(response.cookies)
+            self.cookies.update(response.cookies)
 
+        if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            from django.contrib.sessions.middleware import SessionWrapper
+            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
+            if cookie:
+                self.session = SessionWrapper(cookie.value)
+            
         return response
 
     def get(self, path, data={}, **extra):

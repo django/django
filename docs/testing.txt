@@ -198,11 +198,6 @@ used as test conditions.
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
 
-The Test Client is stateful; if a cookie is returned as part of a response,
-that cookie is provided as part of the next request issued to that Client
-instance. Expiry policies for these cookies are not followed; if you want 
-a cookie to expire, either delete it manually from ``client.cookies``, or 
-create a new Client instance (which will effectively delete all cookies).
 
 Making requests
 ~~~~~~~~~~~~~~~
@@ -295,6 +290,33 @@ for testing purposes:
     ===============  ==========================================================
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+
+Persistent state
+~~~~~~~~~~~~~~~~
+
+The Test Client is stateful; if a cookie is returned as part of a response,
+that cookie is provided as part of the next request issued by that Client
+instance. Expiry policies for these cookies are not followed; if you want 
+a cookie to expire, either delete it manually or create a new Client 
+instance (which will effectively delete all cookies).
+
+There are two properties of the Test Client which are used to store persistent
+state information. If necessary, these properties can be interrogated as
+part of a test condition.
+
+    ===============  ==========================================================
+    Property         Description
+    ===============  ==========================================================
+    ``cookies``      A Python ``SimpleCookie`` object, containing the current
+                     values of all the client cookies.
+
+    ``session``      A dictionary-like object containing session information.
+                     See the `session documentation`_ for full details.
+
+.. _`session documentation`: ../sessions/
+                     
+Example
+~~~~~~~
 
 The following is a simple unit test using the Test Client::
     
