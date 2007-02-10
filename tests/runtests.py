@@ -77,13 +77,19 @@ def django_tests(verbosity, tests_to_run):
     old_root_urlconf = settings.ROOT_URLCONF
     old_template_dirs = settings.TEMPLATE_DIRS
     old_use_i18n = settings.USE_I18N
+    old_middleware_classes = settings.MIDDLEWARE_CLASSES
 
-    # Redirect some settings for the duration of these tests
+    # Redirect some settings for the duration of these tests.
     settings.TEST_DATABASE_NAME = TEST_DATABASE_NAME
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
     settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
+    settings.MIDDLEWARE_CLASSES = (
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    )
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
@@ -91,7 +97,7 @@ def django_tests(verbosity, tests_to_run):
     from django.db.models.loading import get_apps, load_app
     get_apps()
 
-    # Load all the test model apps
+    # Load all the test model apps.
     test_models = []
     for model_dir, model_name in get_test_models():
         model_label = '.'.join([model_dir, model_name])
@@ -109,7 +115,7 @@ def django_tests(verbosity, tests_to_run):
             sys.stderr.write("Error while importing %s:" % model_name + ''.join(traceback.format_exception(*sys.exc_info())[1:]))
             continue
 
-    # Add tests for invalid models
+    # Add tests for invalid models.
     extra_tests = []
     for model_dir, model_name in get_invalid_models():
         model_label = '.'.join([model_dir, model_name])
@@ -120,12 +126,13 @@ def django_tests(verbosity, tests_to_run):
     from django.test.simple import run_tests
     run_tests(test_models, verbosity, extra_tests=extra_tests)
 
-    # Restore the old settings
+    # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps
     settings.TESTS_DATABASE_NAME = old_test_database_name
     settings.ROOT_URLCONF = old_root_urlconf
     settings.TEMPLATE_DIRS = old_template_dirs
     settings.USE_I18N = old_use_i18n
+    settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
 if __name__ == "__main__":
     from optparse import OptionParser
