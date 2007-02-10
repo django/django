@@ -29,7 +29,7 @@ Test your installation by importing it in the Python interactive interpreter::
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _user guide: http://www.reportlab.org/rsrc/userguide.pdf
+.. _user guide: http://www.reportlab.com/docs/userguide.pdf
 
 Write your view
 ===============
