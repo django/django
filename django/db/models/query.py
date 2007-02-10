@@ -881,8 +881,14 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
                 new_opts = field.rel.to._meta
                 new_column = new_opts.pk.column
                 join_column = field.column
-
-            raise FieldFound
+                raise FieldFound
+            elif path:
+                # For regular fields, if there are still items on the path,
+                # an error has been made. We munge "name" so that the error
+                # properly identifies the cause of the problem.
+                name += LOOKUP_SEPARATOR + path[0]
+            else:
+                raise FieldFound
 
     except FieldFound: # Match found, loop has been shortcut.
         pass

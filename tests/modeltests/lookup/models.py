@@ -206,4 +206,15 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.exclude(id__in=[])
 [<Article: Article with \ backslash>, <Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
 
+# Programming errors are pointed out with nice error messages
+>>> Article.objects.filter(pub_date_year='2005').count()
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'pub_date_year' into field
+
+>>> Article.objects.filter(headline__starts='Article')
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'headline__starts' into field
+
 """}
