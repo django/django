@@ -484,12 +484,37 @@ Alternatively, you can use a symlink called ``django`` that points to the
 location of the branch's ``django`` package. If you want to switch back, just
 change the symlink to point to the old code.
 
+A third option is to use a `path file`_ (``<something>.pth``) which should
+work on all systems (including MS Windows, which doesn't have symlinks
+available). First, make sure there are no files, directories or symlinks named
+``django`` in your ``site-packages`` directory. Then create a text file named
+``django.pth`` and save it to your ``site-packages`` directory. That file
+should contain a path to your copy of Django on a single line and optional
+comments. Here is an example that points to multiple branches. Just uncomment
+the line for the branch you want to use ('Trunk' in this example) and make
+sure all other lines are commented::
+
+    # Trunk is a svn checkout of:
+    #   http://code.djangoproject.com/svn/django/trunk/
+    #
+    /path/to/trunk
+    
+    # <branch> is a svn checkout of:
+    #   http://code.djangoproject.com/svn/django/branches/<branch>/
+    #
+    #/path/to/<branch>
+    
+    # On windows a path may look like this:
+    # C:/path/to/<branch>
+
 If you're using Django 0.95 or earlier and installed it using
 ``python setup.py install``, you'll have a directory called something like
 ``Django-0.95-py2.4.egg`` instead of ``django``. In this case, edit the file
 ``setuptools.pth`` and remove the line that references the Django ``.egg``
 file. Then copy the branch's version of the ``django`` directory into
 ``site-packages``.
+
+.. _path file: http://docs.python.org/lib/module-site.html
 
 Official releases
 =================
