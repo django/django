@@ -1133,6 +1133,16 @@ Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
 
+truncatewords_html
+~~~~~~~~~~~~~~~~~~
+
+Similar to ``truncatewords``, except that it is aware of HTML tags. Any tags
+that are opened in the string and not closed before the truncation point, are
+closed immediately after the truncation.
+
+This is less efficient than ``truncatewords``, so should only be used when it
+is being passed HTML text.
+
 unordered_list
 ~~~~~~~~~~~~~~
 
