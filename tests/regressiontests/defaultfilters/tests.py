@@ -87,6 +87,20 @@ u'\xeb'
 >>> truncatewords('A sentence with a few words in it', 'not a number')
 'A sentence with a few words in it'
 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 0) 
+''
+ 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 2) 
+'<p>one <a href="#">two ...</a></p>'
+ 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 4) 
+'<p>one <a href="#">two - three <br>four ...</a></p>'
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 5) 
+'<p>one <a href="#">two - three <br>four</a> five</p>'
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 100) 
+'<p>one <a href="#">two - three <br>four</a> five</p>'
 
 >>> upper('Mixed case input')
 'MIXED CASE INPUT'

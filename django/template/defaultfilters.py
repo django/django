@@ -119,6 +119,21 @@ def truncatewords(value, arg):
         value = str(value)
     return truncate_words(value, length)
 
+def truncatewords_html(value, arg):
+    """
+    Truncates HTML after a certain number of words
+
+    Argument: Number of words to truncate after
+    """
+    from django.utils.text import truncate_html_words
+    try:
+        length = int(arg)
+    except ValueError: # invalid literal for int()
+        return value # Fail silently.
+    if not isinstance(value, basestring):
+        value = str(value)
+    return truncate_html_words(value, length)
+
 def upper(value):
     "Converts a string into all uppercase"
     return value.upper()
@@ -534,6 +549,7 @@ register.filter(timesince)
 register.filter(timeuntil)
 register.filter(title)
 register.filter(truncatewords)
+register.filter(truncatewords_html)
 register.filter(unordered_list)
 register.filter(upper)
 register.filter(urlencode)
