@@ -127,7 +127,7 @@ put into those elements.
       it two template context variables:
 
           * ``{{ obj }}`` -- The current object (one of whichever objects you
-            returned in ``items()``). 
+            returned in ``items()``).
           * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
             representing the current site. This is useful for
             ``{{ site.domain }}`` or ``{{ site.name }}``.
@@ -478,6 +478,22 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         categories = ("python", "django") # Hard-coded list of categories.
 
+        # COPYRIGHT NOTICE -- One of the following three is optional. The
+        # framework looks for them in this order.
+
+        def copyright(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            copyright notice as a normal Python string.
+            """
+
+        def copyright(self):
+            """
+            Returns the feed's copyright notice as a normal Python string.
+            """
+
+        copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -658,6 +674,23 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             """
 
         item_categories = ("python", "django") # Hard-coded categories.
+
+        # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
+        # following three is optional. The framework looks for them in this
+        # order.
+
+        def item_copyright(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            copyright notice as a normal Python string.
+            """
+
+        def item_copyright(self):
+            """
+            Returns the copyright notice for every item in the feed.
+            """
+
+        item_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
 
 
 The low-level framework
