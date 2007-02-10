@@ -198,6 +198,8 @@ DoesNotExist: Article matching query does not exist.
 []
 >>> Article.objects.none().count()
 0
+>>> [article for article in Article.objects.none().iterator()]
+[]
 
 # using __in with an empty list should return an empty query set
 >>> Article.objects.filter(id__in=[])
