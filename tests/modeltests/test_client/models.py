@@ -114,4 +114,14 @@ class ClientTest(unittest.TestCase):
         
         # Check that the session was modified
         self.assertEquals(self.client.session['tobacconist'], 'hovercraft')
+
+    def test_view_with_exception(self):
+        "Request a page that is known to throw an error"
+        self.assertRaises(KeyError, self.client.get, "/test_client/broken_view/")
         
+        #Try the same assertion, a different way
+        try:
+            self.client.get('/test_client/broken_view/')
+            self.fail('Should raise an error')
+        except KeyError:
+            pass

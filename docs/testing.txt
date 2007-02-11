@@ -291,6 +291,17 @@ for testing purposes:
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 
+Exceptions
+~~~~~~~~~~
+
+If you point the Test Client at a view that raises an exception, that exception
+will be visible in the test case. You can then use a standard ``try...catch`` 
+block, or ``unittest.TestCase.assertRaises()`` to test for exceptions.
+
+The only exceptions that are not visible in a Test Case are ``Http404``, 
+``PermissionDenied`` and ``SystemExit``. Django catches these exceptions 
+internally and converts them into the appropriate HTTP responses codes.
+
 Persistent state
 ~~~~~~~~~~~~~~~~
 
