@@ -9,7 +9,6 @@ from django.http import Http404, get_host
 from django.core import urlresolvers
 from django.contrib.admin import utils
 from django.contrib.sites.models import Site
-from django.utils.translation import gettext as _
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation

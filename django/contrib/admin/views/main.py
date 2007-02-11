@@ -12,7 +12,6 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import gettext as _
 import operator
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION

@@ -3,7 +3,7 @@ from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy, string_concat, ngettext, gettext
+from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
 from django import oldforms
@@ -50,7 +50,7 @@ def manipulator_valid_rel_key(f, self, field_data, all_data):
     try:
         klass._default_manager.get(**{f.rel.field_name: field_data})
     except klass.DoesNotExist:
-        raise validators.ValidationError, gettext("Please enter a valid %s.") % f.verbose_name
+        raise validators.ValidationError, _("Please enter a valid %s.") % f.verbose_name
 
 #HACK
 class RelatedField(object):

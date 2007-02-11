@@ -359,9 +359,9 @@ def get_date_formats():
     one, the formats provided in the settings will be used.
     """
     from django.conf import settings
-    date_format = gettext('DATE_FORMAT')
-    datetime_format = gettext('DATETIME_FORMAT')
-    time_format = gettext('TIME_FORMAT')
+    date_format = _('DATE_FORMAT')
+    datetime_format = _('DATETIME_FORMAT')
+    time_format = _('TIME_FORMAT')
     if date_format == 'DATE_FORMAT':
         date_format = settings.DATE_FORMAT
     if datetime_format == 'DATETIME_FORMAT':
@@ -377,8 +377,8 @@ def get_partial_date_formats():
     one, the formats provided in the settings will be used.
     """
     from django.conf import settings
-    year_month_format = gettext('YEAR_MONTH_FORMAT')
-    month_day_format = gettext('MONTH_DAY_FORMAT')
+    year_month_format = _('YEAR_MONTH_FORMAT')
+    month_day_format = _('MONTH_DAY_FORMAT')
     if year_month_format == 'YEAR_MONTH_FORMAT':
         year_month_format = settings.YEAR_MONTH_FORMAT
     if month_day_format == 'MONTH_DAY_FORMAT':

@@ -3,7 +3,6 @@ from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode, quote
 from django.utils.datastructures import MultiValueDict
-from django.utils.translation import gettext as _
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 

@@ -391,7 +391,6 @@ False
 """
 
 from django.template.defaultfilters import *
-from django.utils.translation import gettext as _
 import datetime
 
 if __name__ == '__main__':

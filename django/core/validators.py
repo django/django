@@ -235,14 +235,14 @@ def isExistingURL(field_data, all_data):
         req = urllib2.Request(field_data,None, headers)
         u = urllib2.urlopen(req)
     except ValueError:
-        raise ValidationError, gettext("Invalid URL: %s") % field_data
+        raise ValidationError, _("Invalid URL: %s") % field_data
     except urllib2.HTTPError, e:
         # 401s are valid; they just mean authorization is required.
         # 301 and 302 are redirects; they just mean look somewhere else.
         if str(e.code) not in ('401','301','302'):
-            raise ValidationError, gettext("The URL %s is a broken link.") % field_data
+            raise ValidationError, _("The URL %s is a broken link.") % field_data
     except: # urllib2.URLError, httplib.InvalidURL, etc.
-        raise ValidationError, gettext("The URL %s is a broken link.") % field_data
+        raise ValidationError, _("The URL %s is a broken link.") % field_data
         
 def isValidUSState(field_data, all_data):
     "Checks that the given string is a valid two-letter U.S. state abbreviation"
@@ -537,30 +537,30 @@ class RelaxNGCompact(object):
             # Scrape the Jing error messages to reword them more nicely.
             m = re.search(r'Expected "(.*?)" to terminate element starting on line (\d+)', message)
             if m:
-                display_errors.append(gettext('Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "%(start)s".)') % \
                     {'tag':m.group(1).replace('/', ''), 'line':m.group(2), 'start':lines[int(m.group(2)) - 1][:30]})
                 continue
             if message.strip() == 'text not allowed here':
-                display_errors.append(gettext('Some text starting on line %(line)s is not allowed in that context. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('Some text starting on line %(line)s is not allowed in that context. (Line starts with "%(start)s".)') % \
                     {'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*attribute "(.*?)" not allowed at this point; ignored', message)
             if m:
-                display_errors.append(gettext('"%(attr)s" on line %(line)s is an invalid attribute. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('"%(attr)s" on line %(line)s is an invalid attribute. (Line starts with "%(start)s".)') % \
                     {'attr':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*unknown element "(.*?)"', message)
             if m:
-                display_errors.append(gettext('"<%(tag)s>" on line %(line)s is an invalid tag. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('"<%(tag)s>" on line %(line)s is an invalid tag. (Line starts with "%(start)s".)') % \
                     {'tag':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             if message.strip() == 'required attributes missing':
-                display_errors.append(gettext('A tag on line %(line)s is missing one or more required attributes. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('A tag on line %(line)s is missing one or more required attributes. (Line starts with "%(start)s".)') % \
                     {'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             m = re.search(r'\s*bad value for attribute "(.*?)"', message)
             if m:
-                display_errors.append(gettext('The "%(attr)s" attribute on line %(line)s has an invalid value. (Line starts with "%(start)s".)') % \
+                display_errors.append(_('The "%(attr)s" attribute on line %(line)s has an invalid value. (Line starts with "%(start)s".)') % \
                     {'attr':m.group(1), 'line':line, 'start':lines[int(line) - 1][:30]})
                 continue
             # Failing all those checks, use the default error message.

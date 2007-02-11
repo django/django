@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats, get_partial_date_formats, gettext as _
+from django.utils.translation import get_date_formats, get_partial_date_formats
 from django.template import Library
 import datetime
 

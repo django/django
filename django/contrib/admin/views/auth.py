@@ -6,7 +6,6 @@ from django import oldforms, template
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.utils.html import escape
-from django.utils.translation import gettext as _
 
 def user_add_stage(request):
     if not request.user.has_perm('auth.change_user'):
