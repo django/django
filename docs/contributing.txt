@@ -485,7 +485,7 @@ location of the branch's ``django`` package. If you want to switch back, just
 change the symlink to point to the old code.
 
 A third option is to use a `path file`_ (``<something>.pth``) which should
-work on all systems (including MS Windows, which doesn't have symlinks
+work on all systems (including Windows, which doesn't have symlinks
 available). First, make sure there are no files, directories or symlinks named
 ``django`` in your ``site-packages`` directory. Then create a text file named
 ``django.pth`` and save it to your ``site-packages`` directory. That file
