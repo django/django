@@ -11,7 +11,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext, gettext as _
 import base64, datetime
 
 COMMENTS_PER_PAGE = 20

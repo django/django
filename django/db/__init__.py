@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core import signals
 from django.dispatch import dispatcher
+from django.utils.translation import gettext as _
 
 __all__ = ('backend', 'connection', 'DatabaseError')
 

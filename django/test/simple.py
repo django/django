@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core import management
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.utils import create_test_db, destroy_test_db
+from django.utils.translation import gettext as _
 from django.test.testcases import OutputChecker, DocTestRunner
 
 # The module name for tests outside models.py

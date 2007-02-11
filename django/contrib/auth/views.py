@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import LOGIN_URL, REDIRECT_FIELD_NAME
+from django.utils.translation import gettext as _
 
 def login(request, template_name='registration/login.html'):
     "Displays the login form and handles the login action."

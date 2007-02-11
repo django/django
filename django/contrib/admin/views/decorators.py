@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, gettext as _
 import base64, datetime, md5
 import cPickle as pickle
 
