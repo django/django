@@ -390,6 +390,21 @@ class Templates(unittest.TestCase):
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
 
+            ### NAMED ENDBLOCKS #######################################################
+
+            # Basic test
+            'namedendblocks01': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'),
+
+            # Unbalanced blocks
+            'namedendblocks02': ("1{% block first %}_{% block second %}2{% endblock first %}_{% endblock %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks03': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks04': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks05': ("1{% block first %}_{% block second %}2{% endblock first %}", {}, template.TemplateSyntaxError),
+
+            # Mixed named and unnamed endblocks
+            'namedendblocks06': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'),
+            'namedendblocks07': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'),
+
             ### INHERITANCE ###########################################################
 
             # Standard template with no inheritance

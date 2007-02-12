@@ -253,6 +253,11 @@ Here are some tips for working with inheritance:
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
+    * You can optionally name your ``{{ endblock }}`` tag with the same name
+      you gave the ``{{ block }}`` tag (for example, ``{{ endblock content }}``).
+      In larger templates this helps you see which ``{{ block }}`` tags are
+      being closed.
+
 Finally, note that you can't define multiple ``{% block %}`` tags with the same
 name in the same template. This limitation exists because a block tag works in
 "both" directions. That is, a block tag doesn't just provide a hole to fill --
