@@ -197,9 +197,12 @@ class QuerySet(object):
         "Performs a SELECT COUNT() and returns the number of records as an integer."
         counter = self._clone()
         counter._order_by = ()
+        counter._select_related = False
+        
+        offset = counter._offset
+        limit = counter._limit
         counter._offset = None
         counter._limit = None
-        counter._select_related = False
         
         try:
             select, sql, params = counter._get_sql_clause()
@@ -213,7 +216,16 @@ class QuerySet(object):
             cursor.execute("SELECT COUNT(DISTINCT(%s))" % id_col + sql, params)
         else:
             cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
+        count = cursor.fetchone()[0]
+
+        # Apply any offset and limit constraints manually, since using LIMIT or
+        # OFFSET in SQL doesn't change the output of COUNT.
+        if offset:
+            count = max(0, count - offset)
+        if limit:
+            count = min(limit, count)
+
+        return count
 
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."

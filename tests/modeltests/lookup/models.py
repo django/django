@@ -58,6 +58,17 @@ Article 4
 >>> Article.objects.filter(headline__startswith='Blah blah').count()
 0L
 
+# count() should respect sliced query sets.
+>>> articles = Article.objects.all()
+>>> articles.count()
+7L
+>>> articles[:4].count()
+4
+>>> articles[1:100].count()
+6L
+>>> articles[10:100].count()
+0
+
 # Date and date/time lookups can also be done with strings.
 >>> Article.objects.filter(pub_date__exact='2005-07-27 00:00:00').count()
 3L
