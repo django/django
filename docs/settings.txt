@@ -827,6 +827,11 @@ manual configuration option (see below), Django will *not* touch the ``TZ``
 environment variable, and it'll be up to you to ensure your processes are
 running in the correct environment.
 
+.. note::
+    Django cannot reliably use alternate time zones in a Windows environment.
+    When running Django on Windows this variable must be set to match the
+    system timezone.
+
 URL_VALIDATOR_USER_AGENT
 ------------------------
 
