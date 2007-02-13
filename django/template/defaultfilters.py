@@ -141,6 +141,8 @@ def upper(value):
 def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
+    if not isinstance(value, basestring):
+        value = str(value)
     return urllib.quote(value)
 
 def urlize(value):

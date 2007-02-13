@@ -111,6 +111,8 @@ u'\xcb'
 
 >>> urlencode('jack & jill')
 'jack%20%26%20jill'
+>>> urlencode(1)
+'1'
 
 
 >>> urlizetrunc('http://short.com/', 20)
