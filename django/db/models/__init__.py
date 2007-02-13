@@ -51,7 +51,7 @@ class LazyDate(object):
 
     def __getattr__(self, attr):
         if attr == 'delta':
-            # To fix ticket #3377. Note that normal access to LazyDate.delta
+            # To fix ticket #3377. Note that normal accesses to LazyDate.delta
             # (after construction) will still work, because they don't go
             # through __getattr__). This is mainly needed for unpickling.
             raise AttributeError
