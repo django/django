@@ -50,4 +50,9 @@ class LazyDate(object):
         return (datetime.datetime.now() + self.delta).date()
 
     def __getattr__(self, attr):
+        if attr == 'delta':
+            # To fix ticket #3377. Note that normal access to LazyDate.delta
+            # (after construction) will still work, because they don't go
+            # through __getattr__). This is mainly needed for unpickling.
+            raise AttributeError
         return getattr(self.__get_value__(), attr)
