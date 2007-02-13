@@ -7,6 +7,7 @@ from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
 from util import flatatt, StrAndUnicode, ErrorDict, ErrorList, ValidationError
+import copy
 
 __all__ = ('BaseForm', 'Form')
 
@@ -27,7 +28,7 @@ class SortedDictFromList(SortedDict):
         dict.__init__(self, dict(data))
 
     def copy(self):
-        return SortedDictFromList(self.items())
+        return SortedDictFromList([(k, copy.copy(v)) for k, v in self.items()])
 
 class DeclarativeFieldsMetaclass(type):
     "Metaclass that converts Field attributes to a dictionary called 'base_fields'."

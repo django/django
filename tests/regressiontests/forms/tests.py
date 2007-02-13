@@ -2334,6 +2334,43 @@ the next.
 <tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
 
+Similarly, changes to field attributes do not persist from one Form instance
+to the next.
+>>> class Person(Form):
+...     first_name = CharField(required=False)
+...     last_name = CharField(required=False)
+...     def __init__(self, names_required=False, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if names_required:
+...             self.fields['first_name'].required = True
+...             self.fields['last_name'].required = True
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> f = Person(names_required=True)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(True, True)
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> class Person(Form):
+...     first_name = CharField(max_length=30)
+...     last_name = CharField(max_length=30)
+...     def __init__(self, name_max_length=None, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if name_max_length:
+...             self.fields['first_name'].max_length = name_max_length
+...             self.fields['last_name'].max_length = name_max_length
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
+>>> f = Person(name_max_length=20)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(20, 20)
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
+
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
 separate row is not displayed. They're displayed in the last row of the
