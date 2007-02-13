@@ -33,3 +33,16 @@ def login_protected_view(request):
     
     return HttpResponse(t.render(c))
 login_protected_view = login_required(login_protected_view)
+
+def session_view(request):
+    "A view that modifies the session"
+    request.session['tobacconist'] = 'hovercraft'
+    
+    t = Template('This is a view that modifies the session.', 
+                 name='Session Modifying View Template')
+    c = Context()
+    return HttpResponse(t.render(c))
+
+def broken_view(request):
+    """A view which just raises an exception, simulating a broken view."""
+    raise KeyError("Oops! Looks like you wrote some bad code.")

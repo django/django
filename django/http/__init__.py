@@ -160,7 +160,7 @@ class HttpResponse(object):
         self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
-        if hasattr(content, '__iter__'):
+        if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:

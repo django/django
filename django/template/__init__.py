@@ -117,8 +117,14 @@ class TemplateDoesNotExist(Exception):
     pass
 
 class VariableDoesNotExist(Exception):
-    pass
 
+    def __init__(self, msg, params=()):
+        self.msg = msg
+        self.params = params
+    
+    def __str__(self):
+        return self.msg % self.params
+    
 class InvalidTemplateLibrary(Exception):
     pass
 
@@ -660,7 +666,7 @@ def resolve_variable(path, context):
                     try: # list-index lookup
                         current = current[int(bits[0])]
                     except (IndexError, ValueError, KeyError):
-                        raise VariableDoesNotExist, "Failed lookup for key [%s] in %r" % (bits[0], current) # missing attribute
+                        raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bits[0], current)) # missing attribute
                 except Exception, e:
                     if getattr(e, 'silent_variable_failure', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID

@@ -1,7 +1,6 @@
 Django was originally created in late 2003 at World Online, the Web division
 of the Lawrence Journal-World newspaper in Lawrence, Kansas.
 
-
 The PRIMARY AUTHORS are (and/or have been):
 
 Adrian Holovaty <http://www.holovaty.com/>, who originally created Django with
@@ -45,6 +44,7 @@ answer newbie questions, and generally made Django that much better:
     adurdin@gmail.com
     akaihola
     Andreas
+    andy@jadedplanet.net
     ant9000@netwise.it
     David Ascher <http://ascher.ca/>
     Arthur <avandorp@gmail.com>
@@ -53,10 +53,12 @@ answer newbie questions, and generally made Django that much better:
     Shannon -jj Behrens <http://jjinux.blogspot.com/>
     Esdras Beleza <linux@esdrasbeleza.com>
     James Bennett
+    Ben <afternoon@uk2.net>
     Paul Bissex <http://e-scribe.com/>
     Simon Blanchard
     Andrew Brehaut <http://brehaut.net/blog>
-    andy@jadedplanet.net
+    brut.alll@gmail.com
+    Jonathan Buchanan <jonathan.buchanan@gmail.com>
     Antonio Cavedoni <http://cavedoni.com/>
     C8E
     Chris Chamberlin <dja@cdc.msbx.net>
@@ -66,17 +68,19 @@ answer newbie questions, and generally made Django that much better:
     crankycoder@gmail.com
     Matt Croydon <http://www.postneo.com/>
     dackze+django@gmail.com
+    Dirk Datzert <dummy@habmalnefrage.de>
     Jonathan Daugherty (cygnus) <http://www.cprogrammer.org/>
+    dave@thebarproject.com
     Jason Davies (Esaj) <http://www.jasondavies.com/>
     Alex Dedul
     deric@monowerks.com
     dne@mayonnaise.net
     Maximillian Dornseif <md@hudora.de>
-    dummy@habmalnefrage.de
     Jeremy Dunck <http://dunck.us/>
     Andy Dustman <farcepest@gmail.com>
     Clint Ecker
     Enrico <rico.bl@gmail.com>
+    Marc Fargas <telenieko@telenieko.com>
     favo@exoweb.net
     Eric Floehr <eric@intellovations.com>
     gandalf@owca.info
@@ -84,16 +88,18 @@ answer newbie questions, and generally made Django that much better:
     martin.glueck@gmail.com
     Simon Greenhill <dev@simon.net.nz>
     Espen Grindhaug <http://grindhaug.org/>
+    Brian Harring <ferringb@gmail.com>
     Brant Harris
     Hawkeye
-    heckj@mac.com
+    Joe Heck <http://www.rhonabwy.com/wp/>
     Joel Heenan <joelh-django@planetjoel.com>
     hipertracker@gmail.com
     Ian Holsman <http://feh.holsman.net/>
     Kieran Holland <http://www.kieranholland.com>
     Robert Rock Howard <http://djangomojo.com/>
     Jason Huggins <http://www.jrandolph.com/blog/>
-	Baurzhan Ismagulov <ibr@radix50.net>
+    Tom Insam
+    Baurzhan Ismagulov <ibr@radix50.net>
     jcrasta@gmail.com
     Michael Josephson <http://www.sdjournal.com/>
     jpellerin@gmail.com
@@ -112,6 +118,7 @@ answer newbie questions, and generally made Django that much better:
     Jeong-Min Lee <falsetru@gmail.com>
     Christopher Lenz <http://www.cmlenz.net/>
     lerouxb@gmail.com
+    Waylan Limberg <waylan@gmail.com>
     limodou
     mattmcc
     Martin Maney <http://www.chipy.org/Martin_Maney>
@@ -162,8 +169,8 @@ answer newbie questions, and generally made Django that much better:
     Aaron Swartz <http://www.aaronsw.com/>
     Tyson Tate <tyson@fallingbullets.com>
     Tom Tobin
-    Tom Insam
     Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
+    torne-django@wolfpuppy.org.uk
     Karen Tracey <graybark@bellsouth.net>
     Makoto Tsuyuki <mtsuyuki@gmail.com>
     Amit Upadhyay

@@ -167,17 +167,16 @@ class QuerySet(object):
 
     def iterator(self):
         "Performs the SELECT database lookup of this QuerySet."
+        try:
+            select, sql, params = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
+
         # self._select is a dictionary, and dictionaries' key order is
         # undefined, so we convert it to a list of tuples.
         extra_select = self._select.items()
 
         cursor = connection.cursor()
-        
-        try:
-            select, sql, params = self._get_sql_clause()
-        except EmptyResultSet:
-            raise StopIteration
-            
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
@@ -198,9 +197,12 @@ class QuerySet(object):
         "Performs a SELECT COUNT() and returns the number of records as an integer."
         counter = self._clone()
         counter._order_by = ()
+        counter._select_related = False
+        
+        offset = counter._offset
+        limit = counter._limit
         counter._offset = None
         counter._limit = None
-        counter._select_related = False
         
         try:
             select, sql, params = counter._get_sql_clause()
@@ -214,7 +216,16 @@ class QuerySet(object):
             cursor.execute("SELECT COUNT(DISTINCT(%s))" % id_col + sql, params)
         else:
             cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
+        count = cursor.fetchone()[0]
+
+        # Apply any offset and limit constraints manually, since using LIMIT or
+        # OFFSET in SQL doesn't change the output of COUNT.
+        if offset:
+            count = max(0, count - offset)
+        if limit:
+            count = min(limit, count)
+
+        return count
 
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
@@ -523,10 +534,17 @@ class QuerySet(object):
         return select, " ".join(sql), params
 
 class ValuesQuerySet(QuerySet):
-    def iterator(self):
+    def __init__(self, *args, **kwargs):
+        super(ValuesQuerySet, self).__init__(*args, **kwargs)
         # select_related and select aren't supported in values().
         self._select_related = False
         self._select = {}
+
+    def iterator(self):
+        try:
+            select, sql, params = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
 
         # self._fields is a list of field names to fetch.
         if self._fields:
@@ -535,15 +553,9 @@ class ValuesQuerySet(QuerySet):
         else: # Default to all fields.
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
-
-        cursor = connection.cursor()
-        
-        try:
-            select, sql, params = self._get_sql_clause()
-        except EmptyResultSet:
-            raise StopIteration
         
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
+        cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -592,9 +604,6 @@ class EmptyQuerySet(QuerySet):
         super(EmptyQuerySet, self).__init__(model)
         self._result_cache = []
         
-    def iterator(self):
-        raise StopIteration
-        
     def count(self):
         return 0
         
@@ -605,6 +614,9 @@ class EmptyQuerySet(QuerySet):
         c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
         c._result_cache = []
         return c
+
+    def _get_sql_clause(self):
+        raise EmptyResultSet
 
 class QOperator(object):
     "Base class for QAnd and QOr"
@@ -881,8 +893,14 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
                 new_opts = field.rel.to._meta
                 new_column = new_opts.pk.column
                 join_column = field.column
-
-            raise FieldFound
+                raise FieldFound
+            elif path:
+                # For regular fields, if there are still items on the path,
+                # an error has been made. We munge "name" so that the error
+                # properly identifies the cause of the problem.
+                name += LOOKUP_SEPARATOR + path[0]
+            else:
+                raise FieldFound
 
     except FieldFound: # Match found, loop has been shortcut.
         pass

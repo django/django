@@ -68,7 +68,10 @@ class RelatedObject(object):
                 # object
                 return [attr]
         else:
-            return [None] * self.field.rel.num_in_admin
+            if self.field.rel.min_num_in_admin:
+                return [None] * max(self.field.rel.num_in_admin, self.field.rel.min_num_in_admin)
+            else:
+                return [None] * self.field.rel.num_in_admin
 
     def get_db_prep_lookup(self, lookup_type, value):
         # Defer to the actual field definition for db prep

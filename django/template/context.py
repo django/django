@@ -49,6 +49,9 @@ class Context(object):
                 return True
         return False
 
+    def __contains__(self, key):
+        return self.has_key(key)
+
     def get(self, key, otherwise=None):
         for d in self.dicts:
             if d.has_key(key):

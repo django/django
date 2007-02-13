@@ -390,6 +390,21 @@ class Templates(unittest.TestCase):
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
 
+            ### NAMED ENDBLOCKS #######################################################
+
+            # Basic test
+            'namedendblocks01': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'),
+
+            # Unbalanced blocks
+            'namedendblocks02': ("1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks03': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks04': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks05': ("1{% block first %}_{% block second %}2{% endblock first %}", {}, template.TemplateSyntaxError),
+
+            # Mixed named and unnamed endblocks
+            'namedendblocks06': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'),
+            'namedendblocks07': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'),
+
             ### INHERITANCE ###########################################################
 
             # Standard template with no inheritance
@@ -630,6 +645,17 @@ class Templates(unittest.TestCase):
             # Compare to a given parameter
             'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
             'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
+
+            ### URL TAG ########################################################
+            # Successes
+            'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+
+            # Failures
+            'url04' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url05' : ('{% url no_such_view %}', {}, ''),
+            'url06' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.

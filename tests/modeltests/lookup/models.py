@@ -58,6 +58,17 @@ Article 4
 >>> Article.objects.filter(headline__startswith='Blah blah').count()
 0L
 
+# count() should respect sliced query sets.
+>>> articles = Article.objects.all()
+>>> articles.count()
+7L
+>>> articles[:4].count()
+4
+>>> articles[1:100].count()
+6L
+>>> articles[10:100].count()
+0
+
 # Date and date/time lookups can also be done with strings.
 >>> Article.objects.filter(pub_date__exact='2005-07-27 00:00:00').count()
 3L
@@ -198,6 +209,8 @@ DoesNotExist: Article matching query does not exist.
 []
 >>> Article.objects.none().count()
 0
+>>> [article for article in Article.objects.none().iterator()]
+[]
 
 # using __in with an empty list should return an empty query set
 >>> Article.objects.filter(id__in=[])
@@ -205,5 +218,16 @@ DoesNotExist: Article matching query does not exist.
 
 >>> Article.objects.exclude(id__in=[])
 [<Article: Article with \ backslash>, <Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
+
+# Programming errors are pointed out with nice error messages
+>>> Article.objects.filter(pub_date_year='2005').count()
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'pub_date_year' into field
+
+>>> Article.objects.filter(headline__starts='Article')
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'headline__starts' into field
 
 """}

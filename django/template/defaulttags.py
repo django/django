@@ -315,6 +315,25 @@ class TemplateTagNode(Node):
     def render(self, context):
         return self.mapping.get(self.tagtype, '')
 
+class URLNode(Node):
+    def __init__(self, view_name, args, kwargs):
+        self.view_name = view_name
+        self.args = args
+        self.kwargs = kwargs
+      
+    def render(self, context):
+        from django.core.urlresolvers import reverse, NoReverseMatch
+        args = [arg.resolve(context) for arg in self.args]
+        kwargs = dict([(k, v.resolve(context)) for k, v in self.kwargs.items()])
+        try:
+            return reverse(self.view_name, args=args, kwargs=kwargs)
+        except NoReverseMatch:
+            try:
+                project_name = settings.SETTINGS_MODULE.split('.')[0]
+                return reverse(project_name + '.' + self.view_name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                return ''
+
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
         self.val_expr = val_expr
@@ -867,6 +886,50 @@ def templatetag(parser, token):
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)
 templatetag = register.tag(templatetag)
+
+def url(parser, token):
+    """
+    Returns an absolute URL matching given view with its parameters. This is a
+    way to define links that aren't tied to a particular url configuration:
+    
+        {% url path.to.some_view arg1,arg2,name1=value1 %}
+    
+    The first argument is a path to a view. It can be an absolute python path
+    or just ``app_name.view_name`` without the project name if the view is
+    located inside the project.  Other arguments are comma-separated values
+    that will be filled in place of positional and keyword arguments in the
+    URL. All arguments for the URL should be present.
+
+    For example if you have a view ``app_name.client`` taking client's id and
+    the corresponding line in a urlconf looks like this:
+    
+        ('^client/(\d+)/$', 'app_name.client')
+    
+    and this app's urlconf is included into the project's urlconf under some
+    path:
+    
+        ('^clients/', include('project_name.app_name.urls'))
+    
+    then in a template you can create a link for a certain client like this:
+    
+        {% url app_name.client client.id %}
+    
+    The URL will look like ``/clients/client/123/``.
+    """
+    bits = token.contents.split(' ', 2)
+    if len(bits) < 2:
+        raise TemplateSyntaxError, "'%s' takes at least one argument (path to a view)" % bits[0]
+    args = []
+    kwargs = {}
+    if len(bits) > 2:
+        for arg in bits[2].split(','):
+            if '=' in arg:
+                k, v = arg.split('=', 1)
+                kwargs[k] = parser.compile_filter(v)
+            else:
+                args.append(parser.compile_filter(arg))
+    return URLNode(bits[1], args, kwargs)
+url = register.tag(url)
 
 #@register.tag
 def widthratio(parser, token):

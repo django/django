@@ -274,7 +274,7 @@ In your Web root directory, add this to a file named ``.htaccess`` ::
 
 Then, create a small script that tells Apache how to spawn your FastCGI
 program. Create a file ``mysite.fcgi`` and place it in your Web directory, and
-be sure to make it executable ::
+be sure to make it executable::
 
     #!/usr/bin/python
     import sys, os
