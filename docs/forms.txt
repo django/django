@@ -173,10 +173,10 @@ creation view that takes validation into account::
 
         # Check for validation errors
         errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
         if errors:
             return render_to_response('places/errors.html', {'errors': errors})
         else:
-            manipulator.do_html2python(new_data)
             new_place = manipulator.save(new_data)
             return HttpResponse("Place created: %s" % new_place)
 
@@ -229,10 +229,10 @@ Below is the finished view::
 
             # Check for errors.
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
 
             if not errors:
                 # No errors. This means we can save the data!
-                manipulator.do_html2python(new_data)
                 new_place = manipulator.save(new_data)
 
                 # Redirect to the object's "edit" page. Always use a redirect
@@ -324,8 +324,8 @@ about editing an existing one? It's shockingly similar to creating a new one::
         if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
             if not errors:
-                manipulator.do_html2python(new_data)
                 manipulator.save(new_data)
 
                 # Do a post-after-redirect so that reload works, etc.
@@ -406,8 +406,8 @@ Here's a simple function that might drive the above form::
         if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
             if not errors:
-                manipulator.do_html2python(new_data)
 
                 # Send e-mail using new_data here...
 
