@@ -829,6 +829,40 @@ The argument tells which template bit to output:
 
 Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
 
+url
+~~~
+
+Returns an absolute URL matching a given view function. This is a way to
+define links that aren't tied to a particular url configuration.
+
+::
+
+    {% url path.to.some_view arg1,arg2,name1=value1 %}
+
+The first argument is a path to a view function. It can be an absolute python
+path or just ``app_name.view_name`` without the project name if the view is
+located inside the project.  Other arguments are comma-separated values that
+will be use as positional and keyword arguments in the URL. All arguments
+needed by the URL resolver should be present.
+
+For example, suppose you have a view ``app_name.client`` taking client's id
+and the corresponding line in a urlconf looks like this::
+
+    ('^client/(\d+)/$', 'app_name.client')
+
+If this app's urlconf is included into the project's urlconf under a path
+such as
+
+::
+
+    ('^clients/', include('project_name.app_name.urls'))
+
+then, in a template, you can create a link to this view like this::
+
+    {% url app_name.client client.id %}
+
+The URL rendered in the template will then look like ``/clients/client/123/``.
+
 widthratio
 ~~~~~~~~~~
 

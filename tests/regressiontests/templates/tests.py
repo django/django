@@ -645,6 +645,17 @@ class Templates(unittest.TestCase):
             # Compare to a given parameter
             'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
             'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
+
+            ### URL TAG ########################################################
+            # Successes
+            'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+
+            # Failures
+            'url04' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url05' : ('{% url no_such_view %}', {}, ''),
+            'url06' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.
