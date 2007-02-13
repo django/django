@@ -832,36 +832,36 @@ Note: ``opencomment`` and ``closecomment`` are new in the Django development ver
 url
 ~~~
 
-Returns an absolute URL matching a given view function. This is a way to
-define links that aren't tied to a particular url configuration.
+**New in Django development version**
 
-::
+**Note that the syntax for this tag may change in the future, as we make it more robust.**
+
+Returns an absolute URL (i.e., a URL without the domain name) matching a given
+view function and optional parameters. This is a way to output links without
+violating the DRY principle by having to hard-code URLs in your templates::
 
     {% url path.to.some_view arg1,arg2,name1=value1 %}
 
-The first argument is a path to a view function. It can be an absolute python
-path or just ``app_name.view_name`` without the project name if the view is
-located inside the project.  Other arguments are comma-separated values that
-will be use as positional and keyword arguments in the URL. All arguments
-needed by the URL resolver should be present.
+The first argument is a path to a view function in the format
+``package.package.module.function``. Additional arguments are optional and
+should be comma-separated values that will be used as positional and keyword
+arguments in the URL. All arguments required by the URLconf should be present.
 
-For example, suppose you have a view ``app_name.client`` taking client's id
-and the corresponding line in a urlconf looks like this::
+For example, suppose you have a view, ``app_name.client``, whose URLconf takes
+a client ID. The URLconf line might look like this::
 
     ('^client/(\d+)/$', 'app_name.client')
 
-If this app's urlconf is included into the project's urlconf under a path
-such as
-
-::
+If this app's URLconf is included into the project's URLconf under a path
+such as this::
 
     ('^clients/', include('project_name.app_name.urls'))
 
-then, in a template, you can create a link to this view like this::
+...then, in a template, you can create a link to this view like this::
 
     {% url app_name.client client.id %}
 
-The URL rendered in the template will then look like ``/clients/client/123/``.
+The template tag will output the string ``/clients/client/123/``.
 
 widthratio
 ~~~~~~~~~~
