@@ -92,7 +92,7 @@ Writing unittests
 
 Like doctests, Django's unit tests use a standard library module: unittest_.
 As with doctests, Django's test runner looks for any unit test cases defined
-in ``models.py``, or in a ``tests.py`` file stored in the application 
+in ``models.py``, or in a ``tests.py`` file stored in the application
 directory.
 
 An equivalent unittest test case for the above example would look like::
@@ -111,8 +111,8 @@ An equivalent unittest test case for the above example would look like::
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
 
 When you `run your tests`_, the test utility will find all the test cases
-(that is, subclasses of ``unittest.TestCase``) in ``models.py`` and 
-``tests.py``, automatically build a test suite out of those test cases, 
+(that is, subclasses of ``unittest.TestCase``) in ``models.py`` and
+``tests.py``, automatically build a test suite out of those test cases,
 and run that suite.
 
 For more details about ``unittest``, see the `standard library unittest
@@ -164,12 +164,12 @@ in different circumstances.
 Testing Tools
 =============
 
-To assist in testing various features of your application, Django provides 
+To assist in testing various features of your application, Django provides
 tools that can be used to establish tests and test conditions.
 
 * `Test Client`_
 * Fixtures_
-  
+
 Test Client
 -----------
 
@@ -178,23 +178,23 @@ GET and POST requests on a URL, and observe the response that is received.
 This allows you to test that the correct view is executed for a given URL,
 and that the view constructs the correct response.
 
-As the response is generated, the Test Client gathers details on the 
+As the response is generated, the Test Client gathers details on the
 Template and Context objects that were used to generate the response. These
 Templates and Contexts are then provided as part of the response, and can be
 used as test conditions.
 
 .. admonition:: Test Client vs Browser Automation?
 
-    The Test Client is not intended as a replacement for Twill_, Selenium_, 
-    or other browser automation frameworks - it is intended to allow 
-    testing of the contexts and templates produced by a view, 
+    The Test Client is not intended as a replacement for Twill_, Selenium_,
+    or other browser automation frameworks - it is intended to allow
+    testing of the contexts and templates produced by a view,
     rather than the HTML rendered to the end-user.
-    
+
     A comprehensive test suite should use a combination of both: Test Client
-    tests to establish that the correct view is being called and that 
+    tests to establish that the correct view is being called and that
     the view is collecting the correct context data, and Browser Automation
     tests to check that user interface behaves as expected.
-    
+
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
 
@@ -202,7 +202,7 @@ used as test conditions.
 Making requests
 ~~~~~~~~~~~~~~~
 
-Creating an instance of ``Client`` (``django.test.client.Client``) requires 
+Creating an instance of ``Client`` (``django.test.client.Client``) requires
 no arguments at time of construction. Once constructed, the following methods
 can be invoked on the ``Client`` instance.
 
@@ -220,11 +220,11 @@ can be invoked on the ``Client`` instance.
 ``post(path, data={})``
     Make a POST request on the provided ``path``. The key-value pairs in the
     data dictionary will be used to create the POST data payload. This payload
-    will be transmitted with the mimetype ``multipart/form-data``. 
+    will be transmitted with the mimetype ``multipart/form-data``.
 
     However submitting files is a special case. To POST a file, you need only
-    provide the file field name as a key, and a file handle to the file you wish to 
-    upload as a value. The Test Client will populate the two POST fields (i.e., 
+    provide the file field name as a key, and a file handle to the file you wish to
+    upload as a value. The Test Client will populate the two POST fields (i.e.,
     ``field`` and ``field_file``) required by FileField. For example::
 
         c = Client()
@@ -232,8 +232,8 @@ can be invoked on the ``Client`` instance.
         c.post('/customers/wishes/', {'name':'fred', 'attachment':f})
         f.close()
 
-    will result in the evaluation of a POST request on ``/customers/wishes/``, 
-    with a POST dictionary that contains `name`, `attachment` (containing the 
+    will result in the evaluation of a POST request on ``/customers/wishes/``,
+    with a POST dictionary that contains `name`, `attachment` (containing the
     file name), and `attachment_file` (containing the file data). Note that you
     need to manually close the file after it has been provided to the POST.
 
@@ -245,48 +245,48 @@ can be invoked on the ``Client`` instance.
     call to ``login()`` stimulates the series of GET and POST calls required
     to log a user into a @login_required protected view.
 
-    If login is possible, the final return value of ``login()`` is the response 
+    If login is possible, the final return value of ``login()`` is the response
     that is generated by issuing a GET request on the protected URL. If login
     is not possible, ``login()`` returns False.
 
-    Note that since the test suite will be executed using the test database, 
+    Note that since the test suite will be executed using the test database,
     which contains no users by default. As a result, logins for your production
-    site will not work. You will need to create users as part of the test suite 
-    to be able to test logins to your application. 
+    site will not work. You will need to create users as part of the test suite
+    to be able to test logins to your application.
 
 Testing Responses
 ~~~~~~~~~~~~~~~~~
 
-The ``get()``, ``post()`` and ``login()`` methods all return a Response 
-object. This Response object has the following properties that can be used 
+The ``get()``, ``post()`` and ``login()`` methods all return a Response
+object. This Response object has the following properties that can be used
 for testing purposes:
 
     ===============  ==========================================================
     Property         Description
     ===============  ==========================================================
-    ``status_code``  The HTTP status of the response. See RFC2616_ for a 
+    ``status_code``  The HTTP status of the response. See RFC2616_ for a
                      full list of HTTP status codes.
 
-    ``content``      The body of the response. The is the final page 
-                     content as rendered by the view, or any error message 
+    ``content``      The body of the response. The is the final page
+                     content as rendered by the view, or any error message
                      (such as the URL for a 302 redirect).
 
-    ``template``     The Template instance that was used to render the final 
-                     content. Testing ``template.name`` can be particularly 
-                     useful; if the template was loaded from a file, 
-                     ``template.name`` will be the file name that was loaded. 
+    ``template``     The Template instance that was used to render the final
+                     content. Testing ``template.name`` can be particularly
+                     useful; if the template was loaded from a file,
+                     ``template.name`` will be the file name that was loaded.
 
-                     If multiple templates were rendered, (e.g., if one 
-                     template includes another template),``template`` will 
-                     be a list of Template objects, in the order in which 
+                     If multiple templates were rendered, (e.g., if one
+                     template includes another template),``template`` will
+                     be a list of Template objects, in the order in which
                      they were rendered.
 
-    ``context``      The Context that was used to render the template that 
+    ``context``      The Context that was used to render the template that
                      produced the response content.
 
-                     As with ``template``, if multiple templates were rendered 
-                     ``context`` will be a list of Context objects, stored in 
-                     the order in which they were rendered. 
+                     As with ``template``, if multiple templates were rendered
+                     ``context`` will be a list of Context objects, stored in
+                     the order in which they were rendered.
     ===============  ==========================================================
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -295,11 +295,11 @@ Exceptions
 ~~~~~~~~~~
 
 If you point the Test Client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try...catch`` 
+will be visible in the test case. You can then use a standard ``try...catch``
 block, or ``unittest.TestCase.assertRaises()`` to test for exceptions.
 
-The only exceptions that are not visible in a Test Case are ``Http404``, 
-``PermissionDenied`` and ``SystemExit``. Django catches these exceptions 
+The only exceptions that are not visible in a Test Case are ``Http404``,
+``PermissionDenied`` and ``SystemExit``. Django catches these exceptions
 internally and converts them into the appropriate HTTP responses codes.
 
 Persistent state
@@ -307,8 +307,8 @@ Persistent state
 
 The Test Client is stateful; if a cookie is returned as part of a response,
 that cookie is provided as part of the next request issued by that Client
-instance. Expiry policies for these cookies are not followed; if you want 
-a cookie to expire, either delete it manually or create a new Client 
+instance. Expiry policies for these cookies are not followed; if you want
+a cookie to expire, either delete it manually or create a new Client
 instance (which will effectively delete all cookies).
 
 There are two properties of the Test Client which are used to store persistent
@@ -323,25 +323,26 @@ part of a test condition.
 
     ``session``      A dictionary-like object containing session information.
                      See the `session documentation`_ for full details.
+    ===============  ==========================================================
 
 .. _`session documentation`: ../sessions/
-                     
+
 Example
 ~~~~~~~
 
 The following is a simple unit test using the Test Client::
-    
+
     import unittest
     from django.test.client import Client
-    
+
     class SimpleTest(unittest.TestCase):
         def setUp(self):
             # Every test needs a client
             self.client = Client()
-        def test_details(self):        
+        def test_details(self):
             # Issue a GET request
             response = self.client.get('/customer/details/')
-    
+
             # Check that the respose is 200 OK
             self.failUnlessEqual(response.status_code, 200)
             # Check that the rendered context contains 5 customers
@@ -368,13 +369,13 @@ but you only want to run the animals unit tests, run::
 
 When you run your tests, you'll see a bunch of text flow by as the test
 database is created and models are initialized. This test database is
-created from scratch every time you run your tests. 
+created from scratch every time you run your tests.
 
-By default, the test database gets its name by prepending ``test_`` to 
-the database name specified by the ``DATABASE_NAME`` setting; all other 
+By default, the test database gets its name by prepending ``test_`` to
+the database name specified by the ``DATABASE_NAME`` setting; all other
 database settings will the same as they would be for the project normally.
-If you wish to use a name other than the default for the test database, 
-you can use the ``TEST_DATABASE_NAME`` setting to provide a name. 
+If you wish to use a name other than the default for the test database,
+you can use the ``TEST_DATABASE_NAME`` setting to provide a name.
 
 Once the test database has been established, Django will run your tests.
 If everything goes well, at the end you'll see::
@@ -447,7 +448,7 @@ arguments:
     The module list is the list of Python modules that contain the models to be
     tested. This is the same format returned by ``django.db.models.get_apps()``
 
-    Verbosity determines the amount of notification and debug information that 
+    Verbosity determines the amount of notification and debug information that
     will be printed to the console; `0` is no output, `1` is normal output,
     and `2` is verbose output.
 
@@ -458,12 +459,12 @@ To assist in the creation of your own test runner, Django provides
 a number of utility methods in the ``django.test.utils`` module.
 
 ``setup_test_environment()``
-    Performs any global pre-test setup, such as the installing the 
-    instrumentation of the template rendering system. 
+    Performs any global pre-test setup, such as the installing the
+    instrumentation of the template rendering system.
 
 ``teardown_test_environment()``
-    Performs any global post-test teardown, such as removing the instrumentation 
-    of the template rendering system. 
+    Performs any global post-test teardown, such as removing the instrumentation
+    of the template rendering system.
 
 ``create_test_db(verbosity=1, autoclobber=False)``
     Creates a new test database, and run ``syncdb`` against it.
