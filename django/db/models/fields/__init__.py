@@ -164,7 +164,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'year', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -178,7 +178,13 @@ class Field(object):
             return ["%%%s" % prep_for_like_query(value)]
         elif lookup_type == 'isnull':
             return []
-        raise TypeError, "Field has invalid lookup: %s" % lookup_type
+        elif lookup_type == 'year':
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError("The __year lookup type requires an integer argument")
+            return ['%s-01-01 00:00:00' % value, '%s-12-31 23:59:59.999999' % value]
+        raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
     def has_default(self):
         "Returns a boolean of whether this field has a default value."
