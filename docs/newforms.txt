@@ -51,9 +51,10 @@ too messy. The choice is yours.
 Overview
 ========
 
-As with the ``django.forms`` ("manipulators") system before it, ``django.newforms``
-is intended to handle HTML form display, validation and redisplay. It's what
-you use if you want to perform server-side validation for an HTML form.
+As with the ``django.forms`` ("manipulators") system before it,
+``django.newforms`` is intended to handle HTML form display, data processing
+(validation) and redisplay. It's what you use if you want to perform
+server-side validation for an HTML form.
 
 For example, if your Web site has a contact form that visitors can use to
 send you e-mail, you'd use this library to implement the display of the HTML
