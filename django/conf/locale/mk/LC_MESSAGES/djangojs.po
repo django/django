@@ -1,0 +1,118 @@
+# translation of djangojs.po to Macedonian
+#
+# Georgi Stanojevski <glisha@gmail.com>, 2006.
+msgid ""
+msgstr ""
+"Project-Id-Version: djangojs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-02-15 10:53+1100\n"
+"PO-Revision-Date: 2006-12-04 16:18+0100\n"
+"Last-Translator: Georgi Stanojevski <glisha@gmail.com>\n"
+"Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "Достапно %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "Избери ги сите"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "Додади"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "Отстрани"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "Избрано %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "Означете го вашиот избор/и и кликнете"
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "Исчисти ги сите"
+
+#: contrib/admin/media/js/dateparse.js:32
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Јануари Февруари Март Април Мај Јуни Јули Август Септември Октомври Ноември "
+"Декември"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Недела Понеделник Вторник Среда Четврток Петок Сабота"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "Н П В С Ч П С"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Now"
+msgstr "Сега"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
+msgid "Clock"
+msgstr "Часовник"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
+msgid "Choose a time"
+msgstr "Избери време"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "Midnight"
+msgstr "Полноќ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "6 a.m."
+msgstr "6 наутро"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
+msgid "Noon"
+msgstr "Пладне"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
+msgid "Cancel"
+msgstr "Откажи"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
+msgid "Today"
+msgstr "Денеска"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
+msgid "Calendar"
+msgstr "Календар"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
+msgid "Yesterday"
+msgstr "Вчера"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
+msgid "Tomorrow"
+msgstr "Утре"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr ""
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr ""
