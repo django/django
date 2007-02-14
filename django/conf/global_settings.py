@@ -54,6 +54,7 @@ LANGUAGES = (
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
+    ('lv', gettext_noop('Latvian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
     ('pl', gettext_noop('Polish')),
