@@ -2682,6 +2682,47 @@ purposes, though.
 <li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
 
+# Subclassing forms ###########################################################
+
+You can subclass a Form to add fields. The resulting form subclass will have
+all of the fields of the parent Form, plus whichever fields you define in the
+subclass.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Musician(Person):
+...     instrument = CharField()
+>>> p = Person(auto_id=False)
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+>>> m = Musician(auto_id=False)
+>>> print m.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+
+Yes, you can subclass multiple forms. The fields are added in the order in
+which the parent classes are listed.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Instrument(Form):
+...     instrument = CharField()
+>>> class Beatle(Person, Instrument):
+...     haircut_type = CharField()
+>>> b = Beatle(auto_id=False)
+>>> print b.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+<li>Haircut type: <input type="text" name="haircut_type" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,

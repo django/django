@@ -571,6 +571,46 @@ is a list-like object that is displayed as an HTML ``<ul>`` when printed::
     >>> str(f['subject'].errors)
     ''
 
+Subclassing forms
+-----------------
+
+If you subclass a custom ``Form`` class, the resulting ``Form`` class will
+include all fields of the parent class(es), followed by the fields you define
+in the subclass.
+
+In this example, ``ContactFormWithPriority`` contains all the fields from
+``ContactForm``, plus an additional field, ``priority``. The ``ContactForm``
+fields are ordered first::
+
+    >>> class ContactFormWithPriority(ContactForm):
+    ...     priority = forms.CharField()
+    >>> f = ContactFormWithPriority(auto_id=False)
+    >>> print f.as_ul()
+    <li>Subject: <input type="text" name="subject" maxlength="100" /></li>
+    <li>Message: <input type="text" name="message" /></li>
+    <li>Sender: <input type="text" name="sender" /></li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
+    <li>Priority: <input type="text" name="priority" /></li>
+
+It's possible to subclass multiple forms, treating forms as "mix-ins." In this
+example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
+(in that order), and its field list includes the fields from the parent
+classes::
+
+    >>> class PersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    >>> class InstrumentForm(Form):
+    ...     instrument = CharField()
+    >>> class BeatleForm(PersonForm, InstrumentForm):
+    ...     haircut_type = CharField()
+    >>> b = Beatle(auto_id=False)
+    >>> print b.as_ul()
+    <li>First name: <input type="text" name="first_name" /></li>
+    <li>Last name: <input type="text" name="last_name" /></li>
+    <li>Instrument: <input type="text" name="instrument" /></li>
+    <li>Haircut type: <input type="text" name="haircut_type" /></li>
+
 Fields
 ======
 
