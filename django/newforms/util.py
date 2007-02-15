@@ -7,7 +7,10 @@ flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs
 
 def smart_unicode(s):
     if not isinstance(s, basestring):
-        s = unicode(str(s))
+        if hasattr(s, '__unicode__'):
+            s = unicode(s)
+        else:
+            s = unicode(str(s), settings.DEFAULT_CHARSET)
     elif not isinstance(s, unicode):
         s = unicode(s, settings.DEFAULT_CHARSET)
     return s

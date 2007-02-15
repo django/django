@@ -3265,6 +3265,29 @@ ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
 u''
 >>> f.clean('')
 u''
+
+#################################
+# Tests of underlying functions #
+#################################
+
+# smart_unicode tests
+>>> from django.newforms.util import smart_unicode
+>>> class Test:
+...     def __str__(self):
+...        return 'ŠĐĆŽćžšđ'
+>>> class TestU:
+...     def __str__(self):
+...        return 'Foo'
+...     def __unicode__(self):
+...        return u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(Test())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(TestU())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(1)
+u'1'
+>>> smart_unicode('foo')
+u'foo'
 """
 
 if __name__ == "__main__":
