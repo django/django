@@ -2,7 +2,8 @@
 USA-specific Form helpers
 """
 
-from django.newforms.fields import RegexField
+from django.newforms import ValidationError
+from django.newforms.fields import Field, RegexField, EMPTY_VALUES
 from django.utils.translation import gettext
 
 class USZipCodeField(RegexField):
@@ -11,3 +12,25 @@ class USZipCodeField(RegexField):
             max_length=None, min_length=None,
             error_message=gettext(u'Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
             *args, **kwargs)
+
+class USStateField(Field):
+    """
+    A form field that validates its input is a U.S. state name or abbreviation.
+    It normalizes the input to the standard two-leter postal service
+    abbreviation for the given state.
+    """
+    def clean(self, value):
+        from us_states import STATES_NORMALIZED # relative import
+        super(USStateField, self).clean(value)
+        if value in EMPTY_VALUES:
+            return u''
+        try:
+            value = value.strip().lower()
+        except AttributeError:
+            pass
+        else:
+            try:
+                return STATES_NORMALIZED[value.strip().lower()].decode('ascii')
+            except KeyError:
+                pass
+        raise ValidationError(u'Enter a U.S. state or territory.')

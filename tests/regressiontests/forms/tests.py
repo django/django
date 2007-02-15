@@ -3282,6 +3282,51 @@ u''
 >>> f.clean('')
 u''
 
+# USStateField ################################################################
+
+USStateField validates that the data is either an abbreviation or name of a
+U.S. state.
+>>> from django.contrib.localflavor.usa.forms import USStateField
+>>> f = USStateField()
+>>> f.clean('il')
+u'IL'
+>>> f.clean('IL')
+u'IL'
+>>> f.clean('illinois')
+u'IL'
+>>> f.clean('  illinois ')
+u'IL'
+>>> f.clean(60606)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a U.S. state or territory.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USStateField(required=False)
+>>> f.clean('il')
+u'IL'
+>>> f.clean('IL')
+u'IL'
+>>> f.clean('illinois')
+u'IL'
+>>> f.clean('  illinois ')
+u'IL'
+>>> f.clean(60606)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a U.S. state or territory.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
 #################################
 # Tests of underlying functions #
 #################################
