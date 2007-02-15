@@ -72,6 +72,22 @@ u'<input type="password" class="special" name="email" />'
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
+The render_value argument lets you specify whether the widget should render
+its value. You may want to do this for security reasons.
+>>> w = PasswordInput(render_value=True)
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" value="secret" />'
+>>> w = PasswordInput(render_value=False)
+>>> w.render('email', '')
+u'<input type="password" name="email" />'
+>>> w.render('email', None)
+u'<input type="password" name="email" />'
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" />'
+>>> w = PasswordInput(attrs={'class': 'fun'}, render_value=False)
+>>> w.render('email', 'secret')
+u'<input type="password" class="fun" name="email" />'
+
 # HiddenInput Widget ############################################################
 
 >>> w = HiddenInput()
