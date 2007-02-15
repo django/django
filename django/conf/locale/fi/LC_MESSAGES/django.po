@@ -1029,19 +1029,19 @@ msgstr " %(filter_title)s:"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr "Talleta uutena"
+msgstr "Tallenna uutena"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr "Talleta ja lisää seuraava"
+msgstr "Tallenna ja lisää seuraava"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr "Talleta välillä ja jatka muokkaamista"
+msgstr "Tallenna välillä ja jatka muokkaamista"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
-msgstr "Talleta ja poistu"
+msgstr "Tallenna ja poistu"
 
 #: contrib/admin/templates/admin/change_list.html:11
 #, python-format
