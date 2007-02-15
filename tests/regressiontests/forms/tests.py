@@ -3055,12 +3055,12 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <input type="submit" />
 </form>
 
-#################
-# Extra widgets #
-#################
+###############
+# Extra stuff #
+###############
 
-The newforms library comes with some extra, higher-level Widget classes that
-demonstrate some of the library's abilities.
+The newforms library comes with some extra, higher-level Field and Widget
+classes that demonstrate some of the library's abilities.
 
 # SelectDateWidget ############################################################
 
@@ -3189,6 +3189,66 @@ True
 <option value="2016">2016</option>
 </select>
 
+# USZipCodeField ##############################################################
+
+USZipCodeField validates that the data is either a five-digit U.S. zip code or
+a zip+4.
+>>> from django.newforms.extras.usa import USZipCodeField
+>>> f = USZipCodeField()
+>>> f.clean('60606')
+u'60606'
+>>> f.clean(60606)
+u'60606'
+>>> f.clean('04000')
+u'04000'
+>>> f.clean('4000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-1234')
+u'60606-1234'
+>>> f.clean('6060-1234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USZipCodeField(required=False)
+>>> f.clean('60606')
+u'60606'
+>>> f.clean(60606)
+u'60606'
+>>> f.clean('04000')
+u'04000'
+>>> f.clean('4000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-1234')
+u'60606-1234'
+>>> f.clean('6060-1234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
 """
 
 if __name__ == "__main__":
