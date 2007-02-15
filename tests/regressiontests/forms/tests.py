@@ -2936,7 +2936,7 @@ VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}
 # Some ideas for using templates with forms ###################################
 
 >>> class UserRegistration(Form):
-...    username = CharField(max_length=10)
+...    username = CharField(max_length=10, help_text="Good luck picking a username that doesn't already exist.")
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
@@ -3010,6 +3010,22 @@ field an "id" attribute.
 <p><label for="id_username">Username</label>: <input id="id_username" type="text" name="username" maxlength="10" /></p>
 <p><label for="id_password1">Password1</label>: <input type="password" name="password1" id="id_password1" /></p>
 <p><label for="id_password2">Password2</label>: <input type="password" name="password2" id="id_password2" /></p>
+<input type="submit" />
+</form>
+
+User form.[field].help_text to output a field's help text. If the given field
+does not have help text, nothing will be output.
+>>> t = Template('''<form action="">
+... <p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
+... <p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
+... <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration(auto_id=False)}))
+<form action="">
+<p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn't already exist.</p>
+<p>Password1: <input type="password" name="password1" /></p>
+<p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />
 </form>
 

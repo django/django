@@ -218,6 +218,7 @@ class BoundField(StrAndUnicode):
             self.label = pretty_name(name)
         else:
             self.label = self.field.label
+        self.help_text = field.help_text
 
     def __unicode__(self):
         "Renders this field as an HTML widget."
