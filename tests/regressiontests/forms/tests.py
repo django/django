@@ -3044,6 +3044,8 @@ does not have help text, nothing will be output.
 <p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />
 </form>
+>>> Template('{{ form.password1.help_text }}').render(Context({'form': UserRegistration(auto_id=False)}))
+''
 
 The label_tag() method takes an optional attrs argument: a dictionary of HTML
 attributes to add to the <label> tag.
