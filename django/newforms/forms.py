@@ -61,6 +61,7 @@ class BaseForm(StrAndUnicode):
         self.prefix = prefix
         self.initial = initial or {}
         self.__errors = None # Stores the errors after clean() has been called.
+
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
         # alter self.fields, we create self.fields here by copying base_fields.
