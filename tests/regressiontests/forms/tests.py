@@ -3225,7 +3225,7 @@ True
 
 USZipCodeField validates that the data is either a five-digit U.S. zip code or
 a zip+4.
->>> from django.newforms.extras.usa import USZipCodeField
+>>> from django.contrib.localflavor.usa.forms import USZipCodeField
 >>> f = USZipCodeField()
 >>> f.clean('60606')
 u'60606'
