@@ -107,3 +107,12 @@ msgstr "Gestern"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
 msgid "Tomorrow"
 msgstr "Morgen"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Anzeigen"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Verbergen"
