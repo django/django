@@ -605,7 +605,7 @@ classes::
     ...     instrument = CharField()
     >>> class BeatleForm(PersonForm, InstrumentForm):
     ...     haircut_type = CharField()
-    >>> b = Beatle(auto_id=False)
+    >>> b = BeatleForm(auto_id=False)
     >>> print b.as_ul()
     <li>First name: <input type="text" name="first_name" /></li>
     <li>Last name: <input type="text" name="last_name" /></li>
