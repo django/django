@@ -38,6 +38,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
     ('bn', gettext_noop('Bengali')),
+    ('ca', gettext_noop('Catalan')),
     ('cs', gettext_noop('Czech')),
     ('cy', gettext_noop('Welsh')),
     ('da', gettext_noop('Danish')),
