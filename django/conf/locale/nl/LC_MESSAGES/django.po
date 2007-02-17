@@ -31,7 +31,7 @@ msgstr "en"
 #: db/models/fields/related.py:51
 #, python-format
 msgid "Please enter a valid %s."
-msgstr "Geef een geldig IP adres."
+msgstr "Geef een geldig %s veld."
 
 #: db/models/fields/related.py:618
 msgid "Separate multiple IDs with commas."
