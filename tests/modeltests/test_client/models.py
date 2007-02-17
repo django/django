@@ -43,7 +43,7 @@ class ClientTest(unittest.TestCase):
         
         # Check some response details
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, 'Empty POST Template')
+        self.assertEqual(response.template.name, 'Empty GET Template')
         
     def test_empty_post(self):
         "POST an empty dictionary to a view"
@@ -53,7 +53,7 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty POST Template')
         
-    def test_post_view(self):
+    def test_post(self):
         "POST some data to a view"
         post_data = {
             'value': 37
@@ -66,6 +66,14 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(response.template.name, 'POST Template')
         self.failUnless('Data received' in response.content)
         
+    def test_raw_post(self):
+        test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
+        response = self.client.post("/test_client/raw_post_view/", test_doc,
+                                    content_type="text/xml")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template.name, "Book template")
+        self.assertEqual(response.content, "Blink - Malcolm Gladwell")
+
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')

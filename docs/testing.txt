@@ -217,15 +217,21 @@ can be invoked on the ``Client`` instance.
 
         http://yoursite.com/customers/details/?name=fred&age=7
 
-``post(path, data={})``
-    Make a POST request on the provided ``path``. The key-value pairs in the
-    data dictionary will be used to create the POST data payload. This payload
-    will be transmitted with the mimetype ``multipart/form-data``.
-
-    However submitting files is a special case. To POST a file, you need only
+``post(path, data={}, content_type=MULTIPART_CONTENT)``
+    Make a POST request on the provided ``path``. If you provide a content type
+    (e.g., ``text/xml`` for an XML payload), the contents of ``data`` will be 
+    sent as-is in the POST request, using the content type in the HTTP 
+    ``Content-Type`` header.
+    
+    If you do not provide a value for ``content_type``, the values in 
+    ``data`` will be transmitted with a content type of ``multipart/form-data``.
+    The key-value pairs in the data dictionary will be encoded as a multipart
+    message and used to create the POST data payload.
+    
+    Submitting files is a special case. To POST a file, you need only
     provide the file field name as a key, and a file handle to the file you wish to
     upload as a value. The Test Client will populate the two POST fields (i.e.,
-    ``field`` and ``field_file``) required by FileField. For example::
+    ``field`` and ``field_file``) required by Django's FileField. For example::
 
         c = Client()
         f = open('wishlist.doc')

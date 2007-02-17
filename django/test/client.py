@@ -9,6 +9,9 @@ from django.http import urlencode, SimpleCookie
 from django.test import signals
 from django.utils.functional import curry
 
+BOUNDARY = 'BoUnDaRyStRiNg'
+MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
+
 class ClientHandler(BaseHandler):
     """
     A HTTP Handler that can be used for testing purposes.
@@ -184,19 +187,20 @@ class Client:
 
         return self.request(**r)
 
-    def post(self, path, data={}, **extra):
+    def post(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
         "Request a response from the server using POST."
 
-        BOUNDARY = 'BoUnDaRyStRiNg'
+        if content_type is MULTIPART_CONTENT:
+            post_data = encode_multipart(BOUNDARY, data)
+        else:
+            post_data = data
 
-        encoded = encode_multipart(BOUNDARY, data)
-        stream = StringIO(encoded)
         r = {
-            'CONTENT_LENGTH': len(encoded),
-            'CONTENT_TYPE':   'multipart/form-data; boundary=%s' % BOUNDARY,
+            'CONTENT_LENGTH': len(post_data),
+            'CONTENT_TYPE':   content_type,
             'PATH_INFO':      path,
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     stream,
+            'wsgi.input':     StringIO(post_data),
         }
         r.update(extra)
 
