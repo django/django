@@ -432,3 +432,77 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 ``HttpResponseServerError``
     Acts just like ``HttpResponse`` but uses a 500 status code.
+
+Returning Errors
+================
+
+Returning HTTP error codes in Django is easy; there are the
+``HttpResponseNotFound``, ``HttpResponseForbidden``,
+``HttpResponseServerError``, etc. subclasses mentioned above which, when
+returned by a view, will make the Web server return the corresponding error
+codes (404, 403, 500, ...) and HTTP headers.
+
+The Http404 exception
+---------------------
+When you return an error such as ``HttpResponseNotFound``, you are responsible
+for returning the error page and everything yourself. Since this extra
+information will normally be fairly uniform across your site and because you
+often want to bail out of the middle of a view with a quick "content not
+found" error, Django provides the ``Http404`` exception. This exception is
+caught by Django and results in the standard error page for your application
+being returned along with a 404 error code (although this behavior can be
+customised, as described below).
+
+Using this exception in your code would look something like::
+
+    from django.http import Http404
+    # ...
+    def detail(request, poll_id):
+        try:
+            p = Poll.objects.get(pk=poll_id)
+        except Poll.DoesNotExist:
+            raise Http404
+        return render_to_response('polls/detail.html', {'poll': p})
+
+In order to use the ``Http404`` exception to its fullest, you should create a
+template that is displayed when a 404 error is raised. This template should be
+called ``404.html`` and located in the top level of your template tree.
+
+Customing error views
+---------------------
+
+The 404 (page not found) view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you raise the ``Http404`` exception, Django will load a special view
+devoted to handling 404 errors. It finds it by looking for the variable
+``handler404``, which is a string in Python dotted syntax -- the same format
+the normal URLconf callbacks use. A 404 view itself has nothing special: It's
+just a normal view.
+
+You normally won't have to bother with writing 404 views. By default, URLconfs
+contain the following line::
+
+    from django.conf.urls.defaults import *
+
+That takes care of setting ``handler404`` in the current module. As you can see
+in ``django/conf/urls/defaults.py``, ``handler404`` is set to
+``'django.views.defaults.page_not_found'`` by default.
+
+Three things to note about 404 views:
+
+    * The 404 view is also called if Django doesn't find a match after checking
+      every regular expression in the URLconf.
+    * If you don't define your own 404 view -- and simply use the default,
+      which is recommended -- you still have one obligation: To create a
+      ``404.html`` template in the root of your template directory. The default
+      404 view will use that template for all 404 errors.
+    * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
+      view will never be used, and the traceback will be displayed instead.
+
+The 500 (server error) view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+URLconfs may also define a ``handler500``, which points to a view to call in
+case of server errors. Server errors happen when you have runtime errors in
+view code.
