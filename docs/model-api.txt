@@ -1721,11 +1721,30 @@ But this template code is good::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
-(Yes, we know ``get_absolute_url()`` couples URLs to models, which violates the
-DRY principle, because URLs are defined both in a URLconf and in the model.
-This is a rare case in which we've intentionally violated that principle for
-the sake of convenience. With that said, we're working on an even cleaner way
-of specifying URLs in a more DRY fashion.)
+``permalink``
+-------------
+
+** New in Django development version. **
+
+The problem with the way we wrote ``get_absolute_url()`` above is that it
+slightly violates the DRY principle: the URL for this object is defined both
+in the URLConf file and in the model.
+
+You can further decouple your models from the URL configuration using the
+``permalink`` function. This function acts as a decorator and is passed the
+view function and any parameters you would use for accessing this instance
+directly. Django then works out the correct full URL path using the URL
+configuration file. For example::
+
+    from django.db.models import permalink
+
+    def get_absolute_url(self):
+        return ('people.views.details', str(self.id))
+    get_absolute_url = permalink(get_absolute_url)
+
+In this way, you are tying the model's absolute URL to the view that is used
+to display it, without repeating the URL information anywhere. You still use
+the ``get_absolute_url`` method in templates, as before.
 
 Executing custom SQL
 --------------------
