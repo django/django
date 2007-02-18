@@ -1,6 +1,5 @@
 import unittest, doctest
 from django.conf import settings
-from django.core import management
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.utils import create_test_db, destroy_test_db
 from django.test.testcases import OutputChecker, DocTestRunner
@@ -78,7 +77,6 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
 
     old_name = settings.DATABASE_NAME
     create_test_db(verbosity)
-    management.syncdb(verbosity, interactive=False)
     unittest.TextTestRunner(verbosity=verbosity).run(suite)
     destroy_test_db(old_name, verbosity)
     
