@@ -2698,6 +2698,13 @@ purposes, though.
 <li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
 
+Help text can include arbitrary Unicode characters.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
+>>> p = UserRegistration(auto_id=False)
+>>> p.as_ul()
+u'<li>Username: <input type="text" name="username" maxlength="10" /> \u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</li>'
+
 # Subclassing forms ###########################################################
 
 You can subclass a Form to add fields. The resulting form subclass will have
