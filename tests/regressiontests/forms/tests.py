@@ -2217,6 +2217,19 @@ returns a list of input.
 >>> f.clean_data
 {'composers': [u'J', u'P'], 'name': u'Yesterday'}
 
+Validation errors are HTML-escaped when output as HTML.
+>>> class EscapingForm(Form):
+...     special_name = CharField()
+...     def clean_special_name(self):
+...         raise ValidationError("Something's wrong with '%s'" % self.clean_data['special_name'])
+ 
+>>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
+>>> f = EscapingForm({'special_name': "Should escape < & > and <script>alert('xss')</script>"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+
 # Validating multiple fields in relation to another ###########################
 
 There are a couple of ways to do multiple-field validation. If you want the

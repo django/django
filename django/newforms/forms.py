@@ -113,7 +113,7 @@ class BaseForm(StrAndUnicode):
         output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            bf_errors = bf.errors # Cache in local variable.
+            bf_errors = ErrorList([escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
