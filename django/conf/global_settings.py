@@ -38,6 +38,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
     ('bn', gettext_noop('Bengali')),
+    ('ca', gettext_noop('Catalan')),
     ('cs', gettext_noop('Czech')),
     ('cy', gettext_noop('Welsh')),
     ('da', gettext_noop('Danish')),
@@ -54,6 +55,8 @@ LANGUAGES = (
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
+    ('lv', gettext_noop('Latvian')),
+    ('mk', gettext_noop('Macedonian')),
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
     ('pl', gettext_noop('Polish')),

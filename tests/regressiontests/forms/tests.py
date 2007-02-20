@@ -72,6 +72,22 @@ u'<input type="password" class="special" name="email" />'
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
+The render_value argument lets you specify whether the widget should render
+its value. You may want to do this for security reasons.
+>>> w = PasswordInput(render_value=True)
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" value="secret" />'
+>>> w = PasswordInput(render_value=False)
+>>> w.render('email', '')
+u'<input type="password" name="email" />'
+>>> w.render('email', None)
+u'<input type="password" name="email" />'
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" />'
+>>> w = PasswordInput(attrs={'class': 'fun'}, render_value=False)
+>>> w.render('email', 'secret')
+u'<input type="password" class="fun" name="email" />'
+
 # HiddenInput Widget ############################################################
 
 >>> w = HiddenInput()
@@ -2201,6 +2217,19 @@ returns a list of input.
 >>> f.clean_data
 {'composers': [u'J', u'P'], 'name': u'Yesterday'}
 
+Validation errors are HTML-escaped when output as HTML.
+>>> class EscapingForm(Form):
+...     special_name = CharField()
+...     def clean_special_name(self):
+...         raise ValidationError("Something's wrong with '%s'" % self.clean_data['special_name'])
+
+>>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
+>>> f = EscapingForm({'special_name': "Should escape < & > and <script>alert('xss')</script>"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+
 # Validating multiple fields in relation to another ###########################
 
 There are a couple of ways to do multiple-field validation. If you want the
@@ -2333,6 +2362,43 @@ the next.
 <tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
 <tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
 <tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
+
+Similarly, changes to field attributes do not persist from one Form instance
+to the next.
+>>> class Person(Form):
+...     first_name = CharField(required=False)
+...     last_name = CharField(required=False)
+...     def __init__(self, names_required=False, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if names_required:
+...             self.fields['first_name'].required = True
+...             self.fields['last_name'].required = True
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> f = Person(names_required=True)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(True, True)
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> class Person(Form):
+...     first_name = CharField(max_length=30)
+...     last_name = CharField(max_length=30)
+...     def __init__(self, name_max_length=None, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if name_max_length:
+...             self.fields['first_name'].max_length = name_max_length
+...             self.fields['last_name'].max_length = name_max_length
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
+>>> f = Person(name_max_length=20)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(20, 20)
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
 
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
@@ -2645,6 +2711,54 @@ purposes, though.
 <li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
 <li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
 
+Help text can include arbitrary Unicode characters.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
+>>> p = UserRegistration(auto_id=False)
+>>> p.as_ul()
+u'<li>Username: <input type="text" name="username" maxlength="10" /> \u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</li>'
+
+# Subclassing forms ###########################################################
+
+You can subclass a Form to add fields. The resulting form subclass will have
+all of the fields of the parent Form, plus whichever fields you define in the
+subclass.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Musician(Person):
+...     instrument = CharField()
+>>> p = Person(auto_id=False)
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+>>> m = Musician(auto_id=False)
+>>> print m.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+
+Yes, you can subclass multiple forms. The fields are added in the order in
+which the parent classes are listed.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Instrument(Form):
+...     instrument = CharField()
+>>> class Beatle(Person, Instrument):
+...     haircut_type = CharField()
+>>> b = Beatle(auto_id=False)
+>>> print b.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+<li>Haircut type: <input type="text" name="haircut_type" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,
@@ -2858,7 +2972,7 @@ VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}
 # Some ideas for using templates with forms ###################################
 
 >>> class UserRegistration(Form):
-...    username = CharField(max_length=10)
+...    username = CharField(max_length=10, help_text="Good luck picking a username that doesn't already exist.")
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
@@ -2935,6 +3049,24 @@ field an "id" attribute.
 <input type="submit" />
 </form>
 
+User form.[field].help_text to output a field's help text. If the given field
+does not have help text, nothing will be output.
+>>> t = Template('''<form action="">
+... <p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
+... <p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
+... <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration(auto_id=False)}))
+<form action="">
+<p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn't already exist.</p>
+<p>Password1: <input type="password" name="password1" /></p>
+<p>Password2: <input type="password" name="password2" /></p>
+<input type="submit" />
+</form>
+>>> Template('{{ form.password1.help_text }}').render(Context({'form': UserRegistration(auto_id=False)}))
+''
+
 The label_tag() method takes an optional attrs argument: a dictionary of HTML
 attributes to add to the <label> tag.
 >>> f = UserRegistration(auto_id='id_%s')
@@ -2977,12 +3109,12 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <input type="submit" />
 </form>
 
-#################
-# Extra widgets #
-#################
+###############
+# Extra stuff #
+###############
 
-The newforms library comes with some extra, higher-level Widget classes that
-demonstrate some of the library's abilities.
+The newforms library comes with some extra, higher-level Field and Widget
+classes that demonstrate some of the library's abilities.
 
 # SelectDateWidget ############################################################
 
@@ -3111,6 +3243,246 @@ True
 <option value="2016">2016</option>
 </select>
 
+# USZipCodeField ##############################################################
+
+USZipCodeField validates that the data is either a five-digit U.S. zip code or
+a zip+4.
+>>> from django.contrib.localflavor.usa.forms import USZipCodeField
+>>> f = USZipCodeField()
+>>> f.clean('60606')
+u'60606'
+>>> f.clean(60606)
+u'60606'
+>>> f.clean('04000')
+u'04000'
+>>> f.clean('4000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-1234')
+u'60606-1234'
+>>> f.clean('6060-1234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USZipCodeField(required=False)
+>>> f.clean('60606')
+u'60606'
+>>> f.clean(60606)
+u'60606'
+>>> f.clean('04000')
+u'04000'
+>>> f.clean('4000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-1234')
+u'60606-1234'
+>>> f.clean('6060-1234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean('60606-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# USStateField ################################################################
+
+USStateField validates that the data is either an abbreviation or name of a
+U.S. state.
+>>> from django.contrib.localflavor.usa.forms import USStateField
+>>> f = USStateField()
+>>> f.clean('il')
+u'IL'
+>>> f.clean('IL')
+u'IL'
+>>> f.clean('illinois')
+u'IL'
+>>> f.clean('  illinois ')
+u'IL'
+>>> f.clean(60606)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a U.S. state or territory.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USStateField(required=False)
+>>> f.clean('il')
+u'IL'
+>>> f.clean('IL')
+u'IL'
+>>> f.clean('illinois')
+u'IL'
+>>> f.clean('  illinois ')
+u'IL'
+>>> f.clean(60606)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a U.S. state or territory.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# USStateSelect ###############################################################
+
+USStateSelect is a Select widget that uses a list of U.S. states/territories
+as its choices.
+>>> from django.contrib.localflavor.usa.forms import USStateSelect
+>>> w = USStateSelect()
+>>> print w.render('state', 'IL')
+<select name="state">
+<option value="AL">Alabama</option>
+<option value="AK">Alaska</option>
+<option value="AS">American Samoa</option>
+<option value="AZ">Arizona</option>
+<option value="AR">Arkansas</option>
+<option value="CA">California</option>
+<option value="CO">Colorado</option>
+<option value="CT">Connecticut</option>
+<option value="DE">Deleware</option>
+<option value="DC">District of Columbia</option>
+<option value="FM">Federated States of Micronesia</option>
+<option value="FL">Florida</option>
+<option value="GA">Georgia</option>
+<option value="GU">Guam</option>
+<option value="HI">Hawaii</option>
+<option value="ID">Idaho</option>
+<option value="IL" selected="selected">Illinois</option>
+<option value="IN">Indiana</option>
+<option value="IA">Iowa</option>
+<option value="KS">Kansas</option>
+<option value="KY">Kentucky</option>
+<option value="LA">Louisiana</option>
+<option value="ME">Maine</option>
+<option value="MH">Marshall Islands</option>
+<option value="MD">Maryland</option>
+<option value="MI">Michigan</option>
+<option value="MN">Minnesota</option>
+<option value="MS">Mississippi</option>
+<option value="MO">Missouri</option>
+<option value="MT">Montana</option>
+<option value="NE">Nebraska</option>
+<option value="NV">Nevada</option>
+<option value="NH">New Hampshire</option>
+<option value="NJ">New Jersey</option>
+<option value="NM">New Mexico</option>
+<option value="NY">New York</option>
+<option value="NC">North Carolina</option>
+<option value="ND">North Dakota</option>
+<option value="MP">Northern Mariana Islands</option>
+<option value="OH">Ohio</option>
+<option value="OK">Oklahoma</option>
+<option value="OR">Oregon</option>
+<option value="PW">Palau</option>
+<option value="PA">Pennsylvania</option>
+<option value="PR">Puerto Rico</option>
+<option value="RI">Rhode Island</option>
+<option value="SC">South Carolina</option>
+<option value="SD">South Dakota</option>
+<option value="TN">Tennessee</option>
+<option value="TX">Texas</option>
+<option value="UT">Utah</option>
+<option value="VT">Vermont</option>
+<option value="VI">Virgin Islands</option>
+<option value="VA">Virginia</option>
+<option value="WA">Washington</option>
+<option value="WV">West Virginia</option>
+<option value="WI">Wisconsin</option>
+<option value="WY">Wyoming</option>
+</select>
+
+# UKPostcodeField #############################################################
+
+UKPostcodeField validates that the data is a valid UK postcode.
+>>> from django.contrib.localflavor.uk.forms import UKPostcodeField
+>>> f = UKPostcodeField()
+>>> f.clean('BT32 4PX')
+u'BT32 4PX'
+>>> f.clean('GIR 0AA')
+u'GIR 0AA'
+>>> f.clean('BT324PX')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+>>> f.clean('1NV 4L1D')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = UKPostcodeField(required=False)
+>>> f.clean('BT32 4PX')
+u'BT32 4PX'
+>>> f.clean('GIR 0AA')
+u'GIR 0AA'
+>>> f.clean('1NV 4L1D')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+>>> f.clean('BT324PX')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+#################################
+# Tests of underlying functions #
+#################################
+
+# smart_unicode tests
+>>> from django.newforms.util import smart_unicode
+>>> class Test:
+...     def __str__(self):
+...        return 'ŠĐĆŽćžšđ'
+>>> class TestU:
+...     def __str__(self):
+...        return 'Foo'
+...     def __unicode__(self):
+...        return u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(Test())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(TestU())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(1)
+u'1'
+>>> smart_unicode('foo')
+u'foo'
 """
 
 if __name__ == "__main__":

@@ -198,17 +198,17 @@ class QuerySet(object):
         counter = self._clone()
         counter._order_by = ()
         counter._select_related = False
-        
+
         offset = counter._offset
         limit = counter._limit
         counter._offset = None
         counter._limit = None
-        
+
         try:
             select, sql, params = counter._get_sql_clause()
         except EmptyResultSet:
             return 0
-            
+
         cursor = connection.cursor()
         if self._distinct:
             id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
@@ -553,7 +553,7 @@ class ValuesQuerySet(QuerySet):
         else: # Default to all fields.
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
-        
+
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
@@ -576,12 +576,12 @@ class DateQuerySet(QuerySet):
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
-                
+
         try:
             select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
-        
+
         sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
             backend.quote_name(self._field.column))), sql, self._order)
@@ -598,15 +598,15 @@ class DateQuerySet(QuerySet):
         c._kind = self._kind
         c._order = self._order
         return c
-    
+
 class EmptyQuerySet(QuerySet):
     def __init__(self, model=None):
         super(EmptyQuerySet, self).__init__(model)
         self._result_cache = []
-        
+
     def count(self):
         return 0
-        
+
     def delete(self):
         pass
 
@@ -708,9 +708,9 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
             return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
         else:
             raise EmptyResultSet
-    elif lookup_type == 'range':
+    elif lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
-    elif lookup_type in ('year', 'month', 'day'):
+    elif lookup_type in ('month', 'day'):
         return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
@@ -791,7 +791,7 @@ def parse_lookup(kwarg_items, opts):
 
         if len(path) < 1:
             raise TypeError, "Cannot parse keyword query %r" % kwarg
-        
+
         if value is None:
             # Interpret '__exact=None' as the sql '= NULL'; otherwise, reject
             # all uses of None as a query value.
@@ -1007,7 +1007,7 @@ def delete_objects(seen_objs):
                         pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
             if isinstance(f, GenericRelation):
-                from django.contrib.contenttypes.models import ContentType 
+                from django.contrib.contenttypes.models import ContentType
                 query_extra = 'AND %s=%%s' % f.rel.to._meta.get_field(f.content_type_field_name).column
                 args_extra = [ContentType.objects.get_for_model(cls).id]
             else:

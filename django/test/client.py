@@ -1,5 +1,6 @@
 import sys
 from cStringIO import StringIO
+from urlparse import urlparse
 from django.conf import settings
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
@@ -8,6 +9,9 @@ from django.dispatch import dispatcher
 from django.http import urlencode, SimpleCookie
 from django.test import signals
 from django.utils.functional import curry
+
+BOUNDARY = 'BoUnDaRyStRiNg'
+MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 
 class ClientHandler(BaseHandler):
     """
@@ -184,19 +188,20 @@ class Client:
 
         return self.request(**r)
 
-    def post(self, path, data={}, **extra):
+    def post(self, path, data={}, content_type=MULTIPART_CONTENT, **extra):
         "Request a response from the server using POST."
 
-        BOUNDARY = 'BoUnDaRyStRiNg'
+        if content_type is MULTIPART_CONTENT:
+            post_data = encode_multipart(BOUNDARY, data)
+        else:
+            post_data = data
 
-        encoded = encode_multipart(BOUNDARY, data)
-        stream = StringIO(encoded)
         r = {
-            'CONTENT_LENGTH': len(encoded),
-            'CONTENT_TYPE':   'multipart/form-data; boundary=%s' % BOUNDARY,
+            'CONTENT_LENGTH': len(post_data),
+            'CONTENT_TYPE':   content_type,
             'PATH_INFO':      path,
             'REQUEST_METHOD': 'POST',
-            'wsgi.input':     stream,
+            'wsgi.input':     StringIO(post_data),
         }
         r.update(extra)
 
@@ -218,7 +223,7 @@ class Client:
         if response.status_code != 302:
             return False
 
-        login_path, data = response['Location'].split('?')
+        _, _, login_path, _, data, _= urlparse(response['Location'])
         next = data.split('=')[1]
 
         # Second, GET the login page; required to set up cookies
@@ -235,7 +240,8 @@ class Client:
         response = self.post(login_path, data=form_data, **extra)
 
         # Login page should 302 redirect to the originally requested page
-        if response.status_code != 302 or response['Location'] != path:
+        if (response.status_code != 302 or 
+                urlparse(response['Location'])[2] != path):
             return False
 
         # Since we are logged in, request the actual page again

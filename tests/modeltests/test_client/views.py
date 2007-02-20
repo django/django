@@ -1,3 +1,4 @@
+from xml.dom.minidom import parseString
 from django.template import Context, Template
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -13,15 +14,34 @@ def post_view(request):
     """A view that expects a POST, and returns a different template depending
     on whether any POST data is available
     """
-    if request.POST:
-        t = Template('Data received: {{ data }} is the value.', name='POST Template')
-        c = Context({'data': request.POST['value']})
+    if request.method == 'POST':
+        if request.POST:
+            t = Template('Data received: {{ data }} is the value.', name='POST Template')
+            c = Context({'data': request.POST['value']})
+        else:
+            t = Template('Viewing POST page.', name='Empty POST Template')
+            c = Context()
     else:
-        t = Template('Viewing POST page.', name='Empty POST Template')
+        t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()
-        
+    
     return HttpResponse(t.render(c))
     
+def raw_post_view(request):
+    """A view which expects raw XML to be posted and returns content extracted
+    from the XML"""
+    if request.method == 'POST':
+        root = parseString(request.raw_post_data)
+        first_book = root.firstChild.firstChild
+        title, author = [n.firstChild.nodeValue for n in first_book.childNodes]
+        t = Template("{{ title }} - {{ author }}", name="Book template")
+        c = Context({"title": title, "author": author})
+    else:
+        t = Template("GET request.", name="Book GET template")
+        c = Context()
+
+    return HttpResponse(t.render(c))
+
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client/get_view/')

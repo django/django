@@ -104,12 +104,12 @@ class RelatedObject(object):
                 attr = getattr(manipulator.original_object, self.get_accessor_name())
                 count = attr.count()
                 count += self.field.rel.num_extra_on_change
-                if self.field.rel.min_num_in_admin:
-                    count = max(count, self.field.rel.min_num_in_admin)
-                if self.field.rel.max_num_in_admin:
-                    count = min(count, self.field.rel.max_num_in_admin)
             else:
                 count = self.field.rel.num_in_admin
+            if self.field.rel.min_num_in_admin:
+                count = max(count, self.field.rel.min_num_in_admin)
+            if self.field.rel.max_num_in_admin:
+                count = min(count, self.field.rel.max_num_in_admin)
         else:
             count = 1
 

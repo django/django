@@ -1177,6 +1177,11 @@ createcachetable.args = "[tablename]"
 
 def run_shell(use_plain=False):
     "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
+    # XXX: (Temporary) workaround for ticket #1796: force early loading of all
+    # models from installed apps.
+    from django.db.models.loading import get_models
+    loaded_models = get_models()
+
     try:
         if use_plain:
             # Don't bother loading IPython, because the user wants plain Python.

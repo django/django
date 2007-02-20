@@ -81,6 +81,14 @@ class TextInput(Input):
 class PasswordInput(Input):
     input_type = 'password'
 
+    def __init__(self, attrs=None, render_value=True):
+        self.attrs = attrs or {}
+        self.render_value = render_value
+
+    def render(self, name, value, attrs=None):
+        if not self.render_value: value=None
+        return super(PasswordInput, self).render(name, value, attrs)
+
 class HiddenInput(Input):
     input_type = 'hidden'
     is_hidden = True
