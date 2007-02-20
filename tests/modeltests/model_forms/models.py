@@ -40,9 +40,16 @@ class Writer(models.Model):
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateField()
+    created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
+
+    def save(self):
+        import datetime
+        if not self.id:
+            self.created = datetime.date.today()
+        return super(Article, self).save()
 
     def __str__(self):
         return self.headline

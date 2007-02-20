@@ -34,7 +34,7 @@ def save_instance(form, instance, commit=True):
         raise ValueError("The %s could not be changed because the data didn't validate." % opts.object_name)
     clean_data = form.clean_data
     for f in opts.fields:
-        if isinstance(f, models.AutoField):
+        if not f.editable or isinstance(f, models.AutoField):
             continue
         setattr(instance, f.name, clean_data[f.name])
     if commit:
@@ -66,6 +66,8 @@ def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfiel
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
         formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
@@ -87,6 +89,8 @@ def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kw
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
         current_value = f.value_from_object(instance)
         formfield = formfield_callback(f, initial=current_value)
         if formfield:
@@ -97,7 +101,7 @@ def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kw
 
 def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."
-    fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list])
+    fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
 class ModelChoiceField(ChoiceField):
