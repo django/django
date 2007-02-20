@@ -339,8 +339,9 @@ class ChoiceField(Field):
 
     def _set_choices(self, value):
         # Setting choices also sets the choices on the widget.
-        self._choices = value
-        self.widget.choices = value
+        # choices can be any iterable, but we call list() on it because
+        # it will be consumed more than once.
+        self._choices = self.widget.choices = list(value)
 
     choices = property(_get_choices, _set_choices)
 

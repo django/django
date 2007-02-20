@@ -318,6 +318,7 @@ The value is compared to its str():
 </select>
 
 The 'choices' argument can be any iterable:
+>>> from itertools import chain
 >>> def get_choices():
 ...     for i in range(5):
 ...         yield (i, i)
@@ -329,6 +330,17 @@ The 'choices' argument can be any iterable:
 <option value="3">3</option>
 <option value="4">4</option>
 </select>
+>>> things = ({'id': 1, 'name': 'And Boom'}, {'id': 2, 'name': 'One More Thing!'})
+>>> class SomeForm(Form):
+...     somechoice = ChoiceField(choices=chain((('', '-'*9),), [(thing['id'], thing['name']) for thing in things]))
+>>> f = SomeForm()
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f = SomeForm({'somechoice': 2})
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="">---------</option>\n<option value="1">And Boom</option>\n<option value="2" selected="selected">One More Thing!</option>\n</select></td></tr>'
 
 You can also pass 'choices' to the constructor:
 >>> w = Select(choices=[(1, 1), (2, 2), (3, 3)])
