@@ -4,8 +4,11 @@ and database field objects.
 """
 
 from forms import BaseForm, DeclarativeFieldsMetaclass, SortedDictFromList
+from fields import ChoiceField, MultipleChoiceField
+from widgets import Select, SelectMultiple
 
-__all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields')
+__all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
+           'ModelChoiceField', 'ModelMultipleChoiceField')
 
 def model_save(self, commit=True):
     """
@@ -33,7 +36,7 @@ def save_instance(form, instance, commit=True):
     for f in opts.fields:
         if isinstance(f, models.AutoField):
             continue
-        setattr(instance, f.attname, clean_data[f.name])
+        setattr(instance, f.name, clean_data[f.name])
     if commit:
         instance.save()
         for f in opts.many_to_many:
@@ -96,3 +99,34 @@ def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."
     fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
+
+class ModelChoiceField(ChoiceField):
+    "A ChoiceField whose choices are a model QuerySet."
+    def __init__(self, queryset, empty_label=u"---------", **kwargs):
+        self.model = queryset.model
+        choices = [(obj._get_pk_val(), str(obj)) for obj in queryset]
+        if empty_label is not None:
+            choices = [(u"", empty_label)] + choices
+        ChoiceField.__init__(self, choices=choices, **kwargs)
+
+    def clean(self, value):
+        value = ChoiceField.clean(self, value)
+        if not value:
+            return None
+        try:
+            value = self.model._default_manager.get(pk=value)
+        except self.model.DoesNotExist:
+            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+        return value
+
+class ModelMultipleChoiceField(MultipleChoiceField):
+    "A MultipleChoiceField whose choices are a model QuerySet."
+    def __init__(self, queryset, **kwargs):
+        self.model = queryset.model
+        MultipleChoiceField.__init__(self, choices=[(obj._get_pk_val(), str(obj)) for obj in queryset], **kwargs)
+
+    def clean(self, value):
+        value = MultipleChoiceField.clean(self, value)
+        if not value:
+            return []
+        return self.model._default_manager.filter(pk__in=value)

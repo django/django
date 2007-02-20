@@ -281,4 +281,86 @@ existing Category instance.
 <Category: Third>
 >>> Category.objects.get(id=3)
 <Category: Third>
+
+# ModelChoiceField ############################################################
+
+>>> from django.newforms import ModelChoiceField, ModelMultipleChoiceField
+
+>>> f = ModelChoiceField(Category.objects.all())
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(0)
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+>>> f.clean(3)
+<Category: Third>
+>>> f.clean(2)
+<Category: It's a test>
+
+>>> f = ModelChoiceField(Category.objects.filter(pk=1), required=False)
+>>> print f.clean('')
+None
+>>> f.clean('')
+>>> f.clean('1')
+<Category: Entertainment>
+>>> f.clean('2')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+
+# ModelMultipleChoiceField ####################################################
+
+>>> f = ModelMultipleChoiceField(Category.objects.all())
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean([])
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean([1])
+[<Category: Entertainment>]
+>>> f.clean([2])
+[<Category: It's a test>]
+>>> f.clean(['1'])
+[<Category: Entertainment>]
+>>> f.clean(['1', '2'])
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean([1, '2'])
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean((1, '2'))
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean(['nonexistent'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. nonexistent is not one of the available choices.']
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f = ModelMultipleChoiceField(Category.objects.all(), required=False)
+>>> f.clean([])
+[]
+>>> f.clean(())
+[]
+>>> f.clean(['4'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
+>>> f.clean(['3', '4'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
+>>> f.clean(['1', '5'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 5 is not one of the available choices.']
 """}
