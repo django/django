@@ -3,7 +3,7 @@ USA-specific Form helpers
 """
 
 from django.newforms import ValidationError
-from django.newforms.fields import Field, RegexField, EMPTY_VALUES
+from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.translation import gettext
 
 class USZipCodeField(RegexField):
@@ -34,3 +34,11 @@ class USStateField(Field):
             except KeyError:
                 pass
         raise ValidationError(u'Enter a U.S. state or territory.')
+
+class USStateSelect(Select):
+    """
+    A Select widget that uses a list of U.S. states/territories as its choices.
+    """
+    def __init__(self, attrs=None):
+        from us_states import STATE_CHOICES # relative import
+        super(USStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
