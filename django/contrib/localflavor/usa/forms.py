@@ -18,10 +18,6 @@ class USZipCodeField(RegexField):
             *args, **kwargs)
 
 class USPhoneNumberField(Field):
-    def __init__(self, allow_letters=True, *args, **kwargs):
-        self.allow_letters = allow_letters
-        super(USPhoneNumberField, self).__init__(*args, **kwargs)
-
     def clean(self, value):
         super(USPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
