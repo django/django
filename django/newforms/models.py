@@ -139,7 +139,11 @@ class ModelChoiceField(ChoiceField):
         if hasattr(self, '_choices'):
             return self._choices
         # Otherwise, execute the QuerySet in self.queryset to determine the
-        # choices dynamically.
+        # choices dynamically. Return a fresh QuerySetIterator that has not
+        # been consumed. Note that we're instantiating a new QuerySetIterator
+        # *each* time _get_choices() is called (and, thus, each time
+        # self.choices is accessed) so that we can ensure the QuerySet has not
+        # been consumed.
         return QuerySetIterator(self.queryset, self.empty_label, self.cache_choices)
 
     def _set_choices(self, value):
