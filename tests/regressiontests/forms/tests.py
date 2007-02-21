@@ -2011,6 +2011,19 @@ For a form with a <select>, use ChoiceField:
 <option value="J">Java</option>
 </select>
 
+A subtlety: If one of the choices' value is the empty string and the form is
+unbound, then the <option> for the empty-string choice will get selected="selected".
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('', '------'), ('P', 'Python'), ('J', 'Java')])
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select name="language">
+<option value="" selected="selected">------</option>
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+
 You can specify widget attributes in the Widget constructor.
 >>> class FrameworkForm(Form):
 ...     name = CharField()
