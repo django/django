@@ -3,9 +3,11 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
+from django.utils.translation import gettext
+from util import ValidationError
 from forms import BaseForm, DeclarativeFieldsMetaclass, SortedDictFromList
-from fields import ChoiceField, MultipleChoiceField
-from widgets import Select, SelectMultiple
+from fields import Field, ChoiceField
+from widgets import Select, SelectMultiple, MultipleHiddenInput
 
 __all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
            'ModelChoiceField', 'ModelMultipleChoiceField')
@@ -104,33 +106,81 @@ def form_for_fields(field_list):
     fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
+class QuerySetIterator(object):
+    def __init__(self, queryset, empty_label, cache_choices):
+        self.queryset, self.empty_label, self.cache_choices = queryset, empty_label, cache_choices
+
+    def __iter__(self):
+        if self.empty_label is not None:
+            yield (u"", self.empty_label)
+        for obj in self.queryset:
+            yield (obj._get_pk_val(), str(obj))
+        # Clear the QuerySet cache if required.
+        if not self.cache_choices:
+            self.queryset._result_cache = None
+
 class ModelChoiceField(ChoiceField):
     "A ChoiceField whose choices are a model QuerySet."
-    def __init__(self, queryset, empty_label=u"---------", **kwargs):
-        self.model = queryset.model
-        choices = [(obj._get_pk_val(), str(obj)) for obj in queryset]
-        if empty_label is not None:
-            choices = [(u"", empty_label)] + choices
-        ChoiceField.__init__(self, choices=choices, **kwargs)
+    # This class is a subclass of ChoiceField for purity, but it doesn't
+    # actually use any of ChoiceField's implementation.
+    def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+            required=True, widget=Select, label=None, initial=None, help_text=None):
+        self.queryset = queryset
+        self.empty_label = empty_label
+        self.cache_choices = cache_choices
+        # Call Field instead of ChoiceField __init__() because we don't need
+        # ChoiceField.__init__().
+        Field.__init__(self, required, widget, label, initial, help_text)
+        self.widget.choices = self.choices
+
+    def _get_choices(self):
+        # If self._choices is set, then somebody must have manually set
+        # the property self.choices. In this case, just return self._choices.
+        if hasattr(self, '_choices'):
+            return self._choices
+        # Otherwise, execute the QuerySet in self.queryset to determine the
+        # choices dynamically.
+        return QuerySetIterator(self.queryset, self.empty_label, self.cache_choices)
+
+    def _set_choices(self, value):
+        # This method is copied from ChoiceField._set_choices(). It's necessary
+        # because property() doesn't allow a subclass to overwrite only
+        # _get_choices without implementing _set_choices.
+        self._choices = self.widget.choices = list(value)
+
+    choices = property(_get_choices, _set_choices)
 
     def clean(self, value):
-        value = ChoiceField.clean(self, value)
-        if not value:
+        Field.clean(self, value)
+        if value in ('', None):
             return None
         try:
-            value = self.model._default_manager.get(pk=value)
-        except self.model.DoesNotExist:
+            value = self.queryset.model._default_manager.get(pk=value)
+        except self.queryset.model.DoesNotExist:
             raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
-class ModelMultipleChoiceField(MultipleChoiceField):
+class ModelMultipleChoiceField(ModelChoiceField):
     "A MultipleChoiceField whose choices are a model QuerySet."
-    def __init__(self, queryset, **kwargs):
-        self.model = queryset.model
-        MultipleChoiceField.__init__(self, choices=[(obj._get_pk_val(), str(obj)) for obj in queryset], **kwargs)
+    hidden_widget = MultipleHiddenInput
+    def __init__(self, queryset, cache_choices=False, required=True,
+            widget=SelectMultiple, label=None, initial=None, help_text=None):
+        super(ModelMultipleChoiceField, self).__init__(queryset, None, cache_choices,
+            required, widget, label, initial, help_text)
 
     def clean(self, value):
-        value = MultipleChoiceField.clean(self, value)
-        if not value:
+        if self.required and not value:
+            raise ValidationError(gettext(u'This field is required.'))
+        elif not self.required and not value:
             return []
-        return self.model._default_manager.filter(pk__in=value)
+        if not isinstance(value, (list, tuple)):
+            raise ValidationError(gettext(u'Enter a list of values.'))
+        final_values = []
+        for val in value:
+            try:
+                obj = self.queryset.model._default_manager.get(pk=val)
+            except self.queryset.model.DoesNotExist:
+                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+            else:
+                final_values.append(obj)
+        return final_values
