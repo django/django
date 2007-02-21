@@ -54,6 +54,13 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
+class PhoneNumber(models.Model):
+    phone = models.PhoneNumberField()
+    description = models.CharField(maxlength=20)
+
+    def __str__(self):
+        return self.phone
+
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model, form_for_instance, save_instance, BaseForm, Form, CharField
 >>> import datetime
@@ -445,4 +452,13 @@ ValidationError: [u'Select a valid choice. 10 is not one of the available choice
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
+
+# PhoneNumberField ############################################################
+
+>>> PhoneNumberForm = form_for_model(PhoneNumber)
+>>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'phone': u'312-555-1212', 'description': u'Assistance'}
 """}
