@@ -3329,6 +3329,75 @@ u''
 >>> f.clean('')
 u''
 
+# USPhoneNumberField ##########################################################
+
+USPhoneNumberField validates that the data is a valid U.S. phone number,
+including the area code. It's normalized to XXX-XXX-XXXX format.
+>>> from django.contrib.localflavor.usa.forms import USPhoneNumberField
+>>> f = USPhoneNumberField()
+>>> f.clean('312-555-1212')
+u'312-555-1212'
+>>> f.clean('3125551212')
+u'312-555-1212'
+>>> f.clean('312 555-1212')
+u'312-555-1212'
+>>> f.clean('(312) 555-1212')
+u'312-555-1212'
+>>> f.clean('312 555 1212')
+u'312-555-1212'
+>>> f.clean('312.555.1212')
+u'312-555-1212'
+>>> f.clean('312.555-1212')
+u'312-555-1212'
+>>> f.clean(' (312) 555.1212 ')
+u'312-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('312-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USPhoneNumberField(required=False)
+>>> f.clean('312-555-1212')
+u'312-555-1212'
+>>> f.clean('3125551212')
+u'312-555-1212'
+>>> f.clean('312 555-1212')
+u'312-555-1212'
+>>> f.clean('(312) 555-1212')
+u'312-555-1212'
+>>> f.clean('312 555 1212')
+u'312-555-1212'
+>>> f.clean('312.555.1212')
+u'312-555-1212'
+>>> f.clean('312.555-1212')
+u'312-555-1212'
+>>> f.clean(' (312) 555.1212 ')
+u'312-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('312-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
 # USStateField ################################################################
 
 USStateField validates that the data is either an abbreviation or name of a
