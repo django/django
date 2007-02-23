@@ -194,7 +194,17 @@ class QuerySet(object):
                 yield obj
 
     def count(self):
-        "Performs a SELECT COUNT() and returns the number of records as an integer."
+        """
+        Performs a SELECT COUNT() and returns the number of records as an
+        integer.
+        
+        If the queryset is already cached (i.e. self._result_cache is set) this
+        simply returns the length of the cached results set to avoid multiple
+        SELECT COUNT(*) calls.
+        """
+        if self._results_cache is not None:
+            return len(self._results_cache)
+            
         counter = self._clone()
         counter._order_by = ()
         counter._select_related = False
