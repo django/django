@@ -202,8 +202,8 @@ class QuerySet(object):
         simply returns the length of the cached results set to avoid multiple
         SELECT COUNT(*) calls.
         """
-        if self._results_cache is not None:
-            return len(self._results_cache)
+        if self._result_cache is not None:
+            return len(self._result_cache)
             
         counter = self._clone()
         counter._order_by = ()
