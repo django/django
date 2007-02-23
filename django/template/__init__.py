@@ -580,6 +580,8 @@ class FilterExpression(object):
     def args_check(name, func, provided):
         provided = list(provided)
         plen = len(provided)
+        # Check to see if a decorator is providing the real function.
+        func = getattr(func, '_decorated_function', func)
         args, varargs, varkw, defaults = getargspec(func)
         # First argument is filter input.
         args.pop(0)
