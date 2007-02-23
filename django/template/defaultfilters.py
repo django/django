@@ -35,10 +35,6 @@ def stringfilter(func):
             args[0] = smart_string(args[0])
         return func(*args, **kwargs)
         
-    # Make sure the internal name is the original function name because this
-    # is the internal name of the filter if passed directly to Library().filter
-    _dec.__name__ = func.__name__
-    
     # Include a reference to the real function (used to check original
     # arguments by the template parser).
     _dec._decorated_function = getattr(func, '_decorated_function', func)
