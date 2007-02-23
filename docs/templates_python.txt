@@ -657,12 +657,14 @@ will use the function's name as the filter name.
 Template filters which expect strings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 If you are writing a template filter which only expects a string as the first
-argument, you should use the included decorator ``to_str`` which will convert
+argument, you should use the included decorator ``stringfilter`` which will convert
 an object to it's string value before being passed to your function::
 
+    from django import template
+
+    @template.stringfilter
     def lower(value):
     	return value.lower()
-    lower = template.to_str(lower)
 
 Writing custom template tags
 ----------------------------
