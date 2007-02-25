@@ -246,10 +246,13 @@ class ModelAdmin(object):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
 
-    def has_change_permission(self, request, object_id):
+    def has_change_permission(self, request, obj):
         """
-        Returns True if the given request has permission to change the object
-        with the given object_id.
+        Returns True if the given request has permission to change the given
+        Django model instance.
+
+        If `obj` is None, this should return True if the given request has
+        permission to change *any* object of the given type.
         """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
@@ -386,16 +389,22 @@ class ModelAdmin(object):
         opts = model._meta
         app_label = opts.app_label
 
-        if not self.has_change_permission(request, object_id):
-            raise PermissionDenied
-
-        if request.POST and request.POST.has_key("_saveasnew"):
-            return self.add_view(request, form_url='../../add/')
-
         try:
             obj = model._default_manager.get(pk=object_id)
         except model.DoesNotExist:
+            # Don't raise Http404 just yet, because we haven't checked
+            # permissions yet. We don't want an unauthenticated user to be able
+            # to determine whether a given object exists.
+            obj = None
+
+        if not self.has_change_permission(request, obj):
+            raise PermissionDenied
+
+        if obj is None:
             raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
+
+        if request.POST and request.POST.has_key("_saveasnew"):
+            return self.add_view(request, form_url='../../add/')
 
         ModelForm = forms.form_for_instance(obj, formfield_callback=self.formfield_for_dbfield)
 
