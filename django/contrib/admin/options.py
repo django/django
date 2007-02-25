@@ -265,11 +265,85 @@ class ModelAdmin(object):
     def change_list_queryset(self, request):
         return self.model._default_manager.get_query_set()
 
-    def add_view(self, request, form_url='', post_url_continue='../%s/'):
+    def save_add(self, request, model, form, post_url_continue):
+        """
+        Saves the object in the "add" stage and returns an HttpResponseRedirect.
+
+        `form` is a bound Form instance that's verified to be valid.
+        """
+        from django.contrib.admin.models import LogEntry, ADDITION
+        from django.contrib.contenttypes.models import ContentType
+        opts = model._meta
+        new_object = form.save(commit=True)
+        pk_value = new_object._get_pk_val()
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
+        msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        # Here, we distinguish between different save types by checking for
+        # the presence of keys in request.POST.
+        if request.POST.has_key("_continue"):
+            request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
+            if request.POST.has_key("_popup"):
+                post_url_continue += "?_popup=1"
+            return HttpResponseRedirect(post_url_continue % pk_value)
+        if request.POST.has_key("_popup"):
+            if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
+                pk_value = '"%s"' % pk_value.replace('"', '\\"')
+            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
+                (pk_value, str(new_object).replace('"', '\\"')))
+        elif request.POST.has_key("_addanother"):
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            return HttpResponseRedirect(request.path)
+        else:
+            request.user.message_set.create(message=msg)
+            return HttpResponseRedirect(post_url)
+
+    def save_change(self, request, model, form):
+        """
+        Saves the object in the "change" stage and returns an HttpResponseRedirect.
+
+        `form` is a bound Form instance that's verified to be valid.
+        """
+        from django.contrib.admin.models import LogEntry, CHANGE
+        from django.contrib.contenttypes.models import ContentType
+        opts = model._meta
+        new_object = form.save(commit=True)
+        pk_value = new_object._get_pk_val()
+
+        # Construct the change message. TODO: Temporarily commented-out,
+        # as manipulator object doesn't exist anymore, and we don't yet
+        # have a way to get fields_added, fields_changed, fields_deleted.
+        change_message = []
+        #if manipulator.fields_added:
+            #change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
+        #if manipulator.fields_changed:
+            #change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
+        #if manipulator.fields_deleted:
+            #change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
+        #change_message = ' '.join(change_message)
+        if not change_message:
+            change_message = _('No fields changed.')
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
+
+        msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+        if request.POST.has_key("_continue"):
+            request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
+            if request.REQUEST.has_key('_popup'):
+                return HttpResponseRedirect(request.path + "?_popup=1")
+            else:
+                return HttpResponseRedirect(request.path)
+        elif request.POST.has_key("_saveasnew"):
+            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+            return HttpResponseRedirect("../%s/" % pk_value)
+        elif request.POST.has_key("_addanother"):
+            request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            return HttpResponseRedirect("../add/")
+        else:
+            request.user.message_set.create(message=msg)
+            return HttpResponseRedirect("../")
+
+    def add_view(self, request, form_url=''):
         "The 'add' admin view for this model."
         from django.contrib.admin.views.main import render_change_form
-        from django.contrib.contenttypes.models import ContentType
-        from django.contrib.admin.models import LogEntry, ADDITION
         model = self.model
         opts = model._meta
         app_label = opts.app_label
@@ -291,30 +365,8 @@ class ModelAdmin(object):
             if opts.has_field_type(models.FileField):
                 new_data.update(request.FILES)
             form = ModelForm(new_data)
-
             if form.is_valid():
-                new_object = form.save(commit=True)
-                pk_value = new_object._get_pk_val()
-                LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
-                msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-                # Here, we distinguish between different save types by checking for
-                # the presence of keys in request.POST.
-                if request.POST.has_key("_continue"):
-                    request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                    if request.POST.has_key("_popup"):
-                        post_url_continue += "?_popup=1"
-                    return HttpResponseRedirect(post_url_continue % pk_value)
-                if request.POST.has_key("_popup"):
-                    if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
-                        pk_value = '"%s"' % pk_value.replace('"', '\\"')
-                    return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                        (pk_value, str(new_object).replace('"', '\\"')))
-                elif request.POST.has_key("_addanother"):
-                    request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                    return HttpResponseRedirect(request.path)
-                else:
-                    request.user.message_set.create(message=msg)
-                    return HttpResponseRedirect(post_url)
+                return self.save_add(request, model, form, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
 
@@ -326,14 +378,11 @@ class ModelAdmin(object):
             'show_delete': False,
             'javascript_imports': self.javascript_add(request),
         })
-
         return render_change_form(self, model, model.AddManipulator(), c, add=True)
 
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
         from django.contrib.admin.views.main import render_change_form
-        from django.contrib.contenttypes.models import ContentType
-        from django.contrib.admin.models import LogEntry, CHANGE
         model = self.model
         opts = model._meta
         app_label = opts.app_label
@@ -358,40 +407,7 @@ class ModelAdmin(object):
             form = ModelForm(new_data)
 
             if form.is_valid():
-                new_object = form.save(commit=True)
-                pk_value = new_object._get_pk_val()
-
-                # Construct the change message. TODO: Temporarily commented-out,
-                # as manipulator object doesn't exist anymore, and we don't yet
-                # have a way to get fields_added, fields_changed, fields_deleted.
-                change_message = []
-                #if manipulator.fields_added:
-                    #change_message.append(_('Added %s.') % get_text_list(manipulator.fields_added, _('and')))
-                #if manipulator.fields_changed:
-                    #change_message.append(_('Changed %s.') % get_text_list(manipulator.fields_changed, _('and')))
-                #if manipulator.fields_deleted:
-                    #change_message.append(_('Deleted %s.') % get_text_list(manipulator.fields_deleted, _('and')))
-                #change_message = ' '.join(change_message)
-                if not change_message:
-                    change_message = _('No fields changed.')
-                LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
-
-                msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-                if request.POST.has_key("_continue"):
-                    request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                    if request.REQUEST.has_key('_popup'):
-                        return HttpResponseRedirect(request.path + "?_popup=1")
-                    else:
-                        return HttpResponseRedirect(request.path)
-                elif request.POST.has_key("_saveasnew"):
-                    request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
-                    return HttpResponseRedirect("../%s/" % pk_value)
-                elif request.POST.has_key("_addanother"):
-                    request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
-                    return HttpResponseRedirect("../add/")
-                else:
-                    request.user.message_set.create(message=msg)
-                    return HttpResponseRedirect("../")
+                return self.save_change(request, model, form)
         else:
             form = ModelForm()
 
