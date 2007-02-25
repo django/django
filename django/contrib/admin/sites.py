@@ -11,7 +11,7 @@ class AdminSite(object):
     def __init__(self):
         self._registry = {} # model_class -> admin_class
 
-    def register(model_or_iterable, admin_class=None, **options):
+    def register(self, model_or_iterable, admin_class=None, **options):
         """
         Registers the given model(s) with the given admin class.
 
@@ -30,7 +30,7 @@ class AdminSite(object):
                 raise AlreadyRegistered('The model %s is already registered' % model.__class__.__name__)
             self._registry[model] = admin_class
 
-    def unregister(model_or_iterable):
+    def unregister(self, model_or_iterable):
         if issubclass(model_or_iterable, Model):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
