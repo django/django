@@ -373,7 +373,6 @@ class ModelAdmin(object):
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
             'adminform': AdminForm(form, self.fieldsets_add(request), self.prepopulated_fields),
-            'oldform': oldforms.FormWrapper(model.AddManipulator(), {}, {}),
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
             'javascript_imports': self.javascript_add(request),
@@ -428,7 +427,6 @@ class ModelAdmin(object):
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
             'adminform': AdminForm(form, self.fieldsets_change(request, object_id), self.prepopulated_fields),
-            'oldform': oldforms.FormWrapper(model.ChangeManipulator(object_id), {}, {}),
             'object_id': object_id,
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),

@@ -91,54 +91,6 @@ class FormFieldCollectionWrapper(object):
                              for field in self.fields]
         self.index = index
 
-class TabularBoundRelatedObject(BoundRelatedObject):
-    def __init__(self, related_object, field_mapping, original):
-        super(TabularBoundRelatedObject, self).__init__(related_object, field_mapping, original)
-        self.field_wrapper_list = [FieldWrapper(field) for field in self.relation.editable_fields()]
-
-        fields = self.relation.editable_fields()
-
-        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping, fields, i)
-                                               for (i,field_mapping) in self.field_mappings.items() ]
-        self.original_row_needed = max([fw.use_raw_id_admin() for fw in self.field_wrapper_list])
-        self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
-
-    def template_name(self):
-        return "admin/edit_inline_tabular.html"
-
-class StackedBoundRelatedObject(BoundRelatedObject):
-    def __init__(self, related_object, field_mapping, original):
-        super(StackedBoundRelatedObject, self).__init__(related_object, field_mapping, original)
-        fields = self.relation.editable_fields()
-        self.field_mappings.fill()
-        self.form_field_collection_wrappers = [FormFieldCollectionWrapper(field_mapping ,fields, i)
-                                               for (i,field_mapping) in self.field_mappings.items()]
-        self.show_url = original and hasattr(self.relation.opts, 'get_absolute_url')
-
-    def template_name(self):
-        return "admin/edit_inline_stacked.html"
-
-class EditInlineNode(template.Node):
-    def __init__(self, rel_var):
-        self.rel_var = rel_var
-
-    def render(self, context):
-        relation = template.resolve_variable(self.rel_var, context)
-        context.push()
-        if relation.field.rel.edit_inline == models.TABULAR:
-            bound_related_object_class = TabularBoundRelatedObject
-        elif relation.field.rel.edit_inline == models.STACKED:
-            bound_related_object_class = StackedBoundRelatedObject
-        else:
-            bound_related_object_class = relation.field.rel.edit_inline
-        original = context.get('original', None)
-        bound_related_object = relation.bind(context['oldform'], original, bound_related_object_class)
-        context['bound_related_object'] = bound_related_object
-        t = loader.get_template(bound_related_object.template_name())
-        output = t.render(context)
-        context.pop()
-        return output
-
 def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
@@ -149,10 +101,3 @@ def field_widget(parser, token):
         raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
     return FieldWidgetNode(bits[1])
 field_widget = register.tag(field_widget)
-
-def edit_inline(parser, token):
-    bits = token.contents.split()
-    if len(bits) != 2:
-        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
-    return EditInlineNode(bits[1])
-edit_inline = register.tag(edit_inline)

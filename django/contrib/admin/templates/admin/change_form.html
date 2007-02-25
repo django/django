@@ -63,18 +63,6 @@
 
 {% block after_field_sets %}{% endblock %}
 
-{% if change %}
-   {% if ordered_objects %}
-   <fieldset class="module"><h2>{% trans "Ordering" %}</h2>
-   <div class="form-row{% if oldform.order_.errors %} error{% endif %} ">
-   {% if oldform.order_.errors %}{{ oldform.order_.html_error_list }}{% endif %}
-   <p><label for="id_order_">{% trans "Order:" %}</label> {{ oldform.order_ }}</p>
-   </div></fieldset>
-   {% endif %}
-{% endif %}
-
-{% for related_object in inline_related_objects %}{% edit_inline related_object %}{% endfor %}
-
 {% block after_related_objects %}{% endblock %}
 
 {% submit_row %}
