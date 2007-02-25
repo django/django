@@ -338,14 +338,6 @@ instead of a ``BooleanField`` with ``null=True``.
 
 The admin represents this as a ``<select>`` box with "Unknown", "Yes" and "No" choices.
 
-``PasswordField``
-~~~~~~~~~~~~~~~~~  
-
-A ``PasswordField`` is like a ``TextField`` but the difference is that the
-characters that are entered are masked, typically by asterisks (*). Also note
-that even though this is a password field the data is sent as clear text to
-the server. Additional measures are needed to ensure data safety.
-
 ``PhoneNumberField``
 ~~~~~~~~~~~~~~~~~~~~
 
