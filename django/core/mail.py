@@ -3,7 +3,8 @@
 from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
-import smtplib, rfc822
+from email.Utils import formatdate
+import smtplib
 import socket
 import time
 import random
@@ -65,7 +66,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
-        msg['Date'] = rfc822.formatdate()
+        msg['Date'] = formatdate()
         try:
             random_bits = str(random.getrandbits(64))
         except AttributeError: # Python 2.3 doesn't have random.getrandbits().
