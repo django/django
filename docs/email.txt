@@ -34,8 +34,8 @@ The simplest way to send e-mail is using the function
 ``django.core.mail.send_mail()``. Here's its definition::
 
     send_mail(subject, message, from_email, recipient_list,
-        fail_silently=False, auth_user=EMAIL_HOST_USER,
-        auth_password=EMAIL_HOST_PASSWORD)
+        fail_silently=False, auth_user=None,
+        auth_password=None)
 
 The ``subject``, ``message``, ``from_email`` and ``recipient_list`` parameters
 are required.
@@ -65,7 +65,7 @@ send_mass_mail()
 Here's the definition::
 
     send_mass_mail(datatuple, fail_silently=False,
-        auth_user=EMAIL_HOST_USER, auth_password=EMAIL_HOST_PASSWORD):
+        auth_user=None, auth_password=None):
 
 ``datatuple`` is a tuple in which each element is in this format::
 

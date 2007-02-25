@@ -3,7 +3,8 @@
 from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
-import smtplib, rfc822
+from email.Utils import formatdate
+import smtplib
 import socket
 import time
 import random
@@ -33,21 +34,34 @@ class SafeMIMEText(MIMEText):
             val = Header(val, settings.DEFAULT_CHARSET)
         MIMEText.__setitem__(self, name, val)
 
-def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=settings.EMAIL_HOST_USER, auth_password=settings.EMAIL_HOST_PASSWORD):
+def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None):
     """
     Easy wrapper for sending a single message to a recipient list. All members
     of the recipient list will see the other recipients in the 'To' field.
+
+    If auth_user is None, the EMAIL_HOST_USER setting is used.
+    If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
     """
+    if auth_user is None:
+        auth_user = settings.EMAIL_HOST_USER
+    if auth_password is None:
+        auth_password = settings.EMAIL_HOST_PASSWORD
     return send_mass_mail([[subject, message, from_email, recipient_list]], fail_silently, auth_user, auth_password)
 
-def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST_USER, auth_password=settings.EMAIL_HOST_PASSWORD):
+def send_mass_mail(datatuple, fail_silently=False, auth_user=None, auth_password=None):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), sends
     each message to each recipient list. Returns the number of e-mails sent.
 
     If from_email is None, the DEFAULT_FROM_EMAIL setting is used.
     If auth_user and auth_password are set, they're used to log in.
+    If auth_user is None, the EMAIL_HOST_USER setting is used.
+    If auth_password is None, the EMAIL_HOST_PASSWORD setting is used.
     """
+    if auth_user is None:
+        auth_user = settings.EMAIL_HOST_USER
+    if auth_password is None:
+        auth_password = settings.EMAIL_HOST_PASSWORD
     try:
         server = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
         if auth_user and auth_password:
@@ -65,7 +79,7 @@ def send_mass_mail(datatuple, fail_silently=False, auth_user=settings.EMAIL_HOST
         msg['Subject'] = subject
         msg['From'] = from_email
         msg['To'] = ', '.join(recipient_list)
-        msg['Date'] = rfc822.formatdate()
+        msg['Date'] = formatdate()
         try:
             random_bits = str(random.getrandbits(64))
         except AttributeError: # Python 2.3 doesn't have random.getrandbits().

@@ -28,7 +28,9 @@ class DatabaseWrapper(local):
 
     def cursor(self):
         from django.conf import settings
+        set_tz = False
         if self.connection is None:
+            set_tz = True
             if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
                 raise ImproperlyConfigured, "You need to specify DATABASE_NAME in your Django settings file."
@@ -45,7 +47,8 @@ class DatabaseWrapper(local):
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
-        cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+        if set_tz:
+            cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
