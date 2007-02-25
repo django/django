@@ -813,13 +813,13 @@ The  ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
 
     class MyBackend:
-        def authenticate(username=None, password=None):
+        def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
     class MyBackend:
-        def authenticate(token=None):
+        def authenticate(self, token=None):
             # Check the token and return a User.
 
 Either way, ``authenticate`` should check the credentials it gets, and it
