@@ -146,6 +146,9 @@ class ModelAdmin(object):
     def javascript(self, request, fieldsets):
         """
         Returns a list of URLs to include via <script> statements.
+
+        The URLs can be absolute ('/js/admin/') or explicit
+        ('http://example.com/foo.js').
         """
         from django.conf import settings
         js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
@@ -169,8 +172,8 @@ class ModelAdmin(object):
     def javascript_add(self, request):
         return self.javascript(request, self.fieldsets_add(request))
 
-    def javascript_change(self, request, object_id):
-        return self.javascript(request, self.fieldsets_change(request, object_id))
+    def javascript_change(self, request, obj):
+        return self.javascript(request, self.fieldsets_change(request, obj))
 
     def fieldsets(self, request):
         """
@@ -193,7 +196,7 @@ class ModelAdmin(object):
         for fs in self.fieldsets(request):
             yield fs
 
-    def fieldsets_change(self, request, object_id):
+    def fieldsets_change(self, request, obj):
         "Hook for specifying Fieldsets for the change form."
         for fs in self.fieldsets(request):
             yield fs
@@ -257,10 +260,13 @@ class ModelAdmin(object):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
 
-    def has_delete_permission(self, request, object_id):
+    def has_delete_permission(self, request, obj):
         """
-        Returns True if the given request has permission to change the object
-        with the given object_id.
+        Returns True if the given request has permission to change the given
+        Django model instance.
+
+        If `obj` is None, this should return True if the given request has
+        permission to delete *any* object of the given type.
         """
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
@@ -435,11 +441,11 @@ class ModelAdmin(object):
 
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
-            'adminform': AdminForm(form, self.fieldsets_change(request, object_id), self.prepopulated_fields),
+            'adminform': AdminForm(form, self.fieldsets_change(request, obj), self.prepopulated_fields),
             'object_id': object_id,
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
-            'javascript_imports': self.javascript_change(request, object_id),
+            'javascript_imports': self.javascript_change(request, obj),
         })
         return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
 
@@ -478,9 +484,20 @@ class ModelAdmin(object):
         from django.contrib.admin.models import LogEntry, DELETION
         opts = self.model._meta
         app_label = opts.app_label
-        if not self.has_delete_permission(request, object_id):
+
+        try:
+            obj = self.model._default_manager.get(pk=object_id)
+        except self.model.DoesNotExist:
+            # Don't raise Http404 just yet, because we haven't checked
+            # permissions yet. We don't want an unauthenticated user to be able
+            # to determine whether a given object exists.
+            obj = None
+
+        if not self.has_delete_permission(request, obj):
             raise PermissionDenied
-        obj = get_object_or_404(self.model, pk=object_id)
+
+        if obj is None:
+            raise Http404('%s object with primary key %r does not exist.' % (opts.verbose_name, escape(object_id)))
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
