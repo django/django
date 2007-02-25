@@ -271,8 +271,26 @@ class ModelAdmin(object):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
 
-    def change_list_queryset(self, request):
+    def queryset(self, request):
+        """
+        Returns a QuerySet of all model instances that can be edited by the
+        admin site.
+        """
         return self.model._default_manager.get_query_set()
+
+    def queryset_add(self, request):
+        """
+        Returns a QuerySet of all model instances that can be edited by the
+        admin site in the "add" stage.
+        """
+        return self.queryset()
+
+    def queryset_change(self, request):
+        """
+        Returns a QuerySet of all model instances that can be edited by the
+        admin site in the "change" stage.
+        """
+        return self.queryset()
 
     def save_add(self, request, model, form, post_url_continue):
         """

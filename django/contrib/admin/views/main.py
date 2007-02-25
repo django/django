@@ -229,7 +229,7 @@ class ChangeList(object):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
-        self.root_query_set = model_admin.change_list_queryset(request)
+        self.root_query_set = model_admin.queryset_change(request)
         self.list_display = list_display
         self.list_display_links = list_display_links
         self.list_filter = list_filter
