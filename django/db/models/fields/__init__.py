@@ -750,6 +750,12 @@ class PhoneNumberField(IntegerField):
     def validate(self, field_data, all_data):
         validators.isValidPhone(field_data, all_data)
 
+    def formfield(self, **kwargs):
+        from django.contrib.localflavor.usa.forms import USPhoneNumberField
+        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults.update(kwargs)
+        return USPhoneNumberField(**defaults)
+
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveIntegerField]

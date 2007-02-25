@@ -318,6 +318,7 @@ The value is compared to its str():
 </select>
 
 The 'choices' argument can be any iterable:
+>>> from itertools import chain
 >>> def get_choices():
 ...     for i in range(5):
 ...         yield (i, i)
@@ -329,6 +330,17 @@ The 'choices' argument can be any iterable:
 <option value="3">3</option>
 <option value="4">4</option>
 </select>
+>>> things = ({'id': 1, 'name': 'And Boom'}, {'id': 2, 'name': 'One More Thing!'})
+>>> class SomeForm(Form):
+...     somechoice = ChoiceField(choices=chain((('', '-'*9),), [(thing['id'], thing['name']) for thing in things]))
+>>> f = SomeForm()
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f = SomeForm({'somechoice': 2})
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="">---------</option>\n<option value="1">And Boom</option>\n<option value="2" selected="selected">One More Thing!</option>\n</select></td></tr>'
 
 You can also pass 'choices' to the constructor:
 >>> w = Select(choices=[(1, 1), (2, 2), (3, 3)])
@@ -1999,6 +2011,19 @@ For a form with a <select>, use ChoiceField:
 <option value="J">Java</option>
 </select>
 
+A subtlety: If one of the choices' value is the empty string and the form is
+unbound, then the <option> for the empty-string choice will get selected="selected".
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('', '------'), ('P', 'Python'), ('J', 'Java')])
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select name="language">
+<option value="" selected="selected">------</option>
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+
 You can specify widget attributes in the Widget constructor.
 >>> class FrameworkForm(Form):
 ...     name = CharField()
@@ -3299,6 +3324,75 @@ ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a zip code in the format XXXXX or XXXXX-XXXX.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# USPhoneNumberField ##########################################################
+
+USPhoneNumberField validates that the data is a valid U.S. phone number,
+including the area code. It's normalized to XXX-XXX-XXXX format.
+>>> from django.contrib.localflavor.usa.forms import USPhoneNumberField
+>>> f = USPhoneNumberField()
+>>> f.clean('312-555-1212')
+u'312-555-1212'
+>>> f.clean('3125551212')
+u'312-555-1212'
+>>> f.clean('312 555-1212')
+u'312-555-1212'
+>>> f.clean('(312) 555-1212')
+u'312-555-1212'
+>>> f.clean('312 555 1212')
+u'312-555-1212'
+>>> f.clean('312.555.1212')
+u'312-555-1212'
+>>> f.clean('312.555-1212')
+u'312-555-1212'
+>>> f.clean(' (312) 555.1212 ')
+u'312-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('312-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = USPhoneNumberField(required=False)
+>>> f.clean('312-555-1212')
+u'312-555-1212'
+>>> f.clean('3125551212')
+u'312-555-1212'
+>>> f.clean('312 555-1212')
+u'312-555-1212'
+>>> f.clean('(312) 555-1212')
+u'312-555-1212'
+>>> f.clean('312 555 1212')
+u'312-555-1212'
+>>> f.clean('312.555.1212')
+u'312-555-1212'
+>>> f.clean('312.555-1212')
+u'312-555-1212'
+>>> f.clean(' (312) 555.1212 ')
+u'312-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('312-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
 >>> f.clean(None)
 u''
 >>> f.clean('')

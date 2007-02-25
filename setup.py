@@ -28,7 +28,7 @@ for dirpath, dirnames, filenames in os.walk(django_dir):
 
 # Small hack for working with bdist_wininst.
 # See http://mail.python.org/pipermail/distutils-sig/2004-August/004134.html
-if sys.argv[1] == 'bdist_wininst':
+if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
     for file_info in data_files:
         file_info[0] = '/PURELIB/%s' % file_info[0]
 

@@ -388,7 +388,53 @@ False
 >>> phone2numeric('0800 flowers')
 '0800 3569377'
 
-
+# Filters shouldn't break if passed non-strings
+>>> addslashes(123)
+'123'
+>>> linenumbers(123)
+'1. 123'
+>>> lower(123)
+'123'
+>>> make_list(123)
+['1', '2', '3']
+>>> slugify(123)
+'123'
+>>> title(123)
+'123'
+>>> truncatewords(123, 2)
+'123'
+>>> upper(123)
+'123'
+>>> urlencode(123)
+'123'
+>>> urlize(123)
+'123'
+>>> urlizetrunc(123, 1)
+'123'
+>>> wordcount(123)
+1
+>>> wordwrap(123, 2)
+'123'
+>>> ljust('123', 4)
+'123 '
+>>> rjust('123', 4)
+' 123'
+>>> center('123', 5)
+' 123 '
+>>> center('123', 6)
+' 123  '
+>>> cut(123, '2')
+'13'
+>>> escape(123)
+'123'
+>>> linebreaks(123)
+'<p>123</p>'
+>>> linebreaksbr(123)
+'123'
+>>> removetags(123, 'a')
+'123'
+>>> striptags(123)
+'123'
 
 """
 

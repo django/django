@@ -654,6 +654,18 @@ decorator instead::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
+Template filters which expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are writing a template filter which only expects a string as the first
+argument, you should use the included decorator ``stringfilter`` which will convert
+an object to it's string value before being passed to your function::
+
+    from django import template
+
+    @template.stringfilter
+    def lower(value):
+    	return value.lower()
+
 Writing custom template tags
 ----------------------------
 

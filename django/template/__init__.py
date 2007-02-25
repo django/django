@@ -580,6 +580,8 @@ class FilterExpression(object):
     def args_check(name, func, provided):
         provided = list(provided)
         plen = len(provided)
+        # Check to see if a decorator is providing the real function.
+        func = getattr(func, '_decorated_function', func)
         args, varargs, varkw, defaults = getargspec(func)
         # First argument is filter input.
         args.pop(0)
@@ -812,7 +814,7 @@ class Library(object):
             raise InvalidTemplateLibrary, "Unsupported arguments to Library.tag: (%r, %r)", (name, compile_function)
 
     def tag_function(self,func):
-        self.tags[func.__name__] = func
+        self.tags[getattr(func, "_decorated_function", func).__name__] = func
         return func
 
     def filter(self, name=None, filter_func=None):
@@ -836,7 +838,7 @@ class Library(object):
             raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r)", (name, filter_func)
 
     def filter_function(self, func):
-        self.filters[func.__name__] = func
+        self.filters[getattr(func, "_decorated_function", func).__name__] = func
         return func
 
     def simple_tag(self,func):
@@ -850,9 +852,9 @@ class Library(object):
                 resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
                 return func(*resolved_vars)
 
-        compile_func = curry(generic_tag_compiler, params, defaults, func.__name__, SimpleNode)
+        compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, SimpleNode)
         compile_func.__doc__ = func.__doc__
-        self.tag(func.__name__, compile_func)
+        self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
         return func
 
     def inclusion_tag(self, file_name, context_class=Context, takes_context=False):
@@ -886,9 +888,9 @@ class Library(object):
                         self.nodelist = t.nodelist
                     return self.nodelist.render(context_class(dict))
 
-            compile_func = curry(generic_tag_compiler, params, defaults, func.__name__, InclusionNode)
+            compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
             compile_func.__doc__ = func.__doc__
-            self.tag(func.__name__, compile_func)
+            self.tag(getattr(func, "_decorated_function", func).__name__, compile_func)
             return func
         return dec
 
