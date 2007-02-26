@@ -197,6 +197,10 @@ of (Full name, e-mail address). Example::
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
 
+Note that Django will email all of these people when there's an error, see the
+section on `error-reporting via email`_ for more information.
+
+
 ALLOWED_INCLUDE_ROOTS
 ---------------------
 
@@ -414,7 +418,7 @@ IGNORABLE_404_ENDS
 
 Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
 
-See also ``IGNORABLE_404_STARTS``.
+See also ``IGNORABLE_404_STARTS`` and ``Django Error-reporting via Email``
 
 IGNORABLE_404_STARTS
 --------------------
@@ -422,7 +426,8 @@ IGNORABLE_404_STARTS
 Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
 A tuple of strings that specify beginnings of URLs that should be ignored by
-the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
+the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
+the section on `error-reporting via email`_.
 
 INSTALLED_APPS
 --------------
@@ -636,8 +641,8 @@ Default: ``False``
 Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see the
-`middleware docs`_). See also ``IGNORABLE_404_STARTS`` and
-``IGNORABLE_404_ENDS``.
+`middleware docs`_). See also ``IGNORABLE_404_STARTS``,
+``IGNORABLE_404_ENDS`` and the section on `error-reporting via email`_
 
 SERVER_EMAIL
 ------------
@@ -977,3 +982,24 @@ Also, it's an error to call ``configure()`` more than once, or to call
 
 It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
+
+Error-reporting via email
+=========================
+
+When ``DEBUG`` mode is turned off, Django will email the users listed in the
+``ADMIN`` setting whenever a server error occurs. This is most commonly when a
+resource is not found (404 errors), or when there's been an internal server
+error (500). This gives the administrators immediate notification of any errors.
+
+You can tell Django to stop reporting these 404's by adding the page to the
+``IGNORABLE_404_ENDS`` setting:
+
+    IGNORABLE_404_ENDS = ('xmlhttp.php')
+
+Or, you can ignore it using the start of the request path, by using the
+``IGNORABLE_404_STARTS`` setting:
+
+    IGNORABLE_404_STARTS = ('/phpmyadmin/')
+
+Finally, if you wish to turn off this email reporting completely, just remove
+all entries from the ``ADMINS`` setting.
