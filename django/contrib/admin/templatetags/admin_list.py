@@ -84,22 +84,31 @@ def result_headers(cl):
                     header = attr.short_description
                 except AttributeError:
                     header = field_name.replace('_', ' ')
-            # Non-field list_display values don't get ordering capability.
-            yield {"text": header}
+
+            # It is a non-field, but perhaps one that is sortable
+            if not getattr(getattr(cl.model, field_name), "admin_order_field", None):
+                yield {"text": header}
+                continue
+
+            # So this _is_ a sortable non-field.  Go to the yield
+            # after the else clause.
         else:
             if isinstance(f.rel, models.ManyToOneRel) and f.null:
                 yield {"text": f.verbose_name}
+                continue
             else:
-                th_classes = []
-                new_order_type = 'asc'
-                if field_name == cl.order_field:
-                    th_classes.append('sorted %sending' % cl.order_type.lower())
-                    new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
+                header = f.verbose_name
 
-                yield {"text": f.verbose_name,
-                       "sortable": True,
-                       "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-                       "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
+        th_classes = []
+        new_order_type = 'asc'
+        if field_name == cl.order_field:
+            th_classes.append('sorted %sending' % cl.order_type.lower())
+            new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
+
+        yield {"text": header,
+               "sortable": True,
+               "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
+               "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}

@@ -417,7 +417,10 @@ failed::
 
     FAILED (failures=1)
 
-When the tests have all been executed, the test database is destroyed.
+The return code for the script will indicate the number of tests that failed.
+
+Regardless of whether the tests pass or fail, the test database is destroyed when
+all the tests have been executed. 
 
 Using a different testing framework
 ===================================
@@ -428,7 +431,8 @@ it does provide a mechanism to allow you to invoke tests constructed for
 an alternative framework as if they were normal Django tests.
 
 When you run ``./manage.py test``, Django looks at the ``TEST_RUNNER``
-setting to determine what to do. By default, ``TEST_RUNNER`` points to ``django.test.simple.run_tests``. This method defines the default Django
+setting to determine what to do. By default, ``TEST_RUNNER`` points to 
+``django.test.simple.run_tests``. This method defines the default Django
 testing behavior. This behavior involves:
 
 #. Performing global pre-test setup
@@ -436,7 +440,7 @@ testing behavior. This behavior involves:
 #. Running ``syncdb`` to install models and initial data into the test database
 #. Looking for Unit Tests and Doctests in ``models.py`` and ``tests.py`` file for each installed application
 #. Running the Unit Tests and Doctests that are found
-#. Destroying the test database.
+#. Destroying the test database
 #. Performing global post-test teardown
 
 If you define your own test runner method and point ``TEST_RUNNER``
@@ -457,6 +461,8 @@ arguments:
     Verbosity determines the amount of notification and debug information that
     will be printed to the console; `0` is no output, `1` is normal output,
     and `2` is verbose output.
+    
+    This method should return the number of tests that failed.
 
 Testing utilities
 -----------------

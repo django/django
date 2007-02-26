@@ -124,7 +124,9 @@ def django_tests(verbosity, tests_to_run):
 
     # Run the test suite, including the extra validation tests.
     from django.test.simple import run_tests
-    run_tests(test_models, verbosity, extra_tests=extra_tests)
+    failures = run_tests(test_models, verbosity, extra_tests=extra_tests)
+    if failures:
+        sys.exit(failures)
 
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps

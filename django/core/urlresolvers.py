@@ -16,7 +16,7 @@ class Resolver404(Http404):
 
 class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
-    silent_variable_failure = True  
+    silent_variable_failure = True
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -110,7 +110,7 @@ class RegexURLPattern(object):
             kwargs = match.groupdict()
             if kwargs:
                 args = ()
-            if not kwargs:
+            else:
                 args = match.groups()
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)

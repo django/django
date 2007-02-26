@@ -9,7 +9,7 @@ form .form-row p { padding-left:0; font-size:11px; }
 /* FORM LABELS */
 form h4 { margin:0 !important; padding:0 !important; border:none !important; }
 label { font-weight:normal !important; color:#666; font-size:12px; }
-label.inline { margin-left:20px; }
+/* label.inline { margin-left:20px; } */
 .required label, label.required { font-weight:bold !important; color:#333 !important; }
 
 /* RADIO BUTTONS */
@@ -20,7 +20,7 @@ form ul.inline li { float:left; padding-right:7px; }
 
 /* ALIGNED FIELDSETS */
 .aligned label { display:block; padding:0 1em 3px 0; float:left; width:8em; }
-.aligned label.inline { display:inline; float:none; }
+/* .aligned label.inline { display:inline; float:none; } */
 .colMS .aligned .vLargeTextField, .colMS .aligned .vXMLLargeTextField { width:350px; }
 form .aligned p, form .aligned ul { margin-left:7em; padding-left:30px; }
 form .aligned table p { margin-left:0; padding-left:0; }

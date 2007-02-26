@@ -1,18 +1,19 @@
-# translation of django.po to Macedonian
+# translation of mk_django.po to Macedonian
 #
-# Georgi Stanojevski <glisha@gmail.com>, 2006.
+# Georgi Stanojevski <glisha@gmail.com>, 2006, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: django\n"
+"Project-Id-Version: mk_django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-15 10:53+1100\n"
-"PO-Revision-Date: 2006-12-04 15:58+0100\n"
+"PO-Revision-Date: 2007-02-24 13:53+0100\n"
 "Last-Translator: Georgi Stanojevski <glisha@gmail.com>\n"
 "Language-Team: Macedonian <ossm-members@hedona.on.net.mk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;"
 
 #: db/models/manipulators.py:305
 #, python-format
@@ -31,25 +32,18 @@ msgstr "Ве молам внесете правилно %s."
 
 #: db/models/fields/related.py:642
 msgid "Separate multiple IDs with commas."
-msgstr "Одвој ги повеќето идентификациони броеви со запирки."
+msgstr "Одвојте ги идентификационите броеви со запирки."
 
 #: db/models/fields/related.py:644
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Држете го „Control“ или „Command“ на Мекинтош за да изберете повеќе од едно."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Држете го „Control“ или „Command“ на Мекинтош за да изберете повеќе од едно."
 
 #: db/models/fields/related.py:691
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
-"Ве молам внесете правилен %(self)s идентификацион број. Оваа вредност %"
-"(value)r е неправилна. "
-msgstr[1] ""
-"Ве молам внесете правилен %(self)s идентификацион број. Вредностите %(value)"
-"r се неправилни."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Ве молам внесете правилен %(self)s идентификацион број. Оваа вредност %(value)r е неправилна."
+msgstr[1] "Ве молам внесете правилен %(self)s идентификацион број. Вредностите %(value)r се неправилни."
 
 #: db/models/fields/__init__.py:42
 #, python-format
@@ -161,24 +155,23 @@ msgstr "Јапонски"
 
 #: conf/global_settings.py:57
 msgid "Latvian"
-msgstr ""
+msgstr "Латвиски"
 
 #: conf/global_settings.py:58
 msgid "Macedonian"
-msgstr ""
+msgstr "Македонски"
 
 #: conf/global_settings.py:59
 msgid "Dutch"
-msgstr "Холандија"
+msgstr "Холандски"
 
 #: conf/global_settings.py:60
 msgid "Norwegian"
 msgstr "Норвешки"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Polish"
-msgstr "Англиски"
+msgstr "Полски"
 
 #: conf/global_settings.py:62
 msgid "Brazilian"
@@ -509,20 +502,17 @@ msgstr "сесии"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "Двете полиња со лозинките не се совпаѓаат."
 
 #: contrib/auth/forms.py:25
-#, fuzzy
 msgid "A user with that username already exists."
-msgstr "%(optname)s со ова %(fieldname)s веќе постои."
+msgstr "Веќе постои корисник со тоа корисничко име."
 
 #: contrib/auth/forms.py:53
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr ""
-"Не изгледа дека вашиот прелистувач има овозможено колачиња. Колачињата се "
-"потребни за да се најавите."
+msgstr "Не изгледа дека вашиот прелистувач има овозможено колачиња. Колачињата се потребни за да се најавите."
 
 #: contrib/auth/forms.py:60 contrib/admin/views/decorators.py:10
 msgid ""
@@ -540,15 +530,15 @@ msgstr "Оваа сметка е неактивна."
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
-msgstr ""
+msgstr "Нема регистрирано корисник со оваа адреса за е-пошта. Сигурни ли сте дека сте регистрирани?"
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
-msgstr ""
+msgstr "Двете нови лозинки не се совпаѓаат."
 
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr ""
+msgstr "Не ја внесовте точно вашата стара лозинка. Ве молам внесете ја повторно."
 
 #: contrib/auth/views.py:39
 msgid "Logged out"
@@ -610,7 +600,7 @@ msgstr "лозинка"
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
-msgstr ""
+msgstr "Користете '[algo]$[salt]$[hexdigest]' или користете ја <a href=\"password/\">формата за промена на лозинката</a>."
 
 #: contrib/auth/models.py:95
 msgid "staff status"
@@ -618,8 +608,7 @@ msgstr "статус на администраторите"
 
 #: contrib/auth/models.py:95
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
-"Означува дали корисникот може да се логира во сајтот за администрација."
+msgstr "Означува дали корисникот може да се логира во сајтот за администрација."
 
 #: contrib/auth/models.py:96
 msgid "active"
@@ -742,8 +731,7 @@ msgid "URL"
 msgstr "URL"
 
 #: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
 "На пр. „/za/kontakt/“. Осигурајте се да имате коса црта и на крајот и на "
 "почетокот."
@@ -1054,8 +1042,7 @@ msgid "No voting for yourself"
 msgstr "Нема гласање за самиот себе"
 
 #: contrib/comments/views/comments.py:27
-msgid ""
-"This rating is required because you've entered at least one other rating."
+msgid "This rating is required because you've entered at least one other rating."
 msgstr ""
 "Ова гласање за популарност е потребно бидејќи внесовте најмалку уште едно "
 "друго."
@@ -1114,9 +1101,7 @@ msgstr "Некој ја променил формата за коментари 
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
-msgstr ""
-"Формата за коментар имаше неправилен „target“ параметар - идентификациониот "
-"број на објектот беше неправилен."
+msgstr "Формата за коментар имаше неправилен „target“ параметар - идентификациониот број на објектот беше неправилен"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
@@ -1316,8 +1301,7 @@ msgstr "Уреди го овој објект (во овој прозорец)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Скокнува до админ страницата за страници кои претставуваат единечен објект."
+msgstr "Скокнува до админ страницата за страници кои претставуваат единечен објект."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
@@ -1438,10 +1422,7 @@ msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"Бришење на %(object_name)s '%(escaped_object)s' ќе резултира со бришење на "
-"поврзаните објекти, но со вашата сметка немате доволно привилегии да ги "
-"бришете следните типови на објекти."
+msgstr "Бришење на %(object_name)s '%(escaped_object)s' ќе резултира со бришење на поврзаните објекти, но со вашата сметка немате доволно привилегии да ги бришете следните типови на објекти:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
@@ -1575,7 +1556,7 @@ msgstr "Заради верификација внесете ја истата �
 #: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
+msgstr "Внесете нова лозинка за корисникот <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
@@ -1595,8 +1576,7 @@ msgstr "Време:"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
-"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
+msgstr "Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -1604,8 +1584,7 @@ msgstr "Логирајте се повторно"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Ја добивата оваа порака бидејќи побаравте да се ресетира вашата лозинка"
+msgstr "Ја добивата оваа порака бидејќи побаравте да се ресетира вашата лозинка"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1619,8 +1598,7 @@ msgstr "Вашата нова лозинка е: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr ""
-"Чуствувајте се слободно да ја промените оваа лозинка преку оваа страница:"
+msgstr "Чуствувајте се слободно да ја промените оваа лозинка преку оваа страница:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
@@ -1699,9 +1677,7 @@ msgstr "Вашата лозинка беше сменета."
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
-msgstr ""
-"Сте ја заборавиле вашата лозинка? Внесете ја вашата е-пошта подолу, ќе ја "
-"ресетираме вашата лозинка и новата ќе ви ја пратиме по е-пошта."
+msgstr "Сте ја заборавиле вашата лозинка? Внесете ја вашата е-пошта подолу, ќе ја ресетираме вашата лозинка и новата ќе ви ја пратиме по е-пошта."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1738,7 +1714,7 @@ msgstr "Додади %s"
 #: contrib/admin/views/main.py:335
 #, python-format
 msgid "Added %s."
-msgstr "Додадено %s"
+msgstr "Додадено %s."
 
 #: contrib/admin/views/main.py:337
 #, python-format
@@ -1761,8 +1737,7 @@ msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
 
 #: contrib/admin/views/main.py:353
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" беше успешно додадена.Подолу можете повторно да ја "
 "уредите."
@@ -1968,87 +1943,78 @@ msgid "Add user"
 msgstr "Додади корисник"
 
 #: contrib/admin/views/auth.py:57
-#, fuzzy
 msgid "Password changed successfully."
-msgstr "Успешна промена на лозинката"
+msgstr "Успешна промена на лозинката."
 
 #: contrib/admin/views/auth.py:64
-#, fuzzy, python-format
+#, python-format
 msgid "Change password: %s"
-msgstr "Промени лозинка"
+msgstr "Промени лозинка: %s"
 
 #: newforms/fields.py:101 newforms/fields.py:254
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure this value has at most %d characters."
-msgstr "Осигурајте се дека вашиот текст има помалку од %s знак."
+msgstr "Осигурајте се дека оваа вредност има најмногу %d знаци."
 
 #: newforms/fields.py:103 newforms/fields.py:256
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure this value has at least %d characters."
-msgstr "Осигурајте се дека вашиот текст има помалку од %s знак."
+msgstr "Осигурајте се дека оваа вредност има најмалку %d знаци."
 
 #: newforms/fields.py:126 core/validators.py:120
 msgid "Enter a whole number."
 msgstr "Внеси цел број."
 
 #: newforms/fields.py:128
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Оваа вредноста мора да биде степен од %s."
+msgstr "Осигурајте се дека оваа вредност е помала или еднаква на %s."
 
 #: newforms/fields.py:130
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr ""
+msgstr "Осигурајте се дека оваа вредност е поголема или еднаква со %s."
 
 #: newforms/fields.py:163
-#, fuzzy
 msgid "Enter a valid date."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете правилен датум."
 
 #: newforms/fields.py:190
-#, fuzzy
 msgid "Enter a valid time."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете правилно време."
 
 #: newforms/fields.py:226
-#, fuzzy
 msgid "Enter a valid date/time."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете правилен датум со време."
 
 #: newforms/fields.py:240
-#, fuzzy
 msgid "Enter a valid value."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете правилна вредност."
 
 #: newforms/fields.py:269 core/validators.py:161
 msgid "Enter a valid e-mail address."
-msgstr "Внесте правилна адреса за е-пошта."
+msgstr "Внесeте правилна адреса за е-пошта."
 
 #: newforms/fields.py:287 newforms/fields.py:309
-#, fuzzy
 msgid "Enter a valid URL."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете правилна адреса."
 
 #: newforms/fields.py:311
-#, fuzzy
 msgid "This URL appears to be a broken link."
-msgstr "Адресата %s е скршена врска."
+msgstr "Оваа адреса изгледа дека не е достапна."
 
 #: newforms/fields.py:359
-#, fuzzy
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Изберете правилно, %(data)s' не е во %(choices)s."
+msgstr "Изберете правилно. Тоа не е едно од можните избори."
 
 #: newforms/fields.py:377 newforms/fields.py:453
-#, fuzzy
 msgid "Enter a list of values."
-msgstr "Внесите правилно име на датотека."
+msgstr "Внесете листа на вредности."
 
 #: newforms/fields.py:386
-#, fuzzy, python-format
+#, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Изберете правилно, %(data)s' не е во %(choices)s."
+msgstr "Внесете правилно. %s не е еден од достапните вредности."
 
 #: template/defaultfilters.py:436
 msgid "yes,no,maybe"
@@ -2077,8 +2043,7 @@ msgstr "Оваа вредност смее да има само букви, бр
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr ""
-"Оваа вредност смее да има само букви, бројки, долни црти, црти или коси црти."
+msgstr "Оваа вредност смее да има само букви, бројки, долни црти, црти или коси црти."
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers, underscores or hyphens."
@@ -2127,7 +2092,7 @@ msgstr "Годината мора да биде 1900 или покасно."
 #: core/validators.py:143
 #, python-format
 msgid "Invalid date: %s."
-msgstr "Неправилен датум: %s"
+msgstr "Неправилен датум: %s."
 
 #: core/validators.py:152
 msgid "Enter a valid time in HH:MM format."
@@ -2225,19 +2190,19 @@ msgid "Duplicate values are not allowed."
 msgstr "Дупликат вредности не се дозволени."
 
 #: core/validators.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "This value must be between %s and %s."
-msgstr "Оваа вредноста мора да биде степен од %s."
+msgstr "Оваа вредноста мора да биде помеѓу %s и %s."
 
 #: core/validators.py:366
-#, fuzzy, python-format
+#, python-format
 msgid "This value must be at least %s."
-msgstr "Оваа вредноста мора да биде степен од %s."
+msgstr "Оваа вредноста мора да биде најмалку %s."
 
 #: core/validators.py:368
-#, fuzzy, python-format
+#, python-format
 msgid "This value must be no more than %s."
-msgstr "Оваа вредноста мора да биде степен од %s."
+msgstr "Оваа вредност не смее да биде поголема од %s."
 
 #: core/validators.py:404
 #, python-format
@@ -2251,18 +2216,14 @@ msgstr "Ве молам внесете правилен децимален бр�
 #: core/validators.py:419
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Ве молам внесете правилен децимален број со најмногу %s цифрa."
-msgstr[1] ""
-"Ве молам внесете правилен децимален број со најмногу %s вкупно цифри."
+msgstr[1] "Ве молам внесете правилен децимален број со најмногу %s вкупно цифри."
 
 #: core/validators.py:422
 #, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
-"Please enter a valid decimal number with a whole part of at most %s digits."
+msgid "Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
 "Ве молам внесете правилен децимален број кој во целиот број има најмногу %s "
 "цифра."
@@ -2273,12 +2234,9 @@ msgstr[1] ""
 #: core/validators.py:425
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
-"Ве молам внесете правилен децимален број кој има најмногу %s децимална цифра."
-msgstr[1] ""
-"Ве молам внесете правилен децимален број кој има најмногу %s децимални цифри."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Ве молам внесете правилен децимален број кој има најмногу %s децимална цифра."
+msgstr[1] "Ве молам внесете правилен децимален број кој има најмногу %s децимални цифри."
 
 #: core/validators.py:435
 #, python-format
@@ -2305,10 +2263,8 @@ msgstr "Неможев да извадам ништо од %s."
 
 #: core/validators.py:507
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"Адресата %(url)s врати неправилно заглавје Content-Type „%(contenttype)s“."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr "Адресата %(url)s врати неправилно заглавје Content-Type „%(contenttype)s“."
 
 #: core/validators.py:540
 #, python-format
@@ -2360,13 +2316,5 @@ msgstr ""
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
-msgstr ""
-"Атрибутот „%(attr)s“ на линијата %(line)s има неправилна вредност (линијата "
-"започнува со „%(start)s“)."
+msgstr "Атрибутот „%(attr)s“ на линијата %(line)s има неправилна вредност (линијата започнува со „%(start)s“)."
 
-#~ msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-#~ msgstr ""
-#~ "Дали ја <a href=\"/password_reset/\">заборавите вашата лозинката</a>?"
-
-#~ msgid "Use '[algo]$[salt]$[hexdigest]'"
-#~ msgstr "Користи '[algo]$[salt]$[hexdigest]'"
