@@ -752,6 +752,12 @@ If the results are paginated, the context will contain these extra variables:
 
     * ``previous``: The previous page number, as an integer. This is 1-based.
 
+    * `last_on_page`: **New in Django development version** The number of the
+      last result on the current page. This is 1-based.
+
+    * `first_on_page`: **New in Django development version** The number of the
+      first result on the current page. This is 1-based.
+
     * ``pages``: The total number of pages, as an integer.
 
     * ``hits``: The total number of objects across *all* pages, not just this
