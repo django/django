@@ -143,6 +143,20 @@ install [appname appname ...]
 
 Executes the equivalent of ``sqlall`` for the given appnames.
 
+reset [appname appname ...]
+---------------------------
+Executes the equivalent of ``sqlreset`` for the given appnames.
+
+runfcgi [options]
+-----------------
+Starts a set of FastCGI processes suitable for use with any web server
+which supports the FastCGI protocol. See the `FastCGI deployment
+documentation`- for details. Requires the Python FastCGI module from
+`flup`_.
+
+.. _FastCGI deployment documentation: ../fastcgi/
+.. _flup: http://www.saddi.com/software/flup/
+
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------
 
