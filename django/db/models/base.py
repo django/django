@@ -91,32 +91,35 @@ class Model(object):
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
-        # there is a rather weird disparity here; if kwargs, it's set, then args overrides it.
-        # should be one or the other, don't duplicate the work
-        # the reason for the kwargs check is that standard iterator passes in by args, literally,
-        # the row- with this check, instantiation for iteration is 33% faster.
+        
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work 
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and nstantiation for iteration is 33% faster.
         args_len = len(args)
         if args_len > len(self._meta.fields):
-            # daft, but matches old exception sans the err msg.
-            raise IndexError("number of args exceeds number of fields")
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
 
         fields_iter = iter(self._meta.fields)
         if not kwargs:
-            # ordering of the izip calls matter- izip throws StopIteration when an iter throws it
-            # meaning, if the first iter throws it, the second is *not* consumed from
-            # we rely on this, thus don't change the order without changing the logic.
+            # The ordering of the izip calls matter - izip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
             for val, field in izip(args, fields_iter):
                 setattr(self, field.attname, val)
         else:
-            # slower...
+            # Slower, kwargs-ready version.
             for val, field in izip(args, fields_iter):
                 setattr(self, field.attname, val)
                 kwargs.pop(field.name, None)
-                # maintain compatibility with existing calls, daft as it is.
+                # Maintain compatibility with existing calls.
                 if isinstance(field.rel, ManyToOneRel):
                     kwargs.pop(field.attname, None)
         
-        # now we're left with the unprocessed fields that *must* come from keywords, or default.
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
         
         for field in fields_iter:
             if kwargs:
@@ -131,8 +134,8 @@ class Model(object):
                         except KeyError:
                             val = field.get_default()
                     else:
-                        # Object instance was passed in.
-                        # Special case: You can pass in "None" for related objects if it's allowed.
+                        # Object instance was passed in. Special case: You can
+                        # pass in "None" for related objects if it's allowed.
                         if rel_obj is None and field.null:
                             val = None
                         else:
