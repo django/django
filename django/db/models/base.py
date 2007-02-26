@@ -356,7 +356,7 @@ class Model(object):
     def _get_FIELD_size(self, field):
         return os.path.getsize(self._get_FIELD_filename(field))
 
-    def _save_FIELD_file(self, field, filename, raw_contents):
+    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
@@ -391,8 +391,9 @@ class Model(object):
             if field.height_field:
                 setattr(self, field.height_field, height)
 
-        # Save the object, because it has changed.
-        self.save()
+        # Save the object because it has changed unless save is False
+        if save:
+            self.save()
 
     _save_FIELD_file.alters_data = True
 

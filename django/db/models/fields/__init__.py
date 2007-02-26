@@ -635,7 +635,7 @@ class FileField(Field):
         setattr(cls, 'get_%s_filename' % self.name, curry(cls._get_FIELD_filename, field=self))
         setattr(cls, 'get_%s_url' % self.name, curry(cls._get_FIELD_url, field=self))
         setattr(cls, 'get_%s_size' % self.name, curry(cls._get_FIELD_size, field=self))
-        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_contents: instance._save_FIELD_file(self, filename, raw_contents))
+        setattr(cls, 'save_%s_file' % self.name, lambda instance, filename, raw_contents, save=True: instance._save_FIELD_file(self, filename, raw_contents, save))
         dispatcher.connect(self.delete_file, signal=signals.post_delete, sender=cls)
 
     def delete_file(self, instance):
@@ -653,14 +653,14 @@ class FileField(Field):
     def get_manipulator_field_names(self, name_prefix):
         return [name_prefix + self.name + '_file', name_prefix + self.name]
 
-    def save_file(self, new_data, new_object, original_object, change, rel):
+    def save_file(self, new_data, new_object, original_object, change, rel, save=True):
         upload_field_name = self.get_manipulator_field_names('')[0]
         if new_data.get(upload_field_name, False):
             func = getattr(new_object, 'save_%s_file' % self.name)
             if rel:
-                func(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"])
+                func(new_data[upload_field_name][0]["filename"], new_data[upload_field_name][0]["content"], save)
             else:
-                func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"])
+                func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"], save)
 
     def get_directory_name(self):
         return os.path.normpath(datetime.datetime.now().strftime(self.upload_to))
@@ -704,12 +704,12 @@ class ImageField(FileField):
         if not self.height_field:
             setattr(cls, 'get_%s_height' % self.name, curry(cls._get_FIELD_height, field=self))
 
-    def save_file(self, new_data, new_object, original_object, change, rel):
-        FileField.save_file(self, new_data, new_object, original_object, change, rel)
+    def save_file(self, new_data, new_object, original_object, change, rel, save=True):
+        FileField.save_file(self, new_data, new_object, original_object, change, rel, save)
         # If the image has height and/or width field(s) and they haven't
         # changed, set the width and/or height field(s) back to their original
         # values.
-        if change and (self.width_field or self.height_field):
+        if change and (self.width_field or self.height_field) and save:
             if self.width_field:
                 setattr(new_object, self.width_field, getattr(original_object, self.width_field))
             if self.height_field:
