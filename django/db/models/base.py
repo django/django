@@ -13,6 +13,7 @@ from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.conf import settings
+from itertools import izip
 import types
 import sys
 import os
@@ -90,41 +91,71 @@ class Model(object):
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
-        for f in self._meta.fields:
-            if isinstance(f.rel, ManyToOneRel):
-                try:
-                    # Assume object instance was passed in.
-                    rel_obj = kwargs.pop(f.name)
-                except KeyError:
+        # there is a rather weird disparity here; if kwargs, it's set, then args overrides it.
+        # should be one or the other, don't duplicate the work
+        # the reason for the kwargs check is that standard iterator passes in by args, literally,
+        # the row- with this check, instantiation for iteration is 33% faster.
+        args_len = len(args)
+        if args_len > len(self._meta.fields):
+            # daft, but matches old exception sans the err msg.
+            raise IndexError("number of args exceeds number of fields")
+
+        fields_iter = iter(self._meta.fields)
+        if not kwargs:
+            # ordering of the izip calls matter- izip throws StopIteration when an iter throws it
+            # meaning, if the first iter throws it, the second is *not* consumed from
+            # we rely on this, thus don't change the order without changing the logic.
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+        else:
+            # slower...
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+                kwargs.pop(field.name, None)
+                # maintain compatibility with existing calls, daft as it is.
+                if isinstance(field.rel, ManyToOneRel):
+                    kwargs.pop(field.attname, None)
+        
+        # now we're left with the unprocessed fields that *must* come from keywords, or default.
+        
+        for field in fields_iter:
+            if kwargs:
+                if isinstance(field.rel, ManyToOneRel):
                     try:
-                        # Object instance wasn't passed in -- must be an ID.
-                        val = kwargs.pop(f.attname)
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
                     except KeyError:
-                        val = f.get_default()
-                else:
-                    # Object instance was passed in.
-                    # Special case: You can pass in "None" for related objects if it's allowed.
-                    if rel_obj is None and f.null:
-                        val = None
-                    else:
                         try:
-                            val = getattr(rel_obj, f.rel.get_related_field().attname)
-                        except AttributeError:
-                            raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
-                setattr(self, f.attname, val)
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                    else:
+                        # Object instance was passed in.
+                        # Special case: You can pass in "None" for related objects if it's allowed.
+                        if rel_obj is None and field.null:
+                            val = None
+                        else:
+                            try:
+                                val = getattr(rel_obj, field.rel.get_related_field().attname)
+                            except AttributeError:
+                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" % 
+                                    (field.name, field.rel.to, type(rel_obj)))
+                else:
+                    val = kwargs.pop(field.attname, field.get_default())
             else:
-                val = kwargs.pop(f.attname, f.get_default())
-                setattr(self, f.attname, val)
-        for prop in kwargs.keys():
-            try:
-                if isinstance(getattr(self.__class__, prop), property):
-                    setattr(self, prop, kwargs.pop(prop))
-            except AttributeError:
-                pass
+                val = field.get_default()
+            setattr(self, field.attname, val)
+
         if kwargs:
-            raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
-        for i, arg in enumerate(args):
-            setattr(self, self._meta.fields[i].attname, arg)
+            for prop in kwargs.keys():
+                try:
+                    if isinstance(getattr(self.__class__, prop), property):
+                        setattr(self, prop, kwargs.pop(prop))
+                except AttributeError:
+                    pass
+            if kwargs:
+                raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, value):
