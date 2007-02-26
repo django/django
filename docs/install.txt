@@ -51,10 +51,14 @@ make sure a database server is running. Django works with PostgreSQL_
 Additionally, you'll need to make sure your Python database bindings are
 installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package (version 1.1 --
-  not version 1.0 or version 2, which is still in beta). If you're on Windows,
-  check out the unofficial `compiled Windows version`_.
+* If you're using PostgreSQL, you'll need the psycopg_ package (version 2 is
+  recommended with ``postgresql_psycopg2`` backend, version 1.1 works also with the
+  ``postgresql``` backend). 
+  
+  If you're on Windows, check out the unofficial `compiled Windows version`_.
+  
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
+
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
 .. _PostgreSQL: http://www.postgresql.org/
