@@ -655,10 +655,17 @@ class ChangeList(object):
             order_field, order_type = ordering[0], 'asc'
         if params.has_key(ORDER_VAR):
             try:
+                field_name = lookup_opts.admin.list_display[int(params[ORDER_VAR])]
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
-                    pass
+                    # see if field_name is a name of a non-field
+                    # that allows sorting
+                    try:
+                        attr = getattr(lookup_opts.admin.manager.model, field_name)
+                        order_field = attr.admin_order_field
+                    except IndexError:
+                        pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name

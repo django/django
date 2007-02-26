@@ -1295,10 +1295,30 @@ A few special cases to note about ``list_display``:
 
           list_display = ('__str__', 'some_other_field')
 
-    * For any element of ``list_display`` that is not a field on the model, the
-      change list page will not allow ordering by that column. This is because
-      ordering is done at the database level, and Django has no way of knowing
-      how to order the result of a custom method at the SQL level.
+    * Usually, elements of ``list_display`` that aren't actual database fields
+      can't be used in sorting (because Django does all the sorting at the
+      database level).
+      
+      However, if an element of ``list_display`` represents a certain database
+      field, you can indicate this fact by setting the ``admin_order_field``
+      attribute of the item.
+      
+      For example::
+      
+        class Person(models.Model):
+            first_name = models.CharField(maxlength=50)
+            color_code = models.CharField(maxlength=6)
+
+            class Admin:
+                list_display = ('first_name', 'colored_first_name')
+
+            def colored_first_name(self):
+                return '<span style="color: #%s;">%s</span>' % (self.color_code, self.first_name)
+            colored_first_name.allow_tags = True
+            colored_first_name.admin_order_field = 'first_name'
+    
+      The above will tell Django to order by the ``first_name`` field when
+      trying to sort by ``colored_first_name`` in the admin.
 
 ``list_display_links``
 ----------------------
