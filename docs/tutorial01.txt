@@ -25,6 +25,9 @@ installed.
     to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` and we'll 
     try to help.
 
+.. _django-users: http://groups.google.com/group/django-users 
+.. _#django: irc://irc.freenode.net/django
+
 Creating a project
 ==================
 
