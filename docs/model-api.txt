@@ -498,10 +498,9 @@ or outside your model class altogether::
     class Foo(models.Model):
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-For each field on your model which has ``choices`` set, Django will
-add a method to retrieve the human-readable name for the field's
-current value; see `get_FOO_display`_ in the database API
-documentation.
+For each model field that has ``choices`` set, Django will add a method to
+retrieve the human-readable name for the field's current value. See
+`get_FOO_display`_ in the database API documentation.
 
 .. _get_FOO_display: ../db_api/#get-foo-display
 
