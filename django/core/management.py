@@ -1240,7 +1240,10 @@ def test(app_labels, verbosity=1):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
-    test_runner(app_list, verbosity)
+    failures = test_runner(app_list, verbosity)
+    if failures:
+        sys.exit(failures)
+        
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
 test.args = '[--verbosity] ' + APP_ARGS
 
