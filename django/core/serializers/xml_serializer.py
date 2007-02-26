@@ -150,7 +150,7 @@ class Deserializer(base.Deserializer):
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 m2m_data[field.name] = self._handle_m2m_field_node(field_node)
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                data[field.name] = self._handle_fk_field_node(field_node)
+                data[field.attname] = self._handle_fk_field_node(field_node)
             else:
                 value = field.to_python(getInnerText(field_node).strip().encode(self.encoding))
                 data[field.name] = value
@@ -162,27 +162,17 @@ class Deserializer(base.Deserializer):
         """
         Handle a <field> node for a ForeignKey
         """
-        # Try to set the foreign key by looking up the foreign related object.
-        # If it doesn't exist, set the field to None (which might trigger 
-        # validation error, but that's expected).
-        RelatedModel = self._get_model_from_node(node, "to")
         # Check if there is a child node named 'None', returning None if so.
         if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
             return None
         else:
-            return RelatedModel.objects.get(pk=getInnerText(node).strip().encode(self.encoding))
+            return getInnerText(node).strip().encode(self.encoding)
         
     def _handle_m2m_field_node(self, node):
         """
         Handle a <field> node for a ManyToManyField
         """
-        # Load the related model
-        RelatedModel = self._get_model_from_node(node, "to")
-        
-        # Look up all the related objects. Using the in_bulk() lookup ensures
-        # that missing related objects don't cause an exception
-        related_ids = [c.getAttribute("pk").encode(self.encoding) for c in node.getElementsByTagName("object")]
-        return RelatedModel._default_manager.in_bulk(related_ids).values()
+        return [c.getAttribute("pk").encode(self.encoding) for c in node.getElementsByTagName("object")]
     
     def _get_model_from_node(self, node, attr):
         """

@@ -167,7 +167,8 @@ def _get_sql_model_create(model, known_models=set()):
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')'
+                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' + 
+                        backend.get_deferrable_sql()
                     )
                 else:
                     # We haven't yet created the table to which this field
@@ -210,9 +211,10 @@ def _get_sql_for_pending_references(model, pending_references):
                 # For MySQL, r_name must be unique in the first 64 characters.
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
-                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s);' % \
+                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
                     (backend.quote_name(r_table), r_name,
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col)))
+                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col), 
+                    backend.get_deferrable_sql()))
             del pending_references[model]
     return final_output
 
@@ -232,18 +234,20 @@ def _get_many_to_many_sql_for_model(model):
                 (style.SQL_FIELD(backend.quote_name('id')),
                 style.SQL_COLTYPE(data_types['AutoField']),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
-            table_output.append('    %s %s %s %s (%s),' % \
+            table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
                 style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(opts.db_table)),
-                style.SQL_FIELD(backend.quote_name(opts.pk.column))))
-            table_output.append('    %s %s %s %s (%s),' % \
+                style.SQL_FIELD(backend.quote_name(opts.pk.column)),
+                backend.get_deferrable_sql()))
+            table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
                 style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
-                style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column))))
+                style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column)),
+                backend.get_deferrable_sql()))
             table_output.append('    %s (%s, %s)' % \
                 (style.SQL_KEYWORD('UNIQUE'),
                 style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),

@@ -174,6 +174,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
