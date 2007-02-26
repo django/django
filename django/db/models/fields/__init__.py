@@ -443,6 +443,8 @@ class DateField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def to_python(self, value):
+        if value is None:
+            return value
         if isinstance(value, datetime.datetime):
             return value.date()
         if isinstance(value, datetime.date):
@@ -505,6 +507,8 @@ class DateField(Field):
 
 class DateTimeField(DateField):
     def to_python(self, value):
+        if value is None:
+            return value
         if isinstance(value, datetime.datetime):
             return value
         if isinstance(value, datetime.date):

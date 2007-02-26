@@ -146,4 +146,8 @@ u'john@example.com'
 >>> p.validate()
 {'email': ['Enter a valid e-mail address.']}
 
+# Make sure that Date and DateTime return validation errors and don't raise Python errors.
+>>> Person(name='John Doe', is_child=True, email='abc@def.com').validate()
+{'favorite_moment': ['This field is required.'], 'birthdate': ['This field is required.']}
+
 """}
