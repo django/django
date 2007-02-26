@@ -97,7 +97,7 @@ class ClientTest(unittest.TestCase):
         
         # Request a page that requires a login
         response = self.client.login('/test_client/login_protected_view/', 'testclient', 'password')
-        self.assertTrue(response)
+        self.failUnless(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
         self.assertEqual(response.template.name, 'Login Template')
@@ -106,7 +106,7 @@ class ClientTest(unittest.TestCase):
         "Request a page that is protected with @login, but use bad credentials"
 
         response = self.client.login('/test_client/login_protected_view/', 'otheruser', 'nopassword')
-        self.assertFalse(response)
+        self.failIf(response)
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
