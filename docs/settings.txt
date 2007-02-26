@@ -332,6 +332,16 @@ Default: ``False``
 
 A boolean that turns on/off debug mode.
 
+If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
+regular expression which will hide from the DEBUG view anything that contins
+``'SECRET``, ``PASSWORD``, or ``PROFANITIES'``. This allows untrusted users to
+be able to give backtraces without seeing sensitive (or offensive) settings.
+
+Still, note that there are always going to be sections of your debug output that
+are inapporpriate for public consumption. File paths, configuration options, and
+the like all give attackers extra information about your server. Never deploy a
+site with ``DEBUG`` turned on.
+
 DEFAULT_CHARSET
 ---------------
 
