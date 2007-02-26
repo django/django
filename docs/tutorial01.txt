@@ -19,6 +19,12 @@ installed.
 
 .. _`Django installed`: ../install/
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please post a message
+    to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` and we'll 
+    try to help.
+
 Creating a project
 ==================
 
