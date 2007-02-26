@@ -461,9 +461,12 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        rel_objs = getattr(obj, rel_opts_name, None)
-        if rel_objs:
-            has_related_objs = True
+       
+        # related.get_accessor_name() could return None for symmetrical relationships
+        if rel_opts_name:
+            rel_objs = getattr(obj, rel_opts_name, None)
+            if rel_objs:
+                has_related_objs = True
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
