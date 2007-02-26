@@ -81,10 +81,18 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Django-0.95.tar.gz from our `download page`_.
-2. ``tar xzvf Django-0.95.tar.gz``
-3. ``cd Django-0.95``
-4. ``sudo python setup.py install``
+    1. Check the `distribution specific notes`_ to see if your
+       platform/distribution provides official Django packages/installers.
+       Distribution-provided packages will typically allow for automatic
+       installation of dependancies and easy upgrade paths.
+
+    2. Download Django-0.95.tar.gz from our `download page`_.
+
+    3. ``tar xzvf Django-0.95.tar.gz``
+
+    4. ``cd Django-0.95``
+
+    5. ``sudo python setup.py install``
 
 Note that the last command will automatically download and install setuptools_
 if you don't already have it installed. This requires a working Internet
@@ -97,6 +105,7 @@ The command will install Django in your Python installation's ``site-packages``
 directory.
 
 .. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
+.. _distribution specific notes: ../distributions/
 
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

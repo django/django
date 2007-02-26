@@ -1,0 +1,76 @@
+===================================
+Third-party distributions of Django
+===================================
+
+Several third-party distributors are now providing versions of Django integrated
+with their package-management systems. These can make installation and upgrading
+much easier for users of Django since the integration includes the ability to
+automatically install dependancies (like database adapters) that Django
+requires.
+
+Typically, these packages are based on the latest stable release of Django, so
+if you want to use the development version of Django you'll need to follow the
+instructions for `installing the development version`_ from our Subversion
+repository.
+
+.. _installing the development version: ../install/#installing-the-development-version
+
+Linux distributions
+===================
+
+Debian
+------
+
+A `packaged version of Django`_ is available for `Debian GNU/Linux`_, and can be
+installed from either the "testing" or the "unstable" repositories by typing
+``apt-get install python-django``.
+
+When you install this package, ``apt`` will recommend installing a database
+adapter; you should select and install the adapter for whichever database you
+plan to use with Django.
+
+.. _Debian GNU/Linux: http://www.debian.org/
+.. _packaged version of Django: http://packages.debian.org/testing/python/python-django
+
+Ubuntu
+------
+
+The Debian ``python-django`` package is also available for `Ubuntu Linux`_, in
+the "universe" repository for Ubuntu 7.04 ("Feisty Fawn"). The `current Ubuntu
+package`_ is also based on Django 0.95.1 and can be installed in the same
+fashion as for Debian.
+
+.. _Ubuntu Linux: http://www.ubuntu.com/
+.. _current Ubuntu package: http://packages.ubuntu.com/feisty/python/python-django
+
+Fedora
+------
+
+A Django package is available for `Fedora Linux`_, in the "Fedora Extras"
+repository. The `current Fedora package`_ is based on Django 0.95.1, and can be
+installed by typing ``yum install Django``.
+
+.. _Fedora Linux: http://fedora.redhat.com/
+.. _current Fedora package: http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html
+
+Gentoo
+------
+
+A Django build is available for `Gentoo Linux`_, and is based on Django 0.95.1.
+The `current Gentoo build`_ can be installed by typing ``emerge Django``.
+
+.. _Gentoo Linux: http://www.gentoo.org/
+.. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django
+
+For distributors
+================
+
+If you'd like to package Django for distribution, we'd be happy to help out!
+Please join the `django-developers mailing list`_ and introduce yourself. 
+
+We also encourage all distributors to subscribe to the `django-announce mailing
+list`_, which is a (very) low-traffic list for announcing new releases of Django
+and important bugfixes.
+
+.. _django-developers mailing list: http://groups.google.com/group/django-developers/
+.. _django-announce mailing list: http://groups.google.com/group/django-announce/
