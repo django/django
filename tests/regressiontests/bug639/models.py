@@ -3,7 +3,7 @@ from django.db import models
 
 class Photo(models.Model):
     title = models.CharField(maxlength=30)
-    image = models.ImageField(upload_to=tempfile.gettempdir())
+    image = models.FileField(upload_to=tempfile.gettempdir())
     
     # Support code for the tests; this keeps track of how many times save() gets
     # called on each instance.
