@@ -1,22 +1,22 @@
 # translation of django.po to Castellano
 # This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER.
 #
 # Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail.com>, 2005.
 # Ricardo Javier Cardenes Medina <ricardo.cardenes@gmail.com>, 2005.
 # AgarFu <heaven@croasanaso.sytes.net>, 2007.
+# Mario Gonzalez <gonzalemario @t gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-24 17:08+0000\n"
-"PO-Revision-Date: 2007-02-24 17:12+0000\n"
+"PO-Revision-Date: 2007-02-24 18:02-0600\n"
 "Last-Translator: AgarFu <heaven@croasanaso.sytes.net>\n"
-"Language-Team: Castellano <es@li.org>\n"
+"Language-Team: Castellano <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #: utils/dates.py:6
@@ -187,7 +187,7 @@ msgstr[1] "meses"
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "semana"
-msgstr[1] ""
+msgstr[1] "semanas"
 
 #: utils/timesince.py:15
 msgid "day"
@@ -209,23 +209,23 @@ msgstr[1] "minutos"
 
 #: utils/translation/trans_real.py:362
 msgid "DATE_FORMAT"
-msgstr "FORMATO_DE_FECHA"
+msgstr "j N Y"
 
 #: utils/translation/trans_real.py:363
 msgid "DATETIME_FORMAT"
-msgstr "FORMATO_DE_FECHA_Y_HORA"
+msgstr "j N Y P"
 
 #: utils/translation/trans_real.py:364
 msgid "TIME_FORMAT"
-msgstr "FORMATO_DE_HORA"
+msgstr "P"
 
 #: utils/translation/trans_real.py:380
 msgid "YEAR_MONTH_FORMAT"
-msgstr "FORMATO_DE_AÑO_Y_MES"
+msgstr "F Y"
 
 #: utils/translation/trans_real.py:381
 msgid "MONTH_DAY_FORMAT"
-msgstr "FORMATO_DE_MES_Y_DÍA"
+msgstr "j \\de F"
 
 #: conf/global_settings.py:39
 msgid "Arabic"
@@ -340,9 +340,8 @@ msgid "Slovak"
 msgstr "Eslovaco"
 
 #: conf/global_settings.py:67
-#, fuzzy
 msgid "Slovenian"
-msgstr "Eslovaco"
+msgstr "Esloveno"
 
 #: conf/global_settings.py:68
 msgid "Serbian"
@@ -354,7 +353,7 @@ msgstr "Sueco"
 
 #: conf/global_settings.py:70
 msgid "Tamil"
-msgstr ""
+msgstr "Tamil"
 
 #: conf/global_settings.py:71
 msgid "Turkish"
@@ -388,14 +387,12 @@ msgid "Please enter a valid %s."
 msgstr "Por favor, introduzca un %s válido."
 
 #: db/models/fields/related.py:642
-#, fuzzy
 msgid "Separate multiple IDs with commas."
-msgstr " Separe múltiples IDs con comas."
+msgstr "Separe múltiples IDs con comas."
 
 #: db/models/fields/related.py:644
-#, fuzzy
 msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Pulse \"Control\" o \"Command\" en un Mac para escoger más de uno."
+msgstr "Mantenga presionado \"Control\", o \"Command\" en un Mac, para seleccionar más de uno."
 
 #: db/models/fields/related.py:691
 #, python-format
@@ -462,9 +459,9 @@ msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Escoja una opción válida; '%s' no es una de las opciones disponibles."
 
 #: newforms/fields.py:101 newforms/fields.py:254
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure this value has at most %d characters."
-msgstr "Asegúrese de que su texto tiene menos de %s carácter."
+msgstr "Asegúrese de que su texto tiene a lo más %d caracteres."
 
 #: newforms/fields.py:103 newforms/fields.py:256
 #, python-format
@@ -478,7 +475,7 @@ msgstr "Introduzca un número entero."
 #: newforms/fields.py:128
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "Asegñurese de que este valor es menor o igual a %s."
+msgstr "Asegúrese de que este valor es menor o igual a %s."
 
 #: newforms/fields.py:130
 #, python-format
@@ -533,11 +530,10 @@ msgid "This value must contain only letters, numbers and underscores."
 msgstr "Este valor debe contener sólo letras, números y guiones bajos."
 
 #: core/validators.py:68
-#, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr "Este valor debe contener sólo letras, números, guiones bajos y barras (/)."
+msgstr "Este valor debe contener letras, números, guiones bajos o barras solamente."
 
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers, underscores or hyphens."
@@ -659,8 +655,8 @@ msgstr "Introduzca una abreviatura válida de estado de los EEUU."
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "¡Vigila tu boca! Aquí no admitimos la palabra %s."
-msgstr[1] "¡Vigila tu boca! Aquí no admitimos las palabras %s."
+msgstr[0] "¡Cuida tu vocabulario! Aquí no admitimos la palabra %s."
+msgstr[1] "¡Cuida tu vocabulario! Aquí no admitimos las palabras %s."
 
 #: core/validators.py:272
 #, python-format
@@ -690,9 +686,9 @@ msgid "Duplicate values are not allowed."
 msgstr "No se admiten valores duplicados."
 
 #: core/validators.py:364
-#, fuzzy, python-format
+#, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Este valor no debe ser mayor que %s."
+msgstr "Este valor debe estar entre %(lower)s y %(upper)s."
 
 #: core/validators.py:367
 #, python-format
@@ -725,7 +721,7 @@ msgstr[1] ""
 "total."
 
 #: core/validators.py:423
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
@@ -901,13 +897,12 @@ msgid "template name"
 msgstr "nombre de plantilla"
 
 #: contrib/flatpages/models.py:13
-#, fuzzy
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Ejemplo: 'flatpages/contact_page'. Si no lo proporciona, el sistema usará "
-"'flatpages/default'."
+"Ejemplo: 'flatpages/contact_page.html'. Si no es proporcionado, el sistema usará "
+"'flatpages/default.html'."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -926,9 +921,8 @@ msgid "flat pages"
 msgstr "páginas estáticas"
 
 #: contrib/auth/views.py:39
-#, fuzzy
 msgid "Logged out"
-msgstr "Terminar sesión"
+msgstr "Sesión terminada"
 
 #: contrib/auth/models.py:38 contrib/auth/models.py:57
 msgid "name"
@@ -1225,12 +1219,10 @@ msgid "approved by staff"
 msgstr "aprobado por el staff"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
 msgstr "Comentario libre"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
 msgstr "Comentarios libres"
 
@@ -1243,12 +1235,10 @@ msgid "score date"
 msgstr "fecha de la puntuación"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
 msgstr "Punto karma"
 
 #: contrib/comments/models.py:238
-#, fuzzy
 msgid "karma scores"
 msgstr "Puntos karma"
 
@@ -1273,12 +1263,10 @@ msgid "flag date"
 msgstr "fecha de la marca"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
 msgstr "Marca de usuario"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
 msgstr "Marcas de usuario"
 
@@ -1292,12 +1280,10 @@ msgid "deletion date"
 msgstr "fecha de eliminación"
 
 #: contrib/comments/models.py:280
-#, fuzzy
 msgid "moderator deletion"
 msgstr "Eliminación de moderador"
 
 #: contrib/comments/models.py:281
-#, fuzzy
 msgid "moderator deletions"
 msgstr "Eliminaciones de moderador"
 
@@ -1758,7 +1744,7 @@ msgstr "Acción"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
-msgstr "FECHA_CON_TIEMP_COMPLETO"
+msgstr "j M Y P"
 
 #: contrib/admin/templates/admin/object_history.html:36
 msgid ""
@@ -2330,9 +2316,8 @@ msgid "Add user"
 msgstr "Añadir usuario"
 
 #: contrib/admin/views/auth.py:57
-#, fuzzy
 msgid "Password changed successfully."
-msgstr "Cambio de clave exitoso"
+msgstr "La clave se ha cambiado exitosamente."
 
 #: contrib/admin/views/auth.py:64
 #, python-format
