@@ -21,7 +21,7 @@ msgstr ""
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "Tillgänglig %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 #, fuzzy
@@ -30,39 +30,39 @@ msgstr "Välj en tidpunkt"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr ""
+msgstr "Lägg till"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr ""
+msgstr "Tag bort"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Valde %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Välj ditt/dina val och klicka "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr ""
+msgstr "Avmarkera alla"
 
 #: contrib/admin/media/js/dateparse.js:26
 #: contrib/admin/media/js/calendar.js:24
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr ""
+msgstr "Januari Februari Mars April Maj Juni Juli Augusti September Oktober November December"
 
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr ""
+msgstr "Söndag Mondag Tisdag Onsdag Torsdag Fredag Lördag"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr ""
+msgstr "S M T O T F L"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
@@ -92,7 +92,7 @@ msgstr "Mitt på dagen"
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
 msgid "Cancel"
-msgstr "Ångra"
+msgstr "Avbryt"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
