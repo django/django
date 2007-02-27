@@ -86,10 +86,10 @@ objects in the same way as any other `Django model`_::
     myuser.groups.add(group, group,...)
     myuser.groups.remove(group, group,...)
     myuser.groups.clear()
-    myuser.permissions = [permission_list]
-    myuser.permissions.add(permission, permission, ...)
-    myuser.permissions.remove(permission, permission, ...]
-    myuser.permissions.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
