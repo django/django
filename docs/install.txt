@@ -51,10 +51,14 @@ make sure a database server is running. Django works with PostgreSQL_
 Additionally, you'll need to make sure your Python database bindings are
 installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package (version 1.1 --
-  not version 1.0 or version 2, which is still in beta). If you're on Windows,
-  check out the unofficial `compiled Windows version`_.
-* If you're using MySQL, you'll need MySQLdb_.
+* If you're using PostgreSQL, you'll need the psycopg_ package (version 2 is
+  recommended with ``postgresql_psycopg2`` backend, version 1.1 works also with the
+  ``postgresql``` backend). 
+  
+  If you're on Windows, check out the unofficial `compiled Windows version`_.
+  
+* If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
+
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
 .. _PostgreSQL: http://www.postgresql.org/
@@ -77,10 +81,18 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Django-0.95.tar.gz from our `download page`_.
-2. ``tar xzvf Django-0.95.tar.gz``
-3. ``cd Django-0.95``
-4. ``sudo python setup.py install``
+    1. Check the `distribution specific notes`_ to see if your
+       platform/distribution provides official Django packages/installers.
+       Distribution-provided packages will typically allow for automatic
+       installation of dependancies and easy upgrade paths.
+
+    2. Download Django-0.95.tar.gz from our `download page`_.
+
+    3. ``tar xzvf Django-0.95.tar.gz``
+
+    4. ``cd Django-0.95``
+
+    5. ``sudo python setup.py install``
 
 Note that the last command will automatically download and install setuptools_
 if you don't already have it installed. This requires a working Internet
@@ -93,6 +105,7 @@ The command will install Django in your Python installation's ``site-packages``
 directory.
 
 .. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
+.. _distribution specific notes: ../distributions/
 
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
