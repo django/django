@@ -667,7 +667,11 @@ def resolve_variable(path, context):
                 except (TypeError, AttributeError):
                     try: # list-index lookup
                         current = current[int(bits[0])]
-                    except (IndexError, ValueError, KeyError):
+                    except (IndexError, # list index out of range
+                            ValueError, # invalid literal for int()
+                            KeyError,   # current is a dict without `int(bits[0])` key
+                            TypeError,  # unsubscriptable object
+                            ):
                         raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bits[0], current)) # missing attribute
                 except Exception, e:
                     if getattr(e, 'silent_variable_failure', False):

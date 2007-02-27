@@ -127,6 +127,29 @@ class Templates(unittest.TestCase):
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
+            # List-index syntax allows a template to access a certain item of a subscriptable object.
+            'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
+
+            # Fail silently when the list index is out of range.
+            'list-index02': ("{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")),
+
+            # Fail silently when the variable is not a subscriptable object.
+            'list-index03': ("{{ var.1 }}", {"var": None}, ("", "INVALID")),
+
+            # Fail silently when variable is a dict without the specified key.
+            'list-index04': ("{{ var.1 }}", {"var": {}}, ("", "INVALID")),
+
+            # Dictionary lookup wins out when dict's key is a string.
+            'list-index05': ("{{ var.1 }}", {"var": {'1': "hello"}}, "hello"),
+
+            # But list-index lookup wins out when dict's key is an int, which
+            # behind the scenes is really a dictionary lookup (for a dict)
+            # after converting the key to an int.
+            'list-index06': ("{{ var.1 }}", {"var": {1: "hello"}}, "hello"),
+
+            # Dictionary lookup wins out when there is a string and int version of the key.
+            'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
+            
             # Basic filter usage
             'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
@@ -167,7 +190,7 @@ class Templates(unittest.TestCase):
             'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
             # In methods that raise an exception without a "silent_variable_attribute" set to True,
-            # the exception propogates
+            # the exception propagates
             'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
             # Escaped backslash in argument
