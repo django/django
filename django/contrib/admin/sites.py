@@ -105,7 +105,19 @@ class AdminSite(object):
         url = url.rstrip('/') # Trim trailing slash, if it exists.
         if url == '':
             return self.index(request)
+        elif url == 'password_change':
+            return self.password_change(request)
+        elif url == 'password_change/done':
+            return self.password_change_done(request)
         raise NotImplementedError('Only the admin index page is implemented.')
+
+    def password_change(self, request):
+        from django.contrib.auth.views import password_change
+        return password_change(request)
+
+    def password_change_done(self, request):
+        from django.contrib.auth.views import password_change_done
+        return password_change_done(request)
 
     def login(self, request):
         """
