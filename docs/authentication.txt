@@ -398,7 +398,7 @@ To do this, add the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-Here's what ``django.contrib.auth.views.login`` does::
+Here's what ``django.contrib.auth.views.login`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the same
       URL. More on this in a bit.
