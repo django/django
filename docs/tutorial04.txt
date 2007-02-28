@@ -206,6 +206,21 @@ for the polls app, we manually specify a template name for the results view:
 ``template_name='polls/results.html'``. Otherwise, both views would use the same
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
+.. note:: ``all()`` is lazy
+
+    It might look a little frightening to see ``Poll.objects.all()`` being used
+    in a detail view which only needs one ``Poll`` object, but don't worry;
+    ``Poll.objects.all()`` is actually a special object called a ``QuerySet``,
+    which is "lazy" and doesn't hit your database until it absolutely has to. By
+    the time the database query happens, the ``object_detail`` generic view will
+    have narrowed its scope down to a single object, so the eventual query will
+    only select one row from the database. 
+    
+    If you'd like to know more about how that works, The Django database API
+    documentation `explains the lazy nature of QuerySet objects`_.
+
+.. _explains the lazy nature of QuerySet objects: ../db_api/#querysets-are-lazy
+
 In previous parts of the tutorial, the templates have been provided with a context
 that contains the ``poll`` and ``latest_poll_list`` context variables. However,
 the generic views provide the variables ``object`` and ``object_list`` as context.
