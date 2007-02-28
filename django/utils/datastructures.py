@@ -16,6 +16,9 @@ class MergeDict(object):
 
     def __contains__(self, key):
         return self.has_key(key)
+        
+    def __copy__(self): 
+        return self.__class__(*self.dicts) 
 
     def get(self, key, default=None):
         try:
@@ -42,6 +45,10 @@ class MergeDict(object):
             if dict.has_key(key):
                 return True
         return False
+        
+    def copy(self): 
+        """ returns a copy of this object""" 
+        return self.__copy__()
 
 class SortedDict(dict):
     "A dictionary that keeps its keys in the order in which they're inserted."
