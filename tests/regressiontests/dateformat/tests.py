@@ -17,6 +17,8 @@ r"""
 '07'
 >>> format(my_birthday, 'M')
 'Jul'
+>>> format(my_birthday, 'b')
+'jul'
 >>> format(my_birthday, 'n')
 '7'
 >>> format(my_birthday, 'N')
