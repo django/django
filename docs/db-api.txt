@@ -596,7 +596,7 @@ related ``Person`` *and* the related ``City``::
 Note that ``select_related()`` does not follow foreign keys that have
 ``null=True``.
 
-Usually, using ``select_related()`` can vastly improve performance since your
+Usually, using ``select_related()`` can vastly improve performance because your
 app can avoid many database calls. However, in situations with deeply nested
 sets of relationships ``select_related()`` can sometimes end up following "too
 many" relations, and can generate queries so large that they end up being slow.
@@ -608,6 +608,8 @@ follow::
     b = Book.objects.select_related(depth=1).get(id=4)
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Requires a database call.
+
+The ``depth`` argument is new in the Django development version.
     
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
