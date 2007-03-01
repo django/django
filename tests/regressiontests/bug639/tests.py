@@ -33,3 +33,10 @@ class Bug639Test(unittest.TestCase):
         
         # Check the savecount stored on the object (see the model)
         self.assertEqual(p._savecount, 1)
+        
+    def tearDown(self):
+        """
+        Make sure to delete the "uploaded" file to avoid clogging /tmp.
+        """
+        p = Photo.objects.get()
+        os.unlink(p.get_image_filename())
