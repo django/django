@@ -141,7 +141,7 @@ class Deserializer(object):
 
 class DeserializedObject(object):
     """
-    A deserialzed model.
+    A deserialized model.
 
     Basically a container for holding the pre-saved deserialized data along
     with the many-to-many data saved with the object.

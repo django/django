@@ -19,10 +19,11 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from django.test.client import Client
-import unittest
+from django.test import Client, TestCase
 
-class ClientTest(unittest.TestCase):
+class ClientTest(TestCase):
+    fixtures = ['testdata.json']
+    
     def setUp(self):
         "Set up test environment"
         self.client = Client()

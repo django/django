@@ -319,3 +319,10 @@ TEST_RUNNER = 'django.test.simple.run_tests'
 # The name of the database to use for testing purposes.
 # If None, a name of 'test_' + DATABASE_NAME will be assumed
 TEST_DATABASE_NAME = None
+
+############
+# FIXTURES #
+############
+
+# The list of directories to search for fixtures
+FIXTURE_DIRS = ()

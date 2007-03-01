@@ -422,6 +422,19 @@ Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+FIXTURE_DIRS
+-------------
+
+**New in Django development version**
+
+Default: ``()`` (Empty tuple)
+
+List of locations of the fixture data files, in search order. Note that
+these paths should use Unix-style forward slashes, even on Windows. See 
+`Testing Django Applications`_.
+
+.. _Testing Django Applications: ../testing/
+
 IGNORABLE_404_ENDS
 ------------------
 
@@ -652,6 +665,17 @@ Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see the
 `middleware docs`_). See also ``IGNORABLE_404_STARTS``,
 ``IGNORABLE_404_ENDS`` and the section on `error reporting via e-mail`_
+
+SERIALIZATION_MODULES
+---------------------
+
+Default: Not defined.
+
+A dictionary of modules containing serializer definitions (provided as 
+strings), keyed by a string identifier for that serialization type. For 
+example, to define a YAML serializer, use::
+
+    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
 
 SERVER_EMAIL
 ------------
