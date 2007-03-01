@@ -86,7 +86,7 @@ class DatabaseWrapper(local):
         global postgres_version
         if not postgres_version:
             cursor.execute("SELECT version()")
-            postgres_version = [int(val) for val in cursor.dictfetchone()['version'].split()[1].split('.')]        
+            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]        
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
