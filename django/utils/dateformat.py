@@ -16,7 +16,7 @@ from django.utils.tzinfo import LocalTimezone
 from calendar import isleap, monthrange
 import re, time
 
-re_formatchars = re.compile(r'(?<!\\)([aABdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
+re_formatchars = re.compile(r'(?<!\\)([aAbBdDfFgGhHiIjlLmMnNOPrsStTUwWyYzZ])')
 re_escaped = re.compile(r'\\(.)')
 
 class Formatter(object):
@@ -109,6 +109,10 @@ class DateFormat(TimeFormat):
         self.timezone = getattr(dt, 'tzinfo', None)
         if hasattr(self.data, 'hour') and not self.timezone:
             self.timezone = LocalTimezone(dt)
+
+    def b(self):
+        "Month, textual, 3 letters, lowercase; e.g. 'jan'"
+        return MONTHS_3[self.data.month]
 
     def d(self):
         "Day of the month, 2 digits with leading zeros; i.e. '01' to '31'"
