@@ -400,7 +400,7 @@ In this example, any JSON fixture called ``mammals``, and any fixture
 named ``birds`` will be installed. See the documentation on 
 `loading fixtures`_ for more details on defining and installing fixtures.
 
-.. _`loading fixtures`: ../django-admin/#loaddata-fixture-fixture
+.. _`loading fixtures`: ../django_admin/#loaddata-fixture-fixture
 
 This flush/load procedure is repeated for each test in the test case, so you 
 can be certain that the outcome of a test will not be affected by 
