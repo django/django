@@ -129,7 +129,7 @@ def get_sql_flush(style, tables, sequences):
             # single SQL TRUNCATE statement
             sql = ['%s %s;' % \
                     (style.SQL_KEYWORD('TRUNCATE'),
-                     style.SQL_FIELD(', '.join(quote_name(table) for table in tables))
+                     style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
                     )]
         else:
             sql = ['%s %s %s;' % \
