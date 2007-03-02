@@ -473,7 +473,7 @@ setting the Python path for you.
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
 --format
----------
+--------
 
 **New in Django development version**
 
@@ -489,6 +489,19 @@ of a registered serializer.
 
 Displays a help message that includes a terse list of all available actions and
 options.
+
+--indent
+--------
+
+**New in Django development version**
+
+Example usage::
+
+    django-admin.py dumpdata --indent=4
+
+Specifies the number of spaces that will be used for indentation when 
+pretty-printing output. By default, output will *not* be pretty-printed.
+Pretty-printing will only be enabled if the indent option is provided.
 
 --noinput
 ---------
