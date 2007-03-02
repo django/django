@@ -393,7 +393,7 @@ look like::
         def setUp(self):
             # test definitions as before
 
-At the start of each test vase, before ``setUp()`` is run, Django will
+At the start of each test case, before ``setUp()`` is run, Django will
 flush the database, returning the database the state it was in directly 
 after ``syncdb`` was called. Then, all the named fixtures are installed. 
 In this example, any JSON fixture called ``mammals``, and any fixture
