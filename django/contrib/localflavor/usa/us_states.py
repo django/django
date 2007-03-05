@@ -32,6 +32,7 @@ STATE_CHOICES = (
     ('ME', 'Maine'),
     ('MH', 'Marshall Islands'),
     ('MD', 'Maryland'),
+    ('MA', 'Massachusetts'),
     ('MI', 'Michigan'),
     ('MN', 'Minnesota'),
     ('MS', 'Mississippi'),
