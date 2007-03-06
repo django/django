@@ -608,6 +608,10 @@ fails. If no message is passed in, a default message is used.
     order). If the given field does (or does not have, in the latter case) the
     given value, then the current field being validated is required.
 
+    An optional ``other_label`` argument can be passed which, if given, is used
+    in error messages instead of the value. This allows more user friendly error
+    messages if the value itself is not descriptive enough.
+
     Note that because validators are called before any ``do_html2python()``
     functions, the value being compared against is a string. So
     ``RequiredIfOtherFieldEquals('choice', '1')`` is correct, whilst

@@ -621,7 +621,7 @@ class OneToOneField(RelatedField, IntegerField):
     def formfield(self, **kwargs):
         defaults = {'queryset': self.rel.to._default_manager.all(), 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
-        return forms.ModelChoiceField(**kwargs)
+        return forms.ModelChoiceField(**defaults)
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):

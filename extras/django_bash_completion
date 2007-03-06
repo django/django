@@ -31,6 +31,9 @@
 #
 # To uninstall, just remove the line from your .bash_profile and .bashrc.
 
+# Enable extended pattern matching operators.
+shopt -s extglob
+
 _django_completion()
 {
     local cur prev opts actions action_shell_opts action_runfcgi_opts
@@ -58,8 +61,13 @@ _django_completion()
           ||
           # python manage.py, /some/path/python manage.py (if manage.py exists)
           ( ${COMP_CWORD} -eq 2 &&
-            ( $( basename ${COMP_WORDS[0]} ) == python ) &&
+            ( $( basename ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
             ( $( basename ${COMP_WORDS[1]} ) == manage.py) &&
+            ( -r ${COMP_WORDS[1]} ) ) 
+          ||
+          ( ${COMP_CWORD} -eq 2 &&
+            ( $( basename ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
+            ( $( basename ${COMP_WORDS[1]} ) == django-admin.py) &&
             ( -r ${COMP_WORDS[1]} ) ) ]] ; then
 
         case ${cur} in
@@ -79,10 +87,28 @@ _django_completion()
             adminindex|install|reset| \
             sql|sqlall|sqlclear|sqlindexes| \
             sqlinitialdata|sqlreset|sqlsequencereset)
-            # App completion isn't yet implemented, but here's where that
-            # would go.
-            # COMPREPLY=( $(compgen -W "auth core" -- ${cur}) )
-            COMPREPLY=()
+            # App completion
+            settings=""
+            # If settings.py in the PWD, use that
+            if [ -e settings.py ] ; then
+                settings="$PWD/settings.py"
+            else
+                # Use the ENV variable if it is set
+                if [ $DJANGO_SETTINGS_MODULE ] ; then
+                    settings=$DJANGO_SETTINGS_MODULE
+                fi
+            fi
+            # Couldn't find settings so return nothing
+            if [ -z $settings ] ; then
+                COMPREPLY=()
+            # Otherwise inspect settings.py file
+            else
+                apps=`sed -n "/INSTALLED_APPS = (/,/)/p" $settings | \
+                      grep -v "django.contrib" | 
+                      sed -n "s/^[ ]*'\(.*\.\)*\(.*\)'.*$/\2 /pg" | \
+                      tr -d "\n"`
+                COMPREPLY=( $(compgen -W "${apps}" -- ${cur}) )
+            fi
             return 0
             ;;
 
@@ -117,3 +143,17 @@ _django_completion()
 }
 
 complete -F _django_completion django-admin.py manage.py
+
+# Support for multiple interpreters.
+unset pythons
+if command -v whereis &>/dev/null; then
+    python_interpreters=$(whereis -b python | cut -d " " -f 2-) 
+    for python in $python_interpreters; do
+        pythons="${pythons} $(basename $python)"
+    done
+    pythons=$(echo $pythons | tr " " "\n" | sort -u | tr "\n" " ")
+else
+    pythons=python    
+fi
+
+complete -F _django_completion -o default $pythons

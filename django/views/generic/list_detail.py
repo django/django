@@ -33,6 +33,12 @@ def object_list(request, queryset, paginate_by=None, page=None,
             number of pages, total
         hits
             number of objects, total
+        last_on_page
+            the result number of the last of object in the
+            object_list (1-indexed)
+        first_on_page
+            the result number of the first object in the
+            object_list (1-indexed)
     """
     if extra_context is None: extra_context = {}
     queryset = queryset._clone()
@@ -57,6 +63,8 @@ def object_list(request, queryset, paginate_by=None, page=None,
             'page': page,
             'next': page + 1,
             'previous': page - 1,
+            'last_on_page': paginator.last_on_page(page - 1),
+            'first_on_page': paginator.first_on_page(page - 1),
             'pages': paginator.pages,
             'hits' : paginator.hits,
         }, context_processors)

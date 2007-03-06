@@ -97,6 +97,33 @@ example, the default settings don't define ``ROOT_URLCONF``, so
 Note that Django's default settings live in ``django/conf/global_settings.py``,
 if you're ever curious to see the full list of defaults.
 
+dumpdata [appname appname ...]
+------------------------------
+
+**New in Django development version**
+
+Output to standard output all data in the database associated with the named 
+application(s).
+
+By default, the database will be dumped in JSON format. If you want the output
+to be in another format, use the ``--format`` option (e.g., ``format=xml``). 
+You may specify any Django serialization backend (including any user specified 
+serialization backends named in the ``SERIALIZATION_MODULES`` setting).
+
+If no application name is provided, all installed applications will be dumped.
+
+The output of ``dumpdata`` can be used as input for ``loaddata``. 
+
+flush
+-----
+
+**New in Django development version**
+
+Return the database to the state it was in immediately after syncdb was 
+executed. This means that all data will be removed from the database, any 
+post-synchronization handlers will be re-executed, and the ``initial_data``
+fixture will be re-installed.
+
 inspectdb
 ---------
 
@@ -141,7 +168,91 @@ only works in PostgreSQL and with certain types of MySQL tables.
 install [appname appname ...]
 -----------------------------
 
+**Removed in Django development version**
+
 Executes the equivalent of ``sqlall`` for the given appnames.
+
+loaddata [fixture fixture ...]
+------------------------------
+
+**New in Django development version**
+
+Searches for and loads the contents of the named fixture into the database.
+
+A *Fixture* is a collection of files that contain the serialized contents of
+the database. Each fixture has a unique name; however, the files that
+comprise the fixture can be distributed over multiple directories, in
+multiple applications.
+
+Django will search in three locations for fixtures:
+
+   1. In the ``fixtures`` directory of every installed application
+   2. In any directory named in the ``FIXTURE_DIRS`` setting
+   3. In the literal path named by the fixture
+
+Django will load any and all fixtures it finds in these locations that match
+the provided fixture names. 
+
+If the named fixture has a file extension, only fixtures of that type 
+will be loaded. For example::
+
+    django-admin.py loaddata mydata.json
+    
+would only load JSON fixtures called ``mydata``. The fixture extension 
+must correspond to the registered name of a serializer (e.g., ``json`` or 
+``xml``).
+
+If you omit the extension, Django will search all available fixture types 
+for a matching fixture. For example::
+
+    django-admin.py loaddata mydata
+    
+would look for any fixture of any fixture type called ``mydata``. If a fixture
+directory contained ``mydata.json``, that fixture would be loaded
+as a JSON fixture. However, if two fixtures with the same name but different 
+fixture type are discovered (for example, if ``mydata.json`` and 
+``mydata.xml`` were found in the same fixture directory), fixture 
+installation will be aborted, and any data installed in the call to 
+``loaddata`` will be removed from the database.
+
+The fixtures that are named can include directory components. These 
+directories will be inluded in the search path. For example::
+
+    django-admin.py loaddata foo/bar/mydata.json
+ 
+would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed 
+application,  ``<dirname>/foo/bar/mydata.json`` for each directory in 
+``FIXTURE_DIRS``, and the literal path ``foo/bar/mydata.json``.
+
+Note that the order in which fixture files are processed is undefined. However,
+all fixture data is installed as a single transaction, so data in
+one fixture can reference data in another fixture. If the database backend
+supports row-level constraints, these constraints will be checked at the
+end of the transaction.
+
+.. admonition:: MySQL and Fixtures
+
+    Unfortunately, MySQL isn't capable of completely supporting all the 
+    features of Django fixtures. If you use MyISAM tables, MySQL doesn't
+    support transactions or constraints, so you won't get a rollback if 
+    multiple transaction files are found, or validation of fixture data. 
+    If you use InnoDB tables, you won't be able to have any forward 
+    references in your data files - MySQL doesn't provide a mechanism to 
+    defer checking of row constraints until a transaction is committed.    
+    
+reset [appname appname ...]
+---------------------------
+Executes the equivalent of ``sqlreset`` for the given appnames.
+
+runfcgi [options]
+-----------------
+Starts a set of FastCGI processes suitable for use with any web server
+which supports the FastCGI protocol. See the `FastCGI deployment
+documentation`_ for details. Requires the Python FastCGI module from
+`flup`_.
+
+.. _FastCGI deployment documentation: ../fastcgi/
+.. _flup: http://www.saddi.com/software/flup/
 
 runserver [optional port number, or ipaddr:port]
 ------------------------------------------------
@@ -236,15 +347,12 @@ sqlclear [appname appname ...]
 
 Prints the DROP TABLE SQL statements for the given appnames.
 
-sqlindexes [appname appname ...]
-----------------------------------------
+sqlcustom [appname appname ...]
+-------------------------------
 
-Prints the CREATE INDEX SQL statements for the given appnames.
+**New in Django development version**
 
-sqlinitialdata [appname appname ...]
---------------------------------------------
-
-Prints the initial INSERT SQL statements for the given appnames.
+Prints the custom SQL statements for the given appnames.
 
 For each model in each specified app, this command looks for the file
 ``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given appname and
@@ -255,10 +363,22 @@ command.
 
 Each of the SQL files, if given, is expected to contain valid SQL. The SQL
 files are piped directly into the database after all of the models'
-table-creation statements have been executed. Use this SQL hook to populate
-tables with any necessary initial records, SQL functions or test data.
+table-creation statements have been executed. Use this SQL hook to make any
+table modifications, or insert any SQL functions into the database.
 
 Note that the order in which the SQL files are processed is undefined.
+
+sqlindexes [appname appname ...]
+----------------------------------------
+
+Prints the CREATE INDEX SQL statements for the given appnames.
+
+sqlinitialdata [appname appname ...]
+--------------------------------------------
+
+**Removed in Django development version**
+
+This method has been renamed ``sqlcustom`` in the development version of Django. 
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -298,6 +418,10 @@ this command to install the default apps.
 
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
+
+``syncdb`` will also search for and install any fixture named ``initial_data``. 
+See the documentation for ``loaddata`` for details on the specification of 
+fixture data files.
 
 test
 ----
@@ -348,11 +472,36 @@ setting the Python path for you.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
+--format
+--------
+
+**New in Django development version**
+
+Example usage::
+
+    django-admin.py dumpdata --format=xml
+
+Specifies the output format that will be used. The name provided must be the name
+of a registered serializer.
+
 --help
 ------
 
 Displays a help message that includes a terse list of all available actions and
 options.
+
+--indent
+--------
+
+**New in Django development version**
+
+Example usage::
+
+    django-admin.py dumpdata --indent=4
+
+Specifies the number of spaces that will be used for indentation when 
+pretty-printing output. By default, output will *not* be pretty-printed.
+Pretty-printing will only be enabled if the indent option is provided.
 
 --noinput
 ---------

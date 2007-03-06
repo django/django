@@ -596,6 +596,21 @@ related ``Person`` *and* the related ``City``::
 Note that ``select_related()`` does not follow foreign keys that have
 ``null=True``.
 
+Usually, using ``select_related()`` can vastly improve performance because your
+app can avoid many database calls. However, in situations with deeply nested
+sets of relationships ``select_related()`` can sometimes end up following "too
+many" relations, and can generate queries so large that they end up being slow.
+
+In these situations, you can use the ``depth`` argument to ``select_related()``
+to control how many "levels" of relations ``select_related()`` will actually
+follow::
+
+    b = Book.objects.select_related(depth=1).get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Requires a database call.
+
+The ``depth`` argument is new in the Django development version.
+    
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1620,6 +1635,15 @@ For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
 2005::
 
     Entry.objects.filter(pub_date__year=2005).delete()
+
+When Django deletes an object, it emulates the behavior of the SQL
+constraint ``ON DELETE CASCADE`` -- in other words, any objects which
+had foreign keys pointing at the object to be deleted will be deleted
+along with it. For example::
+
+    b = Blog.objects.get(pk=1)
+    # This will delete the Blog and all of its Entry objects.
+    b.delete()
 
 Note that ``delete()`` is the only ``QuerySet`` method that is not exposed on a
 ``Manager`` itself. This is a safety mechanism to prevent you from accidentally

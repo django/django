@@ -40,6 +40,11 @@ def get_serializer(format):
     if not _serializers:
         _load_serializers()
     return _serializers[format].Serializer
+
+def get_serializer_formats():
+    if not _serializers:
+        _load_serializers()
+    return _serializers.keys()
     
 def get_deserializer(format):
     if not _serializers:

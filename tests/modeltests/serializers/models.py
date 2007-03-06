@@ -139,4 +139,24 @@ __test__ = {'API_TESTS':"""
 ...     print obj
 <DeserializedObject: Profile of Joe>
 
+# Objects ids can be referenced before they are defined in the serialization data
+# However, the deserialization process will need to be contained within a transaction
+>>> json = '[{"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00", "categories": [4, 1], "author": 4}}, {"pk": "4", "model": "serializers.category", "fields": {"name": "Reference"}}, {"pk": "4", "model": "serializers.author", "fields": {"name": "Agnes"}}]'
+>>> from django.db import transaction
+>>> transaction.enter_transaction_management()
+>>> transaction.managed(True)
+>>> for obj in serializers.deserialize("json", json):
+...     obj.save()
+
+>>> transaction.commit()
+>>> transaction.leave_transaction_management()
+
+>>> article = Article.objects.get(pk=3)
+>>> article
+<Article: Forward references pose no problem>
+>>> article.categories.all()
+[<Category: Reference>, <Category: Sports>]
+>>> article.author
+<Author: Agnes>
+
 """}

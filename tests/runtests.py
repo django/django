@@ -124,7 +124,9 @@ def django_tests(verbosity, tests_to_run):
 
     # Run the test suite, including the extra validation tests.
     from django.test.simple import run_tests
-    run_tests(test_models, verbosity, extra_tests=extra_tests)
+    failures = run_tests(test_models, verbosity, extra_tests=extra_tests)
+    if failures:
+        sys.exit(failures)
 
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps
@@ -146,5 +148,7 @@ if __name__ == "__main__":
     options, args = parser.parse_args()
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
-
+    elif "DJANGO_SETTINGS_MODULE" not in os.environ:
+        parser.error("DJANGO_SETTINGS_MODULE is not set in the environment. "
+                      "Set it or use --settings.")
     django_tests(int(options.verbosity), args)

@@ -19,6 +19,15 @@ installed.
 
 .. _`Django installed`: ../install/
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please post a message
+    to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` and we'll 
+    try to help.
+
+.. _django-users: http://groups.google.com/group/django-users 
+.. _#django: irc://irc.freenode.net/django
+
 Creating a project
 ==================
 
@@ -31,6 +40,13 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the command ``django-admin.py startproject mysite``. This
 will create a ``mysite`` directory in your current directory.
+
+.. note::
+    
+    You'll need to avoid naming projects after built-in Python or Django
+    components. In particular, this means you should avoid using names like
+    ``django`` (which will conflict with Django itself) or ``site`` (which
+    conflicts with a built-in Python package).
 
 (``django-admin.py`` should be on your system path if you installed Django via
 ``python setup.py``. If it's not on your path, you can find it in

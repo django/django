@@ -645,6 +645,7 @@ Available format strings:
                       output, because this includes periods
                       to match Associated Press style.)
     A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+    b                 Month, textual, 3 letters, lowercase.     ``'jan'``
     B                 Not implemented.
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.

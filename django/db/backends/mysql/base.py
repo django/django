@@ -174,6 +174,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
@@ -182,6 +185,36 @@ def get_drop_foreignkey_sql():
 
 def get_pk_default_value():
     return "DEFAULT"
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    
+    """
+    # NB: The generated SQL below is specific to MySQL
+    # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # to clear all tables of all data
+    if tables:
+        sql = ['SET FOREIGN_KEY_CHECKS = 0;'] + \
+              ['%s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'),
+                 style.SQL_FIELD(quote_name(table))
+                )  for table in tables] + \
+              ['SET FOREIGN_KEY_CHECKS = 1;']
+              
+        # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
+        # to reset sequence indices
+        sql.extend(["%s %s %s %s %s;" % \
+            (style.SQL_KEYWORD('ALTER'),
+             style.SQL_KEYWORD('TABLE'),
+             style.SQL_TABLE(quote_name(sequence['table'])),
+             style.SQL_KEYWORD('AUTO_INCREMENT'),
+             style.SQL_FIELD('= 1'),
+            ) for sequence in sequences])
+        return sql
+    else:
+        return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

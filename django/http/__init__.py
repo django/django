@@ -52,7 +52,7 @@ def parse_file_upload(header_dict, post_data):
     POST = MultiValueDict()
     FILES = MultiValueDict()
     for submessage in msg.get_payload():
-        if isinstance(submessage, email.Message.Message):
+        if submessage and isinstance(submessage, email.Message.Message):
             name_dict = parse_header(submessage['Content-Disposition'])[1]
             # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
             # or {'name': 'blah'} for POST fields

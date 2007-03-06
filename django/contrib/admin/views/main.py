@@ -461,9 +461,12 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        rel_objs = getattr(obj, rel_opts_name, None)
-        if rel_objs:
-            has_related_objs = True
+       
+        # related.get_accessor_name() could return None for symmetrical relationships
+        if rel_opts_name:
+            rel_objs = getattr(obj, rel_opts_name, None)
+            if rel_objs:
+                has_related_objs = True
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
@@ -655,10 +658,17 @@ class ChangeList(object):
             order_field, order_type = ordering[0], 'asc'
         if params.has_key(ORDER_VAR):
             try:
+                field_name = lookup_opts.admin.list_display[int(params[ORDER_VAR])]
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
-                    pass
+                    # see if field_name is a name of a non-field
+                    # that allows sorting
+                    try:
+                        attr = getattr(lookup_opts.admin.manager.model, field_name)
+                        order_field = attr.admin_order_field
+                    except IndexError:
+                        pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name

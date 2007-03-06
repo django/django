@@ -686,7 +686,7 @@ A page representing a list of objects.
     * ``paginate_by``: An integer specifying how many objects should be
       displayed per page. If this is given, the view will paginate objects with
       ``paginate_by`` objects per page. The view will expect either a ``page``
-      query string parameter (via ``GET``) containing a zero-indexed page
+      query string parameter (via ``GET``) containing a 1-based page
       number, or a ``page`` variable specified in the URLconf. See
       "Notes on pagination" below.
 
@@ -751,6 +751,12 @@ If the results are paginated, the context will contain these extra variables:
       number. This is 1-based.
 
     * ``previous``: The previous page number, as an integer. This is 1-based.
+
+    * `last_on_page`: **New in Django development version** The number of the
+      last result on the current page. This is 1-based.
+
+    * `first_on_page`: **New in Django development version** The number of the
+      first result on the current page. This is 1-based.
 
     * ``pages``: The total number of pages, as an integer.
 
