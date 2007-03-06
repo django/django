@@ -5,14 +5,14 @@
 # Ricardo Javier Cárdenes Medina <ricardo.cardenes@gmail.com>, 2005.
 # Ricardo Javier Cardenes Medina <ricardo.cardenes@gmail.com>, 2005.
 # AgarFu <heaven@croasanaso.sytes.net>, 2007.
-# Mario Gonzalez <gonzalemario @t gmail.com>
+# Mario Gonzalez <gonzalemario @t gmail.com>, 2007
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-24 17:08+0000\n"
 "PO-Revision-Date: 2007-02-24 18:02-0600\n"
-"Last-Translator: AgarFu <heaven@croasanaso.sytes.net>\n"
+"Last-Translator: Mario Gonzalez <gonzalemario @t gmail.com>\n"
 "Language-Team: Castellano <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -435,7 +435,7 @@ msgstr "Introduzca una fecha válida en formato AAAA-MM-DD."
 
 #: db/models/fields/__init__.py:521 core/validators.py:156
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Introduzca una fecha/hora válida en formato YYYY-MM-DD HH:MM."
+msgstr "Introduzca una fecha/hora válida en formato AAAA-MM-DD HH:MM."
 
 #: db/models/fields/__init__.py:625
 msgid "Enter a valid filename."
@@ -934,19 +934,19 @@ msgstr "nombre en código"
 
 #: contrib/auth/models.py:42
 msgid "permission"
-msgstr "Permiso"
+msgstr "permiso"
 
 #: contrib/auth/models.py:43 contrib/auth/models.py:58
 msgid "permissions"
-msgstr "Permisos"
+msgstr "permisos"
 
 #: contrib/auth/models.py:60
 msgid "group"
-msgstr "Grupo"
+msgstr "grupo"
 
 #: contrib/auth/models.py:61 contrib/auth/models.py:100
 msgid "groups"
-msgstr "Grupos"
+msgstr "grupos"
 
 #: contrib/auth/models.py:90
 msgid "username"
@@ -1034,15 +1034,15 @@ msgstr ""
 
 #: contrib/auth/models.py:102
 msgid "user permissions"
-msgstr "Permisos"
+msgstr "permisos"
 
 #: contrib/auth/models.py:105
 msgid "user"
-msgstr "Usuario"
+msgstr "usuario"
 
 #: contrib/auth/models.py:106
 msgid "users"
-msgstr "Usuarios"
+msgstr "usuarios"
 
 #: contrib/auth/models.py:111
 msgid "Personal info"
@@ -1062,7 +1062,7 @@ msgstr "Grupos"
 
 #: contrib/auth/models.py:258
 msgid "message"
-msgstr "Mensaje"
+msgstr "mensaje"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
@@ -1220,11 +1220,11 @@ msgstr "aprobado por el staff"
 
 #: contrib/comments/models.py:176
 msgid "free comment"
-msgstr "Comentario libre"
+msgstr "comentario libre"
 
 #: contrib/comments/models.py:177
 msgid "free comments"
-msgstr "Comentarios libres"
+msgstr "comentarios libres"
 
 #: contrib/comments/models.py:233
 msgid "score"
@@ -1236,16 +1236,16 @@ msgstr "fecha de la puntuación"
 
 #: contrib/comments/models.py:237
 msgid "karma score"
-msgstr "Punto karma"
+msgstr "punto karma"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
-msgstr "Puntos karma"
+msgstr "puntos karma"
 
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "Puntuado %(score)d por %(user)s"
+msgstr "puntuado %(score)d por %(user)s"
 
 #: contrib/comments/models.py:258
 #, python-format
@@ -1264,11 +1264,11 @@ msgstr "fecha de la marca"
 
 #: contrib/comments/models.py:268
 msgid "user flag"
-msgstr "Marca de usuario"
+msgstr "marca de usuario"
 
 #: contrib/comments/models.py:269
 msgid "user flags"
-msgstr "Marcas de usuario"
+msgstr "marcas de usuario"
 
 #: contrib/comments/models.py:273
 #, python-format
@@ -1281,11 +1281,11 @@ msgstr "fecha de eliminación"
 
 #: contrib/comments/models.py:280
 msgid "moderator deletion"
-msgstr "Eliminación de moderador"
+msgstr "eliminación de moderador"
 
 #: contrib/comments/models.py:281
 msgid "moderator deletions"
-msgstr "Eliminaciones de moderador"
+msgstr "eliminaciones de moderador"
 
 #: contrib/comments/models.py:285
 #, python-format
@@ -2095,7 +2095,7 @@ msgstr "etiqueta:"
 #: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
 #: contrib/admin/views/doc.py:81
 msgid "filter:"
-msgstr "Filtro:"
+msgstr "filtro:"
 
 #: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
 #: contrib/admin/views/doc.py:139
