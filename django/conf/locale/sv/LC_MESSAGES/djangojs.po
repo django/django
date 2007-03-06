@@ -1,20 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Swedish translation of Django
+# Copyright (C) 2005
+# This file is distributed under the same license as the Django package.
 #
+#
+# Robin Sonefors <ozamosi@blinkenlights.se>, 2005.
+# Mikko Hellsing <mikko@sorl.net>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2005-12-04 14:12+0100\n"
-"Last-Translator: Robin Sonefors <ozamosi@blinkenlights.se>\n"
-"Language-Team: Django Translators <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2007-03-06 02:29+0100\n"
+"PO-Revision-Date: 2007-03-06 02:30+0100\n"
+"Last-Translator: Mikko Hellsing <mikko@sorl.net>\n"
+"Language-Team: Django translators <djangoi18n@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Language: Swedish\n"
 "X-Poedit-Country: SWEDEN\n"
 
@@ -24,9 +26,8 @@ msgid "Available %s"
 msgstr "Tillgänglig %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
-#, fuzzy
 msgid "Choose all"
-msgstr "Välj en tidpunkt"
+msgstr "Visa alla"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
@@ -49,14 +50,16 @@ msgstr "Välj ditt/dina val och klicka "
 msgid "Clear all"
 msgstr "Avmarkera alla"
 
-#: contrib/admin/media/js/dateparse.js:26
+#: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Januari Februari Mars April Maj Juni Juli Augusti September Oktober November December"
+msgstr ""
+"Januari Februari Mars April Maj Juni Juli Augusti September Oktober November "
+"December"
 
-#: contrib/admin/media/js/dateparse.js:27
+#: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
 msgstr "Söndag Mondag Tisdag Onsdag Torsdag Fredag Lördag"
 
@@ -64,49 +67,59 @@ msgstr "Söndag Mondag Tisdag Onsdag Torsdag Fredag Lördag"
 msgid "S M T W T F S"
 msgstr "S M T O T F L"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Visa"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Göm"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
 msgstr "Nu"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
 msgstr "Klocka"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
 msgstr "Välj en tidpunkt"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
 msgstr "Midnatt"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
 msgstr "06.00"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
 msgstr "Mitt på dagen"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
 msgstr "Idag"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
 msgstr "Kalender"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
 msgstr "Igår"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Imorgon"
+
