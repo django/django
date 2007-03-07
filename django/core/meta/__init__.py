@@ -151,7 +151,7 @@ class BadKeywordArguments(Exception):
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
-        self.field_mappings = field_mapping[related_object.opts.module_name]
+        self.field_mappings = field_mapping[related_object.name]
 
     def template_name(self):
         raise NotImplementedError
@@ -165,7 +165,7 @@ class RelatedObject(object):
         self.opts = opts
         self.field = field
         self.edit_inline = field.rel.edit_inline
-        self.name = opts.module_name
+        self.name = '%s_%s' % (opts.app_label, opts.module_name)
         self.var_name = opts.object_name.lower()
 
     def flatten_data(self, follow, obj=None):
