@@ -11,7 +11,6 @@ DATA_TYPES = {
     'ImageField':        'varchar2(100)',
     'IntegerField':      'integer',
     'IPAddressField':    'char(15)',
-    'ManyToManyField':   None,
     'NullBooleanField':  'integer',
     'OneToOneField':     'integer',
     'PhoneNumberField':  'varchar(20)',
@@ -22,4 +21,5 @@ DATA_TYPES = {
     'TextField':         'long',
     'TimeField':         'timestamp',
     'USStateField':      'varchar(2)',
+    'NoField':           None,
 }

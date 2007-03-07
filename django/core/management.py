@@ -386,6 +386,10 @@ def get_custom_sql_for_model(model):
                     output.append(statement + ";")
             fp.close()
 
+    for f in opts.fields:
+        if hasattr(f, '_post_create_sql'):
+            output.append(f._post_create_sql(style, model._meta.db_table, f.column))
+
     return output
 
 def get_custom_sql(app):

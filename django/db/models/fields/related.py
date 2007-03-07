@@ -644,6 +644,9 @@ class ManyToManyField(RelatedField, Field):
             msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
+    def get_internal_type(self):
+        return "NoField"
+
     def get_manipulator_field_objs(self):
         if self.rel.raw_id_admin:
             return [oldforms.RawIdAdminField]
