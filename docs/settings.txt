@@ -162,9 +162,12 @@ a model object and return its URL. This is a way of overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.Weblog': lambda o: "/blogs/%s/" % o.slug,
-        'news.Story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
+
+Note that the model name used in this setting should be all lower-case, regardless
+of the case of the actual model class name.
 
 ADMIN_FOR
 ---------
