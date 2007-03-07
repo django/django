@@ -1354,13 +1354,14 @@ def load_data(fixture_labels, verbosity=1):
         for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
             if verbosity > 1:
                 print "Checking %s for fixtures..." % humanize(fixture_dir)
-            try:
-                fixture_name, format = fixture_label.rsplit('.', 1)
-                formats = [format]
-            except ValueError:
+            parts = fixture_label.split('.')
+            if len(parts) == 1:
                 fixture_name = fixture_label
                 formats = serializers.get_serializer_formats()
-            
+            else:
+                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+                formats = [format]
+
             label_found = False
             for format in formats:
                 serializer = serializers.get_serializer(format)
