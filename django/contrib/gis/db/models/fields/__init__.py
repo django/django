@@ -25,6 +25,9 @@ class GeometryField(Field):
     
     _geom = 'GEOMETRY'
     _srid = 4326
+
+    def get_internal_type(self):
+        return "NoField"
     
     def _post_create_sql(self, *args, **kwargs):
         """Returns SQL that will be executed after the model has been created.  Geometry
