@@ -1491,8 +1491,8 @@ msgstr[1] "mois"
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "semaine"
+msgstr[1] "semaines"
 
 #: utils/timesince.py:15
 msgid "day"
