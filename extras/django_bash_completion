@@ -147,7 +147,7 @@ complete -F _django_completion django-admin.py manage.py
 # Support for multiple interpreters.
 unset pythons
 if command -v whereis &>/dev/null; then
-    python_interpreters=$(whereis -b python | cut -d " " -f 2-) 
+    python_interpreters=$(whereis python | cut -d " " -f 2-) 
     for python in $python_interpreters; do
         pythons="${pythons} $(basename $python)"
     done
