@@ -215,12 +215,11 @@ ticket has or needs in order to be "ready for checkin":
 A ticket can be resolved in a number of ways:
 
     "fixed"
-        This state is used by one of the core developers once a patch has been
-        rolled into Django, and the issue is fixed.
+        Used by one of the core developers once a patch has been rolled into
+        Django and the issue is fixed.
 
     "invalid"
-        This state is used if the ticket is found to be incorrect, or a user
-        error.
+        Used if the ticket is found to be incorrect or a user error.
 
     "wontfix"
         Used when a core developer decides that this request is not
@@ -229,17 +228,16 @@ A ticket can be resolved in a number of ways:
         feel free to join in when it's something you care about.
 
     "duplicate"
-        This is used when, rather obviously, there's a duplicate ticket about
-        the same issue. By closing the extra tickets, we can keep all the
-        discussion in one place which helps everyone.
+        Used when another ticket covers the same issue. By closing duplicate
+        tickets, we keep all the discussion in one place, which helps everyone.
 
     "worksforme"
-        This state is similar to "invalid", but is generally used to show
-        that the triage team was unable to replicate the original bug.
+        Used when the triage team is unable to replicate the original bug.
 
-If you believe that the ticket was closed in error, either because you're still having the 
-issue, or it's popped up somewhere else, or the triagers have made a mistake, please reopen
-the ticket and tell us why.
+If you believe that the ticket was closed in error -- because you're
+still having the issue, or it's popped up somewhere else, or the triagers have
+-- made a mistake, please reopen the ticket and tell us why. Please do not
+reopen tickets that have been marked as "wontfix" by core developers.
 
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
