@@ -1,7 +1,7 @@
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
-        self.field_mappings = field_mapping[related_object.opts.module_name]
+        self.field_mappings = field_mapping[related_object.name]
 
     def template_name(self):
         raise NotImplementedError
@@ -16,7 +16,7 @@ class RelatedObject(object):
         self.opts = model._meta
         self.field = field
         self.edit_inline = field.rel.edit_inline
-        self.name = self.opts.module_name
+        self.name = '%s_%s' % (self.opts.app_label, self.opts.module_name)
         self.var_name = self.opts.object_name.lower()
 
     def flatten_data(self, follow, obj=None):
