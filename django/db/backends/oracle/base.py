@@ -43,10 +43,11 @@ class DatabaseWrapper(local):
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             try:
                 self.connection.rollback()
             except Database.NotSupportedError:
