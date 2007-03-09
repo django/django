@@ -225,7 +225,7 @@ class InlineObjectCollection(object):
         self.data = data
         self.errors = errors
         self._collections = None
-        self.name = rel_obj.opts.module_name
+        self.name = rel_obj.name
 
     def __len__(self):
         self.fill()
