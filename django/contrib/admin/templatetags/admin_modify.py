@@ -11,6 +11,7 @@ import re
 register = template.Library()
 
 word_re = re.compile('[A-Z][a-z]+')
+absolute_url_re = re.compile(r'^(?:http(?:s)?:/)?/', re.IGNORECASE)
 
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
@@ -18,18 +19,19 @@ def class_name_to_underscored(name):
 def include_admin_script(script_path):
     """
     Returns an HTML script element for including a script from the admin
-    media url.
+    media url (or other location if an absolute url is given).
 
     Example usage::
 
-        {% include_admin_script js/calendar.js %}
+        {% include_admin_script "js/calendar.js" %}
 
     could return::
 
         <script type="text/javascript" src="/media/admin/js/calendar.js">
     """
-
-    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    if not absolute_url_re.match(script_path):
+        script_path = '%s%s' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    return '<script type="text/javascript" src="%s"></script>' % script_path
 include_admin_script = register.simple_tag(include_admin_script)
 
 def submit_row(context):
