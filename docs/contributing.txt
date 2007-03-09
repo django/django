@@ -303,9 +303,11 @@ Please follow these coding standards when writing code for inclusion in Django:
           def my_view(req, foo):
               # ...
 
-    * Please don't put your name in the code. While we appreciate all
-      contributions to Django, our policy is not to publish individual
-      developer names in code -- for instance, at the top of Python modules.
+    * Our policy is to keep the names of developers and contributors
+      in the ``AUTHORS`` file distributed with Django, so please don't include
+      your name in the actual code. Feel free to include a change to the
+      ``AUTHORS`` file in your patch if you make more than a single trivial
+      change.
 
 Committing code
 ===============
