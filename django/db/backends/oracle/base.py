@@ -49,10 +49,15 @@ class DatabaseWrapper(local):
         return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        self.connection.rollback()
+        if self.connection is not None:
+            try:
+                self.connection.rollback()
+            except Database.NotSupportedError:
+                pass
 
     def close(self):
         if self.connection is not None:
@@ -140,6 +145,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"
 
+def get_deferrable_sql():
+    return " DEFERRABLE INITIALLY DEFERRED"
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -167,6 +175,19 @@ def get_autoinc_sql(table):
       SELECT %s.nextval INTO :new.id FROM dual;
     END;\n""" % (tr_name, quote_name(table), sq_name)
     return sequence_sql, trigger_sql
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    """
+    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # TODO - SQL not actually tested against Oracle yet!
+    # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
+    sql = ['%s %s;' % \
+            (style.SQL_KEYWORD('TRUNCATE'),
+             style.SQL_FIELD(quote_name(table))
+             )  for table in tables]
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

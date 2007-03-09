@@ -67,10 +67,11 @@ class DatabaseWrapper(local):
             return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             self.connection.rollback()
 
     def close(self):
@@ -146,6 +147,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RANDOM()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -160,6 +164,24 @@ def get_max_name_length():
 
 def get_autoinc_sql(table):
     return None
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+
+    """
+    # NB: The generated SQL below is specific to SQLite
+    # Note: The DELETE FROM... SQL generated below works for SQLite databases
+    # because constraints don't exist
+    sql = ['%s %s %s;' % \
+            (style.SQL_KEYWORD('DELETE'),
+             style.SQL_KEYWORD('FROM'),
+             style.SQL_FIELD(quote_name(table))
+             ) for table in tables]
+    # Note: No requirement for reset of auto-incremented indices (cf. other
+    # get_sql_flush() implementations). Just return SQL at this point
+    return sql
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:

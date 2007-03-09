@@ -40,12 +40,26 @@ class Writer(models.Model):
 class Article(models.Model):
     headline = models.CharField(maxlength=50)
     pub_date = models.DateField()
+    created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
 
+    def save(self):
+        import datetime
+        if not self.id:
+            self.created = datetime.date.today()
+        return super(Article, self).save()
+
     def __str__(self):
         return self.headline
+
+class PhoneNumber(models.Model):
+    phone = models.PhoneNumberField()
+    description = models.CharField(maxlength=20)
+
+    def __str__(self):
+        return self.phone
 
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model, form_for_instance, save_instance, BaseForm, Form, CharField
@@ -281,4 +295,170 @@ existing Category instance.
 <Category: Third>
 >>> Category.objects.get(id=3)
 <Category: Third>
+
+Here, we demonstrate that choices for a ForeignKey ChoiceField are determined
+at runtime, based on the data in the database when the form is displayed, not
+the data in the database when the form is instantiated.
+>>> ArticleForm = form_for_model(Article)
+>>> f = ArticleForm(auto_id=False)
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" /></li>
+<li>Writer: <select name="writer">
+<option value="" selected="selected">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+</select></li>
+<li>Article: <textarea name="article"></textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="1">Entertainment</option>
+<option value="2">It&#39;s a test</option>
+<option value="3">Third</option>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+>>> Category.objects.create(name='Fourth', url='4th')
+<Category: Fourth>
+>>> Writer.objects.create(name='Carl Bernstein')
+<Writer: Carl Bernstein>
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" /></li>
+<li>Writer: <select name="writer">
+<option value="" selected="selected">---------</option>
+<option value="1">Mike Royko</option>
+<option value="2">Bob Woodward</option>
+<option value="3">Carl Bernstein</option>
+</select></li>
+<li>Article: <textarea name="article"></textarea></li>
+<li>Categories: <select multiple="multiple" name="categories">
+<option value="1">Entertainment</option>
+<option value="2">It&#39;s a test</option>
+<option value="3">Third</option>
+<option value="4">Fourth</option>
+</select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
+
+# ModelChoiceField ############################################################
+
+>>> from django.newforms import ModelChoiceField, ModelMultipleChoiceField
+
+>>> f = ModelChoiceField(Category.objects.all())
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(0)
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+>>> f.clean(3)
+<Category: Third>
+>>> f.clean(2)
+<Category: It's a test>
+
+# Add a Category object *after* the ModelChoiceField has already been
+# instantiated. This proves clean() checks the database during clean() rather
+# than caching it at time of instantiation.
+>>> Category.objects.create(name='Fifth', url='5th')
+<Category: Fifth>
+>>> f.clean(5)
+<Category: Fifth>
+
+# Delete a Category object *after* the ModelChoiceField has already been
+# instantiated. This proves clean() checks the database during clean() rather
+# than caching it at time of instantiation.
+>>> Category.objects.get(url='5th').delete()
+>>> f.clean(5)
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+
+>>> f = ModelChoiceField(Category.objects.filter(pk=1), required=False)
+>>> print f.clean('')
+None
+>>> f.clean('')
+>>> f.clean('1')
+<Category: Entertainment>
+>>> f.clean('100')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+
+# ModelMultipleChoiceField ####################################################
+
+>>> f = ModelMultipleChoiceField(Category.objects.all())
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean([])
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean([1])
+[<Category: Entertainment>]
+>>> f.clean([2])
+[<Category: It's a test>]
+>>> f.clean(['1'])
+[<Category: Entertainment>]
+>>> f.clean(['1', '2'])
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean([1, '2'])
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean((1, '2'))
+[<Category: Entertainment>, <Category: It's a test>]
+>>> f.clean(['100'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 100 is not one of the available choices.']
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+
+# Add a Category object *after* the ModelChoiceField has already been
+# instantiated. This proves clean() checks the database during clean() rather
+# than caching it at time of instantiation.
+>>> Category.objects.create(id=6, name='Sixth', url='6th')
+<Category: Sixth>
+>>> f.clean([6])
+[<Category: Sixth>]
+
+# Delete a Category object *after* the ModelChoiceField has already been
+# instantiated. This proves clean() checks the database during clean() rather
+# than caching it at time of instantiation.
+>>> Category.objects.get(url='6th').delete()
+>>> f.clean([6])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 6 is not one of the available choices.']
+
+>>> f = ModelMultipleChoiceField(Category.objects.all(), required=False)
+>>> f.clean([])
+[]
+>>> f.clean(())
+[]
+>>> f.clean(['10'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
+>>> f.clean(['3', '10'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
+>>> f.clean(['1', '10'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
+
+# PhoneNumberField ############################################################
+
+>>> PhoneNumberForm = form_for_model(PhoneNumber)
+>>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'phone': u'312-555-1212', 'description': u'Assistance'}
 """}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+    <object pk="2" model="fixtures.article">
+        <field type="CharField" name="headline">Poker on TV is great!</field>
+        <field type="DateTimeField" name="pub_date">2006-06-16 11:00:00</field>
+    </object>
+    <object pk="5" model="fixtures.article">
+        <field type="CharField" name="headline">XML identified as leading cause of cancer</field>
+        <field type="DateTimeField" name="pub_date">2006-06-16 16:00:00</field>
+    </object>
+</django-objects>

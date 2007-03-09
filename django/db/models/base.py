@@ -13,6 +13,7 @@ from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.conf import settings
+from itertools import izip
 import types
 import sys
 import os
@@ -21,8 +22,8 @@ class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
         # If this isn't a subclass of Model, don't do anything special.
-        if not bases or bases == (object,):
-            return type.__new__(cls, name, bases, attrs)
+        if name == 'Model' or not filter(lambda b: issubclass(b, Model), bases):
+            return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
@@ -90,41 +91,74 @@ class Model(object):
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
-        for f in self._meta.fields:
-            if isinstance(f.rel, ManyToOneRel):
-                try:
-                    # Assume object instance was passed in.
-                    rel_obj = kwargs.pop(f.name)
-                except KeyError:
+        
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work 
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and nstantiation for iteration is 33% faster.
+        args_len = len(args)
+        if args_len > len(self._meta.fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+
+        fields_iter = iter(self._meta.fields)
+        if not kwargs:
+            # The ordering of the izip calls matter - izip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+                kwargs.pop(field.name, None)
+                # Maintain compatibility with existing calls.
+                if isinstance(field.rel, ManyToOneRel):
+                    kwargs.pop(field.attname, None)
+        
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+        
+        for field in fields_iter:
+            if kwargs:
+                if isinstance(field.rel, ManyToOneRel):
                     try:
-                        # Object instance wasn't passed in -- must be an ID.
-                        val = kwargs.pop(f.attname)
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
                     except KeyError:
-                        val = f.get_default()
-                else:
-                    # Object instance was passed in.
-                    # Special case: You can pass in "None" for related objects if it's allowed.
-                    if rel_obj is None and f.null:
-                        val = None
-                    else:
                         try:
-                            val = getattr(rel_obj, f.rel.get_related_field().attname)
-                        except AttributeError:
-                            raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
-                setattr(self, f.attname, val)
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                    else:
+                        # Object instance was passed in. Special case: You can
+                        # pass in "None" for related objects if it's allowed.
+                        if rel_obj is None and field.null:
+                            val = None
+                        else:
+                            try:
+                                val = getattr(rel_obj, field.rel.get_related_field().attname)
+                            except AttributeError:
+                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" % 
+                                    (field.name, field.rel.to, type(rel_obj)))
+                else:
+                    val = kwargs.pop(field.attname, field.get_default())
             else:
-                val = kwargs.pop(f.attname, f.get_default())
-                setattr(self, f.attname, val)
-        for prop in kwargs.keys():
-            try:
-                if isinstance(getattr(self.__class__, prop), property):
-                    setattr(self, prop, kwargs.pop(prop))
-            except AttributeError:
-                pass
+                val = field.get_default()
+            setattr(self, field.attname, val)
+
         if kwargs:
-            raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
-        for i, arg in enumerate(args):
-            setattr(self, self._meta.fields[i].attname, arg)
+            for prop in kwargs.keys():
+                try:
+                    if isinstance(getattr(self.__class__, prop), property):
+                        setattr(self, prop, kwargs.pop(prop))
+                except AttributeError:
+                    pass
+            if kwargs:
+                raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, value):
@@ -322,7 +356,7 @@ class Model(object):
     def _get_FIELD_size(self, field):
         return os.path.getsize(self._get_FIELD_filename(field))
 
-    def _save_FIELD_file(self, field, filename, raw_contents):
+    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
@@ -357,8 +391,9 @@ class Model(object):
             if field.height_field:
                 setattr(self, field.height_field, height)
 
-        # Save the object, because it has changed.
-        self.save()
+        # Save the object because it has changed unless save is False
+        if save:
+            self.save()
 
     _save_FIELD_file.alters_data = True
 

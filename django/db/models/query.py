@@ -84,6 +84,7 @@ class _QuerySet(object):
         self._filters = Q()
         self._order_by = None        # Ordering, e.g. ('date', '-name'). If None, use model's ordering.
         self._select_related = False # Whether to fill cache for related objects.
+        self._max_related_depth = 0  # Maximum "depth" for select_related
         self._distinct = False       # Whether the query should use SELECT DISTINCT.
         self._select = {}            # Dictionary of attname -> SQL.
         self._where = []             # List of extra WHERE clauses to use.
@@ -167,17 +168,16 @@ class _QuerySet(object):
 
     def iterator(self):
         "Performs the SELECT database lookup of this QuerySet."
-        # self._select is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples.
-        extra_select = self._select.items()
-
-        cursor = connection.cursor()
-
         try:
             select, sql, params, full_query = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
+        # self._select is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples.
+        extra_select = self._select.items()
+
+        cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
 
         fill_cache = self._select_related
@@ -188,7 +188,8 @@ class _QuerySet(object):
                 raise StopIteration
             for row in rows:
                 if fill_cache:
-                    obj, index_end = get_cached_row(self.model, row, 0)
+                    obj, index_end = get_cached_row(klass=self.model, row=row,
+                                                    index_start=0, max_depth=self._max_related_depth)
                 else:
                     obj = self.model(*row[:index_end])
                 for i, k in enumerate(extra_select):
@@ -196,12 +197,25 @@ class _QuerySet(object):
                 yield obj
 
     def count(self):
-        "Performs a SELECT COUNT() and returns the number of records as an integer."
+        """
+        Performs a SELECT COUNT() and returns the number of records as an
+        integer.
+
+        If the queryset is already cached (i.e. self._result_cache is set) this
+        simply returns the length of the cached results set to avoid multiple
+        SELECT COUNT(*) calls.
+        """
+        if self._result_cache is not None:
+            return len(self._result_cache)
+
         counter = self._clone()
         counter._order_by = ()
+        counter._select_related = False
+
+        offset = counter._offset
+        limit = counter._limit
         counter._offset = None
         counter._limit = None
-        counter._select_related = False
 
         try:
             select, sql, params, full_query = counter._get_sql_clause()
@@ -215,7 +229,16 @@ class _QuerySet(object):
             cursor.execute("SELECT COUNT(DISTINCT(%s))" % id_col + sql, params)
         else:
             cursor.execute("SELECT COUNT(*)" + sql, params)
-        return cursor.fetchone()[0]
+        count = cursor.fetchone()[0]
+
+        # Apply any offset and limit constraints manually, since using LIMIT or
+        # OFFSET in SQL doesn't change the output of COUNT.
+        if offset:
+            count = max(0, count - offset)
+        if limit:
+            count = min(limit, count)
+
+        return count
 
     def get(self, *args, **kwargs):
         "Performs the SELECT and returns a single object matching the given keyword arguments."
@@ -374,9 +397,9 @@ class _QuerySet(object):
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def select_related(self, true_or_false=True):
+    def select_related(self, true_or_false=True, depth=0):
         "Returns a new QuerySet instance with '_select_related' modified."
-        return self._clone(_select_related=true_or_false)
+        return self._clone(_select_related=true_or_false, _max_related_depth=depth)
 
     def order_by(self, *field_names):
         "Returns a new QuerySet instance with the ordering changed."
@@ -410,6 +433,7 @@ class _QuerySet(object):
         c._filters = self._filters
         c._order_by = self._order_by
         c._select_related = self._select_related
+        c._max_related_depth = self._max_related_depth
         c._distinct = self._distinct
         c._select = self._select.copy()
         c._where = self._where[:]
@@ -463,7 +487,10 @@ class _QuerySet(object):
 
         # Add additional tables and WHERE clauses based on select_related.
         if self._select_related:
-            fill_table_cache(opts, select, tables, where, opts.db_table, [opts.db_table])
+            fill_table_cache(opts, select, tables, where,
+                             old_prefix=opts.db_table,
+                             cache_tables_seen=[opts.db_table],
+                             max_depth=self._max_related_depth)
 
         # Add any additional SELECTs.
         if self._select:
@@ -531,10 +558,17 @@ else:
     QuerySet = _QuerySet
 
 class ValuesQuerySet(QuerySet):
-    def iterator(self):
+    def __init__(self, *args, **kwargs):
+        super(ValuesQuerySet, self).__init__(*args, **kwargs)
         # select_related and select aren't supported in values().
         self._select_related = False
         self._select = {}
+
+    def iterator(self):
+        try:
+            select, sql, params, full_query = self._get_sql_clause()
+        except EmptyResultSet:
+            raise StopIteration
 
         # self._fields is a list of field names to fetch.
         if self._fields:
@@ -544,14 +578,8 @@ class ValuesQuerySet(QuerySet):
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
 
-        cursor = connection.cursor()
-
-        try:
-            select, sql, params, full_query = self._get_sql_clause()
-        except EmptyResultSet:
-            raise StopIteration
-
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
+        cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -608,9 +636,6 @@ class EmptyQuerySet(QuerySet):
         super(EmptyQuerySet, self).__init__(model)
         self._result_cache = []
 
-    def iterator(self):
-        raise StopIteration
-
     def count(self):
         return 0
 
@@ -621,6 +646,9 @@ class EmptyQuerySet(QuerySet):
         c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
         c._result_cache = []
         return c
+
+    def _get_sql_clause(self):
+        raise EmptyResultSet
 
 class QOperator(object):
     "Base class for QAnd and QOr"
@@ -717,9 +745,9 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
             return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
         else:
             raise EmptyResultSet
-    elif lookup_type == 'range':
+    elif lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
-    elif lookup_type in ('year', 'month', 'day'):
+    elif lookup_type in ('month', 'day'):
         return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
     elif lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
@@ -727,22 +755,33 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
         return backend.get_fulltext_search_sql(table_prefix + field_name)
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
-def get_cached_row(klass, row, index_start):
-    "Helper function that recursively returns an object with cache filled"
+def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0):
+    """Helper function that recursively returns an object with cache filled"""
+
+    # If we've got a max_depth set and we've exceeded that depth, bail now.
+    if max_depth and cur_depth > max_depth:
+        return None
+
     index_end = index_start + len(klass._meta.fields)
     obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
         if f.rel and not f.null:
-            rel_obj, index_end = get_cached_row(f.rel.to, row, index_end)
-            setattr(obj, f.get_cache_name(), rel_obj)
+            cached_row = get_cached_row(f.rel.to, row, index_end, max_depth, cur_depth+1)
+            if cached_row:
+                rel_obj, index_end = cached_row
+                setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
-def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen):
+def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen, max_depth=0, cur_depth=0):
     """
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
-    from django.db.models.fields import AutoField
+
+    # If we've got a max_depth set and we've exceeded that depth, bail now.
+    if max_depth and cur_depth > max_depth:
+        return None
+
     qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
@@ -757,7 +796,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen)
             where.append('%s.%s = %s.%s' % \
                 (qn(old_prefix), qn(f.column), qn(db_table), qn(f.rel.get_related_field().column)))
             select.extend(['%s.%s' % (backend.quote_name(db_table), backend.quote_name(f2.column)) for f2 in f.rel.to._meta.fields])
-            fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen)
+            fill_table_cache(f.rel.to._meta, select, tables, where, db_table, cache_tables_seen, max_depth, cur_depth+1)
 
 def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
@@ -903,8 +942,14 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
                 new_opts = field.rel.to._meta
                 new_column = new_opts.pk.column
                 join_column = field.column
-
-            raise FieldFound
+                raise FieldFound
+            elif path:
+                # For regular fields, if there are still items on the path,
+                # an error has been made. We munge "name" so that the error
+                # properly identifies the cause of the problem.
+                name += LOOKUP_SEPARATOR + path[0]
+            else:
+                raise FieldFound
 
     except FieldFound: # Match found, loop has been shortcut.
         pass

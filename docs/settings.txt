@@ -162,9 +162,12 @@ a model object and return its URL. This is a way of overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.Weblog': lambda o: "/blogs/%s/" % o.slug,
-        'news.Story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
+
+Note that the model name used in this setting should be all lower-case, regardless
+of the case of the actual model class name.
 
 ADMIN_FOR
 ---------
@@ -196,6 +199,9 @@ with the full exception information. Each member of the tuple should be a tuple
 of (Full name, e-mail address). Example::
 
     (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+
+Note that Django will e-mail *all* of these people whenever an error happens. See the
+section on `error reporting via e-mail`_ for more information.
 
 ALLOWED_INCLUDE_ROOTS
 ---------------------
@@ -236,10 +242,10 @@ The cache key prefix that the cache middleware should use. See the
 DATABASE_ENGINE
 ---------------
 
-Default: ``'postgresql'``
+Default: ``''`` (Empty string)
 
-Which database backend to use. Either ``'postgresql'``, ``'mysql'``,
-``'sqlite3'`` or ``'ado_mssql'``.
+Which database backend to use. Either ``'postgresql_psycopg2'``, 
+``'postgresql'``, ``'mysql'``, ``'sqlite3'`` or ``'ado_mssql'``.
 
 DATABASE_HOST
 -------------
@@ -328,6 +334,16 @@ Default: ``False``
 
 A boolean that turns on/off debug mode.
 
+If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
+regular expression which will hide from the DEBUG view anything that contins
+``'SECRET``, ``PASSWORD``, or ``PROFANITIES'``. This allows untrusted users to
+be able to give backtraces without seeing sensitive (or offensive) settings.
+
+Still, note that there are always going to be sections of your debug output that
+are inapporpriate for public consumption. File paths, configuration options, and
+the like all give attackers extra information about your server. Never deploy a
+site with ``DEBUG`` turned on.
+
 DEFAULT_CHARSET
 ---------------
 
@@ -409,12 +425,25 @@ Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+FIXTURE_DIRS
+-------------
+
+**New in Django development version**
+
+Default: ``()`` (Empty tuple)
+
+List of locations of the fixture data files, in search order. Note that
+these paths should use Unix-style forward slashes, even on Windows. See 
+`Testing Django Applications`_.
+
+.. _Testing Django Applications: ../testing/
+
 IGNORABLE_404_ENDS
 ------------------
 
 Default: ``('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi', 'favicon.ico', '.php')``
 
-See also ``IGNORABLE_404_STARTS``.
+See also ``IGNORABLE_404_STARTS`` and ``Error reporting via e-mail``.
 
 IGNORABLE_404_STARTS
 --------------------
@@ -422,7 +451,8 @@ IGNORABLE_404_STARTS
 Default: ``('/cgi-bin/', '/_vti_bin', '/_vti_inf')``
 
 A tuple of strings that specify beginnings of URLs that should be ignored by
-the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS`` and ``IGNORABLE_404_ENDS``.
+the 404 e-mailer. See ``SEND_BROKEN_LINK_EMAILS``, ``IGNORABLE_404_ENDS`` and
+the section on `error reporting via e-mail`_.
 
 INSTALLED_APPS
 --------------
@@ -636,8 +666,19 @@ Default: ``False``
 Whether to send an e-mail to the ``MANAGERS`` each time somebody visits a
 Django-powered page that is 404ed with a non-empty referer (i.e., a broken
 link). This is only used if ``CommonMiddleware`` is installed (see the
-`middleware docs`_). See also ``IGNORABLE_404_STARTS`` and
-``IGNORABLE_404_ENDS``.
+`middleware docs`_). See also ``IGNORABLE_404_STARTS``,
+``IGNORABLE_404_ENDS`` and the section on `error reporting via e-mail`_
+
+SERIALIZATION_MODULES
+---------------------
+
+Default: Not defined.
+
+A dictionary of modules containing serializer definitions (provided as 
+strings), keyed by a string identifier for that serialization type. For 
+example, to define a YAML serializer, use::
+
+    SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
 
 SERVER_EMAIL
 ------------
@@ -827,6 +868,11 @@ manual configuration option (see below), Django will *not* touch the ``TZ``
 environment variable, and it'll be up to you to ensure your processes are
 running in the correct environment.
 
+.. note::
+    Django cannot reliably use alternate time zones in a Windows environment.
+    If you're running Django on Windows, this variable must be set to match the
+    system timezone.
+
 URL_VALIDATOR_USER_AGENT
 ------------------------
 
@@ -972,3 +1018,36 @@ Also, it's an error to call ``configure()`` more than once, or to call
 
 It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
+
+Error reporting via e-mail
+==========================
+
+Server errors
+-------------
+
+When ``DEBUG`` is ``False``, Django will e-mail the users listed in the
+``ADMIN`` setting whenever your code raises an unhandled exception and results
+in an internal server error (HTTP status code 500). This gives the
+administrators immediate notification of any errors.
+
+To disable this behavior, just remove all entries from the ``ADMINS`` setting.
+
+404 errors
+----------
+
+When ``DEBUG`` is ``False`` and your ``MIDDLEWARE_CLASSES`` setting includes
+``CommonMiddleware``, Django will e-mail the users listed in the ``MANAGERS``
+setting whenever your code raises a 404 and the request has a referer.
+(It doesn't bother to e-mail for 404s that don't have a referer.)
+
+You can tell Django to stop reporting particular 404s by tweaking the
+``IGNORABLE_404_ENDS`` and ``IGNORABLE_404_STARTS`` settings. Both should be a
+tuple of strings. For example::
+
+    IGNORABLE_404_ENDS = ('.php', '.cgi')
+    IGNORABLE_404_STARTS = ('/phpmyadmin/')
+
+In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not*
+be reported. Neither will any URL starting with ``/phpmyadmin/``.
+
+To disable this behavior, just remove all entries from the ``MANAGERS`` setting.

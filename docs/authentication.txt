@@ -86,10 +86,10 @@ objects in the same way as any other `Django model`_::
     myuser.groups.add(group, group,...)
     myuser.groups.remove(group, group,...)
     myuser.groups.clear()
-    myuser.permissions = [permission_list]
-    myuser.permissions.add(permission, permission, ...)
-    myuser.permissions.remove(permission, permission, ...]
-    myuser.permissions.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
@@ -317,6 +317,16 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         else:
             # Return an 'invalid login' error message.
 
+Manually checking a user's password
+-----------------------------------
+
+If you'd like to manually authenticate a user by comparing a
+plain-text password to the hashed password in the database, use the
+convenience function `django.contrib.auth.models.check_password`. It
+takes two arguments: the plain-text password to check, and the full
+value of a user's ``password`` field in the database to check against,
+and returns ``True`` if they match, ``False`` otherwise.
+
 How to log a user out
 ---------------------
 
@@ -388,7 +398,7 @@ To do this, add the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-Here's what ``django.contrib.auth.views.login`` does::
+Here's what ``django.contrib.auth.views.login`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the same
       URL. More on this in a bit.
@@ -443,6 +453,147 @@ block::
 
 .. _forms documentation: ../forms/
 .. _site framework docs: ../sites/
+
+Other built-in views
+--------------------
+
+In addition to the `login` view, the authentication system includes a
+few other useful built-in views:
+
+``django.contrib.auth.views.logout``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Logs a user out.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to display after
+      logging the user out. This will default to
+      ``registration/logged_out.html`` if no argument is supplied.
+
+**Template context:**
+
+    * ``title``: The string "Logged out", localized.
+
+``django.contrib.auth.views.logout_then_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Logs a user out, then redirects to the login page.
+
+**Optional arguments:**
+
+    * ``login_url``: The URL of the login page to redirect to. This
+      will default to ``/accounts/login/`` if not supplied.
+
+``django.contrib.auth.views.password_change``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Allows a user to change their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use for
+      displaying the password change form. This will default to
+      ``registration/password_change_form.html`` if not supplied.
+
+**Template context:**
+
+    * ``form``: The password change form.
+
+``django.contrib.auth.views.password_change_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+The page shown after a user has changed their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use. This will
+      default to ``registration/password_change_done.html`` if not
+      supplied.
+
+``django.contrib.auth.views.password_reset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Allows a user to reset their password, and sends them the new password
+in an email.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use for
+      displaying the password reset form. This will default to
+      ``registration/password_reset_form.html`` if not supplied.
+
+    * ``email_template_name``: The full name of a template to use for
+      generating the email with the new password. This will default to
+      ``registration/password_reset_email.html`` if not supplied.
+
+**Template context:**
+
+    * ``form``: The form for resetting the user's password.
+
+``django.contrib.auth.views.password_reset_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+The page shown after a user has reset their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use. This will
+      default to ``registration/password_reset_done.html`` if not
+      supplied.
+
+``django.contrib.auth.views.redirect_to_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Redirects to the login page, and then back to another URL after a
+successful login.
+
+**Required arguments:**
+
+    * ``next``: The URL to redirect to after a successful login.
+
+**Optional arguments:**
+
+    * ``login_url``: The URL of the login page to redirect to. This
+      will default to ``/accounts/login/`` if not supplied.
+
+Built-in manipulators
+---------------------
+
+If you don't want to use the built-in views, but want the convenience
+of not having to write manipulators for this functionality, the
+authentication system provides several built-in manipulators:
+
+    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: A
+      manipulator used in the admin interface to change a user's
+      password.
+
+    * ``django.contrib.auth.forms.AuthenticationForm``: A manipulator
+      for logging a user in.
+
+    * ``django.contrib.auth.forms.PasswordChangeForm``: A manipulator
+      for allowing a user to change their password.
+
+    * ``django.contrib.auth.forms.PasswordResetForm``: A manipulator
+      for resetting a user's password and emailing the new password to
+      them.
+
+    * ``django.contrib.auth.forms.UserCreationForm``: A manipulator
+      for creating a new user.
 
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------
@@ -813,13 +964,13 @@ The  ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
 
     class MyBackend:
-        def authenticate(username=None, password=None):
+        def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
     class MyBackend:
-        def authenticate(token=None):
+        def authenticate(self, token=None):
             # Check the token and return a User.
 
 Either way, ``authenticate`` should check the credentials it gets, and it

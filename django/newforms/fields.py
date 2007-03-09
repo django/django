@@ -51,7 +51,7 @@ class Field(object):
         if label is not None:
             label = smart_unicode(label)
         self.required, self.label, self.initial = required, label, initial
-        self.help_text = help_text
+        self.help_text = smart_unicode(help_text or '')
         widget = widget or self.widget
         if isinstance(widget, type):
             widget = widget()
@@ -339,8 +339,9 @@ class ChoiceField(Field):
 
     def _set_choices(self, value):
         # Setting choices also sets the choices on the widget.
-        self._choices = value
-        self.widget.choices = value
+        # choices can be any iterable, but we call list() on it because
+        # it will be consumed more than once.
+        self._choices = self.widget.choices = list(value)
 
     choices = property(_get_choices, _set_choices)
 
@@ -356,7 +357,7 @@ class ChoiceField(Field):
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
-            raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % value)
+            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class MultipleChoiceField(ChoiceField):

@@ -498,6 +498,12 @@ or outside your model class altogether::
     class Foo(models.Model):
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
+For each model field that has ``choices`` set, Django will add a method to
+retrieve the human-readable name for the field's current value. See
+`get_FOO_display`_ in the database API documentation.
+
+.. _get_FOO_display: ../db_api/#get-foo-display
+
 Finally, note that choices can be any iterable object -- not necessarily a
 list or tuple. This lets you construct choices dynamically. But if you find
 yourself hacking ``choices`` to be dynamic, you're probably better off using
@@ -874,8 +880,8 @@ the relationship should work. All are optional:
                              force Django to add the descriptor for the reverse
                              relationship, allowing ``ManyToMany`` relationships to be
                              non-symmetrical.
-			     
-    ``db_table``             The name of the table to create for storing the many-to-many 
+
+    ``db_table``             The name of the table to create for storing the many-to-many
                              data. If this is not provided, Django will assume a default
                              name based upon the names of the two tables being joined.
 
@@ -1210,6 +1216,9 @@ screen via ``<script src="">`` tags. This can be used to tweak a given type of
 admin page in JavaScript or to provide "quick links" to fill in default values
 for certain fields.
 
+If relative URLs are used, Django admin will automatically prepend these links
+with ``settings.ADMIN_MEDIA_PREFIX``.
+
 ``list_display``
 ----------------
 
@@ -1272,8 +1281,8 @@ A few special cases to note about ``list_display``:
                   return '<span style="color: #%s;">%s %s</span>' % (self.color_code, self.first_name, self.last_name)
               colored_name.allow_tags = True
 
-    * If the string given is a method of the model that returns True or False 
-      Django will display a pretty "on" or "off" icon if you give the method a 
+    * If the string given is a method of the model that returns True or False
+      Django will display a pretty "on" or "off" icon if you give the method a
       ``boolean`` attribute whose value is ``True``.
 
       Here's a full example model::
@@ -1295,10 +1304,30 @@ A few special cases to note about ``list_display``:
 
           list_display = ('__str__', 'some_other_field')
 
-    * For any element of ``list_display`` that is not a field on the model, the
-      change list page will not allow ordering by that column. This is because
-      ordering is done at the database level, and Django has no way of knowing
-      how to order the result of a custom method at the SQL level.
+    * Usually, elements of ``list_display`` that aren't actual database fields
+      can't be used in sorting (because Django does all the sorting at the
+      database level).
+      
+      However, if an element of ``list_display`` represents a certain database
+      field, you can indicate this fact by setting the ``admin_order_field``
+      attribute of the item.
+      
+      For example::
+      
+        class Person(models.Model):
+            first_name = models.CharField(maxlength=50)
+            color_code = models.CharField(maxlength=6)
+
+            class Admin:
+                list_display = ('first_name', 'colored_first_name')
+
+            def colored_first_name(self):
+                return '<span style="color: #%s;">%s</span>' % (self.color_code, self.first_name)
+            colored_first_name.allow_tags = True
+            colored_first_name.admin_order_field = 'first_name'
+    
+      The above will tell Django to order by the ``first_name`` field when
+      trying to sort by ``colored_first_name`` in the admin.
 
 ``list_display_links``
 ----------------------
@@ -1412,7 +1441,7 @@ This should be set to a list of field names that will be searched whenever
 somebody submits a search query in that text box.
 
 These fields should be some kind of text field, such as ``CharField`` or
-``TextField``. You can also perform a related lookup on a ``ForeignKey`` with 
+``TextField``. You can also perform a related lookup on a ``ForeignKey`` with
 the lookup API "follow" notation::
 
     search_fields = ['foreign_key__related_fieldname']
@@ -1721,11 +1750,29 @@ But this template code is good::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
-(Yes, we know ``get_absolute_url()`` couples URLs to models, which violates the
-DRY principle, because URLs are defined both in a URLconf and in the model.
-This is a rare case in which we've intentionally violated that principle for
-the sake of convenience. With that said, we're working on an even cleaner way
-of specifying URLs in a more DRY fashion.)
+The ``permalink`` decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version.**
+
+The problem with the way we wrote ``get_absolute_url()`` above is that it
+slightly violates the DRY principle: the URL for this object is defined both
+in the URLConf file and in the model.
+
+You can further decouple your models from the URLconf using the ``permalink``
+decorator. This decorator is passed the view function and any parameters you
+would use for accessing this instance directly. Django then works out the
+correct full URL path using the URLconf. For example::
+
+    from django.db.models import permalink
+
+    def get_absolute_url(self):
+        return ('people.views.details', str(self.id))
+    get_absolute_url = permalink(get_absolute_url)
+
+In this way, you're tying the model's absolute URL to the view that is used
+to display it, without repeating the URL information anywhere. You can still
+use the ``get_absolute_url`` method in templates, as before.
 
 Executing custom SQL
 --------------------

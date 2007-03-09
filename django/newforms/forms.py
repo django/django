@@ -7,6 +7,7 @@ from django.utils.html import escape
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
 from util import flatatt, StrAndUnicode, ErrorDict, ErrorList, ValidationError
+import copy
 
 __all__ = ('BaseForm', 'Form')
 
@@ -27,13 +28,24 @@ class SortedDictFromList(SortedDict):
         dict.__init__(self, dict(data))
 
     def copy(self):
-        return SortedDictFromList(self.items())
+        return SortedDictFromList([(k, copy.copy(v)) for k, v in self.items()])
 
 class DeclarativeFieldsMetaclass(type):
-    "Metaclass that converts Field attributes to a dictionary called 'base_fields'."
+    """
+    Metaclass that converts Field attributes to a dictionary called
+    'base_fields', taking into account parent class 'base_fields' as well.
+    """
     def __new__(cls, name, bases, attrs):
         fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
         fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+
+        # If this class is subclassing another Form, add that Form's fields.
+        # Note that we loop over the bases in *reverse*. This is necessary in
+        # order to preserve the correct order of fields.
+        for base in bases[::-1]:
+            if hasattr(base, 'base_fields'):
+                fields = base.base_fields.items() + fields
+
         attrs['base_fields'] = SortedDictFromList(fields)
         return type.__new__(cls, name, bases, attrs)
 
@@ -49,6 +61,7 @@ class BaseForm(StrAndUnicode):
         self.prefix = prefix
         self.initial = initial or {}
         self.__errors = None # Stores the errors after clean() has been called.
+
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
         # alter self.fields, we create self.fields here by copying base_fields.
@@ -100,7 +113,7 @@ class BaseForm(StrAndUnicode):
         output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            bf_errors = bf.errors # Cache in local variable.
+            bf_errors = ErrorList([escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
@@ -205,6 +218,7 @@ class BoundField(StrAndUnicode):
             self.label = pretty_name(name)
         else:
             self.label = self.field.label
+        self.help_text = field.help_text or ''
 
     def __unicode__(self):
         "Renders this field as an HTML widget."

@@ -19,10 +19,11 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
-from django.test.client import Client
-import unittest
+from django.test import Client, TestCase
 
-class ClientTest(unittest.TestCase):
+class ClientTest(TestCase):
+    fixtures = ['testdata.json']
+    
     def setUp(self):
         "Set up test environment"
         self.client = Client()
@@ -43,7 +44,7 @@ class ClientTest(unittest.TestCase):
         
         # Check some response details
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, 'Empty POST Template')
+        self.assertEqual(response.template.name, 'Empty GET Template')
         
     def test_empty_post(self):
         "POST an empty dictionary to a view"
@@ -53,7 +54,7 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty POST Template')
         
-    def test_post_view(self):
+    def test_post(self):
         "POST some data to a view"
         post_data = {
             'value': 37
@@ -66,6 +67,14 @@ class ClientTest(unittest.TestCase):
         self.assertEqual(response.template.name, 'POST Template')
         self.failUnless('Data received' in response.content)
         
+    def test_raw_post(self):
+        test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
+        response = self.client.post("/test_client/raw_post_view/", test_doc,
+                                    content_type="text/xml")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template.name, "Book template")
+        self.assertEqual(response.content, "Blink - Malcolm Gladwell")
+
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')
@@ -89,7 +98,7 @@ class ClientTest(unittest.TestCase):
         
         # Request a page that requires a login
         response = self.client.login('/test_client/login_protected_view/', 'testclient', 'password')
-        self.assertTrue(response)
+        self.failUnless(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
         self.assertEqual(response.template.name, 'Login Template')
@@ -98,4 +107,30 @@ class ClientTest(unittest.TestCase):
         "Request a page that is protected with @login, but use bad credentials"
 
         response = self.client.login('/test_client/login_protected_view/', 'otheruser', 'nopassword')
-        self.assertFalse(response)
+        self.failIf(response)
+
+    def test_session_modifying_view(self):
+        "Request a page that modifies the session"
+        # Session value isn't set initially
+        try:
+            self.client.session['tobacconist']
+            self.fail("Shouldn't have a session value")
+        except KeyError:
+            pass
+        
+        from django.contrib.sessions.models import Session
+        response = self.client.post('/test_client/session_view/')
+        
+        # Check that the session was modified
+        self.assertEquals(self.client.session['tobacconist'], 'hovercraft')
+
+    def test_view_with_exception(self):
+        "Request a page that is known to throw an error"
+        self.assertRaises(KeyError, self.client.get, "/test_client/broken_view/")
+        
+        #Try the same assertion, a different way
+        try:
+            self.client.get('/test_client/broken_view/')
+            self.fail('Should raise an error')
+        except KeyError:
+            pass

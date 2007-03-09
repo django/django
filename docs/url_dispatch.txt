@@ -390,6 +390,13 @@ to pass metadata and options to views.
 .. _generic views: ../generic_views/
 .. _syndication framework: ../syndication/
 
+.. admonition:: Dealing with conflicts
+
+    It's possible to have a URL pattern which captures named keyword arguments,
+    and also passes arguments with the same names in its dictionary of extra
+    arguments. When this happens, the arguments in the dictionary will be used
+    instead of the arguments captured in the URL.
+
 Passing extra options to ``include()``
 --------------------------------------
 

@@ -67,20 +67,19 @@ def Deserializer(object_list, **options):
                 
             field = Model._meta.get_field(field_name)
             
-            # Handle M2M relations (with in_bulk() for performance)
+            # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 pks = []
                 for pk in field_value:
                     if isinstance(pk, unicode):
-                        pk = pk.encode(options.get("encoding", settings.DEFAULT_CHARSET))
-                m2m_data[field.name] = field.rel.to._default_manager.in_bulk(field_value).values()
+                        pks.append(pk.encode(options.get("encoding", settings.DEFAULT_CHARSET)))
+                    else:
+                        pks.append(pk)
+                m2m_data[field.name] = pks
                 
             # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel) and field_value is not None:
-                try:
-                    data[field.name] = field.rel.to._default_manager.get(pk=field_value)
-                except field.rel.to.DoesNotExist:
-                    data[field.name] = None
+            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+                data[field.attname] = field_value
                     
             # Handle all other fields
             else:

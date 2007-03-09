@@ -40,7 +40,7 @@ class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
-            feed_url=None):
+            feed_url=None, feed_copyright=None):
         self.feed = {
             'title': title,
             'link': link,
@@ -52,12 +52,13 @@ class SyndicationFeed(object):
             'subtitle': subtitle,
             'categories': categories or (),
             'feed_url': feed_url,
+            'feed_copyright': feed_copyright,
         }
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
         author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, enclosure=None, categories=()):
+        unique_id=None, enclosure=None, categories=(), item_copyright=None):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate, which is a datetime.datetime object, and
@@ -75,6 +76,7 @@ class SyndicationFeed(object):
             'unique_id': unique_id,
             'enclosure': enclosure,
             'categories': categories or (),
+            'item_copyright': item_copyright,
         })
 
     def num_items(self):
@@ -128,6 +130,8 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement(u"language", self.feed['language'])
         for cat in self.feed['categories']:
             handler.addQuickElement(u"category", cat)
+        if self.feed['feed_copyright'] is not None:
+            handler.addQuickElement(u"copyright", self.feed['feed_copyright'])
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
@@ -212,6 +216,8 @@ class Atom1Feed(SyndicationFeed):
             handler.addQuickElement(u"subtitle", self.feed['subtitle'])
         for cat in self.feed['categories']:
             handler.addQuickElement(u"category", "", {u"term": cat})
+        if self.feed['feed_copyright'] is not None:
+            handler.addQuickElement(u"rights", self.feed['feed_copyright'])
         self.write_items(handler)
         handler.endElement(u"feed")
 
@@ -252,9 +258,13 @@ class Atom1Feed(SyndicationFeed):
                      u"length": item['enclosure'].length,
                      u"type": item['enclosure'].mime_type})
 
-            # Categories:
+            # Categories.
             for cat in item['categories']:
                 handler.addQuickElement(u"category", u"", {u"term": cat})
+
+            # Rights.
+            if item['item_copyright'] is not None:
+                handler.addQuickElement(u"rights", item['item_copyright'])
 
             handler.endElement(u"entry")
 

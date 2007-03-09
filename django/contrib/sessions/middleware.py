@@ -10,6 +10,7 @@ TEST_COOKIE_VALUE = 'worked'
 class SessionWrapper(object):
     def __init__(self, session_key):
         self.session_key = session_key
+        self.accessed = False
         self.modified = False
 
     def __contains__(self, key):
@@ -46,6 +47,7 @@ class SessionWrapper(object):
 
     def _get_session(self):
         # Lazily loads session from storage.
+        self.accessed = True
         try:
             return self._session_cache
         except AttributeError:
@@ -72,12 +74,14 @@ class SessionMiddleware(object):
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
         # those changes and set a session cookie.
-        patch_vary_headers(response, ('Cookie',))
         try:
+            accessed = request.session.accessed
             modified = request.session.modified
         except AttributeError:
             pass
         else:
+            if accessed:
+                patch_vary_headers(response, ('Cookie',))
             if modified or settings.SESSION_SAVE_EVERY_REQUEST:
                 session_key = request.session.session_key or Session.objects.get_new_session_key()
                 if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:

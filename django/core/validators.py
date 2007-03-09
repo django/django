@@ -312,11 +312,12 @@ class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
         RequiredIfOtherFieldsGiven.__init__(self, [other_field_name], error_message)
 
 class RequiredIfOtherFieldEquals(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, error_message=None, other_label=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -324,11 +325,12 @@ class RequiredIfOtherFieldEquals(object):
             raise ValidationError(self.error_message)
 
 class RequiredIfOtherFieldDoesNotEqual(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, other_label=None, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is not %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):

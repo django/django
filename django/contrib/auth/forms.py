@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import oldforms
+from django.utils.translation import gettext as _
 
 class UserCreationForm(oldforms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."

@@ -1,6 +1,7 @@
 import sys, time
 from django.conf import settings
 from django.db import connection, backend, get_creation_module
+from django.core import management
 from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
@@ -89,6 +90,8 @@ def create_test_db(verbosity=1, autoclobber=False):
                
     connection.close()
     settings.DATABASE_NAME = TEST_DATABASE_NAME
+
+    management.syncdb(verbosity, interactive=False)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.

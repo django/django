@@ -654,6 +654,18 @@ decorator instead::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
+Template filters which expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are writing a template filter which only expects a string as the first
+argument, you should use the included decorator ``stringfilter`` which will convert
+an object to it's string value before being passed to your function::
+
+    from django import template
+
+    @template.stringfilter
+    def lower(value):
+    	return value.lower()
+
 Writing custom template tags
 ----------------------------
 
@@ -800,6 +812,70 @@ Python 2.4 and above::
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
+
+Passing template variables to the tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although you can pass any number of arguments to a template tag using
+``token.split_contents()``, the arguments are all unpacked as
+string literals. A little more work is required in order to dynamic content (a
+template variable) to a template tag as an argument.
+
+While the previous examples have formatted the current time into a string and
+returned the string, suppose you wanted to pass in a ``DateTimeField`` from an
+object and have the template tag format that date-time::
+
+    <p>This post was last updated at {% format_time blog_entry.date_updated "%Y-%m-%d %I:%M %p" %}.</p>
+
+Initially, ``token.split_contents()`` will return three values:
+
+    1. The tag name ``format_time``.
+    2. The string "blog_entry.date_updated" (without the surrounding quotes).
+    3. The formatting string "%Y-%m-%d %I:%M %p". The return value from
+       ``split_contents()`` will include the leading and trailing quotes for
+       string literals like this.
+
+Now your tag should begin to look like this::
+
+    from django import template
+    def do_format_time(parser, token):
+        try:
+            # split_contents() knows not to split quoted strings.
+            tag_name, date_to_be_formatted, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
+
+You also have to change the renderer to retrieve the actual contents of the
+``date_updated`` property of the ``blog_entry`` object.  This can be
+accomplished by using the ``resolve_variable()`` function in
+``django.template``. You pass ``resolve_variable()`` the variable name and the
+current context, available in the ``render`` method::
+
+    from django import template
+    from django.template import resolve_variable
+    import datetime
+    class FormatTimeNode(template.Node):
+        def __init__(self, date_to_be_formatted, format_string):
+            self.date_to_be_formatted = date_to_be_formatted
+            self.format_string = format_string
+        
+        def render(self, context):
+            try:
+                actual_date = resolve_variable(self.date_to_be_formatted, context)
+                return actual_date.strftime(self.format_string)
+            except VariableDoesNotExist:
+                return ''
+
+``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
+format it accordingly.
+
+.. note::
+    The ``resolve_variable()`` function will throw a ``VariableDoesNotExist``
+    exception if it cannot resolve the string passed to it in the current
+    context of the page.
 
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~

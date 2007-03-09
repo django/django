@@ -127,6 +127,29 @@ class Templates(unittest.TestCase):
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
+            # List-index syntax allows a template to access a certain item of a subscriptable object.
+            'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
+
+            # Fail silently when the list index is out of range.
+            'list-index02': ("{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")),
+
+            # Fail silently when the variable is not a subscriptable object.
+            'list-index03': ("{{ var.1 }}", {"var": None}, ("", "INVALID")),
+
+            # Fail silently when variable is a dict without the specified key.
+            'list-index04': ("{{ var.1 }}", {"var": {}}, ("", "INVALID")),
+
+            # Dictionary lookup wins out when dict's key is a string.
+            'list-index05': ("{{ var.1 }}", {"var": {'1': "hello"}}, "hello"),
+
+            # But list-index lookup wins out when dict's key is an int, which
+            # behind the scenes is really a dictionary lookup (for a dict)
+            # after converting the key to an int.
+            'list-index06': ("{{ var.1 }}", {"var": {1: "hello"}}, "hello"),
+
+            # Dictionary lookup wins out when there is a string and int version of the key.
+            'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
+            
             # Basic filter usage
             'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
@@ -167,7 +190,7 @@ class Templates(unittest.TestCase):
             'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
             # In methods that raise an exception without a "silent_variable_attribute" set to True,
-            # the exception propogates
+            # the exception propagates
             'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
             # Escaped backslash in argument
@@ -378,6 +401,20 @@ class Templates(unittest.TestCase):
             'ifequal-split09': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slash\man"}, "yes"),
             'ifequal-split10': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slashman"}, "no"),
 
+            # NUMERIC RESOLUTION
+            'ifequal-numeric01': ('{% ifequal x 5 %}yes{% endifequal %}', {'x': '5'}, ''),
+            'ifequal-numeric02': ('{% ifequal x 5 %}yes{% endifequal %}', {'x': 5}, 'yes'),
+            'ifequal-numeric03': ('{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5}, ''),
+            'ifequal-numeric04': ('{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5.2}, 'yes'),
+            'ifequal-numeric05': ('{% ifequal x 0.2 %}yes{% endifequal %}', {'x': .2}, 'yes'),
+            'ifequal-numeric06': ('{% ifequal x .2 %}yes{% endifequal %}', {'x': .2}, 'yes'),
+            'ifequal-numeric07': ('{% ifequal x 2. %}yes{% endifequal %}', {'x': 2}, ''),
+            'ifequal-numeric08': ('{% ifequal x "5" %}yes{% endifequal %}', {'x': 5}, ''),
+            'ifequal-numeric09': ('{% ifequal x "5" %}yes{% endifequal %}', {'x': '5'}, 'yes'),
+            'ifequal-numeric10': ('{% ifequal x -5 %}yes{% endifequal %}', {'x': -5}, 'yes'),
+            'ifequal-numeric11': ('{% ifequal x -5.2 %}yes{% endifequal %}', {'x': -5.2}, 'yes'),
+            'ifequal-numeric12': ('{% ifequal x +5 %}yes{% endifequal %}', {'x': 5}, 'yes'),
+
             ### IFNOTEQUAL TAG ########################################################
             'ifnotequal01': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
             'ifnotequal02': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""),
@@ -389,6 +426,21 @@ class Templates(unittest.TestCase):
             'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
+
+            ### NAMED ENDBLOCKS #######################################################
+
+            # Basic test
+            'namedendblocks01': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'),
+
+            # Unbalanced blocks
+            'namedendblocks02': ("1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks03': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks04': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks05': ("1{% block first %}_{% block second %}2{% endblock first %}", {}, template.TemplateSyntaxError),
+
+            # Mixed named and unnamed endblocks
+            'namedendblocks06': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'),
+            'namedendblocks07': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'),
 
             ### INHERITANCE ###########################################################
 
@@ -630,6 +682,17 @@ class Templates(unittest.TestCase):
             # Compare to a given parameter
             'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
             'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
+
+            ### URL TAG ########################################################
+            # Successes
+            'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+
+            # Failures
+            'url04' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url05' : ('{% url no_such_view %}', {}, ''),
+            'url06' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.

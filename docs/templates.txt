@@ -253,6 +253,16 @@ Here are some tips for working with inheritance:
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
+    * **New in Django development version:** For extra readability, you can
+      optionally give a *name* to your ``{% endblock %}`` tag. For example::
+
+          {% block content %}
+          ...
+          {% endblock content %}
+
+      In larger templates, this technique helps you see which ``{% block %}``
+      tags are being closed.
+
 Finally, note that you can't define multiple ``{% block %}`` tags with the same
 name in the same template. This limitation exists because a block tag works in
 "both" directions. That is, a block tag doesn't just provide a hole to fill --
@@ -635,6 +645,7 @@ Available format strings:
                       output, because this includes periods
                       to match Associated Press style.)
     A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+    b                 Month, textual, 3 letters, lowercase.     ``'jan'``
     B                 Not implemented.
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.
@@ -818,6 +829,40 @@ The argument tells which template bit to output:
     ==================  =======
 
 Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
+
+url
+~~~
+
+**New in Django development version**
+
+**Note that the syntax for this tag may change in the future, as we make it more robust.**
+
+Returns an absolute URL (i.e., a URL without the domain name) matching a given
+view function and optional parameters. This is a way to output links without
+violating the DRY principle by having to hard-code URLs in your templates::
+
+    {% url path.to.some_view arg1,arg2,name1=value1 %}
+
+The first argument is a path to a view function in the format
+``package.package.module.function``. Additional arguments are optional and
+should be comma-separated values that will be used as positional and keyword
+arguments in the URL. All arguments required by the URLconf should be present.
+
+For example, suppose you have a view, ``app_name.client``, whose URLconf takes
+a client ID. The URLconf line might look like this::
+
+    ('^client/(\d+)/$', 'app_name.client')
+
+If this app's URLconf is included into the project's URLconf under a path
+such as this::
+
+    ('^clients/', include('project_name.app_name.urls'))
+
+...then, in a template, you can create a link to this view like this::
+
+    {% url app_name.client client.id %}
+
+The template tag will output the string ``/clients/client/123/``.
 
 widthratio
 ~~~~~~~~~~
@@ -1132,6 +1177,16 @@ truncatewords
 Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
+
+truncatewords_html
+~~~~~~~~~~~~~~~~~~
+
+Similar to ``truncatewords``, except that it is aware of HTML tags. Any tags
+that are opened in the string and not closed before the truncation point, are
+closed immediately after the truncation.
+
+This is less efficient than ``truncatewords``, so should only be used when it
+is being passed HTML text.
 
 unordered_list
 ~~~~~~~~~~~~~~

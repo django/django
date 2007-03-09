@@ -14,7 +14,7 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('pub_date','headline')
-        
+
     def __str__(self):
         return self.headline
 
@@ -321,7 +321,6 @@ AttributeError: Manager isn't accessible via Article instances
 >>> Article.objects.filter(id__lte=4).delete()
 >>> Article.objects.all()
 [<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
-
 """}
 
 from django.conf import settings
@@ -360,4 +359,11 @@ __test__['API_TESTS'] += """
 >>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> Article.objects.get(headline="Article 10")
 <Article: Article 10>
+
+# Edge-case test: A year lookup should retrieve all objects in the given
+year, including Jan. 1 and Dec. 31.
+>>> a11 = Article.objects.create(headline='Article 11', pub_date=datetime(2008, 1, 1))
+>>> a12 = Article.objects.create(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999))
+>>> Article.objects.filter(pub_date__year=2008)
+[<Article: Article 11>, <Article: Article 12>]
 """

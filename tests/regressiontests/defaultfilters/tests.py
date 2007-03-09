@@ -87,6 +87,20 @@ u'\xeb'
 >>> truncatewords('A sentence with a few words in it', 'not a number')
 'A sentence with a few words in it'
 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 0) 
+''
+ 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 2) 
+'<p>one <a href="#">two ...</a></p>'
+ 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 4) 
+'<p>one <a href="#">two - three <br>four ...</a></p>'
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 5) 
+'<p>one <a href="#">two - three <br>four</a> five</p>'
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 100) 
+'<p>one <a href="#">two - three <br>four</a> five</p>'
 
 >>> upper('Mixed case input')
 'MIXED CASE INPUT'
@@ -97,6 +111,8 @@ u'\xcb'
 
 >>> urlencode('jack & jill')
 'jack%20%26%20jill'
+>>> urlencode(1)
+'1'
 
 
 >>> urlizetrunc('http://short.com/', 20)
@@ -372,7 +388,53 @@ False
 >>> phone2numeric('0800 flowers')
 '0800 3569377'
 
-
+# Filters shouldn't break if passed non-strings
+>>> addslashes(123)
+'123'
+>>> linenumbers(123)
+'1. 123'
+>>> lower(123)
+'123'
+>>> make_list(123)
+['1', '2', '3']
+>>> slugify(123)
+'123'
+>>> title(123)
+'123'
+>>> truncatewords(123, 2)
+'123'
+>>> upper(123)
+'123'
+>>> urlencode(123)
+'123'
+>>> urlize(123)
+'123'
+>>> urlizetrunc(123, 1)
+'123'
+>>> wordcount(123)
+1
+>>> wordwrap(123, 2)
+'123'
+>>> ljust('123', 4)
+'123 '
+>>> rjust('123', 4)
+' 123'
+>>> center('123', 5)
+' 123 '
+>>> center('123', 6)
+' 123  '
+>>> cut(123, '2')
+'13'
+>>> escape(123)
+'123'
+>>> linebreaks(123)
+'<p>123</p>'
+>>> linebreaksbr(123)
+'123'
+>>> removetags(123, 'a')
+'123'
+>>> striptags(123)
+'123'
 
 """
 
