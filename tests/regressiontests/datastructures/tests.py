@@ -50,6 +50,8 @@
 >>> d['one'] = 'not one'
 >>> d['one']
 'not one'
+>>> d.keys() == d.copy().keys()
+True
 
 ### DotExpandedDict ############################################################
 
