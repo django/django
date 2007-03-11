@@ -140,7 +140,8 @@ def _isValidDate(date_string):
     try:
         date(year, month, day)
     except ValueError, e:
-        raise ValidationError, gettext('Invalid date: %s.' % e)    
+        msg = gettext('Invalid date: %s') % gettext(str(e))
+        raise ValidationError, msg    
 
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
