@@ -19,6 +19,16 @@ class ContentTypeManager(models.Manager):
                 model=key[1], defaults={'name': str(opts.verbose_name)})
             CONTENT_TYPE_CACHE[key] = ct
         return ct
+        
+    def clear_cache(self):
+        """
+        Clear out the content-type cache. This needs to happen during database
+        flushes to prevent caching of "stale" content type IDs (see
+        django.contrib.contenttypes.management.create_contenttypes for where
+        this gets called).
+        """
+        global CONTENT_TYPE_CACHE
+        CONTENT_TYPE_CACHE = {}
 
 class ContentType(models.Model):
     name = models.CharField(maxlength=100)
