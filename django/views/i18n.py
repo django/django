@@ -9,16 +9,16 @@ def set_language(request):
     """
     Redirect to a given url while setting the chosen language in the
     session or cookie. The url and the language code need to be
-    specified in the GET paramters.
+    specified in the GET parameters.
     """
-    lang_code = request.GET['language']
+    lang_code = request.GET.get('language', None)
     next = request.GET.get('next', None)
     if not next:
         next = request.META.get('HTTP_REFERER', None)
     if not next:
         next = '/'
     response = http.HttpResponseRedirect(next)
-    if check_for_language(lang_code):
+    if lang_code and check_for_language(lang_code):
         if hasattr(request, 'session'):
             request.session['django_language'] = lang_code
         else:
