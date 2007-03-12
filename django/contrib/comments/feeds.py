@@ -44,5 +44,5 @@ class LatestCommentsFeed(LatestFreeCommentsFeed):
         kwargs['is_removed__exact'] = False
         if settings.COMMENTS_BANNED_USERS_GROUP:
             kwargs['where'] = ['user_id NOT IN (SELECT user_id FROM auth_users_group WHERE group_id = %s)']
-            kwargs['params'] = [COMMENTS_BANNED_USERS_GROUP]
+            kwargs['params'] = [settings.COMMENTS_BANNED_USERS_GROUP]
         return kwargs
