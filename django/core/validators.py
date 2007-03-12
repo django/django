@@ -364,7 +364,7 @@ class NumberIsInRange(object):
         self.lower, self.upper = lower, upper
         if not error_message:
             if lower and upper:
-                self.error_message = gettext("This value must be between %s and %s.") % (lower, upper)
+                 self.error_message = gettext("This value must be between %(lower)s and %(upper)s.") % {'lower': lower, 'upper': upper}
             elif lower:
                 self.error_message = gettext("This value must be at least %s.") % lower
             elif upper:
