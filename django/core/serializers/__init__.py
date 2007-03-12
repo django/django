@@ -25,6 +25,13 @@ BUILTIN_SERIALIZERS = {
     "json"   : "django.core.serializers.json",
 }
 
+# Check for PyYaml and register the serializer if it's available.
+try:
+    import yaml
+    BUILTIN_SERIALIZERS["yaml"] = "django.core.serializers.pyyaml"
+except ImportError:
+    pass    
+
 _serializers = {}
         
 def register_serializer(format, serializer_module):
