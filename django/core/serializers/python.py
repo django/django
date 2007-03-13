@@ -57,7 +57,7 @@ def Deserializer(object_list, **options):
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.attname : d["pk"]}
+        data = {Model._meta.pk.attname : Model._meta.pk.to_python(d["pk"])}
         m2m_data = {}
         
         # Handle each field
@@ -70,16 +70,17 @@ def Deserializer(object_list, **options):
             # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 pks = []
+                m2m_convert = field.rel.to._meta.pk.to_python
                 for pk in field_value:
                     if isinstance(pk, unicode):
-                        pks.append(pk.encode(options.get("encoding", settings.DEFAULT_CHARSET)))
+                        pks.append(m2m_convert(pk.encode(options.get("encoding", settings.DEFAULT_CHARSET))))
                     else:
-                        pks.append(pk)
+                        pks.append(m2m_convert(pk))
                 m2m_data[field.name] = pks
                 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                data[field.attname] = field_value
+                data[field.attname] = field.rel.to._meta.pk.to_python(field_value)
                     
             # Handle all other fields
             else:

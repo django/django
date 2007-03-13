@@ -13,6 +13,7 @@ Usage:
 
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS
 from django.utils.tzinfo import LocalTimezone
+from django.utils.translation import gettext as _
 from calendar import isleap, monthrange
 import re, time
 
@@ -36,14 +37,14 @@ class TimeFormat(Formatter):
     def a(self):
         "'a.m.' or 'p.m.'"
         if self.data.hour > 11:
-            return 'p.m.'
-        return 'a.m.'
+            return _('p.m.')
+        return _('a.m.')
 
     def A(self):
         "'AM' or 'PM'"
         if self.data.hour > 11:
-            return 'PM'
-        return 'AM'
+            return _('PM')
+        return _('AM')
 
     def B(self):
         "Swatch Internet time"
@@ -91,9 +92,9 @@ class TimeFormat(Formatter):
         Proprietary extension.
         """
         if self.data.minute == 0 and self.data.hour == 0:
-            return 'midnight'
+            return _('midnight')
         if self.data.minute == 0 and self.data.hour == 12:
-            return 'noon'
+            return _('noon')
         return '%s %s' % (self.f(), self.a())
 
     def s(self):

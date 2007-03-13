@@ -140,7 +140,8 @@ def _isValidDate(date_string):
     try:
         date(year, month, day)
     except ValueError, e:
-        raise ValidationError, gettext('Invalid date: %s.' % e)    
+        msg = gettext('Invalid date: %s') % gettext(str(e))
+        raise ValidationError, msg    
 
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
@@ -363,7 +364,7 @@ class NumberIsInRange(object):
         self.lower, self.upper = lower, upper
         if not error_message:
             if lower and upper:
-                self.error_message = gettext("This value must be between %s and %s.") % (lower, upper)
+                 self.error_message = gettext("This value must be between %(lower)s and %(upper)s.") % {'lower': lower, 'upper': upper}
             elif lower:
                 self.error_message = gettext("This value must be at least %s.") % lower
             elif upper:

@@ -130,7 +130,9 @@ class FormWrapper(object):
         if self.edit_inline:
             self.fill_inline_collections()
             for inline_collection in self._inline_collections:
-                if inline_collection.name == key:
+                # The 'orig_name' comparison is for backwards compatibility
+                # with hand-crafted forms.
+                if inline_collection.name == key or (':' not in key and inline_collection.orig_name == key):
                     return inline_collection
         raise KeyError, "Could not find Formfield or InlineObjectCollection named %r" % key
 
@@ -226,6 +228,9 @@ class InlineObjectCollection(object):
         self.errors = errors
         self._collections = None
         self.name = rel_obj.name
+        # This is the name used prior to fixing #1839. Needs for backwards
+        # compatibility.
+        self.orig_name = rel_obj.opts.module_name
 
     def __len__(self):
         self.fill()

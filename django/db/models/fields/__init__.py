@@ -762,6 +762,13 @@ class NullBooleanField(Field):
         kwargs['null'] = True
         Field.__init__(self, *args, **kwargs)
 
+    def to_python(self, value):
+        if value in (None, True, False): return value
+        if value in ('None'): return None
+        if value in ('t', 'True', '1'): return True
+        if value in ('f', 'False', '0'): return False
+        raise validators.ValidationError, gettext("This value must be either None, True or False.")
+
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]
 

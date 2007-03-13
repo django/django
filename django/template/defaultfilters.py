@@ -70,14 +70,15 @@ def floatformat(text, arg=-1):
     With a negative numeric argument, it will display that many decimal
     places -- but only if there's places to be displayed.
     Examples:
-        num1 = 34.23234
-        num2 = 34.00000
-        num1|floatformat results in 34.2
-        num2|floatformat is 34
-        num1|floatformat:3 is 34.232
-        num2|floatformat:3 is 34.000
-        num1|floatformat:-3 is 34.232
-        num2|floatformat:-3 is 34
+
+    * num1 = 34.23234
+    * num2 = 34.00000
+    * num1|floatformat results in 34.2
+    * num2|floatformat is 34
+    * num1|floatformat:3 is 34.232
+    * num2|floatformat:3 is 34.000
+    * num1|floatformat:-3 is 34.232
+    * num2|floatformat:-3 is 34
     """
     try:
         f = float(text)
