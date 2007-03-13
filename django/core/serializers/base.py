@@ -54,11 +54,7 @@ class Serializer(object):
         Convert a field's value to a string.
         """
         if isinstance(field, models.DateTimeField):
-            value = getattr(obj, field.name)
-            if value is None:
-                value = ''
-            else:
-                value = value.strftime("%Y-%m-%d %H:%M:%S")
+            value = getattr(obj, field.name).strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(field, models.FileField):
             value = getattr(obj, "get_%s_url" % field.name, lambda: None)()
         else:
