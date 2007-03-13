@@ -45,7 +45,7 @@ class DatabaseWrapper(local):
         cursor.arraysize = 256
         # set oracle date to ansi date format
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
-        cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS'")
+        cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
         return cursor
 
     def _commit(self):
@@ -181,13 +181,43 @@ def get_sql_flush(style, tables, sequences):
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
     """
-    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
-    # TODO - SQL not actually tested against Oracle yet!
-    # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
-    sql = ['%s %s;' % \
-            (style.SQL_KEYWORD('TRUNCATE'),
-             style.SQL_FIELD(quote_name(table))
-             )  for table in tables]
+    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
+    # 'TRUNCATE z;'... style SQL statements
+    if tables:
+        sql = ['%s %s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'), style.SQL_KEYWORD('TABLE'),
+                 style.SQL_FIELD(quote_name(table))
+                 )  for table in tables]
+        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
+        # to reset sequence indices
+        for sequence_info in sequences:
+            table_name = sequence_info['table']
+            column_name = sequence_info['column']
+            if column_name and len(column_name):
+                # sequence name in this case will be <table>_<column>_seq
+                sql.append("%s %s %s %s %s %s;" % \
+                    (style.SQL_KEYWORD('ALTER'),
+                    style.SQL_KEYWORD('SEQUENCE'),
+                    style.SQL_FIELD('%s_%s_seq' % (table_name, column_name)),
+                    style.SQL_KEYWORD('RESTART'),
+                    style.SQL_KEYWORD('WITH'),
+                    style.SQL_FIELD('1')
+                    )
+                )
+            else:
+                # sequence name in this case will be <table>_id_seq
+                sql.append("%s %s %s %s %s %s;" % \
+                    (style.SQL_KEYWORD('ALTER'),
+                     style.SQL_KEYWORD('SEQUENCE'),
+                     style.SQL_FIELD('%s_id_seq' % table_name),
+                     style.SQL_KEYWORD('RESTART'),
+                     style.SQL_KEYWORD('WITH'),
+                     style.SQL_FIELD('1')
+                     )
+                )
+        return sql
+    else:
+        return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

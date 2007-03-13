@@ -1,4 +1,5 @@
 import sys, time
+from django.core import management
 
 # This dictionary maps Field objects to their associated Oracle column
 # types, as strings. Column-type strings can contain format strings; they'll
@@ -107,6 +108,8 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     connection.close()
     settings.DATABASE_USER = TEST_DATABASE_USER
     settings.DATABASE_PASSWORD = TEST_DATABASE_PASSWD
+
+    management.syncdb(verbosity, interactive=False)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
