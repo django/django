@@ -1436,7 +1436,7 @@ def dump_data(app_labels, format='json', indent=None):
         for model in get_models(app):
             objects.extend(model.objects.all())
     try:
-        print serializers.serialize(format, objects, indent=indent)
+        return serializers.serialize(format, objects, indent=indent)
     except Exception, e:
         sys.stderr.write(style.ERROR("Unable to serialize database: %s\n" % e))
 dump_data.help_doc = 'Output the contents of the database as a fixture of the given format'
@@ -1582,7 +1582,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
     elif action == 'dumpdata':
         try:
-            action_mapping[action](args[1:], options.format, options.indent)
+            print action_mapping[action](args[1:], options.format, options.indent)
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
