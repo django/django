@@ -67,13 +67,13 @@ __test__ = {'API_TESTS': """
 # Try to load fixture 2 using format discovery; this will fail
 # because there are two fixture2's in the fixtures directory 
 >>> management.load_data(['fixture2'], verbosity=0) # doctest: +ELLIPSIS
-Multiple fixtures named 'fixture2' in '.../fixtures'. Aborting.
+Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 
 >>> Article.objects.all()
 [<Article: Time to reform copyright>, <Article: Poker has no place on ESPN>, <Article: Python program becomes self aware>]
 
 # Dump the current contents of the database as a JSON fixture
->>> management.dump_data(['fixtures'], format='json')
+>>> print management.dump_data(['fixtures'], format='json')
 [{"pk": "3", "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": "2", "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": "1", "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}]
 """}
 
