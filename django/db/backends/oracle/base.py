@@ -77,6 +77,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     you'll need to use "%%s".
     """
     def _rewrite_args(self, query, params=None):
+        from django.db.models import LazyDate
         if params is None:
             params = []
         else:
@@ -87,6 +88,8 @@ class FormatStylePlaceholderCursor(Database.Cursor):
                         params[i] = param.encode('utf-8')
                     except UnicodeError:
                         params[i] = str(param)
+                if type(param) == LazyDate:
+                    params[i] = param.__get_value__()
         args = [(':arg%d' % i) for i in range(len(params))]
         query = query % tuple(args)
         # cx_Oracle cannot execute a query with the closing ';'
