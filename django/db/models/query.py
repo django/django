@@ -169,7 +169,7 @@ class _QuerySet(object):
     def iterator(self):
         "Performs the SELECT database lookup of this QuerySet."
         try:
-            select, sql, params, full_query = self._get_sql_clause()
+            select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
@@ -218,7 +218,7 @@ class _QuerySet(object):
         counter._limit = None
 
         try:
-            select, sql, params, full_query = counter._get_sql_clause()
+            select, sql, params = counter._get_sql_clause()
         except EmptyResultSet:
             return 0
 
@@ -548,12 +548,11 @@ class _QuerySet(object):
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
-        return select, " ".join(sql), params, None
+        return select, " ".join(sql), params
 
 # Use the backend's QuerySet class if it defines one, otherwise use _QuerySet.
-backend_query_module = get_query_module()
-if hasattr(backend_query_module, 'get_query_set_class'):
-    QuerySet = backend_query_module.get_query_set_class(_QuerySet)
+if hasattr(backend, 'get_query_set_class'):
+    QuerySet = backend.get_query_set_class(_QuerySet)
 else:
     QuerySet = _QuerySet
 
@@ -566,7 +565,7 @@ class ValuesQuerySet(QuerySet):
 
     def iterator(self):
         try:
-            select, sql, params, full_query = self._get_sql_clause()
+            select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
@@ -601,7 +600,7 @@ class DateQuerySet(QuerySet):
             self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
         try:
-            select, sql, params, full_query = self._get_sql_clause()
+            select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
