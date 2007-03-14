@@ -152,7 +152,7 @@ def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
 def get_drop_foreignkey_sql():
-    return "DROP FOREIGN KEY"
+    return "DROP CONSTRAINT"
 
 def get_pk_default_value():
     return "DEFAULT"
@@ -184,40 +184,45 @@ def get_sql_flush(style, tables, sequences):
     # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
     # 'TRUNCATE z;'... style SQL statements
     if tables:
+        # Oracle does support TRUNCATE, but it seems to get us into
+        # FK referential trouble, whereas DELETE FROM table works.
         sql = ['%s %s %s;' % \
-                (style.SQL_KEYWORD('TRUNCATE'), style.SQL_KEYWORD('TABLE'),
+                (style.SQL_KEYWORD('DELETE'),
+                 style.SQL_KEYWORD('FROM'),
                  style.SQL_FIELD(quote_name(table))
-                 )  for table in tables]
-        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
-        # to reset sequence indices
+                 ) for table in tables]
+        # You can't ALTER SEQUENCE back to 1 in Oracle.  You must DROP and
+        # CREATE the sequence.
+        # What?  You got something better to do than marching up and
+        # down the square?
         for sequence_info in sequences:
             table_name = sequence_info['table']
             column_name = sequence_info['column']
             if column_name and len(column_name):
                 # sequence name in this case will be <table>_<column>_seq
-                sql.append("%s %s %s %s %s %s;" % \
-                    (style.SQL_KEYWORD('ALTER'),
-                    style.SQL_KEYWORD('SEQUENCE'),
-                    style.SQL_FIELD('%s_%s_seq' % (table_name, column_name)),
-                    style.SQL_KEYWORD('RESTART'),
-                    style.SQL_KEYWORD('WITH'),
-                    style.SQL_FIELD('1')
-                    )
-                )
+                seq_name = '%s_%s_seq' % (table_name, column_name)
             else:
                 # sequence name in this case will be <table>_id_seq
-                sql.append("%s %s %s %s %s %s;" % \
-                    (style.SQL_KEYWORD('ALTER'),
-                     style.SQL_KEYWORD('SEQUENCE'),
-                     style.SQL_FIELD('%s_id_seq' % table_name),
-                     style.SQL_KEYWORD('RESTART'),
-                     style.SQL_KEYWORD('WITH'),
-                     style.SQL_FIELD('1')
-                     )
+                seq_name = '%s_id_seq' % table_name
+            sql.append('%s %s %s;' % \
+                (style.SQL_KEYWORD('DROP'),
+                 style.SQL_KEYWORD('SEQUENCE'),
+                 style.SQL_FIELD(seq_name))
+                )
+            sql.append('%s %s %s;' % \
+                (style.SQL_KEYWORD('CREATE'),
+                 style.SQL_KEYWORD('SEQUENCE'),
+                 style.SQL_FIELD(seq_name))
                 )
         return sql
     else:
         return []
+
+def get_drop_sequence(table):
+    name_length = get_max_name_length() - 3
+    sq_name = '%s_sq' % util.truncate_name(table, name_length)
+    drop_sequence_sql = 'DROP SEQUENCE %s;' % sq_name
+    return drop_sequence_sql
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

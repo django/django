@@ -296,6 +296,7 @@ def _get_many_to_many_sql_for_model(model):
 def get_sql_delete(app):
     "Returns a list of the DROP TABLE SQL statements for the given app."
     from django.db import backend, connection, models, get_introspection_module
+    from django.db.backends.util import truncate_name
     introspection = get_introspection_module()
 
     # This should work even if a connecton isn't available
@@ -342,12 +343,15 @@ def get_sql_delete(app):
                     col = f.column
                     r_table = model._meta.db_table
                     r_col = model._meta.get_field(f.rel.field_name).column
+                    r_name = '%s_refs_%s_%s_%s' % (col, r_col, table, r_table)
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
-                        style.SQL_FIELD(backend.quote_name('%s_refs_%s_%x' % (col, r_col, abs(hash((table, r_table))))))))
+                        style.SQL_FIELD(truncate_name(r_name, backend.get_max_name_length()))))
                 del references_to_delete[model]
+                if hasattr(backend, 'get_drop_sequence'):
+                    output.append(backend.get_drop_sequence(model._meta.db_table))
 
     # Output DROP TABLE statements for many-to-many tables.
     for model in app_models:
@@ -356,6 +360,9 @@ def get_sql_delete(app):
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
                     style.SQL_TABLE(backend.quote_name(f.m2m_db_table()))))
+                if hasattr(backend, 'get_drop_sequence'):
+                    output.append(backend.get_drop_sequence("%s_%s" % (model._meta.db_table, f.column)))
+
 
     app_label = app_models[0]._meta.app_label
 

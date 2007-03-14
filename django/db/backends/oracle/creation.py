@@ -158,10 +158,12 @@ def _create_test_db(cursor, parameters, verbosity):
         print "_create_test_db(): dbname = %s" % parameters['dbname']
     statements = [
         """CREATE TABLESPACE %(tblspace)s
-           DATAFILE '%(tblspace)s.dbf' SIZE 10M AUTOEXTEND ON NEXT 10M MAXSIZE 20M
+           DATAFILE '%(tblspace)s.dbf' SIZE 20M
+           REUSE AUTOEXTEND ON NEXT 10M MAXSIZE 100M
         """,
         """CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
-           TEMPFILE '%(tblspace_temp)s.dbf' SIZE 10M AUTOEXTEND ON NEXT 10M MAXSIZE 20M
+           TEMPFILE '%(tblspace_temp)s.dbf' SIZE 20M
+           REUSE AUTOEXTEND ON NEXT 10M MAXSIZE 100M
         """,
     ]
     _execute_statements(cursor, statements, parameters, verbosity)

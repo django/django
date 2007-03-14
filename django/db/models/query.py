@@ -742,7 +742,11 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if lookup_type == 'in':
         in_string = ','.join(['%s' for id in value])
         if in_string:
-            return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
+            if value:
+                value_set = ','.join(['%s' for v in value])
+            else:
+                value_set = 'NULL'
+            return '%s%s IN (%s)' % (table_prefix, field_name, value_set)
         else:
             raise EmptyResultSet
     elif lookup_type in ('range', 'year'):
