@@ -54,7 +54,7 @@ def pk_create(pk, klass, data):
 def data_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, instance.data, 
-                         "Objects with PK=%d not equal; expected '%s', got '%s'" % (pk,data,instance.data))
+                         "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (pk,data, type(data), instance.data, type(instance.data)))
 
 def fk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
