@@ -25,7 +25,6 @@ except ImportError, e:
 
 get_introspection_module = lambda: __import__('django.db.backends.%s.introspection' % settings.DATABASE_ENGINE, {}, {}, [''])
 get_creation_module = lambda: __import__('django.db.backends.%s.creation' % settings.DATABASE_ENGINE, {}, {}, [''])
-get_query_module = lambda: __import__('django.db.backends.%s.query' % settings.DATABASE_ENGINE, {}, {}, [''])
 runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE_ENGINE, {}, {}, ['']).runshell()
 
 connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)

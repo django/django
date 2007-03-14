@@ -1,4 +1,4 @@
-from django.db import backend, connection, get_query_module, transaction
+from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.fields.generic import GenericRelation
 from django.db.models import signals

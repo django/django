@@ -146,7 +146,7 @@ def get_datetime_cast_sql():
 def get_limit_offset_sql(limit, offset=None):
     # Limits and offset are too complicated to be handled here.
     # Instead, they are handled in django/db/backends/oracle/query.py.
-    raise NotImplementedError
+    return ""
 
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"

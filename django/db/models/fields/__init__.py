@@ -3,6 +3,7 @@ from django.dispatch import dispatcher
 from django.conf import settings
 from django.core import validators
 from django import oldforms
+from django import newforms as forms
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
