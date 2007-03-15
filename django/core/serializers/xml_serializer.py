@@ -13,6 +13,10 @@ class Serializer(base.Serializer):
     Serializes a QuerySet to XML.
     """
     
+    def indent(self, level):
+        if self.options.get('indent', None) is not None:
+            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent', None) * level)
+
     def start_serialization(self):
         """
         Start serialization -- open the XML document and the root element.
@@ -25,6 +29,7 @@ class Serializer(base.Serializer):
         """
         End serialization -- end the document.
         """
+        self.indent(0)
         self.xml.endElement("django-objects")
         self.xml.endDocument()
         
@@ -35,6 +40,7 @@ class Serializer(base.Serializer):
         if not hasattr(obj, "_meta"):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
             
+        self.indent(1)
         self.xml.startElement("object", {
             "pk"    : str(obj._get_pk_val()),
             "model" : str(obj._meta),
@@ -44,6 +50,7 @@ class Serializer(base.Serializer):
         """
         Called after handling all fields for an object.
         """
+        self.indent(1)
         self.xml.endElement("object")
         
     def handle_field(self, obj, field):
@@ -51,6 +58,7 @@ class Serializer(base.Serializer):
         Called to handle each field on an object (except for ForeignKeys and
         ManyToManyFields)
         """
+        self.indent(2)
         self.xml.startElement("field", {
             "name" : field.name,
             "type" : field.get_internal_type()
@@ -94,6 +102,7 @@ class Serializer(base.Serializer):
         """
         Helper to output the <field> element for relational fields
         """
+        self.indent(2)
         self.xml.startElement("field", {
             "name" : field.name,
             "rel"  : field.rel.__class__.__name__,
