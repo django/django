@@ -5,6 +5,7 @@
 <td>PID:</td> 
 <td>Change time:</td>
 <td>Type:</td>
+<td>Ch:</td>
 
 </tr>
 {% for change in changes_list %}
@@ -13,6 +14,7 @@
 <td>{{ change.object_id }}</td>
 <td>{{ change.change_time }}</td>
 <td>{{ change.content_type }}</td>
+<td>{{ change.change_type }}</td>
 
 </tr>
 {% endfor %}
