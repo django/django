@@ -137,7 +137,27 @@ def _import_models(instance):
 
     return m
 
-def save_new_revision(sender, instance, signal, *args, **kwargs):
+
+### Signal wrapper functions
+## pre_save
+def save_new_revision_save(sender, instance, signal, *args, **kwargs):
+    """
+    Wrapper function for save_new_revision() - for pre_save signal
+    This way there is no need to modify django/db/models/base.py
+    """
+    save_new_revision(sender, instance, signal, signal_name='pre_save', *args, **kwargs)
+
+## pre_delete
+def save_new_revision_delete(sender, instance, signal, *args, **kwargs):
+    """
+    Wrapper function for save_new_revision() - for pre_delete signal
+    This way there is no need to modify django/db/models/query.py
+    """
+    save_new_revision(sender, instance, signal, signal_name='pre_delete', *args, **kwargs)
+
+
+### Actual save_new_revision
+def save_new_revision(sender, instance, signal, signal_name, *args, **kwargs):
     """ 
     Saves a old copy of the record into the History table.
 
@@ -149,7 +169,7 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 
     """
     print "Sender: ",sender
-    print "Signal: ",kwargs['signal_name']
+    print "Signal_name: ",signal_name
 
     if instance.__class__.__name__ is 'ChangeLog' or not hasattr(instance, 'History'): 
 	print "Not history-enabled class."
@@ -163,11 +183,11 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
     
     if im:
 	try:
-	    if kwargs['signal_name'] is 'pre_delete':
+	    if signal_name is 'pre_delete':
 		print "Instance was last revision."
 		old = instance
 		log = ChangeLog(parent=instance, change_type='D', comment="Object deleted. Last revision.")
-	    elif ((kwargs['signal_name'] is 'pre_save') and instance.id):
+	    elif ((signal_name is 'pre_save') and instance.id):
 		print "Instance has an ID."
 		old = getattr(im, instance.__class__.__name__).objects.filter(pk=instance.id)[0]
 		log = ChangeLog(parent=instance, change_type='U', comment="Update")
@@ -195,5 +215,5 @@ def save_new_revision(sender, instance, signal, *args, **kwargs):
 	print "ChangeLog faild to save changes."
 
 
-dispatcher.connect( save_new_revision, signal=signals.pre_save )
-dispatcher.connect( save_new_revision, signal=signals.pre_delete )
+dispatcher.connect( save_new_revision_save, signal=signals.pre_save )
+dispatcher.connect( save_new_revision_delete, signal=signals.pre_delete )
