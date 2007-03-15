@@ -208,7 +208,7 @@ def save_new_revision(sender, instance, signal, signal_name, *args, **kwargs):
     #print "Log: ",log.change_time
 
     try: 
-	log.object = Pickle.dumps(old, protocol=0)
+	log.object = Pickle.dumps(old)
 	log.save()
 	print "New change saved."
     except:
