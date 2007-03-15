@@ -1,6 +1,6 @@
-def curry(*args, **kwargs):
+def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
-        return args[0](*(args[1:]+moreargs), **dict(kwargs.items() + morekwargs.items()))
+        return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
     return _curried
 
 class Promise:

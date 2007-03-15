@@ -23,7 +23,7 @@ class Article(models.Model):
     def __str__(self):
         return self.headline
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a Reporter.
 >>> r = Reporter(name='John Smith')
 >>> r.save()
@@ -121,4 +121,4 @@ DoesNotExist: <Article: Fourth> is not related to <Reporter: John Smith>.
 >>> Article.objects.filter(reporter__isnull=True)
 [<Article: First>, <Article: Fourth>]
 
-"""
+"""}

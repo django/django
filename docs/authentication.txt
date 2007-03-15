@@ -66,8 +66,8 @@ Fields
       long and can contain any character. See the "Passwords" section below.
     * ``is_staff`` -- Boolean. Designates whether this user can access the
       admin site.
-    * ``is_active`` -- Boolean. Designates whether this user can log into the
-      Django admin. Set this to ``False`` instead of deleting accounts.
+    * ``is_active`` -- Boolean. Designates whether this account can be used
+      to log in. Set this flag to ``False`` instead of deleting accounts.
     * ``is_superuser`` -- Boolean. Designates that this user has all permissions
       without explicitly assigning them.
     * ``last_login`` -- A datetime of the user's last login. Is set to the
@@ -82,14 +82,14 @@ Methods
 ``user_permissions``. ``User`` objects can access their related
 objects in the same way as any other `Django model`_::
 
-    myuser.objects.groups = [group_list]
-    myuser.objects.groups.add(group, group,...)
-    myuser.objects.groups.remove(group, group,...)
-    myuser.objects.groups.clear()
-    myuser.objects.permissions = [permission_list]
-    myuser.objects.permissions.add(permission, permission, ...)
-    myuser.objects.permissions.remove(permission, permission, ...]
-    myuser.objects.permissions.clear()
+    myuser.groups = [group_list]
+    myuser.groups.add(group, group,...)
+    myuser.groups.remove(group, group,...)
+    myuser.groups.clear()
+    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.add(permission, permission, ...)
+    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
 custom methods:
@@ -99,7 +99,9 @@ custom methods:
       should prefer using ``is_authenticated()`` to this method.
 
     * ``is_authenticated()`` -- Always returns ``True``. This is a way to
-      tell if the user has been authenticated.
+      tell if the user has been authenticated. This does not imply any 
+      permissions, and doesn't check if the user is active - it only indicates
+      that the user has provided a valid username and password.
 
     * ``get_full_name()`` -- Returns the ``first_name`` plus the ``last_name``,
       with a space in between.
@@ -120,13 +122,16 @@ custom methods:
 
     * ``has_perm(perm)`` -- Returns ``True`` if the user has the specified
       permission, where perm is in the format ``"package.codename"``.
+      If the user is inactive, this method will always return ``False``.
 
     * ``has_perms(perm_list)`` -- Returns ``True`` if the user has each of the
       specified permissions, where each perm is in the format
-      ``"package.codename"``.
+      ``"package.codename"``. If the user is inactive, this method will 
+      always return ``False``.
 
     * ``has_module_perms(package_name)`` -- Returns ``True`` if the user has
       any permissions in the given package (the Django app label).
+      If the user is inactive, this method will always return ``False``.
 
     * ``get_and_delete_messages()`` -- Returns a list of ``Message`` objects in
       the user's queue and deletes the messages from the queue.
@@ -139,8 +144,8 @@ custom methods:
       Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
       doesn't allow profiles.
 
-.. _Django model: http://www.djangoproject.com/documentation/model_api/
-.. _DEFAULT_FROM_EMAIL: http://www.djangoproject.com/documentation/settings/#default-from-email
+.. _Django model: ../model_api/
+.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
 Manager functions
 ~~~~~~~~~~~~~~~~~
@@ -266,8 +271,8 @@ previous section). You can tell them apart with ``is_authenticated()``, like so:
     else:
         # Do something for anonymous users.
 
-.. _request objects: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _session documentation: http://www.djangoproject.com/documentation/sessions/
+.. _request objects: ../request_response/#httprequest-objects
+.. _session documentation: ../sessions/
 
 How to log a user in
 --------------------
@@ -283,7 +288,10 @@ password is invalid, ``authenticate()`` returns ``None``. Example::
     from django.contrib.auth import authenticate
     user = authenticate(username='john', password='secret')
     if user is not None:
-        print "You provided a correct username and password!"
+        if user.is_active:
+            print "You provided a correct username and password!"
+        else:
+            print "Your account has been disabled!"
     else:
         print "Your username and password were incorrect."
 
@@ -301,10 +309,23 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
-            # Redirect to a success page.
+            if user.is_active:
+                login(request, user)
+                # Redirect to a success page.
+            else:
+                # Return a 'disabled account' error message
         else:
-            # Return an error message.
+            # Return an 'invalid login' error message.
+
+Manually checking a user's password
+-----------------------------------
+
+If you'd like to manually authenticate a user by comparing a
+plain-text password to the hashed password in the database, use the
+convenience function `django.contrib.auth.models.check_password`. It
+takes two arguments: the plain-text password to check, and the full
+value of a user's ``password`` field in the database to check against,
+and returns ``True`` if they match, ``False`` otherwise.
 
 How to log a user out
 ---------------------
@@ -377,7 +398,7 @@ To do this, add the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
-Here's what ``django.contrib.auth.views.login`` does::
+Here's what ``django.contrib.auth.views.login`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the same
       URL. More on this in a bit.
@@ -430,8 +451,149 @@ block::
 
     {% endblock %}
 
-.. _forms documentation: http://www.djangoproject.com/documentation/forms/
-.. _site framework docs: http://www.djangoproject.com/documentation/sites/
+.. _forms documentation: ../forms/
+.. _site framework docs: ../sites/
+
+Other built-in views
+--------------------
+
+In addition to the `login` view, the authentication system includes a
+few other useful built-in views:
+
+``django.contrib.auth.views.logout``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Logs a user out.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to display after
+      logging the user out. This will default to
+      ``registration/logged_out.html`` if no argument is supplied.
+
+**Template context:**
+
+    * ``title``: The string "Logged out", localized.
+
+``django.contrib.auth.views.logout_then_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Logs a user out, then redirects to the login page.
+
+**Optional arguments:**
+
+    * ``login_url``: The URL of the login page to redirect to. This
+      will default to ``/accounts/login/`` if not supplied.
+
+``django.contrib.auth.views.password_change``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Allows a user to change their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use for
+      displaying the password change form. This will default to
+      ``registration/password_change_form.html`` if not supplied.
+
+**Template context:**
+
+    * ``form``: The password change form.
+
+``django.contrib.auth.views.password_change_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+The page shown after a user has changed their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use. This will
+      default to ``registration/password_change_done.html`` if not
+      supplied.
+
+``django.contrib.auth.views.password_reset``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Allows a user to reset their password, and sends them the new password
+in an email.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use for
+      displaying the password reset form. This will default to
+      ``registration/password_reset_form.html`` if not supplied.
+
+    * ``email_template_name``: The full name of a template to use for
+      generating the email with the new password. This will default to
+      ``registration/password_reset_email.html`` if not supplied.
+
+**Template context:**
+
+    * ``form``: The form for resetting the user's password.
+
+``django.contrib.auth.views.password_reset_done``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+The page shown after a user has reset their password.
+
+**Optional arguments:**
+
+    * ``template_name``: The full name of a template to use. This will
+      default to ``registration/password_reset_done.html`` if not
+      supplied.
+
+``django.contrib.auth.views.redirect_to_login``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Description:**
+
+Redirects to the login page, and then back to another URL after a
+successful login.
+
+**Required arguments:**
+
+    * ``next``: The URL to redirect to after a successful login.
+
+**Optional arguments:**
+
+    * ``login_url``: The URL of the login page to redirect to. This
+      will default to ``/accounts/login/`` if not supplied.
+
+Built-in manipulators
+---------------------
+
+If you don't want to use the built-in views, but want the convenience
+of not having to write manipulators for this functionality, the
+authentication system provides several built-in manipulators:
+
+    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: A
+      manipulator used in the admin interface to change a user's
+      password.
+
+    * ``django.contrib.auth.forms.AuthenticationForm``: A manipulator
+      for logging a user in.
+
+    * ``django.contrib.auth.forms.PasswordChangeForm``: A manipulator
+      for allowing a user to change their password.
+
+    * ``django.contrib.auth.forms.PasswordResetForm``: A manipulator
+      for resetting a user's password and emailing the new password to
+      them.
+
+    * ``django.contrib.auth.forms.UserCreationForm``: A manipulator
+      for creating a new user.
 
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------
@@ -455,6 +617,10 @@ As a shortcut, you can use the convenient ``user_passes_test`` decorator::
     def my_view(request):
         # ...
     my_view = user_passes_test(lambda u: u.has_perm('polls.can_vote'))(my_view)
+
+We're using this particular test as a relatively simple example. However, if
+you just want to test whether a permission is available to a user, you can use
+the ``permission_required()`` decorator, described later in this document.
 
 Here's the same thing, using Python 2.4's decorator syntax::
 
@@ -488,6 +654,34 @@ Example in Python 2.4 syntax::
     def my_view(request):
         # ...
 
+The permission_required decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+It's a relatively common task to check whether a user has a particular
+permission. For that reason, Django provides a shortcut for that case: the
+``permission_required()`` decorator. Using this decorator, the earlier example
+can be written as::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote')(my_view)
+
+Note that ``permission_required()`` also takes an optional ``login_url``
+parameter. Example::
+
+    from django.contrib.auth.decorators import permission_required
+
+    def my_view(request):
+        # ...
+    my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
+
+As in the ``login_required`` decorator, ``login_url`` defaults to
+``'/accounts/login/'``.
+
 Limiting access to generic views
 --------------------------------
 
@@ -501,7 +695,7 @@ For example::
     def limited_object_detail(*args, **kwargs):
         return object_detail(*args, **kwargs)
 
-.. _generic view: http://www.djangoproject.com/documentation/generic_views/
+.. _generic view: ../generic_views/
 
 Permissions
 ===========
@@ -563,7 +757,7 @@ This example model creates three custom permissions::
 The only thing this does is create those extra permissions when you run
 ``syncdb``.
 
-.. _model Meta attribute: http://www.djangoproject.com/documentation/model_api/#meta-options
+.. _model Meta attribute: ../model_api/#meta-options
 
 API reference
 -------------
@@ -602,7 +796,7 @@ The currently logged-in user and his/her permissions are made available in the
    setting contains ``"django.core.context_processors.auth"``, which is default.
    For more, see the `RequestContext docs`_.
 
-   .. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-requestcontext
+   .. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
 Users
 -----
@@ -611,7 +805,7 @@ The currently logged-in user, either a ``User`` instance or an``AnonymousUser``
 instance, is stored in the template variable ``{{ user }}``::
 
     {% if user.is_authenticated %}
-        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>    
+        <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
     {% else %}
         <p>Welcome, new user. Please log in.</p>
     {% endif %}
@@ -648,7 +842,7 @@ Thus, you can check permissions in template ``{% if %}`` statements::
         <p>You don't have permission to do anything in the foo app.</p>
     {% endif %}
 
-.. _template context: http://www.djangoproject.com/documentation/templates_python/
+.. _template context: ../templates_python/
 
 Groups
 ======
@@ -677,7 +871,7 @@ timestamps.
 Messages are used by the Django admin after successful actions. For example,
 ``"The poll Foo was created successfully."`` is a message.
 
-The API is simple::
+The API is simple:
 
     * To create a new message, use
       ``user_obj.message_set.create(message='message_text')``.
@@ -702,7 +896,7 @@ messages are made available in the `template context`_ as the template variable
     {% if messages %}
     <ul>
         {% for message in messages %}
-        <li>{{ message.message }}</li>
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -713,7 +907,7 @@ scenes, so any messages will be deleted even if you don't display them.
 Finally, note that this messages framework only works with users in the user
 database. To send messages to anonymous users, use the `session framework`_.
 
-.. _session framework: http://www.djangoproject.com/documentation/sessions/
+.. _session framework: ../sessions/
 
 Other authentication sources
 ============================
@@ -770,13 +964,13 @@ The  ``authenticate`` method takes credentials as keyword arguments. Most of
 the time, it'll just look like this::
 
     class MyBackend:
-        def authenticate(username=None, password=None):
+        def authenticate(self, username=None, password=None):
             # Check the username/password and return a User.
 
 But it could also authenticate a token, like so::
 
     class MyBackend:
-        def authenticate(token=None):
+        def authenticate(self, token=None):
             # Check the token and return a User.
 
 Either way, ``authenticate`` should check the credentials it gets, and it

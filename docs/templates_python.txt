@@ -11,7 +11,7 @@ If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
 the `configuration`_ section later in this document.
 
-.. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
+.. _`The Django template language: For template authors`: ../templates/
 
 Basics
 ======
@@ -198,10 +198,35 @@ some things to keep in mind:
 How invalid variables are handled
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a variable doesn't exist, the template system inserts the value of the
-``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''`` (the empty
-string) by default.
+Generally, if a variable doesn't exist, the template system inserts the
+value of the ``TEMPLATE_STRING_IF_INVALID`` setting, which is set to ``''``
+(the empty string) by default.
 
+Filters that are applied to an invalid variable will only be applied if
+``TEMPLATE_STRING_IF_INVALID`` is set to ``''`` (the empty string). If
+``TEMPLATE_STRING_IF_INVALID`` is set to any other value, variable
+filters will be ignored.
+
+This behavior is slightly different for the ``if``, ``for`` and ``regroup``
+template tags. If an invalid variable is provided to one of these template
+tags, the variable will be interpreted as ``None``. Filters are always
+applied to invalid variables within these template tags.
+
+.. admonition:: For debug purposes only!
+
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
+    it is a bad idea to turn it on as a 'development default'. 
+    
+    Many templates, including those in the Admin site, rely upon the 
+    silence of the template system when a non-existent variable is 
+    encountered. If you assign a value other than ``''`` to
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    problems with these templates and sites.
+    
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
+    in order to debug a specific template problem, then cleared 
+    once debugging is complete.
+        
 Playing with Context objects
 ----------------------------
 
@@ -286,10 +311,24 @@ optional, third positional argument, ``processors``. In this example, the
             'foo': 'bar',
         }, [ip_address_processor])
 
+Note::
+    If you're using Django's ``render_to_response()`` shortcut to populate a
+    template with the contents of a dictionary, your template will be passed a
+    ``Context`` instance by default (not a ``RequestContext``). To use a
+    ``RequestContext`` in your template rendering, pass an optional third
+    argument to ``render_to_response()``: a ``RequestContext``
+    instance. Your code might look like this::
+
+        def some_view(request):
+            # ...
+            return render_to_response('my_template.html',
+                                      my_data_dictionary,
+                                      context_instance=RequestContext(request))
+
 Here's what each of the default processors does:
 
-.. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _TEMPLATE_CONTEXT_PROCESSORS setting: http://www.djangoproject.com/documentation/settings/#template-context-processors
+.. _HttpRequest object: ../request_response/#httprequest-objects
+.. _TEMPLATE_CONTEXT_PROCESSORS setting: ../settings/#template-context-processors
 
 django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -300,14 +339,23 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
       logged in). See the `user authentication docs`.
-    * ``messages`` -- A list of ``auth.Message`` objects for the currently
-      logged-in user.
-    * ``perms`` -- An instance of ``django.core.context_processors.PermWrapper``,
-      representing the permissions that the currently logged-in user has. See
-      the `permissions docs`_.
 
-.. _user authentication docs: http://www.djangoproject.com/documentation/authentication/#users
-.. _permissions docs: http://www.djangoproject.com/documentation/authentication/#permissions
+    * ``messages`` -- A list of messages (as strings) for the currently
+      logged-in user. Behind the scenes, this calls
+      ``request.user.get_and_delete_messages()`` for every request. That method
+      collects the user's messages and deletes them from the database.
+
+      Note that messages are set with ``user.add_message()``. See the
+      `message docs`_ for more.
+
+    * ``perms`` -- An instance of
+      ``django.core.context_processors.PermWrapper``, representing the
+      permissions that the currently logged-in user has. See the `permissions
+      docs`_.
+
+.. _user authentication docs: ../authentication/#users
+.. _message docs: ../authentication/#messages
+.. _permissions docs: ../authentication/#permissions
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -335,9 +383,9 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 
 See the `internationalization docs`_ for more.
 
-.. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
-.. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
+.. _LANGUAGES setting: ../settings/#languages
+.. _LANGUAGE_CODE setting: ../settings/#language-code
+.. _internationalization docs: ../i18n/
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -346,6 +394,18 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 ``RequestContext`` will contain a variable ``request``, which is the current
 `HttpRequest object`_. Note that this processor is not enabled by default;
 you'll have to activate it.
+
+Writing your own context processors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A context processor has a very simple interface: It's just a Python function
+that takes one argument, an ``HttpRequest`` object, and returns a dictionary
+that gets added to the template context. Each context processor *must* return
+a dictionary.
+
+Custom context processors can live anywhere in your code base. All Django cares
+about is that your custom context processors are pointed-to by your
+``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
 Loading templates
 -----------------
@@ -594,6 +654,18 @@ decorator instead::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
+Template filters which expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are writing a template filter which only expects a string as the first
+argument, you should use the included decorator ``stringfilter`` which will convert
+an object to it's string value before being passed to your function::
+
+    from django import template
+
+    @template.stringfilter
+    def lower(value):
+    	return value.lower()
+
 Writing custom template tags
 ----------------------------
 
@@ -741,20 +813,84 @@ Python 2.4 and above::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
 
+Passing template variables to the tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although you can pass any number of arguments to a template tag using
+``token.split_contents()``, the arguments are all unpacked as
+string literals. A little more work is required in order to dynamic content (a
+template variable) to a template tag as an argument.
+
+While the previous examples have formatted the current time into a string and
+returned the string, suppose you wanted to pass in a ``DateTimeField`` from an
+object and have the template tag format that date-time::
+
+    <p>This post was last updated at {% format_time blog_entry.date_updated "%Y-%m-%d %I:%M %p" %}.</p>
+
+Initially, ``token.split_contents()`` will return three values:
+
+    1. The tag name ``format_time``.
+    2. The string "blog_entry.date_updated" (without the surrounding quotes).
+    3. The formatting string "%Y-%m-%d %I:%M %p". The return value from
+       ``split_contents()`` will include the leading and trailing quotes for
+       string literals like this.
+
+Now your tag should begin to look like this::
+
+    from django import template
+    def do_format_time(parser, token):
+        try:
+            # split_contents() knows not to split quoted strings.
+            tag_name, date_to_be_formatted, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
+
+You also have to change the renderer to retrieve the actual contents of the
+``date_updated`` property of the ``blog_entry`` object.  This can be
+accomplished by using the ``resolve_variable()`` function in
+``django.template``. You pass ``resolve_variable()`` the variable name and the
+current context, available in the ``render`` method::
+
+    from django import template
+    from django.template import resolve_variable
+    import datetime
+    class FormatTimeNode(template.Node):
+        def __init__(self, date_to_be_formatted, format_string):
+            self.date_to_be_formatted = date_to_be_formatted
+            self.format_string = format_string
+        
+        def render(self, context):
+            try:
+                actual_date = resolve_variable(self.date_to_be_formatted, context)
+                return actual_date.strftime(self.format_string)
+            except VariableDoesNotExist:
+                return ''
+
+``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
+format it accordingly.
+
+.. note::
+    The ``resolve_variable()`` function will throw a ``VariableDoesNotExist``
+    exception if it cannot resolve the string passed to it in the current
+    context of the page.
+
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Many template tags take a single argument -- a string or a template variable
-reference -- and return a string after doing some processing based solely on
+Many template tags take a number of arguments -- strings or a template variables
+-- and return a string after doing some processing based solely on
 the input argument and some external information. For example, the
 ``current_time`` tag we wrote above is of this variety: we give it a format
 string, it returns the time as a string.
 
 To ease the creation of the types of tags, Django provides a helper function,
 ``simple_tag``. This function, which is a method of
-``django.template.Library``, takes a function that accepts one argument, wraps
-it in a ``render`` function and the other necessary bits mentioned above and
-registers it with the template system.
+``django.template.Library``, takes a function that accepts any number of
+arguments, wraps it in a ``render`` function and the other necessary bits
+mentioned above and registers it with the template system.
 
 Our earlier ``current_time`` function could thus be written like this::
 
@@ -770,18 +906,23 @@ In Python 2.4, the decorator syntax also works::
         ...
 
 A couple of things to note about the ``simple_tag`` helper function:
-    * Only the (single) argument is passed into our function.
     * Checking for the required number of arguments, etc, has already been
       done by the time our function is called, so we don't need to do that.
     * The quotes around the argument (if any) have already been stripped away,
       so we just receive a plain string.
+    * If the argument was a template variable, our function is passed the
+      current value of the variable, not the variable itself.
+
+When your template tag does not need access to the current context, writing a
+function to work with the input values and using the ``simple_tag`` helper is
+the easiest way to create a new tag.
 
 Inclusion tags
 ~~~~~~~~~~~~~~
 
 Another common type of template tag is the type that displays some data by
 rendering *another* template. For example, Django's admin interface uses custom
-template tags to display the buttons along the botton of the "add/change" form
+template tags to display the buttons along the bottom of the "add/change" form
 pages. Those buttons always look the same, but the link targets change depending
 on the object being edited -- so they're a perfect case for using a small
 template that is filled with details from the current object. (In the admin's
@@ -879,7 +1020,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
 
-.. _tutorials: http://www.djangoproject.com/documentation/tutorial1/#creating-models
+.. _tutorials: ../tutorial1/#creating-models
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1027,7 +1168,7 @@ Configuring the template system in standalone mode
 .. note::
 
     This section is only of interest to people trying to use the template
-    system as an output component in another application. If you are using the
+    system as an output component in another application. If you're using the
     template system as part of a Django application, nothing here applies to
     you.
 
@@ -1044,11 +1185,11 @@ described in the `settings file`_ documentation. Simply import the appropriate
 pieces of the templating system and then, *before* you call any of the
 templating functions, call ``django.conf.settings.configure()`` with any
 settings you wish to specify. You might want to consider setting at least
-``TEMPLATE_DIRS`` (if you are going to use template loaders),
+``TEMPLATE_DIRS`` (if you're going to use template loaders),
 ``DEFAULT_CHARSET`` (although the default of ``utf-8`` is probably fine) and
 ``TEMPLATE_DEBUG``. All available settings are described in the
 `settings documentation`_, and any setting starting with *TEMPLATE_*
 is of obvious interest.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/

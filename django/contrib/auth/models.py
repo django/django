@@ -33,7 +33,7 @@ class Permission(models.Model):
 
     Permissions are set globally per type of object, not per specific object instance. It is possible to say "Mary may change news stories," but it's not currently possible to say "Mary may change news stories, but only the ones she created herself" or "Mary may only change news stories that have a certain status or publication date."
 
-    Three basic permissions -- add, create and delete -- are automatically created for each Django model.
+    Three basic permissions -- add, change and delete -- are automatically created for each Django model.
     """
     name = models.CharField(_('name'), maxlength=50)
     content_type = models.ForeignKey(ContentType)
@@ -91,10 +91,10 @@ class User(models.Model):
     first_name = models.CharField(_('first name'), maxlength=30, blank=True)
     last_name = models.CharField(_('last name'), maxlength=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
-    password = models.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]'"))
-    is_staff = models.BooleanField(_('staff status'), help_text=_("Designates whether the user can log into this admin site."))
+    password = models.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
+    is_staff = models.BooleanField(_('staff status'), default=False, help_text=_("Designates whether the user can log into this admin site."))
     is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."))
-    is_superuser = models.BooleanField(_('superuser status'), help_text=_("Designates that this user has all permissions without explicitly assigning them."))
+    is_superuser = models.BooleanField(_('superuser status'), default=False, help_text=_("Designates that this user has all permissions without explicitly assigning them."))
     last_login = models.DateTimeField(_('last login'), default=models.LazyDate())
     date_joined = models.DateTimeField(_('date joined'), default=models.LazyDate())
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
@@ -126,7 +126,7 @@ class User(models.Model):
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
         return False
-    
+
     def is_authenticated(self):
         """Always return True. This is a way to tell if the user has been authenticated in templates.
         """
@@ -216,6 +216,8 @@ class User(models.Model):
 
     def has_module_perms(self, app_label):
         "Returns True if the user has any permissions in the given app label."
+        if not self.is_active:
+            return False
         if self.is_superuser:
             return True
         return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
@@ -268,6 +270,15 @@ class AnonymousUser(object):
     def __str__(self):
         return 'AnonymousUser'
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return 1 # instances always return the same hash value
+
     def save(self):
         raise NotImplementedError
 
@@ -299,6 +310,6 @@ class AnonymousUser(object):
 
     def is_anonymous(self):
         return True
-    
+
     def is_authenticated(self):
         return False

@@ -107,6 +107,11 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
+"Σχόλιο από τον/την %(user)s την %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: contrib/comments/models.py:168
 msgid "person's name"
@@ -141,11 +146,11 @@ msgstr "ημερομηνία βαθμολογίας"
 #: contrib/comments/models.py:237
 #, fuzzy
 msgid "karma score"
-msgstr "βαθμολογία"
+msgstr "karma"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
-msgstr ""
+msgstr "karma"
 
 #: contrib/comments/models.py:242
 #, python-format
@@ -159,7 +164,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Αυτο το σχόλιο σημειώθει απο %(χρήστη)ες\n"
+"Αυτο το σχόλιο σημειώθηκε απο %(χρήστη)ες\n"
 "\n"
 "%(κείμενο)α"
 
@@ -245,7 +250,7 @@ msgstr ""
 #: contrib/comments/views/comments.py:193
 #: contrib/comments/views/comments.py:284
 msgid "One or more of the required fields wasn't submitted"
-msgstr "Ένα ή περισσότερα από τα απαιτούμενα πεδία δεν υποβλίθει"
+msgstr "Ένα ή περισσότερα από τα απαιτούμενα πεδία δεν υπεβλήθει"
 
 #: contrib/comments/views/comments.py:197
 #: contrib/comments/views/comments.py:286
@@ -268,7 +273,7 @@ msgstr ""
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/login.html:17
 msgid "Username:"
-msgstr ""
+msgstr "Όνομα χρήστη:"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/admin/templates/admin/login.html:20
@@ -298,21 +303,21 @@ msgstr "Ξεχάσατε τον κωδικό σας;"
 #: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_index.html:5
 msgid "Log out"
-msgstr ""
+msgstr "Αποσύνδεση"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
-msgstr ""
+msgstr "Βαθμολογίες"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr ""
+msgstr "Απαραίτητο"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr ""
+msgstr "Προαιρετικό"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
@@ -326,11 +331,11 @@ msgstr "Σχόλιο:"
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
 msgid "Preview comment"
-msgstr ""
+msgstr "Προεπισκόπηση σχολίου"
 
 #: contrib/comments/templates/comments/freeform.html:4
 msgid "Your name:"
-msgstr ""
+msgstr "Το όνομα σας:"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -338,15 +343,17 @@ msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
 msgstr ""
+"<h3>Από %s:</h3>\n"
+"<ul>\n"
 
 #: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
 #: contrib/admin/filterspecs.py:143
 msgid "All"
-msgstr ""
+msgstr "Όλα"
 
 #: contrib/admin/filterspecs.py:109
 msgid "Any date"
-msgstr ""
+msgstr "Όλες οι ημερομηνίες"
 
 #: contrib/admin/filterspecs.py:110
 msgid "Today"
@@ -354,7 +361,7 @@ msgstr "Σήμερα"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
-msgstr ""
+msgstr "Τις προηγούμενες 7 ημέρες"
 
 #: contrib/admin/filterspecs.py:115
 msgid "This month"
@@ -374,7 +381,7 @@ msgstr "Όχι"
 
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
-msgstr "’γνωστο"
+msgstr "Άγνωστο"
 
 #: contrib/admin/models.py:16
 msgid "action time"
@@ -441,7 +448,7 @@ msgstr ""
 
 #: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
-msgstr "Τα ονόματα των Χρηστών δεν μπορόυν να περιέχουν τον χαρακτήρα '@'."
+msgstr "Τα ονόματα των χρηστών δεν μπορόυν να περιέχουν τον χαρακτήρα '@'."
 
 #: contrib/admin/views/decorators.py:84
 #, python-format
@@ -452,16 +459,16 @@ msgstr ""
 
 #: contrib/admin/views/main.py:226
 msgid "Site administration"
-msgstr "Διαχείριση του Διαδυκτιακού χώρου"
+msgstr "Διαχείριση του Διαδικτυακού χώρου"
 
 #: contrib/admin/views/main.py:260
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
+msgstr "Το %(name)s \"%(obj)s\" αποθηκεύτηκε επιτυχώς."
 
 #: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Μπορείτε να το επεξεργαστείτε ξανα παρακάτω."
 
 #: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
 #, python-format
@@ -471,12 +478,12 @@ msgstr "Μπορείτε να προσθέσετε ακόμα ένα %s απο �
 #: contrib/admin/views/main.py:290
 #, python-format
 msgid "Add %s"
-msgstr ""
+msgstr "Προσθήκη %s"
 
 #: contrib/admin/views/main.py:336
 #, python-format
 msgid "Added %s."
-msgstr ""
+msgstr "Προστέθηκε %s."
 
 #: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
 #: contrib/admin/views/main.py:340
@@ -486,32 +493,33 @@ msgstr "και"
 #: contrib/admin/views/main.py:338
 #, python-format
 msgid "Changed %s."
-msgstr ""
+msgstr "Επεξεργάσθηκε %s."
 
 #: contrib/admin/views/main.py:340
 #, python-format
 msgid "Deleted %s."
-msgstr ""
+msgstr "Διεγράφη %s."
 
 #: contrib/admin/views/main.py:343
 msgid "No fields changed."
-msgstr ""
+msgstr "Κανένα πεδίο δεν άλλαξε."
 
 #: contrib/admin/views/main.py:346
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "Το %(name)s \"%(obj)s\" επεξεργάσθηκε επιτυχώς."
 
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"Το %(name)s \"%(obj)s\" αποθηκεύθηκε επιτυχώς. Μπορείτε να το επεξεργαστείτε πάλι παρακάτω."
 
 #: contrib/admin/views/main.py:392
 #, python-format
 msgid "Change %s"
-msgstr ""
+msgstr "Αλλαγή %s"
 
 #: contrib/admin/views/main.py:470
 #, python-format
@@ -535,17 +543,17 @@ msgstr "Είστε σίγουρος;"
 #: contrib/admin/views/main.py:533
 #, python-format
 msgid "Change history: %s"
-msgstr ""
+msgstr "Ιστορικό Αλλαγών: %s"
 
 #: contrib/admin/views/main.py:565
 #, python-format
 msgid "Select %s"
-msgstr ""
+msgstr "Επιλογή %s"
 
 #: contrib/admin/views/main.py:565
 #, python-format
 msgid "Select %s to change"
-msgstr ""
+msgstr "Επιλέξτε %s προς αλλαγή"
 
 #: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
 #: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
@@ -555,7 +563,7 @@ msgstr "Ακέραιος"
 
 #: contrib/admin/views/doc.py:278
 msgid "Boolean (Either True or False)"
-msgstr "Boolean (Είτε Αλήθεια ή Ψέμα)"
+msgstr "Boolean (Είτε Αληθές ή Ψέυδές)"
 
 #: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
 #, python-format
@@ -580,7 +588,7 @@ msgstr "Ηλεκτρονική διεύθυνση"
 
 #: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
 msgid "File path"
-msgstr ""
+msgstr "Τοποθεσία Αρχείου"
 
 #: contrib/admin/views/doc.py:285
 msgid "Decimal number"
@@ -592,7 +600,7 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:292
 msgid "Relation to parent model"
-msgstr ""
+msgstr "Σχέση με το γονεϊκό μοντέλο"
 
 #: contrib/admin/views/doc.py:293
 msgid "Phone number"
@@ -627,7 +635,7 @@ msgstr ""
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Τεκμηρίωση"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
@@ -667,11 +675,11 @@ msgstr "Home"
 #: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_form.html:20
 msgid "History"
-msgstr ""
+msgstr "Ιστορικό"
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
-msgstr ""
+msgstr "Ημερομηνία/Ώρα"
 
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "User"
@@ -679,7 +687,7 @@ msgstr "Χρήστης"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
-msgstr ""
+msgstr "Δράση"
 
 #: contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
@@ -697,19 +705,19 @@ msgstr "Διαχειριστής ιστοσελίδας Django"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr ""
+msgstr "Διαχείριση Django"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
-msgstr ""
+msgstr "Σφάλμα Διακομιστή"
 
 #: contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
-msgstr ""
+msgstr "Σφάλμα Διακομιστή (500)"
 
 #: contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
-msgstr ""
+msgstr "Σφάλμα Διακομιστή <em>(500)</em>"
 
 #: contrib/admin/templates/admin/500.html:10
 msgid ""
@@ -720,7 +728,7 @@ msgstr ""
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr ""
+msgstr "Η σελίδα δε βρέθηκε."
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
@@ -729,24 +737,24 @@ msgstr ""
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr ""
+msgstr "Διαθέσιμα μοντέλα στην εφαρμογή %(name)s."
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
 msgid "Add"
-msgstr ""
+msgstr "Προσθήκη"
 
 #: contrib/admin/templates/admin/index.html:34
 msgid "Change"
-msgstr ""
+msgstr "Επεξεργασία"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr ""
+msgstr "Δεν έχετε άδεια να επεξεργαστείτε τίποτα."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
-msgstr ""
+msgstr "Πρόσφατες Πράξεις"
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
@@ -754,16 +762,16 @@ msgstr "Οι πράξεις μου"
 
 #: contrib/admin/templates/admin/index.html:57
 msgid "None available"
-msgstr ""
+msgstr "Κανένα διαθέσιμο"
 
 #: contrib/admin/templates/admin/change_list.html:11
 #, python-format
 msgid "Add %(name)s"
-msgstr ""
+msgstr "Προσθήκη %(name)s"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr ""
+msgstr "<a href=\"/password_reset/\">Ξεχάσατε τον κωδικό σας;</a> "
 
 #: contrib/admin/templates/admin/base.html:23
 msgid "Welcome,"
@@ -772,7 +780,7 @@ msgstr "Καλωσήρθατε,"
 #: contrib/admin/templates/admin/delete_confirmation.html:9
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
-msgstr ""
+msgstr "Διαγραφή"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -800,37 +808,37 @@ msgstr ""
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
-msgstr ""
+msgstr "Πήγαινε"
 
 #: contrib/admin/templates/admin/change_form.html:21
 msgid "View on site"
-msgstr ""
+msgstr "Προβολή στην ιστοσελίδα"
 
 #: contrib/admin/templates/admin/change_form.html:30
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Παρακαλώ διορθώστε το παρακάτω λάθος."
+msgstr[1] "Παρακαλώ διορθώστε τα παρακάτω λάθη."
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
-msgstr ""
+msgstr "Σειρά"
 
 #: contrib/admin/templates/admin/change_form.html:51
 msgid "Order:"
-msgstr ""
+msgstr "Σειρά:"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr ""
+msgstr "Αποθήκευση καινούριου"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr ""
+msgstr "Αποθήκευση και προσθήκη καινούριου."
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Αποθήκευση και συνέχεια επεξεργασίας"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
@@ -841,12 +849,12 @@ msgstr "Αποθήκευση"
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 msgid "Password change"
-msgstr ""
+msgstr "Αλλαγή Κωδικού"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr ""
+msgstr "Αλλαγή κωδικού επιτυχής"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
@@ -857,7 +865,7 @@ msgstr "Ο κωδίκός σας άλλαξε."
 #: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
-msgstr ""
+msgstr "Επαναφορά κωδικού"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
@@ -867,11 +875,11 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
-msgstr ""
+msgstr "E-mail διεύθυνση:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr ""
+msgstr "Επαναφορά του κωδικού μου"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
@@ -880,7 +888,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
-msgstr ""
+msgstr "Εισαγωγή ξανά"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -909,11 +917,11 @@ msgstr "Νέος κωδικός:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr ""
+msgstr "Επιβεβαίωση κωδικού"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr ""
+msgstr "Αλλαγή του κωδικού μου"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -1003,19 +1011,19 @@ msgstr ""
 
 #: contrib/admin/templates/widget/date_time.html:3
 msgid "Date:"
-msgstr ""
+msgstr "Ημ/νία:"
 
 #: contrib/admin/templates/widget/date_time.html:4
 msgid "Time:"
-msgstr ""
+msgstr "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ώρα:"
 
 #: contrib/admin/templates/widget/file.html:2
 msgid "Currently:"
-msgstr ""
+msgstr "Τρέχον:"
 
 #: contrib/admin/templates/widget/file.html:3
 msgid "Change:"
-msgstr ""
+msgstr "Αλλαγή:"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -1271,192 +1279,192 @@ msgstr "P"
 
 #: utils/dates.py:6
 msgid "Monday"
-msgstr ""
+msgstr "Δευτέρα"
 
 #: utils/dates.py:6
 msgid "Tuesday"
-msgstr ""
+msgstr "Τρίτη"
 
 #: utils/dates.py:6
 msgid "Wednesday"
-msgstr ""
+msgstr "Τετάρτη"
 
 #: utils/dates.py:6
 msgid "Thursday"
-msgstr ""
+msgstr "Πέμπτη"
 
 #: utils/dates.py:6
 msgid "Friday"
-msgstr ""
+msgstr "Παρασκευή"
 
 #: utils/dates.py:7
 msgid "Saturday"
-msgstr ""
+msgstr "Σάββατο"
 
 #: utils/dates.py:7
 msgid "Sunday"
-msgstr ""
+msgstr "Κυριακή"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr ""
+msgstr "Ιανουάριος"
 
 #: utils/dates.py:14
 msgid "February"
-msgstr ""
+msgstr "Φεβρουάριος"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "March"
-msgstr ""
+msgstr "Μάρτιος"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "April"
-msgstr ""
+msgstr "Απρίλιος"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "May"
-msgstr ""
+msgstr "Μάιος"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr ""
+msgstr "Ιούνιος"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr ""
+msgstr "Ιούλιος"
 
 #: utils/dates.py:15
 msgid "August"
-msgstr ""
+msgstr "Αύγουστος"
 
 #: utils/dates.py:15
 msgid "September"
-msgstr ""
+msgstr "Σεπτέμβριος"
 
 #: utils/dates.py:15
 msgid "October"
-msgstr ""
+msgstr "Οκτώβριος"
 
 #: utils/dates.py:15
 msgid "November"
-msgstr ""
+msgstr "Νοέμβριος"
 
 #: utils/dates.py:16
 msgid "December"
-msgstr ""
+msgstr "Δεκέμβριος"
 
 #: utils/dates.py:19
 #, fuzzy
 msgid "jan"
-msgstr "και"
+msgstr "Ιαν"
 
 #: utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "Φεβ"
 
 #: utils/dates.py:19
 msgid "mar"
-msgstr ""
+msgstr "Μάρ"
 
 #: utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "Απρ"
 
 #: utils/dates.py:19
 msgid "may"
-msgstr ""
+msgstr "Μάι"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "Ιούν"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "Ιούλ"
 
 #: utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "Αύγ"
 
 #: utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "Σεπ"
 
 #: utils/dates.py:20
 msgid "oct"
-msgstr ""
+msgstr "Οκτ"
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "Νοέ"
 
 #: utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "Δεκ"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr ""
+msgstr "Ιάν."
 
 #: utils/dates.py:27
 msgid "Feb."
-msgstr ""
+msgstr "Φεβ."
 
 #: utils/dates.py:28
 msgid "Aug."
-msgstr ""
+msgstr "Αύγ."
 
 #: utils/dates.py:28
 msgid "Sept."
-msgstr ""
+msgstr "Σεπτ."
 
 #: utils/dates.py:28
 msgid "Oct."
-msgstr ""
+msgstr "Οκτ."
 
 #: utils/dates.py:28
 msgid "Nov."
-msgstr ""
+msgstr "Νοέ."
 
 #: utils/dates.py:28
 msgid "Dec."
-msgstr ""
+msgstr "Δεκ."
 
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "χρόνος"
+msgstr[1] "χρόνια"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "μήνας"
+msgstr[1] "μήνες"
 
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "εβδομάδα"
+msgstr[1] "εβδομάδες"
 
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ημέρα"
+msgstr[1] "ημέρες"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ώρα"
+msgstr[1] "ώρες"
 
 #: utils/timesince.py:17
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "λεπτό"
+msgstr[1] "λεπτά"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -1630,7 +1638,7 @@ msgstr ""
 
 #: core/validators.py:136
 msgid "Enter a valid e-mail address."
-msgstr ""
+msgstr "Εισάγετε ένα σωστό e-mail."
 
 #: core/validators.py:148
 msgid ""
@@ -1745,12 +1753,12 @@ msgstr[1] ""
 #: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Σιγουρευτείτε ότι το αρχείου που ανεβάζετε είναι %s bytes τουλάχιστον."
+msgstr "Σιγουρευτείτε ότι το αρχείο που ανεβάζετε είναι %s bytes τουλάχιστον."
 
 #: core/validators.py:363
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
+msgstr "Σιγουρευτείτε ότι το αρχείο που ανεβάζετε έχει μέγεθος μέχρι %s bytes."
 
 #: core/validators.py:376
 msgid "The format for this field is wrong."
@@ -1827,7 +1835,7 @@ msgstr ""
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
 #: forms/__init__.py:346
 msgid "This field is required."
-msgstr ""
+msgstr "Αυτό το πεδίο είναι απαραίτητο"
 
 #: db/models/fields/__init__.py:337
 msgid "This value must be an integer."
@@ -1836,12 +1844,12 @@ msgstr ""
 #: db/models/fields/__init__.py:369
 #, fuzzy
 msgid "This value must be either True or False."
-msgstr "Boolean (Είτε Αλήθεια ή Ψέμα)"
+msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
 
 #: db/models/fields/__init__.py:385
 #, fuzzy
 msgid "This field cannot be null."
-msgstr "Αυτό το πεδίο είναι άκυρο"
+msgstr "Αυτό το πεδίο δεν μπορεί να είναι κενό (null)"
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
@@ -1850,7 +1858,7 @@ msgstr "Εισάγετε ένα έγκυρο όνομα αρχείου"
 #: db/models/fields/related.py:43
 #, python-format
 msgid "Please enter a valid %s."
-msgstr ""
+msgstr "Παρακαλώ εισάγετε ένα/μία έγκυρο/η %s"
 
 #: db/models/fields/related.py:579
 #, fuzzy

@@ -78,6 +78,7 @@ class Feed(object):
             author_link = self.__get_dynamic_attr('author_link', obj),
             author_email = self.__get_dynamic_attr('author_email', obj),
             categories = self.__get_dynamic_attr('categories', obj),
+            feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
         )
 
         try:
@@ -116,5 +117,6 @@ class Feed(object):
                 author_email = author_email,
                 author_link = author_link,
                 categories = self.__get_dynamic_attr('item_categories', item),
+                item_copyright = self.__get_dynamic_attr('item_copyright', item),
             )
         return feed

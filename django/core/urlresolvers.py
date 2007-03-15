@@ -15,12 +15,16 @@ class Resolver404(Http404):
     pass
 
 class NoReverseMatch(Exception):
-    pass
+    # Don't make this raise an error when used in a template.
+    silent_variable_failure = True
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
     # ['django.views.news.stories', 'story_detail']
-    dot = callback.rindex('.')
+    try:
+        dot = callback.rindex('.')
+    except ValueError:
+        return callback, ''
     return callback[:dot], callback[dot+1:]
 
 def reverse_helper(regex, *args, **kwargs):
@@ -106,7 +110,7 @@ class RegexURLPattern(object):
             kwargs = match.groupdict()
             if kwargs:
                 args = ()
-            if not kwargs:
+            else:
                 args = match.groups()
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
@@ -118,7 +122,7 @@ class RegexURLPattern(object):
             return self._callback
         mod_name, func_name = get_mod_func(self._callback_str)
         try:
-            self._callback = getattr(__import__(mod_name, '', '', ['']), func_name)
+            self._callback = getattr(__import__(mod_name, {}, {}, ['']), func_name)
         except ImportError, e:
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
         except AttributeError, e:
@@ -129,7 +133,7 @@ class RegexURLPattern(object):
     def reverse(self, viewname, *args, **kwargs):
         mod_name, func_name = get_mod_func(viewname)
         try:
-            lookup_view = getattr(__import__(mod_name, '', '', ['']), func_name)
+            lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
         except (ImportError, AttributeError):
             raise NoReverseMatch
         if lookup_view != self.callback:
@@ -170,7 +174,7 @@ class RegexURLResolver(object):
             return self._urlconf_module
         except AttributeError:
             try:
-                self._urlconf_module = __import__(self.urlconf_name, '', '', [''])
+                self._urlconf_module = __import__(self.urlconf_name, {}, {}, [''])
             except ValueError, e:
                 # Invalid urlconf_name, such as "foo.bar." (note trailing period)
                 raise ImproperlyConfigured, "Error while importing URLconf %r: %s" % (self.urlconf_name, e)
@@ -185,7 +189,7 @@ class RegexURLResolver(object):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type)
         mod_name, func_name = get_mod_func(callback)
         try:
-            return getattr(__import__(mod_name, '', '', ['']), func_name), {}
+            return getattr(__import__(mod_name, {}, {}, ['']), func_name), {}
         except (ImportError, AttributeError), e:
             raise ViewDoesNotExist, "Tried %s. Error was: %s" % (callback, str(e))
 
@@ -199,7 +203,7 @@ class RegexURLResolver(object):
         if not callable(lookup_view):
             mod_name, func_name = get_mod_func(lookup_view)
             try:
-                lookup_view = getattr(__import__(mod_name, '', '', ['']), func_name)
+                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
             except (ImportError, AttributeError):
                 raise NoReverseMatch
         for pattern in self.urlconf_module.urlpatterns:

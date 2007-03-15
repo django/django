@@ -6,7 +6,7 @@ Once you've created your `data models`_, Django automatically gives you a
 database-abstraction API that lets you create, retrieve, update and delete
 objects. This document explains that API.
 
-.. _`data models`: http://www.djangoproject.com/documentation/model_api/
+.. _`data models`: ../model_api/
 
 Throughout this reference, we'll refer to the following models, which comprise
 a weblog application::
@@ -85,7 +85,7 @@ There's no way to tell what the value of an ID will be before you call
 unless you explicitly specify ``primary_key=True`` on a field. See the
 `AutoField documentation`_.)
 
-.. _AutoField documentation: http://www.djangoproject.com/documentation/model_api/#autofield
+.. _AutoField documentation: ../model_api/#autofield
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,9 +143,9 @@ or ``UPDATE`` SQL statements. Specifically, when you call ``save()``, Django
 follows this algorithm:
 
     * If the object's primary key attribute is set to a value that evaluates to
-      ``False`` (such as ``None`` or the empty string), Django executes a
-      ``SELECT`` query to determine whether a record with the given primary key
-      already exists.
+      ``True`` (i.e., a value other than ``None`` or the empty string), Django 
+      executes a ``SELECT`` query to determine whether a record with the given 
+      primary key already exists.
     * If the record with the given primary key does already exist, Django
       executes an ``UPDATE`` query.
     * If the object's primary key attribute is *not* set, or if it's set but a
@@ -525,6 +525,21 @@ Examples::
     [datetime.datetime(2005, 3, 20), datetime.datetime(2005, 2, 20)]
     >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
     [datetime.datetime(2005, 3, 20)]
+    
+``none()``
+~~~~~~~~~~
+
+**New in Django development version**
+
+Returns an ``EmptyQuerySet`` -- a ``QuerySet`` that always evaluates to 
+an empty list. This can be used in cases where you know that you should
+return an empty result set and your caller is expecting a ``QuerySet``
+object (instead of returning an empty list, for example.)
+
+Examples::
+    
+    >>> Entry.objects.none()
+    []
 
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
@@ -581,6 +596,21 @@ related ``Person`` *and* the related ``City``::
 Note that ``select_related()`` does not follow foreign keys that have
 ``null=True``.
 
+Usually, using ``select_related()`` can vastly improve performance because your
+app can avoid many database calls. However, in situations with deeply nested
+sets of relationships ``select_related()`` can sometimes end up following "too
+many" relations, and can generate queries so large that they end up being slow.
+
+In these situations, you can use the ``depth`` argument to ``select_related()``
+to control how many "levels" of relations ``select_related()`` will actually
+follow::
+
+    b = Book.objects.select_related(depth=1).get(id=4)
+    p = b.author         # Doesn't hit the database.
+    c = p.hometown       # Requires a database call.
+
+The ``depth`` argument is new in the Django development version.
+    
 ``extra(select=None, where=None, params=None, tables=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -876,15 +906,18 @@ The database API supports the following lookup types:
 exact
 ~~~~~
 
-Exact match.
+Exact match. If the value provided for comparison is ``None``, it will 
+be interpreted as an SQL ``NULL`` (See isnull_ for more details).  
 
-Example::
+Examples::
 
     Entry.objects.get(id__exact=14)
+    Entry.objects.get(id__exact=None)
 
-SQL equivalent::
+SQL equivalents::
 
     SELECT ... WHERE id = 14;
+    SELECT ... WHERE id = NULL;
 
 iexact
 ~~~~~~
@@ -1103,8 +1136,8 @@ such as January 3, July 3, etc.
 isnull
 ~~~~~~
 
-``NULL`` or ``IS NOT NULL`` match. Takes either ``True`` or ``False``, which
-correspond to ``IS NULL`` and ``IS NOT NULL``, respectively.
+Takes either ``True`` or ``False``, which correspond to SQL queries of 
+``IS NULL`` and ``IS NOT NULL``, respectively.
 
 Example::
 
@@ -1113,6 +1146,14 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
+
+.. admonition:: ``__isnull=True`` vs ``__exact=None``
+
+    There is an important difference between ``__isnull=True`` and 
+    ``__exact=None``. ``__exact=None`` will *always* return an empty result
+    set, because SQL requires that no value is equal to ``NULL``. 
+    ``__isnull`` determines if the field is currently holding the value 
+    of ``NULL`` without performing a comparison.
 
 search
 ~~~~~~
@@ -1140,7 +1181,7 @@ The pk lookup shortcut
 ----------------------
 
 For convenience, Django provides a ``pk`` lookup type, which stands for
-"primary_key". This is shorthand for "an exact lookup on the primary-key."
+"primary_key". 
 
 In the example ``Blog`` model, the primary key is the ``id`` field, so these
 three statements are equivalent::
@@ -1149,6 +1190,14 @@ three statements are equivalent::
     Blog.objects.get(id=14) # __exact is implied
     Blog.objects.get(pk=14) # pk implies id__exact
 
+The use of ``pk`` isn't limited to ``__exact`` queries -- any query term 
+can be combined with ``pk`` to perform a query on the primary key of a model::
+
+    # Get blogs entries  with id 1, 4 and 7
+    Blog.objects.filter(pk__in=[1,4,7])
+    # Get all blog entries with id > 14
+    Blog.objects.filter(pk__gt=14) 
+    
 ``pk`` lookups also work across joins. For example, these three statements are
 equivalent::
 
@@ -1511,7 +1560,7 @@ Many-to-many relationships
 --------------------------
 
 Both ends of a many-to-many relationship get automatic API access to the other
-end. The API works just as a "backward" one-to-many relationship. See _Backward
+end. The API works just as a "backward" one-to-many relationship. See Backward_
 above.
 
 The only difference is in the attribute naming: The model that defines the
@@ -1586,6 +1635,15 @@ For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
 2005::
 
     Entry.objects.filter(pub_date__year=2005).delete()
+
+When Django deletes an object, it emulates the behavior of the SQL
+constraint ``ON DELETE CASCADE`` -- in other words, any objects which
+had foreign keys pointing at the object to be deleted will be deleted
+along with it. For example::
+
+    b = Blog.objects.get(pk=1)
+    # This will delete the Blog and all of its Entry objects.
+    b.delete()
 
 Note that ``delete()`` is the only ``QuerySet`` method that is not exposed on a
 ``Manager`` itself. This is a safety mechanism to prevent you from accidentally
@@ -1685,6 +1743,46 @@ For every ``ImageField``, the object will have ``get_FOO_height()`` and
 ``get_FOO_width()`` methods, where ``FOO`` is the name of the field. This
 returns the height (or width) of the image, as an integer, in pixels.
 
+Shortcuts
+=========
+
+As you develop views, you will discover a number of common idioms in the
+way you use the database API. Django encodes some of these idioms as
+shortcuts that can be used to simplify the process of writing views.
+
+get_object_or_404()
+-------------------
+
+One common idiom to use ``get()`` and raise ``Http404`` if the
+object doesn't exist. This idiom is captured by ``get_object_or_404()``. 
+This function takes a Django model as its first argument and an 
+arbitrary number of keyword arguments, which it passes to the manager's 
+``get()`` function. It raises ``Http404`` if the object doesn't
+exist. For example:: 
+    
+    # Get the Entry with a primary key of 3
+    e = get_object_or_404(Entry, pk=3)
+
+When you provide a model to this shortcut function, the default manager 
+is used to execute the underlying ``get()`` query. If you don't want to 
+use the default manager, or you want to search a list of related objects, 
+you can provide ``get_object_or_404()`` with a manager object, instead. 
+For example::
+
+    # Get the author of blog instance `e` with a name of 'Fred'
+    a = get_object_or_404(e.authors, name='Fred')
+
+    # Use a custom manager 'recent_entries' in the search for an
+    # entry with a primary key of 3
+    e = get_object_or_404(Entry.recent_entries, pk=3)
+
+get_list_or_404()
+-----------------
+
+``get_list_or_404`` behaves the same was as ``get_object_or_404()`` 
+-- except the it uses using ``filter()`` instead of ``get()``. It raises 
+``Http404`` if the list is empty.
+
 Falling back to raw SQL
 =======================
 
@@ -1703,4 +1801,4 @@ interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.
 
-.. _Executing custom SQL: http://www.djangoproject.com/documentation/model_api/#executing-custom-sql
+.. _Executing custom SQL: ../model_api/#executing-custom-sql

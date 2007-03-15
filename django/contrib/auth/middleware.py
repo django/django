@@ -1,12 +1,9 @@
 class LazyUser(object):
-    def __init__(self):
-        self._user = None
-
     def __get__(self, request, obj_type=None):
-        if self._user is None:
+        if not hasattr(request, '_cached_user'):
             from django.contrib.auth import get_user
-            self._user = get_user(request)
-        return self._user
+            request._cached_user = get_user(request)
+        return request._cached_user
 
 class AuthenticationMiddleware(object):
     def process_request(self, request):

@@ -48,7 +48,7 @@ def get_app(app_label, emptyOK=False):
 def load_app(app_name):
     "Loads the app with the provided fully qualified name, and returns the model module."
     global _app_list
-    mod = __import__(app_name, '', '', ['models'])
+    mod = __import__(app_name, {}, {}, ['models'])
     if not hasattr(mod, 'models'):
         return None
     if mod.models not in _app_list:

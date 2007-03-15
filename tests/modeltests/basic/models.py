@@ -10,11 +10,13 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
+    class Meta:
+        ordering = ('pub_date','headline')
+
     def __str__(self):
         return self.headline
 
-API_TESTS = """
-
+__test__ = {'API_TESTS': """
 # No articles are in the system yet.
 >>> Article.objects.all()
 []
@@ -86,6 +88,10 @@ DoesNotExist: Article matching query does not exist.
 # The following is identical to articles.get(id=1).
 >>> Article.objects.get(pk=1)
 <Article: Area woman programs in Python>
+
+# pk can be used as a shortcut for the primary key name in any query
+>>> Article.objects.filter(pk__in=[1])
+[<Article: Area woman programs in Python>]
 
 # Model instances of the same type and same ID are considered equal.
 >>> a = Article.objects.get(pk=1)
@@ -242,7 +248,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>]
 
 # Slicing again works:
 >>> Article.objects.all()[0:5][0:2]
@@ -250,17 +256,17 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.all()[0:5][:2]
 [<Article: Area woman programs in Python>, <Article: Second article>]
 >>> Article.objects.all()[0:5][4:]
-[<Article: Article 6>]
+[<Article: Default headline>]
 >>> Article.objects.all()[0:5][5:]
 []
 
 # Some more tests!
 >>> Article.objects.all()[2:][0:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][2:3]
-[<Article: Article 6>]
+[<Article: Default headline>]
 
 # Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
 >>> Article.objects.all()[2:]
@@ -309,19 +315,18 @@ AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
 >>> Article.objects.all()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>, <Article: Fourth article>, <Article: Article 7>, <Article: Updated article 8>]
 >>> Article.objects.filter(id__lte=4).delete()
 >>> Article.objects.all()
 [<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
-
-"""
+"""}
 
 from django.conf import settings
 
 building_docs = getattr(settings, 'BUILDING_DOCS', False)
 
 if building_docs or settings.DATABASE_ENGINE == 'postgresql':
-    API_TESTS += """
+    __test__['API_TESTS'] += """
 # In PostgreSQL, microsecond-level precision is available.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
 >>> a9.save()
@@ -330,7 +335,7 @@ datetime.datetime(2005, 7, 31, 12, 30, 45, 180)
 """
 
 if building_docs or settings.DATABASE_ENGINE == 'mysql':
-    API_TESTS += """
+    __test__['API_TESTS'] += """
 # In MySQL, microsecond-level precision isn't available. You'll lose
 # microsecond-level precision once the data is saved.
 >>> a9 = Article(headline='Article 9', pub_date=datetime(2005, 7, 31, 12, 30, 45, 180))
@@ -339,7 +344,7 @@ if building_docs or settings.DATABASE_ENGINE == 'mysql':
 datetime.datetime(2005, 7, 31, 12, 30, 45)
 """
 
-API_TESTS += """
+__test__['API_TESTS'] += """
 
 # You can manually specify the primary key when creating a new object.
 >>> a101 = Article(id=101, headline='Article 101', pub_date=datetime(2005, 7, 31, 12, 30, 45))
@@ -352,4 +357,11 @@ API_TESTS += """
 >>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> Article.objects.get(headline="Article 10")
 <Article: Article 10>
+
+# Edge-case test: A year lookup should retrieve all objects in the given
+year, including Jan. 1 and Dec. 31.
+>>> a11 = Article.objects.create(headline='Article 11', pub_date=datetime(2008, 1, 1))
+>>> a12 = Article.objects.create(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999))
+>>> Article.objects.filter(pub_date__year=2008)
+[<Article: Article 11>, <Article: Article 12>]
 """

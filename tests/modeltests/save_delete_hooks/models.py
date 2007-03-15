@@ -24,7 +24,7 @@ class Person(models.Model):
         super(Person, self).delete() # Call the "real" delete() method
         print "After deletion"
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 >>> p1 = Person(first_name='John', last_name='Smith')
 >>> p1.save()
 Before save
@@ -39,4 +39,4 @@ After deletion
 
 >>> Person.objects.all()
 []
-"""
+"""}

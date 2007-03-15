@@ -25,7 +25,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
 
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create a few Reporters.
 >>> r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
 >>> r.save()
@@ -263,4 +263,4 @@ TypeError: Cannot resolve keyword 'reporter_id' into field
 >>> Article.objects.all()
 []
 
-"""
+"""}

@@ -27,6 +27,21 @@ Encoding basic Python object hierarchies::
     >>> io.getvalue()
     '["streaming API"]'
 
+Compact encoding::
+
+    >>> import simplejson
+    >>> simplejson.dumps([1,2,3,{'4': 5, '6': 7}], separators=(',',':'))
+    '[1,2,3,{"4":5,"6":7}]'
+
+Pretty printing::
+
+    >>> import simplejson
+    >>> print simplejson.dumps({'4': 5, '6': 7}, sort_keys=True, indent=4)
+    {
+        "4": 5, 
+        "6": 7
+    }
+
 Decoding JSON::
     
     >>> import simplejson
@@ -68,10 +83,10 @@ Extending JSONEncoder::
     ['[', '2.0', ', ', '1.0', ']']
     
 
-Note that the JSON produced by this module is a subset of YAML,
-so it may be used as a serializer for that as well.
+Note that the JSON produced by this module's default settings
+is a subset of YAML, so it may be used as a serializer for that as well.
 """
-__version__ = '1.3'
+__version__ = '1.5'
 __all__ = [
     'dump', 'dumps', 'load', 'loads',
     'JSONDecoder', 'JSONEncoder',
@@ -81,7 +96,7 @@ from django.utils.simplejson.decoder import JSONDecoder
 from django.utils.simplejson.encoder import JSONEncoder
 
 def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, **kw):
+        allow_nan=True, cls=None, indent=None, **kw):
     """
     Serialize ``obj`` as a JSON formatted stream to ``fp`` (a
     ``.write()``-supporting file-like object).
@@ -105,6 +120,10 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     in strict compliance of the JSON specification, instead of using the
     JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``).
 
+    If ``indent`` is a non-negative integer, then JSON array elements and object
+    members will be pretty-printed with that indent level.  An indent level
+    of 0 will only insert newlines.  ``None`` is the most compact representation.
+
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg.
@@ -112,7 +131,7 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
     if cls is None:
         cls = JSONEncoder
     iterable = cls(skipkeys=skipkeys, ensure_ascii=ensure_ascii,
-        check_circular=check_circular, allow_nan=allow_nan,
+        check_circular=check_circular, allow_nan=allow_nan, indent=indent,
         **kw).iterencode(obj)
     # could accelerate with writelines in some versions of Python, at
     # a debuggability cost
@@ -120,7 +139,7 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
         fp.write(chunk)
 
 def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, **kw):
+        allow_nan=True, cls=None, indent=None, separators=None, **kw):
     """
     Serialize ``obj`` to a JSON formatted ``str``.
 
@@ -141,14 +160,26 @@ def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
     strict compliance of the JSON specification, instead of using the
     JavaScript equivalents (``NaN``, ``Infinity``, ``-Infinity``).
 
+    If ``indent`` is a non-negative integer, then JSON array elements and
+    object members will be pretty-printed with that indent level.  An indent
+    level of 0 will only insert newlines.  ``None`` is the most compact
+    representation.
+
+    If ``separators`` is an ``(item_separator, dict_separator)`` tuple
+    then it will be used instead of the default ``(', ', ': ')`` separators.
+    ``(',', ':')`` is the most compact JSON representation.
+
     To use a custom ``JSONEncoder`` subclass (e.g. one that overrides the
     ``.default()`` method to serialize additional types), specify it with
     the ``cls`` kwarg.
     """
     if cls is None:
         cls = JSONEncoder
-    return cls(skipkeys=skipkeys, ensure_ascii=ensure_ascii,
-        check_circular=check_circular, allow_nan=allow_nan, **kw).encode(obj)
+    return cls(
+        skipkeys=skipkeys, ensure_ascii=ensure_ascii,
+        check_circular=check_circular, allow_nan=allow_nan, indent=indent,
+        separators=separators,
+        **kw).encode(obj)
 
 def load(fp, encoding=None, cls=None, object_hook=None, **kw):
     """

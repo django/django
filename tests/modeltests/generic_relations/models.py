@@ -53,7 +53,7 @@ class Mineral(models.Model):
     def __str__(self):
         return self.name
         
-API_TESTS = """
+__test__ = {'API_TESTS':"""
 # Create the world in 7 lines of code...
 >>> lion = Animal(common_name="Lion", latin_name="Panthera leo")
 >>> platypus = Animal(common_name="Platypus", latin_name="Ornithorhynchus anatinus")
@@ -65,14 +65,14 @@ API_TESTS = """
 
 # Objects with declared GenericRelations can be tagged directly -- the API
 # mimics the many-to-many API.
->>> lion.tags.create(tag="yellow")
-<TaggedItem: yellow>
->>> lion.tags.create(tag="hairy")
-<TaggedItem: hairy>
 >>> bacon.tags.create(tag="fatty")
 <TaggedItem: fatty>
 >>> bacon.tags.create(tag="salty")
 <TaggedItem: salty>
+>>> lion.tags.create(tag="yellow")
+<TaggedItem: yellow>
+>>> lion.tags.create(tag="hairy")
+<TaggedItem: hairy>
 
 >>> lion.tags.all()
 [<TaggedItem: hairy>, <TaggedItem: yellow>]
@@ -105,4 +105,30 @@ API_TESTS = """
 [<TaggedItem: shiny>]
 >>> TaggedItem.objects.filter(content_type__pk=ctype.id, object_id=quartz.id)
 [<TaggedItem: clearish>]
-"""
+
+# If you delete an object with an explicit Generic relation, the related
+# objects are deleted when the source object is deleted.
+# Original list of tags:
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('hairy', <ContentType: animal>, 1), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2), ('yellow', <ContentType: animal>, 1)]
+
+>>> lion.delete()
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+
+# If Generic Relation is not explicitly defined, any related objects 
+# remain after deletion of the source object.
+>>> quartz.delete()
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+
+# If you delete a tag, the objects using the tag are unaffected 
+# (other than losing a tag)
+>>> tag = TaggedItem.objects.get(id=1)
+>>> tag.delete()
+>>> bacon.tags.all()
+[<TaggedItem: salty>]
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[('clearish', <ContentType: mineral>, 1), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+
+"""}

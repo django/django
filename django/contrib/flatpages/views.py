@@ -3,6 +3,7 @@ from django.template import loader, RequestContext
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.conf import settings
+from django.core.xheaders import populate_xheaders
 
 DEFAULT_TEMPLATE = 'flatpages/default.html'
 
@@ -32,4 +33,6 @@ def flatpage(request, url):
     c = RequestContext(request, {
         'flatpage': f,
     })
-    return HttpResponse(t.render(c))
+    response = HttpResponse(t.render(c))
+    populate_xheaders(request, response, FlatPage, f.id)
+    return response

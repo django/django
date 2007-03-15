@@ -2,14 +2,26 @@
 Forms, fields, and manipulators
 ===============================
 
+Forwards-compatibility note
+===========================
+
+The legacy forms/manipulators system described in this document is going to be
+replaced in the next Django release. If you're starting from scratch, we
+strongly encourage you not to waste your time learning this. Instead, learn and
+use the django.newforms system, which we have begun to document in the
+`newforms documentation`_.
+
+If you have legacy form/manipulator code, read the "Migration plan" section in
+that document to understand how we're making the switch.
+
+.. _newforms documentation: ../newforms/
+
+Introduction
+============
+
 Once you've got a chance to play with Django's admin interface, you'll probably
 wonder if the fantastic form validation framework it uses is available to user
 code. It is, and this document explains how the framework works.
-
-    .. admonition:: A note to the lazy
-
-        If all you want to do is present forms for a user to create and/or
-        update a given object, you may be able to use `generic views`_.
 
 We'll take a top-down approach to examining Django's form validation framework,
 because much of the time you won't need to use the lower-level APIs. Throughout
@@ -41,17 +53,17 @@ this document, we'll be working with the following model, a "place" object::
 Defining the above class is enough to create an admin interface to a ``Place``,
 but what if you want to allow public users to submit places?
 
-Manipulators
-============
+Automatic Manipulators
+======================
 
 The highest-level interface for object creation and modification is the
-**Manipulator** framework. A manipulator is a utility class tied to a given
-model that "knows" how to create or modify instances of that model and how to
-validate data for the object. Manipulators come in two flavors:
-``AddManipulators`` and ``ChangeManipulators``. Functionally they are quite
-similar, but the former knows how to create new instances of the model, while
-the latter modifies existing instances. Both types of classes are automatically
-created when you define a new class::
+**automatic Manipulator** framework. An automatic manipulator is a utility
+class tied to a given model that "knows" how to create or modify instances of
+that model and how to validate data for the object. Automatic Manipulators come
+in two flavors: ``AddManipulators`` and ``ChangeManipulators``. Functionally
+they are quite similar, but the former knows how to create new instances of the
+model, while the latter modifies existing instances. Both types of classes are
+automatically created when you define a new class::
 
     >>> from mysite.myapp.models import Place
     >>> Place.AddManipulator
@@ -136,7 +148,7 @@ template::
     {% endblock %}
 
 Before we get back to the problems with these naive set of views, let's go over
-some salient points of the above template::
+some salient points of the above template:
 
     * Field "widgets" are handled for you: ``{{ form.field }}`` automatically
       creates the "right" type of widget for the form, as you can see with the
@@ -148,8 +160,8 @@ some salient points of the above template::
       If you must use tables, use tables. If you're a semantic purist, you can
       probably find better HTML than in the above template.
 
-    * To avoid name conflicts, the ``id``s of form elements take the form
-      "id_*fieldname*".
+    * To avoid name conflicts, the ``id`` values of form elements take the
+      form "id_*fieldname*".
 
 By creating a creation form we've solved problem number 3 above, but we still
 don't have any validation. Let's revise the validation issue by writing a new
@@ -161,10 +173,10 @@ creation view that takes validation into account::
 
         # Check for validation errors
         errors = manipulator.get_validation_errors(new_data)
+        manipulator.do_html2python(new_data)
         if errors:
             return render_to_response('places/errors.html', {'errors': errors})
         else:
-            manipulator.do_html2python(new_data)
             new_place = manipulator.save(new_data)
             return HttpResponse("Place created: %s" % new_place)
 
@@ -211,16 +223,16 @@ Below is the finished view::
     def create_place(request):
         manipulator = Place.AddManipulator()
 
-        if request.POST:
+        if request.method == 'POST':
             # If data was POSTed, we're trying to create a new Place.
             new_data = request.POST.copy()
 
             # Check for errors.
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
 
             if not errors:
                 # No errors. This means we can save the data!
-                manipulator.do_html2python(new_data)
                 new_place = manipulator.save(new_data)
 
                 # Redirect to the object's "edit" page. Always use a redirect
@@ -309,11 +321,11 @@ about editing an existing one? It's shockingly similar to creating a new one::
         # Grab the Place object in question for future use.
         place = manipulator.original_object
 
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
             if not errors:
-                manipulator.do_html2python(new_data)
                 manipulator.save(new_data)
 
                 # Do a post-after-redirect so that reload works, etc.
@@ -321,7 +333,7 @@ about editing an existing one? It's shockingly similar to creating a new one::
         else:
             errors = {}
             # This makes sure the form accurate represents the fields of the place.
-            new_data = place.__dict__
+            new_data = manipulator.flatten_data()
 
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('places/edit_form.html', {'form': form, 'place': place})
@@ -336,10 +348,10 @@ The only real differences are:
     * ``ChangeManipulator.original_object`` stores the instance of the
       object being edited.
 
-    * We set ``new_data`` to the original object's ``__dict__``. This makes
-      sure the form fields contain the current values of the object.
-      ``FormWrapper`` does not modify ``new_data`` in any way, and templates
-      cannot, so this is perfectly safe.
+    * We set ``new_data`` based upon ``flatten_data()`` from the manipulator.
+      ``flatten_data()`` takes the data from the original object under
+      manipulation, and converts it into a data dictionary that can be used
+      to populate form elements with the existing values for the object.
 
     * The above example uses a different template, so create and edit can be
       "skinned" differently if needed, but the form chunk itself is completely
@@ -391,11 +403,11 @@ Here's a simple function that might drive the above form::
 
     def contact_form(request):
         manipulator = ContactManipulator()
-        if request.POST:
+        if request.method == 'POST':
             new_data = request.POST.copy()
             errors = manipulator.get_validation_errors(new_data)
+            manipulator.do_html2python(new_data)
             if not errors:
-                manipulator.do_html2python(new_data)
 
                 # Send e-mail using new_data here...
 
@@ -404,7 +416,28 @@ Here's a simple function that might drive the above form::
             errors = new_data = {}
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
-        
+
+Implementing ``flatten_data`` for custom manipulators
+------------------------------------------------------
+
+It is possible (although rarely needed) to replace the default automatically
+created manipulators on a model with your own custom manipulators. If you do
+this and you are intending to use those models in generic views, you should
+also define a ``flatten_data`` method in any ``ChangeManipulator`` replacement.
+This should act like the default ``flatten_data`` and return a dictionary
+mapping field names to their values, like so::
+
+    def flatten_data(self):
+        obj = self.original_object
+        return dict(
+            from = obj.from,
+            subject = obj.subject,
+            ...
+        )
+
+In this way, your new change manipulator will act exactly like the default
+version.
+
 ``FileField`` and ``ImageField`` special cases
 ==============================================
 
@@ -481,7 +514,33 @@ the data being validated.
 Also, because consistency in user interfaces is important, we strongly urge you
 to put punctuation at the end of your validation messages.
 
-Ready-made Validators
+When are validators called?
+---------------------------
+
+After a form has been submitted, Django first checks to see that all the
+required fields are present and non-empty. For each field that passes that
+test *and if the form submission contained data* for that field, all the
+validators for that field are called in turn. The emphasized portion in the
+last sentence is important: if a form field is not submitted (because it
+contains no data -- which is normal HTML behavior), the validators are not
+run against the field.
+
+This feature is particularly important for models using
+``models.BooleanField`` or custom manipulators using things like
+``forms.CheckBoxField``. If the checkbox is not selected, it will not
+contribute to the form submission.
+
+If you would like your validator to run *always*, regardless of whether its
+attached field contains any data, set the ``always_test`` attribute on the
+validator function. For example::
+
+    def my_custom_validator(field_data, all_data):
+        # ...
+    my_custom_validator.always_test = True
+
+This validator will always be executed for any field it is attached to.
+
+Ready-made validators
 ---------------------
 
 Writing your own validator is not difficult, but there are some situations
@@ -553,7 +612,7 @@ fails. If no message is passed in, a default message is used.
 ``ValidateIfOtherFieldEquals``
     Takes three parameters: ``other_field``, ``other_value`` and
     ``validator_list``, in that order. If ``other_field`` has a value of
-    ``other_vaue``, then the validators in ``validator_list`` are all run
+    ``other_value``, then the validators in ``validator_list`` are all run
     against the current field.
 
 ``RequiredIfOtherFieldNotGiven``
@@ -570,6 +629,10 @@ fails. If no message is passed in, a default message is used.
     order). If the given field does (or does not have, in the latter case) the
     given value, then the current field being validated is required.
 
+    An optional ``other_label`` argument can be passed which, if given, is used
+    in error messages instead of the value. This allows more user friendly error
+    messages if the value itself is not descriptive enough.
+
     Note that because validators are called before any ``do_html2python()``
     functions, the value being compared against is a string. So
     ``RequiredIfOtherFieldEquals('choice', '1')`` is correct, whilst
@@ -583,6 +646,15 @@ fails. If no message is passed in, a default message is used.
     this function to compare data that should be treated as another type. The
     string "123" is less than the string "2", for example. If you don't want
     string comparison here, you will need to write your own validator.
+
+``NumberIsInRange``
+    Takes two boundary numbers, ``lower`` and ``upper``, and checks that the
+    field is greater than ``lower`` (if given) and less than ``upper`` (if
+    given).  
+    
+    Both checks are inclusive. That is, ``NumberIsInRange(10, 20)`` will allow
+    values of both 10 and 20. This validator only checks numeric values
+    (e.g., float and integer values).
 
 ``IsAPowerOf``
     Takes an integer argument and when called as a validator, checks that the
@@ -618,6 +690,6 @@ fails. If no message is passed in, a default message is used.
     the executable specified in the ``JING_PATH`` setting (see the settings_
     document for more details).
 
-.. _`generic views`: http://www.djangoproject.com/documentation/generic_views/
-.. _`models API`: http://www.djangoproject.com/documentation/model_api/
-.. _settings: http://www.djangoproject.com/documentation/settings/
+.. _`generic views`: ../generic_views/
+.. _`models API`: ../model_api/
+.. _settings: ../settings/

@@ -26,7 +26,7 @@ to determine which feed to output.
 
 To create a feed, just write a ``Feed`` class and point to it in your URLconf_.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Initialization
 --------------
@@ -72,8 +72,8 @@ The above example registers two feeds:
 
 Once that's set up, you just need to define the ``Feed`` classes themselves.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _URLconf: ../url_dispatch/
+.. _settings file: ../settings/
 
 Feed classes
 ------------
@@ -95,7 +95,7 @@ latest five news items::
     from django.contrib.syndication.feeds import Feed
     from chicagocrime.models import NewsItem
 
-    class SiteNewsFeed(Feed):
+    class LatestEntries(Feed):
         title = "Chicagocrime.org site news"
         link = "/sitenews/"
         description = "Updates on changes and additions to chicagocrime.org."
@@ -120,8 +120,8 @@ One thing's left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 put into those elements.
 
     * To specify the contents of ``<title>`` and ``<description>``, create
-      `Django templates`_ called ``feeds/sitenews_title.html`` and
-      ``feeds/sitenews_description.html``, where ``sitenews`` is the ``slug``
+      `Django templates`_ called ``feeds/latest_title.html`` and
+      ``feeds/latest_description.html``, where ``latest`` is the ``slug``
       specified in the URLconf for the given feed. Note the ``.html`` extension
       is required. The RSS system renders that template for each item, passing
       it two template context variables:
@@ -145,9 +145,19 @@ put into those elements.
       Both ``get_absolute_url()`` and ``item_link()`` should return the item's
       URL as a normal Python string.
 
+    * For the LatestEntries example above, we could have very simple feed templates:
+
+          * latest_title.html::
+
+             {{ obj.title }}
+
+          * latest_description.html::
+
+             {{ obj.description }}
+
 .. _chicagocrime.org: http://www.chicagocrime.org/
-.. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
-.. _Django templates: http://www.djangoproject.com/documentation/templates/
+.. _object-relational mapper: ../db_api/
+.. _Django templates: ../templates/
 
 A complex example
 -----------------
@@ -267,7 +277,7 @@ Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). This
 comes directly from your `LANGUAGE_CODE setting`_.
 
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
+.. _LANGUAGE_CODE setting: ../settings/#language-code
 
 URLs
 ----
@@ -282,7 +292,7 @@ Atom feeds require a ``<link rel="self">`` that defines the feed's current
 location. The syndication framework populates this automatically, using the
 domain of the current site according to the SITE_ID setting.
 
-.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+.. _SITE_ID setting: ../settings/#site-id
 
 Publishing Atom and RSS feeds in tandem
 ---------------------------------------
@@ -468,6 +478,22 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         categories = ("python", "django") # Hard-coded list of categories.
 
+        # COPYRIGHT NOTICE -- One of the following three is optional. The
+        # framework looks for them in this order.
+
+        def copyright(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            copyright notice as a normal Python string.
+            """
+
+        def copyright(self):
+            """
+            Returns the feed's copyright notice as a normal Python string.
+            """
+
+        copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -649,6 +675,23 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         item_categories = ("python", "django") # Hard-coded categories.
 
+        # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
+        # following three is optional. The framework looks for them in this
+        # order.
+
+        def item_copyright(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            copyright notice as a normal Python string.
+            """
+
+        def item_copyright(self):
+            """
+            Returns the copyright notice for every item in the feed.
+            """
+
+        item_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
+
 
 The low-level framework
 =======================
@@ -707,7 +750,7 @@ This example creates an Atom 1.0 feed and prints it to standard output::
     ...     title=u"My Weblog",
     ...     link=u"http://www.example.com/",
     ...     description=u"In which I write about what I ate today.",
-    ...     language=u"en"),
+    ...     language=u"en")
     >>> f.add_item(title=u"Hot dog today",
     ...     link=u"http://www.example.com/entries/1/",
     ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")

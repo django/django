@@ -13,9 +13,10 @@ def populate_xheaders(request, response, model, object_id):
     """
     Adds the "X-Object-Type" and "X-Object-Id" headers to the given
     HttpResponse according to the given model and object_id -- but only if the
-    given HttpRequest object has an IP address within the INTERNAL_IPS setting.
+    given HttpRequest object has an IP address within the INTERNAL_IPS setting
+    or if the request is from a logged in staff member.
     """
     from django.conf import settings
-    if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS:
+    if request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS or (hasattr(request, 'user') and request.user.is_authenticated() and request.user.is_staff):
         response['X-Object-Type'] = "%s.%s" % (model._meta.app_label, model._meta.object_name.lower())
         response['X-Object-Id'] = str(object_id)

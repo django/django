@@ -109,6 +109,21 @@ Some tags require beginning and ending tags (i.e.
 below describes all the built-in tags. You can create your own tags, if you
 know how to write Python code.
 
+Comments
+========
+
+**New in Django development version**
+
+To comment-out part of a template, use the comment syntax: ``{# #}``.
+
+For example, this template would render as ``'hello'``::
+
+    {# greeting #}hello
+
+A comment can contain any template code, invalid or not. For example::
+
+    {# {% if foo %}bar{% else %} #}
+
 Template inheritance
 ====================
 
@@ -237,6 +252,16 @@ Here are some tips for working with inheritance:
       the ``{{ block.super }}`` variable will do the trick. This is useful
       if you want to add to the contents of a parent block instead of
       completely overriding it.
+
+    * **New in Django development version:** For extra readability, you can
+      optionally give a *name* to your ``{% endblock %}`` tag. For example::
+
+          {% block content %}
+          ...
+          {% endblock content %}
+
+      In larger templates, this technique helps you see which ``{% block %}``
+      tags are being closed.
 
 Finally, note that you can't define multiple ``{% block %}`` tags with the same
 name in the same template. This limitation exists because a block tag works in
@@ -458,7 +483,7 @@ block are output::
 In the above, if ``athlete_list`` is not empty, the number of athletes will be
 displayed by the ``{{ athlete_list|length }}`` variable.
 
-As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
+As you can see, the ``if`` tag can take an optional ``{% else %}`` clause that
 will be displayed if the test fails.
 
 ``if`` tags may use ``and``, ``or`` or ``not`` to test a number of variables or
@@ -510,16 +535,29 @@ ifchanged
 
 Check if a value has changed from the last iteration of a loop.
 
-The ``ifchanged`` block tag is used within a loop. It checks its own rendered
-contents against its previous state and only displays its content if the value
-has changed::
+The 'ifchanged' block tag is used within a loop. It has two possible uses.
 
-    <h1>Archive for {{ year }}</h1>
+1. Checks its own rendered contents against its previous state and only
+   displays the content if it has changed. For example, this displays a list of
+   days, only displaying the month if it changes::
 
-    {% for day in days %}
-    {% ifchanged %}<h3>{{ day|date:"F" }}</h3>{% endifchanged %}
-    <a href="{{ day|date:"M/d"|lower }}/">{{ day|date:"j" }}</a>
-    {% endfor %}
+        <h1>Archive for {{ year }}</h1>
+
+        {% for date in days %}
+            {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+            <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+        {% endfor %}
+
+2. **New in Django development version.** If given a variable, check whether that
+   variable has changed. For example, the following shows the date every time it
+   changes, but only shows the hour if both the hour and the date has changed::
+
+        {% for date in days %}
+            {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
+            {% ifchanged date.hour date.date %}
+                {{ date.hour }}
+            {% endifchanged %}
+        {% endfor %}
 
 ifequal
 ~~~~~~~
@@ -539,6 +577,11 @@ The arguments can be hard-coded strings, so the following is valid::
     {% ifequal user.username "adrian" %}
         ...
     {% endifequal %}
+
+It is only possible to compare an argument to template variables or strings.
+You cannot check for equality with Python objects such as ``True`` or
+``False``.  If you need to test if something is true or false, use the ``if``
+tag instead.
 
 ifnotequal
 ~~~~~~~~~~
@@ -602,6 +645,7 @@ Available format strings:
                       output, because this includes periods
                       to match Associated Press style.)
     A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
+    b                 Month, textual, 3 letters, lowercase.     ``'jan'``
     B                 Not implemented.
     d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
                       leading zeros.
@@ -759,7 +803,7 @@ Note that if you use ``{% ssi %}``, you'll need to define
 
 See also: ``{% include %}``.
 
-.. _ALLOWED_INCLUDE_ROOTS: http://www.djangoproject.com/documentation/settings/#allowed-include-roots
+.. _ALLOWED_INCLUDE_ROOTS: ../settings/#allowed-include-roots
 
 templatetag
 ~~~~~~~~~~~
@@ -780,7 +824,45 @@ The argument tells which template bit to output:
     ``closevariable``   ``}}``
     ``openbrace``       ``{``
     ``closebrace``      ``}``
+    ``opencomment``     ``{#``
+    ``closecomment``    ``#}``
     ==================  =======
+
+Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
+
+url
+~~~
+
+**New in Django development version**
+
+**Note that the syntax for this tag may change in the future, as we make it more robust.**
+
+Returns an absolute URL (i.e., a URL without the domain name) matching a given
+view function and optional parameters. This is a way to output links without
+violating the DRY principle by having to hard-code URLs in your templates::
+
+    {% url path.to.some_view arg1,arg2,name1=value1 %}
+
+The first argument is a path to a view function in the format
+``package.package.module.function``. Additional arguments are optional and
+should be comma-separated values that will be used as positional and keyword
+arguments in the URL. All arguments required by the URLconf should be present.
+
+For example, suppose you have a view, ``app_name.client``, whose URLconf takes
+a client ID. The URLconf line might look like this::
+
+    ('^client/(\d+)/$', 'app_name.client')
+
+If this app's URLconf is included into the project's URLconf under a path
+such as this::
+
+    ('^clients/', include('project_name.app_name.urls'))
+
+...then, in a template, you can create a link to this view like this::
+
+    {% url app_name.client client.id %}
+
+The template tag will output the string ``/clients/client/123/``.
 
 widthratio
 ~~~~~~~~~~
@@ -887,12 +969,30 @@ Replaces ampersands with ``&amp;`` entities.
 floatformat
 ~~~~~~~~~~~
 
-Rounds a floating-point number to one decimal place -- but only if there's a
-decimal part to be displayed. For example:
+When used without an argument, rounds a floating-point number to one decimal
+place -- but only if there's a decimal part to be displayed. For example:
 
     * ``36.123`` gets converted to ``36.1``
     * ``36.15`` gets converted to ``36.2``
     * ``36`` gets converted to ``36``
+
+**New in Django development version**
+
+If used with a numeric integer argument, ``floatformat`` rounds a number to that 
+many decimal places.  For example:
+
+    * ``36.1234`` with floatformat:3 gets converted to ``36.123``
+    * ``36`` with floatformat:4 gets converted to ``36.0000``
+
+If the argument passed to ``floatformat`` is negative, it will round a number to
+that many decimal places -- but only if there's a decimal part to be displayed.
+For example:
+
+    * ``36.1234`` with floatformat:-3 gets converted to ``36.123``
+    * ``36`` with floatformat:-4 gets converted to ``36``
+
+Using ``floatformat`` with no argument is equivalent to using ``floatformat`` with 
+an argument of ``-1``.
 
 get_digit
 ~~~~~~~~~
@@ -1051,7 +1151,7 @@ Formats a date as the time since that date (i.e. "4 days, 6 hours").
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (without the argument, the comparison point is *now*).
 For example, if ``blog_date`` is a date instance representing midnight on 1
-June 2006, and ``comment_date`` is a date instanace for 08:00 on 1 June 2006,
+June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
 
 timeuntil
@@ -1077,6 +1177,16 @@ truncatewords
 Truncates a string after a certain number of words.
 
 **Argument:** Number of words to truncate after
+
+truncatewords_html
+~~~~~~~~~~~~~~~~~~
+
+Similar to ``truncatewords``, except that it is aware of HTML tags. Any tags
+that are opened in the string and not closed before the truncation point, are
+closed immediately after the truncation.
+
+This is less efficient than ``truncatewords``, so should only be used when it
+is being passed HTML text.
 
 unordered_list
 ~~~~~~~~~~~~~~
@@ -1163,7 +1273,7 @@ django.contrib.humanize
 A set of Django template filters useful for adding a "human touch" to data. See
 the `humanize documentation`_.
 
-.. _humanize documentation: http://www.djangoproject.com/documentation/add_ons/#humanize
+.. _humanize documentation: ../add_ons/#humanize
 
 django.contrib.markup
 ---------------------

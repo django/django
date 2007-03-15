@@ -16,12 +16,17 @@ hours to take a complicated Web application from concept to public launch.
 At the same time, the World Online Web developers have consistently been
 perfectionists when it comes to following best practices of Web development.
 
-Thus, Django was designed not only to allow fast Web development, but
-*best-practice* Web development.
+In fall 2003, the World Online developers (Adrian Holovaty and Simon Willison)
+ditched PHP and began using Python to develop its Web sites. As they built
+intensive, richly interactive sites such as Lawrence.com, they began to extract
+a generic Web development framework that let them build Web applications more
+and more quickly. They tweaked this framework constantly, adding improvements
+over two years.
 
-Django would not be possible without a whole host of open-source projects --
-`Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're thrilled to
-be able to give something back to the open-source community.
+In summer 2005, World Online decided to open-source the resulting software,
+Django. Django would not be possible without a whole host of open-source
+projects -- `Apache`_, `Python`_, and `PostgreSQL`_ to name a few -- and we're
+thrilled to be able to give something back to the open-source community.
 
 .. _Apache: http://httpd.apache.org/
 .. _Python: http://www.python.org/
@@ -42,8 +47,8 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 Is Django stable?
 -----------------
 
-Yes. World Online has been using Django for more than two years. Sites built on
-Django have weathered traffic spikes of over one million hits an hour and a
+Yes. World Online has been using Django for more than three years. Sites built
+on Django have weathered traffic spikes of over one million hits an hour and a
 number of Slashdottings. Yes, it's quite stable.
 
 Does Django scale?
@@ -58,7 +63,7 @@ at any level -- database servers, caching servers or Web/application servers.
 The framework cleanly separates components such as its database layer and
 application layer. And it ships with a simple-yet-powerful `cache framework`_.
 
-.. _`cache framework`: http://www.djangoproject.com/documentation/cache/
+.. _`cache framework`: ../cache/
 
 Who's behind this?
 ------------------
@@ -98,10 +103,10 @@ Lawrence, Kansas, USA.
     On IRC, Simon goes by ``SimonW``.
 
 `Wilson Miner`_
-    Wilson's design-fu makes us all look like rock stars. By day, he's an 
+    Wilson's design-fu makes us all look like rock stars. By day, he's an
     interactive designer for `Apple`. Don't ask him what he's working on, or
     he'll have to kill you. He lives in San Francisco.
-    
+
     On IRC, Wilson goes by ``wilsonian``.
 
 .. _`World Online`: http://code.djangoproject.com/wiki/WorldOnline
@@ -186,7 +191,7 @@ Like we said: We're picky.
 
 We've documented our philosophies on the `design philosophies page`_.
 
-.. _design philosophies page: http://www.djangoproject.com/documentation/design_philosophies/
+.. _design philosophies page: ../design_philosophies/
 
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
@@ -222,9 +227,7 @@ When will you release Django 1.0?
 
 Short answer: When we're comfortable with Django's APIs, have added all
 features that we feel are necessary to earn a "1.0" status, and are ready to
-begin maintaining backwards compatibility. This should happen in a couple of
-months or so, although it's entirely possible that it could happen earlier.
-That translates into summer 2006.
+begin maintaining backwards compatibility. 
 
 The merging of Django's `magic-removal branch`_ went a long way toward Django
 1.0.
@@ -274,9 +277,9 @@ How do I get started?
        run into trouble.
 
 .. _`Download the code`: http://www.djangoproject.com/download/
-.. _`installation guide`: http://www.djangoproject.com/documentation/install/
-.. _tutorial:  http://www.djangoproject.com/documentation/tutorial1/
-.. _documentation: http://www.djangoproject.com/documentation/
+.. _`installation guide`: ../install/
+.. _tutorial:  ../tutorial1/
+.. _documentation: ../
 .. _ask questions: http://www.djangoproject.com/community/
 
 How do I fix the "install a later version of setuptools" error?
@@ -308,6 +311,18 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
 
+Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
+----------------------------------------------------------------------------------------
+
+No. Django itself is guaranteed to work with any version of Python from 2.3
+and higher.
+
+If you use a Python version newer than 2.3, you will, of course, be able to
+take advantage of newer Python features in your own code, along with the speed
+improvements and other optimizations that have been made to the Python language
+itself. But the Django framework itself should work equally well on 2.3 as it
+does on 2.4 or 2.5.
+
 Do I have to use mod_python?
 ----------------------------
 
@@ -322,7 +337,7 @@ If you just want to play around and develop things on your local computer, use
 the development Web server that comes with Django. Things should Just Work.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
+.. _How to use Django with FastCGI: ../fastcgi/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?
@@ -449,7 +464,7 @@ Can I use Django with a pre-existing database?
 
 Yes. See `Integrating with a legacy database`_.
 
-.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+.. _`Integrating with a legacy database`: ../legacy_databases/
 
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
@@ -482,7 +497,7 @@ specify an object to edit or delete.
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ------------------------------------------------------------------------------------------------------------------
 
-We try to avoid adding special cases in the Django code to accomodate all the
+We try to avoid adding special cases in the Django code to accommodate all the
 database-specific options such as table type, etc. If you'd like to use any of
 these options, create an `SQL initial data file`_ that contains ``ALTER TABLE``
 statements that do what you want to do. The initial data files are executed in
@@ -496,7 +511,7 @@ type, create an initial data file and put something like this in it::
 As explained in the `SQL initial data file`_ documentation, this SQL file can
 contain arbitrary SQL, so you can make any sorts of changes you need to make.
 
-.. _SQL initial data file: http://www.djangoproject.com/documentation/model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model_api/#providing-initial-sql-data
 
 Why is Django leaking memory?
 -----------------------------
@@ -577,7 +592,7 @@ My admin-site CSS and images showed up fine using the development server, but th
 See `serving the admin files`_ in the "How to use Django with mod_python"
 documentation.
 
-.. _serving the admin files: http://www.djangoproject.com/documentation/modpython/#serving-the-admin-files
+.. _serving the admin files: ../modpython/#serving-the-admin-files
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
@@ -615,7 +630,7 @@ site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet. We've got a
 `guide to the CSS used in the admin`_ to get you started.
 
-.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
+.. _`guide to the CSS used in the admin`: ../admin_css/
 
 How do I create users without having to edit password hashes?
 -------------------------------------------------------------
@@ -625,10 +640,18 @@ development version, where this problem was fixed on Aug. 4, 2006.
 
 You can also use the Python API. See `creating users`_ for full info.
 
-.. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+.. _creating users: ../authentication/#creating-users
 
 Contributing code
 =================
+
+How can I get started contributing code to Django?
+--------------------------------------------------
+
+Thanks for asking! We've written an entire document devoted to this question.
+It's titled `Contributing to Django`_.
+
+.. _Contributing to Django: ../contributing/
 
 I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
 --------------------------------------------------------------------------------------------

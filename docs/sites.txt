@@ -266,7 +266,18 @@ this::
 If you attempt to use ``CurrentSiteManager`` and pass a field name that doesn't
 exist, Django will raise a ``ValueError``.
 
-.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
+Finally, note that you'll probably want to keep a normal (non-site-specific)
+``Manager`` on your model, even if you use ``CurrentSiteManager``. As explained
+in the `manager documentation`_, if you define a manager manually, then Django
+won't create the automatic ``objects = models.Manager()`` manager for you.
+Also, note that certain parts of Django -- namely, the Django admin site and
+generic views -- use whichever manager is defined *first* in the model, so if
+you want your admin site to have access to all objects (not just site-specific
+ones), put ``objects = models.Manager()`` in your model, before you define
+``CurrentSiteManager``.
+
+.. _manager: ../model_api/#managers
+.. _manager documentation: ../model_api/#managers
 
 How Django uses the sites framework
 ===================================
@@ -305,7 +316,7 @@ Here's how Django uses the sites framework:
     * The shortcut view (``django.views.defaults.shortcut``) uses the domain of
       the current ``Site`` object when calculating an object's URL.
 
-.. _redirects framework: http://www.djangoproject.com/documentation/redirects/
-.. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _authentication framework: http://www.djangoproject.com/documentation/authentication/
+.. _redirects framework: ../redirects/
+.. _flatpages framework: ../flatpages/
+.. _syndication framework: ../syndication/
+.. _authentication framework: ../authentication/

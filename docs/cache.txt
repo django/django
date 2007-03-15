@@ -250,7 +250,7 @@ Additionally, ``CacheMiddleware`` automatically sets a few headers in each
 
 See the `middleware documentation`_ for more on middleware.
 
-.. _`middleware documentation`: http://www.djangoproject.com/documentation/middleware/
+.. _`middleware documentation`: ../middleware/
 
 The per-view cache
 ==================

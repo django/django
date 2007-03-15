@@ -11,7 +11,7 @@ understand how Django works, but this isn't intended to be a tutorial or
 reference. Please see our more-detailed Django documentation_ when you're ready
 to start a project.
 
-.. _documentation: http://www.djangoproject.com/documentation/
+.. _documentation: ../
 
 Design your model
 =================
@@ -159,7 +159,7 @@ of contents for your app, it contains a simple mapping between URL patterns and
 Python callback functions. URLconfs also serve to decouple URLs from Python
 code.
 
-Here's what a URLconf might look like for the above ``Reporter``/``Article``
+Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above::
 
     from django.conf.urls.defaults import *

@@ -31,9 +31,11 @@ Optional Fcgi settings: (setting=value)
   port=PORTNUM         port to listen on.
   socket=FILE          UNIX socket to listen on.
   method=IMPL          prefork or threaded (default prefork)
-  maxspare=NUMBER      max number of spare processes to keep running.
-  minspare=NUMBER      min number of spare processes to prefork.
-  maxchildren=NUMBER   hard limit number of processes in prefork mode.
+  maxrequests=NUMBER   number of requests a child handles before it is 
+                       killed and a new child is forked (0 = no limit).
+  maxspare=NUMBER      max number of spare processes / threads
+  minspare=NUMBER      min number of spare processes / threads.
+  maxchildren=NUMBER   hard limit number of processes / threads
   daemonize=BOOL       whether to detach from terminal.
   pidfile=FILE         write the spawned process-id to this file.
   workdir=DIRECTORY    change to this directory when daemonizing
@@ -66,6 +68,7 @@ FASTCGI_OPTIONS = {
     'maxspare': 5,
     'minspare': 2,
     'maxchildren': 50,
+    'maxrequests': 0,
 }
 
 def fastcgi_help(message=None):
@@ -74,8 +77,9 @@ def fastcgi_help(message=None):
         print message
     return False
 
-def runfastcgi(argset):
+def runfastcgi(argset=[], **kwargs):
     options = FASTCGI_OPTIONS.copy()
+    options.update(kwargs)
     for x in argset:
         if "=" in x:
             k, v = x.split('=', 1)
@@ -102,12 +106,19 @@ def runfastcgi(argset):
             'maxSpare': int(options["maxspare"]),
             'minSpare': int(options["minspare"]),
             'maxChildren': int(options["maxchildren"]),
+            'maxRequests': int(options["maxrequests"]), 
         }
     elif options['method'] in ('thread', 'threaded'):
         from flup.server.fcgi import WSGIServer
-        wsgi_opts = {}
+        wsgi_opts = {
+            'maxSpare': int(options["maxspare"]),
+            'minSpare': int(options["minspare"]),
+            'maxThreads': int(options["maxchildren"]),
+        }
     else:
         return fastcgi_help("ERROR: Implementation must be one of prefork or thread.")
+
+    wsgi_opts['debug'] = False # Turn off flup tracebacks
 
     # Prep up and go
     from django.core.handlers.wsgi import WSGIHandler

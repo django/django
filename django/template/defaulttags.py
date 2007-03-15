@@ -1,7 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
 from django.template import Node, NodeList, Template, Context, resolve_variable
-from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END
+from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
@@ -13,14 +13,18 @@ class CommentNode(Node):
         return ''
 
 class CycleNode(Node):
-    def __init__(self, cyclevars):
+    def __init__(self, cyclevars, variable_name=None):
         self.cyclevars = cyclevars
         self.cyclevars_len = len(cyclevars)
         self.counter = -1
+        self.variable_name = variable_name
 
     def render(self, context):
         self.counter += 1
-        return self.cyclevars[self.counter % self.cyclevars_len]
+        value = self.cyclevars[self.counter % self.cyclevars_len]
+        if self.variable_name:
+            context[self.variable_name] = value
+        return value
 
 class DebugNode(Node):
     def render(self, context):
@@ -86,7 +90,7 @@ class ForNode(Node):
             parentloop = {}
         context.push()
         try:
-            values = self.sequence.resolve(context)
+            values = self.sequence.resolve(context, True)
         except VariableDoesNotExist:
             values = []
         if values is None:
@@ -120,15 +124,27 @@ class ForNode(Node):
         return nodelist.render(context)
 
 class IfChangedNode(Node):
-    def __init__(self, nodelist):
+    def __init__(self, nodelist, *varlist):
         self.nodelist = nodelist
         self._last_seen = None
+        self._varlist = varlist
 
     def render(self, context):
-        content = self.nodelist.render(context)
-        if content != self._last_seen:
+        if context.has_key('forloop') and context['forloop']['first']:
+            self._last_seen = None
+        try:
+            if self._varlist:
+                # Consider multiple parameters.
+                # This automatically behaves like a OR evaluation of the multiple variables.
+                compare_to = [resolve_variable(var, context) for var in self._varlist]
+            else:
+                compare_to = self.nodelist.render(context)
+        except VariableDoesNotExist:
+            compare_to = None        
+
+        if  compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
-            self._last_seen = content
+            self._last_seen = compare_to
             context.push()
             context['ifchanged'] = {'firstloop': firstloop}
             content = self.nodelist.render(context)
@@ -212,13 +228,13 @@ class RegroupNode(Node):
         self.var_name = var_name
 
     def render(self, context):
-        obj_list = self.target.resolve(context)
-        if obj_list == '': # target_var wasn't found in context; fail silently
+        obj_list = self.target.resolve(context, True)
+        if obj_list == None: # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = self.expression.resolve(Context({'var': obj}))
+            grouper = self.expression.resolve(Context({'var': obj}), True)
             # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
@@ -251,7 +267,7 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                t = Template(output)
+                t = Template(output, name=self.filepath)
                 return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:
@@ -289,6 +305,8 @@ class TemplateTagNode(Node):
                'closevariable': VARIABLE_TAG_END,
                'openbrace': SINGLE_BRACE_START,
                'closebrace': SINGLE_BRACE_END,
+               'opencomment': COMMENT_TAG_START,
+               'closecomment': COMMENT_TAG_END,
                }
 
     def __init__(self, tagtype):
@@ -296,6 +314,25 @@ class TemplateTagNode(Node):
 
     def render(self, context):
         return self.mapping.get(self.tagtype, '')
+
+class URLNode(Node):
+    def __init__(self, view_name, args, kwargs):
+        self.view_name = view_name
+        self.args = args
+        self.kwargs = kwargs
+      
+    def render(self, context):
+        from django.core.urlresolvers import reverse, NoReverseMatch
+        args = [arg.resolve(context) for arg in self.args]
+        kwargs = dict([(k, v.resolve(context)) for k, v in self.kwargs.items()])
+        try:
+            return reverse(self.view_name, args=args, kwargs=kwargs)
+        except NoReverseMatch:
+            try:
+                project_name = settings.SETTINGS_MODULE.split('.')[0]
+                return reverse(project_name + '.' + self.view_name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                return ''
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
@@ -385,7 +422,7 @@ def cycle(parser, token):
             raise TemplateSyntaxError("Second 'cycle' argument must be 'as'")
         cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
         name = args[3]
-        node = CycleNode(cyclevars)
+        node = CycleNode(cyclevars, name)
 
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
@@ -398,6 +435,15 @@ def cycle(parser, token):
 cycle = register.tag(cycle)
 
 def debug(parser, token):
+    """
+    Output a whole load of debugging information, including the current context and imported modules.
+
+    Sample usage::
+
+        <pre>
+            {% debug %}
+        </pre>
+    """
     return DebugNode()
 debug = register.tag(debug)
 
@@ -501,21 +547,6 @@ def do_for(parser, token):
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
-    """
-    Output the contents of the block if the two arguments equal/don't equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
     bits = list(token.split_contents())
     if len(bits) != 3:
         raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
@@ -531,11 +562,27 @@ def do_ifequal(parser, token, negate):
 
 #@register.tag
 def ifequal(parser, token):
+    """
+    Output the contents of the block if the two arguments equal each other.
+
+    Examples::
+
+        {% ifequal user.id comment.user_id %}
+            ...
+        {% endifequal %}
+
+        {% ifnotequal user.id comment.user_id %}
+            ...
+        {% else %}
+            ...
+        {% endifnotequal %}
+    """
     return do_ifequal(parser, token, False)
 ifequal = register.tag(ifequal)
 
 #@register.tag
 def ifnotequal(parser, token):
+    """Output the contents of the block if the two arguments are not equal. See ifequal"""
     return do_ifequal(parser, token, True)
 ifnotequal = register.tag(ifnotequal)
 
@@ -626,23 +673,34 @@ def ifchanged(parser, token):
     """
     Check if a value has changed from the last iteration of a loop.
 
-    The 'ifchanged' block tag is used within a loop. It checks its own rendered
-    contents against its previous state and only displays its content if the
-    value has changed::
+    The 'ifchanged' block tag is used within a loop. It has two possible uses.
 
-        <h1>Archive for {{ year }}</h1>
+    1. Checks its own rendered contents against its previous state and only
+       displays the content if it has changed. For example, this displays a list of
+       days, only displaying the month if it changes::
 
-        {% for date in days %}
-        {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
-        <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
-        {% endfor %}
+            <h1>Archive for {{ year }}</h1>
+
+            {% for date in days %}
+                {% ifchanged %}<h3>{{ date|date:"F" }}</h3>{% endifchanged %}
+                <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
+            {% endfor %}
+
+    2. If given a variable, check whether that variable has changed. For example, the
+       following shows the date every time it changes, but only shows the hour if both
+       the hour and the date have changed::
+
+            {% for date in days %}
+                {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
+                {% ifchanged date.hour date.date %}
+                    {{ date.hour }}
+                {% endifchanged %}
+            {% endfor %}
     """
     bits = token.contents.split()
-    if len(bits) != 1:
-        raise TemplateSyntaxError, "'ifchanged' tag takes no arguments"
     nodelist = parser.parse(('endifchanged',))
     parser.delete_first_token()
-    return IfChangedNode(nodelist)
+    return IfChangedNode(nodelist, *bits[1:])
 ifchanged = register.tag(ifchanged)
 
 #@register.tag
@@ -825,6 +883,8 @@ def templatetag(parser, token):
         ``closevariable``   ``}}``
         ``openbrace``       ``{``
         ``closebrace``      ``}``
+        ``opencomment``     ``{#``
+        ``closecomment``    ``#}``
         ==================  =======
     """
     bits = token.contents.split()
@@ -836,6 +896,51 @@ def templatetag(parser, token):
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)
 templatetag = register.tag(templatetag)
+
+def url(parser, token):
+    """
+    Returns an absolute URL matching given view with its parameters. 
+    
+    This is a way to define links that aren't tied to a particular url configuration::
+    
+        {% url path.to.some_view arg1,arg2,name1=value1 %}
+    
+    The first argument is a path to a view. It can be an absolute python path
+    or just ``app_name.view_name`` without the project name if the view is
+    located inside the project.  Other arguments are comma-separated values
+    that will be filled in place of positional and keyword arguments in the
+    URL. All arguments for the URL should be present.
+
+    For example if you have a view ``app_name.client`` taking client's id and
+    the corresponding line in a urlconf looks like this::
+    
+        ('^client/(\d+)/$', 'app_name.client')
+    
+    and this app's urlconf is included into the project's urlconf under some
+    path::
+    
+        ('^clients/', include('project_name.app_name.urls'))
+    
+    then in a template you can create a link for a certain client like this::
+    
+        {% url app_name.client client.id %}
+    
+    The URL will look like ``/clients/client/123/``.
+    """
+    bits = token.contents.split(' ', 2)
+    if len(bits) < 2:
+        raise TemplateSyntaxError, "'%s' takes at least one argument (path to a view)" % bits[0]
+    args = []
+    kwargs = {}
+    if len(bits) > 2:
+        for arg in bits[2].split(','):
+            if '=' in arg:
+                k, v = arg.split('=', 1)
+                kwargs[k] = parser.compile_filter(v)
+            else:
+                args.append(parser.compile_filter(arg))
+    return URLNode(bits[1], args, kwargs)
+url = register.tag(url)
 
 #@register.tag
 def widthratio(parser, token):

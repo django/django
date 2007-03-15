@@ -8,12 +8,13 @@ validator will *always* be run, regardless of whether its associated
 form field is required.
 """
 
+import urllib2
 from django.conf import settings
 from django.utils.translation import gettext, gettext_lazy, ngettext
 from django.utils.functional import Promise, lazy
 import re
 
-_datere = r'(19|2\d)\d{2}-((?:0?[1-9])|(?:1[0-2]))-((?:0?[1-9])|(?:[12][0-9])|(?:3[0-1]))'
+_datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
 alnum_re = re.compile(r'^\w+$')
 alnumurl_re = re.compile(r'^[-\w/]+$')
@@ -122,9 +123,30 @@ def isOnlyLetters(field_data, all_data):
     if not field_data.isalpha():
         raise ValidationError, gettext("Only alphabetical characters are allowed here.")
 
+def _isValidDate(date_string):
+    """
+    A helper function used by isValidANSIDate and isValidANSIDatetime to
+    check if the date is valid.  The date string is assumed to already be in
+    YYYY-MM-DD format.
+    """
+    from datetime import date
+    # Could use time.strptime here and catch errors, but datetime.date below
+    # produces much friendlier error messages.
+    year, month, day = map(int, date_string.split('-'))
+    # This check is needed because strftime is used when saving the date
+    # value to the database, and strftime requires that the year be >=1900.
+    if year < 1900:
+        raise ValidationError, gettext('Year must be 1900 or later.')
+    try:
+        date(year, month, day)
+    except ValueError, e:
+        msg = gettext('Invalid date: %s') % gettext(str(e))
+        raise ValidationError, msg    
+
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
+    _isValidDate(field_data)
 
 def isValidANSITime(field_data, all_data):
     if not ansi_time_re.search(field_data):
@@ -133,6 +155,7 @@ def isValidANSITime(field_data, all_data):
 def isValidANSIDatetime(field_data, all_data):
     if not ansi_datetime_re.search(field_data):
         raise ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+    _isValidDate(field_data.split()[0])
 
 def isValidEmail(field_data, all_data):
     if not email_re.search(field_data):
@@ -202,18 +225,26 @@ def isWellFormedXmlFragment(field_data, all_data):
     isWellFormedXml('<root>%s</root>' % field_data, all_data)
 
 def isExistingURL(field_data, all_data):
-    import urllib2
     try:
-        u = urllib2.urlopen(field_data)
+        headers = {
+            "Accept" : "text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5",
+            "Accept-Language" : "en-us,en;q=0.5",
+            "Accept-Charset": "ISO-8859-1,utf-8;q=0.7,*;q=0.7",
+            "Connection" : "close",
+            "User-Agent": settings.URL_VALIDATOR_USER_AGENT
+            }
+        req = urllib2.Request(field_data,None, headers)
+        u = urllib2.urlopen(req)
     except ValueError:
-        raise ValidationError, gettext("Invalid URL: %s") % field_data
+        raise ValidationError, _("Invalid URL: %s") % field_data
     except urllib2.HTTPError, e:
         # 401s are valid; they just mean authorization is required.
-        if e.code not in ('401',):
-            raise ValidationError, gettext("The URL %s is a broken link.") % field_data
+        # 301 and 302 are redirects; they just mean look somewhere else.
+        if str(e.code) not in ('401','301','302'):
+            raise ValidationError, _("The URL %s is a broken link.") % field_data
     except: # urllib2.URLError, httplib.InvalidURL, etc.
-        raise ValidationError, gettext("The URL %s is a broken link.") % field_data
-
+        raise ValidationError, _("The URL %s is a broken link.") % field_data
+        
 def isValidUSState(field_data, all_data):
     "Checks that the given string is a valid two-letter U.S. state abbreviation"
     states = ['AA', 'AE', 'AK', 'AL', 'AP', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'FM', 'GA', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MH', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'PW', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
@@ -227,9 +258,8 @@ def hasNoProfanities(field_data, all_data):
     catch 'motherfucker' as well. Raises a ValidationError such as:
         Watch your mouth! The words "f--k" and "s--t" are not allowed here.
     """
-    bad_words = ['asshat', 'asshead', 'asshole', 'cunt', 'fuck', 'gook', 'nigger', 'shit'] # all in lower case
     field_data = field_data.lower() # normalize
-    words_seen = [w for w in bad_words if field_data.find(w) > -1]
+    words_seen = [w for w in settings.PROFANITIES_LIST if w in field_data]
     if words_seen:
         from django.utils.text import get_text_list
         plural = len(words_seen) > 1
@@ -283,11 +313,12 @@ class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
         RequiredIfOtherFieldsGiven.__init__(self, [other_field_name], error_message)
 
 class RequiredIfOtherFieldEquals(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, error_message=None, other_label=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -295,11 +326,12 @@ class RequiredIfOtherFieldEquals(object):
             raise ValidationError(self.error_message)
 
 class RequiredIfOtherFieldDoesNotEqual(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, other_label=None, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is not %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
@@ -323,6 +355,38 @@ class UniqueAmongstFieldsWithPrefix(object):
         for field_name, value in all_data.items():
             if field_name != self.field_name and value == field_data:
                 raise ValidationError, self.error_message
+
+class NumberIsInRange(object):
+    """
+    Validator that tests if a value is in a range (inclusive).
+    """
+    def __init__(self, lower=None, upper=None, error_message=''):
+        self.lower, self.upper = lower, upper
+        if not error_message:
+            if lower and upper:
+                 self.error_message = gettext("This value must be between %(lower)s and %(upper)s.") % {'lower': lower, 'upper': upper}
+            elif lower:
+                self.error_message = gettext("This value must be at least %s.") % lower
+            elif upper:
+                self.error_message = gettext("This value must be no more than %s.") % upper
+        else:
+            self.error_message = error_message
+
+    def __call__(self, field_data, all_data):
+        # Try to make the value numeric. If this fails, we assume another 
+        # validator will catch the problem.
+        try:
+            val = float(field_data)
+        except ValueError:
+            return
+            
+        # Now validate
+        if self.lower and self.upper and (val < self.lower or val > self.upper):
+            raise ValidationError(self.error_message)
+        elif self.lower and val < self.lower:
+            raise ValidationError(self.error_message)
+        elif self.upper and val > self.upper:
+            raise ValidationError(self.error_message)
 
 class IsAPowerOf(object):
     """
@@ -352,10 +416,12 @@ class IsValidFloat(object):
             float(data)
         except ValueError:
             raise ValidationError, gettext("Please enter a valid decimal number.")
-        if len(data) > (self.max_digits + 1):
+        # Negative floats require more space to input.
+        max_allowed_length = data.startswith('-') and (self.max_digits + 2) or (self.max_digits + 1)
+        if len(data) > max_allowed_length:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (self.max_digits - self.decimal_places)) or ('.' in data and len(data) > (self.max_digits - (self.decimal_places - len(data.split('.')[1])) + 1)):
+        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
         if '.' in data and len(data.split('.')[1]) > self.decimal_places:

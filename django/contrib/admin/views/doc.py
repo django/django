@@ -98,13 +98,13 @@ def view_index(request):
         return missing_docutils_page(request)
 
     if settings.ADMIN_FOR:
-        settings_modules = [__import__(m, '', '', ['']) for m in settings.ADMIN_FOR]
+        settings_modules = [__import__(m, {}, {}, ['']) for m in settings.ADMIN_FOR]
     else:
         settings_modules = [settings]
 
     views = []
     for settings_mod in settings_modules:
-        urlconf = __import__(settings_mod.ROOT_URLCONF, '', '', [''])
+        urlconf = __import__(settings_mod.ROOT_URLCONF, {}, {}, [''])
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         if Site._meta.installed:
             site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
@@ -127,7 +127,7 @@ def view_detail(request, view):
 
     mod, func = urlresolvers.get_mod_func(view)
     try:
-        view_func = getattr(__import__(mod, '', '', ['']), func)
+        view_func = getattr(__import__(mod, {}, {}, ['']), func)
     except (ImportError, AttributeError):
         raise Http404
     title, body, metadata = utils.parse_docstring(view_func.__doc__)
@@ -168,7 +168,7 @@ def model_detail(request, app_label, model_name):
             model = m
             break
     if model is None:
-        raise Http404, _("Model %r not found in app %r") % (model_name, app_label)
+        raise Http404, _("Model %(name)r not found in app %(label)r") % {'name': model_name, 'label': app_label}
 
     opts = model._meta
 
@@ -180,7 +180,7 @@ def model_detail(request, app_label, model_name):
         if isinstance(field, models.ForeignKey):
             data_type = related_object_name = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst((_("the related `%s.%s` object")  % (app_label, data_type)), 'model', _('model:') + data_type)
+            verbose = utils.parse_rst((_("the related `%(label)s.%(type)s` object")  % {'label': app_label, 'type': data_type}), 'model', _('model:') + data_type)
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name
@@ -211,7 +211,7 @@ def model_detail(request, app_label, model_name):
 
     # Gather related objects
     for rel in opts.get_all_related_objects():
-        verbose = _("related `%s.%s` objects") % (rel.opts.app_label, rel.opts.object_name)
+        verbose = _("related `%(label)s.%(name)s` objects") % {'label': rel.opts.app_label, 'name': rel.opts.object_name}
         accessor = rel.get_accessor_name()
         fields.append({
             'name'      : "%s.all" % accessor,
@@ -235,7 +235,7 @@ model_detail = staff_member_required(model_detail)
 def template_detail(request, template):
     templates = []
     for site_settings_module in settings.ADMIN_FOR:
-        settings_mod = __import__(site_settings_module, '', '', [''])
+        settings_mod = __import__(site_settings_module, {}, {}, [''])
         if Site._meta.installed:
             site_obj = Site.objects.get(pk=settings_mod.SITE_ID)
         else:
@@ -328,13 +328,17 @@ def extract_views_from_urlpatterns(urlpatterns, base=''):
     """
     views = []
     for p in urlpatterns:
-        if hasattr(p, 'get_callback'):
+        if hasattr(p, '_get_callback'):
             try:
-                views.append((p.get_callback(), base + p.regex.pattern))
+                views.append((p._get_callback(), base + p.regex.pattern))
             except ViewDoesNotExist:
                 continue
         elif hasattr(p, '_get_url_patterns'):
-            views.extend(extract_views_from_urlpatterns(p.url_patterns, base + p.regex.pattern))
+            try:
+                patterns = p.url_patterns
+            except ImportError:
+                continue
+            views.extend(extract_views_from_urlpatterns(patterns, base + p.regex.pattern))
         else:
             raise TypeError, _("%s does not appear to be a urlpattern object") % p
     return views

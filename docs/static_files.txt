@@ -24,14 +24,14 @@ production setting. Use this only for development.
 For information on serving static files in an Apache production environment,
 see the `Django mod_python documentation`_.
 
-.. _Django mod_python documentation: http://www.djangoproject.com/documentation/modpython/#serving-media-files
+.. _Django mod_python documentation: ../modpython/#serving-media-files
 
 How to do it
 ============
 
 Just put this in your URLconf_::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media'}),
 
 ...where ``site_media`` is the URL where your media will be rooted, and
 ``/path/to/media`` is the filesystem root for your media.
@@ -49,7 +49,7 @@ Examples:
     * The file ``/path/bar.jpg`` will not be accessible, because it doesn't
       fall under the document root.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Directory listings
 ==================
@@ -60,7 +60,7 @@ listings for directories.
 
 Example::
 
-    (r'^site_media/(.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/path/to/media', 'show_indexes': True}),
 
 You can customize the index view by creating a template called
 ``static/directory_index``. That template gets two objects in its context:
@@ -122,4 +122,4 @@ associated with the ``django.views.static.serve`` view. If not
 Of course, the catch here is that you'll have to remember to set ``DEBUG=False``
 in your production settings file. But you should be doing that anyway.
 
-.. _DEBUG setting: http://www.djangoproject.com/documentation/settings/#debug
+.. _DEBUG setting: ../settings/#debug

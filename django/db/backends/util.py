@@ -17,7 +17,7 @@ class CursorDebugWrapper(object):
             if not isinstance(params, (tuple, dict)):
                 params = tuple(params)
             self.db.queries.append({
-                'sql': sql % tuple(params),
+                'sql': sql % params,
                 'time': "%.3f" % (stop - start),
             })
 
@@ -98,7 +98,7 @@ def rev_typecast_boolean(obj, d):
 
 def _dict_helper(desc, row):
     "Returns a dictionary for the given cursor.description and result row."
-    return dict([(desc[col[0]][0], col[1]) for col in enumerate(row)])
+    return dict(zip([col[0] for col in desc], row))
 
 def dictfetchone(cursor):
     "Returns a row from the cursor as a dict"
@@ -110,9 +110,11 @@ def dictfetchone(cursor):
 def dictfetchmany(cursor, number):
     "Returns a certain number of rows from a cursor as a dict"
     desc = cursor.description
-    return [_dict_helper(desc, row) for row in cursor.fetchmany(number)]
+    for row in cursor.fetchmany(number):
+        yield _dict_helper(desc, row)
 
 def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
     desc = cursor.description
-    return [_dict_helper(desc, row) for row in cursor.fetchall()]
+    for row in cursor.fetchall():
+        yield _dict_helper(desc, row)

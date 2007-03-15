@@ -3,7 +3,7 @@ Iterator based sre token scanner
 """
 import sre_parse, sre_compile, sre_constants
 from sre_constants import BRANCH, SUBPATTERN
-from sre import VERBOSE, MULTILINE, DOTALL
+from re import VERBOSE, MULTILINE, DOTALL
 import re
 
 __all__ = ['Scanner', 'pattern']

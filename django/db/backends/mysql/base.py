@@ -10,45 +10,39 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
+if Database.version_info < (1,2,1,'final',2):
+    raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % MySQLdb.__version__
+
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
+import re
 
 DatabaseError = Database.DatabaseError
 
+# MySQLdb-1.2.1 supports the Python boolean type, and only uses datetime
+# module for time-related columns; older versions could have used mx.DateTime
+# or strings if there were no datetime module. However, MySQLdb still returns
+# TIME columns as timedelta -- they are more like timedelta in terms of actual
+# behavior as they are signed and include days -- and Django expects time, so
+# we still need to override that.
 django_conversions = conversions.copy()
 django_conversions.update({
-    types.BooleanType: util.rev_typecast_boolean,
-    FIELD_TYPE.DATETIME: util.typecast_timestamp,
-    FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
 })
 
-# This is an extra debug layer over MySQL queries, to display warnings.
-# It's only used when DEBUG=True.
-class MysqlDebugWrapper:
-    def __init__(self, cursor):
-        self.cursor = cursor
+# This should match the numerical portion of the version numbers (we can treat
+# versions like 5.0.24 and 5.0.24a as the same). Based on the list of version
+# at http://dev.mysql.com/doc/refman/4.1/en/news.html and
+# http://dev.mysql.com/doc/refman/5.0/en/news.html .
+server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
-    def execute(self, sql, params=()):
-        try:
-            return self.cursor.execute(sql, params)
-        except Database.Warning, w:
-            self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
-
-    def executemany(self, sql, param_list):
-        try:
-            return self.cursor.executemany(sql, param_list)
-        except Database.Warning, w:
-            self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
-
-    def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+# MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
+# MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
+# point is to raise Warnings as exceptions, this can be done with the Python
+# warning module, and this is setup when the connection is created, and the
+# standard util.CursorDebugWrapper can be used. Also, using sql_mode
+# TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 try:
     # Only exists in Python 2.4+
@@ -58,9 +52,11 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.connection = None
         self.queries = []
+        self.server_version = None
+        self.options = kwargs
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -74,32 +70,39 @@ class DatabaseWrapper(local):
 
     def cursor(self):
         from django.conf import settings
+        from warnings import filterwarnings
         if not self._valid_connection():
             kwargs = {
-                'user': settings.DATABASE_USER,
-                'db': settings.DATABASE_NAME,
-                'passwd': settings.DATABASE_PASSWORD,
                 'conv': django_conversions,
             }
+            if settings.DATABASE_USER:
+                kwargs['user'] = settings.DATABASE_USER
+            if settings.DATABASE_NAME:
+                kwargs['db'] = settings.DATABASE_NAME
+            if settings.DATABASE_PASSWORD:
+                kwargs['passwd'] = settings.DATABASE_PASSWORD
             if settings.DATABASE_HOST.startswith('/'):
                 kwargs['unix_socket'] = settings.DATABASE_HOST
-            else:
+            elif settings.DATABASE_HOST:
                 kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
+            kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
-        cursor = self.connection.cursor()
-        if self.connection.get_server_info() >= '4.1':
-            cursor.execute("SET NAMES 'utf8'")
+            cursor = self.connection.cursor()
+        else:
+            cursor = self.connection.cursor()
         if settings.DEBUG:
-            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
+            filterwarnings("error", category=Database.Warning)
+            return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             try:
                 self.connection.rollback()
             except Database.NotSupportedError:
@@ -109,6 +112,16 @@ class DatabaseWrapper(local):
         if self.connection is not None:
             self.connection.close()
             self.connection = None
+
+    def get_server_version(self):
+        if not self.server_version:
+            if not self._valid_connection():
+                self.cursor()
+            m = server_version_re.match(self.connection.get_server_info())
+            if not m:
+                raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
+            self.server_version = tuple([int(x) for x in m.groups()])
+        return self.server_version
 
 supports_constraints = True
 
@@ -152,6 +165,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
@@ -160,6 +176,36 @@ def get_drop_foreignkey_sql():
 
 def get_pk_default_value():
     return "DEFAULT"
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    
+    """
+    # NB: The generated SQL below is specific to MySQL
+    # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # to clear all tables of all data
+    if tables:
+        sql = ['SET FOREIGN_KEY_CHECKS = 0;'] + \
+              ['%s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'),
+                 style.SQL_FIELD(quote_name(table))
+                )  for table in tables] + \
+              ['SET FOREIGN_KEY_CHECKS = 1;']
+              
+        # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
+        # to reset sequence indices
+        sql.extend(["%s %s %s %s %s;" % \
+            (style.SQL_KEYWORD('ALTER'),
+             style.SQL_KEYWORD('TABLE'),
+             style.SQL_TABLE(quote_name(sequence['table'])),
+             style.SQL_KEYWORD('AUTO_INCREMENT'),
+             style.SQL_FIELD('= 1'),
+            ) for sequence in sequences])
+        return sql
+    else:
+        return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

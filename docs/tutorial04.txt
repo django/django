@@ -120,7 +120,7 @@ Now, go to ``/polls/1/`` in your browser and vote in the poll. You should see a
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
-.. _request and response documentation: http://www.djangoproject.com/documentation/request_response/
+.. _request and response documentation: ../request_response/
 
 Use generic views: Less code is better
 ======================================
@@ -192,13 +192,13 @@ objects" and "display a detail page for a particular type of object."
       ``object_id`` for the generic views.
 
 By default, the ``object_detail`` generic view uses a template called
-``<app name>/<module name>_detail.html``. In our case, it'll use the template
+``<app name>/<model name>_detail.html``. In our case, it'll use the template
 ``"polls/poll_detail.html"``. Thus, rename your ``polls/detail.html`` template to
 ``polls/poll_detail.html``, and change the ``render_to_response()`` line in
 ``vote()``.
 
 Similarly, the ``object_list`` generic view uses a template called
-``<app name>/<module name>_list.html``. Thus, rename ``polls/index.html`` to
+``<app name>/<model name>_list.html``. Thus, rename ``polls/index.html`` to
 ``polls/poll_list.html``.
 
 Because we have more than one entry in the URLconf that uses ``object_detail``
@@ -206,8 +206,23 @@ for the polls app, we manually specify a template name for the results view:
 ``template_name='polls/results.html'``. Otherwise, both views would use the same
 template. Note that we use ``dict()`` to return an altered dictionary in place.
 
+.. note:: ``all()`` is lazy
+
+    It might look a little frightening to see ``Poll.objects.all()`` being used
+    in a detail view which only needs one ``Poll`` object, but don't worry;
+    ``Poll.objects.all()`` is actually a special object called a ``QuerySet``,
+    which is "lazy" and doesn't hit your database until it absolutely has to. By
+    the time the database query happens, the ``object_detail`` generic view will
+    have narrowed its scope down to a single object, so the eventual query will
+    only select one row from the database. 
+    
+    If you'd like to know more about how that works, The Django database API
+    documentation `explains the lazy nature of QuerySet objects`_.
+
+.. _explains the lazy nature of QuerySet objects: ../db_api/#querysets-are-lazy
+
 In previous parts of the tutorial, the templates have been provided with a context
-that contains the ``poll` and ``latest_poll_list`` context variables. However,
+that contains the ``poll`` and ``latest_poll_list`` context variables. However,
 the generic views provide the variables ``object`` and ``object_list`` as context.
 Therefore, you need to change your templates to match the new context variables.
 Go through your templates, and modify any reference to ``latest_poll_list`` to
@@ -226,7 +241,7 @@ Run the server, and use your new polling app based on generic views.
 
 For full details on generic views, see the `generic views documentation`_.
 
-.. _generic views documentation: http://www.djangoproject.com/documentation/generic_views/
+.. _generic views documentation: ../generic_views/
 
 Coming soon
 ===========
@@ -241,4 +256,4 @@ installments:
     * Advanced admin features: Permissions
     * Advanced admin features: Custom JavaScript
 
-.. _Tutorial 3: http://www.djangoproject.com/documentation/tutorial3/
+.. _Tutorial 3: ../tutorial3/

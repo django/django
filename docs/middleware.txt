@@ -47,7 +47,7 @@ Enables site-wide cache. If this is enabled, each Django-powered page will be
 cached for as long as the ``CACHE_MIDDLEWARE_SECONDS`` setting defines. See
 the `cache documentation`_.
 
-.. _`cache documentation`: http://www.djangoproject.com/documentation/cache/#the-per-site-cache
+.. _`cache documentation`: ../cache/#the-per-site-cache
 
 django.middleware.common.CommonMiddleware
 -----------------------------------------
@@ -106,9 +106,10 @@ django.middleware.http.SetRemoteAddrFromForwardedFor
 
 **New in Django development version**
 
-Sets ``request['REMOTE_ADDR']`` based on ``request.['HTTP_X_FORWARDED_FOR']``,
-if the latter is set. This is useful if you're sitting behind a reverse proxy
-that causes each request's ``REMOTE_ADDR`` to be set to ``127.0.0.1``.
+Sets ``request.META['REMOTE_ADDR']`` based on
+``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
+if you're sitting behind a reverse proxy that causes each request's
+``REMOTE_ADDR`` to be set to ``127.0.0.1``.
 
 **Important note:** This does NOT validate ``HTTP_X_FORWARDED_FOR``. If you're
 not behind a reverse proxy that sets ``HTTP_X_FORWARDED_FOR`` automatically, do
@@ -122,7 +123,7 @@ django.contrib.sessions.middleware.SessionMiddleware
 
 Enables session support. See the `session documentation`_.
 
-.. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+.. _`session documentation`: ../sessions/
 
 django.contrib.auth.middleware.AuthenticationMiddleware
 -------------------------------------------------------
@@ -130,7 +131,7 @@ django.contrib.auth.middleware.AuthenticationMiddleware
 Adds the ``user`` attribute, representing the currently-logged-in user, to
 every incoming ``HttpRequest`` object. See `Authentication in Web requests`_.
 
-.. _Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+.. _Authentication in Web requests: ../authentication/#authentication-in-web-requests
 
 django.middleware.transaction.TransactionMiddleware
 ---------------------------------------------------
@@ -146,7 +147,7 @@ the same transaction control as the view functions.
 
 See the `transaction management documentation`_.
 
-.. _`transaction management documentation`: http://www.djangoproject.com/documentation/transactions/
+.. _`transaction management documentation`: ../transactions/
 
 Writing your own middleware
 ===========================

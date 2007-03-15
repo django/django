@@ -127,6 +127,7 @@ def JSONObject(match, context, _w=WHITESPACE.match):
         raise ValueError(errmsg("Expecting property name", s, end))
     end += 1
     encoding = getattr(context, 'encoding', None)
+    iterscan = JSONScanner.iterscan
     while True:
         key, end = scanstring(s, end, encoding)
         end = _w(s, end).end()
@@ -134,7 +135,7 @@ def JSONObject(match, context, _w=WHITESPACE.match):
             raise ValueError(errmsg("Expecting : delimiter", s, end))
         end = _w(s, end + 1).end()
         try:
-            value, end = JSONScanner.iterscan(s, idx=end).next()
+            value, end = iterscan(s, idx=end, context=context).next()
         except StopIteration:
             raise ValueError(errmsg("Expecting object", s, end))
         pairs[key] = value
@@ -164,9 +165,10 @@ def JSONArray(match, context, _w=WHITESPACE.match):
     nextchar = s[end:end + 1]
     if nextchar == ']':
         return values, end + 1
+    iterscan = JSONScanner.iterscan
     while True:
         try:
-            value, end = JSONScanner.iterscan(s, idx=end).next()
+            value, end = iterscan(s, idx=end, context=context).next()
         except StopIteration:
             raise ValueError(errmsg("Expecting object", s, end))
         values.append(value)

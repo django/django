@@ -4,10 +4,18 @@ SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 
 from django.db.backends import util
 try:
-    from pysqlite2 import dbapi2 as Database
+    try:
+        from sqlite3 import dbapi2 as Database
+    except ImportError:
+        from pysqlite2 import dbapi2 as Database
 except ImportError, e:
+    import sys
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading pysqlite2 module: %s" % e
+    if sys.version_info < (2, 5, 0):
+        module = 'pysqlite2'
+    else:
+        module = 'sqlite3'
+    raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
 
 DatabaseError = Database.DatabaseError
 
@@ -34,16 +42,20 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.connection = None
         self.queries = []
+        self.options = kwargs
 
     def cursor(self):
         from django.conf import settings
         if self.connection is None:
-            self.connection = Database.connect(settings.DATABASE_NAME,
-                detect_types=Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES)
-
+            kwargs = {
+                'database': settings.DATABASE_NAME,
+                'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
+            }
+            kwargs.update(self.options)
+            self.connection = Database.connect(**kwargs)
             # Register extract and date_trunc functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
@@ -55,14 +67,18 @@ class DatabaseWrapper(local):
             return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             self.connection.rollback()
 
     def close(self):
-        if self.connection is not None:
+        from django.conf import settings
+        # If database is in memory, closing the connection destroys the database.
+        # To prevent accidental data loss, ignore close requests on an in-memory db.
+        if self.connection is not None and settings.DATABASE_NAME != ":memory:":
             self.connection.close()
             self.connection = None
 
@@ -124,6 +140,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RANDOM()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -132,6 +151,24 @@ def get_drop_foreignkey_sql():
 
 def get_pk_default_value():
     return "NULL"
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    
+    """
+    # NB: The generated SQL below is specific to SQLite
+    # Note: The DELETE FROM... SQL generated below works for SQLite databases
+    # because constraints don't exist
+    sql = ['%s %s %s;' % \
+            (style.SQL_KEYWORD('DELETE'),
+             style.SQL_KEYWORD('FROM'),
+             style.SQL_FIELD(quote_name(table))
+             ) for table in tables]
+    # Note: No requirement for reset of auto-incremented indices (cf. other
+    # get_sql_flush() implementations). Just return SQL at this point
+    return sql
 
 def _sqlite_date_trunc(lookup_type, dt):
     try:

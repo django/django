@@ -16,7 +16,7 @@ class Serializer(PythonSerializer):
     Convert a queryset to JSON.
     """
     def end_serialization(self):
-        simplejson.dump(self.objects, self.stream, cls=DateTimeAwareJSONEncoder)
+        simplejson.dump(self.objects, self.stream, cls=DateTimeAwareJSONEncoder, **self.options)
         
     def getvalue(self):
         return self.stream.getvalue()
@@ -48,4 +48,4 @@ class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
         elif isinstance(o, datetime.time):
             return o.strftime(self.TIME_FORMAT)
         else:
-            return super(self, DateTimeAwareJSONEncoder).default(o)
+            return super(DateTimeAwareJSONEncoder, self).default(o)

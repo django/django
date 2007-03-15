@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.sessions.models import Session
+from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
 import datetime
 
@@ -9,6 +10,7 @@ TEST_COOKIE_VALUE = 'worked'
 class SessionWrapper(object):
     def __init__(self, session_key):
         self.session_key = session_key
+        self.accessed = False
         self.modified = False
 
     def __contains__(self, key):
@@ -45,6 +47,7 @@ class SessionWrapper(object):
 
     def _get_session(self):
         # Lazily loads session from storage.
+        self.accessed = True
         try:
             return self._session_cache
         except AttributeError:
@@ -55,7 +58,7 @@ class SessionWrapper(object):
                     s = Session.objects.get(session_key=self.session_key,
                         expire_date__gt=datetime.datetime.now())
                     self._session_cache = s.get_decoded()
-                except Session.DoesNotExist:
+                except (Session.DoesNotExist, SuspiciousOperation):
                     self._session_cache = {}
                     # Set the session_key to None to force creation of a new
                     # key, for extra security.
@@ -71,12 +74,14 @@ class SessionMiddleware(object):
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
         # those changes and set a session cookie.
-        patch_vary_headers(response, ('Cookie',))
         try:
+            accessed = request.session.accessed
             modified = request.session.modified
         except AttributeError:
             pass
         else:
+            if accessed:
+                patch_vary_headers(response, ('Cookie',))
             if modified or settings.SESSION_SAVE_EVERY_REQUEST:
                 session_key = request.session.session_key or Session.objects.get_new_session_key()
                 if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:

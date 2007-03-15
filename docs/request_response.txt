@@ -117,14 +117,14 @@ All attributes except ``session`` should be considered read-only.
     ``AuthenticationMiddleware`` activated. For more, see
     `Authentication in Web requests`_.
 
-    .. _Authentication in Web requests: http://www.djangoproject.com/documentation/authentication/#authentication-in-web-requests
+    .. _Authentication in Web requests: ../authentication/#authentication-in-web-requests
 
 ``session``
     A readable-and-writable, dictionary-like object that represents the current
     session. This is only available if your Django installation has session
     support activated. See the `session documentation`_ for full details.
 
-    .. _`session documentation`: http://www.djangoproject.com/documentation/sessions/
+    .. _`session documentation`: ../sessions/
 
 ``raw_post_data``
     The raw HTTP POST data. This is only useful for advanced processing. Use
@@ -341,9 +341,9 @@ hard-coded strings. If you use this technique, follow these guidelines:
 Methods
 -------
 
-``__init__(content='', mimetype=DEFAULT_MIME_TYPE)``
+``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
     Instantiates an ``HttpResponse`` object with the given page content (a
-    string) and MIME type. The ``DEFAULT_MIME_TYPE`` is ``'text/html'``.
+    string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 
     ``content`` can be an iterator or a string. If it's an iterator, it should
     return strings, and those strings will be joined together to form the
@@ -432,3 +432,118 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 ``HttpResponseServerError``
     Acts just like ``HttpResponse`` but uses a 500 status code.
+
+Returning errors
+================
+
+Returning HTTP error codes in Django is easy. We've already mentioned the
+``HttpResponseNotFound``, ``HttpResponseForbidden``,
+``HttpResponseServerError``, etc., subclasses; just return an instance of one
+of those subclasses instead of a normal ``HttpResponse`` in order to signify
+an error. For example::
+
+    def my_view(request):
+        # ...
+        if foo:
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+        else:
+            return HttpResponse('<h1>Page was found</h1>')
+
+Because 404 errors are by far the most common HTTP error, there's an easier way
+to handle those errors.
+
+The Http404 exception
+---------------------
+
+When you return an error such as ``HttpResponseNotFound``, you're responsible
+for defining the HTML of the resulting error page::
+
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+For convenience, and because it's a good idea to have a consistent 404 error page
+across your site, Django provides an ``Http404`` exception. If you raise
+``Http404`` at any point in a view function, Django will catch it and return the
+standard error page for your application, along with an HTTP error code 404.
+
+Example usage::
+
+    from django.http import Http404
+
+    def detail(request, poll_id):
+        try:
+            p = Poll.objects.get(pk=poll_id)
+        except Poll.DoesNotExist:
+            raise Http404
+        return render_to_response('polls/detail.html', {'poll': p})
+
+In order to use the ``Http404`` exception to its fullest, you should create a
+template that is displayed when a 404 error is raised. This template should be
+called ``404.html`` and located in the top level of your template tree.
+
+Customing error views
+---------------------
+
+The 404 (page not found) view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When you raise an ``Http404`` exception, Django loads a special view devoted
+to handling 404 errors. By default, it's the view
+``django.views.defaults.page_not_found``, which loads and renders the template
+``404.html``.
+
+This means you need to define a ``404.html`` template in your root template
+directory. This template will be used for all 404 errors.
+
+This ``page_not_found`` view should suffice for 99% of Web applications, but if
+you want to override the 404 view, you can specify ``handler404`` in your
+URLconf, like so::
+
+    handler404 = 'mysite.views.my_custom_404_view'
+
+Behind the scenes, Django determines the 404 view by looking for ``handler404``.
+By default, URLconfs contain the following line::
+
+    from django.conf.urls.defaults import *
+
+That takes care of setting ``handler404`` in the current module. As you can see
+in ``django/conf/urls/defaults.py``, ``handler404`` is set to
+``'django.views.defaults.page_not_found'`` by default.
+
+Three things to note about 404 views:
+
+    * The 404 view is also called if Django doesn't find a match after checking
+      every regular expression in the URLconf.
+
+    * If you don't define your own 404 view -- and simply use the default,
+      which is recommended -- you still have one obligation: To create a
+      ``404.html`` template in the root of your template directory. The default
+      404 view will use that template for all 404 errors.
+
+    * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
+      view will never be used, and the traceback will be displayed instead.
+
+The 500 (server error) view
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Similarly, Django executes special-case behavior in the case of runtime errors
+in view code. If a view results in an exception, Django will, by default, call
+the view ``django.views.defaults.server_error``, which loads and renders the
+template ``500.html``.
+
+This means you need to define a ``500.html`` template in your root template
+directory. This template will be used for all server errors.
+
+This ``server_error`` view should suffice for 99% of Web applications, but if
+you want to override the view, you can specify ``handler500`` in your
+URLconf, like so::
+
+    handler500 = 'mysite.views.my_custom_error_view'
+
+Behind the scenes, Django determines the error view by looking for ``handler500``.
+By default, URLconfs contain the following line::
+
+    from django.conf.urls.defaults import *
+
+That takes care of setting ``handler500`` in the current module. As you can see
+in ``django/conf/urls/defaults.py``, ``handler500`` is set to
+``'django.views.defaults.server_error'`` by default.

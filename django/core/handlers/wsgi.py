@@ -4,6 +4,11 @@ from django.dispatch import dispatcher
 from django.utils import datastructures
 from django import http
 from pprint import pformat
+from shutil import copyfileobj
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {
@@ -50,17 +55,49 @@ STATUS_CODE_TEXT = {
     505: 'HTTP VERSION NOT SUPPORTED',
 }
 
+def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
+    """
+    A version of shutil.copyfileobj that will not read more than 'size' bytes.
+    This makes it safe from clients sending more than CONTENT_LENGTH bytes of
+    data in the body.
+    """
+    if not size:
+        return
+    while size > 0:
+        buf = fsrc.read(min(length, size))
+        if not buf:
+            break
+        fdst.write(buf)
+        size -= len(buf)
+
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
         self.path = environ['PATH_INFO']
-        self.META = environ 
+        self.META = environ
         self.method = environ['REQUEST_METHOD'].upper()
 
     def __repr__(self):
+        # Since this is called as part of error handling, we need to be very
+        # robust against potentially malformed input.
+        try:
+            get = pformat(self.GET)
+        except:
+            get = '<could not parse>'
+        try:
+            post = pformat(self.POST)
+        except:
+            post = '<could not parse>'
+        try:
+            cookies = pformat(self.COOKIES)
+        except:
+            cookies = '<could not parse>'
+        try:
+            meta = pformat(self.META)
+        except:
+            meta = '<could not parse>'
         return '<WSGIRequest\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (pformat(self.GET), pformat(self.POST), pformat(self.COOKIES),
-            pformat(self.META))
+            (get, post, cookies, meta)
 
     def get_full_path(self):
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
@@ -119,7 +156,15 @@ class WSGIRequest(http.HttpRequest):
         try:
             return self._raw_post_data
         except AttributeError:
-            self._raw_post_data = self.environ['wsgi.input'].read(int(self.environ["CONTENT_LENGTH"]))
+            buf = StringIO()
+            try:
+                # CONTENT_LENGTH might be absent if POST doesn't have content at all (lighttpd)
+                content_length = int(self.environ.get('CONTENT_LENGTH', 0))
+            except ValueError: # if CONTENT_LENGTH was empty string or not an integer
+                content_length = 0
+            safe_copyfileobj(self.environ['wsgi.input'], buf, size=content_length)
+            self._raw_post_data = buf.getvalue()
+            buf.close()
             return self._raw_post_data
 
     GET = property(_get_get, _set_get)
@@ -133,10 +178,6 @@ class WSGIHandler(BaseHandler):
     def __call__(self, environ, start_response):
         from django.conf import settings
 
-        if settings.ENABLE_PSYCO:
-            import psyco
-            psyco.profile()
-
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
@@ -145,7 +186,7 @@ class WSGIHandler(BaseHandler):
         dispatcher.send(signal=signals.request_started)
         try:
             request = WSGIRequest(environ)
-            response = self.get_response(request.path, request)
+            response = self.get_response(request)
 
             # Apply response middleware
             for middleware_method in self._response_middleware:
@@ -163,4 +204,4 @@ class WSGIHandler(BaseHandler):
         for c in response.cookies.values():
             response_headers.append(('Set-Cookie', c.output(header='')))
         start_response(status, response_headers)
-        return response.iterator
+        return response

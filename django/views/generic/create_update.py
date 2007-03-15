@@ -1,6 +1,6 @@
 from django.core.xheaders import populate_xheaders
 from django.template import loader
-from django import forms
+from django import oldforms
 from django.db.models import FileField
 from django.contrib.auth.views import redirect_to_login
 from django.template import RequestContext
@@ -56,7 +56,7 @@ def create_object(request, model, template_name=None,
         new_data = manipulator.flatten_data()
 
     # Create the FormWrapper, template, context, response
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -102,7 +102,7 @@ def update_object(request, model, object_id=None, slug=None,
     except ObjectDoesNotExist:
         raise Http404, "No %s found for %s" % (model._meta.verbose_name, lookup_kwargs)
 
-    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.name), follow=follow)
+    manipulator = model.ChangeManipulator(getattr(object, object._meta.pk.attname), follow=follow)
 
     if request.POST:
         new_data = request.POST.copy()
@@ -128,7 +128,7 @@ def update_object(request, model, object_id=None, slug=None,
         # This makes sure the form acurate represents the fields of the place.
         new_data = manipulator.flatten_data()
 
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -142,7 +142,7 @@ def update_object(request, model, object_id=None, slug=None,
         else:
             c[key] = value
     response = HttpResponse(t.render(c))
-    populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
+    populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
     return response
 
 def delete_object(request, model, post_delete_redirect,
@@ -196,5 +196,5 @@ def delete_object(request, model, post_delete_redirect,
             else:
                 c[key] = value
         response = HttpResponse(t.render(c))
-        populate_xheaders(request, response, model, getattr(object, object._meta.pk.name))
+        populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
         return response

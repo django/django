@@ -22,6 +22,9 @@ of the community, so there are many ways you can help Django's development:
       likely to be skeptical of large-scale suggestions without some code to
       back it up.
 
+    * Triage patches that have been submitted by other users. Please read
+      `Ticket triage`_ below, for details on the triage process.
+
 That's all you need to know if you'd like to join the Django development
 community. The rest of this document describes the details of how our community
 works and how it handles bugs, mailing lists, and all the other minutiae of
@@ -44,8 +47,10 @@ particular:
 
     * **Do** write complete, reproducible, specific bug reports. Include as
       much information as you possibly can, complete with code snippets, test
-      cases, etc.  A minimal example that illustrates the bug in a nice small
-      test case is the best possible bug report.
+      cases, etc. This means including a clear, concise description of the
+      problem, and a clear set of instructions for replicating the problem.
+      A minimal example that illustrates the bug in a nice small test case
+      is the best possible bug report.
 
     * **Don't** use the ticket system to ask support questions.  Use the
       `django-users`_ list, or the `#django`_ IRC channel for that.
@@ -117,9 +122,126 @@ Patch style
     * Name the patch file with a ``.diff`` extension; this will let the ticket
       tracker apply correct syntax highlighting, which is quite helpful.
 
-    * Put the prefix "[patch] " before the title of your ticket. This will make
-      it obvious that the ticket includes a patch, and it will add the ticket
-      to the `list of tickets with patches`_.
+    * Check the "Has patch" box on the ticket details. This will make it
+      obvious that the ticket includes a patch, and it will add the ticket to
+      the `list of tickets with patches`_.
+
+    * The code required to fix a problem or add a feature is an essential part
+      of a patch, but it is not the only part. A good patch should also include
+      a regression test to validate the behavior that has been fixed (and prevent
+      the problem from arising again).
+
+    * If the code associated with a patch adds a new feature, or modifies behavior
+      of an existing feature, the patch should also contain documentation.
+
+Non-trivial patches
+-------------------
+
+A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
+that introduces Django functionality and makes some sort of design decision.
+
+If you provide a non-trivial patch, include evidence that alternatives have
+been discussed on `django-developers`_. If you're not sure whether your patch
+should be considered non-trivial, just ask.
+
+Ticket triage
+=============
+
+Unfortunately, not all bug reports in the `ticket tracker`_ provide all
+the `required details`_. A number of tickets have patches, but those patches
+don't meet all the requirements of a `good patch`_.
+
+One way to help out is to *triage* bugs that have been reported by other
+users. A couple of dedicated volunteers work on this regularly, but more help
+is always appreciated.
+
+Most of the workflow is based around the concept of a ticket's "triage stage".
+This stage describes where in its lifetime a given ticket is at any time.
+Along with a handful of flags, this field easily tells us what and who each
+ticket is waiting on.
+
+Since a picture is worth a thousand words, let's start there:
+
+.. image:: http://media.djangoproject.com/img/doc/djangotickets.png
+   :height: 451
+   :width: 590
+   :alt: Django's ticket workflow
+
+We've got two roles here:
+
+    * Core developers: people with commit access who make the decisions and
+      write the bulk of the code.
+
+    * Ticket triagers: community members who keep track of tickets, making
+      sure the tickets are always categorized correctly.
+
+Second, note the four triage stages:
+
+    1. A ticket starts as "Unreviewed", meaning that a triager has yet to
+       examine the ticket and move it along.
+
+    2. "Design decision needed" means "this concept requires a design
+       decision," which should be discussed either in the ticket comments or on
+       django-developers.
+
+    3. Once a ticket is ruled to be approved for fixing, it's moved into the
+       "Accepted" stage. This stage is where all the real work gets done.
+
+    4. If a ticket has an associated patch (see below), a triager will review the
+       patch. If the patch is complete, it'll be marked as "ready for checkin" so
+       that a core developer knows to review and check in the patches.
+
+The second part of this workflow involves a set of flags the describe what the
+ticket has or needs in order to be "ready for checkin":
+
+    "Has patch"
+        This means the ticket has an associated patch_. These will be
+        reviewed to see if the patch is "good".
+
+    "Needs documentation"
+        This flag is used for tickets with patches that need associated
+        documentation. Complete documentation of features is a prerequisite
+        before we can check a fix into the codebase.
+
+    "Needs tests"
+        This flags the patch as needing associated unit tests. Again, this is a
+        required part of a valid patch.
+
+    "Patch needs improvement"
+        This flag means that although the ticket *has* a patch, it's not quite
+        ready for checkin. This could mean the patch no longer applies
+        cleanly, or that the code doesn't live up to our standards.
+
+A ticket can be resolved in a number of ways:
+
+    "fixed"
+        Used by one of the core developers once a patch has been rolled into
+        Django and the issue is fixed.
+
+    "invalid"
+        Used if the ticket is found to be incorrect or a user error.
+
+    "wontfix"
+        Used when a core developer decides that this request is not
+        appropriate for consideration in Django. This is usually chosen after
+        discussion in the ``django-developers`` mailing list, and you should
+        feel free to join in when it's something you care about.
+
+    "duplicate"
+        Used when another ticket covers the same issue. By closing duplicate
+        tickets, we keep all the discussion in one place, which helps everyone.
+
+    "worksforme"
+        Used when the triage team is unable to replicate the original bug.
+
+If you believe that the ticket was closed in error -- because you're
+still having the issue, or it's popped up somewhere else, or the triagers have
+-- made a mistake, please reopen the ticket and tell us why. Please do not
+reopen tickets that have been marked as "wontfix" by core developers.
+
+.. _required details: `Reporting bugs`_
+.. _good patch: `Patch style`_
+.. _patch: `Submitting patches`_
 
 Submitting and maintaining translations
 =======================================
@@ -137,7 +259,7 @@ translated, here's what to do:
       `i18n documentation`_.
 
 .. _Django i18n mailing list: http://groups.google.com/group/django-i18n/
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
+.. _i18n documentation: ../i18n/
 
 Coding style
 ============
@@ -168,9 +290,24 @@ Please follow these coding standards when writing code for inclusion in Django:
 
           {{foo}}
 
-    * Please don't put your name in the code. While we appreciate all
-      contributions to Django, our policy is not to publish individual
-      developer names in code -- for instance, at the top of Python modules.
+    * In Django views, the first parameter in a view function should be called
+      ``request``.
+
+      Do this::
+
+          def my_view(request, foo):
+              # ...
+
+      Don't do this::
+
+          def my_view(req, foo):
+              # ...
+
+    * Our policy is to keep the names of developers and contributors
+      in the ``AUTHORS`` file distributed with Django, so please don't include
+      your name in the actual code. Feel free to include a change to the
+      ``AUTHORS`` file in your patch if you make more than a single trivial
+      change.
 
 Committing code
 ===============
@@ -234,17 +371,22 @@ Django tarball. It's our policy to make sure all tests pass at all times.
 
 The tests cover:
 
-    * Models and the database API (``tests/testapp/models``).
-    * The cache system (``tests/otherthests/cache.py``).
-    * The ``django.utils.dateformat`` module (``tests/othertests/dateformat.py``).
-    * Database typecasts (``tests/othertests/db_typecasts.py``).
-    * The template system (``tests/othertests/templates.py`` and
-      ``tests/othertests/defaultfilters.py``).
-    * ``QueryDict`` objects (``tests/othertests/httpwrappers.py``).
-    * Markup template tags (``tests/othertests/markup.py``).
-    * The ``django.utils.timesince`` module (``tests/othertests/timesince.py``).
+    * Models and the database API (``tests/modeltests/``).
+    * The cache system (``tests/regressiontests/cache.py``).
+    * The ``django.utils.dateformat`` module (``tests/regressiontests/dateformat/``).
+    * Database typecasts (``tests/regressiontests/db_typecasts/``).
+    * The template system (``tests/regressiontests/templates/`` and
+      ``tests/regressiontests/defaultfilters/``).
+    * ``QueryDict`` objects (``tests/regressiontests/httpwrappers/``).
+    * Markup template tags (``tests/regressiontests/markup/``).
 
 We appreciate any and all contributions to the test suite!
+
+The Django tests all use the testing infrastructure that ships with Django for
+testing applications. See `Testing Django applications`_ for an explanation of
+how to write new tests.
+
+.. _Testing Django applications: ../testing/
 
 Running the unit tests
 ----------------------
@@ -255,10 +397,14 @@ To run the tests, ``cd`` to the ``tests/`` directory and type::
 
 Yes, the unit tests need a settings module, but only for database connection
 info -- the ``DATABASE_ENGINE``, ``DATABASE_USER`` and ``DATABASE_PASSWORD``.
+You will also need a ``ROOT_URLCONF`` setting (its value is ignored; it just
+needs to be present) and a ``SITE_ID`` setting (any integer value will do) in
+order for all the tests to pass.
 
-The unit tests will not touch your database; they create a new database, called
-``django_test_db``, which is deleted when the tests are finished. This means
-your user account needs permission to execute ``CREATE DATABASE``.
+The unit tests will not touch your existing databases; they create a new
+database, called ``django_test_db``, which is deleted when the tests are
+finished. This means your user account needs permission to execute ``CREATE
+DATABASE``.
 
 Requesting features
 ===================
@@ -316,21 +462,88 @@ trunk more than once.
 Using branches
 --------------
 
-To test a given branch, you can simply check out the entire branch, like so::
+To use a branch, you'll need to do two things:
+
+    * Get the branch's code through Subversion.
+
+    * Point your Python ``site-packages`` directory at the branch's version of
+      the ``django`` package rather than the version you already have
+      installed.
+
+Getting the code from Subversion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To get the latest version of a branch's code, check it out using Subversion::
 
     svn co http://code.djangoproject.com/svn/django/branches/<branch>/
 
-Or, if you've got a working directory you'd like to switch to use a branch,
-you can use::
+...where ``<branch>`` is the branch's name. See the `list of branch names`_.
+
+Alternatively, you can automatically convert an existing directory of the
+Django source code as long as you've checked it out via Subversion. To do the
+conversion, execute this command from within your ``django`` directory::
 
     svn switch http://code.djangoproject.com/svn/django/branches/<branch>/
 
-...in the root of your Django sandbox (the directory that contains ``django``,
-``docs``, and ``tests``).
-
 The advantage of using ``svn switch`` instead of ``svn co`` is that the
 ``switch`` command retains any changes you might have made to your local copy
-of the code. It attempts to merge those changes into the "switched" code.
+of the code. It attempts to merge those changes into the "switched" code. The
+disadvantage is that it may cause conflicts with your local changes if the
+"switched" code has altered the same lines of code.
+
+(Note that if you use ``svn switch``, you don't need to point Python at the new
+version, as explained in the next section.)
+
+.. _list of branch names: http://code.djangoproject.com/browser/django/branches
+
+Pointing Python at the new Django version
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've retrieved the branch's code, you'll need to change your Python
+``site-packages`` directory so that it points to the branch version of the
+``django`` directory. (The ``site-packages`` directory is somewhere such as
+``/usr/lib/python2.4/site-packages`` or
+``/usr/local/lib/python2.4/site-packages`` or ``C:\Python\site-packages``.)
+
+The simplest way to do this is by renaming the old ``django`` directory to
+``django.OLD`` and moving the trunk version of the code into the directory
+and calling it ``django``.
+
+Alternatively, you can use a symlink called ``django`` that points to the
+location of the branch's ``django`` package. If you want to switch back, just
+change the symlink to point to the old code.
+
+A third option is to use a `path file`_ (``<something>.pth``) which should
+work on all systems (including Windows, which doesn't have symlinks
+available). First, make sure there are no files, directories or symlinks named
+``django`` in your ``site-packages`` directory. Then create a text file named
+``django.pth`` and save it to your ``site-packages`` directory. That file
+should contain a path to your copy of Django on a single line and optional
+comments. Here is an example that points to multiple branches. Just uncomment
+the line for the branch you want to use ('Trunk' in this example) and make
+sure all other lines are commented::
+
+    # Trunk is a svn checkout of:
+    #   http://code.djangoproject.com/svn/django/trunk/
+    #
+    /path/to/trunk
+    
+    # <branch> is a svn checkout of:
+    #   http://code.djangoproject.com/svn/django/branches/<branch>/
+    #
+    #/path/to/<branch>
+    
+    # On windows a path may look like this:
+    # C:/path/to/<branch>
+
+If you're using Django 0.95 or earlier and installed it using
+``python setup.py install``, you'll have a directory called something like
+``Django-0.95-py2.4.egg`` instead of ``django``. In this case, edit the file
+``setuptools.pth`` and remove the line that references the Django ``.egg``
+file. Then copy the branch's version of the ``django`` directory into
+``site-packages``.
+
+.. _path file: http://docs.python.org/lib/module-site.html
 
 Official releases
 =================
@@ -435,8 +648,7 @@ requests for commit access are potential flame-war starters, and will be ignored
 .. _search the tracker: http://code.djangoproject.com/search
 .. _django-users: http://groups.google.com/group/django-users
 .. _`#django`: irc://irc.freenode.net/django
-.. _list of tickets with patches: http://code.djangoproject.com/report/12
+.. _list of tickets with patches: http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
 .. _PEP 8: http://www.python.org/peps/pep-0008.html
-.. _i18n documentation: http://www.djangoproject.com/documentation/i18n/
 .. _i18n branch: http://code.djangoproject.com/browser/django/branches/i18n
 .. _`tags/releases`: http://code.djangoproject.com/browser/django/tags/releases

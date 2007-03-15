@@ -1,4 +1,4 @@
-from django import forms, template
+from django import oldforms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
@@ -46,8 +46,8 @@ def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
     any '/', '_' and ':' characters. Similar to urllib.quote, except that the
-    quoting is slightly different so that it doesn't get autoamtically
-    unquoted by the web browser.
+    quoting is slightly different so that it doesn't get automatically
+    unquoted by the Web browser.
     """
     if type(s) != type(''):
         return s
@@ -226,7 +226,7 @@ index = staff_member_required(never_cache(index))
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -283,7 +283,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
 
     c = template.RequestContext(request, {
         'title': _('Add %s') % opts.verbose_name,
@@ -302,7 +302,7 @@ def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
@@ -313,8 +313,8 @@ def change_stage(request, app_label, model_name, object_id):
 
     try:
         manipulator = model.ChangeManipulator(object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except model.DoesNotExist:
+        raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
     if request.POST:
         new_data = request.POST.copy()
@@ -374,7 +374,7 @@ def change_stage(request, app_label, model_name, object_id):
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 
@@ -454,16 +454,19 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
             if related.opts.admin and has_related_objs:
                 p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                 if not user.has_perm(p):
-                    perms_needed.add(rel_opts_name)
+                    perms_needed.add(related.opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        rel_objs = getattr(obj, rel_opts_name, None)
-        if rel_objs:
-            has_related_objs = True
+       
+        # related.get_accessor_name() could return None for symmetrical relationships
+        if rel_opts_name:
+            rel_objs = getattr(obj, rel_opts_name, None)
+            if rel_objs:
+                has_related_objs = True
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
@@ -490,7 +493,7 @@ def delete_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
@@ -527,7 +530,7 @@ def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     action_list = LogEntry.objects.filter(object_id=object_id,
         content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
@@ -655,10 +658,17 @@ class ChangeList(object):
             order_field, order_type = ordering[0], 'asc'
         if params.has_key(ORDER_VAR):
             try:
+                field_name = lookup_opts.admin.list_display[int(params[ORDER_VAR])]
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
-                    pass
+                    # see if field_name is a name of a non-field
+                    # that allows sorting
+                    try:
+                        attr = getattr(lookup_opts.admin.manager.model, field_name)
+                        order_field = attr.admin_order_field
+                    except IndexError:
+                        pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name
@@ -727,6 +737,8 @@ class ChangeList(object):
             for bit in self.query.split():
                 or_queries = [models.Q(**{construct_search(field_name): bit}) for field_name in self.lookup_opts.admin.search_fields]
                 other_qs = QuerySet(self.model)
+                if qs._select_related:
+                    other_qs = other_qs.select_related()
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
 
@@ -741,7 +753,7 @@ class ChangeList(object):
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
         raise PermissionDenied
     try:

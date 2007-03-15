@@ -17,7 +17,16 @@ installed by running the Python interactive interpreter and typing
 ``import django``. If that command runs successfully, with no errors, Django is
 installed.
 
-.. _`Django installed`: http://www.djangoproject.com/documentation/install/
+.. _`Django installed`: ../install/
+
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please post a message
+    to `django-users`_ or drop by `#django`_ on ``irc.freenode.net`` and we'll 
+    try to help.
+
+.. _django-users: http://groups.google.com/group/django-users 
+.. _#django: irc://irc.freenode.net/django
 
 Creating a project
 ==================
@@ -31,6 +40,13 @@ application-specific settings.
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the command ``django-admin.py startproject mysite``. This
 will create a ``mysite`` directory in your current directory.
+
+.. note::
+    
+    You'll need to avoid naming projects after built-in Python or Django
+    components. In particular, this means you should avoid using names like
+    ``django`` (which will conflict with Django itself) or ``site`` (which
+    conflicts with a built-in Python package).
 
 (``django-admin.py`` should be on your system path if you installed Django via
 ``python setup.py``. If it's not on your path, you can find it in
@@ -108,7 +124,7 @@ It worked!
 
     Full docs for the development server are at `django-admin documentation`_.
 
-.. _django-admin documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin documentation: ../django_admin/
 
 Database setup
 --------------
@@ -378,7 +394,7 @@ as you like, and it will only ever create the tables that don't exist.
 Read the `django-admin.py documentation`_ for full information on what the
 ``manage.py`` utility can do.
 
-.. _django-admin.py documentation: http://www.djangoproject.com/documentation/django_admin/
+.. _django-admin.py documentation: ../django_admin/
 
 Playing with the API
 ====================
@@ -555,5 +571,5 @@ For full details on the database API, see our `Database API reference`_.
 When you're comfortable with the API, read `part 2 of this tutorial`_ to get
 Django's automatic admin working.
 
-.. _Database API reference: http://www.djangoproject.com/documentation/db_api/
-.. _part 2 of this tutorial: http://www.djangoproject.com/documentation/tutorial2/
+.. _Database API reference: ../db_api/
+.. _part 2 of this tutorial: ../tutorial2/

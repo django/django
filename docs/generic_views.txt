@@ -71,7 +71,7 @@ are first evaluated, so if you want to pass in a QuerySet via
 ``extra_context`` that is always fresh you need to wrap it in a function or
 lambda that returns the QuerySet.
 
-.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+.. _database API docs: ../db_api/
 
 "Simple" generic views
 ======================
@@ -91,6 +91,14 @@ which is a dictionary of the parameters captured in the URL.
 **Required arguments:**
 
     * ``template``: The full name of a template to use.
+
+**Optional arguments:**
+
+    * ``extra_context``: A dictionary of values to add to the template
+      context. By default, this is an empty dictionary. If a value in the
+      dictionary is callable, the generic view will call it
+      just before rendering the template. (**This is new in the
+      Django development version.**)
 
 **Example:**
 
@@ -171,7 +179,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
       template. By default, it's ``django.template.loader``.
 
     * ``extra_context``: A dictionary of values to add to the template
-      context. By default, this is an empty dictionary.
+      context. By default, this is an empty dictionary. If a value in the
       dictionary is callable, the generic view will call it
       just before rendering the template.
 
@@ -184,7 +192,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
       the view's template. See the `RequestContext docs`_.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -197,11 +205,11 @@ If ``template_name`` isn't specified, this view will use the template
 ``<app_label>/<model_name>_archive.html`` by default, where:
 
     * ``<model_name>`` is your model's name in all lowercase. For a model
-        ``StaffMember``, that'd be ``staffmember``.
+      ``StaffMember``, that'd be ``staffmember``.
 
     * ``<app_label>`` is the right-most part of the full Python path to
-        your model's app. For example, if your model lives in
-        ``apps/blog/models.py``, that'd be ``blog``.
+      your model's app. For example, if your model lives in
+      ``apps/blog/models.py``, that'd be ``blog``.
 
 **Template context:**
 
@@ -215,7 +223,7 @@ In addition to ``extra_context``, the template's context will be:
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
       ``latest`` will be a list of the latest 10 objects in ``queryset``.
 
-.. _RequestContext docs: http://www.djangoproject.com/documentation/templates_python/#subclassing-context-djangocontext
+.. _RequestContext docs: ../templates_python/#subclassing-context-djangocontext
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
@@ -258,9 +266,9 @@ to ``True``.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``. The
-       view will append ``'_list'`` to the value of this parameter in
-       determining the variable's name.
+      to use in the template context. By default, this is ``'object'``. The
+      view will append ``'_list'`` to the value of this parameter in
+      determining the variable's name.
 
     * ``make_object_list``: A boolean specifying whether to retrieve the full
       list of objects for this year and pass those to the template. If ``True``,
@@ -270,7 +278,7 @@ to ``True``.
       this is ``False``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -352,12 +360,12 @@ date in the *future* are not displayed unless you set ``allow_future`` to
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``. The
-       view will append ``'_list'`` to the value of this parameter in
-       determining the variable's name.
+      to use in the template context. By default, this is ``'object'``. The
+      view will append ``'_list'`` to the value of this parameter in
+      determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -433,12 +441,12 @@ in the *future* are not displayed unless you set ``allow_future`` to ``True``.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``. The
-       view will append ``'_list'`` to the value of this parameter in
-       determining the variable's name.
+      to use in the template context. By default, this is ``'object'``. The
+      view will append ``'_list'`` to the value of this parameter in
+      determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -518,12 +526,12 @@ you set ``allow_future`` to ``True``.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``. The
-       view will append ``'_list'`` to the value of this parameter in
-       determining the variable's name.
+      to use in the template context. By default, this is ``'object'``. The
+      view will append ``'_list'`` to the value of this parameter in
+      determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -630,10 +638,10 @@ future, the view will throw a 404 error by default, unless you set
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
     * ``allow_future``: A boolean specifying whether to include "future"
       objects on this page, where "future" means objects in which the field
@@ -678,7 +686,7 @@ A page representing a list of objects.
     * ``paginate_by``: An integer specifying how many objects should be
       displayed per page. If this is given, the view will paginate objects with
       ``paginate_by`` objects per page. The view will expect either a ``page``
-      query string parameter (via ``GET``) containing a zero-indexed page
+      query string parameter (via ``GET``) containing a 1-based page
       number, or a ``page`` variable specified in the URLconf. See
       "Notes on pagination" below.
 
@@ -702,12 +710,12 @@ A page representing a list of objects.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``. The
-       view will append ``'_list'`` to the value of this parameter in
-       determining the variable's name.
+      to use in the template context. By default, this is ``'object'``. The
+      view will append ``'_list'`` to the value of this parameter in
+      determining the variable's name.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 
@@ -743,6 +751,12 @@ If the results are paginated, the context will contain these extra variables:
       number. This is 1-based.
 
     * ``previous``: The previous page number, as an integer. This is 1-based.
+
+    * `last_on_page`: **New in Django development version** The number of the
+      last result on the current page. This is 1-based.
+
+    * `first_on_page`: **New in Django development version** The number of the
+      first result on the current page. This is 1-based.
 
     * ``pages``: The total number of pages, as an integer.
 
@@ -816,10 +830,10 @@ A page representing an individual object.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
     * ``mimetype``: The MIME type to use for the resulting document. Defaults
-      to the value of the ``DEFAULT_MIME_TYPE`` setting.
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Template name:**
 
@@ -894,7 +908,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.FormWrapper`` instance representing the form
+    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 
@@ -908,8 +922,8 @@ In addition to ``extra_context``, the template's context will be:
       See the `manipulator and formfield documentation`_ for more information
       about using ``FormWrapper`` objects in templates.
 
-.. _authentication system: http://www.djangoproject.com/documentation/authentication/
-.. _manipulator and formfield documentation: http://www.djangoproject.com/documentation/forms/
+.. _authentication system: ../authentication/
+.. _manipulator and formfield documentation: ../forms/
 
 ``django.views.generic.create_update.update_object``
 ----------------------------------------------------
@@ -965,7 +979,7 @@ object. This uses the automatic manipulators that come with Django models.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
 **Template name:**
 
@@ -976,7 +990,7 @@ If ``template_name`` isn't specified, this view will use the template
 
 In addition to ``extra_context``, the template's context will be:
 
-    * ``form``: A ``django.forms.FormWrapper`` instance representing the form
+    * ``form``: A ``django.oldforms.FormWrapper`` instance representing the form
       for editing the object. This lets you refer to form fields easily in the
       template system.
 
@@ -1046,7 +1060,7 @@ contain a form that POSTs to the same URL.
       the view's template. See the `RequestContext docs`_.
 
     * ``template_object_name``:  Designates the name of the template variable
-       to use in the template context. By default, this is ``'object'``.
+      to use in the template context. By default, this is ``'object'``.
 
 **Template name:**
 

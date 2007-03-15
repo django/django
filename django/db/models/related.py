@@ -1,7 +1,7 @@
 class BoundRelatedObject(object):
     def __init__(self, related_object, field_mapping, original):
         self.relation = related_object
-        self.field_mappings = field_mapping[related_object.opts.module_name]
+        self.field_mappings = field_mapping[related_object.name]
 
     def template_name(self):
         raise NotImplementedError
@@ -16,7 +16,7 @@ class RelatedObject(object):
         self.opts = model._meta
         self.field = field
         self.edit_inline = field.rel.edit_inline
-        self.name = self.opts.module_name
+        self.name = '%s:%s' % (self.opts.app_label, self.opts.module_name)
         self.var_name = self.opts.object_name.lower()
 
     def flatten_data(self, follow, obj=None):
@@ -68,7 +68,10 @@ class RelatedObject(object):
                 # object
                 return [attr]
         else:
-            return [None] * self.field.rel.num_in_admin
+            if self.field.rel.min_num_in_admin:
+                return [None] * max(self.field.rel.num_in_admin, self.field.rel.min_num_in_admin)
+            else:
+                return [None] * self.field.rel.num_in_admin
 
     def get_db_prep_lookup(self, lookup_type, value):
         # Defer to the actual field definition for db prep
@@ -101,12 +104,12 @@ class RelatedObject(object):
                 attr = getattr(manipulator.original_object, self.get_accessor_name())
                 count = attr.count()
                 count += self.field.rel.num_extra_on_change
-                if self.field.rel.min_num_in_admin:
-                    count = max(count, self.field.rel.min_num_in_admin)
-                if self.field.rel.max_num_in_admin:
-                    count = min(count, self.field.rel.max_num_in_admin)
             else:
                 count = self.field.rel.num_in_admin
+            if self.field.rel.min_num_in_admin:
+                count = max(count, self.field.rel.min_num_in_admin)
+            if self.field.rel.max_num_in_admin:
+                count = min(count, self.field.rel.max_num_in_admin)
         else:
             count = 1
 
@@ -131,6 +134,9 @@ class RelatedObject(object):
         # many-to-many objects. It uses the lower-cased object_name + "_set",
         # but this can be overridden with the "related_name" option.
         if self.field.rel.multiple:
+            # If this is a symmetrical m2m relation on self, there is no reverse accessor.
+            if getattr(self.field.rel, 'symmetrical', False) and self.model == self.parent_model:
+                return None
             return self.field.rel.related_name or (self.opts.object_name.lower() + '_set')
         else:
             return self.field.rel.related_name or (self.opts.object_name.lower())

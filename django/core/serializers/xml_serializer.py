@@ -57,10 +57,12 @@ class Serializer(base.Serializer):
         })
         
         # Get a "string version" of the object's data (this is handled by the
-        # serializer base class).  None is handled specially.
-        value = self.get_string_value(obj, field)
-        if value is not None:
+        # serializer base class). 
+        if getattr(obj, field.name) is not None:
+            value = self.get_string_value(obj, field)
             self.xml.characters(str(value))
+        else:
+            self.xml.addQuickElement("None")
 
         self.xml.endElement("field")
         
@@ -127,7 +129,8 @@ class Deserializer(base.Deserializer):
         pk = node.getAttribute("pk")
         if not pk:
             raise base.DeserializationError("<object> node is missing the 'pk' attribute")
-        data = {Model._meta.pk.name : pk}
+
+        data = {Model._meta.pk.attname : Model._meta.pk.to_python(pk)}
         
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
@@ -148,37 +151,37 @@ class Deserializer(base.Deserializer):
             
             # As is usually the case, relation fields get the special treatment.
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
-                m2m_data[field.name] = self._handle_m2m_field_node(field_node)
+                m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                data[field.name] = self._handle_fk_field_node(field_node)
+                data[field.attname] = self._handle_fk_field_node(field_node, field)
             else:
-                value = field.to_python(getInnerText(field_node).strip().encode(self.encoding))
+                if len(field_node.childNodes) == 1 and field_node.childNodes[0].nodeName == 'None':
+                    value = None
+                else:
+                    value = field.to_python(getInnerText(field_node).strip().encode(self.encoding))
                 data[field.name] = value
         
         # Return a DeserializedObject so that the m2m data has a place to live.
         return base.DeserializedObject(Model(**data), m2m_data)
         
-    def _handle_fk_field_node(self, node):
+    def _handle_fk_field_node(self, node, field):
         """
         Handle a <field> node for a ForeignKey
         """
-        # Try to set the foreign key by looking up the foreign related object.
-        # If it doesn't exist, set the field to None (which might trigger 
-        # validation error, but that's expected).
-        RelatedModel = self._get_model_from_node(node, "to")
-        return RelatedModel.objects.get(pk=getInnerText(node).strip().encode(self.encoding))
+        # Check if there is a child node named 'None', returning None if so.
+        if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
+            return None
+        else:
+            return field.rel.to._meta.pk.to_python(
+                       getInnerText(node).strip().encode(self.encoding))
         
-    def _handle_m2m_field_node(self, node):
+    def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField
         """
-        # Load the related model
-        RelatedModel = self._get_model_from_node(node, "to")
-        
-        # Look up all the related objects. Using the in_bulk() lookup ensures
-        # that missing related objects don't cause an exception
-        related_ids = [c.getAttribute("pk").encode(self.encoding) for c in node.getElementsByTagName("object")]
-        return RelatedModel._default_manager.in_bulk(related_ids).values()
+        return [field.rel.to._meta.pk.to_python(
+                    c.getAttribute("pk").encode(self.encoding)) 
+                    for c in node.getElementsByTagName("object")]
     
     def _get_model_from_node(self, node, attr):
         """

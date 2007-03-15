@@ -17,7 +17,7 @@ served with no startup time. Unlike mod_python (or `mod_perl`_), a FastCGI
 process doesn't run inside the Web server process, but in a separate,
 persistent process.
 
-.. _current preferred setup: http://www.djangoproject.com/documentation/modpython/
+.. _current preferred setup: ../modpython/
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
@@ -270,11 +270,11 @@ In your Web root directory, add this to a file named ``.htaccess`` ::
     AddHandler fastcgi-script .fcgi
     RewriteEngine On
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
+    RewriteRule ^(.*)$ mysite.fcgi/$1 [QSA,L]
 
 Then, create a small script that tells Apache how to spawn your FastCGI
 program. Create a file ``mysite.fcgi`` and place it in your Web directory, and
-be sure to make it executable ::
+be sure to make it executable::
 
     #!/usr/bin/python
     import sys, os
@@ -289,7 +289,7 @@ be sure to make it executable ::
     os.environ['DJANGO_SETTINGS_MODULE'] = "myproject.settings"
 
     from django.core.servers.fastcgi import runfastcgi
-    runfastcgi(["method=threaded", "daemonize=false"])
+    runfastcgi(method="threaded", daemonize="false")
 
 Restarting the spawned server
 -----------------------------
@@ -304,3 +304,14 @@ If you have access to a command shell on a Unix system, you can accomplish this
 easily by using the ``touch`` command::
 
     touch mysite.fcgi
+
+Serving admin media files
+=========================
+
+Regardless of the server and configuration you eventually decide to use, you will
+also need to give some thought to how to serve the admin media files. The
+advice given in the modpython_ documentation is also applicable in the setups
+detailed above.
+
+.. _modpython: ../modpython/#serving-the-admin-files
+

@@ -45,8 +45,8 @@ algorithm the system follows to determine which Python code to execute:
        `request object`_ as its first argument and any values captured in the
        regex as remaining arguments.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _settings file: ../settings/
+.. _request object: ../request_response/#httprequest-objects
 
 Example
 =======
@@ -286,7 +286,7 @@ With this in mind, the above example can be written more concisely as::
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
 that in automatically.
 
-.. _Django overview: http://www.djangoproject.com/documentation/overview/
+.. _Django overview: ../overview/
 
 Multiple view prefixes
 ----------------------
@@ -387,13 +387,20 @@ In this example, for a request to ``/blog/2005/``, Django will call the
 This technique is used in `generic views`_ and in the `syndication framework`_
 to pass metadata and options to views.
 
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. _generic views: ../generic_views/
+.. _syndication framework: ../syndication/
+
+.. admonition:: Dealing with conflicts
+
+    It's possible to have a URL pattern which captures named keyword arguments,
+    and also passes arguments with the same names in its dictionary of extra
+    arguments. When this happens, the arguments in the dictionary will be used
+    instead of the arguments captured in the URL.
 
 Passing extra options to ``include()``
 --------------------------------------
 
-**New in the Django development version.**
+**New in Django development version.**
 
 Similarly, you can pass extra options to ``include()``. When you pass extra
 options to ``include()``, *each* line in the included URLconf will be passed
@@ -435,7 +442,7 @@ every view in the the included URLconf accepts the extra options you're passing.
 Passing callable objects instead of strings
 ===========================================
 
-**New in the Django development version.**
+**New in Django development version.**
 
 Some developers find it more natural to pass the actual Python function object
 rather than a string containing the path to its module. This alternative is

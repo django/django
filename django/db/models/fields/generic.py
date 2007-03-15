@@ -2,7 +2,7 @@
 Classes allowing "generic" relations through ContentType and object-id fields.
 """
 
-from django import forms
+from django import oldforms
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import backend
 from django.db.models import signals
@@ -98,7 +98,7 @@ class GenericRelation(RelatedField, Field):
 
     def get_manipulator_field_objs(self):
         choices = self.get_choices_default()
-        return [curry(forms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
+        return [curry(oldforms.SelectMultipleField, size=min(max(len(choices), 5), 15), choices=choices)]
 
     def get_choices_default(self):
         return Field.get_choices(self, include_blank=False)
@@ -117,7 +117,7 @@ class GenericRelation(RelatedField, Field):
         return self.object_id_field_name
         
     def m2m_reverse_name(self):
-        return self.model._meta.pk.attname
+        return self.object_id_field_name
 
     def contribute_to_class(self, cls, name):
         super(GenericRelation, self).contribute_to_class(cls, name)

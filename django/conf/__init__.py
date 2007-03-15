@@ -7,6 +7,7 @@ a list of all possible variables.
 """
 
 import os
+import time     # Needed for Windows
 from django.conf import global_settings
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -77,7 +78,7 @@ class Settings(object):
         self.SETTINGS_MODULE = settings_module
 
         try:
-            mod = __import__(self.SETTINGS_MODULE, '', '', [''])
+            mod = __import__(self.SETTINGS_MODULE, {}, {}, [''])
         except ImportError, e:
             raise EnvironmentError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
 
@@ -97,7 +98,7 @@ class Settings(object):
         new_installed_apps = []
         for app in self.INSTALLED_APPS:
             if app.endswith('.*'):
-                appdir = os.path.dirname(__import__(app[:-2], '', '', ['']).__file__)
+                appdir = os.path.dirname(__import__(app[:-2], {}, {}, ['']).__file__)
                 for d in os.listdir(appdir):
                     if d.isalpha() and os.path.isdir(os.path.join(appdir, d)):
                         new_installed_apps.append('%s.%s' % (app[:-2], d))
@@ -105,8 +106,10 @@ class Settings(object):
                 new_installed_apps.append(app)
         self.INSTALLED_APPS = new_installed_apps
 
-        # move the time zone info into os.environ
-        os.environ['TZ'] = self.TIME_ZONE
+        if hasattr(time, 'tzset'):
+            # Move the time zone info into os.environ. See ticket #2315 for why
+            # we don't do this unconditionally (breaks Windows).
+            os.environ['TZ'] = self.TIME_ZONE
 
     def get_all_members(self):
         return dir(self)

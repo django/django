@@ -26,3 +26,11 @@ login_required.__doc__ = (
     to the log-in page if necessary.
     """
     )
+
+def permission_required(perm, login_url=LOGIN_URL):
+    """
+    Decorator for views that checks whether a user has a particular permission
+    enabled, redirecting to the log-in page if necessary.
+    """
+    return user_passes_test(lambda u: u.has_perm(perm), login_url=login_url)
+

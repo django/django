@@ -126,12 +126,10 @@ msgid "approved by staff"
 msgstr "zaakceptowano"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
 msgstr "wolny komentarz"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
 msgstr "wolne komentarze"
 
@@ -144,7 +142,6 @@ msgid "score date"
 msgstr "data przyznania punktów"
 
 #: contrib/comments/models.py:237
-#, fuzzy
 msgid "karma score"
 msgstr "ilość punktów"
 
@@ -243,6 +240,9 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
+"Ten komentarze został dodany przez użytkownika::\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:189
 #: contrib/comments/views/comments.py:280
@@ -257,19 +257,20 @@ msgstr "Jedno lub więcej wymaganych pól nie zostało wypełnionych"
 #: contrib/comments/views/comments.py:197
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
+msgstr "Ktoś próbował obejść zabezpieczenia formularza komentarzy"
 
 #: contrib/comments/views/comments.py:207
 #: contrib/comments/views/comments.py:292
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
-msgstr ""
+msgstr "Formularz komentarza miał niepoprawny parametr 'target' -- ID obiektu było "
+"niepoprawne"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
+msgstr "Formularz komentarza nie zapewnił obiektów 'preview' ani 'post'"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
@@ -600,7 +601,7 @@ msgstr "Wartość logiczna (True, False, None - prawda, fałsz lub nic)"
 
 #: contrib/admin/views/doc.py:292
 msgid "Relation to parent model"
-msgstr ""
+msgstr "Relacja do modelu rodzica"
 
 #: contrib/admin/views/doc.py:293
 msgid "Phone number"
@@ -794,6 +795,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
+"Skasowanie %(object_name)s '%(object)s' spowoduje kasację zależnych "
+"obiektów, lecz twoje uprawnienia nie pozwalają na usunięcie następujących "
+"typów obiektów:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
@@ -801,6 +805,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
 "the following related items will be deleted:"
 msgstr ""
+"Czy chcesz skasować %(object_name)s \"%(object)s\"? Wszystkie "
+"zależne obiekty zostaną skasowane:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
@@ -820,11 +826,10 @@ msgid "View on site"
 msgstr "Pokaż na stronie"
 
 #: contrib/admin/templates/admin/change_form.html:30
-#, fuzzy
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Proszę popraw poniższy błąd"
-msgstr[1] "Proszę popraw poniższy błąd"
+msgstr[1] "Proszę popraw poniższe błędy"
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
@@ -965,11 +970,11 @@ msgstr "Zespół %(site_name)s"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
-msgstr ""
+msgstr "Zakładki"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
-msgstr ""
+msgstr "Zakładki Dokumentacji"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
@@ -1094,6 +1099,8 @@ msgid ""
 "Example: 'flatpages/contact_page'. If this isn't provided, the system will "
 "use 'flatpages/default'."
 msgstr ""
+"Przykład: 'flatpages/contact_page'. Jeżeli nie podane system użyje "
+"'flatpages/default'."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1105,11 +1112,11 @@ msgstr "Jeżeli zaznaczone - tylko zalogowani użytkownicy będą mogli zobaczy�
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr ""
+msgstr "strona statyczna"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr ""
+msgstr "strony statyczne"
 
 #: contrib/auth/models.py:13 contrib/auth/models.py:26
 msgid "name"
@@ -1117,7 +1124,7 @@ msgstr "nazwa"
 
 #: contrib/auth/models.py:15
 msgid "codename"
-msgstr ""
+msgstr "nazwa kodowa"
 
 #: contrib/auth/models.py:17
 msgid "permission"
@@ -1161,11 +1168,11 @@ msgstr "Użyj '[algo]$[salt]$[hexdigest]'"
 
 #: contrib/auth/models.py:60
 msgid "staff status"
-msgstr "stan w zespole"
+msgstr "w zespole"
 
 #: contrib/auth/models.py:60
 msgid "Designates whether the user can log into this admin site."
-msgstr "Oznaczy czy użytkownik może zalogować się do panelu admina."
+msgstr "Oznacza czy użytkownik może zalogować się do panelu admina."
 
 #: contrib/auth/models.py:61
 msgid "active"
@@ -1195,15 +1202,14 @@ msgstr ""
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
 
+#kurwa
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
-msgstr "Użytkownik"
+msgstr "użytkownik"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
-msgstr "Uzytkownicy"
+msgstr "użytkownicy"
 
 #: contrib/auth/models.py:76
 msgid "Personal info"
@@ -1222,7 +1228,6 @@ msgid "Groups"
 msgstr "Grupy"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
 msgstr "wiadomość"
 
@@ -1371,7 +1376,6 @@ msgid "December"
 msgstr "Grudzień"
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "jan"
 msgstr "sty"
 
@@ -1472,11 +1476,10 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 
 #: utils/timesince.py:16
-#, fuzzy
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "godzina"
-msgstr[1] "godzina"
+msgstr[1] "godzin"
 
 #: utils/timesince.py:17
 msgid "minute"
@@ -1569,7 +1572,6 @@ msgid "Slovak"
 msgstr "Słowacki"
 
 #: conf/global_settings.py:58
-#, fuzzy
 msgid "Slovenian"
 msgstr "Słowacki"
 
@@ -1582,9 +1584,8 @@ msgid "Swedish"
 msgstr "Szwedzki"
 
 #: conf/global_settings.py:61
-#, fuzzy
 msgid "Ukrainian"
-msgstr "Brazylijski"
+msgstr "Ukraiński"
 
 #: conf/global_settings.py:62
 msgid "Simplified Chinese"
@@ -1715,14 +1716,14 @@ msgstr "Odnośnik %s jest nieprawidłowy."
 
 #: core/validators.py:214
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Wpisz poprawny kod stanu U.S."
+msgstr "Wpisz poprawny kod stanu U.S.A."
 
 #: core/validators.py:229
-#, fuzzy, python-format
+#, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Nie wolno przeklinać! Słowo %s jest niedozwolone."
-msgstr[1] "Nie wolno przeklinać! Słowo %s jest niedozwolone."
+msgstr[1] "Nie wolno przeklinać! Słowa %s są niedozwolone."
 
 #: core/validators.py:236
 #, python-format
@@ -1745,11 +1746,11 @@ msgstr "To pole musi być uzupełnione jeśli %(field)s jest %(value)s"
 #: core/validators.py:294
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr ""
+msgstr "To pole musi być wypełnione jeżeli %(field)s nie jest %(value)s"
 
 #: core/validators.py:313
 msgid "Duplicate values are not allowed."
-msgstr ""
+msgstr "Duplikaty są niedozwolone."
 
 #: core/validators.py:336
 #, python-format
@@ -1761,20 +1762,20 @@ msgid "Please enter a valid decimal number."
 msgstr "Proszę wpisać poprawną liczbę dziesiętną."
 
 #: core/validators.py:349
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną."
-msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną."
+msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfry."
+msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfr."
 
 #: core/validators.py:352
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną."
-msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną."
+msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną z dokładnością do %s miejsca po przecinku."
+msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną z dokładnością do %s miejsc po przecinku."
 
 #: core/validators.py:362
 #, python-format
@@ -1797,13 +1798,14 @@ msgstr "To pole jest nieprawidłowe."
 #: core/validators.py:426
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr "Nie można otrzymać nic z %s."
+msgstr "Nie można nic pobrać z %s."
 
 #: core/validators.py:429
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
+"URL %(url)s zwrócił niepoprawny Content-Type header '%(contenttype)s'."
 
 
 #: core/validators.py:462
@@ -1866,17 +1868,15 @@ msgstr "To pole jest wymagane"
 
 #: db/models/fields/__init__.py:337
 msgid "This value must be an integer."
-msgstr ""
+msgstr "Ta wartość musi być liczbą całkowitą"
 
 #: db/models/fields/__init__.py:369
-#, fuzzy
 msgid "This value must be either True or False."
-msgstr "Wartość logiczna (True, False - prawda lub fałsz)"
+msgstr "Ta wartość musi być logiczna (True, False - prawda lub fałsz)."
 
 #: db/models/fields/__init__.py:385
-#, fuzzy
 msgid "This field cannot be null."
-msgstr "To pole jest nieprawidłowe."
+msgstr "To pole nie może być puste."
 
 #: db/models/fields/__init__.py:562
 msgid "Enter a valid filename."
@@ -1888,12 +1888,10 @@ msgid "Please enter a valid %s."
 msgstr "Proszę wpisać poprawne %s."
 
 #: db/models/fields/related.py:579
-#, fuzzy
 msgid "Separate multiple IDs with commas."
 msgstr "Oddziel kilka pól ID przecinkami."
 
 #: db/models/fields/related.py:581
-#, fuzzy
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
@@ -1909,11 +1907,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: forms/__init__.py:380
-#, fuzzy, python-format
+#, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Upewnij się, że jest mniej niż %s znaków."
-msgstr[1] "Upewnij się, że jest mniej niż %s znaków."
+msgstr[0] "Upewnij się, że tekst ma mniej niż %s znak."
+msgstr[1] "Upewnij się, że tekst ma mniej niż %s znaków."
 
 #: forms/__init__.py:385
 msgid "Line breaks are not allowed here."

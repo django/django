@@ -14,7 +14,13 @@ class MergeDict(object):
                 pass
         raise KeyError
 
-    def get(self, key, default):
+    def __contains__(self, key):
+        return self.has_key(key)
+        
+    def __copy__(self): 
+        return self.__class__(*self.dicts) 
+
+    def get(self, key, default=None):
         try:
             return self[key]
         except KeyError:
@@ -39,6 +45,10 @@ class MergeDict(object):
             if dict.has_key(key):
                 return True
         return False
+        
+    def copy(self): 
+        """ returns a copy of this object""" 
+        return self.__copy__()
 
 class SortedDict(dict):
     "A dictionary that keeps its keys in the order in which they're inserted."
@@ -67,7 +77,7 @@ class SortedDict(dict):
         return self.keyOrder[:]
 
     def values(self):
-        return [dict.__getitem__(self,k) for k in self.keyOrder]
+        return [dict.__getitem__(self, k) for k in self.keyOrder]
 
     def update(self, dict):
         for k, v in dict.items():
@@ -77,6 +87,17 @@ class SortedDict(dict):
         if key not in self.keyOrder:
             self.keyOrder.append(key)
         return dict.setdefault(self, key, default)
+
+    def value_for_index(self, index):
+        "Returns the value of the item at the given zero-based index."
+        return self[self.keyOrder[index]]
+
+    def copy(self):
+        "Returns a copy of this object."
+        # This way of initialising the copy means it works for subclasses, too.
+        obj = self.__class__(self)
+        obj.keyOrder = self.keyOrder
+        return obj
 
 class MultiValueDictKeyError(KeyError):
     pass
@@ -187,17 +208,23 @@ class MultiValueDict(dict):
         "Returns a copy of this object."
         return self.__deepcopy__()
 
-    def update(self, other_dict):
-        "update() extends rather than replaces existing key lists."
-        if isinstance(other_dict, MultiValueDict):
-            for key, value_list in other_dict.lists():
-                self.setlistdefault(key, []).extend(value_list)
-        else:
-            try:
-                for key, value in other_dict.items():
-                    self.setlistdefault(key, []).append(value)
-            except TypeError:
-                raise ValueError, "MultiValueDict.update() takes either a MultiValueDict or dictionary"
+    def update(self, *args, **kwargs):
+        "update() extends rather than replaces existing key lists. Also accepts keyword args."
+        if len(args) > 1:
+            raise TypeError, "update expected at most 1 arguments, got %d", len(args)
+        if args:
+            other_dict = args[0]
+            if isinstance(other_dict, MultiValueDict):
+                for key, value_list in other_dict.lists():
+                    self.setlistdefault(key, []).extend(value_list)
+            else:
+                try:
+                    for key, value in other_dict.items():
+                        self.setlistdefault(key, []).append(value)
+                except TypeError:
+                    raise ValueError, "MultiValueDict.update() takes either a MultiValueDict or dictionary"
+        for key, value in kwargs.iteritems():
+            self.setlistdefault(key, []).append(value)
 
 class DotExpandedDict(dict):
     """

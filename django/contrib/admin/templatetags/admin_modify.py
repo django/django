@@ -11,6 +11,7 @@ import re
 register = template.Library()
 
 word_re = re.compile('[A-Z][a-z]+')
+absolute_url_re = re.compile(r'^(?:http(?:s)?:/)?/', re.IGNORECASE)
 
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
@@ -18,18 +19,19 @@ def class_name_to_underscored(name):
 def include_admin_script(script_path):
     """
     Returns an HTML script element for including a script from the admin
-    media url.
+    media url (or other location if an absolute url is given).
 
     Example usage::
 
-        {% include_admin_script js/calendar.js %}
+        {% include_admin_script "js/calendar.js" %}
 
     could return::
 
         <script type="text/javascript" src="/media/admin/js/calendar.js">
     """
-
-    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    if not absolute_url_re.match(script_path):
+        script_path = '%s%s' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    return '<script type="text/javascript" src="%s"></script>' % script_path
 include_admin_script = register.simple_tag(include_admin_script)
 
 def submit_row(context):
@@ -160,8 +162,10 @@ class EditInlineNode(template.Node):
         context.push()
         if relation.field.rel.edit_inline == models.TABULAR:
             bound_related_object_class = TabularBoundRelatedObject
-        else:
+        elif relation.field.rel.edit_inline == models.STACKED:
             bound_related_object_class = StackedBoundRelatedObject
+        else:
+            bound_related_object_class = relation.field.rel.edit_inline
         original = context.get('original', None)
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
@@ -175,8 +179,8 @@ def output_all(form_fields):
 output_all = register.simple_tag(output_all)
 
 def auto_populated_field_script(auto_pop_fields, change = False):
+    t = []
     for field in auto_pop_fields:
-        t = []
         if change:
             t.append('document.getElementById("id_%s")._changed = true;' % field.name)
         else:
@@ -196,7 +200,7 @@ def filter_interface_script_maybe(bound_field):
     if f.rel and isinstance(f.rel, models.ManyToManyRel) and f.rel.filter_interface:
         return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
-              f.name, f.verbose_name, f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
+              f.name, f.verbose_name.replace('"', '\\"'), f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
     else:
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)
