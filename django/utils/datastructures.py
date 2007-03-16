@@ -92,6 +92,13 @@ class SortedDict(dict):
         "Returns the value of the item at the given zero-based index."
         return self[self.keyOrder[index]]
 
+    def copy(self):
+        "Returns a copy of this object."
+        # This way of initializing the copy means it works for subclasses, too.
+        obj = self.__class__(self)
+        obj.keyOrder = self.keyOrder
+        return obj
+
 class MultiValueDictKeyError(KeyError):
     pass
 

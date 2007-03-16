@@ -198,7 +198,6 @@ used as test conditions.
 .. _Twill: http://twill.idyll.org/
 .. _Selenium: http://www.openqa.org/selenium/
 
-
 Making requests
 ~~~~~~~~~~~~~~~
 
@@ -357,7 +356,55 @@ The following is a simple unit test using the Test Client::
 Fixtures
 --------
 
-Feature still to come...
+A test case for a database-backed website isn't much use if there isn't any
+data in the database. To make it easy to put test data into the database,
+Django provides a fixtures framework.
+
+A *Fixture* is a collection of files that contain the serialized contents of
+the database. Each fixture has a unique name; however, the files that
+comprise the fixture can be distributed over multiple directories, in
+multiple applications.
+
+.. note::
+    If you have synchronized a Django project, you have already experienced 
+    the use of one fixture -- the ``initial_data`` fixture. Every time you
+    synchronize the database, Django installs the ``initial_data`` fixture.
+    This provides a mechanism to populate a new database with any initial
+    data (such as a default set of categories). Fixtures with other names
+    can be installed manually using ``django-admin.py loaddata``. 
+    
+
+However, for the purposes of unit testing, each test must be able to 
+guarantee the contents of the database at the start of each and every
+test. To do this, Django provides a TestCase baseclass that can integrate
+with fixtures.
+
+Moving from a normal unittest TestCase to a Django TestCase is easy - just
+change the base class of your test, and define a list of fixtures
+to be used. For example, the test case from `Writing unittests`_ would 
+look like::
+
+    from django.test import TestCase
+    from myapp.models import Animal
+
+    class AnimalTestCase(TestCase):
+        fixtures = ['mammals.json', 'birds']
+        
+        def setUp(self):
+            # test definitions as before
+
+At the start of each test case, before ``setUp()`` is run, Django will
+flush the database, returning the database the state it was in directly 
+after ``syncdb`` was called. Then, all the named fixtures are installed. 
+In this example, any JSON fixture called ``mammals``, and any fixture
+named ``birds`` will be installed. See the documentation on 
+`loading fixtures`_ for more details on defining and installing fixtures.
+
+.. _`loading fixtures`: ../django_admin/#loaddata-fixture-fixture
+
+This flush/load procedure is repeated for each test in the test case, so you 
+can be certain that the outcome of a test will not be affected by 
+another test, or the order of test execution.
 
 Running tests
 =============

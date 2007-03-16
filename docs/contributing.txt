@@ -195,7 +195,7 @@ The second part of this workflow involves a set of flags the describe what the
 ticket has or needs in order to be "ready for checkin":
 
     "Has patch"
-        The means the ticket has an associated patch_. These will be
+        This means the ticket has an associated patch_. These will be
         reviewed to see if the patch is "good".
 
     "Needs documentation"
@@ -211,6 +211,33 @@ ticket has or needs in order to be "ready for checkin":
         This flag means that although the ticket *has* a patch, it's not quite
         ready for checkin. This could mean the patch no longer applies
         cleanly, or that the code doesn't live up to our standards.
+
+A ticket can be resolved in a number of ways:
+
+    "fixed"
+        Used by one of the core developers once a patch has been rolled into
+        Django and the issue is fixed.
+
+    "invalid"
+        Used if the ticket is found to be incorrect or a user error.
+
+    "wontfix"
+        Used when a core developer decides that this request is not
+        appropriate for consideration in Django. This is usually chosen after
+        discussion in the ``django-developers`` mailing list, and you should
+        feel free to join in when it's something you care about.
+
+    "duplicate"
+        Used when another ticket covers the same issue. By closing duplicate
+        tickets, we keep all the discussion in one place, which helps everyone.
+
+    "worksforme"
+        Used when the triage team is unable to replicate the original bug.
+
+If you believe that the ticket was closed in error -- because you're
+still having the issue, or it's popped up somewhere else, or the triagers have
+-- made a mistake, please reopen the ticket and tell us why. Please do not
+reopen tickets that have been marked as "wontfix" by core developers.
 
 .. _required details: `Reporting bugs`_
 .. _good patch: `Patch style`_
@@ -276,9 +303,11 @@ Please follow these coding standards when writing code for inclusion in Django:
           def my_view(req, foo):
               # ...
 
-    * Please don't put your name in the code. While we appreciate all
-      contributions to Django, our policy is not to publish individual
-      developer names in code -- for instance, at the top of Python modules.
+    * Please don't put your name in the code you contribute. Our policy is to
+      keep contributors' names in the ``AUTHORS`` file distributed with Django
+      -- not scattered throughout the codebase itself. Feel free to include a
+      change to the ``AUTHORS`` file in your patch if you make more than a
+      single trivial change.
 
 Committing code
 ===============
@@ -498,12 +527,12 @@ sure all other lines are commented::
     #   http://code.djangoproject.com/svn/django/trunk/
     #
     /path/to/trunk
-    
+
     # <branch> is a svn checkout of:
     #   http://code.djangoproject.com/svn/django/branches/<branch>/
     #
     #/path/to/<branch>
-    
+
     # On windows a path may look like this:
     # C:/path/to/<branch>
 

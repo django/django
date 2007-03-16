@@ -435,6 +435,15 @@ def cycle(parser, token):
 cycle = register.tag(cycle)
 
 def debug(parser, token):
+    """
+    Output a whole load of debugging information, including the current context and imported modules.
+
+    Sample usage::
+
+        <pre>
+            {% debug %}
+        </pre>
+    """
     return DebugNode()
 debug = register.tag(debug)
 
@@ -538,21 +547,6 @@ def do_for(parser, token):
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
-    """
-    Output the contents of the block if the two arguments equal/don't equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
     bits = list(token.split_contents())
     if len(bits) != 3:
         raise TemplateSyntaxError, "%r takes two arguments" % bits[0]
@@ -568,11 +562,27 @@ def do_ifequal(parser, token, negate):
 
 #@register.tag
 def ifequal(parser, token):
+    """
+    Output the contents of the block if the two arguments equal each other.
+
+    Examples::
+
+        {% ifequal user.id comment.user_id %}
+            ...
+        {% endifequal %}
+
+        {% ifnotequal user.id comment.user_id %}
+            ...
+        {% else %}
+            ...
+        {% endifnotequal %}
+    """
     return do_ifequal(parser, token, False)
 ifequal = register.tag(ifequal)
 
 #@register.tag
 def ifnotequal(parser, token):
+    """Output the contents of the block if the two arguments are not equal. See ifequal."""
     return do_ifequal(parser, token, True)
 ifnotequal = register.tag(ifnotequal)
 
@@ -889,8 +899,9 @@ templatetag = register.tag(templatetag)
 
 def url(parser, token):
     """
-    Returns an absolute URL matching given view with its parameters. This is a
-    way to define links that aren't tied to a particular url configuration:
+    Returns an absolute URL matching given view with its parameters. 
+    
+    This is a way to define links that aren't tied to a particular URL configuration::
     
         {% url path.to.some_view arg1,arg2,name1=value1 %}
     
@@ -901,16 +912,16 @@ def url(parser, token):
     URL. All arguments for the URL should be present.
 
     For example if you have a view ``app_name.client`` taking client's id and
-    the corresponding line in a urlconf looks like this:
+    the corresponding line in a URLconf looks like this::
     
         ('^client/(\d+)/$', 'app_name.client')
     
-    and this app's urlconf is included into the project's urlconf under some
-    path:
+    and this app's URLconf is included into the project's URLconf under some
+    path::
     
         ('^clients/', include('project_name.app_name.urls'))
     
-    then in a template you can create a link for a certain client like this:
+    then in a template you can create a link for a certain client like this::
     
         {% url app_name.client client.id %}
     

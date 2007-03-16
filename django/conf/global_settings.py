@@ -69,6 +69,7 @@ LANGUAGES = (
     ('sr', gettext_noop('Serbian')),
     ('sv', gettext_noop('Swedish')),
     ('ta', gettext_noop('Tamil')),
+    ('te', gettext_noop('Telugu')),
     ('tr', gettext_noop('Turkish')),
     ('uk', gettext_noop('Ukrainian')),
     ('zh-cn', gettext_noop('Simplified Chinese')),
@@ -319,3 +320,10 @@ TEST_RUNNER = 'django.test.simple.run_tests'
 # The name of the database to use for testing purposes.
 # If None, a name of 'test_' + DATABASE_NAME will be assumed
 TEST_DATABASE_NAME = None
+
+############
+# FIXTURES #
+############
+
+# The list of directories to search for fixtures
+FIXTURE_DIRS = ()

@@ -91,6 +91,8 @@ UNKNOWN_SOURCE="&lt;unknown source&gt;"
 tag_re = re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
                                           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
                                           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END)))
+# matches if the string is valid number
+number_re = re.compile(r'[-+]?(\d+|\d*\.\d+)$')
 
 # global dictionary of libraries that have been loaded using get_library
 libraries = {}
@@ -632,12 +634,9 @@ def resolve_variable(path, context):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if path[0].isdigit():
+    if number_re.match(path):
         number_type = '.' in path and float or int
-        try:
-            current = number_type(path)
-        except ValueError:
-            current = settings.TEMPLATE_STRING_IF_INVALID
+        current = number_type(path)
     elif path[0] in ('"', "'") and path[0] == path[-1]:
         current = path[1:-1]
     else:

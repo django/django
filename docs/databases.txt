@@ -1,0 +1,162 @@
+===============================
+Notes about supported databases
+===============================
+
+Django attempts to support as many features as possible on all database
+backends. However, not all database backends are alike, and we've had to make
+design decisions on which features to support and which assumptions we can make
+safely.
+
+This file describes some of the features that might be relevant to Django
+usage. Of course, it is not intended as a replacement for server-specific
+documentation or reference manuals.
+
+MySQL notes
+===========
+
+Django expects the database to support transactions, referential integrity,
+and Unicode support (UTF-8 encoding). Fortunately, MySQL_ has all these
+features as available as far back as 3.23. While it may be possible to use
+3.23 or 4.0, you'll probably have less trouble if you use 4.1 or 5.0.
+
+MySQL 4.1
+---------
+
+`MySQL 4.1`_ has greatly improved support for character sets. It is possible to
+set different default character sets on the database, table, and column.
+Previous versions have only a server-wide character set setting. It's also the
+first version where the character set can be changed on the fly. 4.1 also has
+support for views, but Django currently doesn't use views.
+
+MySQL 5.0
+---------
+
+`MySQL 5.0`_ adds the ``information_schema`` database, which contains detailed
+data on all database schema. Django's ``inspectdb`` feature uses this
+``information_schema`` if it's available. 5.0 also has support for stored
+procedures, but Django currently doesn't use stored procedures.
+
+.. _MySQL: http://www.mysql.com/
+.. _MySQL 4.1: http://dev.mysql.com/doc/refman/4.1/en/index.html
+.. _MySQL 5.0: http://dev.mysql.com/doc/refman/5.0/en/index.html
+
+Storage engines
+---------------
+
+MySQL has several `storage engines`_ (previously called table types). You can
+change the default storage engine in the server configuration.
+
+The default engine is MyISAM_. The main drawback of MyISAM is that it doesn't
+currently support transactions or foreign keys. On the plus side, it's
+currently the only engine that supports full-text indexing and searching.
+
+The InnoDB_ engine is fully transactional and supports foreign key references.
+
+The BDB_ engine, like InnoDB, is also fully transactional and supports foreign
+key references. However, its use seems to be deprecated.
+
+`Other storage engines`_, including SolidDB_ and Falcon_, are on the horizon.
+For now, InnoDB is probably your best choice.
+
+.. _storage engines: http://dev.mysql.com/doc/refman/5.0/en/storage-engines.html
+.. _MyISAM: http://dev.mysql.com/doc/refman/5.0/en/myisam-storage-engine.html
+.. _BDB: http://dev.mysql.com/doc/refman/5.0/en/bdb-storage-engine.html
+.. _InnoDB: http://dev.mysql.com/doc/refman/5.0/en/innodb.html
+.. _Other storage engines: http://dev.mysql.com/doc/refman/5.1/en/storage-engines-other.html
+.. _SolidDB: http://forge.mysql.com/projects/view.php?id=139
+.. _Falcon: http://dev.mysql.com/doc/falcon/en/index.html
+
+MySQLdb
+-------
+
+`MySQLdb`_ is the Python interface to MySQL. 1.2.1 is the first version that
+has support for MySQL 4.1 and newer. If you are trying to use an older version
+of MySQL, then 1.2.0 *might* work for you.
+
+.. _MySQLdb: http://sourceforge.net/projects/mysql-python
+
+Creating your database
+----------------------
+
+You can `create your database`_ using the command-line tools and this SQL::
+
+  CREATE DATABASE <dbname> CHARACTER SET utf8;
+
+This ensures all tables and columns will use UTF-8 by default.
+
+.. _create your database: http://dev.mysql.com/doc/refman/5.0/en/create-database.html
+
+Connecting to the database
+--------------------------
+
+Refer to the `settings documentation`_.
+
+Connection settings are used in this order:
+
+ 1. ``DATABASE_OPTIONS``
+ 2. ``DATABASE_NAME``, ``DATABASE_USER``, ``DATABASE_PASSWORD``, ``DATABASE_HOST``,
+    ``DATABASE_PORT``
+ 3. MySQL option files.
+
+In other words, if you set the name of the database in ``DATABASE_OPTIONS``,
+this will take precedence over ``DATABASE_NAME``, which would override
+anything in a `MySQL option file`_.
+
+Here's a sample configuration which uses a MySQL option file::
+
+  # settings.py
+  DATABASE_ENGINE = "mysql"
+  DATABASE_OPTIONS = {
+      'read_default_file': '/path/to/my.cnf',
+      }
+
+  # my.cnf
+  [client]
+  database = DATABASE_NAME
+  user = DATABASE_USER
+  passwd = DATABASE_PASSWORD
+  default-character-set = utf8
+
+Several other MySQLdb connection options may be useful, such as ``ssl``,
+``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
+`MySQLdb documentation`_ for more details.
+
+.. _settings documentation: http://www.djangoproject.com/documentation/settings/#database-engine
+.. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
+.. _MySQLdb documentation: http://mysql-python.sourceforge.net/
+
+Creating your tables
+--------------------
+
+When Django generates the schema, it doesn't specify a storage engine, so
+tables will be created with whatever default storage engine your database
+server is configured for. The easiest solution is to set your database server's
+default storage engine to the desired engine.
+
+If you're using a hosting service and can't change your server's default
+storage engine, you have a couple of options.
+
+    * After the tables are created, execute an ``ALTER TABLE`` statement to
+      convert a table to a new storage engine (such as InnoDB)::
+
+          ALTER TABLE <tablename> ENGINE=INNODB;
+
+      This can be tedious if you have a lot of tables.
+
+    * Another option is to use the ``init_command`` option for MySQLdb prior to
+      creating your tables::
+
+          DATABASE_OPTIONS = {
+              # ...
+             "init_command": "SET storage_engine=INNODB",
+              # ...
+          }
+
+      This sets the default storage engine upon connecting to the database.
+      After your tables have been created, you should remove this option.
+
+    * Another method for changing the storage engine is described in
+      AlterModelOnSyncDB_.
+
+.. _AlterModelOnSyncDB: http://code.djangoproject.com/wiki/AlterModelOnSyncDB
+

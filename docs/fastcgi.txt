@@ -304,3 +304,14 @@ If you have access to a command shell on a Unix system, you can accomplish this
 easily by using the ``touch`` command::
 
     touch mysite.fcgi
+
+Serving admin media files
+=========================
+
+Regardless of the server and configuration you eventually decide to use, you will
+also need to give some thought to how to serve the admin media files. The
+advice given in the modpython_ documentation is also applicable in the setups
+detailed above.
+
+.. _modpython: ../modpython/#serving-the-admin-files
+

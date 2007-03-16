@@ -20,6 +20,8 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
+postgres_version = None
+
 class DatabaseWrapper(local):
     def __init__(self, **kwargs):
         self.connection = None
@@ -49,15 +51,20 @@ class DatabaseWrapper(local):
         cursor.tzinfo_factory = None
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
+        global postgres_version
+        if not postgres_version:
+            cursor.execute("SELECT version()")
+            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]        
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def _commit(self):
-        return self.connection.commit()
+        if self.connection is not None:
+            return self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             return self.connection.rollback()
 
     def close(self):
@@ -111,6 +118,58 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    """
+    if tables:
+        if postgres_version[0] >= 8 and postgres_version[1] >= 1:
+            # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to* in order to be able to
+            # truncate tables referenced by a foreign key in any other table. The result is a
+            # single SQL TRUNCATE statement
+            sql = ['%s %s;' % \
+                    (style.SQL_KEYWORD('TRUNCATE'),
+                     style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
+                    )]
+        else:
+            sql = ['%s %s %s;' % \
+                    (style.SQL_KEYWORD('DELETE'),
+                     style.SQL_KEYWORD('FROM'),
+                     style.SQL_FIELD(quote_name(table))
+                     ) for table in tables]
+                     
+        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
+        # to reset sequence indices
+        for sequence in sequences:
+            table_name = sequence['table']
+            column_name = sequence['column']
+            if column_name and len(column_name) > 0:
+                # sequence name in this case will be <table>_<column>_seq
+                sql.append("%s %s %s %s %s %s;" % \
+                    (style.SQL_KEYWORD('ALTER'),
+                     style.SQL_KEYWORD('SEQUENCE'),
+                     style.SQL_FIELD('%s_%s_seq' % (table_name, column_name)),
+                     style.SQL_KEYWORD('RESTART'),
+                     style.SQL_KEYWORD('WITH'),
+                     style.SQL_FIELD('1')
+                     )
+                )
+            else:
+                # sequence name in this case will be <table>_id_seq
+                sql.append("%s %s %s %s %s %s;" % \
+                    (style.SQL_KEYWORD('ALTER'),
+                     style.SQL_KEYWORD('SEQUENCE'),
+                     style.SQL_FIELD('%s_id_seq' % table_name),
+                     style.SQL_KEYWORD('RESTART'),
+                     style.SQL_KEYWORD('WITH'),
+                     style.SQL_FIELD('1')
+                     )
+                )
+        return sql
+    else:
+        return []
+        
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'ILIKE %s',

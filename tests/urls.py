@@ -6,7 +6,7 @@ urlpatterns = patterns('',
 
     # Always provide the auth system login and logout views
     (r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}),
-    (r'^accounts/logout/$', 'django.contrib.auth.views.login'),
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
 
     # test urlconf for {% url %} template tag
     (r'^url_tag/', include('regressiontests.templates.urls')),

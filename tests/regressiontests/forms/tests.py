@@ -3476,6 +3476,7 @@ as its choices.
 <option value="ME">Maine</option>
 <option value="MH">Marshall Islands</option>
 <option value="MD">Maryland</option>
+<option value="MA">Massachusetts</option>
 <option value="MI">Michigan</option>
 <option value="MN">Minnesota</option>
 <option value="MS">Mississippi</option>

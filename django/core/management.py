@@ -68,6 +68,25 @@ def _get_table_list():
     cursor = connection.cursor()
     return get_introspection_module().get_table_list(cursor)
 
+def _get_sequence_list():
+    "Returns a list of information about all DB sequences for all models in all apps"
+    from django.db import models
+
+    apps = models.get_apps()
+    sequence_list = []
+
+    for app in apps:
+        for model in models.get_models(app):
+            for f in model._meta.fields:
+                if isinstance(f, models.AutoField):
+                    sequence_list.append({'table':model._meta.db_table,'column':f.column,})
+                    break # Only one AutoField is allowed per model, so don't bother continuing.
+
+            for f in model._meta.many_to_many:
+                sequence_list.append({'table':f.m2m_db_table(),'column':None,})
+
+    return sequence_list
+
 # If the foreign key points to an AutoField, a PositiveIntegerField or a
 # PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
 # referred field type. Otherwise, the foreign key should be the same type of
@@ -334,7 +353,15 @@ def get_sql_reset(app):
 get_sql_reset.help_doc = "Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s)."
 get_sql_reset.args = APP_ARGS
 
-def get_sql_initial_data_for_model(model):
+def get_sql_flush():
+    "Returns a list of the SQL statements used to flush the database"
+    from django.db import backend
+    statements = backend.get_sql_flush(style, _get_table_list(), _get_sequence_list())
+    return statements
+get_sql_flush.help_doc = "Returns a list of the SQL statements required to return all tables in the database to the state they were in just after they were installed."
+get_sql_flush.args = ''
+
+def get_custom_sql_for_model(model):
     from django.db import models
     from django.conf import settings
 
@@ -361,8 +388,8 @@ def get_sql_initial_data_for_model(model):
 
     return output
 
-def get_sql_initial_data(app):
-    "Returns a list of the initial INSERT SQL statements for the given app."
+def get_custom_sql(app):
+    "Returns a list of the custom table modifying SQL statements for the given app."
     from django.db.models import get_models
     output = []
 
@@ -370,11 +397,17 @@ def get_sql_initial_data(app):
     app_dir = os.path.normpath(os.path.join(os.path.dirname(app.__file__), 'sql'))
 
     for model in app_models:
-        output.extend(get_sql_initial_data_for_model(model))
+        output.extend(get_custom_sql_for_model(model))
 
     return output
-get_sql_initial_data.help_doc = "Prints the initial INSERT SQL statements for the given app name(s)."
-get_sql_initial_data.args = APP_ARGS
+get_custom_sql.help_doc = "Prints the custom table modifying SQL statements for the given app name(s)."
+get_custom_sql.args = APP_ARGS
+
+def get_sql_initial_data(apps):
+    "Returns a list of the initial INSERT SQL statements for the given app."
+    return style.ERROR("This action has been renamed. Try './manage.py sqlcustom %s'." % ' '.join(apps and apps or ['app1', 'app2']))
+get_sql_initial_data.help_doc = "RENAMED: see 'sqlcustom'"
+get_sql_initial_data.args = ''
 
 def get_sql_sequence_reset(app):
     "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
@@ -432,16 +465,26 @@ def get_sql_indexes_for_model(model):
 
 def get_sql_all(app):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return get_sql_create(app) + get_sql_initial_data(app) + get_sql_indexes(app)
+    return get_sql_create(app) + get_custom_sql(app) + get_sql_indexes(app)
 get_sql_all.help_doc = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
 get_sql_all.args = APP_ARGS
+
+def _emit_post_sync_signal(created_models, verbosity, interactive):
+    from django.db import models
+    from django.dispatch import dispatcher
+    # Emit the post_sync signal for every application.
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if verbosity >= 2:
+            print "Running post-sync handlers for application", app_name
+        dispatcher.send(signal=models.signals.post_syncdb, sender=app,
+            app=app, created_models=created_models,
+            verbosity=verbosity, interactive=interactive)
 
 def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     from django.db import connection, transaction, models, get_creation_module
-    from django.db.models import signals
     from django.conf import settings
-    from django.dispatch import dispatcher
 
     disable_termcolors()
 
@@ -503,27 +546,22 @@ def syncdb(verbosity=1, interactive=True):
 
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
-    for app in models.get_apps():
-        app_name = app.__name__.split('.')[-2]
-        if verbosity >= 2:
-            print "Running post-sync handlers for application", app_name
-        dispatcher.send(signal=signals.post_syncdb, sender=app,
-            app=app, created_models=created_models,
-            verbosity=verbosity, interactive=interactive)
+    _emit_post_sync_signal(created_models, verbosity, interactive)
 
-        # Install initial data for the app (but only if this is a model we've
-        # just created)
+    # Install custom SQL for the app (but only if this 
+    # is a model we've just created)
+    for app in models.get_apps():
         for model in models.get_models(app):
             if model in created_models:
-                initial_sql = get_sql_initial_data_for_model(model)
-                if initial_sql:
+                custom_sql = get_custom_sql_for_model(model)
+                if custom_sql:
                     if verbosity >= 1:
-                        print "Installing initial data for %s.%s model" % (app_name, model._meta.object_name)
+                        print "Installing custom SQL for %s.%s model" % (app_name, model._meta.object_name)
                     try:
-                        for sql in initial_sql:
+                        for sql in custom_sql:
                             cursor.execute(sql)
                     except Exception, e:
-                        sys.stderr.write("Failed to install initial SQL data for %s.%s model: %s" % \
+                        sys.stderr.write("Failed to install custom SQL for %s.%s model: %s" % \
                                             (app_name, model._meta.object_name, e))
                         transaction.rollback_unless_managed()
                     else:
@@ -548,7 +586,10 @@ def syncdb(verbosity=1, interactive=True):
                     else:
                         transaction.commit_unless_managed()
 
-syncdb.args = ''
+    # Install the 'initialdata' fixture, using format discovery
+    load_data(['initial_data'], verbosity=verbosity)
+syncdb.help_doc = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
+syncdb.args = '[--verbosity] [--interactive]'
 
 def get_admin_index(app):
     "Returns admin-index template snippet (in list form) for the given app."
@@ -601,36 +642,6 @@ def diffsettings():
     print '\n'.join(output)
 diffsettings.args = ""
 
-def install(app):
-    "Executes the equivalent of 'get_sql_all' in the current database."
-    from django.db import connection, transaction
-
-    app_name = app.__name__.split('.')[-2]
-
-    disable_termcolors()
-
-    # First, try validating the models.
-    _check_for_validation_errors(app)
-
-    sql_list = get_sql_all(app)
-
-    try:
-        cursor = connection.cursor()
-        for sql in sql_list:
-            cursor.execute(sql)
-    except Exception, e:
-        sys.stderr.write(style.ERROR("""Error: %s couldn't be installed. Possible reasons:
-  * The database isn't running or isn't configured correctly.
-  * At least one of the database tables already exists.
-  * The SQL was invalid.
-Hint: Look at the output of 'django-admin.py sqlall %s'. That's the SQL this command wasn't able to run.
-The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
-        transaction.rollback_unless_managed()
-        sys.exit(1)
-    transaction.commit_unless_managed()
-install.help_doc = "Executes ``sqlall`` for the given app(s) in the current database."
-install.args = APP_ARGS
-
 def reset(app, interactive=True):
     "Executes the equivalent of 'get_sql_reset' in the current database."
     from django.db import connection, transaction
@@ -672,7 +683,68 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
     else:
         print "Reset cancelled."
 reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
-reset.args = APP_ARGS
+reset.args = '[--interactive]' + APP_ARGS
+
+def flush(verbosity=1, interactive=True):
+    "Returns all tables in the database to the same state they were in immediately after syncdb."
+    from django.conf import settings
+    from django.db import connection, transaction, models
+    from django.dispatch import dispatcher
+    
+    disable_termcolors()
+
+    # First, try validating the models.
+    _check_for_validation_errors()
+
+    # Import the 'management' module within each installed app, to register
+    # dispatcher events.
+    for app_name in settings.INSTALLED_APPS:
+        try:
+            __import__(app_name + '.management', {}, {}, [''])
+        except ImportError:
+            pass
+    
+    sql_list = get_sql_flush()
+
+    if interactive:
+        confirm = raw_input("""
+You have requested a flush of the database.
+This will IRREVERSIBLY DESTROY all data currently in the database,
+and return each table to the state it was in after syncdb.
+Are you sure you want to do this?
+
+Type 'yes' to continue, or 'no' to cancel: """)
+    else:
+        confirm = 'yes'
+
+    if confirm == 'yes':
+        try:
+            cursor = connection.cursor()
+            for sql in sql_list:
+                cursor.execute(sql)
+        except Exception, e:
+            sys.stderr.write(style.ERROR("""Error: Database %s couldn't be flushed. Possible reasons:
+  * The database isn't running or isn't configured correctly.
+  * At least one of the expected database tables doesn't exist.
+  * The SQL was invalid.
+Hint: Look at the output of 'django-admin.py sqlflush'. That's the SQL this command wasn't able to run.
+The full error: """ % settings.DATABASE_NAME + style.ERROR_OUTPUT(str(e)) + '\n'))
+            transaction.rollback_unless_managed()
+            sys.exit(1)
+        transaction.commit_unless_managed()
+
+        # Emit the post sync signal. This allows individual
+        # applications to respond as if the database had been
+        # sync'd from scratch.
+        _emit_post_sync_signal(models.get_models(), verbosity, interactive)
+        
+        # Reinstall the initial_data fixture
+        load_data(['initial_data'], verbosity=verbosity)
+        
+    else:
+        print "Flush cancelled."
+flush.help_doc = "Executes ``sqlflush`` on the current database."
+flush.args = '[--verbosity] [--interactive]'
 
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -755,7 +827,7 @@ def inspectdb():
     yield "#     * Make sure each model has one field with primary_key=True"
     yield "# Feel free to rename the models, but don't rename db_table values or field names."
     yield "#"
-    yield "# Also note: You'll have to insert the output of 'django-admin.py sqlinitialdata [appname]'"
+    yield "# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'"
     yield "# into your database."
     yield ''
     yield 'from django.db import models'
@@ -1254,6 +1326,125 @@ def test(app_labels, verbosity=1):
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
 test.args = '[--verbosity] ' + APP_ARGS
 
+def load_data(fixture_labels, verbosity=1):
+    "Installs the provided fixture file(s) as data in the database."
+    from django.db.models import get_apps
+    from django.core import serializers
+    from django.db import connection, transaction
+    from django.conf import settings
+    import sys
+     
+    # Keep a count of the installed objects and fixtures
+    count = [0,0]
+    
+    humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
+
+    # Get a cursor (even though we don't need one yet). This has
+    # the side effect of initializing the test database (if 
+    # it isn't already initialized).
+    cursor = connection.cursor()
+    
+    # Start transaction management. All fixtures are installed in a 
+    # single transaction to ensure that all references are resolved.
+    transaction.commit_unless_managed()
+    transaction.enter_transaction_management()
+    transaction.managed(True)
+    
+    app_fixtures = [os.path.join(os.path.dirname(app.__file__),'fixtures') for app in get_apps()]
+    for fixture_label in fixture_labels:
+        if verbosity > 0:
+            print "Loading '%s' fixtures..." % fixture_label
+        for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
+            if verbosity > 1:
+                print "Checking %s for fixtures..." % humanize(fixture_dir)
+            parts = fixture_label.split('.')
+            if len(parts) == 1:
+                fixture_name = fixture_label
+                formats = serializers.get_serializer_formats()
+            else:
+                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+                formats = [format]
+
+            label_found = False
+            for format in formats:
+                serializer = serializers.get_serializer(format)
+                if verbosity > 1:
+                    print "Trying %s for %s fixture '%s'..." % \
+                        (humanize(fixture_dir), format, fixture_name)
+                try:
+                    full_path = os.path.join(fixture_dir, '.'.join([fixture_name, format]))
+                    fixture = open(full_path, 'r')
+                    if label_found:
+                        fixture.close()
+                        print style.ERROR("Multiple fixtures named '%s' in %s. Aborting." % 
+                            (fixture_name, humanize(fixture_dir)))
+                        transaction.rollback()
+                        transaction.leave_transaction_management()
+                        return
+                    else:
+                        count[1] += 1
+                        if verbosity > 0:
+                            print "Installing %s fixture '%s' from %s." % \
+                                (format, fixture_name, humanize(fixture_dir))
+                        try:
+                            objects =  serializers.deserialize(format, fixture)
+                            for obj in objects:
+                                count[0] += 1
+                                obj.save()
+                            label_found = True
+                        except Exception, e:
+                            fixture.close()
+                            sys.stderr.write(
+                                style.ERROR("Problem installing fixture '%s': %s\n" % 
+                                     (full_path, str(e))))
+                            transaction.rollback()
+                            transaction.leave_transaction_management()
+                            return
+                        fixture.close()
+                except:
+                    if verbosity > 1:
+                        print "No %s fixture '%s' in %s." % \
+                            (format, fixture_name, humanize(fixture_dir))
+    if count[0] == 0:
+        if verbosity > 0:
+            print "No fixtures found."
+    else:
+        if verbosity > 0:
+            print "Installed %d object(s) from %d fixture(s)" % tuple(count)
+    transaction.commit()
+    transaction.leave_transaction_management()
+        
+load_data.help_doc = 'Installs the named fixture(s) in the database'
+load_data.args = "[--verbosity] fixture, fixture, ..."
+ 
+def dump_data(app_labels, format='json', indent=None):
+    "Output the current contents of the database as a fixture of the given format"
+    from django.db.models import get_app, get_apps, get_models
+    from django.core import serializers
+ 
+    if len(app_labels) == 0:
+        app_list = get_apps()
+    else:
+        app_list = [get_app(app_label) for app_label in app_labels]
+ 
+    # Check that the serialization format exists; this is a shortcut to
+    # avoid collating all the objects and _then_ failing.
+    try:
+        serializers.get_serializer(format)
+    except KeyError:
+        sys.stderr.write(style.ERROR("Unknown serialization format: %s\n" % format))        
+    
+    objects = []
+    for app in app_list:
+        for model in get_models(app):
+            objects.extend(model.objects.all())
+    try:
+        return serializers.serialize(format, objects, indent=indent)
+    except Exception, e:
+        sys.stderr.write(style.ERROR("Unable to serialize database: %s\n" % e))
+dump_data.help_doc = 'Output the contents of the database as a fixture of the given format'
+dump_data.args = '[--format]' + APP_ARGS
+
 # Utilities for command-line script
 
 DEFAULT_ACTION_MAPPING = {
@@ -1261,8 +1452,10 @@ DEFAULT_ACTION_MAPPING = {
     'createcachetable' : createcachetable,
     'dbshell': dbshell,
     'diffsettings': diffsettings,
+    'dumpdata': dump_data,
+    'flush': flush,
     'inspectdb': inspectdb,
-    'install': install,
+    'loaddata': load_data,
     'reset': reset,
     'runfcgi': runfcgi,
     'runserver': runserver,
@@ -1270,6 +1463,8 @@ DEFAULT_ACTION_MAPPING = {
     'sql': get_sql_create,
     'sqlall': get_sql_all,
     'sqlclear': get_sql_delete,
+    'sqlcustom': get_custom_sql,
+    'sqlflush': get_sql_flush,
     'sqlindexes': get_sql_indexes,
     'sqlinitialdata': get_sql_initial_data,
     'sqlreset': get_sql_reset,
@@ -1286,7 +1481,6 @@ NO_SQL_TRANSACTION = (
     'createcachetable',
     'dbshell',
     'diffsettings',
-    'install',
     'reset',
     'sqlindexes',
     'syncdb',
@@ -1333,6 +1527,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         help='Tells Django to NOT prompt the user for input of any kind.')
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
+    parser.add_option('--format', default='json', dest='format',
+        help='Specifies the output serialization format for fixtures')    
+    parser.add_option('--indent', default=None, dest='indent',
+        type='int', help='Specifies the indent level to use when pretty-printing output')
     parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
         type='choice', choices=['0', '1', '2'],
         help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
@@ -1366,7 +1564,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action_mapping[action](options.plain is True)
     elif action in ('validate', 'diffsettings', 'dbshell'):
         action_mapping[action]()
-    elif action == 'syncdb':
+    elif action in ('flush', 'syncdb'):
         action_mapping[action](int(options.verbosity), options.interactive)
     elif action == 'inspectdb':
         try:
@@ -1380,9 +1578,14 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             action_mapping[action](args[1])
         except IndexError:
             parser.print_usage_and_exit()
-    elif action == 'test':
+    elif action in ('test', 'loaddata'):
         try:
             action_mapping[action](args[1:], int(options.verbosity))
+        except IndexError:
+            parser.print_usage_and_exit()
+    elif action == 'dumpdata':
+        try:
+            print action_mapping[action](args[1:], options.format, options.indent)
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):
@@ -1403,6 +1606,10 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action_mapping[action](addr, port, options.use_reloader, options.admin_media_path)
     elif action == 'runfcgi':
         action_mapping[action](args[1:])
+    elif action == 'sqlinitialdata':
+        print action_mapping[action](args[1:])
+    elif action == 'sqlflush':
+        print '\n'.join(action_mapping[action]())
     else:
         from django.db import models
         validate(silent_success=True)

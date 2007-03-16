@@ -76,10 +76,11 @@ class DatabaseWrapper(local):
         return cursor
 
     def _commit(self):
-        return self.connection.commit()
+        if self.connection is not None:
+            return self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             return self.connection.rollback()
 
     def close(self):
@@ -136,6 +137,19 @@ def get_drop_foreignkey_sql():
 
 def get_pk_default_value():
     return "DEFAULT"
+
+def get_sql_flush(sql_styler, full_table_list):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    """
+    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # TODO - SQL not actually tested against ADO MSSQL yet!
+    # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
+    sql_list = ['%s %s;' % \
+                (sql_styler.SQL_KEYWORD('TRUNCATE'),
+                 sql_styler.SQL_FIELD(quote_name(table))
+                 )  for table in full_table_list]
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

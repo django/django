@@ -1,0 +1,10 @@
+[
+    {
+        "pk": "1", 
+        "model": "fixtures.article", 
+        "fields": {
+            "headline": "Python program becomes self aware", 
+            "pub_date": "2006-06-16 11:00:00"
+        }
+    }
+]
