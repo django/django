@@ -284,13 +284,13 @@ obtain) the language translations themselves. Here's how that works.
 
 .. admonition:: Locale restrictions
 
-    Django does not support localising your application into a locale for
-    which Django itself has not been translated -- it will ignore your
-    translation files. If you were to try this and Django supported it, you
-    would inevitably see a mixture of translated strings (from your
-    application) and English strings (from Django itself). If you are wanting
-    to support a locale for your application that is not already part of
-    Django, you will need to make at least a minimal translation of the Django
+    Django does not support localizing your application into a locale for
+    which Django itself has not been translated. In this case, it will ignore
+    your translation files. If you were to try this and Django supported it,
+    you would inevitably see a mixture of translated strings (from your
+    application) and English strings (from Django itself). If you want to
+    support a locale for your application that is not already part of
+    Django, you'll need to make at least a minimal translation of the Django
     core.
 
 Message files
