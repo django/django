@@ -108,13 +108,14 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         query, params = self._rewrite_args(query, params)
         return Database.Cursor.executemany(self, query, params)
 
-
 def quote_name(name):
-    # Oracle requires that quoted names be uppercase.
-    name = name.upper()
+    # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+    # not quoted, Oracle has case-insensitive behavior for identifiers, but
+    # always defaults to uppercase.
+    # We simplify things by making Oracle identifiers always uppercase.
     if not name.startswith('"') and not name.endswith('"'):
         name = '"%s"' % util.truncate_name(name.upper(), get_max_name_length())
-    return name
+    return name.upper()
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
@@ -169,9 +170,8 @@ def get_max_name_length():
 def get_autoinc_sql(table):
     # To simulate auto-incrementing primary keys in Oracle, we have to
     # create a sequence and a trigger.
-    name_length = get_max_name_length() - 3
-    sq_name = '%s_sq' % util.truncate_name(table, name_length)
-    tr_name = '%s_tr' % util.truncate_name(table, name_length)
+    sq_name = get_sequence_name(table)
+    tr_name = get_trigger_name(table)
     sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
     trigger_sql = """CREATE OR REPLACE TRIGGER %s
   BEFORE INSERT ON %s
@@ -203,13 +203,7 @@ def get_sql_flush(style, tables, sequences):
         # down the square?
         for sequence_info in sequences:
             table_name = sequence_info['table']
-            column_name = sequence_info['column']
-            if column_name and len(column_name):
-                # sequence name in this case will be <table>_<column>_seq
-                seq_name = '%s_%s_seq' % (table_name, column_name)
-            else:
-                # sequence name in this case will be <table>_id_seq
-                seq_name = '%s_id_seq' % table_name
+            seq_name = get_sequence_name(table_name)
             sql.append('%s %s %s;' % \
                 (style.SQL_KEYWORD('DROP'),
                  style.SQL_KEYWORD('SEQUENCE'),
@@ -224,11 +218,19 @@ def get_sql_flush(style, tables, sequences):
     else:
         return []
 
-def get_drop_sequence(table):
+def get_sequence_name(table):
     name_length = get_max_name_length() - 3
-    sq_name = '%s_sq' % util.truncate_name(table, name_length)
-    drop_sequence_sql = 'DROP SEQUENCE %s;' % sq_name
-    return drop_sequence_sql
+    return '%s_SQ' % util.truncate_name(table, name_length).upper()
+
+def get_trigger_name(table):
+    name_length = get_max_name_length() - 3
+    return '%s_TR' % util.truncate_name(table, name_length).upper()
+
+def get_create_sequence(table):
+    return 'CREATE SEQUENCE %s;' % get_sequence_name(table)
+
+def get_drop_sequence(table):
+    return 'DROP SEQUENCE %s;' % get_sequence_name(table)
 
 def get_query_set_class(DefaultQuerySet):
     "Create a custom QuerySet class for Oracle."

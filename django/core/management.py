@@ -213,7 +213,7 @@ def _get_sql_model_create(model, known_models=set()):
     full_statement.append(');')
     final_output.append('\n'.join(full_statement))
 
-    if opts.has_auto_field:
+    if opts.has_auto_field and hasattr(backend, 'get_autoinc_sql'):
         # Add any extra SQL needed to support auto-incrementing primary keys
         autoinc_sql = backend.get_autoinc_sql(opts.db_table)
         if autoinc_sql:
