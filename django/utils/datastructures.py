@@ -94,7 +94,7 @@ class SortedDict(dict):
 
     def copy(self):
         "Returns a copy of this object."
-        # This way of initialising the copy means it works for subclasses, too.
+        # This way of initializing the copy means it works for subclasses, too.
         obj = self.__class__(self)
         obj.keyOrder = self.keyOrder
         return obj
