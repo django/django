@@ -70,6 +70,7 @@ class DatabaseWrapper(local):
 allows_group_by_ordinal = False
 allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
 needs_datetime_string_cast = False
+needs_upper_for_iops = True
 supports_constraints = True
 uses_case_insensitive_names = True
 
@@ -225,12 +226,6 @@ def get_sequence_name(table):
 def get_trigger_name(table):
     name_length = get_max_name_length() - 3
     return '%s_TR' % util.truncate_name(table, name_length).upper()
-
-def get_create_sequence(table):
-    return 'CREATE SEQUENCE %s;' % get_sequence_name(table)
-
-def get_drop_sequence(table):
-    return 'DROP SEQUENCE %s;' % get_sequence_name(table)
 
 def get_query_set_class(DefaultQuerySet):
     "Create a custom QuerySet class for Oracle."
@@ -429,15 +424,15 @@ def get_query_set_class(DefaultQuerySet):
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
-    'iexact': "LIKE %s ESCAPE '\\'",
+    'iexact': '= UPPER(%s)',
     'contains': "LIKE %s ESCAPE '\\'",
-    'icontains': "LIKE LOWER(%s) ESCAPE '\\'",
+    'icontains': "LIKE UPPER(%s) ESCAPE '\\'",
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',
     'lte': '<= %s',
     'startswith': "LIKE %s ESCAPE '\\'",
     'endswith': "LIKE %s ESCAPE '\\'",
-    'istartswith': "LIKE %s ESCAPE '\\'",
-    'iendswith': "LIKE %s ESCAPE '\\'",
+    'istartswith': "LIKE UPPER(%s) ESCAPE '\\'",
+    'iendswith': "LIKE UPPER(%s) ESCAPE '\\'",
 }

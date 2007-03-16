@@ -733,9 +733,13 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
         cast_sql = backend.get_datetime_cast_sql()
     else:
         cast_sql = '%s'
+    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
+        format = 'UPPER(%s%s) %s'
+    else:
+        format = '%s%s %s'
     try:
-        return '%s%s %s' % (table_prefix, field_name,
-                            backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
+        return format % (table_prefix, field_name,
+                         backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':
