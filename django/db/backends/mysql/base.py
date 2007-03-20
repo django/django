@@ -194,6 +194,9 @@ def get_pk_default_value():
 def get_max_name_length():
     return 64;
 
+def get_start_transaction_sql():
+    return "BEGIN;"
+
 def get_autoinc_sql(table):
     return None
 

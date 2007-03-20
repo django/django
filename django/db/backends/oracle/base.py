@@ -168,6 +168,9 @@ def get_pk_default_value():
 def get_max_name_length():
     return 30
 
+def get_start_transaction_sql():
+    return ""
+
 def get_autoinc_sql(table):
     # To simulate auto-incrementing primary keys in Oracle, we have to
     # create a sequence and a trigger.

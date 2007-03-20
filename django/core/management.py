@@ -1542,6 +1542,8 @@ def print_error(msg, cmd):
     sys.exit(1)
 
 def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
+    from django.db import backend
+    
     # Use sys.argv if we've not passed in a custom argv
     if argv is None:
         argv = sys.argv
@@ -1652,7 +1654,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         if not mod_list:
             parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
-            print style.SQL_KEYWORD("BEGIN;")
+            print style.SQL_KEYWORD(backend.get_start_transaction_sql())
         for mod in mod_list:
             if action == 'reset':
                 output = action_mapping[action](mod, options.interactive)
