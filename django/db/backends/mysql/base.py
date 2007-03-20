@@ -80,6 +80,8 @@ class DatabaseWrapper(local):
         if not self._valid_connection():
             kwargs = {
                 'conv': django_conversions,
+                'charset': 'utf8',
+                'use_unicode': False,
             }
             if settings.DATABASE_USER:
                 kwargs['user'] = settings.DATABASE_USER
