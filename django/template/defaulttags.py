@@ -582,7 +582,7 @@ ifequal = register.tag(ifequal)
 
 #@register.tag
 def ifnotequal(parser, token):
-    """Output the contents of the block if the two arguments are not equal. See ifequal"""
+    """Output the contents of the block if the two arguments are not equal. See ifequal."""
     return do_ifequal(parser, token, True)
 ifnotequal = register.tag(ifnotequal)
 
@@ -901,7 +901,7 @@ def url(parser, token):
     """
     Returns an absolute URL matching given view with its parameters. 
     
-    This is a way to define links that aren't tied to a particular url configuration::
+    This is a way to define links that aren't tied to a particular URL configuration::
     
         {% url path.to.some_view arg1,arg2,name1=value1 %}
     
@@ -912,11 +912,11 @@ def url(parser, token):
     URL. All arguments for the URL should be present.
 
     For example if you have a view ``app_name.client`` taking client's id and
-    the corresponding line in a urlconf looks like this::
+    the corresponding line in a URLconf looks like this::
     
         ('^client/(\d+)/$', 'app_name.client')
     
-    and this app's urlconf is included into the project's urlconf under some
+    and this app's URLconf is included into the project's URLconf under some
     path::
     
         ('^clients/', include('project_name.app_name.urls'))

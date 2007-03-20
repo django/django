@@ -67,7 +67,7 @@ class Field(object):
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
         maxlength=None, unique=False, blank=False, null=False, db_index=False,
-        core=False, rel=None, default=NOT_PROVIDED, editable=True,
+        core=False, rel=None, default=NOT_PROVIDED, editable=True, serialize=True,
         prepopulate_from=None, unique_for_date=None, unique_for_month=None,
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
         help_text='', db_column=None):
@@ -78,6 +78,7 @@ class Field(object):
         self.blank, self.null = blank, null
         self.core, self.rel, self.default = core, rel, default
         self.editable = editable
+        self.serialize = serialize
         self.validator_list = validator_list or []
         self.prepopulate_from = prepopulate_from
         self.unique_for_date, self.unique_for_month = unique_for_date, unique_for_month
@@ -851,9 +852,12 @@ class TimeField(Field):
                 value = value.replace(microsecond=0)
                 value = str(value)
             elif settings.DATABASE_ENGINE == 'oracle':
-                value = value.replace(microsecond=0)
-                # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
-                value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
+                if hasattr(value, 'microsecond'):
+                    value = value.replace(microsecond=0)
+                    # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
+                    value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
+                else:
+                    value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
             else:
                 value = str(value)
         return Field.get_db_prep_save(self, value)

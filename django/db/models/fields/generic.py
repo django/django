@@ -94,6 +94,7 @@ class GenericRelation(RelatedField, Field):
         
         kwargs['blank'] = True
         kwargs['editable'] = False
+        kwargs['serialize'] = False
         Field.__init__(self, **kwargs)
 
     def get_manipulator_field_objs(self):

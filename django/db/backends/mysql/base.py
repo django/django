@@ -10,8 +10,14 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
-if Database.version_info < (1,2,1,'final',2):
-    raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % MySQLdb.__version__
+
+# We want version (1, 2, 1, 'final', 2) or later. We can't just use
+# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
+# inadvertently passes the version test.
+version = Database.version_info
+if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
+        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
+    raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__
 
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE

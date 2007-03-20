@@ -303,11 +303,11 @@ Please follow these coding standards when writing code for inclusion in Django:
           def my_view(req, foo):
               # ...
 
-    * Our policy is to keep the names of developers and contributors
-      in the ``AUTHORS`` file distributed with Django, so please don't include
-      your name in the actual code. Feel free to include a change to the
-      ``AUTHORS`` file in your patch if you make more than a single trivial
-      change.
+    * Please don't put your name in the code you contribute. Our policy is to
+      keep contributors' names in the ``AUTHORS`` file distributed with Django
+      -- not scattered throughout the codebase itself. Feel free to include a
+      change to the ``AUTHORS`` file in your patch if you make more than a
+      single trivial change.
 
 Committing code
 ===============
@@ -527,12 +527,12 @@ sure all other lines are commented::
     #   http://code.djangoproject.com/svn/django/trunk/
     #
     /path/to/trunk
-    
+
     # <branch> is a svn checkout of:
     #   http://code.djangoproject.com/svn/django/branches/<branch>/
     #
     #/path/to/<branch>
-    
+
     # On windows a path may look like this:
     # C:/path/to/<branch>
 
