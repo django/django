@@ -19,7 +19,7 @@ def get_object_or_404(klass, *args, **kwargs):
     try:
         return manager.get(*args, **kwargs)
     except klass.DoesNotExist:
-        raise Http404
+        raise Http404('No %s matches the given query.' % klass._meta.object_name)
 
 def get_list_or_404(klass, *args, **kwargs):
     if isinstance(klass, Manager):
@@ -28,5 +28,5 @@ def get_list_or_404(klass, *args, **kwargs):
         manager = klass._default_manager
     obj_list = list(manager.filter(*args, **kwargs))
     if not obj_list:
-        raise Http404
+        raise Http404('No %s matches the given query.' % manager.model._meta.object_name)
     return obj_list
