@@ -1,4 +1,4 @@
-from django.db.backends.mysql.base import quote_name
+from django.db.backends.mysql_old.base import quote_name
 from MySQLdb import ProgrammingError, OperationalError
 from MySQLdb.constants import FIELD_TYPE
 import re
