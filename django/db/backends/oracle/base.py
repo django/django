@@ -234,6 +234,7 @@ def get_query_set_class(DefaultQuerySet):
     "Create a custom QuerySet class for Oracle."
 
     from django.db import backend, connection
+    from django.db.models.query import EmptyResultSet
 
     class OracleQuerySet(DefaultQuerySet):
 
@@ -248,7 +249,13 @@ def get_query_set_class(DefaultQuerySet):
 
             full_query = None
 
-            select, sql, params, full_query = self._get_sql_clause(get_full_query=True)
+            try:
+                try:
+                    select, sql, params, full_query = self._get_sql_clause(get_full_query=True)
+                except TypeError:
+                    select, sql, params = self._get_sql_clause()
+            except EmptyResultSet:
+                raise StopIteration
             if not full_query:
                 full_query = "SELECT %s%s\n%s" % \
                              ((self._distinct and "DISTINCT " or ""),
