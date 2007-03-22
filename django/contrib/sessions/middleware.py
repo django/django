@@ -83,7 +83,12 @@ class SessionMiddleware(object):
             if accessed:
                 patch_vary_headers(response, ('Cookie',))
             if modified or settings.SESSION_SAVE_EVERY_REQUEST:
-                session_key = request.session.session_key or Session.objects.get_new_session_key()
+                if request.session.session_key:
+                    session_key = request.session.session_key
+                else:
+                    obj = Session.objects.get_new_session_object()
+                    session_key = obj.session_key
+
                 if settings.SESSION_EXPIRE_AT_BROWSER_CLOSE:
                     max_age = None
                     expires = None

@@ -44,7 +44,7 @@ __test__ = {'API_TESTS':"""
 >>> get_object_or_404(Article, title="Foo")
 Traceback (most recent call last):
 ...
-Http404
+Http404: No Article matches the given query.
 
 # Create an Article.
 >>> article = Article.objects.create(title="Run away!")
@@ -63,7 +63,7 @@ Http404
 >>> get_object_or_404(a.article_set, title__contains="Camelot")
 Traceback (most recent call last):
 ...
-Http404
+Http404: No Article matches the given query.
 
 # Custom managers can be used too.
 >>> get_object_or_404(Article.by_a_sir, title="Run away!")
@@ -77,7 +77,7 @@ Http404
 >>> get_list_or_404(a.article_set, title__icontains='Shrubbery')
 Traceback (most recent call last):
 ...
-Http404
+Http404: No Article matches the given query.
 
 # Custom managers can be used too.
 >>> get_list_or_404(Article.by_a_sir, title__icontains="Run")

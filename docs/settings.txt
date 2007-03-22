@@ -245,7 +245,8 @@ DATABASE_ENGINE
 Default: ``''`` (Empty string)
 
 Which database backend to use. Either ``'postgresql_psycopg2'``, 
-``'postgresql'``, ``'mysql'``, ``'sqlite3'`` or ``'ado_mssql'``.
+``'postgresql'``, ``'mysql'``,  ``'mysql_old'``, ``'sqlite3'`` or
+``'ado_mssql'``.
 
 DATABASE_HOST
 -------------

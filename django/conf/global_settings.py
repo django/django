@@ -61,6 +61,7 @@ LANGUAGES = (
     ('nl', gettext_noop('Dutch')),
     ('no', gettext_noop('Norwegian')),
     ('pl', gettext_noop('Polish')),
+    ('pt', gettext_noop('Portugese')),
     ('pt-br', gettext_noop('Brazilian')),
     ('ro', gettext_noop('Romanian')),
     ('ru', gettext_noop('Russian')),

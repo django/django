@@ -1,6 +1,6 @@
-=====================
-The "contrib" add-ons
-=====================
+============================
+The "django.contrib" add-ons
+============================
 
 Django aims to follow Python's `"batteries included" philosophy`_. It ships
 with a variety of extra, optional tools that solve common Web-development
@@ -153,11 +153,15 @@ markup
 
 A collection of template filters that implement these common markup languages:
 
-    * Textile
-    * Markdown
-    * ReST (ReStructured Text)
+    * `Textile`_
+    * `Markdown`_
+    * `ReST (ReStructured Text)`_
 
 For documentation, read the source code in django/contrib/markup/templatetags/markup.py.
+
+.. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
+.. _Markdown: http://en.wikipedia.org/wiki/Markdown
+.. _ReST (ReStructured Text): http://en.wikipedia.org/wiki/ReStructuredText
 
 redirects
 =========

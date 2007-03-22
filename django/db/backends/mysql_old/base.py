@@ -10,15 +10,6 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
-
-# We want version (1, 2, 1, 'final', 2) or later. We can't just use
-# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
-# inadvertently passes the version test.
-version = Database.version_info
-if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
-        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
-    raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__
-
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
@@ -26,14 +17,11 @@ import re
 
 DatabaseError = Database.DatabaseError
 
-# MySQLdb-1.2.1 supports the Python boolean type, and only uses datetime
-# module for time-related columns; older versions could have used mx.DateTime
-# or strings if there were no datetime module. However, MySQLdb still returns
-# TIME columns as timedelta -- they are more like timedelta in terms of actual
-# behavior as they are signed and include days -- and Django expects time, so
-# we still need to override that.
 django_conversions = conversions.copy()
 django_conversions.update({
+    types.BooleanType: util.rev_typecast_boolean,
+    FIELD_TYPE.DATETIME: util.typecast_timestamp,
+    FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
 })
 
@@ -43,12 +31,31 @@ django_conversions.update({
 # http://dev.mysql.com/doc/refman/5.0/en/news.html .
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
-# MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
-# MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
-# point is to raise Warnings as exceptions, this can be done with the Python
-# warning module, and this is setup when the connection is created, and the
-# standard util.CursorDebugWrapper can be used. Also, using sql_mode
-# TRADITIONAL will automatically cause most warnings to be treated as errors.
+# This is an extra debug layer over MySQL queries, to display warnings.
+# It's only used when DEBUG=True.
+class MysqlDebugWrapper:
+    def __init__(self, cursor):
+        self.cursor = cursor
+
+    def execute(self, sql, params=()):
+        try:
+            return self.cursor.execute(sql, params)
+        except Database.Warning, w:
+            self.cursor.execute("SHOW WARNINGS")
+            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+
+    def executemany(self, sql, param_list):
+        try:
+            return self.cursor.executemany(sql, param_list)
+        except Database.Warning, w:
+            self.cursor.execute("SHOW WARNINGS")
+            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+
+    def __getattr__(self, attr):
+        if self.__dict__.has_key(attr):
+            return self.__dict__[attr]
+        else:
+            return getattr(self.cursor, attr)
 
 try:
     # Only exists in Python 2.4+
@@ -76,33 +83,28 @@ class DatabaseWrapper(local):
 
     def cursor(self):
         from django.conf import settings
-        from warnings import filterwarnings
         if not self._valid_connection():
             kwargs = {
+                'user': settings.DATABASE_USER,
+                'db': settings.DATABASE_NAME,
+                'passwd': settings.DATABASE_PASSWORD,
                 'conv': django_conversions,
-                'charset': 'utf8',
-                'use_unicode': False,
             }
-            if settings.DATABASE_USER:
-                kwargs['user'] = settings.DATABASE_USER
-            if settings.DATABASE_NAME:
-                kwargs['db'] = settings.DATABASE_NAME
-            if settings.DATABASE_PASSWORD:
-                kwargs['passwd'] = settings.DATABASE_PASSWORD
             if settings.DATABASE_HOST.startswith('/'):
                 kwargs['unix_socket'] = settings.DATABASE_HOST
-            elif settings.DATABASE_HOST:
+            else:
                 kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
             kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
             cursor = self.connection.cursor()
+            if self.connection.get_server_info() >= '4.1':
+                cursor.execute("SET NAMES 'utf8'")
         else:
             cursor = self.connection.cursor()
         if settings.DEBUG:
-            filterwarnings("error", category=Database.Warning)
-            return util.CursorDebugWrapper(cursor, self)
+            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
     def _commit(self):
@@ -131,12 +133,7 @@ class DatabaseWrapper(local):
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
-needs_upper_for_iops = False
 supports_constraints = True
-uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith("`") and name.endswith("`"):
@@ -169,9 +166,6 @@ def get_date_trunc_sql(lookup_type, field_name):
         sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
     return sql
 
-def get_datetime_cast_sql():
-    return None
-
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
     if offset and offset != 0:
@@ -193,20 +187,11 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
-def get_max_name_length():
-    return 64;
-
-def get_start_transaction_sql():
-    return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
-
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
-
+    
     """
     # NB: The generated SQL below is specific to MySQL
     # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
@@ -218,7 +203,7 @@ def get_sql_flush(style, tables, sequences):
                  style.SQL_FIELD(quote_name(table))
                 )  for table in tables] + \
               ['SET FOREIGN_KEY_CHECKS = 1;']
-
+              
         # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
         # to reset sequence indices
         sql.extend(["%s %s %s %s %s;" % \
