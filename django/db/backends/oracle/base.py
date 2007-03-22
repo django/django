@@ -49,18 +49,17 @@ class DatabaseWrapper(local):
         # set oracle date to ansi date format
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
         cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
+        if settings.DEBUG:
+            return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def _commit(self):
         if self.connection is not None:
-            self.connection.commit()
+            return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            try:
-                self.connection.rollback()
-            except Database.NotSupportedError:
-                pass
+            return self.connection.rollback()
 
     def close(self):
         if self.connection is not None:
@@ -169,7 +168,7 @@ def get_max_name_length():
     return 30
 
 def get_start_transaction_sql():
-    return ""
+    return None
 
 def get_autoinc_sql(table):
     # To simulate auto-incrementing primary keys in Oracle, we have to

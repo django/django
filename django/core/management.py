@@ -1653,7 +1653,8 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
         if action not in NO_SQL_TRANSACTION:
             from django.db import backend
-            print style.SQL_KEYWORD(backend.get_start_transaction_sql())
+            if backend.get_start_transaction_sql():
+                print style.SQL_KEYWORD(backend.get_start_transaction_sql())
         for mod in mod_list:
             if action == 'reset':
                 output = action_mapping[action](mod, options.interactive)
