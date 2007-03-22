@@ -1,0 +1,224 @@
+=================================
+Django version 0.96 release notes
+=================================
+
+Welcome to Django 0.96!
+
+The primary goal for 0.96 is a cleanup and stabilization of the features
+introduced in 0.95. There have been a few small `backwards-incompatible
+changes`_ since 0.95, but nearly all changes shouldn't require any major
+updates.
+
+However, we're also releasing 0.96 now because we have a set of
+backwards-incompatible changes scheduled for the near future. These changes are
+will require code changes for developers tracking the Django development
+version, so if you're looking for a rock-solid, stable, version of Django we
+recommend you stick with Django until the next official release and upgrade all
+at once.
+
+What's new in 0.96?
+===================
+
+This revision represents over a thousand source commits and over four hundred
+bug fixes, so we can't possibly catalog all the changes. Here, we describe the
+most notable changes in this release.
+
+New forms library
+-----------------
+
+``django.newforms`` is Django's fantastic new form-handling library. It's a
+replacement for ``django.forms``, the old form/manipulator/validation framework.
+Both APIs are available in 0.96, but over the next two releases we plan to
+completely replace the old forms framework with this new one.
+
+Our transition plan is:
+
+    * We've copied the current ``django.forms`` to ``django.oldforms``. This
+      allows you to upgrade your code *now* rather than waiting for the
+      backwards-incompatible change and rushing to fix your code after the fact.
+      Just change your import statements like this::
+
+          from django import forms             # 0.95-style
+          from django import oldforms as forms # 0.96-style
+
+    * Before the next release, we will move the current ``django.newforms`` to
+      ``django.forms``. This will be a backwards-incompatible change, and
+      anybody who is still using the old version of ``django.forms`` at that
+      time will need to change their import statements, as described in the
+      previous bullet.
+
+    * We will remove ``django.oldforms`` in the release *after* the next Django
+      release -- the release that comes after the release in which we're
+      creating the new ``django.forms``.
+
+Although the ``newforms`` library will continue to evolve, it's ready for use
+for most common cases. We recommend that anyone new to form handling skip the
+old forms and start with the new.
+
+For more information about ``django.newforms``, read the `newforms
+documentation`_.
+
+.. _newforms documentation: ../newforms/
+
+URLconf improvements
+--------------------
+
+You can now use any callable as the callback in URLconfs (previously, only
+strings that referred to callables were allowed). This allows a much more
+natural use of URLconfs. For example, this URLconf::
+
+    from django.conf.urls.defaults import *
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', 'mysite.myapp.views.myview')
+    )
+    
+can now be rewritten as::
+
+    from django.conf.urls.defaults import *
+    from mysite.myapp.views import myview
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', myview)
+    )
+        
+A very useful application of this can be seen when using decorators: this change
+allows you to apply decorators to views *in your URLconf*. Thus, you can make a
+generic view require login very easily::
+
+    from django.conf.urls.defaults import *
+    from django.contrib.auth.decorators import login_required
+    from django.views.generic.list_detail import object_list
+    from mysite.myapp.models import MyModel
+    
+    info = {
+        "queryset" : MyModel.objects.all(),
+    }
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', login_required(object_list), info)
+    )
+
+Note that both syntaxes (strings and callables) are valid, and will continue to
+be valid for the foreseeable future.  
+
+The test framework
+------------------
+
+Django now includes a test framework so you can start transmuting fear into
+boredom (with apologies to Kent Beck). You can write tests based on doctest_
+or unittest_ and test your views with a simple test client.
+
+There is also new support for "fixtures" -- initial data stored in any of the
+supported `serialization formats`_ that will be loaded into your database at the
+start of your tests. This makes testing with real data much easier.
+
+See `the testing documentation`_ for the full details.
+
+.. _doctest: http://docs.python.org/lib/module-doctest.html
+.. _unittest: http://docs.python.org/lib/module-unittest.html
+.. _the testing documentation: ../testing/
+.. _serialization formats: ../serialization/
+
+
+Improvements to the user admin interface
+----------------------------------------
+
+A small change, but a very nice one: you no longer need to edit MD5 hashes when
+creating and/or updating users from the admin interface.
+
+Django is now hash-free for over a thousand revisions!
+
+Backwards-incompatible changes
+==============================
+
+The following changes may require you to update your code when you switch from
+0.95 to 0.96:
+
+Database constraint names changed
+---------------------------------
+
+The format of the constraint names Django generates for foreign key references
+changed slightly. These names are only used sometimes, when it is not possible
+to put the reference directly on the affected column, so this is not always
+visible.
+
+The effect of this change is that ``manage.py reset`` and similar commands may
+generate SQL with new constraint names and thus generate an error when run
+against the database (the database server will complain about the constraint not
+existing). To fix this, you will need to tweak the output of ``manage.py``
+to match the correct constraint names and pass the results to the
+database server manually. 
+
+You can also fix this by examining the output of ``manage.py sqlall`` and
+renaming database constraints to match the new naming scheme.
+
+Names changes in ``manage.py``
+------------------------------
+
+A few of the options to ``manage.py`` have changed with the addition of fixture
+support:
+
+    * There are new ``dumpdata`` and ``loaddata`` commands, which, as you might
+      expect, will dump and load data to/from the database. These targets
+      operate against one of the serialization formats.
+
+    * The ``sqlinitialdata`` target has been renamed to ``sqlcustom`` to
+      emphasize that ``loaddata`` should be used for data (and ``sqlcustom`` for
+      other custom SQL -- views, stored procedures, etc.).
+      
+    * The vestigal ``install`` target is gone. Use ``syncdb``.
+
+Backslash escaping changed
+--------------------------
+
+The Django database API now escapes backslashes given as query parameters. If
+you have any database API code that match backslashes, and it was working before
+(despite the broken escaping), you'll have to change your code to "unescape" the
+slashes one level.
+
+For example, this used to work::
+
+    # Find text containing a single backslash
+    MyModel.objects.filter(text__contains='\\\\')
+
+The above is now incorrect, and should be rewritten as::
+
+    # Find text containing a single backslash
+    MyModel.objects.filter(text__contains='\\')
+
+Removed ENABLE_PSYCO setting
+----------------------------
+
+The ``ENABLE_PSYCO`` setting no longer exists. If your settings file includes
+``ENABLE_PSYCO``, nothing will break per se, but it just won't do anything.
+
+If you want to use Psyco_ with Django, you'll need to write some custom
+middleware that activates Psyco.
+
+.. _psyco: http://psyco.sourceforge.net/
+
+Thanks
+======
+
+Since 0.95, a number of people have stepped forward and taken a major new role in Django's development. We'd like to thank these
+people for all their hard work:
+
+    * Russell Keith-Magee and Malcolm Tredinnick for their major code
+      contributions. This release wouldn't have been possible without them.
+      
+    * Our new release manager, James Bennett, for his work in getting out
+      0.95.1, 0.96, and (hopefully) future release.
+      
+    * Our ticket managers Chris Beaven (aka SmileyChris), Simon Greenhill,
+      Michael Radziej, and Gary Wilson. They agreed to take on the monumental
+      task of wrangling our tickets into nicely cataloged submission. Figuring
+      out what to work on is now about a million times easier; thanks again,
+      guys.
+            
+    * Everyone who submitted a bug report, patch or ticket comment. We can't
+      possibly thank everyone by name -- over 200 developers submitted patches
+      that went into 0.96 -- but everyone who's contributed to Django is listed
+      in AUTHORS_.
+      
+.. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS
