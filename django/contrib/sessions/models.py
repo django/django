@@ -1,4 +1,4 @@
-import base64, md5, random, sys
+import base64, md5, random, sys, datetime
 import cPickle as pickle
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -22,6 +22,23 @@ class SessionManager(models.Manager):
             except self.model.DoesNotExist:
                 break
         return session_key
+
+    def get_new_session_object(self):
+        """
+        Returns a new session object.
+        """
+        # FIXME: There is a *small* chance of collision here, meaning we will
+        # return an existing object. That can be fixed when we add a way to
+        # validate (and guarantee) that non-auto primary keys are unique. For
+        # now, we save immediately in order to reduce the "window of
+        # misfortune" as much as possible.
+        created = False
+        while not created:
+            obj, created = self.get_or_create(session_key=self.get_new_session_key(),
+                    expire_date = datetime.datetime.now())
+            # Collision in key generation, so re-seed the generator
+            random.seed()
+        return obj
 
     def save(self, session_key, session_dict, expire_date):
         s = self.model(session_key, self.encode(session_dict), expire_date)
