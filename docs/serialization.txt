@@ -31,7 +31,8 @@ but it'll almost always be a QuerySet).
 
 You can also use a serializer object directly::
 
-    xml_serializer = serializers.get_serializer("xml")
+    XMLSerializer = serializers.get_serializer("xml")
+    xml_serializer = XMLSerializer()
     xml_serializer.serialize(queryset)
     data = xml_serializer.getvalue()
 
