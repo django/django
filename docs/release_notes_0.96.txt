@@ -80,8 +80,8 @@ If you need to work around this, there are two methods available:
        constraint names, and use that as a guide to rename existing
        constraints in your database.
 
-Names changes in ``manage.py``
-------------------------------
+Name changes in ``manage.py``
+-----------------------------
 
 A few of the options to ``manage.py`` have changed with the addition of fixture
 support:
