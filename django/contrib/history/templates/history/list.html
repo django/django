@@ -2,7 +2,8 @@
 <table border="1">
 <tr>
 <td>ID:</td>
-<td>PID:</td> 
+<td>PID:</td>
+<td>PaID:</td>
 <td>Change time:</td>
 <td>Type:</td>
 <td>Ch:</td>
@@ -12,6 +13,7 @@
 <tr>
 <td><a href="detail/{{ change.id }}/">{{ change.id }}</td>
 <td>{{ change.object_id }}</td>
+<td>{{ change.parent.id }}</td>
 <td>{{ change.change_time }}</td>
 <td>{{ change.content_type }}</td>
 <td>{{ change.change_type }}</td>

@@ -1,5 +1,6 @@
 {% if change %}
 <h3>ChangeLog</h3>
+{% comment %}
 <table border="1px">
 <thead>
 <tr>
@@ -23,8 +24,9 @@
 {% endfor %}
 </tbody>
 </table>
+{% endcomment %}
 
-<h3>{{ object }}</h3>
+<h3>{{ object }}</h3>{% comment %}
 <table border="1px">
 <thead>
 <tr>
@@ -43,11 +45,12 @@
 {% endfor %}
 </tbody>
 </table>
-
+{% endcomment %}
 
 <ul>
 <li>ID: {{ change.id }}</li>
 <li>PID: {{ change.object_id }}</li>
+<li>Parent: {{ change.parent.id }}</li>
 <li>UID: {{ change.user_id }}</li>
 <li>Type: {{ change.content_type }}</li>
 <li>Change time: {{ change.change_time }}</li>
