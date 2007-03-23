@@ -54,7 +54,7 @@ setting (see the `databases documentation`_ for details), are only
 available on the "mysql" backend, and will not be made available for
 "mysql_old".
 
-.. _databases: ../databases/
+.. _databases documentation: ../databases/
 
 Database constraint names changed
 ---------------------------------
