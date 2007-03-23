@@ -23,7 +23,7 @@ def detail(request, change_id):
     change = get_object_or_404(ChangeLog, pk=change_id)
     object = change.get_object()
 
-
+    """
     ch1 = ChangeLog.objects.version_by_date(object, datetime(2006, 8, 21))
     print "Change1: ",ch1
 
@@ -32,7 +32,8 @@ def detail(request, change_id):
 
     ch3 = ChangeLog.objects.list_history(object, offset=1)
     print "Change3: ",ch3
-
+    """
+    
     return render_to_response('history/detail.html', {'change': change,
 						      'object': object,
 						      'change_fields': change._meta.fields,
