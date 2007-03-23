@@ -429,8 +429,6 @@ trailing space.
 FIXTURE_DIRS
 -------------
 
-**New in Django development version**
-
 Default: ``()`` (Empty tuple)
 
 List of locations of the fixture data files, in search order. Note that
@@ -716,8 +714,6 @@ See the `session docs`_.
 SESSION_COOKIE_SECURE
 ---------------------
 
-**New in Django development version**
-
 Default: ``False``
 
 Whether to use a secure cookie for the session cookie. If this is set to
@@ -812,8 +808,6 @@ misspelled) variables. See `How invalid variables are handled`_.
 TEST_RUNNER
 -----------
 
-**New in Django development version**
-
 Default: ``'django.test.simple.run_tests'``
 
 The name of the method to use for starting the test suite. See 
@@ -823,8 +817,6 @@ The name of the method to use for starting the test suite. See
 
 TEST_DATABASE_NAME
 ------------------
-
-**New in Django development version**
 
 Default: ``None``
 

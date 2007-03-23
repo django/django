@@ -51,8 +51,6 @@ See the `csrf documentation`_.
 formtools
 =========
 
-**New in Django development version**
-
 A set of high-level abstractions for Django forms (django.newforms).
 
 django.contrib.formtools.preview
@@ -141,8 +139,6 @@ See the `flatpages documentation`_.
 
 localflavor
 ===========
-
-**New in Django development version**
 
 A collection of various Django snippets that are useful only for a particular
 country or culture. For example, ``django.contrib.localflavor.usa.forms``
