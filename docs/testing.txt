@@ -227,6 +227,12 @@ can be invoked on the ``Client`` instance.
     The key-value pairs in the data dictionary will be encoded as a multipart
     message and used to create the POST data payload.
     
+    To submit multiple values for a given key (for example, to specify 
+    the selections for a multiple selection list), provide the values as a 
+    list or tuple for the required key. For example, a data dictionary of
+    ``{'choices': ('a','b','d')}`` would submit three selected rows for the
+    field named ``choices``.
+    
     Submitting files is a special case. To POST a file, you need only
     provide the file field name as a key, and a file handle to the file you wish to
     upload as a value. The Test Client will populate the two POST fields (i.e.,
