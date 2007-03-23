@@ -23,15 +23,15 @@ Backwards-incompatible changes
 The following changes may require you to update your code when you switch from
 0.95 to 0.96:
 
-`MySQLdb` version requirement
+``MySQLdb`` version requirement
 -----------------------------
 
-Due to a bug in older versions of the `MySQLdb` Python module (which
+Due to a bug in older versions of the ``MySQLdb`` Python module (which
 Django uses to connect to MySQL databases), Django's MySQL backend now
 requires version 1.2.1p2 or higher of `MySQLdb`, and will raise
 exceptions if you attempt to use an older version.
 
-If you're currently unable to upgrade your copy of `MySQLdb` to meet
+If you're currently unable to upgrade your copy of ``MySQLdb`` to meet
 this requirement, a separate, backwards-compatible backend, called
 "mysql_old", has been added to Django. To use this backend, change
 the ``DATABASE_ENGINE`` setting in your Django settings file from
