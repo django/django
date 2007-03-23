@@ -86,13 +86,13 @@ Installing the official version
        Distribution-provided packages will typically allow for automatic
        installation of dependancies and easy upgrade paths.
 
-    2. Download Django-0.95.tar.gz from our `download page`_.
+    2. Download the latest release from our `download page`_.
 
-    3. ``tar xzvf Django-0.95.tar.gz``
+    3. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``).
 
-    4. ``cd Django-0.95``
+    4. Change into the downloaded directory (e.g. ``cd Django-NNN``).
 
-    5. ``sudo python setup.py install``
+    5. Run ``sudo python setup.py install``.
 
 Note that the last command will automatically download and install setuptools_
 if you don't already have it installed. This requires a working Internet
