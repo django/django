@@ -31,4 +31,35 @@
 'nonexistent'
 >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 
+### SortedDict #################################################################
+
+>>> d = SortedDict()
+>>> d['one'] = 'one'
+>>> d['two'] = 'two'
+>>> d['three'] = 'three'
+>>> d['one']
+'one'
+>>> d['two']
+'two'
+>>> d['three']
+'three'
+>>> d.keys()
+['one', 'two', 'three']
+>>> d.values()
+['one', 'two', 'three']
+>>> d['one'] = 'not one'
+>>> d['one']
+'not one'
+>>> d.keys() == d.copy().keys()
+True
+
+### DotExpandedDict ############################################################
+
+>>> d = DotExpandedDict({'person.1.firstname': ['Simon'], 'person.1.lastname': ['Willison'], 'person.2.firstname': ['Adrian'], 'person.2.lastname': ['Holovaty']})
+>>> d['person']['1']['lastname']
+['Willison']
+>>> d['person']['2']['lastname']
+['Holovaty']
+>>> d['person']['2']['firstname']
+['Adrian']
 """

@@ -11,9 +11,9 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-06 00:17+0100\n"
-"PO-Revision-Date: 2007-03-06 01:46+0100\n"
+"PO-Revision-Date: 2007-03-06 10:30+0100\n"
 "Last-Translator: Mikko Hellsing <mikko@sorl.net>\n"
-"Language-Team: Django translators <djangoi18n@googlegroups.com>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,7 +27,7 @@ msgstr ""
 #: newforms/fields.py:78 newforms/fields.py:374 newforms/fields.py:450
 #: newforms/fields.py:461
 msgid "This field is required."
-msgstr "Det här fältet är obligatoriskt."
+msgstr "Detta fältet är obligatoriskt."
 
 #: oldforms/__init__.py:387
 #, python-format
@@ -122,7 +122,7 @@ msgstr "Fyll i ett giltigt filnamn."
 #: db/models/fields/related.py:53
 #, python-format
 msgid "Please enter a valid %s."
-msgstr "Var god fyll i ett giltigt %s."
+msgstr "Var god fyll i giltigt %s."
 
 #: db/models/fields/related.py:642
 msgid "Separate multiple IDs with commas."
@@ -317,7 +317,7 @@ msgstr "Fyll enbart i siffror avskilda med kommatecken."
 
 #: core/validators.py:99
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Fyll i giltiga e-postadresser avskilda med kommatecken."
+msgstr "Fyll i giltiga e-mailadresser avskilda med kommatecken."
 
 #: core/validators.py:103
 msgid "Please enter a valid IP address."
@@ -358,7 +358,7 @@ msgstr "Fyll i en giltig tid i formatet HH:MM"
 
 #: core/validators.py:161 newforms/fields.py:269
 msgid "Enter a valid e-mail address."
-msgstr "Fyll i en giltig e-postadress."
+msgstr "Fyll i en giltig e-mailadress."
 
 #: core/validators.py:177
 msgid ""
@@ -652,7 +652,7 @@ msgstr "Detta URL verkar vara en trasig länk."
 
 #: contrib/contenttypes/models.py:26
 msgid "python model class name"
-msgstr "python model class namn"
+msgstr "python modell klass namn"
 
 #: contrib/contenttypes/models.py:29
 msgid "content type"
@@ -710,7 +710,7 @@ msgstr "efternamn"
 
 #: contrib/auth/models.py:93
 msgid "e-mail address"
-msgstr "e-postadress"
+msgstr "e-mailadress"
 
 #: contrib/auth/models.py:94
 msgid "password"
@@ -728,7 +728,7 @@ msgstr "personalstatus"
 
 #: contrib/auth/models.py:95
 msgid "Designates whether the user can log into this admin site."
-msgstr "Avgör om användaren kan logga in till den här administrationssidan."
+msgstr "Avgör om användaren kan logga in på den här admin-siten."
 
 #: contrib/auth/models.py:96
 msgid "active"
@@ -823,8 +823,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"V.G. ange ett korrekt användarnamn och lösenord. Notera att båda fält är "
-"skiftlägeskänsliga."
+"V.G. ange ett korrekt användarnamn och lösenord. Observera att båda fälten gör "
+"skillnad på versaler och gemener."
 
 #: contrib/auth/forms.py:62
 msgid "This account is inactive."
@@ -835,7 +835,7 @@ msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
-"Den e-postadressen har inte något konto associerat med sig. Är du säker på "
+"Den e-mailadressen har inte något konto associerat med sig. Är du säker på "
 "att du har registrerat dig?"
 
 #: contrib/auth/forms.py:117
@@ -848,7 +848,7 @@ msgstr "Ditt gamla lösenord var felaktigt ifyllt. Var vänlig fyll i det igen"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
-msgstr "vidarebefordra från"
+msgstr "omdirigera från"
 
 #: contrib/redirects/models.py:8
 msgid ""
@@ -860,7 +860,7 @@ msgstr ""
 
 #: contrib/redirects/models.py:9
 msgid "redirect to"
-msgstr "vidarebefordra till"
+msgstr "omdirigera till"
 
 #: contrib/redirects/models.py:10
 msgid ""
@@ -872,11 +872,11 @@ msgstr ""
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
-msgstr "vidarebefordra"
+msgstr "omdirigera"
 
 #: contrib/redirects/models.py:14
 msgid "redirects"
-msgstr "vidarebefordringar"
+msgstr "omdirigeringar"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -1113,7 +1113,7 @@ msgstr ""
 #: contrib/comments/views/comments.py:188
 #: contrib/comments/views/comments.py:280
 msgid "Only POSTs are allowed"
-msgstr "Endast POSTningar är tillåtna"
+msgstr "Endast POST tillåtet"
 
 #: contrib/comments/views/comments.py:192
 #: contrib/comments/views/comments.py:284
@@ -1131,7 +1131,7 @@ msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
-"Kommentars-formuläret har en ogiltig 'target'-parameter -- objektets ID är "
+"Kommentars-formuläret hade en ogiltig 'mål'-parameter -- objektets ID var "
 "ogiltigt"
 
 #: contrib/comments/views/comments.py:257
@@ -1286,11 +1286,11 @@ msgstr "visat namn"
 
 #: contrib/sites/models.py:15
 msgid "site"
-msgstr "sida"
+msgstr "site"
 
 #: contrib/sites/models.py:16
 msgid "sites"
-msgstr "sidor"
+msgstr "siter"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -1386,7 +1386,7 @@ msgstr "Användarnamn kan inte innehålla tecknet '@'."
 #: contrib/admin/views/decorators.py:85
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Din e-postadress är inte ditt användarnamn. Försök med '%s' istället."
+msgstr "Din e-mailadress är inte ditt användarnamn. Försök med '%s' istället."
 
 #: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:257
 #, python-format
@@ -1594,11 +1594,11 @@ msgstr "Decimaltal"
 
 #: contrib/admin/views/doc.py:306
 msgid "Boolean (Either True, False or None)"
-msgstr "Boolesk (antingen Sann, Falsk eller Inget)"
+msgstr "Boolesk (antingen True, False eller None)"
 
 #: contrib/admin/views/doc.py:307
 msgid "Relation to parent model"
-msgstr "Relation till förälder modell"
+msgstr "Relation till förälder-modell"
 
 #: contrib/admin/views/doc.py:308
 msgid "Phone number"
@@ -1614,7 +1614,7 @@ msgstr "Tid"
 
 #: contrib/admin/views/doc.py:316
 msgid "U.S. state (two uppercase letters)"
-msgstr "Stat i USA (två stora bokstäver)"
+msgstr "Stat i USA (två versaler)"
 
 #: contrib/admin/views/doc.py:317
 msgid "XML text"
@@ -1720,7 +1720,7 @@ msgid ""
 "admin site."
 msgstr ""
 "Det här objektet har ingen ändringshistorik. Det lades antagligen inte till "
-"i den här admin-sidan"
+"i den här admin-siten"
 
 #: contrib/admin/templates/admin/change_list.html:12
 #, python-format
@@ -1749,7 +1749,7 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Ett fel har uppstått. Administratören har meddelats via e-post och "
+"Ett fel har uppstått. Administratören har meddelats via e-mail och "
 "felet bör åtgärdas snart. Tack för ditt tålamod."
 
 #: contrib/admin/templates/admin/invalid_setup.html:8
@@ -1783,7 +1783,7 @@ msgstr "Visa alla"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Django sidadministration"
+msgstr "Django site-administration"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
@@ -1827,11 +1827,11 @@ msgstr "Du har inte rättigheter att ändra något."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
-msgstr "Senaste händelserna"
+msgstr "Senaste Händelserna"
 
 #: contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
-msgstr "Mina händelser"
+msgstr "Mina Händelser"
 
 #: contrib/admin/templates/admin/index.html:57
 msgid "None available"
@@ -1839,7 +1839,7 @@ msgstr "Inga tillgängliga"
 
 #: contrib/admin/templates/admin/change_form.html:22
 msgid "View on site"
-msgstr "Visa på hemsidan"
+msgstr "Visa på siten"
 
 #: contrib/admin/templates/admin/change_form.html:32
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
@@ -1918,7 +1918,7 @@ msgstr "Lösenord"
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
 #: contrib/admin/templates/admin/auth/user/add_form.html:23
 msgid "Password (again)"
-msgstr "lösenord (igen)"
+msgstr "Lösenord (igen)"
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:40
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
@@ -1930,8 +1930,8 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Ange först ett användarnamn och ett lösenord sedan kommer du att kunna "
-"ändra fler användaralternativ."
+"Ange först ett användarnamn och ett lösenord. Sedan kommer du att kunna ändra "
+"fler användaralternativ."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
@@ -1965,7 +1965,7 @@ msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
 msgstr ""
-"Har du glömt ditt lösenord? Fyll i din e-postadress nedan, så nollställer vi "
+"Har du glömt ditt lösenord? Fyll i din e-mailadress nedan, så nollställer vi "
 "ditt lösenord och mailar det nya till dig."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
@@ -1978,7 +1978,7 @@ msgstr "Nollställ mitt lösenord"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Tack för att du spenderade kvalitetstid med websidan idag."
+msgstr "Tack för att du spenderade kvalitetstid med web-siten idag."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -1994,7 +1994,7 @@ msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
 msgstr ""
-"Vi har skickat ett nytt lösenord till e-postadressen du fyllde i. Det bör "
+"Vi har skickat ett nytt lösenord till e-mailadressen du fyllde i. Det bör "
 "anlända snarast."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
@@ -2047,7 +2047,7 @@ msgstr "Ditt användarnamn, om du har glömt:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
-msgstr "Tack för att du använder vår sida!"
+msgstr "Tack för att du använder vår site!"
 
 #: contrib/admin/templates/registration/password_reset_email.html:15
 #, python-format
@@ -2076,7 +2076,7 @@ msgstr ""
 "<p class=\"help\">För att installera smarta bokmärken, dra länken till din\n"
 "verktygsrad med bokmärken, eller högerklicka på länken och lägg till den\n"
 "till dina bokmärken. Nu kan du välja det smarta bokmärket från alla sidor\n"
-"på hemsidan. Observera att några av dessa smarta bokmärken kräver att du besöker\n"
+"på siten. Observera att några av dessa smarta bokmärken kräver att du besöker\n"
 "sidan från en dator som är \"intern\" (tala med din systemadministratör\n"
 "om du inte är säker på om din dator är \"intern\").</p>\n"
 

@@ -7,6 +7,7 @@ from django.db.models import get_apps, get_models, signals
 
 def create_contenttypes(app, created_models, verbosity=2):
     from django.contrib.contenttypes.models import ContentType
+    ContentType.objects.clear_cache()
     app_models = get_models(app)
     if not app_models:
         return

@@ -60,10 +60,11 @@ class DatabaseWrapper(local):
         return cursor
 
     def _commit(self):
-        return self.connection.commit()
+        if self.connection is not None:
+            return self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             return self.connection.rollback()
 
     def close(self):

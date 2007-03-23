@@ -13,6 +13,10 @@ class Serializer(base.Serializer):
     Serializes a QuerySet to XML.
     """
     
+    def indent(self, level):
+        if self.options.get('indent', None) is not None:
+            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent', None) * level)
+
     def start_serialization(self):
         """
         Start serialization -- open the XML document and the root element.
@@ -25,6 +29,7 @@ class Serializer(base.Serializer):
         """
         End serialization -- end the document.
         """
+        self.indent(0)
         self.xml.endElement("django-objects")
         self.xml.endDocument()
         
@@ -35,6 +40,7 @@ class Serializer(base.Serializer):
         if not hasattr(obj, "_meta"):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
             
+        self.indent(1)
         self.xml.startElement("object", {
             "pk"    : str(obj._get_pk_val()),
             "model" : str(obj._meta),
@@ -44,6 +50,7 @@ class Serializer(base.Serializer):
         """
         Called after handling all fields for an object.
         """
+        self.indent(1)
         self.xml.endElement("object")
         
     def handle_field(self, obj, field):
@@ -51,16 +58,19 @@ class Serializer(base.Serializer):
         Called to handle each field on an object (except for ForeignKeys and
         ManyToManyFields)
         """
+        self.indent(2)
         self.xml.startElement("field", {
             "name" : field.name,
             "type" : field.get_internal_type()
         })
         
         # Get a "string version" of the object's data (this is handled by the
-        # serializer base class).  None is handled specially.
-        value = self.get_string_value(obj, field)
-        if value is not None:
+        # serializer base class). 
+        if getattr(obj, field.name) is not None:
+            value = self.get_string_value(obj, field)
             self.xml.characters(str(value))
+        else:
+            self.xml.addQuickElement("None")
 
         self.xml.endElement("field")
         
@@ -92,6 +102,7 @@ class Serializer(base.Serializer):
         """
         Helper to output the <field> element for relational fields
         """
+        self.indent(2)
         self.xml.startElement("field", {
             "name" : field.name,
             "rel"  : field.rel.__class__.__name__,
@@ -127,7 +138,8 @@ class Deserializer(base.Deserializer):
         pk = node.getAttribute("pk")
         if not pk:
             raise base.DeserializationError("<object> node is missing the 'pk' attribute")
-        data = {Model._meta.pk.name : pk}
+
+        data = {Model._meta.pk.attname : Model._meta.pk.to_python(pk)}
         
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
@@ -148,17 +160,20 @@ class Deserializer(base.Deserializer):
             
             # As is usually the case, relation fields get the special treatment.
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
-                m2m_data[field.name] = self._handle_m2m_field_node(field_node)
+                m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                data[field.attname] = self._handle_fk_field_node(field_node)
+                data[field.attname] = self._handle_fk_field_node(field_node, field)
             else:
-                value = field.to_python(getInnerText(field_node).strip().encode(self.encoding))
+                if len(field_node.childNodes) == 1 and field_node.childNodes[0].nodeName == 'None':
+                    value = None
+                else:
+                    value = field.to_python(getInnerText(field_node).strip().encode(self.encoding))
                 data[field.name] = value
         
         # Return a DeserializedObject so that the m2m data has a place to live.
         return base.DeserializedObject(Model(**data), m2m_data)
         
-    def _handle_fk_field_node(self, node):
+    def _handle_fk_field_node(self, node, field):
         """
         Handle a <field> node for a ForeignKey
         """
@@ -166,13 +181,16 @@ class Deserializer(base.Deserializer):
         if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
             return None
         else:
-            return getInnerText(node).strip().encode(self.encoding)
+            return field.rel.to._meta.pk.to_python(
+                       getInnerText(node).strip().encode(self.encoding))
         
-    def _handle_m2m_field_node(self, node):
+    def _handle_m2m_field_node(self, node, field):
         """
         Handle a <field> node for a ManyToManyField
         """
-        return [c.getAttribute("pk").encode(self.encoding) for c in node.getElementsByTagName("object")]
+        return [field.rel.to._meta.pk.to_python(
+                    c.getAttribute("pk").encode(self.encoding)) 
+                    for c in node.getElementsByTagName("object")]
     
     def _get_model_from_node(self, node, attr):
         """

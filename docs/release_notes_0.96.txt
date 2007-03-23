@@ -1,0 +1,264 @@
+=================================
+Django version 0.96 release notes
+=================================
+
+Welcome to Django 0.96!
+
+The primary goal for 0.96 is a cleanup and stabilization of the features
+introduced in 0.95. There have been a few small `backwards-incompatible
+changes`_ since 0.95, but the upgrade process should be fairly simple
+and should not require major changes to existing applications.
+
+However, we're also releasing 0.96 now because we have a set of
+backwards-incompatible changes scheduled for the near future. Once
+completed, they will involve some code changes for application
+developers, so we recommend that you stick with Django 0.96 until the
+next official release; then you'll be able to upgrade in one step
+instead of needing to make incremental changes to keep up with the
+development version of Django.
+
+What's new in 0.96?
+===================
+
+This revision represents over a thousand source commits and over four hundred
+bug fixes, so we can't possibly catalog all the changes. Here, we describe the
+most notable changes in this release.
+
+New forms library
+-----------------
+
+``django.newforms`` is Django's new form-handling library. It's a
+replacement for ``django.forms``, the old form/manipulator/validation
+framework.  Both APIs are available in 0.96, but over the next two
+releases we plan to switch completely to the new forms system, and
+deprecate and remove the old system.
+
+There are three elements to this transition:
+
+    * We've copied the current ``django.forms`` to
+      ``django.oldforms``. This allows you to upgrade your code *now*
+      rather than waiting for the backwards-incompatible change and
+      rushing to fix your code after the fact.  Just change your
+      import statements like this::
+
+          from django import forms             # 0.95-style
+          from django import oldforms as forms # 0.96-style
+
+    * The next official release of Django will move the current
+      ``django.newforms`` to ``django.forms``. This will be a
+      backwards-incompatible change, and anyone still using the old
+      version of ``django.forms`` at that time will need to change
+      their import statements as described above.
+
+    * The next release after that will completely remove
+      ``django.oldforms``.
+
+Although the ``newforms`` library will continue to evolve, it's ready for use
+for most common cases. We recommend that anyone new to form handling skip the
+old forms system and start with the new.
+
+For more information about ``django.newforms``, read the `newforms
+documentation`_.
+
+.. _newforms documentation: ../newforms/
+
+URLconf improvements
+--------------------
+
+You can now use any callable as the callback in URLconfs (previously, only
+strings that referred to callables were allowed). This allows a much more
+natural use of URLconfs. For example, this URLconf::
+
+    from django.conf.urls.defaults import *
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', 'mysite.myapp.views.myview')
+    )
+    
+can now be rewritten as::
+
+    from django.conf.urls.defaults import *
+    from mysite.myapp.views import myview
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', myview)
+    )
+        
+One useful application of this can be seen when using decorators; this
+change allows you to apply decorators to views *in your
+URLconf*. Thus, you can make a generic view require login very
+easily::
+
+    from django.conf.urls.defaults import *
+    from django.contrib.auth.decorators import login_required
+    from django.views.generic.list_detail import object_list
+    from mysite.myapp.models import MyModel
+    
+    info = {
+        "queryset" : MyModel.objects.all(),
+    }
+    
+    urlpatterns = patterns('', 
+        ('^myview/$', login_required(object_list), info)
+    )
+
+Note that both syntaxes (strings and callables) are valid, and will continue to
+be valid for the foreseeable future.  
+
+The test framework
+------------------
+
+Django now includes a test framework so you can start transmuting fear into
+boredom (with apologies to Kent Beck). You can write tests based on doctest_
+or unittest_ and test your views with a simple test client.
+
+There is also new support for "fixtures" -- initial data, stored in any of the
+supported `serialization formats`_, that will be loaded into your database at the
+start of your tests. This makes testing with real data much easier.
+
+See `the testing documentation`_ for the full details.
+
+.. _doctest: http://docs.python.org/lib/module-doctest.html
+.. _unittest: http://docs.python.org/lib/module-unittest.html
+.. _the testing documentation: ../testing/
+.. _serialization formats: ../serialization/
+
+Improvements to the admin interface
+-----------------------------------
+
+A small change, but a very nice one: dedicated views for adding and
+updating users have been added to the admin interface, so you no
+longer need to worry about working with hashed passwords in the admin.
+
+Backwards-incompatible changes
+==============================
+
+The following changes may require you to update your code when you switch from
+0.95 to 0.96:
+
+`MySQLdb` version requirement
+-----------------------------
+
+Due to a bug in older versions of the `MySQLdb` Python module (which
+Django uses to connect to MySQL databases), Django's MySQL backend now
+requires version 1.2.1p2 or higher of `MySQLdb`, and will raise
+exceptions if you attempt to use an older version.
+
+If you're currently unable to upgrade your copy of `MySQLdb` to meet
+this requirement, a separate, backwards-compatible backend, called
+"mysql_old", has been added to Django. To use this backend, change
+the ``DATABASE_ENGINE`` setting in your Django settings file from
+this::
+
+    DATABASE_ENGINE = "mysql"
+
+to this::
+
+    DATABASE_ENGINE = "mysql_old"
+
+However, we strongly encourage MySQL users to upgrade to a more recent
+version of `MySQLdb` as soon as possible, The "mysql_old" backend is
+provided only to ease this transition, and is considered deprecated;
+aside from any necessary security fixes, it will not be actively
+maintained, and it will be removed in a future release of Django.
+
+Also, note that some features, like the new ``DATABASE_OPTIONS``
+setting (see the `databases documentation`_ for details), are only
+available on the "mysql" backend, and will not be made available for
+"mysql_old".
+
+.. _databases: ../databases/
+
+Database constraint names changed
+---------------------------------
+
+The format of the constraint names Django generates for foreign key
+references have changed slightly. These names are generally only used
+when it is not possible to put the reference directly on the affected
+column, so they is not always visible.
+
+The effect of this change is that running ``manage.py reset`` and
+similar commands against an existing database may generate SQL with
+the new form of constraint name, while the database itself contains
+constraints named in the old form; this will cause the database server
+to raise an error message about modifying non-existent constraints.
+
+If you need to work around this, there are two methods available:
+
+    1. Redirect the output of ``manage.py`` to a file, and edit the
+       generated SQL to use the correct constraint names before
+       executing it.
+
+    2. Examine the output of ``manage.py sqlall`` to see the new-style
+       constraint names, and use that as a guide to rename existing
+       constraints in your database.
+
+Names changes in ``manage.py``
+------------------------------
+
+A few of the options to ``manage.py`` have changed with the addition of fixture
+support:
+
+    * There are new ``dumpdata`` and ``loaddata`` commands which, as
+      you might expect, will dump and load data to/from the
+      database. These commands can operate against any of Django's
+      supported serialization formats.
+
+    * The ``sqlinitialdata`` command has been renamed to ``sqlcustom`` to
+      emphasize that ``loaddata`` should be used for data (and ``sqlcustom`` for
+      other custom SQL -- views, stored procedures, etc.).
+      
+    * The vestigial ``install`` command has been removed. Use ``syncdb``.
+
+Backslash escaping changed
+--------------------------
+
+The Django database API now escapes backslashes given as query parameters. If
+you have any database API code that matches backslashes, and it was working before
+(despite the lack of escaping), you'll have to change your code to "unescape" the
+slashes one level.
+
+For example, this used to work::
+
+    # Find text containing a single backslash
+    MyModel.objects.filter(text__contains='\\\\')
+
+The above is now incorrect, and should be rewritten as::
+
+    # Find text containing a single backslash
+    MyModel.objects.filter(text__contains='\\')
+
+Removed ENABLE_PSYCO setting
+----------------------------
+
+The ``ENABLE_PSYCO`` setting no longer exists. If your settings file includes
+``ENABLE_PSYCO`` it will have no effect; to use Psyco, we recommend
+writing a middleware class to activate it.
+
+.. _psyco: http://psyco.sourceforge.net/
+
+Thanks
+======
+
+Since 0.95, a number of people have stepped forward and taken a major
+new role in Django's development. We'd like to thank these people for
+all their hard work:
+
+    * Russell Keith-Magee and Malcolm Tredinnick for their major code
+      contributions. This release wouldn't have been possible without them.
+      
+    * Our new release manager, James Bennett, for his work in getting out
+      0.95.1, 0.96, and (hopefully) future release.
+      
+    * Our ticket managers Chris Beaven (aka SmileyChris), Simon Greenhill,
+      Michael Radziej, and Gary Wilson. They agreed to take on the monumental
+      task of wrangling our tickets into nicely cataloged submission. Figuring
+      out what to work on is now about a million times easier; thanks again,
+      guys.
+            
+    * Everyone who submitted a bug report, patch or ticket comment. We can't
+      possibly thank everyone by name -- over 200 developers submitted patches
+      that went into 0.96 -- but everyone who's contributed to Django is listed
+      in AUTHORS_.
+      
+.. _AUTHORS: http://code.djangoproject.com/browser/django/trunk/AUTHORS

@@ -216,7 +216,7 @@ installation will be aborted, and any data installed in the call to
 ``loaddata`` will be removed from the database.
 
 The fixtures that are named can include directory components. These 
-directories will be inluded in the search path. For example::
+directories will be included in the search path. For example::
 
     django-admin.py loaddata foo/bar/mydata.json
  

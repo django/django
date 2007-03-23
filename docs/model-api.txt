@@ -1216,6 +1216,10 @@ screen via ``<script src="">`` tags. This can be used to tweak a given type of
 admin page in JavaScript or to provide "quick links" to fill in default values
 for certain fields.
 
+If you use relative URLs -- URLs that don't start with ``http://`` or ``/`` --
+then the admin site will automatically prefix these links with
+``settings.ADMIN_MEDIA_PREFIX``.
+
 ``list_display``
 ----------------
 

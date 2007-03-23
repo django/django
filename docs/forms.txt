@@ -417,6 +417,27 @@ Here's a simple function that might drive the above form::
         form = forms.FormWrapper(manipulator, new_data, errors)
         return render_to_response('contact_form.html', {'form': form})
 
+Implementing ``flatten_data`` for custom manipulators
+------------------------------------------------------
+
+It is possible (although rarely needed) to replace the default automatically
+created manipulators on a model with your own custom manipulators. If you do
+this and you are intending to use those models in generic views, you should
+also define a ``flatten_data`` method in any ``ChangeManipulator`` replacement.
+This should act like the default ``flatten_data`` and return a dictionary
+mapping field names to their values, like so::
+
+    def flatten_data(self):
+        obj = self.original_object
+        return dict(
+            from = obj.from,
+            subject = obj.subject,
+            ...
+        )
+
+In this way, your new change manipulator will act exactly like the default
+version.
+
 ``FileField`` and ``ImageField`` special cases
 ==============================================
 

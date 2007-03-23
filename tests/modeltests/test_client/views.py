@@ -2,6 +2,8 @@ from xml.dom.minidom import parseString
 from django.template import Context, Template
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.newforms.forms import Form
+from django.newforms import fields
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -45,7 +47,39 @@ def raw_post_view(request):
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client/get_view/')
+
+TestChoices = (
+    ('a', 'First Choice'),
+    ('b', 'Second Choice'),
+    ('c', 'Third Choice'),
+    ('d', 'Fourth Choice'),
+    ('e', 'Fifth Choice')
+)
+
+class TestForm(Form):
+    text = fields.CharField()
+    email = fields.EmailField()
+    value = fields.IntegerField()
+    single = fields.ChoiceField(choices=TestChoices)
+    multi = fields.MultipleChoiceField(choices=TestChoices)
     
+def form_view(request):
+    "A view that tests a simple form"
+    if request.method == 'POST':
+        form = TestForm(request.POST)
+        if form.is_valid():
+            t = Template('Valid POST data.', name='Valid POST Template')
+            c = Context()
+        else:
+            t = Template('Invalid POST data. {{ form.errors }}', name='Invalid POST Template')
+            c = Context({'form': form})
+    else:
+        form = TestForm()
+        t = Template('Viewing base form. {{ form }}.', name='Form GET Template')
+        c = Context({'form': form})
+    
+    return HttpResponse(t.render(c))
+        
 def login_protected_view(request):
     "A simple view that is login protected."
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')

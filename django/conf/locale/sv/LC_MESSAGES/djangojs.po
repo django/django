@@ -10,9 +10,9 @@ msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-06 02:29+0100\n"
-"PO-Revision-Date: 2007-03-06 02:30+0100\n"
+"PO-Revision-Date: 2007-03-06 10:30+0100\n"
 "Last-Translator: Mikko Hellsing <mikko@sorl.net>\n"
-"Language-Team: Django translators <djangoi18n@googlegroups.com>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,7 +27,7 @@ msgstr "Tillgänglig %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Visa alla"
+msgstr "Välj alla"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
@@ -35,20 +35,20 @@ msgstr "Lägg till"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Tag bort"
+msgstr "Ta bort"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Valde %s"
+msgstr "Vald %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Välj ditt/dina val och klicka "
+msgstr "Gör dina val och klicka på "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Avmarkera alla"
+msgstr "Ta bort alla"
 
 #: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24

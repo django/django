@@ -280,7 +280,7 @@ def get_sql_delete(app):
     from django.db import backend, connection, models, get_introspection_module
     introspection = get_introspection_module()
 
-    # This should work even if a connecton isn't available
+    # This should work even if a connection isn't available
     try:
         cursor = connection.cursor()
     except:
@@ -516,6 +516,7 @@ def syncdb(verbosity=1, interactive=True):
     created_models = set()
     pending_references = {}
 
+    # Create the tables for each model
     for app in models.get_apps():
         app_name = app.__name__.split('.')[-2]
         model_list = models.get_models(app)
@@ -537,6 +538,11 @@ def syncdb(verbosity=1, interactive=True):
                 cursor.execute(statement)
             table_list.append(model._meta.db_table)
 
+    # Create the m2m tables. This must be done after all tables have been created
+    # to ensure that all referred tables will exist.
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        model_list = models.get_models(app)
         for model in model_list:
             if model in created_models:
                 sql = _get_many_to_many_sql_for_model(model)
@@ -546,7 +552,7 @@ def syncdb(verbosity=1, interactive=True):
                     for statement in sql:
                         cursor.execute(statement)
 
-        transaction.commit_unless_managed()
+    transaction.commit_unless_managed()
 
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.
@@ -1358,13 +1364,14 @@ def load_data(fixture_labels, verbosity=1):
         for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
             if verbosity > 1:
                 print "Checking %s for fixtures..." % humanize(fixture_dir)
-            try:
-                fixture_name, format = fixture_label.rsplit('.', 1)
-                formats = [format]
-            except ValueError:
+            parts = fixture_label.split('.')
+            if len(parts) == 1:
                 fixture_name = fixture_label
                 formats = serializers.get_serializer_formats()
-            
+            else:
+                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+                formats = [format]
+
             label_found = False
             for format in formats:
                 serializer = serializers.get_serializer(format)
@@ -1439,7 +1446,7 @@ def dump_data(app_labels, format='json', indent=None):
         for model in get_models(app):
             objects.extend(model.objects.all())
     try:
-        print serializers.serialize(format, objects, indent=indent)
+        return serializers.serialize(format, objects, indent=indent)
     except Exception, e:
         sys.stderr.write(style.ERROR("Unable to serialize database: %s\n" % e))
 dump_data.help_doc = 'Output the contents of the database as a fixture of the given format'
@@ -1585,7 +1592,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             parser.print_usage_and_exit()
     elif action == 'dumpdata':
         try:
-            action_mapping[action](args[1:], options.format, options.indent)
+            print action_mapping[action](args[1:], options.format, options.indent)
         except IndexError:
             parser.print_usage_and_exit()
     elif action in ('startapp', 'startproject'):

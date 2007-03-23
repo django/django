@@ -34,17 +34,17 @@ class Serializer(object):
         for obj in queryset:
             self.start_object(obj)
             for field in obj._meta.fields:
-                if field is obj._meta.pk:
-                    continue
-                elif field.rel is None:
-                    if self.selected_fields is None or field.attname in self.selected_fields:
-                        self.handle_field(obj, field)
-                else:
-                    if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
-                        self.handle_fk_field(obj, field)
+                if field.serialize:
+                    if field.rel is None:
+                        if self.selected_fields is None or field.attname in self.selected_fields:
+                            self.handle_field(obj, field)
+                    else:
+                        if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
+                            self.handle_fk_field(obj, field)
             for field in obj._meta.many_to_many:
-                if self.selected_fields is None or field.attname in self.selected_fields:
-                    self.handle_m2m_field(obj, field)
+                if field.serialize:
+                    if self.selected_fields is None or field.attname in self.selected_fields:
+                        self.handle_m2m_field(obj, field)
             self.end_object(obj)
         self.end_serialization()
         return self.getvalue()
@@ -54,11 +54,7 @@ class Serializer(object):
         Convert a field's value to a string.
         """
         if isinstance(field, models.DateTimeField):
-            value = getattr(obj, field.name)
-            if value is None:
-                value = ''
-            else:
-                value = value.strftime("%Y-%m-%d %H:%M:%S")
+            value = getattr(obj, field.name).strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(field, models.FileField):
             value = getattr(obj, "get_%s_url" % field.name, lambda: None)()
         else:
