@@ -162,6 +162,12 @@ provided only to ease this transition, and is considered deprecated;
 aside from any necessary security fixes, it will not be actively
 maintained, and it will be removed in a future release of Django.
 
+Also, note that some features, like the new ``DATABASE_OPTIONS``
+setting (see the `databases documentation`_ for details), are only
+available on the "mysql" backend, and will not be made available for
+"mysql_old".
+
+.. _databases: ../databases/
 
 Database constraint names changed
 ---------------------------------
