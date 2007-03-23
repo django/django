@@ -24,7 +24,7 @@ The following changes may require you to update your code when you switch from
 0.95 to 0.96:
 
 ``MySQLdb`` version requirement
------------------------------
+-------------------------------
 
 Due to a bug in older versions of the ``MySQLdb`` Python module (which
 Django uses to connect to MySQL databases), Django's MySQL backend now
