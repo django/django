@@ -362,9 +362,8 @@ Like a ``PositiveIntegerField``, but only allows values under a certain
 containing only letters, numbers, underscores or hyphens. They're generally
 used in URLs.
 
-In the Django development version, you can specify ``maxlength``. If
-``maxlength`` is not specified, Django will use a default length of 50. In
-previous Django versions, there's no way to override the length of 50.
+Like a CharField, you can specify ``maxlength``. If ``maxlength`` is
+not specified, Django will use a default length of 50.
 
 Implies ``db_index=True``.
 
@@ -1216,8 +1215,9 @@ screen via ``<script src="">`` tags. This can be used to tweak a given type of
 admin page in JavaScript or to provide "quick links" to fill in default values
 for certain fields.
 
-If relative URLs are used, Django admin will automatically prepend these links
-with ``settings.ADMIN_MEDIA_PREFIX``.
+If you use relative URLs -- URLs that don't start with ``http://`` or ``/`` --
+then the admin site will automatically prefix these links with
+``settings.ADMIN_MEDIA_PREFIX``.
 
 ``list_display``
 ----------------
@@ -1456,8 +1456,8 @@ user searches for ``john lennon``, Django will do the equivalent of this SQL
     WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
     AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
-**New in Django development version:** For faster and/or more restrictive
-searches, prefix the field name with an operator:
+For faster and/or more restrictive searches, prefix the field name
+with an operator:
 
 ``^``
     Matches the beginning of the field. For example, if ``search_fields`` is
@@ -1752,8 +1752,6 @@ But this template code is good::
 
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-**New in Django development version.**
 
 The problem with the way we wrote ``get_absolute_url()`` above is that it
 slightly violates the DRY principle: the URL for this object is defined both

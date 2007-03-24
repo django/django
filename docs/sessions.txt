@@ -265,8 +265,6 @@ The name of the cookie to use for sessions. This can be whatever you want.
 SESSION_COOKIE_SECURE
 ---------------------
 
-**New in Django development version**
-
 Default: ``False``
 
 Whether to use a secure cookie for the session cookie. If this is set to

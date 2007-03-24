@@ -245,7 +245,8 @@ DATABASE_ENGINE
 Default: ``''`` (Empty string)
 
 Which database backend to use. Either ``'postgresql_psycopg2'``, 
-``'postgresql'``, ``'mysql'``, ``'sqlite3'`` or ``'ado_mssql'``.
+``'postgresql'``, ``'mysql'``,  ``'mysql_old'``, ``'sqlite3'`` or
+``'ado_mssql'``.
 
 DATABASE_HOST
 -------------
@@ -427,8 +428,6 @@ trailing space.
 
 FIXTURE_DIRS
 -------------
-
-**New in Django development version**
 
 Default: ``()`` (Empty tuple)
 
@@ -715,8 +714,6 @@ See the `session docs`_.
 SESSION_COOKIE_SECURE
 ---------------------
 
-**New in Django development version**
-
 Default: ``False``
 
 Whether to use a secure cookie for the session cookie. If this is set to
@@ -811,8 +808,6 @@ misspelled) variables. See `How invalid variables are handled`_.
 TEST_RUNNER
 -----------
 
-**New in Django development version**
-
 Default: ``'django.test.simple.run_tests'``
 
 The name of the method to use for starting the test suite. See 
@@ -822,8 +817,6 @@ The name of the method to use for starting the test suite. See
 
 TEST_DATABASE_NAME
 ------------------
-
-**New in Django development version**
 
 Default: ``None``
 

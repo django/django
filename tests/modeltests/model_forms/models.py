@@ -1,5 +1,5 @@
 """
-34. Generating HTML forms from models
+36. Generating HTML forms from models
 
 Django provides shortcuts for creating Form objects from a model class and a
 model instance.

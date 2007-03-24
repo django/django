@@ -15,7 +15,7 @@ import yaml
 
 class Serializer(PythonSerializer):
     """
-    Convert a queryset to JSON.
+    Convert a queryset to YAML.
     """
     def end_serialization(self):
         yaml.dump(self.objects, self.stream, **self.options)
@@ -25,7 +25,7 @@ class Serializer(PythonSerializer):
 
 def Deserializer(stream_or_string, **options):
     """
-    Deserialize a stream or string of JSON data.
+    Deserialize a stream or string of YAML data.
     """
     if isinstance(stream_or_string, basestring):
         stream = StringIO(stream_or_string)

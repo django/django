@@ -57,7 +57,7 @@ Gentoo
 ------
 
 A Django build is available for `Gentoo Linux`_, and is based on Django 0.95.1.
-The `current Gentoo build`_ can be installed by typing ``emerge Django``.
+The `current Gentoo build`_ can be installed by typing ``emerge django``.
 
 .. _Gentoo Linux: http://www.gentoo.org/
 .. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django

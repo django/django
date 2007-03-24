@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-02-26 20:44+0100\n"
-"PO-Revision-Date: 2007-02-27 20:06+0100\n"
+"PO-Revision-Date: 2007-03-14 19:29+0100\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -523,7 +523,7 @@ msgstr ""
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
-msgstr "I due campi parola chiave non corrispondono."
+msgstr "I due campi password non corrispondono."
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
@@ -555,7 +555,7 @@ msgstr "Questo indirizzo email non è associato ad alcun account utente. Sei sic
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
-msgstr "I due campi 'nuova parola chiave' non corrispondono."
+msgstr "I due campi 'nuova password' non corrispondono."
 
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -609,13 +609,13 @@ msgstr "indirizzo e-mail"
 
 #: contrib/auth/models.py:94
 msgid "password"
-msgstr "parola chiave"
+msgstr "password"
 
 #: contrib/auth/models.py:94
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
-msgstr "Usare '[algo]$[salt]$[hexdigest]' oppure la maschera di <a href=\"password/\">cambio parola chiave</a>."
+msgstr "Usare '[algo]$[salt]$[hexdigest]' oppure la maschera di <a href=\"password/\">cambio password</a>."
 
 #: contrib/auth/models.py:95
 msgid "staff status"
@@ -1040,12 +1040,12 @@ msgstr "Aggiungi utente"
 
 #: contrib/admin/views/auth.py:57
 msgid "Password changed successfully."
-msgstr "La parola chiave è stata cambiata correttamente."
+msgstr "La password è stata cambiata correttamente."
 
 #: contrib/admin/views/auth.py:64
 #, python-format
 msgid "Change password: %s"
-msgstr "Cambia la parola chiave: %s"
+msgstr "Cambia la password: %s"
 
 #: contrib/admin/templatetags/admin_list.py:247
 msgid "All dates"
@@ -1088,7 +1088,7 @@ msgstr "Documentazione"
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/registration/password_change_done.html:3
 msgid "Change password"
-msgstr "Cambia la parola chiave"
+msgstr "Cambia la password"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:3
 #: contrib/admin/templates/admin/change_form.html:10
@@ -1335,11 +1335,11 @@ msgstr "Nome utente:"
 #: contrib/admin/templates/admin/login.html:20
 #: contrib/comments/templates/comments/form.html:8
 msgid "Password:"
-msgstr "Parola chiave:"
+msgstr "Password:"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Hai <a href=\"/password_reset/\">dimenticato la parola chiave</a>?"
+msgstr "Hai <a href=\"/password_reset/\">dimenticato la password</a>?"
 
 #: contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
@@ -1349,7 +1349,7 @@ msgstr "Benvenuto,"
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
-msgstr "Inserire innanzitutto nome utente e parola chiave. Si potrà quindi modificare le altre impostazioni dell'utente."
+msgstr "Inserire innanzitutto nome utente e password. Si potrà quindi modificare le altre impostazioni dell'utente."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
@@ -1358,22 +1358,22 @@ msgstr "Nome utente"
 #: contrib/admin/templates/admin/auth/user/add_form.html:18
 #: contrib/admin/templates/admin/auth/user/change_password.html:34
 msgid "Password"
-msgstr "Parola chiave"
+msgstr "Password"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:23
 #: contrib/admin/templates/admin/auth/user/change_password.html:39
 msgid "Password (again)"
-msgstr "Parola chiave (di nuovo)"
+msgstr "Password (di nuovo)"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
 #: contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
-msgstr "Inserire la stessa parola chiave inserita sopra, come verifica."
+msgstr "Inserire la stessa password inserita sopra, come verifica."
 
 #: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Inserire una nuova parola chiave per l'utente <strong>%(username)s</strong>."
+msgstr "Inserire una nuova password per l'utente <strong>%(username)s</strong>."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1460,13 +1460,13 @@ msgstr "Modifica:"
 #: contrib/admin/templates/registration/password_reset_form.html:10
 #: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
-msgstr "Reimposta la parola chiave"
+msgstr "Reimposta la password"
 
 #: contrib/admin/templates/registration/password_reset_form.html:12
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll reset "
 "your password and e-mail the new one to you."
-msgstr "Dimenticata la parola chiave? Inserire il proprio indirizzo e-mail qui sotto: la parola chiave sarà reimpostata, e la nuova ti verrà inviata per e-mail."
+msgstr "Dimenticata la password? Inserire il proprio indirizzo e-mail qui sotto: la password sarà reimpostata, e la nuova ti verrà inviata per e-mail."
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "E-mail address:"
@@ -1474,11 +1474,11 @@ msgstr "Indirizzo e-mail:"
 
 #: contrib/admin/templates/registration/password_reset_form.html:16
 msgid "Reset my password"
-msgstr "Reimposta la mia parola chiave"
+msgstr "Reimposta la mia password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Hai ricevuto questa e-mail perché hai chiesto di reimpostare la parola chiave"
+msgstr "Hai ricevuto questa e-mail perché hai chiesto di reimpostare la password"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1488,11 +1488,11 @@ msgstr "per il tuo account utente su %(site_name)s"
 #: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
 msgid "Your new password is: %(new_password)s"
-msgstr "La tua nuova parola chiave è: %(new_password)s"
+msgstr "La tua nuova password è: %(new_password)s"
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "Puoi liberamente cambiare la tua parola chiave tramite questa pagina:"
+msgstr "Puoi liberamente cambiare la tua password tramite questa pagina:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
@@ -1518,51 +1518,51 @@ msgstr "Accedi di nuovo"
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "Parola chiave reimpostata correttamente"
+msgstr "Password reimpostata correttamente"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
 "We've e-mailed a new password to the e-mail address you submitted. You "
 "should be receiving it shortly."
-msgstr "La nuova parola chiave è stata inviata all'indirizzo e-mail inserito. Arriverà a breve."
+msgstr "La nuova password è stata inviata all'indirizzo e-mail inserito. Arriverà a breve."
 
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
 #: contrib/admin/templates/registration/password_change_done.html:4
 msgid "Password change"
-msgstr "Cambio di parola chiave"
+msgstr "Cambio password"
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
-msgstr "Inserire l'attuale parola chiave, per ragioni di sicurezza, e poi la nuova parola chiave due volte, per verificare di averla scritta correttamente."
+msgstr "Inserire l'attuale password, per ragioni di sicurezza, e poi la nuova password due volte, per verificare di averla scritta correttamente."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
-msgstr "Parola chiave attuale:"
+msgstr "Password attuale:"
 
 #: contrib/admin/templates/registration/password_change_form.html:19
 msgid "New password:"
-msgstr "Nuova parola chiave:"
+msgstr "Nuova password:"
 
 #: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Confirm password:"
-msgstr "Confermare la parola chiave:"
+msgstr "Confermare la password:"
 
 #: contrib/admin/templates/registration/password_change_form.html:23
 msgid "Change my password"
-msgstr "Modifica la mia parola chiave"
+msgstr "Modifica la mia password"
 
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "Cambio di parola chiave avvenuto correttamente"
+msgstr "Cambio di password avvenuto correttamente"
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
-msgstr "La parola chiave è stata cambiata."
+msgstr "La password è stata cambiata."
 
 #: contrib/sites/models.py:10
 msgid "domain name"
@@ -1905,7 +1905,7 @@ msgstr "Il modulo di commento non fornisce né 'anteprima' né 'invia'"
 
 #: contrib/comments/templates/comments/form.html:8
 msgid "Forgotten your password?"
-msgstr "Hai dimenticato la parola chiave?"
+msgstr "Hai dimenticato la password?"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"

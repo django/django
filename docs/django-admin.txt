@@ -100,8 +100,6 @@ if you're ever curious to see the full list of defaults.
 dumpdata [appname appname ...]
 ------------------------------
 
-**New in Django development version**
-
 Output to standard output all data in the database associated with the named 
 application(s).
 
@@ -116,8 +114,6 @@ The output of ``dumpdata`` can be used as input for ``loaddata``.
 
 flush
 -----
-
-**New in Django development version**
 
 Return the database to the state it was in immediately after syncdb was 
 executed. This means that all data will be removed from the database, any 
@@ -165,17 +161,8 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
-install [appname appname ...]
------------------------------
-
-**Removed in Django development version**
-
-Executes the equivalent of ``sqlall`` for the given appnames.
-
 loaddata [fixture fixture ...]
 ------------------------------
-
-**New in Django development version**
 
 Searches for and loads the contents of the named fixture into the database.
 
@@ -216,7 +203,7 @@ installation will be aborted, and any data installed in the call to
 ``loaddata`` will be removed from the database.
 
 The fixtures that are named can include directory components. These 
-directories will be inluded in the search path. For example::
+directories will be included in the search path. For example::
 
     django-admin.py loaddata foo/bar/mydata.json
  
@@ -350,8 +337,6 @@ Prints the DROP TABLE SQL statements for the given appnames.
 sqlcustom [appname appname ...]
 -------------------------------
 
-**New in Django development version**
-
 Prints the custom SQL statements for the given appnames.
 
 For each model in each specified app, this command looks for the file
@@ -372,13 +357,6 @@ sqlindexes [appname appname ...]
 ----------------------------------------
 
 Prints the CREATE INDEX SQL statements for the given appnames.
-
-sqlinitialdata [appname appname ...]
---------------------------------------------
-
-**Removed in Django development version**
-
-This method has been renamed ``sqlcustom`` in the development version of Django. 
 
 sqlreset [appname appname ...]
 --------------------------------------
@@ -425,8 +403,6 @@ fixture data files.
 
 test
 ----
-
-**New in Django development version**
 
 Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
 
@@ -475,8 +451,6 @@ setting the Python path for you.
 --format
 --------
 
-**New in Django development version**
-
 Example usage::
 
     django-admin.py dumpdata --format=xml
@@ -493,8 +467,6 @@ options.
 --indent
 --------
 
-**New in Django development version**
-
 Example usage::
 
     django-admin.py dumpdata --indent=4
@@ -505,8 +477,6 @@ Pretty-printing will only be enabled if the indent option is provided.
 
 --noinput
 ---------
-
-**New in Django development version**
 
 Inform django-admin that the user should NOT be prompted for any input. Useful
 if the django-admin script will be executed as an unattended, automated
@@ -530,8 +500,6 @@ Example output::
 --verbosity
 -----------
 
-**New in Django development version**
-
 Example usage::
 
     django-admin.py syncdb --verbosity=2
@@ -542,8 +510,6 @@ and `2` is verbose output.
 
 --adminmedia
 ------------
-
-**New in Django development version**
 
 Example usage::
     django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
