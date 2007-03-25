@@ -342,7 +342,7 @@ Prints the custom SQL statements for the given appnames.
 For each model in each specified app, this command looks for the file
 ``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given appname and
 ``<modelname>`` is the model's name in lowercase. For example, if you have an
-app ``news`` that includes a ``Story`` model, ``sqlinitialdata`` will attempt
+app ``news`` that includes a ``Story`` model, ``sqlcustom`` will attempt
 to read a file ``news/sql/story.sql`` and append it to the output of this
 command.
 
