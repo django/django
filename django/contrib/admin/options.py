@@ -283,14 +283,14 @@ class ModelAdmin(object):
         Returns a QuerySet of all model instances that can be edited by the
         admin site in the "add" stage.
         """
-        return self.queryset()
+        return self.queryset(request)
 
     def queryset_change(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
         admin site in the "change" stage.
         """
-        return self.queryset()
+        return self.queryset(request)
 
     def save_add(self, request, model, form, post_url_continue):
         """
