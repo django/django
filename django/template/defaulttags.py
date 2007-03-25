@@ -595,8 +595,8 @@ def do_if(parser, token):
 
     ::
 
-        {% if althlete_list %}
-            Number of athletes: {{ althete_list|count }}
+        {% if athlete_list %}
+            Number of athletes: {{ athlete_list|count }}
         {% else %}
             No athletes.
         {% endif %}
