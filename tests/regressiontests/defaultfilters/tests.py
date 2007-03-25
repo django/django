@@ -133,6 +133,12 @@ u'\xcb'
 >>> wordwrap('this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14)
 "this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI'm afraid"
 
+>>> wordwrap('this is a short paragraph of text.\n  But this line should be indented',14)
+'this is a\nshort\nparagraph of\ntext.\n  But this\nline should be\nindented'
+
+>>> wordwrap('this is a short paragraph of text.\n  But this line should be indented',15)
+'this is a short\nparagraph of\ntext.\n  But this line\nshould be\nindented'
+
 >>> ljust('test', 10)
 'test      '
 

@@ -1,5 +1,5 @@
 """
-XXX. Serialization
+41. Serialization
 
 ``django.core.serializers`` provides interfaces to converting Django querysets
 to and from "flat" data (i.e. strings).

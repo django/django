@@ -69,6 +69,14 @@ def encode_multipart(boundary, data):
                 '',
                 value.read()
             ])
+        elif hasattr(value, '__iter__'): 
+            for item in value:
+                lines.extend([ 
+                    '--' + boundary, 
+                    'Content-Disposition: form-data; name="%s"' % key, 
+                    '', 
+                    str(item) 
+                ])
         else:
             lines.extend([
                 '--' + boundary,

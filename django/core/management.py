@@ -280,7 +280,7 @@ def get_sql_delete(app):
     from django.db import backend, connection, models, get_introspection_module
     introspection = get_introspection_module()
 
-    # This should work even if a connecton isn't available
+    # This should work even if a connection isn't available
     try:
         cursor = connection.cursor()
     except:
@@ -512,6 +512,7 @@ def syncdb(verbosity=1, interactive=True):
     created_models = set()
     pending_references = {}
 
+    # Create the tables for each model
     for app in models.get_apps():
         app_name = app.__name__.split('.')[-2]
         model_list = models.get_models(app)
@@ -533,6 +534,11 @@ def syncdb(verbosity=1, interactive=True):
                 cursor.execute(statement)
             table_list.append(model._meta.db_table)
 
+    # Create the m2m tables. This must be done after all tables have been created
+    # to ensure that all referred tables will exist.
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        model_list = models.get_models(app)
         for model in model_list:
             if model in created_models:
                 sql = _get_many_to_many_sql_for_model(model)
@@ -542,7 +548,7 @@ def syncdb(verbosity=1, interactive=True):
                     for statement in sql:
                         cursor.execute(statement)
 
-        transaction.commit_unless_managed()
+    transaction.commit_unless_managed()
 
     # Send the post_syncdb signal, so individual apps can do whatever they need
     # to do at this point.

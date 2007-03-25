@@ -17,7 +17,7 @@ def wrap(text, width):
         pos = len(word) - word.rfind('\n') - 1
         for word in it:
             if "\n" in word:
-                lines = word.splitlines()
+                lines = word.split('\n')
             else:
                 lines = (word,)
             pos += len(lines[0]) + 1

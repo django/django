@@ -104,8 +104,6 @@ Also removes the content from any response to a HEAD request and sets the
 django.middleware.http.SetRemoteAddrFromForwardedFor
 ----------------------------------------------------
 
-**New in Django development version**
-
 Sets ``request.META['REMOTE_ADDR']`` based on
 ``request.META['HTTP_X_FORWARDED_FOR']``, if the latter is set. This is useful
 if you're sitting behind a reverse proxy that causes each request's

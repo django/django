@@ -1,5 +1,5 @@
 """
-39. Testing using the Test Client
+38. Testing using the Test Client
 
 The test client is a class that can act like a simple
 browser for testing purposes.
@@ -81,7 +81,43 @@ class ClientTest(TestCase):
         
         # Check that the response was a 302 (redirect)
         self.assertEqual(response.status_code, 302)
-                
+
+    def test_valid_form(self):
+        "POST valid data to a form"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'foo@example.com',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template.name, "Valid POST Template")
+
+    def test_incomplete_data_form(self):
+        "POST incomplete data to a form"
+        post_data = {
+            'text': 'Hello World',
+            'value': 37            
+        }
+        response = self.client.post('/test_client/form_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template.name, "Invalid POST Template")
+
+    def test_form_error(self):
+        "POST erroneous data to a form"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'not an email address',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.template.name, "Invalid POST Template")
+        
     def test_unknown_page(self):
         "GET an invalid URL"
         response = self.client.get('/test_client/unknown_view/')

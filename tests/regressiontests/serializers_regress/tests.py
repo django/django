@@ -24,6 +24,14 @@ def data_create(pk, klass, data):
     instance.data = data
     instance.save()    
     return instance
+
+def generic_create(pk, klass, data):
+    instance = klass(id=pk)
+    instance.data = data[0]
+    instance.save()
+    for tag in data[1:]:
+        instance.tags.create(data=tag)
+    return instance
     
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
@@ -56,6 +64,11 @@ def data_compare(testcase, pk, klass, data):
     testcase.assertEqual(data, instance.data, 
                          "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (pk,data, type(data), instance.data, type(instance.data)))
 
+def generic_compare(testcase, pk, klass, data):
+    instance = klass.objects.get(id=pk)
+    testcase.assertEqual(data[0], instance.data)
+    testcase.assertEqual(data[1:], [t.data for t in instance.tags.all()])
+    
 def fk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, instance.data_id)
@@ -76,6 +89,7 @@ def pk_compare(testcase, pk, klass, data):
 # actually a pair of functions; one to create
 # and one to compare objects of that type
 data_obj = (data_create, data_compare)
+generic_obj = (generic_create, generic_compare)
 fk_obj = (fk_create, fk_compare)
 m2m_obj = (m2m_create, m2m_compare)
 o2o_obj = (o2o_create, o2o_compare)
@@ -139,6 +153,9 @@ The end."""),
     (data_obj, 181, USStateData, None),
     (data_obj, 190, XMLData, "<foo></foo>"),
     (data_obj, 191, XMLData, None),
+
+    (generic_obj, 200, GenericData, ['Generic Object 1', 'tag1', 'tag2']),
+    (generic_obj, 201, GenericData, ['Generic Object 2', 'tag2', 'tag3']),
 
     (data_obj, 300, Anchor, "Anchor 1"),
     (data_obj, 301, Anchor, "Anchor 2"),
@@ -222,6 +239,9 @@ def serializerTest(format, self):
     transaction.commit()
     transaction.leave_transaction_management()
 
+    # Add the generic tagged objects to the object list 
+    objects.extend(Tag.objects.all())
+    
     # Serialize the test database
     serialized_data = serializers.serialize(format, objects, indent=2)
 

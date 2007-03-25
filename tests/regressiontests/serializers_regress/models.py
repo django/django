@@ -6,7 +6,8 @@ This class sets up a model for each model field type
 """
 
 from django.db import models
-    
+from django.contrib.contenttypes.models import ContentType
+
 # The following classes are for testing basic data 
 # marshalling, including NULL values.
 
@@ -72,6 +73,22 @@ class USStateData(models.Model):
 
 class XMLData(models.Model):
     data = models.XMLField(null=True)
+    
+class Tag(models.Model):
+    """A tag on an item."""
+    data = models.SlugField()
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+
+    content_object = models.GenericForeignKey()
+
+    class Meta:
+        ordering = ["data"]
+
+class GenericData(models.Model):
+    data = models.CharField(maxlength=30)
+
+    tags = models.GenericRelation(Tag)
     
 # The following test classes are all for validation
 # of related objects; in particular, forward, backward,
