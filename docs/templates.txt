@@ -878,7 +878,7 @@ with
 **New in Django development version**
 
 Caches a complex variable under a simpler name. This is useful when accessing
-an "expensive" method (e.g. one that hits the database) multiple times.
+an "expensive" method (e.g., one that hits the database) multiple times.
 
 For example::
 
@@ -887,7 +887,7 @@ For example::
     {% endwith %}
 
 The populated variable (in the example above, ``total``) is only available
-inside of the ``{% with %}`` block.
+between the ``{% with %}`` and ``{% endwith %}`` tags.
 
 Built-in filter reference
 -------------------------
