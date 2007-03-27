@@ -872,6 +872,22 @@ Above, if ``this_value`` is 175 and ``max_value`` is 200, the the image in the
 above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
 which is rounded up to 88).
 
+with
+~~~~
+
+**New in Django development version**
+
+Useful for caching a method which will be used more than once.
+
+For example::
+
+    {% with person.some_sql_method as total %}
+        {{ total }} person object{{ total|pluralize }}
+    {% endwith %}
+
+The populated variable (in the example above, ``total``) is only available
+inside of ``{% with %}`` block.
+
 Built-in filter reference
 -------------------------
 
