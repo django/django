@@ -1355,18 +1355,26 @@ def load_data(fixture_labels, verbosity=1):
     
     app_fixtures = [os.path.join(os.path.dirname(app.__file__),'fixtures') for app in get_apps()]
     for fixture_label in fixture_labels:
+        parts = fixture_label.split('.')
+        if len(parts) == 1:
+            fixture_name = fixture_label
+            formats = serializers.get_serializer_formats()
+        else:
+            fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+            if format in serializers.get_serializer_formats():
+                formats = [format]
+            else:
+                formats = []
+                
         if verbosity > 0:
-            print "Loading '%s' fixtures..." % fixture_label
+            if formats:
+                print "Loading '%s' fixtures..." % fixture_name
+            else:
+                print "Skipping fixture '%s': %s is not a known serialization format" % (fixture_name, format)
+            
         for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
             if verbosity > 1:
                 print "Checking %s for fixtures..." % humanize(fixture_dir)
-            parts = fixture_label.split('.')
-            if len(parts) == 1:
-                fixture_name = fixture_label
-                formats = serializers.get_serializer_formats()
-            else:
-                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                formats = [format]
 
             label_found = False
             for format in formats:
