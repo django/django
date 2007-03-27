@@ -877,16 +877,17 @@ with
 
 **New in Django development version**
 
-Useful for caching a method which will be used more than once.
+Caches a complex variable under a simpler name. This is useful when accessing
+an "expensive" method (e.g. one that hits the database) multiple times.
 
 For example::
 
-    {% with person.some_sql_method as total %}
-        {{ total }} person object{{ total|pluralize }}
+    {% with business.employees.count as total %}
+        {{ total }} employee{{ total|pluralize }}
     {% endwith %}
 
 The populated variable (in the example above, ``total``) is only available
-inside of ``{% with %}`` block.
+inside of the ``{% with %}`` block.
 
 Built-in filter reference
 -------------------------
