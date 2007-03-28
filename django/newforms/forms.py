@@ -159,6 +159,24 @@ class BaseForm(StrAndUnicode):
         """
         return self.errors.get(NON_FIELD_ERRORS, ErrorList())
 
+    def is_empty(self, exceptions=None):
+        """
+        Returns True if this form has been bound and all fields that aren't
+        listed in exceptions are empty.
+        """
+        # TODO: This could probably use some optimization
+        exceptions = exceptions or []
+        for name, field in self.fields.items():
+            if name in exceptions:
+                continue
+            # value_from_datadict() gets the data from the dictionary.
+            # Each widget type knows how to retrieve its own data, because some
+            # widgets split data over several HTML fields.
+            value = field.widget.value_from_datadict(self.data, self.add_prefix(name))
+            if value not in (None, ''):
+                return False
+        return True
+
     def full_clean(self):
         """
         Cleans all of self.data and populates self.__errors and self.clean_data.
