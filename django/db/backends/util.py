@@ -33,6 +33,9 @@ class CursorDebugWrapper(object):
                 'time': "%.3f" % (stop - start),
             })
 
+    def __iter__(self):
+        return self.cursor.__iter__()
+
     def __getattr__(self, attr):
         if self.__dict__.has_key(attr):
             return self.__dict__[attr]
@@ -98,9 +101,9 @@ def truncate_name(name, length=None):
     """
     if length is None or len(name) <= length:
         return name
-    
+
     hash = md5.md5(name).hexdigest()[:4]
-    
+
     return '%s%s' % (name[:length-4], hash)
 
 ##################################################################################
