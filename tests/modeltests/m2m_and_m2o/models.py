@@ -1,5 +1,5 @@
 """
-28. Many-to-many and many-to-one relationships to the same table
+29. Many-to-many and many-to-one relationships to the same table
 
 Make sure to set ``related_name`` if you use relationships to the same table.
 """
