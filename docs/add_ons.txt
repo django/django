@@ -9,6 +9,13 @@ problems.
 This code lives in ``django/contrib`` in the Django distribution. Here's a
 rundown of the packages in ``contrib``:
 
+.. admonition:: Note
+
+    For most of these add-ons -- specifically, the add-ons that include either
+    models or template tags -- you'll need to add the package name (e.g.,
+    ``'django.contrib.admin'``) to your ``INSTALLED_APPS`` setting and re-run
+    ``manage.py syncdb``.
+
 .. _"batteries included" philosophy: http://docs.python.org/tut/node12.html#batteries-included
 
 admin
@@ -50,8 +57,6 @@ See the `csrf documentation`_.
 
 formtools
 =========
-
-**New in Django development version**
 
 A set of high-level abstractions for Django forms (django.newforms).
 
@@ -142,8 +147,6 @@ See the `flatpages documentation`_.
 localflavor
 ===========
 
-**New in Django development version**
-
 A collection of various Django snippets that are useful only for a particular
 country or culture. For example, ``django.contrib.localflavor.usa.forms``
 contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
@@ -151,13 +154,20 @@ contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
 markup
 ======
 
-A collection of template filters that implement these common markup languages:
+A collection of template filters that implement common markup languages:
 
-    * `Textile`_
-    * `Markdown`_
-    * `ReST (ReStructured Text)`_
+    * ``textile`` -- implements `Textile`_
+    * ``markdown`` -- implements `Markdown`_
+    * ``restructuredtext`` -- implements `ReST (ReStructured Text)`_
 
-For documentation, read the source code in django/contrib/markup/templatetags/markup.py.
+In each case, the filter expects formatted markup as a string and returns a
+string representing the marked-up text. For example, the ``textile`` filter
+converts text that is marked-up in Textile format to HTML.
+
+To activate these filters, add ``'django.contrib.markup'`` to your
+``INSTALLED_APPS`` setting. Once you've done that, use ``{% load markup %}`` in
+a template, and you'll have access to these filters. For more documentation,
+read the source code in django/contrib/markup/templatetags/markup.py.
 
 .. _Textile: http://en.wikipedia.org/wiki/Textile_%28markup_language%29
 .. _Markdown: http://en.wikipedia.org/wiki/Markdown

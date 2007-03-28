@@ -384,7 +384,6 @@ Methods
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
 
-    The ``path`` and ``domain`` arguments are new in the Django development version.
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be deleted.
 

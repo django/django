@@ -9,9 +9,10 @@ framework. This document explains how to use this new library.
 Migration plan
 ==============
 
-``django.newforms`` currently is only available in the Django development version
--- i.e., it's not available in the Django 0.95 release. For the next Django
-release, our plan is to do the following:
+``django.newforms`` currently is only available in Django beginning
+with the 0.96 release.  the Django development version -- i.e., it's
+not available in the Django 0.95 release. For the next Django release,
+our plan is to do the following:
 
     * As of revision [4208], we've copied the current ``django.forms`` to
       ``django.oldforms``. This allows you to upgrade your code *now* rather
@@ -858,6 +859,16 @@ level and at the form instance level, and the latter gets precedence::
     <tr><th>Name:</th><td><input type="text" name="name" value="instance" /></td></tr>
     <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+Creating custom fields
+----------------------
+
+If the built-in ``Field`` classes don't meet your needs, you can easily create
+custom ``Field`` classes. To do this, just create a subclass of
+``django.newforms.Field``. Its only requirements are that it implement a
+``clean()`` method and that its ``__init__()`` method accept the core arguments
+mentioned above (``required``, ``label``, ``initial``, ``widget``,
+``help_text``).
 
 More coming soon
 ================

@@ -45,7 +45,7 @@ class Permission(models.Model):
         ordering = ('content_type', 'codename')
 
     def __str__(self):
-        return "%s | %s" % (self.content_type, self.name)
+        return "%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.

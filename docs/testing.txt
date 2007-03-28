@@ -2,8 +2,6 @@
 Testing Django applications
 ===========================
 
-**New in Django development version**.
-
 Automated testing is an extremely useful weapon in the bug-killing arsenal
 of the modern developer. When initially writing code, a test suite can be
 used to validate that code behaves as expected. When refactoring or
@@ -226,6 +224,12 @@ can be invoked on the ``Client`` instance.
     ``data`` will be transmitted with a content type of ``multipart/form-data``.
     The key-value pairs in the data dictionary will be encoded as a multipart
     message and used to create the POST data payload.
+    
+    To submit multiple values for a given key (for example, to specify 
+    the selections for a multiple selection list), provide the values as a 
+    list or tuple for the required key. For example, a data dictionary of
+    ``{'choices': ('a','b','d')}`` would submit three selected rows for the
+    field named ``choices``.
     
     Submitting files is a special case. To POST a file, you need only
     provide the file field name as a key, and a file handle to the file you wish to
