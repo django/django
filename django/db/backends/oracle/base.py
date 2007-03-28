@@ -45,7 +45,7 @@ class DatabaseWrapper(local):
                 self.connection = Database.connect(conn_string, **self.options)
         cursor = FormatStylePlaceholderCursor(self.connection)
         # default arraysize of 1 is highly sub-optimal
-        cursor.arraysize = 256
+        cursor.arraysize = 100
         # set oracle date to ansi date format
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
         cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
@@ -233,7 +233,7 @@ def get_query_set_class(DefaultQuerySet):
     "Create a custom QuerySet class for Oracle."
 
     from django.db import backend, connection
-    from django.db.models.query import EmptyResultSet
+    from django.db.models.query import EmptyResultSet, GET_ITERATOR_CHUNK_SIZE
 
     class OracleQuerySet(DefaultQuerySet):
 
@@ -285,15 +285,21 @@ def get_query_set_class(DefaultQuerySet):
                     else:
                         yield field
 
-            for unresolved_row in cursor:
-                row = list(resolve_cols(unresolved_row))
-                if fill_cache:
-                    obj, index_end = get_cached_row(self.model, row, 0)
-                else:
-                    obj = self.model(*row[:index_end])
-                for i, k in enumerate(extra_select):
-                    setattr(obj, k[0], row[index_end+i])
-                yield obj
+            while 1:
+                rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+                if not rows:
+                    raise StopIteration
+                for row in rows:
+                    row = list(resolve_cols(row))
+                    if fill_cache:
+                        obj, index_end = get_cached_row(klass=self.model, row=row,
+                                                        index_start=0, max_depth=self._max_related_depth)
+                    else:
+                        obj = self.model(*row[:index_end])
+                    for i, k in enumerate(extra_select):
+                        setattr(obj, k[0], row[index_end+i])
+                    yield obj
+
 
         def _get_sql_clause(self, get_full_query=False):
             from django.db.models.query import fill_table_cache, \

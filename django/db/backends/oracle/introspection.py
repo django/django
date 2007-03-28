@@ -6,13 +6,13 @@ foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REF
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
     cursor.execute("SELECT TABLE_NAME FROM USER_TABLES")
-    return [row[0].upper() for row in cursor]
+    return [row[0].upper() for row in cursor.fetchall()]
 
 def get_table_description(cursor, table_name):
     "Returns a description of the table, with the DB-API cursor.description interface."
     cursor.execute("SELECT * FROM %s WHERE ROWNUM < 2" % quote_name(table_name))
     return cursor.description
-  
+
 def _name_to_index(cursor, table_name):
     """
     Returns a dictionary of {field_name: field_index} for the given table.
@@ -24,7 +24,7 @@ def get_relations(cursor, table_name):
     """
     Returns a dictionary of {field_index: (field_index_other_table, other_table)}
     representing all relationships to the given table. Indexes are 0-based.
-    """    
+    """
     cursor.execute("""
 SELECT ta.column_id - 1, tb.table_name, tb.column_id - 1
 FROM   user_constraints, USER_CONS_COLUMNS ca, USER_CONS_COLUMNS cb,
@@ -83,7 +83,7 @@ WHERE  allcols.column_name = primarycols.column_name (+) AND
         # Here, we skip any indexes across multiple fields.
         indexes[row[0]] = {'primary_key': row[1], 'unique': row[2]}
     return indexes
-    
+
 
 # Maps type codes to Django Field types.
 DATA_TYPES_REVERSE = {

@@ -33,9 +33,6 @@ class CursorDebugWrapper(object):
                 'time': "%.3f" % (stop - start),
             })
 
-    def __iter__(self):
-        return self.cursor.__iter__()
-
     def __getattr__(self, attr):
         if self.__dict__.has_key(attr):
             return self.__dict__[attr]
