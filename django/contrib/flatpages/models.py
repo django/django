@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
 class FlatPage(models.Model):
-    url = models.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL],
+    url = models.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL], db_index=True,
         help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
     title = models.CharField(_('title'), maxlength=200)
     content = models.TextField(_('content'))
