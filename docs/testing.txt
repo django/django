@@ -468,7 +468,8 @@ failed::
 
     FAILED (failures=1)
 
-The return code for the script will indicate the number of tests that failed.
+The return code for the script is the total number of failed and erroneous 
+tests. If all the tests pass, the return code is 0.
 
 Regardless of whether the tests pass or fail, the test database is destroyed when
 all the tests have been executed. 
