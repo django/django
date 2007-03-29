@@ -1,5 +1,7 @@
 from django.db.backends.oracle.base import quote_name
 import re
+import cx_Oracle
+
 
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
@@ -84,19 +86,13 @@ WHERE  allcols.column_name = primarycols.column_name (+) AND
         indexes[row[0]] = {'primary_key': row[1], 'unique': row[2]}
     return indexes
 
-
-# Maps type codes to Django Field types.
+# Maps type objects to Django Field types.
 DATA_TYPES_REVERSE = {
-    16: 'BooleanField',
-    21: 'SmallIntegerField',
-    23: 'IntegerField',
-    25: 'TextField',
-    869: 'IPAddressField',
-    1043: 'CharField',
-    1082: 'DateField',
-    1083: 'TimeField',
-    1114: 'DateTimeField',
-    1184: 'DateTimeField',
-    1266: 'TimeField',
-    1700: 'FloatField',
+    cx_Oracle.CLOB: 'TextField',
+    cx_Oracle.DATETIME: 'DateTimeField',
+    cx_Oracle.FIXED_CHAR: 'CharField',
+    cx_Oracle.NCLOB: 'TextField',
+    cx_Oracle.NUMBER: 'FloatField',
+    cx_Oracle.STRING: 'TextField',
+    cx_Oracle.TIMESTAMP: 'DateTimeField',
 }

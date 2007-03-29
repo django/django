@@ -883,7 +883,7 @@ def inspectdb():
         except NotImplementedError:
             indexes = {}
         for i, row in enumerate(introspection_module.get_table_description(cursor, table_name)):
-            att_name = row[0]
+            att_name = row[0].lower()
             comment_notes = [] # Holds Field notes, to be displayed in a Python comment.
             extra_params = {}  # Holds Field parameters such as 'db_column'.
 
