@@ -97,8 +97,7 @@ which is a dictionary of the parameters captured in the URL.
     * ``extra_context``: A dictionary of values to add to the template
       context. By default, this is an empty dictionary. If a value in the
       dictionary is callable, the generic view will call it
-      just before rendering the template. (**This is new in the
-      Django development version.**)
+      just before rendering the template.
 
 **Example:**
 
@@ -752,10 +751,10 @@ If the results are paginated, the context will contain these extra variables:
 
     * ``previous``: The previous page number, as an integer. This is 1-based.
 
-    * `last_on_page`: **New in Django development version** The number of the
+    * `last_on_page`: The number of the
       last result on the current page. This is 1-based.
 
-    * `first_on_page`: **New in Django development version** The number of the
+    * `first_on_page`: The number of the
       first result on the current page. This is 1-based.
 
     * ``pages``: The total number of pages, as an integer.

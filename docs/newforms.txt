@@ -9,9 +9,10 @@ framework. This document explains how to use this new library.
 Migration plan
 ==============
 
-``django.newforms`` currently is only available in the Django development version
--- i.e., it's not available in the Django 0.95 release. For the next Django
-release, our plan is to do the following:
+``django.newforms`` currently is only available in Django beginning
+with the 0.96 release.  the Django development version -- i.e., it's
+not available in the Django 0.95 release. For the next Django release,
+our plan is to do the following:
 
     * As of revision [4208], we've copied the current ``django.forms`` to
       ``django.oldforms``. This allows you to upgrade your code *now* rather

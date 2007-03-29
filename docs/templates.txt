@@ -112,8 +112,6 @@ know how to write Python code.
 Comments
 ========
 
-**New in Django development version**
-
 To comment-out part of a template, use the comment syntax: ``{# #}``.
 
 For example, this template would render as ``'hello'``::
@@ -253,8 +251,8 @@ Here are some tips for working with inheritance:
       if you want to add to the contents of a parent block instead of
       completely overriding it.
 
-    * **New in Django development version:** For extra readability, you can
-      optionally give a *name* to your ``{% endblock %}`` tag. For example::
+    * For extra readability, you can optionally give a *name* to your
+      ``{% endblock %}`` tag. For example::
 
           {% block content %}
           ...
@@ -548,9 +546,9 @@ The 'ifchanged' block tag is used within a loop. It has two possible uses.
             <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
         {% endfor %}
 
-2. **New in Django development version.** If given a variable, check whether that
-   variable has changed. For example, the following shows the date every time it
-   changes, but only shows the hour if both the hour and the date has changed::
+2. If given a variable, check whether that variable has changed. For
+   example, the following shows the date every time it changes, but
+   only shows the hour if both the hour and the date has changed::
 
         {% for date in days %}
             {% ifchanged date.date %} {{ date.date }} {% endifchanged %}
@@ -828,12 +826,8 @@ The argument tells which template bit to output:
     ``closecomment``    ``#}``
     ==================  =======
 
-Note: ``opencomment`` and ``closecomment`` are new in the Django development version.
-
 url
 ~~~
-
-**New in Django development version**
 
 **Note that the syntax for this tag may change in the future, as we make it more robust.**
 
@@ -975,8 +969,6 @@ place -- but only if there's a decimal part to be displayed. For example:
     * ``36.123`` gets converted to ``36.1``
     * ``36.15`` gets converted to ``36.2``
     * ``36`` gets converted to ``36``
-
-**New in Django development version**
 
 If used with a numeric integer argument, ``floatformat`` rounds a number to that 
 many decimal places.  For example:

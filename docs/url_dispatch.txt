@@ -400,8 +400,6 @@ to pass metadata and options to views.
 Passing extra options to ``include()``
 --------------------------------------
 
-**New in Django development version.**
-
 Similarly, you can pass extra options to ``include()``. When you pass extra
 options to ``include()``, *each* line in the included URLconf will be passed
 the extra options.
@@ -441,8 +439,6 @@ every view in the the included URLconf accepts the extra options you're passing.
 
 Passing callable objects instead of strings
 ===========================================
-
-**New in Django development version.**
 
 Some developers find it more natural to pass the actual Python function object
 rather than a string containing the path to its module. This alternative is

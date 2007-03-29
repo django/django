@@ -2,8 +2,6 @@
 Testing Django applications
 ===========================
 
-**New in Django development version**.
-
 Automated testing is an extremely useful weapon in the bug-killing arsenal
 of the modern developer. When initially writing code, a test suite can be
 used to validate that code behaves as expected. When refactoring or
