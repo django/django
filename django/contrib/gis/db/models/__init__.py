@@ -6,7 +6,7 @@ from django.contrib.gis.db.models.manager import GeoManager
 
 # The various PostGIS/OpenGIS enabled fields.
 from django.contrib.gis.db.models.fields import \
-     GeometryField, PointField, LineString, PolygonField, \
+     GeometryField, PointField, LineStringField, PolygonField, \
      MultiPointField, MultiLineStringField, MultiPolygonField, \
      GeometryCollectionField
 

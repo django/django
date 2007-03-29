@@ -2,33 +2,31 @@
 # django.db.models.query objects to be customized for PostGIS.
 from copy import copy
 from django.db import backend
-from django.db.models.query import \
-     LOOKUP_SEPARATOR, QUERY_TERMS, \
-     find_field, FieldFound, get_where_clause
+from django.db.models.query import LOOKUP_SEPARATOR, find_field, FieldFound
 from django.utils.datastructures import SortedDict
 
 # PostGIS-specific operators. The commented descriptions of these
 # operators come from Section 6.2.2 of the official PostGIS documentation.
 POSTGIS_OPERATORS = {
     # The "&<" operator returns true if A's bounding box overlaps or is to the left of B's bounding box.
-    'overlapsleft' : '&< %s',
+    'overlaps_left' : '&< %s',
     # The "&>" operator returns true if A's bounding box overlaps or is to the right of B's bounding box.
-    'overlapsright' : '&> %s',
+    'overlaps_right' : '&> %s',
     # The "<<" operator returns true if A's bounding box is strictly to the left of B's bounding box.
     'left' : '<< %s',
     # The ">>" operator returns true if A's bounding box is strictly to the right of B's bounding box.
     'right' : '>> %s',
     # The "&<|" operator returns true if A's bounding box overlaps or is below B's bounding box.
-    'overlapsbelow' : '&<| %s',
+    'overlaps_below' : '&<| %s',
     # The "|&>" operator returns true if A's bounding box overlaps or is above B's bounding box.
-    'overlapsabove' : '|&> %s',
+    'overlaps_above' : '|&> %s',
     # The "<<|" operator returns true if A's bounding box is strictly below B's bounding box.
-    'strictlybelow' : '<<| %s',
+    'strictly_below' : '<<| %s',
     # The "|>>" operator returns true if A's bounding box is strictly above B's bounding box.
-    'strictlyabove' : '|>> %s',
+    'strictly_above' : '|>> %s',
     # The "~=" operator is the "same as" operator. It tests actual geometric equality of two features. So if
     # A and B are the same feature, vertex-by-vertex, the operator returns true.
-    'sameas' : '~= %s',
+    'same_as' : '~= %s',
     # The "@" operator returns true if A's bounding box is completely contained by B's bounding box.
     'contained' : '@ %s',
     # The "~" operator returns true if A's bounding box completely contains B's bounding box.

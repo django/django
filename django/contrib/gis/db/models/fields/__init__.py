@@ -1,6 +1,10 @@
 # The Django base Field class.
 from django.db.models.fields import Field
+from django.oldforms import LargeTextField
 from django.contrib.gis.db.models.postgis import POSTGIS_TERMS
+from geos import geomToWKT, geomFromHEX
+
+#TODO: add db.quotename.
 
 # Creates the SQL to add the model to the database. 
 def _add_geom(geom, srid, style, model, field, dim=2):
@@ -20,16 +24,25 @@ def _add_geom(geom, srid, style, model, field, dim=2):
 # Creates an index for the given geometry.
 def _geom_index(geom, style, model, field,
                 index_type='GIST',
-                index_opts='GIST_GEOMETRY_OPTS'):
+                index_opts='GIST_GEOMETRY_OPS'):
     sql = style.SQL_KEYWORD('CREATE INDEX ') + \
-          style.SQL_FIELD(field + '_idx') + \
+          style.SQL_TABLE('"%s_%s_id"' % (model, field)) + \
           style.SQL_KEYWORD(' ON ') + \
-          style.SQL_TABLE(model) + \
+          style.SQL_TABLE('"%s"' % model) + \
           style.SQL_KEYWORD(' USING ') + \
           style.SQL_COLTYPE(index_type) + ' ( ' + \
-          style.SQL_FIELD(field) + ' ' + \
+          style.SQL_FIELD('"%s"' % field) + ' ' + \
           style.SQL_KEYWORD(index_opts) + ' );'
     return sql
+
+class WKTField(LargeTextField):
+    "An oldforms LargeTextField for editing WKT text in the admin."
+
+    def render(self, data):
+        # PostGIS uses EWKBHEX to store its values internally, converting
+        # to WKT for the admin first.
+        wkt = geomToWKT(geomFromHEX(data))
+        return super(WKTField, self).render(wkt)
 
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Geometry type."
@@ -38,12 +51,19 @@ class GeometryField(Field):
     _geom = 'GEOMETRY'
 
     def __init__(self, srid=4326, index=False, **kwargs):
+        #TODO: SRID a standard, or specific to postgis?
+        # Whether or not index this field, defaults to False
+        # Why can't we just use db_index? 
+        # TODO: Move index creation (and kwarg lookup, and...)
+        #  into Field rather than core.management and db.models.query.
+        self._index = index
+
+        # The SRID for the geometry, defaults to 4326.
+        self._srid = srid
+
         # Calling the Field initialization function first
         super(GeometryField, self).__init__(**kwargs)
 
-        # The SRID for the geometry, defaults to 4326
-        self._srid = srid
-        self._index = index
 
     def get_internal_type(self):
         return "NoField"
@@ -51,11 +71,16 @@ class GeometryField(Field):
     def _post_create_sql(self, *args, **kwargs):
         """Returns SQL that will be executed after the model has been created.  Geometry
         columns must be added after creation with the PostGIS AddGeometryColumn() function."""
+
+        #TODO: clean up *args/**kwargs.
+
+        # Getting the AddGeometryColumn() SQL necessary to create a PostGIS
+        # geometry field.
         post_sql = _add_geom(self._geom, self._srid, *args, **kwargs)
+
+        # If the user wants to index this data, then get the indexing SQL as well.
         if self._index:
-            # Creating geometry indices doesn't yet work.
-            #return '%s\n%s' % (post_sql, _geom_index(self._geom, *args, **kwargs))
-            return post_sql
+            return '%s\n%s' % (post_sql, _geom_index(self._geom, *args, **kwargs))
         else:
             return post_sql
 
@@ -69,12 +94,16 @@ class GeometryField(Field):
     def get_db_prep_save(self, value):
         "Making sure the SRID is included before saving."
         return 'SRID=%d;%s' % (self._srid, value)
+
+    def get_manipulator_field_objs(self):
+        "Using the WKTField (defined above) to be our manipulator."
+        return [WKTField]
     
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     _geom = 'POINT'
 
-class LineString(GeometryField):
+class LineStringField(GeometryField):
     _geom = 'LINESTRING'
 
 class PolygonField(GeometryField):
