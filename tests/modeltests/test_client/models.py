@@ -1,5 +1,5 @@
 """
-39. Testing using the Test Client
+38. Testing using the Test Client
 
 The test client is a class that can act like a simple
 browser for testing purposes.
