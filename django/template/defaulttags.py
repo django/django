@@ -140,7 +140,7 @@ class IfChangedNode(Node):
             else:
                 compare_to = self.nodelist.render(context)
         except VariableDoesNotExist:
-            compare_to = None        
+            compare_to = None
 
         if  compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
@@ -280,24 +280,6 @@ class LoadNode(Node):
     def render(self, context):
         return ''
 
-class LoremNode(Node):
-    def __init__(self, count, method, common):
-        self.count, self.method, self.common = count, method, common
-
-    def render(self, context):
-        from django.utils.lorem_ipsum import words, paragraphs
-        try:
-            count = int(self.count.resolve(context))
-        except (ValueError, TypeError):
-            count = 1
-        if self.method == 'w':
-            return words(count, common=self.common)
-        else:
-            paras = paragraphs(count, common=self.common)
-        if self.method == 'p':
-            paras = ['<p>%s</p>' % p for p in paras]
-        return '\n\n'.join(paras)
-
 class NowNode(Node):
     def __init__(self, format_string):
         self.format_string = format_string
@@ -338,7 +320,7 @@ class URLNode(Node):
         self.view_name = view_name
         self.args = args
         self.kwargs = kwargs
-      
+
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
@@ -787,52 +769,6 @@ def load(parser, token):
 load = register.tag(load)
 
 #@register.tag
-def lorem(parser, token):
-    """
-    Creates random latin text useful for providing test data in templates.
-
-    Usage format::
-
-        {% lorem [count] [method] [random] %}
-
-    ``count`` is a number (or variable) containing the number of paragraphs or
-    words to generate (default is 1).
-
-    ``method`` is either ``w`` for words, ``p`` for HTML paragraphs, ``b`` for
-    plain-text paragraph blocks (default is ``b``).
-
-    ``random`` is the word ``random``, which if given, does not use the common
-    paragraph (starting "Lorem ipsum dolor sit amet, consectetuer...").
-
-    Examples:
-        * ``{% lorem %}`` will output the common "lorem ipsum" paragraph
-        * ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
-          and two random paragraphs each wrapped in HTML ``<p>`` tags
-        * ``{% lorem 2 w random %}`` will output two random latin words
-    """
-    bits = list(token.split_contents())
-    tagname = bits[0]
-    # Random bit
-    common = bits[-1] != 'random'
-    if not common:
-        bits.pop()
-    # Method bit
-    if bits[-1] in ('w', 'p', 'b'):
-        method = bits.pop()
-    else:
-        method = 'b'
-    # Count bit
-    if len(bits) > 1:
-        count = bits.pop()
-    else:
-        count = '1'
-    count = parser.compile_filter(count)
-    if len(bits) != 1:
-        raise TemplateSyntaxError, "Incorrect format for %r tag" % tagname
-    return LoremNode(count, method, common)
-lorem = register.tag(lorem)    
-
-#@register.tag
 def now(parser, token):
     """
     Display the date, formatted according to the given string.
@@ -980,12 +916,12 @@ templatetag = register.tag(templatetag)
 
 def url(parser, token):
     """
-    Returns an absolute URL matching given view with its parameters. 
-    
+    Returns an absolute URL matching given view with its parameters.
+
     This is a way to define links that aren't tied to a particular URL configuration::
-    
+
         {% url path.to.some_view arg1,arg2,name1=value1 %}
-    
+
     The first argument is a path to a view. It can be an absolute python path
     or just ``app_name.view_name`` without the project name if the view is
     located inside the project.  Other arguments are comma-separated values
@@ -994,18 +930,18 @@ def url(parser, token):
 
     For example if you have a view ``app_name.client`` taking client's id and
     the corresponding line in a URLconf looks like this::
-    
+
         ('^client/(\d+)/$', 'app_name.client')
-    
+
     and this app's URLconf is included into the project's URLconf under some
     path::
-    
+
         ('^clients/', include('project_name.app_name.urls'))
-    
+
     then in a template you can create a link for a certain client like this::
-    
+
         {% url app_name.client client.id %}
-    
+
     The URL will look like ``/clients/client/123/``.
     """
     bits = token.contents.split(' ', 2)
