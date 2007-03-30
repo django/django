@@ -43,6 +43,7 @@ The arguments are:
     ``random``   The word ``random``, which if given, does not use the common
                  paragraph ("Lorem ipsum dolor sit amet...") when generating
                  text.
+    ===========  =============================================================
 
 Examples:
 
