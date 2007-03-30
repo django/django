@@ -192,8 +192,8 @@ def smart_split(text):
     backslashes. In the output, strings will keep their initial and trailing
     quote marks.
 
-    >>> list(smart_split('This is "a person\'s" test.')) 
-    ['This', 'is', '"a person\'s"', 'test.'] 
+    >>> list(smart_split('This is "a person\'s" test.'))
+    ['This', 'is', '"a person\'s"', 'test.']
     """
     for bit in smart_split_re.finditer(text):
         bit = bit.group(0)
