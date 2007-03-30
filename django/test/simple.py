@@ -84,5 +84,5 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
     
     teardown_test_environment()
     
-    return len(result.failures)
+    return len(result.failures) + len(result.errors)
     

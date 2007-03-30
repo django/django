@@ -186,7 +186,7 @@ def _get_sql_model_create(model, known_models=set()):
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' + 
+                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
                         backend.get_deferrable_sql()
                     )
                 else:
@@ -232,7 +232,7 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
                     (backend.quote_name(r_table), r_name,
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col), 
+                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col),
                     backend.get_deferrable_sql()))
             del pending_references[model]
     return final_output
@@ -456,7 +456,7 @@ def get_sql_indexes_for_model(model):
             unique = f.unique and 'UNIQUE ' or ''
             output.append(
                 style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_TABLE(backend.quote_name('%s_%s' % (model._meta.db_table, f.column))) + ' ' + \
                 style.SQL_KEYWORD('ON') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                 "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
@@ -554,7 +554,7 @@ def syncdb(verbosity=1, interactive=True):
     # to do at this point.
     _emit_post_sync_signal(created_models, verbosity, interactive)
 
-    # Install custom SQL for the app (but only if this 
+    # Install custom SQL for the app (but only if this
     # is a model we've just created)
     for app in models.get_apps():
         for model in models.get_models(app):
@@ -696,7 +696,7 @@ def flush(verbosity=1, interactive=True):
     from django.conf import settings
     from django.db import connection, transaction, models
     from django.dispatch import dispatcher
-    
+
     disable_termcolors()
 
     # First, try validating the models.
@@ -709,7 +709,7 @@ def flush(verbosity=1, interactive=True):
             __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
-    
+
     sql_list = get_sql_flush()
 
     if interactive:
@@ -743,10 +743,10 @@ The full error: """ % settings.DATABASE_NAME + style.ERROR_OUTPUT(str(e)) + '\n'
         # applications to respond as if the database had been
         # sync'd from scratch.
         _emit_post_sync_signal(models.get_models(), verbosity, interactive)
-        
+
         # Reinstall the initial_data fixture
         load_data(['initial_data'], verbosity=verbosity)
-        
+
     else:
         print "Flush cancelled."
 flush.help_doc = "Executes ``sqlflush`` on the current database."
@@ -1325,7 +1325,7 @@ def test(app_labels, verbosity=1):
     failures = test_runner(app_list, verbosity)
     if failures:
         sys.exit(failures)
-        
+
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
 test.args = '[--verbosity] ' + APP_ARGS
 
@@ -1336,37 +1336,45 @@ def load_data(fixture_labels, verbosity=1):
     from django.db import connection, transaction
     from django.conf import settings
     import sys
-     
+
     # Keep a count of the installed objects and fixtures
     count = [0,0]
-    
+
     humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
 
     # Get a cursor (even though we don't need one yet). This has
-    # the side effect of initializing the test database (if 
+    # the side effect of initializing the test database (if
     # it isn't already initialized).
     cursor = connection.cursor()
-    
-    # Start transaction management. All fixtures are installed in a 
+
+    # Start transaction management. All fixtures are installed in a
     # single transaction to ensure that all references are resolved.
     transaction.commit_unless_managed()
     transaction.enter_transaction_management()
     transaction.managed(True)
-    
+
     app_fixtures = [os.path.join(os.path.dirname(app.__file__),'fixtures') for app in get_apps()]
     for fixture_label in fixture_labels:
+        parts = fixture_label.split('.')
+        if len(parts) == 1:
+            fixture_name = fixture_label
+            formats = serializers.get_serializer_formats()
+        else:
+            fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+            if format in serializers.get_serializer_formats():
+                formats = [format]
+            else:
+                formats = []
+
         if verbosity > 0:
-            print "Loading '%s' fixtures..." % fixture_label
+            if formats:
+                print "Loading '%s' fixtures..." % fixture_name
+            else:
+                print "Skipping fixture '%s': %s is not a known serialization format" % (fixture_name, format)
+
         for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
             if verbosity > 1:
                 print "Checking %s for fixtures..." % humanize(fixture_dir)
-            parts = fixture_label.split('.')
-            if len(parts) == 1:
-                fixture_name = fixture_label
-                formats = serializers.get_serializer_formats()
-            else:
-                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                formats = [format]
 
             label_found = False
             for format in formats:
@@ -1379,7 +1387,7 @@ def load_data(fixture_labels, verbosity=1):
                     fixture = open(full_path, 'r')
                     if label_found:
                         fixture.close()
-                        print style.ERROR("Multiple fixtures named '%s' in %s. Aborting." % 
+                        print style.ERROR("Multiple fixtures named '%s' in %s. Aborting." %
                             (fixture_name, humanize(fixture_dir)))
                         transaction.rollback()
                         transaction.leave_transaction_management()
@@ -1398,7 +1406,7 @@ def load_data(fixture_labels, verbosity=1):
                         except Exception, e:
                             fixture.close()
                             sys.stderr.write(
-                                style.ERROR("Problem installing fixture '%s': %s\n" % 
+                                style.ERROR("Problem installing fixture '%s': %s\n" %
                                      (full_path, str(e))))
                             transaction.rollback()
                             transaction.leave_transaction_management()
@@ -1416,27 +1424,27 @@ def load_data(fixture_labels, verbosity=1):
             print "Installed %d object(s) from %d fixture(s)" % tuple(count)
     transaction.commit()
     transaction.leave_transaction_management()
-        
+
 load_data.help_doc = 'Installs the named fixture(s) in the database'
 load_data.args = "[--verbosity] fixture, fixture, ..."
- 
+
 def dump_data(app_labels, format='json', indent=None):
     "Output the current contents of the database as a fixture of the given format"
     from django.db.models import get_app, get_apps, get_models
     from django.core import serializers
- 
+
     if len(app_labels) == 0:
         app_list = get_apps()
     else:
         app_list = [get_app(app_label) for app_label in app_labels]
- 
+
     # Check that the serialization format exists; this is a shortcut to
     # avoid collating all the objects and _then_ failing.
     try:
         serializers.get_serializer(format)
     except KeyError:
-        sys.stderr.write(style.ERROR("Unknown serialization format: %s\n" % format))        
-    
+        sys.stderr.write(style.ERROR("Unknown serialization format: %s\n" % format))
+
     objects = []
     for app in app_list:
         for model in get_models(app):
@@ -1531,7 +1539,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
     parser.add_option('--format', default='json', dest='format',
-        help='Specifies the output serialization format for fixtures')    
+        help='Specifies the output serialization format for fixtures')
     parser.add_option('--indent', default=None, dest='indent',
         type='int', help='Specifies the indent level to use when pretty-printing output')
     parser.add_option('--verbosity', action='store', dest='verbosity', default='1',

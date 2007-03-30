@@ -860,6 +860,16 @@ level and at the form instance level, and the latter gets precedence::
     <tr><th>Url:</th><td><input type="text" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
+Creating custom fields
+----------------------
+
+If the built-in ``Field`` classes don't meet your needs, you can easily create
+custom ``Field`` classes. To do this, just create a subclass of
+``django.newforms.Field``. Its only requirements are that it implement a
+``clean()`` method and that its ``__init__()`` method accept the core arguments
+mentioned above (``required``, ``label``, ``initial``, ``widget``,
+``help_text``).
+
 More coming soon
 ================
 

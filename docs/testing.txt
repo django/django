@@ -276,7 +276,7 @@ for testing purposes:
     ``status_code``  The HTTP status of the response. See RFC2616_ for a
                      full list of HTTP status codes.
 
-    ``content``      The body of the response. The is the final page
+    ``content``      The body of the response. This is the final page
                      content as rendered by the view, or any error message
                      (such as the URL for a 302 redirect).
 
@@ -468,7 +468,8 @@ failed::
 
     FAILED (failures=1)
 
-The return code for the script will indicate the number of tests that failed.
+The return code for the script is the total number of failed and erroneous 
+tests. If all the tests pass, the return code is 0.
 
 Regardless of whether the tests pass or fail, the test database is destroyed when
 all the tests have been executed. 

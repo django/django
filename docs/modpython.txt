@@ -37,7 +37,8 @@ Then edit your ``httpd.conf`` file and add the following::
         PythonDebug On
     </Location>
 
-...and replace ``mysite.settings`` with the Python path to your settings file.
+...and replace ``mysite.settings`` with the Python import path to your Django
+project's settings file.
 
 This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``

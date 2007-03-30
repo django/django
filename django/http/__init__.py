@@ -155,6 +155,9 @@ def parse_cookie(cookie):
 
 class HttpResponse(object):
     "A basic HTTP response, with content and dictionary-accessed headers"
+
+    status_code = 200
+
     def __init__(self, content='', mimetype=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
@@ -168,7 +171,6 @@ class HttpResponse(object):
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
-        self.status_code = 200
 
     def __str__(self):
         "Full HTTP message, including headers"
@@ -254,47 +256,49 @@ class HttpResponse(object):
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseRedirect(HttpResponse):
+    status_code = 302
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 302
 
 class HttpResponsePermanentRedirect(HttpResponse):
+    status_code = 301
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 301
 
 class HttpResponseNotModified(HttpResponse):
-    def __init__(self):
-        HttpResponse.__init__(self)
-        self.status_code = 304
+    status_code = 304
+
+class HttpResponseBadRequest(HttpResponse):
+    status_code = 400
 
 class HttpResponseNotFound(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 404
+    status_code = 404
 
 class HttpResponseForbidden(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 403
+    status_code = 403
 
 class HttpResponseNotAllowed(HttpResponse):
+    status_code = 405
+
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
-        self.status_code = 405
 
 class HttpResponseGone(HttpResponse):
+    status_code = 410
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 410
 
 class HttpResponseServerError(HttpResponse):
+    status_code = 500
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 500
 
 def get_host(request):
     "Gets the HTTP host from the environment or request headers."
