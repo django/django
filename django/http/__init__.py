@@ -272,6 +272,9 @@ class HttpResponsePermanentRedirect(HttpResponse):
 class HttpResponseNotModified(HttpResponse):
     status_code = 304
 
+class HttpResponseBadRequest(HttpResponse):
+    status_code = 400
+
 class HttpResponseNotFound(HttpResponse):
     status_code = 404
 
