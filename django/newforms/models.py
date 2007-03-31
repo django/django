@@ -36,13 +36,14 @@ def save_instance(form, instance, commit=True):
         raise ValueError("The %s could not be changed because the data didn't validate." % opts.object_name)
     clean_data = form.clean_data
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField):
+        if not f.editable or isinstance(f, models.AutoField) or not f.name in clean_data:
             continue
         setattr(instance, f.name, clean_data[f.name])
     if commit:
         instance.save()
         for f in opts.many_to_many:
-            setattr(instance, f.attname, clean_data[f.name])
+            if f.name in clean_data:
+                setattr(instance, f.attname, clean_data[f.name])
     # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
     # data will be lost. This happens because a many-to-many options cannot be
     # set on an object until after it's saved. Maybe we should raise an
