@@ -3878,6 +3878,24 @@ A Select widget that uses a list of Japanese prefectures as its choices.
 <option value="okinawa">Okinawa</option>
 </select>
 
+# ITZipCodeField #############################################################
+
+>>> from django.contrib.localflavor.it.forms import ITZipCodeField
+>>> f = ITZipCodeField()
+>>> f.clean('00100')
+u'00100'
+>>> f.clean(' 00100')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX.']
+
+# ITRegionSelect #############################################################
+
+>>> from django.contrib.localflavor.it.forms import ITRegionSelect
+>>> w = ITRegionSelect()
+>>> w.render('regions', 'PMN')
+u'<select name="regions">\n<option value="ABR">Abruzzo</option>\n<option value="BAS">Basilicata</option>\n<option value="CAL">Calabria</option>\n<option value="CAM">Campania</option>\n<option value="EMR">Emilia-Romagna</option>\n<option value="FVG">Friuli-Venezia Giulia</option>\n<option value="LAZ">Lazio</option>\n<option value="LIG">Liguria</option>\n<option value="LOM">Lombardia</option>\n<option value="MAR">Marche</option>\n<option value="MOL">Molise</option>\n<option value="PMN" selected="selected">Piemonte</option>\n<option value="PUG">Puglia</option>\n<option value="SAR">Sardegna</option>\n<option value="SIC">Sicilia</option>\n<option value="TOS">Toscana</option>\n<option value="TAA">Trentino-Alto Adige</option>\n<option value="UMB">Umbria</option>\n<option value="VAO">Valle d\u2019Aosta</option>\n<option value="VEN">Veneto</option>\n</select>'
+
 # FIZipCodeField #############################################################
 
 FIZipCodeField validates that the data is a valid FI zipcode.
