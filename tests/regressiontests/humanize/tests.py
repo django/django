@@ -27,8 +27,10 @@ should've produced %s""" % (method, rendered, result_list[index]))
         self.humanize_tester(test_list, result_list, 'ordinal')
 
     def test_intcomma(self):
-        test_list = ('100','1000','10123','10311','1000000')
-        result_list = ('100', '1,000', '10,123', '10,311', '1,000,000')
+        test_list = (100, 1000, 10123, 10311, 1000000, 1234567.25,
+                     '100','1000','10123','10311','1000000','1234567.1234567')
+        result_list = ('100', '1,000', '10,123', '10,311', '1,000,000','1,234,567.25',
+                       '100', '1,000', '10,123', '10,311', '1,000,000','1,234,567.1234567')
 
         self.humanize_tester(test_list, result_list, 'intcomma')
 
