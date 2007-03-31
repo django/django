@@ -1,8 +1,8 @@
 # The Django base Field class.
 from django.db.models.fields import Field
-from django.oldforms import LargeTextField
 from django.contrib.gis.db.models.postgis import POSTGIS_TERMS
-from geos import geomToWKT, geomFromHEX
+from django.contrib.gis.oldforms import WKTField
+from django.utils.functional import curry
 
 #TODO: add db.quotename.
 
@@ -35,15 +35,6 @@ def _geom_index(geom, style, model, field,
           style.SQL_KEYWORD(index_opts) + ' );'
     return sql
 
-class WKTField(LargeTextField):
-    "An oldforms LargeTextField for editing WKT text in the admin."
-
-    def render(self, data):
-        # PostGIS uses EWKBHEX to store its values internally, converting
-        # to WKT for the admin first.
-        wkt = geomToWKT(geomFromHEX(data))
-        return super(WKTField, self).render(wkt)
-
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Geometry type."
 
@@ -64,6 +55,14 @@ class GeometryField(Field):
         # Calling the Field initialization function first
         super(GeometryField, self).__init__(**kwargs)
 
+
+    def contribute_to_class(self, cls, name):
+        super(GeometryField, self).contribute_to_class(cls, name)
+
+        # Adding the WKT accessor function for geometry
+        setattr(cls, 'get_%s_wkt' % self.name, curry(cls._get_GEOM_wkt, field=self))
+        setattr(cls, 'get_%s_centroid' % self.name, curry(cls._get_GEOM_centroid, field=self))
+        setattr(cls, 'get_%s_area' % self.name, curry(cls._get_GEOM_area, field=self))
 
     def get_internal_type(self):
         return "NoField"
@@ -98,7 +97,7 @@ class GeometryField(Field):
     def get_manipulator_field_objs(self):
         "Using the WKTField (defined above) to be our manipulator."
         return [WKTField]
-    
+
 # The OpenGIS Geometry Type Fields
 class PointField(GeometryField):
     _geom = 'POINT'

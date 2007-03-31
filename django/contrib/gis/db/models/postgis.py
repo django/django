@@ -2,7 +2,7 @@
 # django.db.models.query objects to be customized for PostGIS.
 from copy import copy
 from django.db import backend
-from django.db.models.query import LOOKUP_SEPARATOR, find_field, FieldFound
+from django.db.models.query import LOOKUP_SEPARATOR, find_field, FieldFound, QUERY_TERMS, get_where_clause
 from django.utils.datastructures import SortedDict
 
 # PostGIS-specific operators. The commented descriptions of these
@@ -41,7 +41,6 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
     'distance' : 'Distance',
     'equals' : 'Equals',
     'disjoint' : 'Disjoint',
-    'intersects' : 'Intersects',
     'touches' : 'Touches',
     'crosses' : 'Crosses',
     'within' : 'Within',
@@ -55,6 +54,7 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
 # and the geometry functions.
 POSTGIS_TERMS = list(POSTGIS_OPERATORS.keys()) # Getting the operators first
 POSTGIS_TERMS.extend(list(POSTGIS_GEOMETRY_FUNCTIONS.keys())) # Adding on the Geometry Functions
+POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
 
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
@@ -72,17 +72,17 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
         return '%s(%s%s, %%s)' % (POSTGIS_GEOMETRY_FUNCTIONS[lookup_type], table_prefix, field_name)
     except KeyError:
         pass
-
+    
     # For any other lookup type
     if lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
 
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
-def geo_parse_lookup(kwarg_items, opts):
+def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
     # (e.g. "name__exact": "tom") to SQL.
-    # Returns a tuple of (tables, joins, where, params).
+    # Returns a tuple of (joins, where, params).
 
     # 'joins' is a sorted dictionary describing the tables that must be joined
     # to complete the query. The dictionary is sorted because creation order
@@ -112,10 +112,11 @@ def geo_parse_lookup(kwarg_items, opts):
         # If there is only one part, or the last part is not a query
         # term, assume that the query is an __exact
         lookup_type = path.pop()
+
         if lookup_type == 'pk':
             lookup_type = 'exact'
             path.append(None)
-        elif len(path) == 0 or lookup_type not in POSTGIS_TERMS:
+        elif len(path) == 0 or not ((lookup_type in QUERY_TERMS) or (lookup_type in POSTGIS_TERMS)):
             path.append(lookup_type)
             lookup_type = 'exact'
 
@@ -200,6 +201,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
 
         # Does the name belong to a one-to-one, many-to-one, or regular field?
         field = find_field(name, current_opts.fields, False)
+
         if field:
             if field.rel: # One-to-One/Many-to-one field
                 new_table = current_table + '__' + name
@@ -293,8 +295,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         if hasattr(field, '_geom'):
             where.append(get_geo_where_clause(lookup_type, current_table + '.', column, value))
         else:
-            raise TypeError, 'Field "%s" (%s) is not a Geometry Field.' % (column, field.__class__.__name__)
+            where.append(get_where_clause(lookup_type, current_table + '.', column, value))
         params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params
-

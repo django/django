@@ -1,25 +1,24 @@
-from django.db.models.query import *
-from django.contrib.gis.db.models.postgis import geo_parse_lookup
+from django.db.models.query import Q, QNot, QuerySet
+from django.contrib.gis.db.models.postgis import parse_lookup
+import operator
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
 
     def get_sql(self, opts):
-        "Overloaded to use the geo_parse_lookup() function instead of parse_lookup()"
-        return geo_parse_lookup(self.kwargs.items(), opts)
+        "Overloaded to use our own parse_lookup() function."
+        return parse_lookup(self.kwargs.items(), opts)
 
 class GeoQuerySet(QuerySet):
     "Geographical-enabled QuerySet object."
 
-    def geo_filter(self, *args, **kwargs):
-        "Returns a new GeoQuerySet instance with the args ANDed to the existing set."
-        return self._geo_filter_or_exclude(None, *args, **kwargs)
+    def __init__(self, model=None):
+        super(GeoQuerySet, self).__init__(model=model)
 
-    def geo_exclude(self, *args, **kwargs):
-        "Returns a new GeoQuerySet instance with NOT (args) ANDed to the existing set."
-        return self._geo_filter_or_exclude(QNot, *args, **kwargs)
+        # We only want to use the GeoQ object for our queries
+        self._filters = GeoQ()
 
-    def _geo_filter_or_exclude(self, mapper, *args, **kwargs):
+    def _filter_or_exclude(self, mapper, *args, **kwargs):
         # mapper is a callable used to transform Q objects,
         # or None for identity transform
         if mapper is None:
