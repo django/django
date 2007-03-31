@@ -1758,15 +1758,39 @@ slightly violates the DRY principle: the URL for this object is defined both
 in the URLConf file and in the model.
 
 You can further decouple your models from the URLconf using the ``permalink``
-decorator. This decorator is passed the view function and any parameters you
-would use for accessing this instance directly. Django then works out the
-correct full URL path using the URLconf. For example::
+decorator. This decorator is passed the view function, a list of positional
+parameters and (optionally) a dictionary of named parameters.  Django then
+works out the correct full URL path using the URLconf, substituting the
+parameters you have given into the URL. For example, if your URLconf
+contained a line such as::
+
+    (r'^/people/(\d+)/$', 'people.views.details'),
+
+...your model could have a ``get_absolute_url`` method that looked like this::
 
     from django.db.models import permalink
 
     def get_absolute_url(self):
-        return ('people.views.details', str(self.id))
+        return ('people.views.details', [str(self.id)])
     get_absolute_url = permalink(get_absolute_url)
+
+
+Similraly, if you had a URLconf entry that looked like::
+
+    (r'/archive/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$',
+        archive_view)
+
+...you could reference this using ``permalink()`` as follows::
+
+    def get_absolute_url(self):
+        return ('archive_view', (), {
+            'year': self.created.year,
+            'month': self.created.month,
+            'day': self.created.day})
+    get_absolute_url = permalink(get_absolute_url)
+
+Notice that we specify an empty sequence for the second argument in this case,
+since we're only wanting to pass in some keyword arguments.
 
 In this way, you're tying the model's absolute URL to the view that is used
 to display it, without repeating the URL information anywhere. You can still
