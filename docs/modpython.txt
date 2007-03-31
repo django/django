@@ -54,6 +54,19 @@ on it, you'll need to tell mod_python::
 
     PythonPath "['/path/to/project'] + sys.path"
 
+.. caution::
+
+    Is you are using Windows, remember that the path will contain backslashes.
+    This string is passed through Python's string parser twice, so you need to
+    escape each backslash **twice**::
+
+        PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
+
+    or use raw strings::
+
+        PythonPath "[r'c:\\path\\to\\project'] + sys.path"
+
+
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.
 
