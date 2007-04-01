@@ -923,7 +923,8 @@ class FilePathField(SelectField):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     if match is None or match_re.search(f):
-                        choices.append((os.path.join(root, f), f))
+                        f = os.path.join(root, f)
+                        choices.append((f, f.replace(path, "", 1)))
         else:
             try:
                 for f in os.listdir(path):
