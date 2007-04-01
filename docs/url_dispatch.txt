@@ -203,7 +203,7 @@ optional extra arguments dictionary. For example::
         ...
     )
 
-See `Naming URL patterns`_ for why then ``name`` parameter is useful.
+See `Naming URL patterns`_ for why the ``name`` parameter is useful.
 
 handler404
 ----------
