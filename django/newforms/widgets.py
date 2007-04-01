@@ -24,7 +24,10 @@ class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
-        self.attrs = attrs or {}
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
 
     def render(self, name, value, attrs=None):
         """

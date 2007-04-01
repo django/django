@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from localflavor import localflavor_tests
+from regressions import regression_tests
 
 form_tests = r"""
 >>> from django.newforms import *
@@ -3297,6 +3298,7 @@ u'foo'
 __test__ = {
     'form_tests': form_tests,
     'localflavor': localflavor_tests,
+    'regressions': regression_tests,
 }
 
 if __name__ == "__main__":
