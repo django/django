@@ -328,9 +328,9 @@ Do I have to use mod_python?
 
 Although we recommend mod_python for production use, you don't have to use it,
 thanks to the fact that Django uses an arrangement called WSGI_. Django can
-talk to any WSGI-enabled server. Other common non-mod_python deployment
-setups are FastCGI, SCGI, or AJP. See `How to use Django with FastCGI, SCGI or
-AJP`_ for full information.
+talk to any WSGI-enabled server. Other non-mod_python deployment setups are
+FastCGI, SCGI or AJP. See `How to use Django with FastCGI, SCGI or AJP`_ for
+full information.
 
 Also, see the `server arrangements wiki page`_ for other deployment strategies.
 

@@ -4,13 +4,14 @@ How to use Django with FastCGI, SCGI or AJP
 
 Although the `current preferred setup`_ for running Django is Apache_ with
 `mod_python`_, many people use shared hosting, on which protocols such as
-FastCGI, SCGI, or AJP are the only viable options. In some setups, these protocols
+FastCGI, SCGI or AJP are the only viable options. In some setups, these protocols
 also allow better security -- and, possibly, better performance -- than mod_python.
 
 .. admonition:: Note
 
-    This document primarily talks about FastCGI, although other flup-supported
-    protocols such as SCGI and AJP are supported. 
+    This document primarily focuses on FastCGI. Other protocols, such as SCGI
+    and AJP, are also supported, through the ``flup`` Python package. See the
+    "Protocols" section below for specifics about SCGI and AJP.
 
 Essentially, FastCGI is an efficient way of letting an external application
 serve pages to a Web server. The Web server delegates the incoming Web requests
@@ -86,10 +87,12 @@ or socket you specified when starting the FastCGI server.
 Protocols
 ---------
 
-Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_, and `AJP1.3`_. 
-Your preferred protocol can be selected by using the `protocol=`<protocol_name> option with
-`./manage.py runfcgi` where <protocol-name> may currently be one of: `fcgi` (the default), 
-`scgi`, or `ajp`. 
+Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and `AJP1.3`_
+(the Apache JServ Protocol, version 1.3). Select your preferred protocol by using the
+`protocol=`<protocol_name> option with `./manage.py runfcgi` -- where <protocol_name>
+may be one of: `fcgi` (the default), `scgi` or `ajp`. For example::
+
+    ./manage.py runfcgi --protocol=scgi
 
 .. _flup: http://www.saddi.com/software/flup/
 .. _fastcgi: http://www.fastcgi.com/
