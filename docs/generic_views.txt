@@ -222,7 +222,7 @@ In addition to ``extra_context``, the template's context will be:
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
       ``latest`` will be a list of the latest 10 objects in ``queryset``.
 
-.. _RequestContext docs: ../templates_python/#subclassing-context-djangocontext
+.. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------
