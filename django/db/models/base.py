@@ -26,7 +26,8 @@ class ModelBase(type):
             if not filter(lambda b: issubclass(b, Model), bases):
                 return super(ModelBase, cls).__new__(cls, name, bases, attrs)
         except NameError:
-            # Model isn't defined yet, meaning we're looking at django's own Model defined below 
+            # 'Model' isn't defined yet, meaning we're looking at Django's own
+            # Model class, defined below.
             return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
