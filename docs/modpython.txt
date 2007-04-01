@@ -13,14 +13,15 @@ other server arrangements.
 Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
 `prefork MPM`_, as opposed to the `worker MPM`_.
 
-You may also be interested in `How to use Django with FastCGI`_.
+You may also be interested in `How to use Django with FastCGI, SCGI or AJP`_
+(which also covers SCGI and AJP).
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
-.. _How to use Django with FastCGI: ../fastcgi/
+.. _How to use Django with FastCGI, SCGI or AJP: ../fastcgi/
 
 Basic configuration
 ===================
