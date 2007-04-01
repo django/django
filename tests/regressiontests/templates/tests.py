@@ -692,11 +692,12 @@ class Templates(unittest.TestCase):
             'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
             'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+            'url04' : ('{% url named-client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
 
             # Failures
-            'url04' : ('{% url %}', {}, template.TemplateSyntaxError),
-            'url05' : ('{% url no_such_view %}', {}, ''),
-            'url06' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
+            'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url-fail02' : ('{% url no_such_view %}', {}, ''),
+            'url-fail03' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.

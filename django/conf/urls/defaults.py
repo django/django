@@ -1,19 +1,25 @@
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
 
-__all__ = ['handler404', 'handler500', 'include', 'patterns']
+__all__ = ['handler404', 'handler500', 'include', 'patterns', 'url']
 
 handler404 = 'django.views.defaults.page_not_found'
 handler500 = 'django.views.defaults.server_error'
 
 include = lambda urlconf_module: [urlconf_module]
 
-def patterns(prefix, *tuples):
+def patterns(prefix, *args):
     pattern_list = []
-    for t in tuples:
-        regex, view_or_include = t[:2]
-        default_kwargs = t[2:]
-        if type(view_or_include) == list:
-            pattern_list.append(RegexURLResolver(regex, view_or_include[0], *default_kwargs))
+    for t in args:
+        if isinstance(t, (list, tuple)):
+            pattern_list.append(url(prefix=prefix, *t))
         else:
-            pattern_list.append(RegexURLPattern(regex, prefix and (prefix + '.' + view_or_include) or view_or_include, *default_kwargs))
+            pattern_list.append(t)
     return pattern_list
+
+def url(regex, view, kwargs=None, name=None, prefix=''):
+    if type(view) == list:
+        # For include(...) processing.
+        return RegexURLResolver(regex, view[0], kwargs)
+    else:
+        return RegexURLPattern(regex, prefix and (prefix + '.' + view) or view, kwargs, name)
+
