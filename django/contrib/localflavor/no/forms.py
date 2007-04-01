@@ -46,10 +46,12 @@ class NOSocialSecurityNumber(Field):
         try:
             if 000 <= inum < 500:
                 self.birthday = datetime.date(1900+year2, month, day)
-            if 500 <= inum < 750:
+            if 500 <= inum < 750 and year2 > 54:
                 self.birthday = datetime.date(1800+year2, month, day)
-            if 500 <= inum < 1000:
+            if 500 <= inum < 1000 and year2 < 40:
                 self.birthday = datetime.date(2000+year2, month, day)
+            if 900 <= inum < 1000 and year2 > 39:
+                self.birthday = datetime.date(1900+year2, month, day)
         except ValueError:
             raise ValidationError(msg)
 
