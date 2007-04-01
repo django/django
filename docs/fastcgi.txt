@@ -87,10 +87,11 @@ or socket you specified when starting the FastCGI server.
 Protocols
 ---------
 
-Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and `AJP1.3`_
-(the Apache JServ Protocol, version 1.3). Select your preferred protocol by using the
-``protocol=``<protocol_name> option with ``./manage.py runfcgi`` -- where <protocol_name>
-may be one of: ``fcgi`` (the default), ``scgi`` or ``ajp``. For example::
+Django supports all the protocols that flup_ does, namely fastcgi_, `SCGI`_ and
+`AJP1.3`_ (the Apache JServ Protocol, version 1.3). Select your preferred
+protocol by using the ``protocol=<protocol_name>`` option with
+``./manage.py runfcgi`` -- where ``<protocol_name>`` may be one of: ``fcgi``
+(the default), ``scgi`` or ``ajp``. For example::
 
     ./manage.py runfcgi --protocol=scgi
 
