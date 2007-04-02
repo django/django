@@ -3,7 +3,6 @@
 import os, re, sys
 import gettext as gettext_module
 from cStringIO import StringIO
-from django.utils.functional import lazy
 
 try:
     import threading
@@ -277,9 +276,6 @@ def ngettext(singular, plural, number):
         _default = translation(settings.LANGUAGE_CODE)
     return _default.ngettext(singular, plural, number)
 
-gettext_lazy = lazy(gettext, str)
-ngettext_lazy = lazy(ngettext, str)
-
 def check_for_language(lang_code):
     """
     Checks whether there is a global language file for the given language code.
@@ -493,4 +489,3 @@ def string_concat(*strings):
     """
     return ''.join([str(el) for el in strings])
 
-string_concat = lazy(string_concat, str)
