@@ -149,7 +149,7 @@ class Templates(unittest.TestCase):
 
             # Dictionary lookup wins out when there is a string and int version of the key.
             'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
-            
+
             # Basic filter usage
             'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
@@ -522,8 +522,8 @@ class Templates(unittest.TestCase):
             ### I18N ##################################################################
 
             # {% spaceless %} tag
-            'spaceless01': ("{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b> <i> text </i> </b>"),
-            'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b> <i> text </i> </b>"),
+            'spaceless01': ("{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
+            'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
             'spaceless03': ("{% spaceless %}<b><i>text</i></b>{% endspaceless %}", {}, "<b><i>text</i></b>"),
 
             # simple translation of a string delimited by '
@@ -654,11 +654,6 @@ class Templates(unittest.TestCase):
             'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
             'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
 
-            ### LOREM TAG ######################################################
-            'lorem01': ('{% lorem %}', {}, 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'),
-            'lorem02': ('{% lorem p %}', {}, '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>'),
-            'lorem03': ('{% lorem 6 w %}', {}, 'lorem ipsum dolor sit amet consectetur'),
-
             ### NOW TAG ########################################################
             # Simple case
             'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
@@ -697,11 +692,12 @@ class Templates(unittest.TestCase):
             'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
             'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+            'url04' : ('{% url named-client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
 
             # Failures
-            'url04' : ('{% url %}', {}, template.TemplateSyntaxError),
-            'url05' : ('{% url no_such_view %}', {}, ''),
-            'url06' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
+            'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url-fail02' : ('{% url no_such_view %}', {}, ''),
+            'url-fail03' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.

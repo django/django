@@ -328,8 +328,9 @@ Do I have to use mod_python?
 
 Although we recommend mod_python for production use, you don't have to use it,
 thanks to the fact that Django uses an arrangement called WSGI_. Django can
-talk to any WSGI-enabled server. The most common non-mod_python deployment
-setup is FastCGI. See `How to use Django with FastCGI`_ for full information.
+talk to any WSGI-enabled server. Other non-mod_python deployment setups are
+FastCGI, SCGI or AJP. See `How to use Django with FastCGI, SCGI or AJP`_ for
+full information.
 
 Also, see the `server arrangements wiki page`_ for other deployment strategies.
 
@@ -337,7 +338,7 @@ If you just want to play around and develop things on your local computer, use
 the development Web server that comes with Django. Things should Just Work.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with FastCGI: ../fastcgi/
+.. _How to use Django with FastCGI, SCGI or AJP: ../fastcgi/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?

@@ -88,7 +88,7 @@ class MatchChecker(object):
         return str(value) # TODO: Unicode?
 
 class RegexURLPattern(object):
-    def __init__(self, regex, callback, default_args=None):
+    def __init__(self, regex, callback, default_args=None, name=None):
         # regex is a string representing a regular expression.
         # callback is either a string like 'foo.views.news.stories.story_detail'
         # which represents the path to a module and a view function name, or a
@@ -100,6 +100,7 @@ class RegexURLPattern(object):
             self._callback = None
             self._callback_str = callback
         self.default_args = default_args or {}
+        self.name = name
 
     def resolve(self, path):
         match = self.regex.search(path)
@@ -205,14 +206,15 @@ class RegexURLResolver(object):
             try:
                 lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
             except (ImportError, AttributeError):
-                raise NoReverseMatch
+                if func_name != '':
+                    raise NoReverseMatch
         for pattern in self.urlconf_module.urlpatterns:
             if isinstance(pattern, RegexURLResolver):
                 try:
                     return pattern.reverse_helper(lookup_view, *args, **kwargs)
                 except NoReverseMatch:
                     continue
-            elif pattern.callback == lookup_view:
+            elif pattern.callback == lookup_view or pattern.name == lookup_view:
                 try:
                     return pattern.reverse_helper(*args, **kwargs)
                 except NoReverseMatch:

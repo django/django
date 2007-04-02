@@ -185,10 +185,25 @@ The first argument to ``patterns()`` is a string ``prefix``. See
 
 The remaining arguments should be tuples in this format::
 
-    (regular expression, Python callback function [, optional dictionary])
+    (regular expression, Python callback function [, optional dictionary [, optional name]])
 
-...where ``optional dictionary`` is optional. (See
-_`Passing extra options to view functions` below.)
+...where ``optional dictionary`` and ``optional name`` are optional. (See
+`Passing extra options to view functions`_ below.)
+
+url
+---
+**New in development version**
+
+The ``url()`` function can be used instead of a tuple as an argument to
+``patterns()``. This is convenient if you wish to specify a name without the
+optional extra arguments dictionary. For example::
+
+    urlpatterns = patterns('',
+        url(r'/index/$', index_view, name="main-view"),
+        ...
+    )
+
+See `Naming URL patterns`_ for why the ``name`` parameter is useful.
 
 handler404
 ----------
@@ -479,3 +494,44 @@ The style you use is up to you.
 
 Note that if you use this technique -- passing objects rather than strings --
 the view prefix (as explained in "The view prefix" above) will have no effect.
+
+Naming URL patterns
+===================
+
+**New in development version**
+
+It is fairly common to use the same view function in multiple URL patterns in
+your URLConf. This leads to problems when you come to do reverse URL matching,
+because the ``permalink()`` decorator and ``{% url %}`` template tag use the
+name of the view function to find a match.
+
+To solve this problem, you can give a name to each of your URL patterns in
+order to distinguish them from other patterns using the same views and
+parameters. You can then use this name wherever you would otherwise use the
+name of the view function. For example, if you URLConf contains::
+
+    urlpatterns = patterns('',
+        url(r'/archive/(\d{4})/$', archive, name="full-archive"),
+        url(r'/archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
+    )
+
+...you could refer to either the summary archive view in a template as::
+
+    {% url arch-summary 1945 %}
+
+Even though both URL patterns refer to the ``archive`` view here, using the
+``name`` parameter to ``url()`` allows you to tell them apart in templates.
+
+The string used for the URL name can contain any characters you like. You are
+not restricted to valid Python names.
+
+.. note::
+
+    Make sure that when you name your URLs, you use names that are unlikely to
+    clash with any other application's choice of names. If you call your URL
+    pattern *comment* and another application does the same thing, there is no
+    guarantee which URL will be inserted into your template when you use this
+    name. Putting a prefix on your URL names, perhaps derived from
+    the application name, will decrease the chances of collision. Something
+    like *myapp-comment* is recommended over simply *comment*.
+

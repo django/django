@@ -38,15 +38,16 @@ class Field(object):
     def __init__(self, required=True, widget=None, label=None, initial=None, help_text=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
-        # widget -- A Widget class, or instance of a Widget class, that should be
-        #         used for this Field when displaying it. Each Field has a default
-        #         Widget that it'll use if you don't specify this. In most cases,
-        #         the default widget is TextInput.
-        # label -- A verbose name for this field, for use in displaying this field in
-        #         a form. By default, Django will use a "pretty" version of the form
-        #         field name, if the Field is part of a Form.
-        # initial -- A value to use in this Field's initial display. This value is
-        #            *not* used as a fallback if data isn't given.
+        # widget -- A Widget class, or instance of a Widget class, that should
+        #           be used for this Field when displaying it. Each Field has a
+        #           default Widget that it'll use if you don't specify this. In
+        #           most cases, the default widget is TextInput.
+        # label -- A verbose name for this field, for use in displaying this
+        #          field in a form. By default, Django will use a "pretty"
+        #          version of the form field name, if the Field is part of a
+        #          Form.
+        # initial -- A value to use in this Field's initial display. This value
+        #            is *not* used as a fallback if data isn't given.
         # help_text -- An optional string to use as "help text" for this Field.
         if label is not None:
             label = smart_unicode(label)

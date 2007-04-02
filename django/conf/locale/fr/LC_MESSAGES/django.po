@@ -673,19 +673,19 @@ msgstr "L'URL est un lien cassé."
 
 #: contrib/humanize/templatetags/humanize.py:16
 msgid "th"
-msgstr "e"
+msgstr "<sup>e</sup>"
 
 #: contrib/humanize/templatetags/humanize.py:16
 msgid "st"
-msgstr "er"
+msgstr "<sup>er</sup>"
 
 #: contrib/humanize/templatetags/humanize.py:16
 msgid "nd"
-msgstr "d"
+msgstr "<sup>d</sup>"
 
 #: contrib/humanize/templatetags/humanize.py:16
 msgid "rd"
-msgstr "e"
+msgstr "<sup>e</sup>"
 
 #: contrib/humanize/templatetags/humanize.py:48
 #, python-format
@@ -1346,7 +1346,7 @@ msgstr "Sélectionnez %s pour changer"
 
 #: contrib/admin/views/main.py:768
 msgid "Database error"
-msgstr ""
+msgstr "Erreur de base de données"
 
 #: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
 #: contrib/admin/views/doc.py:50
@@ -1391,7 +1391,7 @@ msgstr "les objets `%(label)s.%(type)s en relation"
 #: contrib/admin/views/doc.py:219
 #, python-format
 msgid "all %s"
-msgstr ""
+msgstr "tous les %s"
 
 #: contrib/admin/views/doc.py:224
 #, python-format
@@ -1401,7 +1401,7 @@ msgstr "nombre de %s"
 #: contrib/admin/views/doc.py:229
 #, python-format
 msgid "Fields on %s objects"
-msgstr ""
+msgstr "Champs sur les objets %s"
 
 #: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
 #: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
@@ -1613,7 +1613,8 @@ msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
-msgstr ""
+msgstr "Quelque chose ne va pas avec votre base de données. Vérifiez que les"
+"bonnes bases ont été créées, et qu'elle est lisible par le bon utilisateur."
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
@@ -1930,6 +1931,13 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">Pour installer des bookmarklets, faîtes glisser le lien vers\n"
+"votre barre de marques-pages, ou cliquez droit dessus et ajoutez-y le.\n"
+"Maintenant vous pouvez le sélectionner depuis n'importe quelle page\n"
+"du site. Notez que certains d'entre eux nécessitent que vous visionniez\n"
+"le site depuis un ordinateur dit \"interne\" (veuillez contacter votre\n"
+"administrateur système si vous n'êtes pas sûr que votre ordinateur le soit).</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"

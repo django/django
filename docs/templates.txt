@@ -625,31 +625,6 @@ Load a custom template tag set.
 
 See `Custom tag and filter libraries`_ for more information.
 
-lorem
-~~~~~
-
-Display random latin text useful for providing sample data in templates.
-
-Usage format: ``{% lorem [count] [method] [random] %}``
-
-    ===========  =============================================================
-    Argument     Description
-    ===========  =============================================================
-    ``count``    A number (or variable) containing the number of paragraphs or
-                 words to generate (default is 1).
-    ``method``   Either ``w`` for words, ``p`` for HTML paragraphs or ``b``
-                 for plain-text paragraph blocks (default is ``b``).
-    ``random``   The word ``random``, which if given, does not use the common
-                 paragraph ("Lorem ipsum dolor sit amet...") when generating
-                 text.
-
-Examples:
-
-    * ``{% lorem %}`` will output the common "lorem ipsum" paragraph.
-    * ``{% lorem 3 p %}`` will output the common "lorem ipsum" paragraph
-      and two random paragraphs each wrapped in HTML ``<p>`` tags.
-    * ``{% lorem 2 w random %}`` will output two random latin words.
-
 now
 ~~~
 
@@ -782,7 +757,7 @@ i.e.::
 spaceless
 ~~~~~~~~~
 
-Normalizes whitespace between HTML tags to a single space. This includes tab
+Removes whitespace between HTML tags. This includes tab
 characters and newlines.
 
 Example usage::
@@ -795,9 +770,9 @@ Example usage::
 
 This example would return this HTML::
 
-    <p> <a href="foo/">Foo</a> </p>
+    <p><a href="foo/">Foo</a></p>
 
-Only space between *tags* is normalized -- not space between tags and text. In
+Only space between *tags* is removed -- not space between tags and text. In
 this example, the space around ``Hello`` won't be stripped::
 
     {% spaceless %}
