@@ -989,7 +989,9 @@ widthratio = register.tag(widthratio)
 def do_with(parser, token):
     """
     Add a value to the context (inside of this block) for caching and easy
-    access. For example::
+    access.
+    
+    For example::
 
         {% with person.some_sql_method as total %}
             {{ total }} object{{ total|pluralize }}
