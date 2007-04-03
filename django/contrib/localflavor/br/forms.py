@@ -15,7 +15,7 @@ class BRZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
             max_length=None, min_length=None,
-            error_message=u'Informe um código postal no formato XXXXX-XXX.',
+            error_message=gettext(u'Enter a zip code in the format XXXXX-XXX.'),
             *args, **kwargs)
 
 class BRPhoneNumberField(Field):
@@ -27,7 +27,7 @@ class BRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(u'Números de telefone devem estar no formato XX-XXXX-XXXX.')
+        raise ValidationError(gettext(u'Phone numbers must be in XX-XXXX-XXXX format.'))
 
 class BRStateSelect(Select):
     """

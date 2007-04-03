@@ -734,23 +734,23 @@ u'12345-123'
 >>> f.clean('12345_123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('1234-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('abcde-abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -768,23 +768,23 @@ u''
 >>> f.clean('-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('abcde-abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('1234-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345_123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-123')
 u'12345-123'
 
