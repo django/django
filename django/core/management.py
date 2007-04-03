@@ -482,7 +482,7 @@ def get_sql_indexes_for_model(model):
     output = []
 
     for f in model._meta.fields:
-        if f.db_index:
+        if f.db_index and not (f.primary_key and backend.autoindexes_primary_keys):
             unique = f.unique and 'UNIQUE ' or ''
             output.append(
                 style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \

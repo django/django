@@ -68,6 +68,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = False
 allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
+autoindexes_primary_keys = True
 needs_datetime_string_cast = False
 needs_upper_for_iops = True
 supports_constraints = True
