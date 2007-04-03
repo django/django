@@ -30,7 +30,7 @@ root_dir = os.path.dirname(__file__)
 django_dir = os.path.join(root_dir, 'django')
 pieces = fullsplit(root_dir)
 if pieces[-1] == '':
-    len_root_dir = len(pieces)- 1
+    len_root_dir = len(pieces) - 1
 else:
     len_root_dir = len(pieces)
 

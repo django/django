@@ -256,7 +256,7 @@ u'987-65-4330'
 >>> f.clean('078-05-1120')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter a valid US Social Security number in XXX-XX-XXXX format']
+ValidationError: [u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
 
 # UKPostcodeField #############################################################
 

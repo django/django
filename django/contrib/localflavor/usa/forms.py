@@ -43,28 +43,26 @@ class USSocialSecurityNumberField(Field):
         * The number is not one known to be invalid due to otherwise widespread
           promotional use or distribution (e.g., the Woolworth's number or the 1962
           promotional number).
-    
     """
     def clean(self, value):
         super(USSocialSecurityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
-        msg = gettext(u'Enter a valid US Social Security number in XXX-XX-XXXX format')
+        msg = gettext(u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.')
         match = re.match(ssn_re, value)
         if not match:
             raise ValidationError(msg)
         area, group, serial = match.groupdict()['area'], match.groupdict()['group'], match.groupdict()['serial']
-        
+
         # First pass: no blocks of all zeroes.
         if area == '000' or \
            group == '00' or \
            serial == '0000':
             raise ValidationError(msg)
-        
+
         # Second pass: promotional and otherwise permanently invalid numbers.
         if area == '666' or \
-           (area == '987' and group == '65' and \
-            4320 <= int(serial) <= 4329) or \
+           (area == '987' and group == '65' and 4320 <= int(serial) <= 4329) or \
            value == '078-05-1120' or \
            value == '219-09-9999':
             raise ValidationError(msg)
