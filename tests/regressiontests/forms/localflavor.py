@@ -246,6 +246,18 @@ as its choices.
 <option value="WY">Wyoming</option>
 </select>
 
+# USSocialSecurityNumberField #################################################
+>>> from django.contrib.localflavor.usa.forms import USSocialSecurityNumberField
+>>> f = USSocialSecurityNumberField()
+>>> f.clean('987-65-4330')
+u'987-65-4330'
+>>> f.clean('987654330')
+u'987-65-4330'
+>>> f.clean('078-05-1120')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid US Social Security number in XXX-XX-XXXX format']
+
 # UKPostcodeField #############################################################
 
 UKPostcodeField validates that the data is a valid UK postcode.
