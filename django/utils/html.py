@@ -1,6 +1,7 @@
 "HTML utilities suitable for global use."
 
 import re, string
+from django.utils.encoding import smart_unicode
 
 # Configuration for urlize() function
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
@@ -24,7 +25,7 @@ del x # Temporary variable
 def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
     if not isinstance(html, basestring):
-        html = str(html)
+        html = smart_unicode(html)
     return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 def linebreaks(value):
