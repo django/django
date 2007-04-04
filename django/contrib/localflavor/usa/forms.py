@@ -4,7 +4,7 @@ USA-specific Form helpers
 
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.newforms.util import smart_unicode
+from django.utils.encoding import smart_unicode
 from django.utils.translation import gettext
 import re
 
@@ -32,9 +32,9 @@ class USPhoneNumberField(Field):
 class USSocialSecurityNumberField(Field):
     """
     A United States Social Security number.
-    
+
     Checks the following rules to determine whether the number is valid:
-    
+
         * Conforms to the XXX-XX-XXXX format.
         * No group consists entirely of zeroes.
         * The leading group is not "666" (block "666" will never be allocated).

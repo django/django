@@ -3276,7 +3276,7 @@ True
 #################################
 
 # smart_unicode tests
->>> from django.newforms.util import smart_unicode
+>>> from django.utils.encoding import smart_unicode
 >>> class Test:
 ...     def __str__(self):
 ...        return 'ŠĐĆŽćžšđ'
