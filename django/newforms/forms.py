@@ -5,7 +5,6 @@ Form classes
 from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
 from django.utils.encoding import StrAndUnicode
-from django.conf import settings
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
 from util import flatatt, ErrorDict, ErrorList, ValidationError
@@ -229,9 +228,9 @@ class BoundField(StrAndUnicode):
         value = self.as_widget(self.field.widget)
         if not isinstance(value, basestring):
             # Some Widget render() methods -- notably RadioSelect -- return a
-            # "special" object rather than a string. Call the __str__() on that
+            # "special" object rather than a string. Call __unicode__() on that
             # object to get its rendered value.
-            value = value.__unicode__()
+            value = unicode(value)
         return value
 
     def _errors(self):
