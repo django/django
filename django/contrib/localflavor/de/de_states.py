@@ -2,7 +2,7 @@
 from django.utils.translation import gettext_lazy as _
 
 STATE_CHOICES = (
-    ('BW', _(u'Baden-Württemberg')),
+    ('BW', _('Baden-Wuerttemberg')),
     ('BY', _('Bavaria')),
     ('BE', _('Berlin')),
     ('BB', _('Brandenburg')),
