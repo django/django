@@ -55,7 +55,7 @@ msgstr "Não"
 
 #: oldforms/__init__.py:672 core/validators.py:174 core/validators.py:445
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
+msgstr "Nenhum arquivo enviado. Verifique o tipo de codificação do formulário."
 
 #: oldforms/__init__.py:674
 msgid "The submitted file is empty."
@@ -252,7 +252,7 @@ msgstr "Norueguês"
 #: conf/global_settings.py:63
 #, fuzzy
 msgid "Polish"
-msgstr "Inglês"
+msgstr "Polônia"
 
 #: conf/global_settings.py:64
 msgid "Portugese"
@@ -314,20 +314,21 @@ msgstr "Chinês Tradicional"
 
 #: core/validators.py:64
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Deve conter apenas letras, números e sublinhados (_)."
+msgstr "Este valor deve conter apenas letras, números e sublinhados (_)."
 
 #: core/validators.py:68
 #, fuzzy
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr "Deve conter apenas letras, números, sublinhados (_), pontos e "
-"barras (/)."
+msgstr "Este valor deve conter apenas letras, números, sublinhados (_), "
+"pontos e barras (/)."
 
 #: core/validators.py:72
 #, fuzzy
 msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr "Deve conter apenas letras, números, sublinhados (_) e hífens (-)."
+msgstr "Este valor deve conter apenas letras, números, sublinhados (_) e "
+"hífens (-)."
 
 #: core/validators.py:76
 msgid "Uppercase letters are not allowed here."
@@ -397,13 +398,13 @@ msgstr ""
 #: core/validators.py:185
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "A URL %s não aponta para um imagem válida."
+msgstr "A URL %s não aponta para uma imagem válida."
 
 #: core/validators.py:189
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
-"Números de telefone deves estar no formato XXX-XXX-XXXX.\"%s\" é inválido."
+"Números de telefone devem estar no formato XXX-XXX-XXXX.\"%s\" é inválido."
 
 #: core/validators.py:197
 #, python-format
@@ -420,7 +421,7 @@ msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
 msgstr ""
-"HTML válido é exigido. Estes são os erros específicos:\n"
+"HTML válido é exigido. Os erros específicos são:\n"
 "%s"
 
 #: core/validators.py:222
@@ -440,19 +441,19 @@ msgstr "A URL %s é um link quebrado."
 
 #: core/validators.py:252
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Informe uma abreviação válida de nome de um estado dos EUA."
+msgstr "Informe uma abreviação válida de estado dos E.U.A."
 
 #: core/validators.py:266
 #, fuzzy, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Lave sua boca! A palavra %s não é permitida aqui."
-msgstr[1] "Lave sua boca! As palavras %s não são permitidas aqui."
+msgstr[0] "Olha sua boca! A palavra %s não é permitida aqui."
+msgstr[1] "Olha sua boca! As palavras %s não são permitidas aqui."
 
 #: core/validators.py:273
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Este campo deve ser igual ao campo '%s'."
+msgstr "Este campo deve casar com o campo '%s'."
 
 #: core/validators.py:292
 msgid "Please enter something for at least one field."
@@ -505,8 +506,8 @@ msgstr "Informe um número decimal válido."
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Por favor entre com um número decimal com no máximo %s digito."
-msgstr[1] "Por favor entre com um número decimal com no máximo %s digitos."
+msgstr[0] "Por favor entre com um número decimal com no máximo %s dígito."
+msgstr[1] "Por favor entre com um número decimal com no máximo %s dígitos."
 
 #: core/validators.py:425
 #, fuzzy, python-format
@@ -515,19 +516,20 @@ msgid ""
 msgid_plural ""
 "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
-"Por favor entre com um número decimal com a parte inteira de no máximo %s "
+"Por favor informe um número decimal com a parte inteira de no máximo %s "
 "digito."
 msgstr[1] ""
-"Por favor entre com um número decimal com a parte inteira de no máximo %s "
-"digito."
+"Por favor informe um número decimal com a parte inteira de no máximo %s "
+"digitos."
 
 #: core/validators.py:428
 #, fuzzy, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Informe um número decimal com no máximo %s casa decimal."
-msgstr[1] "Informe um número decimal com no máximo %s casas decimais."
+msgstr[0] "Por favor informe um número decimal com no máximo %s casa decimal."
+msgstr[1] "Por favor informe um número decimal com no máximo %s casas "
+"decimais."
 
 #: core/validators.py:438
 #, python-format
@@ -617,22 +619,23 @@ msgstr ""
 #: views/generic/create_update.py:43
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "O(A) %(name)s \"%(obj)s\" foi criado com sucesso."
+msgstr "O(A) %(verbose_name)s foi criado com sucesso."
 
 #: views/generic/create_update.py:117
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "O(A) %(name)s \"%(obj)s\" foi modificado com sucesso."
+msgstr "O(A) %(verbose_name)s foi modificado com sucesso."
 
 #: views/generic/create_update.py:184
 #, fuzzy, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "O(A) %(name)s \"%(obj)s\" foi excluído."
+msgstr "O(A) %(verbose_name)s foi excluído."
 
 #: newforms/models.py:164 newforms/fields.py:360
 #, fuzzy
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Selecione uma escolha válida; '%(data)s' não está em %(choices)s."
+msgstr "Selecione uma escolha válida. Tal escolha não é uma das escolhas "
+"disponíveis."
 
 #: newforms/models.py:181 newforms/fields.py:378 newforms/fields.py:454
 #, fuzzy
@@ -642,12 +645,12 @@ msgstr "Informe uma lista ou tupla de valores."
 #: newforms/models.py:187 newforms/fields.py:387
 #, fuzzy, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
-msgstr "Selecione uma escolha válida; '%(data)s' não está em %(choices)s."
+msgstr "Selecione uma escolha válida. %s não é uma das escolhas disponíveis."
 
 #: newforms/fields.py:101 newforms/fields.py:254
 #, fuzzy, python-format
 msgid "Ensure this value has at most %d characters."
-msgstr "Certifique-se de que seu texto tenha menos que %d caractere."
+msgstr "Certifique-se de que seu texto tenha menos que %d caracteres."
 
 #: newforms/fields.py:103 newforms/fields.py:256
 #, python-format
@@ -692,12 +695,12 @@ msgstr "Informe uma URL válida."
 #: newforms/fields.py:311
 #, fuzzy
 msgid "This URL appears to be a broken link."
-msgstr "A URL %s é um link quebrado."
+msgstr "A URL %s parece ser um link quebrado."
 
 #: contrib/contenttypes/models.py:36
 #, fuzzy
 msgid "python model class name"
-msgstr "nome do módulo python"
+msgstr "nome da classe model no python"
 
 #: contrib/contenttypes/models.py:39
 msgid "content type"
@@ -709,12 +712,12 @@ msgstr "tipos de conteúdo"
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "th"
-msgstr ""
+msgstr "º"
 
 #: contrib/humanize/templatetags/humanize.py:17
 #, fuzzy
 msgid "st"
-msgstr "site"
+msgstr "º"
 
 #: contrib/humanize/templatetags/humanize.py:17
 #, fuzzy
@@ -723,7 +726,7 @@ msgstr "º"
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "rd"
-msgstr ""
+msgstr "º"
 
 #: contrib/humanize/templatetags/humanize.py:47
 #, python-format
@@ -798,7 +801,7 @@ msgstr "nome"
 
 #: contrib/auth/models.py:40
 msgid "codename"
-msgstr "nome código"
+msgstr "apelido"
 
 #: contrib/auth/models.py:42
 #, fuzzy
@@ -860,7 +863,7 @@ msgstr "status da equipe"
 
 #: contrib/auth/models.py:95
 msgid "Designates whether the user can log into this admin site."
-msgstr "Informa se o usuário pode acessar este site de administração."
+msgstr "Permite ao usuário o acesso a este site de administração."
 
 #: contrib/auth/models.py:96
 msgid "active"
@@ -871,7 +874,7 @@ msgstr "ativar"
 msgid ""
 "Designates whether this user can log into the Django admin. Unselect this "
 "instead of deleting accounts."
-msgstr "Informa se o usuário pode acessar este site de administração. "
+msgstr "Permite ao usuário acessar este site de administração. "
 "Ao invés de excluir contas de usuário, desmarque isso."
 
 #: contrib/auth/models.py:97
@@ -939,12 +942,12 @@ msgstr "mensagem"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
-msgstr ""
+msgstr "Os dois campos de senha não combinam."
 
 #: contrib/auth/forms.py:25
 #, fuzzy
 msgid "A user with that username already exists."
-msgstr "%(optname)s com este %(fieldname)s já existe."
+msgstr "Um usuário com este username já existe."
 
 #: contrib/auth/forms.py:53
 msgid ""
@@ -975,7 +978,7 @@ msgstr "Este endereço de e-mail não está associado com uma conta de usuário.
 
 #: contrib/auth/forms.py:117
 msgid "The two 'new password' fields didn't match."
-msgstr "Os duas 'novas senhas' não conferem."
+msgstr "Os dois campos 'nova senha' não conferem."
 
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
@@ -991,7 +994,7 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Deve conter um caminho absoluto, excluindo o nome de domínio. Exemplo: '/"
+"Isso deve ser um caminho absoluto, excluindo o nome de domínio. Exemplo: '/"
 "eventos/busca/'."
 
 #: contrib/redirects/models.py:9
@@ -1003,8 +1006,8 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Deve conter um caminho absoluto (como acima) ou uma URL completa, começando "
-"com 'http://'."
+"Isto pode ser um caminho absoluto (como acima) ou uma URL completa, "
+"começando com 'http://'."
 
 #: contrib/redirects/models.py:13
 msgid "redirect"
@@ -1084,8 +1087,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Selecione esta opção se o comentário é inapropriado. Uma mensagem \"Este "
-"comentário foi removido\" a mensagem será mostrada no lugar."
+"Selecione esta opção se o comentário é inapropriado. A mensagem \"Este "
+"comentário foi removido\" será mostrada no lugar."
 
 #: contrib/comments/models.py:91
 #, fuzzy
@@ -1268,7 +1271,7 @@ msgstr "Um ou mais dos campos requeridos não foram enviados"
 #: contrib/comments/views/comments.py:196
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Alguém modificou o form de comentários (violação de segurança)"
+msgstr "Alguém modificou o formulário de comentários (violação de segurança)"
 
 #: contrib/comments/views/comments.py:206
 #: contrib/comments/views/comments.py:292
@@ -1276,13 +1279,13 @@ msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
 "invalid"
 msgstr ""
-"O form de comentários teve um parâmetro 'target' inválido -- o ID do objeto "
-"é inválido"
+"O formulário de comentários teve um parâmetro 'target' inválido -- o ID do "
+"objeto é inválido"
 
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "O form de comentários não forneceu nem 'preview' nem 'post'"
+msgstr "O formulário de comentários não forneceu nem 'preview' nem 'post'"
 
 #: contrib/comments/templates/comments/freeform.html:4
 #, fuzzy
@@ -1389,8 +1392,8 @@ msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Exemplo: 'flatfiles/contact_page'. Se não for informado, será utilizado "
-"'flatfiles/default'."
+"Exemplo: 'flatpages/contact_page.html'. Se não for informado, será utilizado "
+"'flatpages/default.html'."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1402,11 +1405,11 @@ msgstr "Se estiver marcado, apenas usuários conectados poderão ver a página."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr "página plana"
+msgstr ""
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr "páginas planas"
+msgstr ""
 
 #: contrib/sessions/models.py:68
 msgid "session key"
@@ -1553,7 +1556,7 @@ msgstr "Você pode editá-lo(a) de novo abaixo."
 #: contrib/admin/views/auth.py:30
 #, fuzzy
 msgid "Add user"
-msgstr "Adicionar %s"
+msgstr "Adicionar usuário"
 
 #: contrib/admin/views/auth.py:57
 #, fuzzy
@@ -1563,7 +1566,7 @@ msgstr "Senha alterada com sucesso"
 #: contrib/admin/views/auth.py:64
 #, fuzzy, python-format
 msgid "Change password: %s"
-msgstr "Alterar senha"
+msgstr "Alterar senha: %s"
 
 #: contrib/admin/views/main.py:223
 msgid "Site administration"
@@ -1592,7 +1595,7 @@ msgstr "Modificado %s."
 #: contrib/admin/views/main.py:339
 #, python-format
 msgid "Deleted %s."
-msgstr "Apagado %s."
+msgstr "Excluído %s."
 
 #: contrib/admin/views/main.py:342
 msgid "No fields changed."
@@ -1832,7 +1835,7 @@ msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
-msgstr "Alguma coisa errada com a instalação do banco de dados. certifique-se "
+msgstr "Alguma coisa errada com a instalação do banco de dados. Certifique-se "
 "que as tabelas necessárias foram criadas e que o banco de dados pode ser "
 "acessado pelo usuário."
 
@@ -1886,7 +1889,7 @@ msgstr "Modelos disponíveis na aplicação %(name)s"
 #: contrib/admin/templates/admin/index.html:18
 #, fuzzy, python-format
 msgid "%(name)s"
-msgstr "Adicionar %(name)s"
+msgstr "%(name)s"
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
@@ -1949,8 +1952,8 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"A remoção de '%(object)s' %(object_name)s pode resultar na remoção de "
-"objetos relacionados, mas sua conta não tem a permissão para remoção dos "
+"A remoção de '%(object_name)s' %(escaped_object)s pode resultar na remoção "
+"de objetos relacionados, mas sua conta não tem a permissão para remoção dos "
 "seguintes tipos de objetos:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
@@ -1959,8 +1962,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Você tem certeza que quer remover o \"%(object)s\" %(object_name)s? Todos os "
-"seguintes itens relacionados serão removidos:"
+"Você tem certeza que quer remover o %(object_name)s \"%(escaped_object)s\"? "
+"Todos os seguintes itens relacionados serão removidos:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
@@ -2002,7 +2005,7 @@ msgstr "Senha (novamente)"
 #: contrib/admin/templates/admin/auth/user/change_password.html:40
 #: contrib/admin/templates/admin/auth/user/add_form.html:24
 msgid "Enter the same password as above, for verification."
-msgstr "Informe a mesma senha digitada acima, para verficação."
+msgstr "Informe a mesma senha digitada acima, para verificação."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
@@ -2082,7 +2085,7 @@ msgid ""
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Por favor, informe sua senha antiga, por segurança, e então informe sua nova "
-"senha duas vezes para que possamos verificar que se ela está correta."
+"senha duas vezes para que possamos verificar se você digitou corretamente."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
 msgid "Old password:"
