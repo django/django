@@ -9,7 +9,6 @@ def ngettext(singular, plural, number):
     return plural
 ngettext_lazy = ngettext
 
-gettext = gettext_noop = gettext_lazy = _ = lambda x: x
 string_concat = lambda *strings: ''.join([str(el) for el in strings])
 activate = lambda x: None
 deactivate = install = lambda: None
@@ -18,6 +17,20 @@ get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
 get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)
 get_partial_date_formats = lambda: (settings.YEAR_MONTH_FORMAT, settings.MONTH_DAY_FORMAT)
 check_for_language = lambda x: True
+
+TECHNICAL_ID_MAP = {
+    "DATE_WITH_TIME_FULL": settings.DATETIME_FORMAT,
+    "DATE_FORMAT": settings.DATE_FORMAT,
+    "DATETIME_FORMAT": settings.DATETIME_FORMAT,
+    "TIME_FORMAT": settings.TIME_FORMAT,
+    "YEAR_MONTH_FORMAT": settings.YEAR_MONTH_FORMAT,
+    "MONTH_DAY_FORMAT": settings.MONTH_DAY_FORMAT,
+}
+
+def gettext(message):
+    return TECHNICAL_ID_MAP.get(message, message)
+
+gettext_noop = gettext_lazy = gettext
 
 def to_locale(language):
     p = language.find('-')
