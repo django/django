@@ -3,7 +3,8 @@ Field classes
 """
 
 from django.utils.translation import gettext
-from util import ErrorList, ValidationError, smart_unicode
+from django.utils.encoding import smart_unicode
+from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 import datetime
 import re

@@ -1,40 +1,11 @@
 from django.conf import settings
 from django.utils.html import escape
 from django.utils.functional import Promise, lazy
+from django.utils.encoding import smart_unicode
 
 # Converts a dictionary to a single string with key="value", XML-style with
 # a leading space. Assumes keys do not need to be XML-escaped.
 flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
-
-def smart_unicode(s):
-    if isinstance(s, Promise):
-        # The input is something from gettext_lazy or similar. We don't want to
-        # translate it until render time, so defer the conversion.
-        return smart_unicode_lazy(s)
-    else:
-        return smart_unicode_immediate(s)
-
-def smart_unicode_immediate(s):
-    if not isinstance(s, basestring):
-        if hasattr(s, '__unicode__'):
-            s = unicode(s)
-        else:
-            s = unicode(str(s), settings.DEFAULT_CHARSET)
-    elif not isinstance(s, unicode):
-        s = unicode(s, settings.DEFAULT_CHARSET)
-    return s
-
-smart_unicode_lazy = lazy(smart_unicode_immediate, unicode)
-
-class StrAndUnicode(object):
-    """
-    A class whose __str__ returns its __unicode__ as a bytestring
-    according to settings.DEFAULT_CHARSET.
-
-    Useful as a mix-in.
-    """
-    def __str__(self):
-        return self.__unicode__().encode(settings.DEFAULT_CHARSET)
 
 class ErrorDict(dict):
     """

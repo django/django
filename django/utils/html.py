@@ -1,6 +1,7 @@
 "HTML utilities suitable for global use."
 
 import re, string
+from django.utils.encoding import smart_unicode
 
 # Configuration for urlize() function
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']

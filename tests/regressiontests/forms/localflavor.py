@@ -246,6 +246,18 @@ as its choices.
 <option value="WY">Wyoming</option>
 </select>
 
+# USSocialSecurityNumberField #################################################
+>>> from django.contrib.localflavor.usa.forms import USSocialSecurityNumberField
+>>> f = USSocialSecurityNumberField()
+>>> f.clean('987-65-4330')
+u'987-65-4330'
+>>> f.clean('987654330')
+u'987-65-4330'
+>>> f.clean('078-05-1120')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.']
+
 # UKPostcodeField #############################################################
 
 UKPostcodeField validates that the data is a valid UK postcode.
@@ -734,23 +746,23 @@ u'12345-123'
 >>> f.clean('12345_123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('1234-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('abcde-abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -768,23 +780,23 @@ u''
 >>> f.clean('-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('abcde-abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('1234-123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345_123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Informe um c\xf3digo postal no formato XXXXX-XXX.']
+ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-123')
 u'12345-123'
 
@@ -839,4 +851,35 @@ u'41-3562-3464'
 >>> w = BRStateSelect()
 >>> w.render('states', 'PR')
 u'<select name="states">\n<option value="AC">Acre</option>\n<option value="AL">Alagoas</option>\n<option value="AP">Amap\xe1</option>\n<option value="AM">Amazonas</option>\n<option value="BA">Bahia</option>\n<option value="CE">Cear\xe1</option>\n<option value="DF">Distrito Federal</option>\n<option value="ES">Esp\xedrito Santo</option>\n<option value="GO">Goi\xe1s</option>\n<option value="MA">Maranh\xe3o</option>\n<option value="MT">Mato Grosso</option>\n<option value="MS">Mato Grosso do Sul</option>\n<option value="MG">Minas Gerais</option>\n<option value="PA">Par\xe1</option>\n<option value="PB">Para\xedba</option>\n<option value="PR" selected="selected">Paran\xe1</option>\n<option value="PE">Pernambuco</option>\n<option value="PI">Piau\xed</option>\n<option value="RJ">Rio de Janeiro</option>\n<option value="RN">Rio Grande do Norte</option>\n<option value="RS">Rio Grande do Sul</option>\n<option value="RO">Rond\xf4nia</option>\n<option value="RR">Roraima</option>\n<option value="SC">Santa Catarina</option>\n<option value="SP">S\xe3o Paulo</option>\n<option value="SE">Sergipe</option>\n<option value="TO">Tocantins</option>\n</select>'
+
+# DEZipCodeField ##############################################################
+
+>>> from django.contrib.localflavor.de.forms import DEZipCodeField
+>>> f = DEZipCodeField()
+>>> f.clean('99423')
+u'99423'
+>>> f.clean(' 99423')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXXX.']
+
+# DEStateSelect #############################################################
+
+>>> from django.contrib.localflavor.de.forms import DEStateSelect
+>>> w = DEStateSelect()
+>>> w.render('states', 'TH')
+u'<select name="states">\n<option value="BW">Baden-Wuerttemberg</option>\n<option value="BY">Bavaria</option>\n<option value="BE">Berlin</option>\n<option value="BB">Brandenburg</option>\n<option value="HB">Bremen</option>\n<option value="HH">Hamburg</option>\n<option value="HE">Hessen</option>\n<option value="MV">Mecklenburg-Western Pomerania</option>\n<option value="NI">Lower Saxony</option>\n<option value="NW">North Rhine-Westphalia</option>\n<option value="RP">Rhineland-Palatinate</option>\n<option value="SL">Saarland</option>\n<option value="SN">Saxony</option>\n<option value="ST">Saxony-Anhalt</option>\n<option value="SH">Schleswig-Holstein</option>\n<option value="TH" selected="selected">Thuringia</option>\n</select>'
+
+# DEIdentityCardNumberField #################################################
+
+>>> from django.contrib.localflavor.de.forms import DEIdentityCardNumberField
+>>> f = DEIdentityCardNumberField()
+>>> f.clean('7549313035D-6004103-0903042-0')
+u'7549313035D-6004103-0903042-0'
+>>> f.clean('9786324830D 6104243 0910271 2')
+u'9786324830D-6104243-0910271-2'
+>>> f.clean('0434657485D-6407276-0508137-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format']
 """

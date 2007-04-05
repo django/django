@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 r"""
 >>> floatformat(7.7)
 '7.7'
@@ -87,19 +89,19 @@ u'\xeb'
 >>> truncatewords('A sentence with a few words in it', 'not a number')
 'A sentence with a few words in it'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 0) 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 0)
 ''
- 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 2) 
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 2)
 '<p>one <a href="#">two ...</a></p>'
- 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 4) 
+
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 4)
 '<p>one <a href="#">two - three <br>four ...</a></p>'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 5) 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 5)
 '<p>one <a href="#">two - three <br>four</a> five</p>'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 100) 
+>>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 100)
 '<p>one <a href="#">two - three <br>four</a> five</p>'
 
 >>> upper('Mixed case input')
@@ -165,6 +167,9 @@ u'\xcb'
 
 >>> escape('<some html & special characters > here')
 '&lt;some html &amp; special characters &gt; here'
+
+>>> escape(u'<some html & special characters > here ĐÅ€£')
+u'&lt;some html &amp; special characters &gt; here \xc4\x90\xc3\x85\xe2\x82\xac\xc2\xa3'
 
 >>> linebreaks('line 1')
 '<p>line 1</p>'

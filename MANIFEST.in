@@ -1,8 +1,12 @@
+include README
 include AUTHORS
 include INSTALL
 include LICENSE
+include MANIFEST.in
 recursive-include docs *
 recursive-include scripts *
+recursive-include examples *
+recursive-include extras *
 recursive-include django/conf/locale *
 recursive-include django/contrib/admin/templates *
 recursive-include django/contrib/admin/media *
