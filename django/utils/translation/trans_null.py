@@ -30,7 +30,7 @@ TECHNICAL_ID_MAP = {
 def gettext(message):
     return TECHNICAL_ID_MAP.get(message, message)
 
-gettext_noop = gettext_lazy = gettext
+gettext_noop = gettext_lazy = _ = gettext
 
 def to_locale(language):
     p = language.find('-')
