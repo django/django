@@ -1455,7 +1455,7 @@ u''
 >>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
 u'http://www.google.com'
 
-EmailField also access min_length and max_length parameters, for convenience.
+URLField also access min_length and max_length parameters, for convenience.
 >>> f = URLField(min_length=15, max_length=20)
 >>> f.clean('http://f.com')
 Traceback (most recent call last):
