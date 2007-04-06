@@ -140,7 +140,7 @@ class IfChangedNode(Node):
             else:
                 compare_to = self.nodelist.render(context)
         except VariableDoesNotExist:
-            compare_to = None        
+            compare_to = None
 
         if  compare_to != self._last_seen:
             firstloop = (self._last_seen == None)
@@ -320,7 +320,7 @@ class URLNode(Node):
         self.view_name = view_name
         self.args = args
         self.kwargs = kwargs
-      
+
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
@@ -353,6 +353,23 @@ class WidthRatioNode(Node):
         except (ValueError, ZeroDivisionError):
             return ''
         return str(int(round(ratio)))
+
+class WithNode(Node):
+    def __init__(self, var, name, nodelist):
+        self.var = var
+        self.name = name
+        self.nodelist = nodelist
+
+    def __repr__(self):
+        return "<WithNode>"
+
+    def render(self, context):
+        val = self.var.resolve(context)
+        context.push()
+        context[self.name] = val
+        output = self.nodelist.render(context)
+        context.pop()
+        return output
 
 #@register.tag
 def comment(parser, token):
@@ -835,7 +852,7 @@ regroup = register.tag(regroup)
 
 def spaceless(parser, token):
     """
-    Normalize whitespace between HTML tags to a single space. This includes tab
+    Removes whitespace between HTML tags. This includes tab
     characters and newlines.
 
     Example usage::
@@ -848,7 +865,7 @@ def spaceless(parser, token):
 
     This example would return this HTML::
 
-        <p> <a href="foo/">Foo</a> </p>
+        <p><a href="foo/">Foo</a></p>
 
     Only space between *tags* is normalized -- not space between tags and text. In
     this example, the space around ``Hello`` won't be stripped::
@@ -899,12 +916,12 @@ templatetag = register.tag(templatetag)
 
 def url(parser, token):
     """
-    Returns an absolute URL matching given view with its parameters. 
-    
+    Returns an absolute URL matching given view with its parameters.
+
     This is a way to define links that aren't tied to a particular URL configuration::
-    
+
         {% url path.to.some_view arg1,arg2,name1=value1 %}
-    
+
     The first argument is a path to a view. It can be an absolute python path
     or just ``app_name.view_name`` without the project name if the view is
     located inside the project.  Other arguments are comma-separated values
@@ -913,18 +930,18 @@ def url(parser, token):
 
     For example if you have a view ``app_name.client`` taking client's id and
     the corresponding line in a URLconf looks like this::
-    
+
         ('^client/(\d+)/$', 'app_name.client')
-    
+
     and this app's URLconf is included into the project's URLconf under some
     path::
-    
+
         ('^clients/', include('project_name.app_name.urls'))
-    
+
     then in a template you can create a link for a certain client like this::
-    
+
         {% url app_name.client client.id %}
-    
+
     The URL will look like ``/clients/client/123/``.
     """
     bits = token.contents.split(' ', 2)
@@ -967,3 +984,25 @@ def widthratio(parser, token):
     return WidthRatioNode(parser.compile_filter(this_value_expr),
                           parser.compile_filter(max_value_expr), max_width)
 widthratio = register.tag(widthratio)
+
+#@register.tag
+def do_with(parser, token):
+    """
+    Add a value to the context (inside of this block) for caching and easy
+    access.
+    
+    For example::
+
+        {% with person.some_sql_method as total %}
+            {{ total }} object{{ total|pluralize }}
+        {% endwith %}
+    """
+    bits = list(token.split_contents())
+    if len(bits) != 4 or bits[2] != "as":
+        raise TemplateSyntaxError, "%r expected format is 'value as name'" % tagname
+    var = parser.compile_filter(bits[1])
+    name = bits[3]
+    nodelist = parser.parse(('endwith',))
+    parser.delete_first_token()
+    return WithNode(var, name, nodelist)
+do_with = register.tag('with', do_with)

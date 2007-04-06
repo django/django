@@ -210,7 +210,7 @@ class FreeComment(models.Model):
 class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
-            karma = self.objects.get(comment__pk=comment_id, user__pk=user_id)
+            karma = self.get(comment__pk=comment_id, user__pk=user_id)
         except self.model.DoesNotExist:
             karma = self.model(None, user_id=user_id, comment_id=comment_id, score=score, scored_date=datetime.datetime.now())
             karma.save()

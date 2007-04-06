@@ -42,6 +42,7 @@ people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Django that much better:
 
     adurdin@gmail.com
+    Daniel Alves Barbosa de Oliveira Vaz <danielvaz@gmail.com>
     Andreas
     andy@jadedplanet.net
     Fabrice Aneche <akh@nobugware.com>
@@ -64,9 +65,11 @@ answer newbie questions, and generally made Django that much better:
     Chris Chamberlin <dja@cdc.msbx.net>
     Amit Chakradeo <http://amit.chakradeo.net/>
     ChaosKCW
+    ivan.chelubeev@gmail.com
     Ian Clelland <clelland@gmail.com>
     crankycoder@gmail.com
     Matt Croydon <http://www.postneo.com/>
+    flavio.curella@gmail.com
     Jure Cuhalev <gandalf@owca.info>
     dackze+django@gmail.com
     Dirk Datzert <dummy@habmalnefrage.de>
@@ -125,6 +128,7 @@ answer newbie questions, and generally made Django that much better:
     Nicola Larosa <nico@teknico.net>
     Eugene Lazutkin <http://lazutkin.com/blog/>
     Jeong-Min Lee <falsetru@gmail.com>
+    Jannis Leidel <jl@websushi.org>
     Christopher Lenz <http://www.cmlenz.net/>
     lerouxb@gmail.com
     Waylan Limberg <waylan@gmail.com>
@@ -154,6 +158,7 @@ answer newbie questions, and generally made Django that much better:
     oggie rob <oz.robharvey@gmail.com>
     Jay Parlar <parlar@gmail.com>
     pavithran s <pavithran.s@gmail.com>
+    Barry Pederson <bp@barryp.org>
     pgross@thoughtworks.com
     phaedo <http://phaedo.cx/>
     phil@produxion.net
@@ -177,13 +182,17 @@ answer newbie questions, and generally made Django that much better:
     SmileyChris <smileychris@gmail.com>
     smurf@smurf.noris.de
     sopel
+    Wiliam Alves de Souza <wiliamsouza83@gmail.com>
     Georgi Stanojevski <glisha@gmail.com>
     Thomas Steinacher <http://www.eggdrop.ch/>
     nowell strite
     Radek Švarz <http://www.svarz.cz/translate/>
     Swaroop C H <http://www.swaroopch.info>
     Aaron Swartz <http://www.aaronsw.com/>
+    Ville Säävuori <http://www.unessa.net/>
     Tyson Tate <tyson@fallingbullets.com>
+    thebjorn <bp@datakortet.no>
+    Zach Thompson <zthompson47@gmail.com>
     Tom Tobin
     Joe Topjian <http://joe.terrarum.net/geek/code/python/django/>
     torne-django@wolfpuppy.org.uk

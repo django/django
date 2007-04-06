@@ -158,7 +158,7 @@ is defined in ``django/contrib/sessions/models.py``. Because it's a normal
 model, you can access sessions using the normal Django database API::
 
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get_object(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 

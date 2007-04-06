@@ -170,6 +170,11 @@ def get_sql_flush(style, tables, sequences):
     # get_sql_flush() implementations). Just return SQL at this point
     return sql
 
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
+    
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)

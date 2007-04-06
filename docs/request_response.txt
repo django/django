@@ -416,6 +416,10 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     The constructor doesn't take any arguments. Use this to designate that a
     page hasn't been modified since the user's last request.
 
+``HttpResponseBadRequest``
+    **New in Django development version.**
+    Acts just like ``HttpResponse`` but uses a 400 status code.
+
 ``HttpResponseNotFound``
     Acts just like ``HttpResponse`` but uses a 404 status code.
 

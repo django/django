@@ -97,6 +97,16 @@ class SelfClashM2M(models.Model):
     m2m_3 = models.ManyToManyField('self', symmetrical=False)
     m2m_4 = models.ManyToManyField('self', symmetrical=False)
 
+class Model(models.Model):
+    "But it's valid to call a model Model."
+    year = models.PositiveIntegerField() #1960
+    make = models.CharField(maxlength=10) #Aston Martin
+    name = models.CharField(maxlength=10) #DB 4 GT
+
+class Car(models.Model):
+    colour = models.CharField(maxlength=5)
+    model = models.ForeignKey(Model)
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "floatfield": FloatFields require a "max_digits" attribute.

@@ -737,6 +737,7 @@ The following snippet of template code would accomplish this dubious task::
             <li>{{ item }}</li>
             {% endfor %}
         </ul>
+        </li>
     {% endfor %}
     </ul>
 
@@ -756,7 +757,7 @@ i.e.::
 spaceless
 ~~~~~~~~~
 
-Normalizes whitespace between HTML tags to a single space. This includes tab
+Removes whitespace between HTML tags. This includes tab
 characters and newlines.
 
 Example usage::
@@ -769,9 +770,9 @@ Example usage::
 
 This example would return this HTML::
 
-    <p> <a href="foo/">Foo</a> </p>
+    <p><a href="foo/">Foo</a></p>
 
-Only space between *tags* is normalized -- not space between tags and text. In
+Only space between *tags* is removed -- not space between tags and text. In
 this example, the space around ``Hello`` won't be stripped::
 
     {% spaceless %}
@@ -872,6 +873,23 @@ Above, if ``this_value`` is 175 and ``max_value`` is 200, the the image in the
 above example will be 88 pixels wide (because 175/200 = .875; .875 * 100 = 87.5
 which is rounded up to 88).
 
+with
+~~~~
+
+**New in Django development version**
+
+Caches a complex variable under a simpler name. This is useful when accessing
+an "expensive" method (e.g., one that hits the database) multiple times.
+
+For example::
+
+    {% with business.employees.count as total %}
+        {{ total }} employee{{ total|pluralize }}
+    {% endwith %}
+
+The populated variable (in the example above, ``total``) is only available
+between the ``{% with %}`` and ``{% endwith %}`` tags.
+
 Built-in filter reference
 -------------------------
 
@@ -970,7 +988,7 @@ place -- but only if there's a decimal part to be displayed. For example:
     * ``36.15`` gets converted to ``36.2``
     * ``36`` gets converted to ``36``
 
-If used with a numeric integer argument, ``floatformat`` rounds a number to that 
+If used with a numeric integer argument, ``floatformat`` rounds a number to that
 many decimal places.  For example:
 
     * ``36.1234`` with floatformat:3 gets converted to ``36.123``
@@ -983,7 +1001,7 @@ For example:
     * ``36.1234`` with floatformat:-3 gets converted to ``36.123``
     * ``36`` with floatformat:-4 gets converted to ``36``
 
-Using ``floatformat`` with no argument is equivalent to using ``floatformat`` with 
+Using ``floatformat`` with no argument is equivalent to using ``floatformat`` with
 an argument of ``-1``.
 
 get_digit

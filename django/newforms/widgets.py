@@ -9,10 +9,11 @@ __all__ = (
     'MultiWidget', 'SplitDateTimeWidget',
 )
 
-from util import flatatt, StrAndUnicode, smart_unicode
+from util import flatatt
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import gettext
+from django.utils.encoding import StrAndUnicode, smart_unicode
 from itertools import chain
 
 try:
@@ -24,7 +25,10 @@ class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
-        self.attrs = attrs or {}
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
 
     def render(self, name, value, attrs=None):
         """

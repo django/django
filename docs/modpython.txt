@@ -13,14 +13,15 @@ other server arrangements.
 Django requires Apache 2.x and mod_python 3.x, and you should use Apache's
 `prefork MPM`_, as opposed to the `worker MPM`_.
 
-You may also be interested in `How to use Django with FastCGI`_.
+You may also be interested in `How to use Django with FastCGI, SCGI or AJP`_
+(which also covers SCGI and AJP).
 
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _mod_perl: http://perl.apache.org/
 .. _prefork MPM: http://httpd.apache.org/docs/2.2/mod/prefork.html
 .. _worker MPM: http://httpd.apache.org/docs/2.2/mod/worker.html
-.. _How to use Django with FastCGI: ../fastcgi/
+.. _How to use Django with FastCGI, SCGI or AJP: ../fastcgi/
 
 Basic configuration
 ===================
@@ -37,7 +38,8 @@ Then edit your ``httpd.conf`` file and add the following::
         PythonDebug On
     </Location>
 
-...and replace ``mysite.settings`` with the Python path to your settings file.
+...and replace ``mysite.settings`` with the Python import path to your Django
+project's settings file.
 
 This tells Apache: "Use mod_python for any URL at or under '/mysite/', using the
 Django mod_python handler." It passes the value of ``DJANGO_SETTINGS_MODULE``
@@ -52,6 +54,19 @@ Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
 on it, you'll need to tell mod_python::
 
     PythonPath "['/path/to/project'] + sys.path"
+
+.. caution::
+
+    Is you are using Windows, remember that the path will contain backslashes.
+    This string is passed through Python's string parser twice, so you need to
+    escape each backslash **twice**::
+
+        PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
+
+    or use raw strings::
+
+        PythonPath "[r'c:\\path\\to\\project'] + sys.path"
+
 
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.
