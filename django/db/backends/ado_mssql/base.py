@@ -138,7 +138,7 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
-def get_sql_flush(sql_styler, full_table_list):
+def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
@@ -147,9 +147,9 @@ def get_sql_flush(sql_styler, full_table_list):
     # TODO - SQL not actually tested against ADO MSSQL yet!
     # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
     sql_list = ['%s %s;' % \
-                (sql_styler.SQL_KEYWORD('TRUNCATE'),
-                 sql_styler.SQL_FIELD(quote_name(table))
-                 )  for table in full_table_list]
+                (style.SQL_KEYWORD('TRUNCATE'),
+                 style.SQL_FIELD(quote_name(table))
+                 )  for table in tables]
 
 def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
