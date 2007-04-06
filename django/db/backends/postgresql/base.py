@@ -213,6 +213,30 @@ def get_sql_flush(style, tables, sequences):
     else:
         return []
 
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    from django.db import models
+    output = []
+    for model in model_list:
+        for f in model._meta.fields:
+            if isinstance(f, models.AutoField):
+                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
+                    style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(quote_name(f.column)),
+                    style.SQL_KEYWORD('FROM'),
+                    style.SQL_TABLE(quote_name(model._meta.db_table))))
+                break # Only one AutoField is allowed per model, so don't bother continuing.
+        for f in model._meta.many_to_many:
+            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
+                (style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
+                style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD(quote_name('id')),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_TABLE(f.m2m_db_table())))
+    return output
         
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg

@@ -134,6 +134,10 @@ def get_sql_flush(style, tables, sequences):
              style.SQL_FIELD(quote_name(table))
              )  for table in tables]
 
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
