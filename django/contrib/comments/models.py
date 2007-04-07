@@ -86,22 +86,11 @@ class Comment(models.Model):
     is_removed = models.BooleanField(_('is removed'), help_text=_('Check this box if the comment is inappropriate. A "This comment has been removed" message will be displayed instead.'))
     site = models.ForeignKey(Site)
     objects = CommentManager()
+
     class Meta:
         verbose_name = _('comment')
         verbose_name_plural = _('comments')
         ordering = ('-submit_date',)
-    class Admin:
-        fields = (
-            (None, {'fields': ('content_type', 'object_id', 'site')}),
-            ('Content', {'fields': ('user', 'headline', 'comment')}),
-            ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
-            ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
-        )
-        list_display = ('user', 'submit_date', 'content_type', 'get_content_object')
-        list_filter = ('submit_date',)
-        date_hierarchy = 'submit_date'
-        search_fields = ('comment', 'user__username')
-        raw_id_fields = ('user',)
 
     def __repr__(self):
         return "%s: %s..." % (self.user.username, self.comment[:100])
@@ -173,20 +162,11 @@ class FreeComment(models.Model):
     # TODO: Change this to is_removed, like Comment
     approved = models.BooleanField(_('approved by staff'))
     site = models.ForeignKey(Site)
+
     class Meta:
         verbose_name = _('free comment')
         verbose_name_plural = _('free comments')
         ordering = ('-submit_date',)
-    class Admin:
-        fields = (
-            (None, {'fields': ('content_type', 'object_id', 'site')}),
-            ('Content', {'fields': ('person_name', 'comment')}),
-            ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
-        )
-        list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
-        list_filter = ('submit_date',)
-        date_hierarchy = 'submit_date'
-        search_fields = ('comment', 'person_name')
 
     def __repr__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
@@ -234,6 +214,7 @@ class KarmaScore(models.Model):
     score = models.SmallIntegerField(_('score'), db_index=True)
     scored_date = models.DateTimeField(_('score date'), auto_now=True)
     objects = KarmaScoreManager()
+
     class Meta:
         verbose_name = _('karma score')
         verbose_name_plural = _('karma scores')
@@ -265,6 +246,7 @@ class UserFlag(models.Model):
     comment = models.ForeignKey(Comment)
     flag_date = models.DateTimeField(_('flag date'), auto_now_add=True)
     objects = UserFlagManager()
+
     class Meta:
         verbose_name = _('user flag')
         verbose_name_plural = _('user flags')
@@ -277,6 +259,7 @@ class ModeratorDeletion(models.Model):
     user = models.ForeignKey(User, verbose_name='moderator')
     comment = models.ForeignKey(Comment)
     deletion_date = models.DateTimeField(_('deletion date'), auto_now_add=True)
+
     class Meta:
         verbose_name = _('moderator deletion')
         verbose_name_plural = _('moderator deletions')
@@ -284,3 +267,36 @@ class ModeratorDeletion(models.Model):
 
     def __repr__(self):
         return _("Moderator deletion by %r") % self.user
+
+# Register the admin options for these models.
+# TODO: Maybe this should live in a separate module admin.py, but how would we
+# ensure that module was loaded?
+
+from django.contrib import admin
+
+class CommentAdmin(admin.ModelAdmin):
+    fields = (
+        (None, {'fields': ('content_type', 'object_id', 'site')}),
+        ('Content', {'fields': ('user', 'headline', 'comment')}),
+        ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
+        ('Meta', {'fields': ('is_public', 'is_removed', 'ip_address')}),
+    )
+    list_display = ('user', 'submit_date', 'content_type', 'get_content_object')
+    list_filter = ('submit_date',)
+    date_hierarchy = 'submit_date'
+    search_fields = ('comment', 'user__username')
+    raw_id_fields = ('user',)
+
+class FreeCommentAdmin(admin.ModelAdmin):
+    fields = (
+        (None, {'fields': ('content_type', 'object_id', 'site')}),
+        ('Content', {'fields': ('person_name', 'comment')}),
+        ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
+    )
+    list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
+    list_filter = ('submit_date',)
+    date_hierarchy = 'submit_date'
+    search_fields = ('comment', 'person_name')
+
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(FreeComment, FreeCommentAdmin)
