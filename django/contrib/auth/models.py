@@ -63,10 +63,6 @@ class Group(models.Model):
         verbose_name_plural = _('groups')
         ordering = ('name',)
 
-    class Admin:
-        search_fields = ('name',)
-        filter_horizontal = ('permissions',)
-
     def __str__(self):
         return self.name
 
@@ -110,19 +106,6 @@ class User(models.Model):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         ordering = ('username',)
-
-    class Admin:
-        fields = (
-            (None, {'fields': ('username', 'password')}),
-            (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-            (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
-            (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-            (_('Groups'), {'fields': ('groups',)}),
-        )
-        list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
-        list_filter = ('is_staff', 'is_superuser')
-        search_fields = ('username', 'first_name', 'last_name', 'email')
-        filter_horizontal = ('user_permissions',)
 
     def __str__(self):
         return self.username
@@ -320,3 +303,29 @@ class AnonymousUser(object):
 
     def is_authenticated(self):
         return False
+
+# Register the admin options for these models.
+# TODO: Maybe this should live in a separate module admin.py, but how would we
+# ensure that module was loaded?
+
+from django.contrib import admin
+
+class GroupAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+    filter_horizontal = ('permissions',)
+
+class UserAdmin(admin.ModelAdmin):
+    fields = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+        (_('Groups'), {'fields': ('groups',)}),
+    )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser')
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    filter_horizontal = ('user_permissions',)
+
+admin.site.register(Group, GroupAdmin)
+admin.site.register(User, UserAdmin)
