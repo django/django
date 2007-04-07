@@ -16,9 +16,17 @@ class Redirect(models.Model):
         unique_together=(('site', 'old_path'),)
         ordering = ('old_path',)
 
-    class Admin:
-        list_filter = ('site',)
-        search_fields = ('old_path', 'new_path')
-
     def __str__(self):
         return "%s ---> %s" % (self.old_path, self.new_path)
+
+# Register the admin options for these models.
+# TODO: Maybe this should live in a separate module admin.py, but how would we
+# ensure that module was loaded?
+
+from django.contrib import admin
+
+class RedirectAdmin(admin.ModelAdmin):
+    list_filter = ('site',)
+    search_fields = ('old_path', 'new_path')
+
+admin.site.register(Redirect, RedirectAdmin)
