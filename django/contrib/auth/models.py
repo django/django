@@ -38,6 +38,7 @@ class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), maxlength=100)
+
     class Meta:
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
@@ -56,10 +57,12 @@ class Group(models.Model):
     """
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
+
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
         ordering = ('name',)
+
     class Admin:
         search_fields = ('name',)
 
@@ -101,10 +104,12 @@ class User(models.Model):
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
     objects = UserManager()
+
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
         ordering = ('username',)
+
     class Admin:
         fields = (
             (None, {'fields': ('username', 'password')}),
