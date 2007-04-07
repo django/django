@@ -19,13 +19,16 @@ def submit_row(context):
     opts = context['opts']
     change = context['change']
     is_popup = context['is_popup']
+    # TODO: Fix this hack.
+    # save_as = opts.admin.save_as
+    save_as = False
     return {
         'onclick_attrib': (opts.get_ordered_objects() and change
                             and 'onclick="submitOrderForm();"' or ''),
         'show_delete_link': (not is_popup and context['has_delete_permission']
                               and (change or context['show_delete'])),
-        'show_save_as_new': not is_popup and change and opts.admin.save_as,
-        'show_save_and_add_another': not is_popup and (not opts.admin.save_as or context['add']),
+        'show_save_as_new': not is_popup and change and save_as,
+        'show_save_and_add_another': not is_popup and (not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'show_save': True
     }
