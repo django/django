@@ -322,6 +322,13 @@ class ModelAdmin(object):
             return HttpResponseRedirect(request.path)
         else:
             request.user.message_set.create(message=msg)
+            # Figure out where to redirect. If the user has change permission,
+            # redirect to the change-list page for this object. Otherwise,
+            # redirect to the admin index.
+            if self.has_change_permission(request, None):
+                post_url = '../'
+            else:
+                post_url = '../../../'
             return HttpResponseRedirect(post_url)
 
     def save_change(self, request, model, form):
