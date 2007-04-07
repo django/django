@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from localflavor import localflavor_tests
 from regressions import regression_tests
+from formsets import formset_tests
 
 form_tests = r"""
 >>> from django.newforms import *
@@ -2898,158 +2899,6 @@ True
 >>> p.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
-# FormSets ####################################################################
-
-FormSets allow you to create a bunch of instances of the same form class and
-get back clean data as a list of dicts.
-
->>> from django.newforms import formsets
-
->>> class ChoiceForm(Form):
-...     choice = CharField()
-...     votes = IntegerField()
-
-
-Create an empty form set
-
->>> form_set = formsets.FormSet(ChoiceForm, prefix='choices', auto_id=False)
->>> for form in form_set.get_forms():
-...     print form.as_ul()
-<li>Choice: <input type="text" name="choices-0-choice" /></li>
-<li>Votes: <input type="text" name="choices-0-votes" /></li>
-
-
-Forms pre-filled with initial data.
-
->>> initial_data = [
-...     {'votes': 50, 'choice': u'The Doors', 'id': u'0'},
-...     {'votes': 51, 'choice': u'The Beatles', 'id': u'1'},
-... ]
-
->>> form_set = formsets.FormSet(ChoiceForm, initial=initial_data, auto_id=False, prefix='choices')
->>> print form_set.management_form.as_ul()
-<input type="hidden" name="choices-COUNT" value="3" />
-
->>> for form in form_set.get_forms(): # print pre-filled forms
-...     print form.as_ul()
-<li>Choice: <input type="text" name="choices-0-choice" value="The Doors" /></li>
-<li>Votes: <input type="text" name="choices-0-votes" value="50" /></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="The Beatles" /></li>
-<li>Votes: <input type="text" name="choices-1-votes" value="51" /></li>
-<li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="text" name="choices-2-votes" /></li>
-
-
-Tests for dealing with POSTed data
-
->>> data = {
-...     'choices-COUNT': u'3', # the number of forms rendered
-...     'choices-0-choice': u'The Doors',
-...     'choices-0-votes': u'50',
-...     'choices-1-choice': u'The Beatles',
-...     'choices-1-votes': u'51',
-...     'choices-2-choice': u'',
-...     'choices-2-votes': u'',
-... }
-
-
->>> form_set = formsets.FormSet(ChoiceForm, data, auto_id=False, prefix='choices')
->>> print form_set.is_valid()
-True
->>> for data in form_set.clean_data:
-...     print data
-{'votes': 50, 'choice': u'The Doors'}
-{'votes': 51, 'choice': u'The Beatles'}
-
-
-FormSet with deletion fields
-
->>> form_set = formsets.FormSetWithDeletion(ChoiceForm, initial=initial_data, auto_id=False, prefix='choices')
->>> for form in form_set.get_forms(): # print pre-filled forms
-...     print form.as_ul()
-<li>Choice: <input type="text" name="choices-0-choice" value="The Doors" /></li>
-<li>Votes: <input type="text" name="choices-0-votes" value="50" /></li>
-<li>Delete: <input type="checkbox" name="choices-0-DELETE" /></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="The Beatles" /></li>
-<li>Votes: <input type="text" name="choices-1-votes" value="51" /></li>
-<li>Delete: <input type="checkbox" name="choices-1-DELETE" /></li>
-<li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="text" name="choices-2-votes" /></li>
-<li>Delete: <input type="checkbox" name="choices-2-DELETE" /></li>
-
->>> data = {
-...     'choices-COUNT': u'3', # the number of forms rendered
-...     'choices-0-choice': u'Fergie',
-...     'choices-0-votes': u'1000',
-...     'choices-0-DELETE': u'on', # Delete this choice.
-...     'choices-1-choice': u'The Decemberists',
-...     'choices-1-votes': u'150',
-...     'choices-2-choice': u'Calexico',
-...     'choices-2-votes': u'90',
-... }
-
->>> form_set = formsets.FormSetWithDeletion(ChoiceForm, data, auto_id=False, prefix='choices')
->>> print form_set.is_valid()
-True
-
-When we access form_set.clean_data, items marked for deletion won't be there,
-but they *will* be in form_set.deleted_data
-
->>> for data in form_set.clean_data:
-...     print data
-{'votes': 150, 'DELETE': False, 'choice': u'The Decemberists'}
-{'votes': 90, 'DELETE': False, 'choice': u'Calexico'}
-
->>> for data in form_set.deleted_data:
-...     print data
-{'votes': 1000, 'DELETE': True, 'choice': u'Fergie'}
-
-
-FormSet with Ordering
-
->>> form_set = formsets.FormSetWithOrdering(ChoiceForm, initial=initial_data, auto_id=False, prefix='choices')
->>> for form in form_set.get_forms(): # print pre-filled forms
-...     print form.as_ul()
-<li>Choice: <input type="text" name="choices-0-choice" value="The Doors" /></li>
-<li>Votes: <input type="text" name="choices-0-votes" value="50" /></li>
-<li>Order: <input type="text" name="choices-0-ORDER" value="1" /></li>
-<li>Choice: <input type="text" name="choices-1-choice" value="The Beatles" /></li>
-<li>Votes: <input type="text" name="choices-1-votes" value="51" /></li>
-<li>Order: <input type="text" name="choices-1-ORDER" value="2" /></li>
-<li>Choice: <input type="text" name="choices-2-choice" /></li>
-<li>Votes: <input type="text" name="choices-2-votes" /></li>
-<li>Order: <input type="text" name="choices-2-ORDER" value="3" /></li>
-
->>> data = {
-...     'choices-COUNT': u'4', # the number of forms rendered
-...     'choices-0-choice': u'Fergie',
-...     'choices-0-votes': u'1000',
-...     'choices-0-ORDER': u'3',
-...     'choices-1-choice': u'The Decemberists',
-...     'choices-1-votes': u'150',
-...     'choices-1-ORDER': u'1',
-...     'choices-2-choice': u'Calexico',
-...     'choices-2-votes': u'90',
-...     'choices-2-ORDER': u'2',
-...     'choices-3-choice': u'',
-...     'choices-3-votes': u'',
-...     'choices-3-ORDER': u'4',
-... }
-
->>> form_set = formsets.FormSetWithOrdering(ChoiceForm, data, auto_id=False, prefix='choices')
->>> print form_set.is_valid()
-True
-
-The form_set.clean_data will be in the correct order as specified by the
-ORDER field from each form.
-
->>> for data in form_set.clean_data:
-...     print data
-{'votes': 150, 'ORDER': 1, 'choice': u'The Decemberists'}
-{'votes': 90, 'ORDER': 2, 'choice': u'Calexico'}
-{'votes': 1000, 'ORDER': 3, 'choice': u'Fergie'}
-
-
 # Forms with NullBooleanFields ################################################
 
 NullBooleanField is a bit of a special case because its presentation (widget)
@@ -3451,6 +3300,7 @@ __test__ = {
     'form_tests': form_tests,
     'localflavor': localflavor_tests,
     'regressions': regression_tests,
+    'formset_tests': formset_tests,
 }
 
 if __name__ == "__main__":
