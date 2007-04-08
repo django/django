@@ -6,7 +6,7 @@ localflavor_tests = r"""
 
 USZipCodeField validates that the data is either a five-digit U.S. zip code or
 a zip+4.
->>> from django.contrib.localflavor.usa.forms import USZipCodeField
+>>> from django.contrib.localflavor.us.forms import USZipCodeField
 >>> f = USZipCodeField()
 >>> f.clean('60606')
 u'60606'
@@ -67,7 +67,7 @@ u''
 
 USPhoneNumberField validates that the data is a valid U.S. phone number,
 including the area code. It's normalized to XXX-XXX-XXXX format.
->>> from django.contrib.localflavor.usa.forms import USPhoneNumberField
+>>> from django.contrib.localflavor.us.forms import USPhoneNumberField
 >>> f = USPhoneNumberField()
 >>> f.clean('312-555-1212')
 u'312-555-1212'
@@ -136,7 +136,7 @@ u''
 
 USStateField validates that the data is either an abbreviation or name of a
 U.S. state.
->>> from django.contrib.localflavor.usa.forms import USStateField
+>>> from django.contrib.localflavor.us.forms import USStateField
 >>> f = USStateField()
 >>> f.clean('il')
 u'IL'
@@ -181,7 +181,7 @@ u''
 
 USStateSelect is a Select widget that uses a list of U.S. states/territories
 as its choices.
->>> from django.contrib.localflavor.usa.forms import USStateSelect
+>>> from django.contrib.localflavor.us.forms import USStateSelect
 >>> w = USStateSelect()
 >>> print w.render('state', 'IL')
 <select name="state">
@@ -247,7 +247,7 @@ as its choices.
 </select>
 
 # USSocialSecurityNumberField #################################################
->>> from django.contrib.localflavor.usa.forms import USSocialSecurityNumberField
+>>> from django.contrib.localflavor.us.forms import USSocialSecurityNumberField
 >>> f = USSocialSecurityNumberField()
 >>> f.clean('987-65-4330')
 u'987-65-4330'
