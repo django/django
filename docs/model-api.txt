@@ -734,10 +734,10 @@ relationship should work. All are optional:
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
                              the `Database API reference`_) that limit the
                              available admin choices for this object. Use this
-                             with ``models.LazyDate`` to limit choices of objects
-                             by date. For example::
+                             with functions from the Python ``datetime`` module 
+                             to limit choices of objects by date. For example::
 
-                                limit_choices_to = {'pub_date__lte': models.LazyDate()}
+                                limit_choices_to = {'pub_date__lte': datetime.now}
 
                              only allows the choice of related objects with a
                              ``pub_date`` before the current date/time to be
