@@ -160,7 +160,7 @@ If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, here's how you can turn off mod_python for a
 particular part of the site::
 
-    <Location "/media/">
+    <Location "/media">
         SetHandler None
     </Location>
 
@@ -177,7 +177,7 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
-    <Location "media">
+    <Location "/media">
         SetHandler None
     </Location>
 
