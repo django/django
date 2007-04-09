@@ -109,7 +109,8 @@ application(s).
 By default, the database will be dumped in JSON format. If you want the output
 to be in another format, use the ``--format`` option (e.g., ``format=xml``).
 You may specify any Django serialization backend (including any user specified
-serialization backends named in the ``SERIALIZATION_MODULES`` setting).
+serialization backends named in the ``SERIALIZATION_MODULES`` setting). The
+``--indent`` option can be used to pretty-print the output.
 
 If no application name is provided, all installed applications will be dumped.
 
@@ -219,6 +220,8 @@ all fixture data is installed as a single transaction, so data in
 one fixture can reference data in another fixture. If the database backend
 supports row-level constraints, these constraints will be checked at the
 end of the transaction.
+
+The ``dumpdata`` command can be used to generate input for ``loaddata``.
 
 .. admonition:: MySQL and Fixtures
 
