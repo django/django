@@ -83,16 +83,14 @@ class DatabaseWrapper(local):
         cursor = self.connection.cursor()
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
-        if not settings.DATABASE_CHARSET:
-            cursor.execute("SHOW client_encoding")
-            encoding = ENCODING_MAP[cursor.fetchone()[0]]
-        else:
-            encoding = settings.DATABASE_CHARSET
+        cursor.execute("SHOW client_encoding")
+        encoding = ENCODING_MAP[cursor.fetchone()[0]]
         cursor = UnicodeCursorWrapper(cursor, encoding)
         global client_encoding
         if not client_encoding:
             # We assume the client encoding isn't going to change for random
             # reasons.
+            Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
             client_encoding = encoding
         global postgres_version
         if not postgres_version:
@@ -268,7 +266,6 @@ except AttributeError:
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
-Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
