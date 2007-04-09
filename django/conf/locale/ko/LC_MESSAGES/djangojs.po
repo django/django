@@ -1,116 +1,118 @@
-# 
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Django 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-01 19:21+0200\n"
-"PO-Revision-Date: 2007-04-03 21:48+0200\n"
-"Last-Translator:  <>\n"
-"Language-Team: \n"
+"POT-Creation-Date: 2007-04-06 11:10+0900\n"
+"PO-Revision-Date: 2007-04-06 11:15+0900\n"
+"Last-Translator: Hyun Mi Ae <happyhyun@gmail.com>\n"
+"Language-Team: Korean\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr "1월 2월 3월 4월 5월 6월 7월 8월 9월 10월 11월 12월"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "일 월 화 수 목 금 토"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "일요일 월요일 화요일 수요일 목요일 금요일 토요일"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr "Možný %s"
+msgstr "이용 가능한 %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Vybrať všetko"
+msgstr "모두 선택"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Pridať"
+msgstr "추가"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Vymazať"
+msgstr "삭제"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Vybrané %s"
+msgstr "선택된 %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Vyberte položku a kliknite"
+msgstr "선택한 후 클릭하세요"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr "Odstrániť vybrané"
-
-#: contrib/admin/media/js/dateparse.js:32
-#: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Január Február Marec Apríl Máj Jún Júl August September Október November "
-"December"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Nedeľa Pondelok Utorok Streda Štvrtok Piatok Sobota"
-
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "N P U S Š P S"
+msgstr "모두 삭제"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr "Zobraziť"
+msgstr "보기"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr "Skryť"
+msgstr "감추기"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr "Práve teraz"
+msgstr "현재"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
-msgstr "Hodiny"
+msgstr "시계"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "Vybrať čas"
+msgstr "시간 선택"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
-msgstr "Polnoc"
+msgstr "자정"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr "6 ráno"
+msgstr "오전 6시"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr "Poludnie"
+msgstr "정오"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr "Zrušiť"
+msgstr "취소"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr "Dnes"
+msgstr "오늘"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
-msgstr "Kalendár"
+msgstr "달력"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr "Včera"
+msgstr "어제"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr "Zajtra"
-
+msgstr "내일"

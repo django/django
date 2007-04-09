@@ -439,30 +439,10 @@ get_sql_initial_data.help_doc = "RENAMED: see 'sqlcustom'"
 get_sql_initial_data.args = ''
 
 def get_sql_sequence_reset(app):
-    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
+    "Returns a list of the SQL statements to reset sequences for the given app."
     from django.db import backend, models
-    output = []
-    for model in models.get_models(app):
-        for f in model._meta.fields:
-            if isinstance(f, models.AutoField):
-                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                    (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
-                    style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD(backend.quote_name(f.column)),
-                    style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-                break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in model._meta.many_to_many:
-            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                (style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
-                style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_KEYWORD('FROM'),
-                style.SQL_TABLE(f.m2m_db_table())))
-    return output
-get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
+    return backend.get_sql_sequence_reset(style, models.get_models(app))
+get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
@@ -843,11 +823,12 @@ def startapp(app_name, directory):
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
     project_dir = os.path.normpath(os.path.join(directory, '..'))
-    project_name = os.path.basename(project_dir)
-    if app_name == os.path.basename(directory):
+    parent_dir = os.path.basename(project_dir)
+    project_name = os.path.basename(directory)
+    if app_name == project_name:
         sys.stderr.write(style.ERROR("Error: You cannot create an app with the same name (%r) as your project.\n" % app_name))
         sys.exit(1)
-    _start_helper('app', app_name, directory, project_name)
+    _start_helper('app', app_name, directory, parent_dir)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
@@ -1367,13 +1348,14 @@ def load_data(fixture_labels, verbosity=1):
     "Installs the provided fixture file(s) as data in the database."
     from django.db.models import get_apps
     from django.core import serializers
-    from django.db import connection, transaction
+    from django.db import connection, transaction, backend
     from django.conf import settings
     import sys
 
     # Keep a count of the installed objects and fixtures
     count = [0,0]
-
+    models = set()
+    
     humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
 
     # Get a cursor (even though we don't need one yet). This has
@@ -1435,6 +1417,7 @@ def load_data(fixture_labels, verbosity=1):
                             objects =  serializers.deserialize(format, fixture)
                             for obj in objects:
                                 count[0] += 1
+                                models.add(obj.object.__class__)
                                 obj.save()
                             label_found = True
                         except Exception, e:
@@ -1456,6 +1439,12 @@ def load_data(fixture_labels, verbosity=1):
     else:
         if verbosity > 0:
             print "Installed %d object(s) from %d fixture(s)" % tuple(count)
+        sequence_sql = backend.get_sql_sequence_reset(style, models)
+        if sequence_sql:
+            if verbosity > 1:
+                print "Resetting sequences"
+            for line in sequence_sql:
+                cursor.execute(line)
     transaction.commit()
     transaction.leave_transaction_management()
 

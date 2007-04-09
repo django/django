@@ -855,6 +855,8 @@ def parse_lookup(kwarg_items, opts):
             # all uses of None as a query value.
             if lookup_type != 'exact':
                 raise ValueError, "Cannot use None as a query value"
+        elif callable(value):
+            value = value()
 
         joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
         joins.update(joins2)

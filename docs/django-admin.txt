@@ -29,6 +29,9 @@ Generally, when working on a single Django project, it's easier to use
 ``--settings`` command line option, if you need to switch between multiple
 Django settings files.
 
+The command-line examples throughout this document use ``django-admin.py`` to
+be consistent, but any example can use ``manage.py`` just as well.
+
 Usage
 =====
 
@@ -100,23 +103,24 @@ if you're ever curious to see the full list of defaults.
 dumpdata [appname appname ...]
 ------------------------------
 
-Output to standard output all data in the database associated with the named 
+Output to standard output all data in the database associated with the named
 application(s).
 
 By default, the database will be dumped in JSON format. If you want the output
-to be in another format, use the ``--format`` option (e.g., ``format=xml``). 
-You may specify any Django serialization backend (including any user specified 
-serialization backends named in the ``SERIALIZATION_MODULES`` setting).
+to be in another format, use the ``--format`` option (e.g., ``format=xml``).
+You may specify any Django serialization backend (including any user specified
+serialization backends named in the ``SERIALIZATION_MODULES`` setting). The
+``--indent`` option can be used to pretty-print the output.
 
 If no application name is provided, all installed applications will be dumped.
 
-The output of ``dumpdata`` can be used as input for ``loaddata``. 
+The output of ``dumpdata`` can be used as input for ``loaddata``.
 
 flush
 -----
 
-Return the database to the state it was in immediately after syncdb was 
-executed. This means that all data will be removed from the database, any 
+Return the database to the state it was in immediately after syncdb was
+executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
 
@@ -178,37 +182,37 @@ Django will search in three locations for fixtures:
    3. In the literal path named by the fixture
 
 Django will load any and all fixtures it finds in these locations that match
-the provided fixture names. 
+the provided fixture names.
 
-If the named fixture has a file extension, only fixtures of that type 
+If the named fixture has a file extension, only fixtures of that type
 will be loaded. For example::
 
     django-admin.py loaddata mydata.json
-    
-would only load JSON fixtures called ``mydata``. The fixture extension 
-must correspond to the registered name of a serializer (e.g., ``json`` or 
+
+would only load JSON fixtures called ``mydata``. The fixture extension
+must correspond to the registered name of a serializer (e.g., ``json`` or
 ``xml``).
 
-If you omit the extension, Django will search all available fixture types 
+If you omit the extension, Django will search all available fixture types
 for a matching fixture. For example::
 
     django-admin.py loaddata mydata
-    
+
 would look for any fixture of any fixture type called ``mydata``. If a fixture
 directory contained ``mydata.json``, that fixture would be loaded
-as a JSON fixture. However, if two fixtures with the same name but different 
-fixture type are discovered (for example, if ``mydata.json`` and 
-``mydata.xml`` were found in the same fixture directory), fixture 
-installation will be aborted, and any data installed in the call to 
+as a JSON fixture. However, if two fixtures with the same name but different
+fixture type are discovered (for example, if ``mydata.json`` and
+``mydata.xml`` were found in the same fixture directory), fixture
+installation will be aborted, and any data installed in the call to
 ``loaddata`` will be removed from the database.
 
-The fixtures that are named can include directory components. These 
+The fixtures that are named can include directory components. These
 directories will be included in the search path. For example::
 
     django-admin.py loaddata foo/bar/mydata.json
- 
-would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed 
-application,  ``<dirname>/foo/bar/mydata.json`` for each directory in 
+
+would search ``<appname>/fixtures/foo/bar/mydata.json`` for each installed
+application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
 ``FIXTURE_DIRS``, and the literal path ``foo/bar/mydata.json``.
 
 Note that the order in which fixture files are processed is undefined. However,
@@ -217,16 +221,18 @@ one fixture can reference data in another fixture. If the database backend
 supports row-level constraints, these constraints will be checked at the
 end of the transaction.
 
+The ``dumpdata`` command can be used to generate input for ``loaddata``.
+
 .. admonition:: MySQL and Fixtures
 
-    Unfortunately, MySQL isn't capable of completely supporting all the 
+    Unfortunately, MySQL isn't capable of completely supporting all the
     features of Django fixtures. If you use MyISAM tables, MySQL doesn't
-    support transactions or constraints, so you won't get a rollback if 
-    multiple transaction files are found, or validation of fixture data. 
-    If you use InnoDB tables, you won't be able to have any forward 
-    references in your data files - MySQL doesn't provide a mechanism to 
-    defer checking of row constraints until a transaction is committed.    
-    
+    support transactions or constraints, so you won't get a rollback if
+    multiple transaction files are found, or validation of fixture data.
+    If you use InnoDB tables, you won't be able to have any forward
+    references in your data files - MySQL doesn't provide a mechanism to
+    defer checking of row constraints until a transaction is committed.
+
 reset [appname appname ...]
 ---------------------------
 Executes the equivalent of ``sqlreset`` for the given appnames.
@@ -366,7 +372,7 @@ Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given appnames.
 sqlsequencereset [appname appname ...]
 ----------------------------------------------
 
-Prints the SQL statements for resetting PostgreSQL sequences for the given
+Prints the SQL statements for resetting sequences for the given
 appnames.
 
 See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
@@ -397,8 +403,8 @@ this command to install the default apps.
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
 
-``syncdb`` will also search for and install any fixture named ``initial_data``. 
-See the documentation for ``loaddata`` for details on the specification of 
+``syncdb`` will also search for and install any fixture named ``initial_data``.
+See the documentation for ``loaddata`` for details on the specification of
 fixture data files.
 
 test
@@ -471,7 +477,7 @@ Example usage::
 
     django-admin.py dumpdata --indent=4
 
-Specifies the number of spaces that will be used for indentation when 
+Specifies the number of spaces that will be used for indentation when
 pretty-printing output. By default, output will *not* be pretty-printed.
 Pretty-printing will only be enabled if the indent option is provided.
 
@@ -512,7 +518,8 @@ and `2` is verbose output.
 ------------
 
 Example usage::
-    django-admin.py manage.py --adminmedia=/tmp/new-admin-style/
+
+    django-admin.py --adminmedia=/tmp/new-admin-style/
 
 Tells Django where to find the various CSS and JavaScript files for the admin
 interface when running the development server. Normally these files are served

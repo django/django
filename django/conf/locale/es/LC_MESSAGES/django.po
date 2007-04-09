@@ -305,7 +305,7 @@ msgstr "Japonés"
 
 #: conf/global_settings.py:58
 msgid "Latvian"
-msgstr ""
+msgstr "Latvio"
 
 #: conf/global_settings.py:59
 msgid "Macedonian"
@@ -611,7 +611,7 @@ msgstr "La URL %s no apunta a una imagen válida."
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr ""
-"Los números de teléfono deben guardar el formato XXX-XXX-XXXX format. \"%s\" "
+"Los números de teléfono deben guardar el formato XXX-XXX-XXXX. \"%s\" "
 "no es válido."
 
 #: core/validators.py:196
@@ -726,10 +726,10 @@ msgid "Please enter a valid decimal number with a whole part of at most %s digit
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr[0] ""
 "Por favor, introduzca un número decimal válido con a lo más %s dígito en "
-"total."
+"su parte entera."
 msgstr[1] ""
 "Por favor, introduzca un número decimal válido con a lo más %s dígitos en "
-"total."
+"su parte entera."
 
 #: core/validators.py:426
 #, python-format
@@ -958,7 +958,7 @@ msgid ""
 "digits and underscores)."
 msgstr ""
 "Requerido. 30 caracteres o menos. Sólo caracteres alfanuméricos (letras, "
-"dígutos y guiones bajos)."
+"dígitos y guiones bajos)."
 
 #: contrib/auth/models.py:91
 msgid "first name"
@@ -1107,7 +1107,7 @@ msgstr "Las contraseñas introducidas en los campos 'nueva contraseña' no coincid
 #: contrib/auth/forms.py:124
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
-"Tu contraseña antígua es incorrecta. Por favor, vuelve a introducirla "
+"Tu contraseña antigua es incorrecta. Por favor, vuelve a introducirla "
 "correctamente."
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
@@ -1707,7 +1707,7 @@ msgid ""
 msgstr ""
 "Ha ocurrido un error. Se ha informado a los administradores del sitio "
 "mediante correo electrónico y debería arreglarse en breve. Gracias por su "
-"paciencia"
+"paciencia."
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
@@ -1899,7 +1899,7 @@ msgid ""
 "the appropriate user."
 msgstr ""
 "Algo va mal con la instalación de la base de datos. Asegúrate que las tablas "
-"necesarias han sido creadas, y que la base de datos puede ser leida por el "
+"necesarias han sido creadas, y que la base de datos puede ser leída por el "
 "usuario apropiado."
 
 #: contrib/admin/templates/admin/filter.html:2
@@ -1912,7 +1912,7 @@ msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Primero, introduzca un nombre de usuario y una contraseña. Luego, podrá "
+"Primero introduzca un nombre de usuario y una contraseña. Luego podrá "
 "editar el resto de opciones del usuario."
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
@@ -2105,7 +2105,7 @@ msgstr "vista:"
 #: contrib/admin/views/doc.py:164
 #, python-format
 msgid "App %r not found"
-msgstr "Applicación %r no encontrada"
+msgstr "Aplicación %r no encontrada"
 
 #: contrib/admin/views/doc.py:171
 #, python-format
@@ -2326,12 +2326,12 @@ msgstr "Cambiar clave: %s"
 
 #: contrib/localflavor/usa/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Introduzca un código zip en el formato XXXXX o XXXX-XXXX."
+msgstr "Introduzca un código postal en el formato XXXXX o XXXX-XXXX."
 
 #: contrib/localflavor/uk/forms.py:18
 msgid "Enter a postcode. A space is required between the two postcode parts."
 msgstr ""
-"Introduzca in código postal. Se necesita un espacio entre las dos partes del "
+"Introduzca un código postal. Se necesita un espacio entre las dos partes del "
 "código."
 
 #: contrib/sessions/models.py:51

@@ -42,25 +42,25 @@ On the Web
 
 The most recent version of the Django documentation lives at
 http://www.djangoproject.com/documentation/ . These HTML pages are generated
-automatically from the text files in source control every 15 minutes. That
-means they reflect the "latest and greatest" in Django -- they include the very
-latest corrections and additions, and they discuss the latest Django features,
+automatically from the text files in source control. That means they reflect
+the "latest and greatest" in Django -- they include the very latest
+corrections and additions, and they discuss the latest Django features,
 which may only be available to users of the Django development version. (See
 "Differences between versions" below.)
 
-A key advantage of the Web-based documentation is the comment section at the
-bottom of each document. This is an area for anybody to submit changes,
-corrections and suggestions about the given document. The Django developers
-frequently monitor the comments there and use them to improve the documentation
-for everybody.
+We encourage you to help improve the docs by submitting changes, corrections
+and suggestions in the `ticket system`_. The Django developers actively monitor
+the ticket system and use your feedback to improve the documentation for
+everybody.
 
-We encourage you to help improve the docs: it's easy! Note, however, that
-comments should explicitly relate to the documentation, rather than asking
-broad tech-support questions. If you need help with your particular Django
-setup, try the `django-users mailing list`_ instead of posting a comment to the
-documentation.
+Note, however, that tickets should explicitly relate to the documentation,
+rather than asking broad tech-support questions. If you need help with your
+particular Django setup, try the `django-users mailing list`_ or the
+`#django IRC channel`_ instead.
 
+.. _ticket system: http://code.djangoproject.com/simpleticket?component=Documentation
 .. _django-users mailing list: http://groups.google.com/group/django-users
+.. _#django IRC channel: irc://irc.freenode.net/django
 
 In plain text
 -------------
@@ -133,14 +133,6 @@ We follow this policy:
       changes. Once documentation is frozen, we add a note to the top of each
       frozen document that says "These docs are frozen for Django version XXX"
       and links to the current version of that document.
-
-    * Once a document is frozen for a Django release, we remove comments from
-      that page, in favor of having comments on the latest version of that
-      document. This is for the sake of maintainability and usability, so that
-      users have one, and only one, place to leave comments on a particular
-      document. We realize that some people may be stuck on a previous version
-      of Django, but we believe the usability problems with multiple versions
-      of a document the outweigh the benefits.
 
     * The `main documentation Web page`_ includes links to documentation for
       all previous versions.

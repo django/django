@@ -39,11 +39,11 @@ Auto-generate the models
 Django comes with a utility that can create models by introspecting an existing
 database. You can view the output by running this command::
 
-    django-admin.py inspectdb --settings=path.to.settings
+    python manage.py inspectdb
 
 Save this as a file by using standard Unix output redirection::
 
-    django-admin.py inspectdb --settings=path.to.settings > models.py
+    python manage.py inspectdb > models.py
 
 This feature is meant as a shortcut, not as definitive model generation. See
 the `django-admin.py documentation`_ for more information.
@@ -60,7 +60,7 @@ Install the core Django tables
 Next, run the ``manage.py syncdb`` command to install any extra needed database
 records such as admin permissions and content types::
 
-    django-admin.py init --settings=path.to.settings
+    python manage.py syncdb
 
 See whether it worked
 =====================

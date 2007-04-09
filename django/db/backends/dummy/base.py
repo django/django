@@ -40,5 +40,6 @@ get_deferrable_sql = complain
 get_fulltext_search_sql = complain
 get_drop_foreignkey_sql = complain
 get_sql_flush = complain
+get_sql_sequence_reset = complain
 
 OPERATOR_MAPPING = {}

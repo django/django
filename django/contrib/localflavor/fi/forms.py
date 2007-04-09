@@ -26,8 +26,8 @@ class FISocialSecurityNumber(Field):
     def clean(self, value):
         super(FISocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
- 	        return u''
-        
+            return u''
+
         checkmarks = "0123456789ABCDEFHJKLMNPRSTUVWXY"
         result = re.match(r"""^
             (?P<date>([0-2]\d|3[01])
@@ -35,13 +35,11 @@ class FISocialSecurityNumber(Field):
             (\d{2}))
             [A+-]
             (?P<serial>(\d{3}))
-            (?P<chechsum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
+            (?P<checksum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
         if not result:
             raise ValidationError(gettext(u'Enter a valid Finnish social security number.'))
-        checksum = int(result.groupdict()['date'] + result.groupdict()['serial'])
-
-        if checkmarks[checksum % len(checkmarks)] == result.groupdict()['chechsum'].upper():
+        gd = result.groupdict()
+        checksum = int(gd['date'] + gd['serial'])
+        if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
             return u'%s' % value.upper()
-        
         raise ValidationError(gettext(u'Enter a valid Finnish social security number.'))
-
