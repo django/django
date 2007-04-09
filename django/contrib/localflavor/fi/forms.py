@@ -38,7 +38,7 @@ class FISocialSecurityNumber(Field):
             (?P<checksum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
         if not result:
             raise ValidationError(gettext(u'Enter a valid Finnish social security number.'))
-        gd = match.groupdict()
+        gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
             return u'%s' % value.upper()
