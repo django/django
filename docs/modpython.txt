@@ -57,16 +57,15 @@ on it, you'll need to tell mod_python::
 
 .. caution::
 
-    Is you are using Windows, remember that the path will contain backslashes.
+    If you're using Windows, remember that the path will contain backslashes.
     This string is passed through Python's string parser twice, so you need to
     escape each backslash **twice**::
 
         PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
 
-    or use raw strings::
+    Or, use raw strings::
 
         PythonPath "[r'c:\\path\\to\\project'] + sys.path"
-
 
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.
@@ -161,7 +160,7 @@ If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, here's how you can turn off mod_python for a
 particular part of the site::
 
-    <Location "/media/">
+    <Location "/media">
         SetHandler None
     </Location>
 
@@ -178,7 +177,7 @@ the ``media`` subdirectory and any URL that ends with ``.jpg``, ``.gif`` or
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
     </Location>
 
-    <Location "media">
+    <Location "/media">
         SetHandler None
     </Location>
 

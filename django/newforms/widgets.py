@@ -121,6 +121,12 @@ class FileInput(Input):
     input_type = 'file'
 
 class Textarea(Widget):
+    def __init__(self, attrs=None):
+        # The 'rows' and 'cols' attributes are required for HTML correctness.
+        self.attrs = {'cols': '40', 'rows': '10'}
+        if attrs:
+            self.attrs.update(attrs)
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         value = smart_unicode(value)

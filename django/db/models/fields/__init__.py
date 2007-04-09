@@ -763,7 +763,7 @@ class PhoneNumberField(IntegerField):
         validators.isValidPhone(field_data, all_data)
 
     def formfield(self, **kwargs):
-        from django.contrib.localflavor.usa.forms import USPhoneNumberField
+        from django.contrib.localflavor.us.forms import USPhoneNumberField
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         defaults.update(kwargs)
         return USPhoneNumberField(**defaults)

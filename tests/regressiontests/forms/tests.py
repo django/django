@@ -194,30 +194,30 @@ u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u01
 
 >>> w = Textarea()
 >>> w.render('msg', '')
-u'<textarea name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg"></textarea>'
 >>> w.render('msg', None)
-u'<textarea name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg"></textarea>'
 >>> w.render('msg', 'value')
-u'<textarea name="msg">value</textarea>'
+u'<textarea rows="10" cols="40" name="msg">value</textarea>'
 >>> w.render('msg', 'some "quoted" & ampersanded value')
-u'<textarea name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
->>> w.render('msg', 'value', attrs={'class': 'pretty'})
-u'<textarea name="msg" class="pretty">value</textarea>'
+u'<textarea rows="10" cols="40" name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
+>>> w.render('msg', 'value', attrs={'class': 'pretty', 'rows': 20})
+u'<textarea class="pretty" rows="20" cols="40" name="msg">value</textarea>'
 
 You can also pass 'attrs' to the constructor:
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '')
-u'<textarea class="pretty" name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="pretty"></textarea>'
 >>> w.render('msg', 'example')
-u'<textarea class="pretty" name="msg">example</textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="pretty">example</textarea>'
 
 'attrs' passed to render() get precedence over those passed to the constructor:
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '', attrs={'class': 'special'})
-u'<textarea class="special" name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="special"></textarea>'
 
 >>> w.render('msg', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
-u'<textarea class="fun" name="msg">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="fun">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
 
 # CheckboxInput Widget ########################################################
 
@@ -1967,12 +1967,12 @@ Any Field can have a Widget class passed to its constructor:
 >>> print f['subject']
 <input type="text" name="subject" />
 >>> print f['message']
-<textarea name="message"></textarea>
+<textarea rows="10" cols="40" name="message"></textarea>
 
 as_textarea(), as_text() and as_hidden() are shortcuts for changing the output
 widget type:
 >>> f['subject'].as_textarea()
-u'<textarea name="subject"></textarea>'
+u'<textarea rows="10" cols="40" name="subject"></textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" />'
 >>> f['message'].as_hidden()
@@ -1992,7 +1992,7 @@ as_hidden():
 u'<input type="text" name="message" />'
 >>> f = ContactForm({'subject': 'Hello', 'message': 'I love you.'}, auto_id=False)
 >>> f['subject'].as_textarea()
-u'<textarea name="subject">Hello</textarea>'
+u'<textarea rows="10" cols="40" name="subject">Hello</textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" value="I love you." />'
 >>> f['message'].as_hidden()
