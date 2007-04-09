@@ -1,0 +1,2735 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Django 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-04-06 10:51+0900\n"
+"PO-Revision-Date: 2007-04-06 11:04+0900\n"
+"Last-Translator: Hyun Mi Ae <happyhyun@gmail.com>\n"
+"Language-Team: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: conf/global_settings.py:39
+msgid "Arabic"
+msgstr "아랍어"
+
+#: conf/global_settings.py:40
+msgid "Bengali"
+msgstr "방글라데시어"
+
+#: conf/global_settings.py:41
+msgid "Catalan"
+msgstr "카탈로니아어"
+
+#: conf/global_settings.py:42
+msgid "Czech"
+msgstr "체코어"
+
+#: conf/global_settings.py:43
+msgid "Welsh"
+msgstr "웨일즈어"
+
+#: conf/global_settings.py:44
+msgid "Danish"
+msgstr "덴마크어"
+
+#: conf/global_settings.py:45
+msgid "German"
+msgstr "독일어"
+
+#: conf/global_settings.py:46
+msgid "Greek"
+msgstr "그리스어"
+
+#: conf/global_settings.py:47
+msgid "English"
+msgstr "영어"
+
+#: conf/global_settings.py:48
+msgid "Spanish"
+msgstr "스페인어"
+
+#: conf/global_settings.py:49
+msgid "Argentinean Spanish"
+msgstr "아르헨티나_스페인어"
+
+#: conf/global_settings.py:50
+msgid "Finnish"
+msgstr "핀란드어"
+
+#: conf/global_settings.py:51
+msgid "French"
+msgstr "프랑스어"
+
+#: conf/global_settings.py:52
+msgid "Galician"
+msgstr "갈리시아어"
+
+#: conf/global_settings.py:53
+msgid "Hungarian"
+msgstr "헝가리어"
+
+#: conf/global_settings.py:54
+msgid "Hebrew"
+msgstr "히브리어"
+
+#: conf/global_settings.py:55
+msgid "Icelandic"
+msgstr "아이슬란드어"
+
+#: conf/global_settings.py:56
+msgid "Italian"
+msgstr "이탈리아어"
+
+#: conf/global_settings.py:57
+msgid "Japanese"
+msgstr "일본어"
+
+#: conf/global_settings.py:58
+msgid "Kannada"
+msgstr ""
+
+#: conf/global_settings.py:59
+msgid "Korean"
+msgstr "한국어"
+
+#: conf/global_settings.py:60
+msgid "Latvian"
+msgstr "라트비아어"
+
+#: conf/global_settings.py:61
+msgid "Macedonian"
+msgstr "마케도니아어"
+
+#: conf/global_settings.py:62
+msgid "Dutch"
+msgstr "네덜란드어"
+
+#: conf/global_settings.py:63
+msgid "Norwegian"
+msgstr "노르웨이어"
+
+#: conf/global_settings.py:64
+msgid "Polish"
+msgstr "폴란드어"
+
+#: conf/global_settings.py:65
+msgid "Portugese"
+msgstr "포르투갈어"
+
+#: conf/global_settings.py:66
+msgid "Brazilian"
+msgstr "브라질어"
+
+#: conf/global_settings.py:67
+msgid "Romanian"
+msgstr "루마니아어"
+
+#: conf/global_settings.py:68
+msgid "Russian"
+msgstr "러시아어"
+
+#: conf/global_settings.py:69
+msgid "Slovak"
+msgstr "슬로바키아어"
+
+#: conf/global_settings.py:70
+msgid "Slovenian"
+msgstr "슬로베니아어"
+
+#: conf/global_settings.py:71
+msgid "Serbian"
+msgstr "세르비아어"
+
+#: conf/global_settings.py:72
+msgid "Swedish"
+msgstr "스웨덴어"
+
+#: conf/global_settings.py:73
+msgid "Tamil"
+msgstr "타밀어"
+
+#: conf/global_settings.py:74
+msgid "Telugu"
+msgstr "텔루구어"
+
+#: conf/global_settings.py:75
+msgid "Turkish"
+msgstr "터키어"
+
+#: conf/global_settings.py:76
+msgid "Ukrainian"
+msgstr "우크라이나어"
+
+#: conf/global_settings.py:77
+msgid "Simplified Chinese"
+msgstr "중국어 간체"
+
+#: conf/global_settings.py:78
+msgid "Traditional Chinese"
+msgstr "중국어 번체"
+
+#: contrib/admin/filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>%s(으)로:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+msgid "All"
+msgstr "모두"
+
+#: contrib/admin/filterspecs.py:109
+msgid "Any date"
+msgstr "언제나"
+
+#: contrib/admin/filterspecs.py:110
+msgid "Today"
+msgstr "오늘"
+
+#: contrib/admin/filterspecs.py:113
+msgid "Past 7 days"
+msgstr "지난 7일"
+
+#: contrib/admin/filterspecs.py:115
+msgid "This month"
+msgstr "이번 달"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This year"
+msgstr "이번 해"
+
+#: contrib/admin/filterspecs.py:143 newforms/widgets.py:174
+#: oldforms/__init__.py:577
+msgid "Yes"
+msgstr "예"
+
+#: contrib/admin/filterspecs.py:143 newforms/widgets.py:174
+#: oldforms/__init__.py:577
+msgid "No"
+msgstr "아니오"
+
+#: contrib/admin/filterspecs.py:150 newforms/widgets.py:174
+#: oldforms/__init__.py:577
+msgid "Unknown"
+msgstr "알 수 없습니다."
+
+#: contrib/admin/models.py:16
+msgid "action time"
+msgstr "액션 타임"
+
+#: contrib/admin/models.py:19
+msgid "object id"
+msgstr "오브젝트 아이디"
+
+#: contrib/admin/models.py:20
+msgid "object repr"
+msgstr "오브젝트 표현"
+
+#: contrib/admin/models.py:21
+msgid "action flag"
+msgstr "액션 플래그"
+
+#: contrib/admin/models.py:22
+msgid "change message"
+msgstr "메시지 변경"
+
+#: contrib/admin/models.py:25
+msgid "log entry"
+msgstr "로그 엔트리"
+
+#: contrib/admin/models.py:26
+msgid "log entries"
+msgstr "로그 엔트리"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "해당 페이지가 없습니다."
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "죄송합니다, 요청하신 페이지를 찾을 수 없습니다."
+
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/change_list.html:6
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/auth/user/change_password.html:12
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "홈"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "서버 오류"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "서버 오류 (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "서버 오류 <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"오류가 발생했습니다. 사이트 관리자에게 이메일로 에러를 보고 했습니다.조속히 "
+"수정하도록 하겠습니다. 고맙습니다."
+
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "환영합니다,"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Documentation"
+msgstr "문서"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Change password"
+msgstr "비밀번호 변경"
+
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/comments/templates/comments/form.html:6
+msgid "Log out"
+msgstr "로그아웃"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django 사이트 관리"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django 관리"
+
+#: contrib/admin/templates/admin/change_form.html:15
+#: contrib/admin/templates/admin/index.html:28
+msgid "Add"
+msgstr "추가"
+
+#: contrib/admin/templates/admin/change_form.html:21
+#: contrib/admin/templates/admin/object_history.html:5
+msgid "History"
+msgstr "히스토리"
+
+#: contrib/admin/templates/admin/change_form.html:22
+msgid "View on site"
+msgstr "사이트에서 보기"
+
+#: contrib/admin/templates/admin/change_form.html:32
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "아래의 오류를 수정해 주세요."
+msgstr[1] "아래의 오류들을 수정해 주세요."
+
+#: contrib/admin/templates/admin/change_form.html:50
+msgid "Ordering"
+msgstr "순서"
+
+#: contrib/admin/templates/admin/change_form.html:53
+msgid "Order:"
+msgstr "순서:"
+
+#: contrib/admin/templates/admin/change_list.html:12
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s 추가"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "삭제"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s \"%(escaped_object)s\" (을)를 삭제하면서관련 오브젝트를 제거"
+"하고자 했으나, 지금 사용하시는 계정은 다음 타입의 오브젝트를 제거할 권한이 없"
+"습니다. :"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:21
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"정말로 %(object_name)s \"%(escaped_object)s\" (을)를 삭제하시겠습니까?다음의 "
+"관련 아이템들이 모두 삭제됩니다. :"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "네, 확실합니다."
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s (으)로"
+
+#: contrib/admin/templates/admin/filters.html:4
+msgid "Filter"
+msgstr "필터"
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "%(name)s 어플리케이션으로 이용 가능한 모델"
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "변경"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "수정할 권한이 없습니다."
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "최근 액션"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "나의 액션"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "이용할 수 없습니다."
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"데이터베이스 설정에 문제가 발생했습니다. 해당 데이터베이스 테이블이 생성되었"
+"는지,해당 유저가 데이터베이스를 읽어 들일 수 있는지 확인하세요."
+
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+msgid "Username:"
+msgstr "사용자명"
+
+#: contrib/admin/templates/admin/login.html:20
+#: contrib/comments/templates/comments/form.html:8
+msgid "Password:"
+msgstr "비밀번호"
+
+#: contrib/admin/templates/admin/login.html:25
+#: contrib/admin/views/decorators.py:24
+msgid "Log in"
+msgstr "로그인"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "날짜/시간"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "User"
+msgstr "사용자"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "액션"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "년/월/일 시:분:초"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"오브젝트에 변경사항이 없습니다.이 admin 사이트를 통해 추가된 사항이 아닙니다."
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "모두 표시"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "실행"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "1건"
+msgstr[1] "%(counter)s 건"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "모두 %(full_result_count)s 건"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "새로 저장"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "저장 및 다른 이름으로 추가"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "저장 및 편집 계속"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "저장"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"사용자명와 비밀번호를 입력하세요.더 많은 사용자 옵션을 사용하실 수 있습니다."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "사용자명"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
+msgid "Password"
+msgstr "비밀번호"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+msgid "Password (again)"
+msgstr "비밀번호 (확인)"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+msgid "Enter the same password as above, for verification."
+msgstr "확인을 위해 위와 동일한 비밀번호를 입력하세요. "
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "<strong>%(username)s</strong> 새로운 비밀번호를 입력하세요."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "북마크릿"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "문서 북마크릿"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\"> 북마크릿을 설치하시려면 링크를 북마크 툴바로 드래그 하거"
+"나,\n"
+"오른쪽 클릭으로 해당 링크를 북마크에 추가하세요.\n"
+"이제 사이트 내의 모든 페이지에서 북마크릿 선택이 가능합니다.\n"
+"북마크릿에 따라 내부 네트워크 상의 컴퓨터로부터 이 사이트를 참조해야하는 경우"
+"가 있습니다.\n"
+"(내부 네트워크가 있는지 불명확한 경우 시스템 관리자에게 확인하시기 바랍니다.)"
+"</p>\n"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "이 페이지의 문서"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "각 페이지로에서 해당 페이지를 생성한 뷰의 문서로 갑니다."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "오브젝트 아이디 표시"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "단일 오브젝트 페이지의 고유 아이디와 컨텐츠 타입을 표시합니다."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "오브젝트 편집(현재 창)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "단일 오브젝트 페이지의 관리 페이지로 이동"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "오브젝트 편집(새로운 창)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "위와 동일하며, 새로운 창에서 관리 페이지를 엽니다."
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "사이트를 이용해 주셔서 고맙습니다."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "다시 로그인하기"
+
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "비밀번호 변경"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "비밀번호를 변경하였습니다."
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "비밀번호가 변경되었습니다."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"보안상 필요하오니 기존에 사용하시던 비밀번호를 입력해 주세요.새로운 비밀번호"
+"는 정확히 입력했는지 확인할 수 있도록 두 번 입력하시기 바랍니다."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "기존 비밀번호:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "새로운 비밀번호:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "새로운 비밀번호(확인):"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "비밀번호 변경"
+
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "비밀번호 초기화"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "비밀번호가 초기화 되었습니다."
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr "새로운 비밀번호를 등록하신 이메일로 보내드렸습니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "비밀번호가 초기화 되었음을 알려드립니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "%(site_name)s 의 사용자 비밀번호가 초기화 되었습니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "새로운 비밀번호는 %(new_password)s 입니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "해당 페이지에서 언제든지 비밀번호 변경이 가능합니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "사용자명:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "사이트를 이용해 주셔서 고맙습니다."
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s 팀"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"비밀번호를 잊으셨나요? 아래에 비밀번호를 입력하시면비밀전호를 초기화 한 후, "
+"새로운 비밀번호를 보내드리겠습니다."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "이메일 주소:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "비밀번호 초기화"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "날짜:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "시각:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "현재:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "변경:"
+
+#: contrib/admin/templatetags/admin_list.py:247
+msgid "All dates"
+msgstr "언제나"
+
+#: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:257
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다."
+
+#: contrib/admin/views/auth.py:24 contrib/admin/views/main.py:261
+#: contrib/admin/views/main.py:347
+msgid "You may edit it again below."
+msgstr "계속해서 편집하실 수 있습니다."
+
+#: contrib/admin/views/auth.py:30
+msgid "Add user"
+msgstr "사용자 추가"
+
+#: contrib/admin/views/auth.py:57
+msgid "Password changed successfully."
+msgstr "비밀번호가 변경되었습니다."
+
+#: contrib/admin/views/auth.py:64
+#, python-format
+msgid "Change password: %s"
+msgstr "비밀번호 변경: %s"
+
+#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "사용자명과 비밀번호를 입력하세요.(대, 소문자 구별)"
+
+#: contrib/admin/views/decorators.py:62
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr "로그인 세션이 끊겼습니다. 다시 로그인 하세요."
+
+#: contrib/admin/views/decorators.py:69
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"사용하시는 브라우저가 쿠키 사용을 허가하고 있지 않습니다.쿠키 사용을 체크하시"
+"고 다시 시도해 주세요."
+
+#: contrib/admin/views/decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "사용자명에는 '@'을 사용할 수 없습니다."
+
+#: contrib/admin/views/decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "이메일 주소와 사용자명은 다릅니다. '%s'를 사용하세요."
+
+#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
+#: contrib/admin/views/doc.py:50
+msgid "tag:"
+msgstr "태그:"
+
+#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
+#: contrib/admin/views/doc.py:81
+msgid "filter:"
+msgstr "필터:"
+
+#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
+#: contrib/admin/views/doc.py:139
+msgid "view:"
+msgstr "뷰:"
+
+#: contrib/admin/views/doc.py:164
+#, python-format
+msgid "App %r not found"
+msgstr "어플리케이션 %r (이)가 없습니다."
+
+#: contrib/admin/views/doc.py:171
+#, python-format
+msgid "Model %(name)r not found in app %(label)r"
+msgstr "모델 %(name)r (이)가 어플리케이션 %(label)r 에 없습니다."
+
+#: contrib/admin/views/doc.py:183
+#, python-format
+msgid "the related `%(label)s.%(type)s` object"
+msgstr "`%(label)s.%(type)s` 관련 오브젝트"
+
+#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
+#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
+msgid "model:"
+msgstr "모델:"
+
+#: contrib/admin/views/doc.py:214
+#, python-format
+msgid "related `%(label)s.%(name)s` objects"
+msgstr "`%(label)s.%(name)s` 관련 오브젝트(들)"
+
+#: contrib/admin/views/doc.py:219
+#, python-format
+msgid "all %s"
+msgstr "모든 %s"
+
+#: contrib/admin/views/doc.py:224
+#, python-format
+msgid "number of %s"
+msgstr "%s 의 수"
+
+#: contrib/admin/views/doc.py:229
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s 오브젝트의 필드"
+
+#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
+#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
+msgid "Integer"
+msgstr "정수"
+
+#: contrib/admin/views/doc.py:292
+msgid "Boolean (Either True or False)"
+msgstr "boolean(참 또는 거짓)"
+
+#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "문자열(%(maxlength)s 까지)"
+
+#: contrib/admin/views/doc.py:294
+msgid "Comma-separated integers"
+msgstr "정수(콤마로 구분)"
+
+#: contrib/admin/views/doc.py:295
+msgid "Date (without time)"
+msgstr "날짜(시간 제외)"
+
+#: contrib/admin/views/doc.py:296
+msgid "Date (with time)"
+msgstr "날짜(시간 포함)"
+
+#: contrib/admin/views/doc.py:297
+msgid "E-mail address"
+msgstr "이메일 주소"
+
+#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
+#: contrib/admin/views/doc.py:302
+msgid "File path"
+msgstr "파일 경로"
+
+#: contrib/admin/views/doc.py:300
+msgid "Decimal number"
+msgstr "10진수"
+
+#: contrib/admin/views/doc.py:304 contrib/comments/models.py:85
+msgid "IP address"
+msgstr "IP 주소"
+
+#: contrib/admin/views/doc.py:306
+msgid "Boolean (Either True, False or None)"
+msgstr "boolean (참, 거짓 또는 none)"
+
+#: contrib/admin/views/doc.py:307
+msgid "Relation to parent model"
+msgstr "부모(상위) 모델과 연계"
+
+#: contrib/admin/views/doc.py:308
+msgid "Phone number"
+msgstr "전화번호"
+
+#: contrib/admin/views/doc.py:313
+msgid "Text"
+msgstr "텍스트"
+
+#: contrib/admin/views/doc.py:314
+msgid "Time"
+msgstr "시각"
+
+#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:316
+msgid "U.S. state (two uppercase letters)"
+msgstr ""
+
+#: contrib/admin/views/doc.py:317
+msgid "XML text"
+msgstr "XML 텍스트"
+
+#: contrib/admin/views/doc.py:343
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s (은)는 url 패턴의 오브젝트가 아닙니다."
+
+#: contrib/admin/views/main.py:223
+msgid "Site administration"
+msgstr "사이트 관리"
+
+#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
+#, python-format
+msgid "You may add another %s below."
+msgstr "계속해서 다른 %s (을)를 추가하세요."
+
+#: contrib/admin/views/main.py:289
+#, python-format
+msgid "Add %s"
+msgstr "%s 추가"
+
+#: contrib/admin/views/main.py:335
+#, python-format
+msgid "Added %s."
+msgstr "%s (이)가 추가되었습니다."
+
+#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
+#: contrib/admin/views/main.py:339 db/models/manipulators.py:308
+msgid "and"
+msgstr "또한"
+
+#: contrib/admin/views/main.py:337
+#, python-format
+msgid "Changed %s."
+msgstr "%s (이)가 변경되었습니다."
+
+#: contrib/admin/views/main.py:339
+#, python-format
+msgid "Deleted %s."
+msgstr "%s (이)가 삭제되었습니다."
+
+#: contrib/admin/views/main.py:342
+msgid "No fields changed."
+msgstr "변경된 필드가 없습니다."
+
+#: contrib/admin/views/main.py:345
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" (이)가 변경되었습니다."
+
+#: contrib/admin/views/main.py:353
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" (이)가 추가되었습니다. 계속해서 편집하세요."
+
+#: contrib/admin/views/main.py:391
+#, python-format
+msgid "Change %s"
+msgstr "%s 변경"
+
+#: contrib/admin/views/main.py:476
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "%(name)s 에 %(fieldname)s (이)가 하나 이상 있는 %(obj)s"
+
+#: contrib/admin/views/main.py:481
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "%(name)s 에 %(fieldname)s (이)가 하나 이상 있는"
+
+#: contrib/admin/views/main.py:514
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" (이)가 삭제되었습니다."
+
+#: contrib/admin/views/main.py:517
+msgid "Are you sure?"
+msgstr "확실합니까?"
+
+#: contrib/admin/views/main.py:539
+#, python-format
+msgid "Change history: %s"
+msgstr "변경 히스토리: %s"
+
+#: contrib/admin/views/main.py:573
+#, python-format
+msgid "Select %s"
+msgstr "%s 선택"
+
+#: contrib/admin/views/main.py:573
+#, python-format
+msgid "Select %s to change"
+msgstr "변경할 %s 선택"
+
+#: contrib/admin/views/main.py:768
+msgid "Database error"
+msgstr "데이터베이스 오류"
+
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+msgid "The two password fields didn't match."
+msgstr "비밀번호가 일치하지 않습니다."
+
+#: contrib/auth/forms.py:25
+msgid "A user with that username already exists."
+msgstr "해당 사용자명은 이미 존재합니다."
+
+#: contrib/auth/forms.py:53
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"사용하시는 브라우저가 쿠키를 허용하지 않습니다.로그인하기 위해서는 쿠키 사용"
+"이 필요합니다."
+
+#: contrib/auth/forms.py:62
+msgid "This account is inactive."
+msgstr "이 계정은 유효하지 않습니다."
+
+#: contrib/auth/forms.py:85
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"이메일주소와 일치하는 사용자가 없습니다.이 이메일주소로 등록하셨습니까?"
+
+#: contrib/auth/forms.py:117
+msgid "The two 'new password' fields didn't match."
+msgstr "새로운 비밀번호가 일치하지 않습니다."
+
+#: contrib/auth/forms.py:124
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "기존 비밀번호를 잘못 입력하셨습니다. 다시 입력해 주세요."
+
+#: contrib/auth/models.py:38 contrib/auth/models.py:57
+msgid "name"
+msgstr "이름"
+
+#: contrib/auth/models.py:40
+msgid "codename"
+msgstr "코드명"
+
+#: contrib/auth/models.py:42
+msgid "permission"
+msgstr "허가"
+
+#: contrib/auth/models.py:43 contrib/auth/models.py:58
+msgid "permissions"
+msgstr "허가"
+
+#: contrib/auth/models.py:60
+msgid "group"
+msgstr "그룹"
+
+#: contrib/auth/models.py:61 contrib/auth/models.py:100
+msgid "groups"
+msgstr "그룹"
+
+#: contrib/auth/models.py:90
+msgid "username"
+msgstr "사용자명"
+
+#: contrib/auth/models.py:90
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr "필수항목입니다. 30자 이내로 입력하세요.(알파벳, 숫자, '_' 만 가능)"
+
+#: contrib/auth/models.py:91
+msgid "first name"
+msgstr "이름"
+
+#: contrib/auth/models.py:92
+msgid "last name"
+msgstr "성"
+
+#: contrib/auth/models.py:93
+msgid "e-mail address"
+msgstr "이메일 주소"
+
+#: contrib/auth/models.py:94
+msgid "password"
+msgstr "비밀번호"
+
+#: contrib/auth/models.py:94
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+"'[algo]$[salt]$[hexdigest]' 또는 <a href=\"password/\">비밀번호 변경</a>"
+
+#: contrib/auth/models.py:95
+msgid "staff status"
+msgstr "스태프 권한"
+
+#: contrib/auth/models.py:95
+msgid "Designates whether the user can log into this admin site."
+msgstr "사용자가 관리사이트에 로그인이 가능한지를 나타냅니다."
+
+#: contrib/auth/models.py:96
+msgid "active"
+msgstr "활성"
+
+#: contrib/auth/models.py:96
+msgid ""
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr "사용자가 'Django 관리'에 로그인이 가능한지를 나타냅니다."
+
+#: contrib/auth/models.py:97
+msgid "superuser status"
+msgstr "최상위 사용자 권한"
+
+#: contrib/auth/models.py:97
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "해당 사용자에게 모든 권한을 허가합니다."
+
+#: contrib/auth/models.py:98
+msgid "last login"
+msgstr "마지막 로그인"
+
+#: contrib/auth/models.py:99
+msgid "date joined"
+msgstr "등록일"
+
+#: contrib/auth/models.py:101
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "해당 사용자에게 속해있는 그룹의 모든 권한을 허가합니다."
+
+#: contrib/auth/models.py:102
+msgid "user permissions"
+msgstr "사용자 권한"
+
+#: contrib/auth/models.py:105
+msgid "user"
+msgstr "사용자"
+
+#: contrib/auth/models.py:106
+msgid "users"
+msgstr "사용자(들)"
+
+#: contrib/auth/models.py:111
+msgid "Personal info"
+msgstr "개인정보"
+
+#: contrib/auth/models.py:112
+msgid "Permissions"
+msgstr "권한"
+
+#: contrib/auth/models.py:113
+msgid "Important dates"
+msgstr "중요한 일정"
+
+#: contrib/auth/models.py:114
+msgid "Groups"
+msgstr "그룹"
+
+#: contrib/auth/models.py:258
+msgid "message"
+msgstr "메시지"
+
+#: contrib/auth/views.py:39
+msgid "Logged out"
+msgstr "로그 아웃"
+
+#: contrib/comments/models.py:67 contrib/comments/models.py:166
+msgid "object ID"
+msgstr "오브젝트 ID"
+
+#: contrib/comments/models.py:68
+msgid "headline"
+msgstr "최근 정보"
+
+#: contrib/comments/models.py:69 contrib/comments/models.py:90
+#: contrib/comments/models.py:167
+msgid "comment"
+msgstr "코멘트"
+
+#: contrib/comments/models.py:70
+msgid "rating #1"
+msgstr "rating #1"
+
+#: contrib/comments/models.py:71
+msgid "rating #2"
+msgstr "rating #2"
+
+#: contrib/comments/models.py:72
+msgid "rating #3"
+msgstr "rating #3"
+
+#: contrib/comments/models.py:73
+msgid "rating #4"
+msgstr "rating #4"
+
+#: contrib/comments/models.py:74
+msgid "rating #5"
+msgstr "rating #5"
+
+#: contrib/comments/models.py:75
+msgid "rating #6"
+msgstr "rating #6"
+
+#: contrib/comments/models.py:76
+msgid "rating #7"
+msgstr "rating #7"
+
+#: contrib/comments/models.py:77
+msgid "rating #8"
+msgstr "rating #8"
+
+#: contrib/comments/models.py:82
+msgid "is valid rating"
+msgstr "올바른 레이팅입니다."
+
+#: contrib/comments/models.py:83 contrib/comments/models.py:169
+msgid "date/time submitted"
+msgstr "날짜/시간 확인"
+
+#: contrib/comments/models.py:84 contrib/comments/models.py:170
+msgid "is public"
+msgstr "공개합니다."
+
+#: contrib/comments/models.py:86
+msgid "is removed"
+msgstr "삭제합니다."
+
+#: contrib/comments/models.py:86
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"코멘트가 부적절한 경우 체크하세요. \"코멘트가 삭제되었습니다.\" 메시지가 표시"
+"됩니다."
+
+#: contrib/comments/models.py:91
+msgid "comments"
+msgstr "코멘트(들)"
+
+#: contrib/comments/models.py:131 contrib/comments/models.py:207
+msgid "Content object"
+msgstr "콘텐츠 오브젝트"
+
+#: contrib/comments/models.py:159
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"%(user)s (이)가 %(date)s 등록\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:168
+msgid "person's name"
+msgstr "사용자 이름"
+
+#: contrib/comments/models.py:171
+msgid "ip address"
+msgstr "IP 주소"
+
+#: contrib/comments/models.py:173
+msgid "approved by staff"
+msgstr "스태프 승인"
+
+#: contrib/comments/models.py:176
+msgid "free comment"
+msgstr "프리 코멘트"
+
+#: contrib/comments/models.py:177
+msgid "free comments"
+msgstr "프리 코멘트(들)"
+
+#: contrib/comments/models.py:233
+msgid "score"
+msgstr "스코어"
+
+#: contrib/comments/models.py:234
+msgid "score date"
+msgstr "스코어 날짜"
+
+#: contrib/comments/models.py:237
+msgid "karma score"
+msgstr "카르마 스코어"
+
+#: contrib/comments/models.py:238
+msgid "karma scores"
+msgstr "카르마 스코어"
+
+#: contrib/comments/models.py:242
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "%(user)s (이)가 %(score)d 점 부여했습니다."
+
+#: contrib/comments/models.py:258
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"%(user)s:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/models.py:265
+msgid "flag date"
+msgstr "플래그 날짜"
+
+#: contrib/comments/models.py:268
+msgid "user flag"
+msgstr "사용자 플래그"
+
+#: contrib/comments/models.py:269
+msgid "user flags"
+msgstr "사용자 플래그"
+
+#: contrib/comments/models.py:273
+#, python-format
+msgid "Flag by %r"
+msgstr "%r (으)로 플래그"
+
+#: contrib/comments/models.py:278
+msgid "deletion date"
+msgstr "삭제일"
+
+#: contrib/comments/models.py:280
+msgid "moderator deletion"
+msgstr ""
+
+#: contrib/comments/models.py:281
+msgid "moderator deletions"
+msgstr ""
+
+#: contrib/comments/models.py:285
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "비밀번호를 잊으셨습니까?"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr "레이팅"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "필수항목"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "옵션"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "사진 등록"
+
+#: contrib/comments/templates/comments/form.html:28
+#: contrib/comments/templates/comments/freeform.html:5
+msgid "Comment:"
+msgstr "코멘트:"
+
+#: contrib/comments/templates/comments/form.html:35
+#: contrib/comments/templates/comments/freeform.html:10
+msgid "Preview comment"
+msgstr "코멘트 미리보기"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "이름:"
+
+#: contrib/comments/views/comments.py:27
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr "다른 레이팅을 입력했을 경우, 이 레이팅은 필히 입력하셔야 합니다."
+
+#: contrib/comments/views/comments.py:111
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"이 코멘트를 작성한 사용자의 코멘트 포스팅은 %(count)s 번 이하입니다.:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"이 코멘트를 작성한 사용자의 코멘트 포스팅은 %(count)s 번 이하입니다.:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:116
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"이 코멘트는 알수 없는 사용자가 작성했습니다.:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:188
+#: contrib/comments/views/comments.py:280
+msgid "Only POSTs are allowed"
+msgstr "POST만 가능합니다."
+
+#: contrib/comments/views/comments.py:192
+#: contrib/comments/views/comments.py:284
+msgid "One or more of the required fields wasn't submitted"
+msgstr "하나 이상의 필수항목이 누락되었습니다."
+
+#: contrib/comments/views/comments.py:196
+#: contrib/comments/views/comments.py:286
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "해당 코멘트가 누군가에 의해 변경되었습니다."
+
+#: contrib/comments/views/comments.py:206
+#: contrib/comments/views/comments.py:292
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr ""
+"'target' 파라미터가 코멘트 폼에 적합하지 않습니다.오브젝트 ID가 부적절합니다."
+
+#: contrib/comments/views/comments.py:257
+#: contrib/comments/views/comments.py:321
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "해당 코멘트 폼은 '미리보기'와 'post' 기능을 제공하지 않습니다."
+
+#: contrib/comments/views/karma.py:19
+msgid "Anonymous users cannot vote"
+msgstr "미등록 사용자는 투표할 수 없습니다."
+
+#: contrib/comments/views/karma.py:23
+msgid "Invalid comment ID"
+msgstr "코멘트 ID가 부적절합니다."
+
+#: contrib/comments/views/karma.py:25
+msgid "No voting for yourself"
+msgstr "자신이 직접 투표할 수 없습니다."
+
+#: contrib/contenttypes/models.py:36
+msgid "python model class name"
+msgstr "python 모델 클래스 명"
+
+#: contrib/contenttypes/models.py:39
+msgid "content type"
+msgstr "콘텐츠 타입"
+
+#: contrib/contenttypes/models.py:40
+msgid "content types"
+msgstr "콘텐츠 타입(들)"
+
+#: contrib/flatpages/models.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "앞, 뒤에 슬래시(/)를 넣으세요. 예:'/about/contact/' "
+
+#: contrib/flatpages/models.py:9
+msgid "title"
+msgstr "제목"
+
+#: contrib/flatpages/models.py:10
+msgid "content"
+msgstr "내용"
+
+#: contrib/flatpages/models.py:11
+msgid "enable comments"
+msgstr "사용 가능한 코멘트"
+
+#: contrib/flatpages/models.py:12
+msgid "template name"
+msgstr "템플릿명"
+
+#: contrib/flatpages/models.py:13
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"예: 'flatpages/contact_page.html' 를 사용할 수 없는 경우 시스템이 'flatpages/"
+"default.html' (을)를 사용합니다."
+
+#: contrib/flatpages/models.py:14
+msgid "registration required"
+msgstr "등록하세요."
+
+#: contrib/flatpages/models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "체크할 경우, 로그인 사용자만 해당 페이지를 볼 수 있습니다."
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "플랫 페이지"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "플랫 페이지(들)"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "th"
+msgstr "번째"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "st"
+msgstr "번째"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "nd"
+msgstr "번째"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "rd"
+msgstr "번째"
+
+#: contrib/humanize/templatetags/humanize.py:47
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "(value).1f"
+msgstr[1] "(value).1f"
+
+#: contrib/humanize/templatetags/humanize.py:50
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f"
+msgstr[1] "%(value).1f"
+
+#: contrib/humanize/templatetags/humanize.py:53
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f"
+msgstr[1] "%(value).1f"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "one"
+msgstr "1"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "two"
+msgstr "2"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "three"
+msgstr "3"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "four"
+msgstr "4"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "five"
+msgstr "5"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "six"
+msgstr "6"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "seven"
+msgstr "7"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "eight"
+msgstr "8"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "nine"
+msgstr "9"
+
+#: contrib/localflavor/br/forms.py:18
+#, fuzzy
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "우편번호를 입력하세요.(xxx xxx)"
+
+#: contrib/localflavor/br/forms.py:30
+#, fuzzy
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr ""
+"전화번호는 xxx-xxx-xxxx 형식으로 입력하세요.  \"%s\" (은)는 부적절합니다."
+
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:7
+#, fuzzy
+msgid "Berlin"
+msgstr "브라질어"
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:11
+#, fuzzy
+msgid "Hessen"
+msgstr "메시지"
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:16
+#, fuzzy
+msgid "Saarland"
+msgstr "카탈로니아어"
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr ""
+
+#: contrib/localflavor/de/forms.py:16 contrib/localflavor/fi/forms.py:14
+#: contrib/localflavor/fr/forms.py:17 contrib/localflavor/it/forms.py:14
+msgid "Enter a zip code in the format XXXXX."
+msgstr "우편번호를 입력하세요.(xxx xxx)"
+
+#: contrib/localflavor/de/forms.py:63
+msgid ""
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format"
+msgstr ""
+
+#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:46
+#, fuzzy
+msgid "Enter a valid Finnish social security number."
+msgstr "올바른 파일명을 입력하세요."
+
+#: contrib/localflavor/jp/forms.py:21
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr "우변번호를 입력하세요.(xxxxxx 또는 xxx-xxx)"
+
+#: contrib/localflavor/jp/jp_prefectures.py:4
+msgid "Hokkaido"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:5
+msgid "Aomori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:6
+msgid "Iwate"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:7
+msgid "Miyagi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:8
+msgid "Akita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:9
+msgid "Yamagata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:10
+msgid "Fukushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:11
+msgid "Ibaraki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:12
+msgid "Tochigi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:13
+msgid "Gunma"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:14
+msgid "Saitama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:15
+msgid "Chiba"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:16
+msgid "Tokyo"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:17
+msgid "Kanagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:18
+msgid "Yamanashi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:19
+msgid "Nagano"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:20
+msgid "Niigata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:21
+msgid "Toyama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:22
+msgid "Ishikawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:23
+msgid "Fukui"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:24
+msgid "Gifu"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:25
+msgid "Shizuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:26
+msgid "Aichi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:27
+msgid "Mie"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:28
+msgid "Shiga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:29
+msgid "Kyoto"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:30
+msgid "Osaka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:31
+msgid "Hyogo"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:32
+msgid "Nara"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:33
+msgid "Wakayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:34
+msgid "Tottori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:35
+msgid "Shimane"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:36
+msgid "Okayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:37
+msgid "Hiroshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:38
+msgid "Yamaguchi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:39
+msgid "Tokushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:40
+msgid "Kagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:41
+msgid "Ehime"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:42
+msgid "Kochi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:43
+msgid "Fukuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:44
+msgid "Saga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:45
+msgid "Nagasaki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:46
+msgid "Kumamoto"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:47
+msgid "Oita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:48
+msgid "Miyazaki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:49
+msgid "Kagoshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:50
+msgid "Okinawa"
+msgstr ""
+
+#: contrib/localflavor/no/forms.py:15
+#, fuzzy
+msgid "Enter a zip code in the format XXXX."
+msgstr "우편번호를 입력하세요.(xxx xxx)"
+
+#: contrib/localflavor/no/forms.py:36
+#, fuzzy
+msgid "Enter a valid Norwegian social security number."
+msgstr "10진수를 사용해 주세요."
+
+#: contrib/localflavor/uk/forms.py:18
+msgid "Enter a postcode. A space is required between the two postcode parts."
+msgstr "우편번호를 입력하세요. (xxx xxx)"
+
+#: contrib/localflavor/usa/forms.py:18
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr "우변번호를 입력하세요.(xxxxxx 또는 xxx-xxx)"
+
+#: contrib/localflavor/usa/forms.py:51
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr ""
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr "에서 재전송"
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr "도메인명을 제외한 절대경로로 입력하세요. 예: '/events/search/'"
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr "(으)로 재전송"
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr "절대경로와 URL('http://' 포함) 모두 가능합니다."
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr "재전송"
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr "재전송"
+
+#: contrib/sessions/models.py:68
+msgid "session key"
+msgstr "세션 키"
+
+#: contrib/sessions/models.py:69
+msgid "session data"
+msgstr "세션 날짜"
+
+#: contrib/sessions/models.py:70
+msgid "expire date"
+msgstr "유효날짜"
+
+#: contrib/sessions/models.py:74
+msgid "session"
+msgstr "세션"
+
+#: contrib/sessions/models.py:75
+msgid "sessions"
+msgstr "세션"
+
+#: contrib/sites/models.py:10
+msgid "domain name"
+msgstr "도메인 명"
+
+#: contrib/sites/models.py:11
+msgid "display name"
+msgstr "표시명"
+
+#: contrib/sites/models.py:15
+msgid "site"
+msgstr "사이트"
+
+#: contrib/sites/models.py:16
+msgid "sites"
+msgstr "사이트(들)"
+
+#: core/validators.py:64
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "문자, 숫자, '_'만 가능합니다."
+
+#: core/validators.py:68
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr "문자, 숫자, '_', '-', '/'만 가능합니다."
+
+#: core/validators.py:72
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr "문자, 숫자, '_', '-'만 가능합니다."
+
+#: core/validators.py:76
+msgid "Uppercase letters are not allowed here."
+msgstr "대문자는 사용할 수 없습니다."
+
+#: core/validators.py:80
+msgid "Lowercase letters are not allowed here."
+msgstr "소문자는 사용할 수 없습니다."
+
+#: core/validators.py:87
+msgid "Enter only digits separated by commas."
+msgstr "콤마로 구분된 숫자만 입력하세요."
+
+#: core/validators.py:99
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "콤마로 구분된 이메일 주소만 입력하세요."
+
+#: core/validators.py:103
+msgid "Please enter a valid IP address."
+msgstr "올바른 IP 주소를 입력하세요."
+
+#: core/validators.py:107
+msgid "Empty values are not allowed here."
+msgstr "반드시 입력하세요."
+
+#: core/validators.py:111
+msgid "Non-numeric characters aren't allowed here."
+msgstr "숫자만 사용할 수 있습니다."
+
+#: core/validators.py:115
+msgid "This value can't be comprised solely of digits."
+msgstr "숫자만 사용할 수는 없습니다."
+
+#: core/validators.py:120 newforms/fields.py:128
+msgid "Enter a whole number."
+msgstr "정수를 입력하세요."
+
+#: core/validators.py:124
+msgid "Only alphabetical characters are allowed here."
+msgstr "문자만 사용할 수 있습니다."
+
+#: core/validators.py:139
+msgid "Year must be 1900 or later."
+msgstr "1900년 이후의 연도만 가능"
+
+#: core/validators.py:143
+#, python-format
+msgid "Invalid date: %s"
+msgstr "날짜가 부적절합니다.: %s"
+
+#: core/validators.py:148 db/models/fields/__init__.py:457
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "날짜는 YYYY-MM-DD 형식으로 입력하세요."
+
+#: core/validators.py:153
+msgid "Enter a valid time in HH:MM format."
+msgstr "시각은 HH:MM 형식으로 입력하세요."
+
+#: core/validators.py:157 db/models/fields/__init__.py:526
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "날짜/시각을 YYYY-MM-DD HH:MM 형식으로 입력하세요."
+
+#: core/validators.py:162 newforms/fields.py:271
+msgid "Enter a valid e-mail address."
+msgstr "올바른 이메일 주소를 입력하세요."
+
+#: core/validators.py:174 core/validators.py:445 oldforms/__init__.py:672
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "등록된 파일이 없습니다. 인코딩 형식을 확인하세요."
+
+#: core/validators.py:178
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"올바른 이미지를 업로드하세요.업로드하신 파일은 이미지 파일이 아니거나 파일이 "
+"깨져 있습니다."
+
+#: core/validators.py:185
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "해당 URL %s (은)는 올바른 이미지가 아닙니다."
+
+#: core/validators.py:189
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr ""
+"전화번호는 xxx-xxx-xxxx 형식으로 입력하세요.  \"%s\" (은)는 부적절합니다."
+
+#: core/validators.py:197
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "해당 URL %s (은)는 올바른 QuickTime video가 아닙니다."
+
+#: core/validators.py:201
+msgid "A valid URL is required."
+msgstr "올바른 URL을 입력하세요."
+
+#: core/validators.py:215
+#, python-format
+msgid ""
+"Valid HTML is required. Specific errors are:\n"
+"%s"
+msgstr ""
+"올바른 HTML을 입력하세요. 오류:\n"
+"%s"
+
+#: core/validators.py:222
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "잘못된 형식의 XML: %s"
+
+#: core/validators.py:239
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "부적절한 URL: %s"
+
+#: core/validators.py:244 core/validators.py:246
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "해당 URL %s 링크가 깨졌습니다."
+
+#: core/validators.py:252
+msgid "Enter a valid U.S. state abbreviation."
+msgstr ""
+
+#: core/validators.py:266
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "비속어/욕설입니다. %s (은)는 사용하실 수 없습니다."
+msgstr[1] "비속어/욕설입니다. %s (은)는 사용하실 수 없습니다."
+
+#: core/validators.py:273
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "이 필드는 '%s' 필드와 일치해야 합니다."
+
+#: core/validators.py:292
+msgid "Please enter something for at least one field."
+msgstr "하나 이상의 필드에 입력해 주세요."
+
+#: core/validators.py:301 core/validators.py:312
+msgid "Please enter both fields or leave them both empty."
+msgstr "양쪽 필드에 모두 입력하시거나, 모두 빈칸으로 해 주십시오."
+
+#: core/validators.py:320
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "%(field)s (이)가 %(value)s 일 경우, 이 필드에 반드시 입력해 주세요."
+
+#: core/validators.py:333
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr ""
+"%(field)s (이)가 %(value)s (이)가 아닐 경우, 이 필드에 반드시 입력해 주세요."
+
+#: core/validators.py:352
+msgid "Duplicate values are not allowed."
+msgstr "중복해서 사용할 수 없습니다."
+
+#: core/validators.py:367
+#, python-format
+msgid "This value must be between %(lower)s and %(upper)s."
+msgstr "%(lower)s 에서 %(upper)s 사이의 값을 사용해 주세요."
+
+#: core/validators.py:369
+#, python-format
+msgid "This value must be at least %s."
+msgstr "%s 이상의 값을 사용해 주세요."
+
+#: core/validators.py:371
+#, python-format
+msgid "This value must be no more than %s."
+msgstr "%s 이하의 값을 사용해 주세요."
+
+#: core/validators.py:407
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "%s 제곱의 값을 사용해 주세요."
+
+#: core/validators.py:418
+msgid "Please enter a valid decimal number."
+msgstr "10진수를 사용해 주세요."
+
+#: core/validators.py:422
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "전체 %s 자리 이하의 10진수를 입력하세요."
+msgstr[1] "전체 %s 자리 이하의 10진수를 입력하세요."
+
+#: core/validators.py:425
+#, python-format
+msgid ""
+"Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural ""
+"Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr[0] "정수부분이 %s 자리 이하인 10진수를 입력하세요."
+msgstr[1] "정수부분이 %s 자리 이하인 10진수를 입력하세요."
+
+#: core/validators.py:428
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "소수부분이 %s 자리 이하인 10진수를 입력하세요."
+msgstr[1] "소수부분이 %s 자리 이하인 10진수를 입력하세요."
+
+#: core/validators.py:438
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "업로드 파일은 %s bytes 이상입니다."
+
+#: core/validators.py:439
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "업로드 파일은 %s bytes 이하입니다."
+
+#: core/validators.py:456
+msgid "The format for this field is wrong."
+msgstr "이 필드의 형식이 잘못되었습니다."
+
+#: core/validators.py:471
+msgid "This field is invalid."
+msgstr "필드가 올바르지 않습니다."
+
+#: core/validators.py:507
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr "%s 에서 검색된 내용이 없습니다."
+
+#: core/validators.py:510
+#, python-format
+msgid ""
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgstr ""
+"URL %(url)s (이)가 부적절한 Content-Type heade '%(contenttype)s' (을)를 반환"
+"했습니다."
+
+#: core/validators.py:543
+#, python-format
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
+msgstr ""
+"%(line)s 줄의 %(tag)s 태그가 닫히지 않았습니다.(시작줄 : \"%(start)s\")"
+
+#: core/validators.py:547
+#, python-format
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s 줄의 내용으로 시작하는 텍스트는 사용할 수 없습니다.(시작줄 : \"%"
+"(start)s\")"
+
+#: core/validators.py:552
+#, python-format
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"%(line)s 줄의 \"%(attr)s\" (은)는 부적절한 속성입니다.(시작줄 : \"%(start)s"
+"\")"
+
+#: core/validators.py:557
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
+"%(line)s 줄의 \"<%(tag)s>\" (은)는 부적절한 태그입니다.(시작줄 : \"%(start)s"
+"\")"
+
+#: core/validators.py:561
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s 줄의 태그는 하나 이상의 필수 속성이 생략되어 있습니다.(시작줄 : \"%"
+"(start)s\")"
+
+#: core/validators.py:566
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
+"%(line)s 줄의 \"%(attr)s\" 속성의 값이 부적절합니다.(시작줄 : \"%(start)s\")"
+
+#: db/models/manipulators.py:307
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(field)s 에 입력된 값은 %(type)s 의 %(object)s 에 이미 존재합니다."
+
+#: db/models/fields/__init__.py:42
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(fieldname)s 의 %(optname)s (은)는 이미 존재합니다."
+
+#: db/models/fields/__init__.py:117 db/models/fields/__init__.py:274
+#: db/models/fields/__init__.py:610 db/models/fields/__init__.py:621
+#: newforms/fields.py:80 newforms/fields.py:376 newforms/fields.py:452
+#: newforms/fields.py:463 newforms/models.py:178 oldforms/__init__.py:357
+msgid "This field is required."
+msgstr "필수 항목입니다."
+
+#: db/models/fields/__init__.py:367
+msgid "This value must be an integer."
+msgstr "정수 값을 사용하세요."
+
+#: db/models/fields/__init__.py:402
+msgid "This value must be either True or False."
+msgstr "True 또는 False 값을 사용하세요."
+
+#: db/models/fields/__init__.py:423
+msgid "This field cannot be null."
+msgstr "이 필드는 null 값은 사용할 수 없습니다. "
+
+#: db/models/fields/__init__.py:630
+msgid "Enter a valid filename."
+msgstr "올바른 파일명을 입력하세요."
+
+#: db/models/fields/__init__.py:751
+msgid "This value must be either None, True or False."
+msgstr "None, True 또는 False 값을 사용하세요."
+
+#: db/models/fields/related.py:53
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "올바른  %s (을)를 입력하세요."
+
+#: db/models/fields/related.py:642
+msgid "Separate multiple IDs with commas."
+msgstr "복수 ID는 콤마로 구분해 주세요."
+
+#: db/models/fields/related.py:644
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"복수 선택 시에는 \"Control\" 키를 누른 상태에서 선택해 주세요.(Mac은 "
+"\"Command\" 키)"
+
+#: db/models/fields/related.py:691
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] ""
+"올바른 %(self)s ID를 입력해 주세요. %(value)r (은)는 적절치 않습니다."
+msgstr[1] ""
+"올바른 %(self)s ID를 입력해 주세요. %(value)r (은)는 적절치 않습니다."
+
+#: newforms/fields.py:103 newforms/fields.py:256
+#, python-format
+msgid "Ensure this value has at most %d characters."
+msgstr "%d 자 이하로 입력해 주세요."
+
+#: newforms/fields.py:105 newforms/fields.py:258
+#, python-format
+msgid "Ensure this value has at least %d characters."
+msgstr "%d 자 이상 입력해 주세요."
+
+#: newforms/fields.py:130
+#, python-format
+msgid "Ensure this value is less than or equal to %s."
+msgstr "%s 자 이하로 입력해 주세요."
+
+#: newforms/fields.py:132
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr "%s 자 이상 입력해 주세요."
+
+#: newforms/fields.py:165
+msgid "Enter a valid date."
+msgstr "올바른 날짜를 입력하세요."
+
+#: newforms/fields.py:192
+msgid "Enter a valid time."
+msgstr "올바른 시각을 입력하세요."
+
+#: newforms/fields.py:228
+msgid "Enter a valid date/time."
+msgstr "올바른 날짜/시각을 입력하세요."
+
+#: newforms/fields.py:242
+msgid "Enter a valid value."
+msgstr "올바른 값을 입력하세요."
+
+#: newforms/fields.py:289 newforms/fields.py:311
+msgid "Enter a valid URL."
+msgstr "올바른 URL을 입력하세요."
+
+#: newforms/fields.py:313
+msgid "This URL appears to be a broken link."
+msgstr "해당 URL의 링크가 잘못 되어 있습니다."
+
+#: newforms/fields.py:362 newforms/models.py:165
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목에 없습니다."
+
+#: newforms/fields.py:380 newforms/fields.py:456 newforms/models.py:182
+msgid "Enter a list of values."
+msgstr "리스트를 입력하세요."
+
+#: newforms/fields.py:389 newforms/models.py:188
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "올바르게 선택해 주세요. %s (이)가 선택가능항목에 없습니다."
+
+#: oldforms/__init__.py:392
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "%s 자 이하로 입력해 주세요."
+msgstr[1] "%s 자 이하로 입력해 주세요."
+
+#: oldforms/__init__.py:397
+msgid "Line breaks are not allowed here."
+msgstr "줄바꿈이 허용되지 않습니다."
+
+#: oldforms/__init__.py:498 oldforms/__init__.py:571 oldforms/__init__.py:610
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "올바르게 선택해 주세요. '%(data)s' (이)가 %(choices)s 에 없습니다."
+
+#: oldforms/__init__.py:674
+msgid "The submitted file is empty."
+msgstr "입력하신 파일은 빈 파일입니다."
+
+#: oldforms/__init__.py:730
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "-32,768 ~ 32,767 사이의 정수를 입력하세요."
+
+#: oldforms/__init__.py:740
+msgid "Enter a positive number."
+msgstr "양수를 입력하세요."
+
+#: oldforms/__init__.py:750
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "0 ~ 32,767 사이의 정수를 입력하세요."
+
+#: template/defaultfilters.py:491
+msgid "yes,no,maybe"
+msgstr "예, 아니오, 아마도"
+
+#: utils/dateformat.py:40
+msgid "p.m."
+msgstr "오후"
+
+#: utils/dateformat.py:41
+msgid "a.m."
+msgstr "오전"
+
+#: utils/dateformat.py:46
+msgid "PM"
+msgstr "오후"
+
+#: utils/dateformat.py:47
+msgid "AM"
+msgstr "오전"
+
+#: utils/dateformat.py:95
+msgid "midnight"
+msgstr "자정"
+
+#: utils/dateformat.py:97
+msgid "noon"
+msgstr "정오"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "월요일"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "화요일"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "수요일"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "목요일"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "금요일"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "토요일"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "일요일"
+
+#: utils/dates.py:14
+msgid "January"
+msgstr "1월"
+
+#: utils/dates.py:14
+msgid "February"
+msgstr "2월"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "March"
+msgstr "3월"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "April"
+msgstr "4월"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "May"
+msgstr "5월"
+
+#: utils/dates.py:14 utils/dates.py:27
+msgid "June"
+msgstr "6월"
+
+#: utils/dates.py:15 utils/dates.py:27
+msgid "July"
+msgstr "7월"
+
+#: utils/dates.py:15
+msgid "August"
+msgstr "8월"
+
+#: utils/dates.py:15
+msgid "September"
+msgstr "9월"
+
+#: utils/dates.py:15
+msgid "October"
+msgstr "10월"
+
+#: utils/dates.py:15
+msgid "November"
+msgstr "11월"
+
+#: utils/dates.py:16
+msgid "December"
+msgstr "12월"
+
+#: utils/dates.py:19
+msgid "jan"
+msgstr "1월"
+
+#: utils/dates.py:19
+msgid "feb"
+msgstr "2월"
+
+#: utils/dates.py:19
+msgid "mar"
+msgstr "3월"
+
+#: utils/dates.py:19
+msgid "apr"
+msgstr "4월"
+
+#: utils/dates.py:19
+msgid "may"
+msgstr "5월"
+
+#: utils/dates.py:19
+msgid "jun"
+msgstr "6월"
+
+#: utils/dates.py:20
+msgid "jul"
+msgstr "7월"
+
+#: utils/dates.py:20
+msgid "aug"
+msgstr "8월"
+
+#: utils/dates.py:20
+msgid "sep"
+msgstr "9월"
+
+#: utils/dates.py:20
+msgid "oct"
+msgstr "10월"
+
+#: utils/dates.py:20
+msgid "nov"
+msgstr "11월"
+
+#: utils/dates.py:20
+msgid "dec"
+msgstr "12월"
+
+#: utils/dates.py:27
+msgid "Jan."
+msgstr "1월"
+
+#: utils/dates.py:27
+msgid "Feb."
+msgstr "2월"
+
+#: utils/dates.py:28
+msgid "Aug."
+msgstr "8월"
+
+#: utils/dates.py:28
+msgid "Sept."
+msgstr "9월"
+
+#: utils/dates.py:28
+msgid "Oct."
+msgstr "10월"
+
+#: utils/dates.py:28
+msgid "Nov."
+msgstr "11월"
+
+#: utils/dates.py:28
+msgid "Dec."
+msgstr "12월"
+
+#: utils/timesince.py:12
+msgid "year"
+msgid_plural "years"
+msgstr[0] "년"
+msgstr[1] "년"
+
+#: utils/timesince.py:13
+msgid "month"
+msgid_plural "months"
+msgstr[0] "월"
+msgstr[1] "월"
+
+#: utils/timesince.py:14
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "주"
+msgstr[1] "주"
+
+#: utils/timesince.py:15
+msgid "day"
+msgid_plural "days"
+msgstr[0] "일"
+msgstr[1] "일"
+
+#: utils/timesince.py:16
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "시"
+msgstr[1] "시"
+
+#: utils/timesince.py:17
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "분"
+msgstr[1] "분"
+
+#: utils/translation/trans_real.py:358
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:359
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:360
+msgid "TIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:376
+msgid "YEAR_MONTH_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:377
+msgid "MONTH_DAY_FORMAT"
+msgstr ""
+
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "%(verbose_name)s (이)가 생성되었습니다."
+
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "%(verbose_name)s (이)가 수정되었습니다."
+
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "%(verbose_name)s (이)가 삭제되었습니다."
