@@ -213,7 +213,7 @@ True
 1
 >>> new_art = Article.objects.get(id=1)
 >>> new_art.headline
-'New headline'
+u'New headline'
 
 Add some categories and test the many-to-many form output.
 >>> new_art.categories.all()

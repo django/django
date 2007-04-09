@@ -100,7 +100,7 @@ __test__ = {'API_TESTS':"""
 3
 
 >>> list(Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values())
-[{'headline': 'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
+[{'headline': u'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
 {1: <Article: Hello>}

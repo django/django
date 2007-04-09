@@ -4,6 +4,7 @@ from django.template import Node, NodeList, Template, Context, resolve_variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
+from django.utils.encoding import smart_str
 import sys
 
 register = Library()
@@ -324,7 +325,7 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(k, v.resolve(context)) for k, v in self.kwargs.items()])
+        kwargs = dict([(smart_str(k,'ascii'), v.resolve(context)) for k, v in self.kwargs.items()])
         try:
             return reverse(self.view_name, args=args, kwargs=kwargs)
         except NoReverseMatch:

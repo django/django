@@ -11,7 +11,13 @@ from django.template import loader
 from django.utils.translation import activate, deactivate, install
 from django.utils.tzinfo import LocalTimezone
 from datetime import datetime, timedelta
+from unicode import unicode_tests
 import unittest
+
+# Some other tests we would like to run
+__test__ = {
+        'unicode': unicode_tests,
+}
 
 #################################
 # Custom template tag for tests #
@@ -202,8 +208,8 @@ class Templates(unittest.TestCase):
             # Empty strings can be passed as arguments to filters
             'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the value
-            # will be converted to a bytestring.
+            # Make sure that any unicode strings are converted to bytestrings
+            # in the final output.
             'basic-syntax37': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################

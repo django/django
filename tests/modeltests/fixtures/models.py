@@ -1,10 +1,10 @@
 """
 37. Fixtures.
 
-Fixtures are a way of loading data into the database in bulk. Fixure data 
-can be stored in any serializable format (including JSON and XML). Fixtures 
+Fixtures are a way of loading data into the database in bulk. Fixure data
+can be stored in any serializable format (including JSON and XML). Fixtures
 are identified by name, and are stored in either a directory named 'fixtures'
-in the application directory, on in one of the directories named in the 
+in the application directory, on in one of the directories named in the
 FIXTURE_DIRS setting.
 """
 
@@ -16,15 +16,15 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
-        
+
     class Meta:
         ordering = ('-pub_date', 'headline')
-        
+
 __test__ = {'API_TESTS': """
 >>> from django.core import management
 >>> from django.db.models import get_app
 
-# Reset the database representation of this app. 
+# Reset the database representation of this app.
 # This will return the database to a clean initial state.
 >>> management.flush(verbosity=0, interactive=False)
 
@@ -42,7 +42,7 @@ __test__ = {'API_TESTS': """
 >>> Article.objects.all()
 [<Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker has no place on ESPN>, <Article: Python program becomes self aware>]
 
-# Load fixture 3, XML format. 
+# Load fixture 3, XML format.
 >>> management.load_data(['fixture3.xml'], verbosity=0)
 >>> Article.objects.all()
 [<Article: XML identified as leading cause of cancer>, <Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker on TV is great!>, <Article: Python program becomes self aware>]
@@ -65,7 +65,7 @@ __test__ = {'API_TESTS': """
 [<Article: Time to reform copyright>, <Article: Poker has no place on ESPN>, <Article: Python program becomes self aware>]
 
 # Try to load fixture 2 using format discovery; this will fail
-# because there are two fixture2's in the fixtures directory 
+# because there are two fixture2's in the fixtures directory
 >>> management.load_data(['fixture2'], verbosity=0) # doctest: +ELLIPSIS
 Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 
@@ -81,7 +81,7 @@ from django.test import TestCase
 
 class SampleTestCase(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
-        
+
     def testClassFixtures(self):
         "Check that test case has installed 4 fixture objects"
         self.assertEqual(Article.objects.count(), 4)

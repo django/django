@@ -4,7 +4,9 @@ PostgreSQL database backend for Django.
 Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
+from django.utils.encoding import smart_str, smart_unicode
 from django.db.backends import util
+from django.db.backends.postgresql.encodings import ENCODING_MAP
 try:
     import psycopg as Database
 except ImportError, e:
@@ -20,11 +22,6 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
-def smart_basestring(s, charset):
-    if isinstance(s, unicode):
-        return s.encode(charset)
-    return s
-
 class UnicodeCursorWrapper(object):
     """
     A thin wrapper around psycopg cursors that allows them to accept Unicode
@@ -32,18 +29,21 @@ class UnicodeCursorWrapper(object):
 
     This is necessary because psycopg doesn't apply any DB quoting to
     parameters that are Unicode strings. If a param is Unicode, this will
-    convert it to a bytestring using DEFAULT_CHARSET before passing it to
-    psycopg.
+    convert it to a bytestring using database client's encoding before passing
+    it to psycopg.
+
+    All results retrieved from the database are converted into Unicode strings
+    before being returned to the caller.
     """
     def __init__(self, cursor, charset):
         self.cursor = cursor
         self.charset = charset
 
     def execute(self, sql, params=()):
-        return self.cursor.execute(sql, [smart_basestring(p, self.charset) for p in params])
+        return self.cursor.execute(smart_str(sql, self.charset), [smart_str(p, self.charset, True) for p in params])
 
     def executemany(self, sql, param_list):
-        new_param_list = [tuple([smart_basestring(p, self.charset) for p in params]) for params in param_list]
+        new_param_list = [tuple([smart_str(p, self.charset) for p in params]) for params in param_list]
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
@@ -53,6 +53,7 @@ class UnicodeCursorWrapper(object):
             return getattr(self.cursor, attr)
 
 postgres_version = None
+client_encoding = None
 
 class DatabaseWrapper(local):
     def __init__(self, **kwargs):
@@ -82,11 +83,21 @@ class DatabaseWrapper(local):
         cursor = self.connection.cursor()
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
-        cursor = UnicodeCursorWrapper(cursor, settings.DEFAULT_CHARSET)
+        if not settings.DATABASE_CHARSET:
+            cursor.execute("SHOW client_encoding")
+            encoding = ENCODING_MAP[cursor.fetchone()[0]]
+        else:
+            encoding = settings.DATABASE_CHARSET
+        cursor = UnicodeCursorWrapper(cursor, encoding)
+        global client_encoding
+        if not client_encoding:
+            # We assume the client encoding isn't going to change for random
+            # reasons.
+            client_encoding = encoding
         global postgres_version
         if not postgres_version:
             cursor.execute("SELECT version()")
-            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]        
+            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
@@ -148,7 +159,7 @@ def get_random_function_sql():
 
 def get_deferrable_sql():
     return " DEFERRABLE INITIALLY DEFERRED"
-    
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -162,20 +173,21 @@ def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
-    
-    """    
+
+    """
     if tables:
         if postgres_version[0] >= 8 and postgres_version[1] >= 1:
-            # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to* in order to be able to
-            # truncate tables referenced by a foreign key in any other table. The result is a
-            # single SQL TRUNCATE statement.
+            # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to*
+            # in order to be able to truncate tables referenced by a foreign
+            # key in any other table. The result is a single SQL TRUNCATE
+            # statement.
             sql = ['%s %s;' % \
                 (style.SQL_KEYWORD('TRUNCATE'),
                  style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
             )]
         else:
-            # Older versions of Postgres can't do TRUNCATE in a single call, so they must use 
-            # a simple delete.
+            # Older versions of Postgres can't do TRUNCATE in a single call, so
+            # they must use a simple delete.
             sql = ['%s %s %s;' % \
                     (style.SQL_KEYWORD('DELETE'),
                      style.SQL_KEYWORD('FROM'),
@@ -237,7 +249,15 @@ def get_sql_sequence_reset(style, model_list):
                 style.SQL_KEYWORD('FROM'),
                 style.SQL_TABLE(f.m2m_db_table())))
     return output
-        
+
+def typecast_string(s):
+    """
+    Cast all returned strings to unicode strings.
+    """
+    if not s:
+        return s
+    return smart_unicode(s, client_encoding)
+
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
 # use mx.DateTime by default.
@@ -248,6 +268,7 @@ except AttributeError:
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
+Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

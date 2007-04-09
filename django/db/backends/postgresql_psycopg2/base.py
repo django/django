@@ -7,6 +7,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 from django.db.backends import util
 try:
     import psycopg2 as Database
+    import psycopg2.extensions
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
@@ -19,6 +20,8 @@ try:
 except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
+
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
 postgres_version = None
 
@@ -47,6 +50,7 @@ class DatabaseWrapper(local):
                 conn_string += " port=%s" % settings.DATABASE_PORT
             self.connection = Database.connect(conn_string, **self.options)
             self.connection.set_isolation_level(1) # make transactions transparent to all cursors
+            self.connection.set_client_encoding('UTF8')
         cursor = self.connection.cursor()
         cursor.tzinfo_factory = None
         if set_tz:

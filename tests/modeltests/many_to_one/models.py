@@ -47,7 +47,7 @@ __test__ = {'API_TESTS':"""
 # Article objects have access to their related Reporter objects.
 >>> r = a.reporter
 >>> r.first_name, r.last_name
-('John', 'Smith')
+(u'John', u'Smith')
 
 # Create an Article via the Reporter object.
 >>> new_article = r.article_set.create(headline="John's second story", pub_date=datetime(2005, 7, 29))

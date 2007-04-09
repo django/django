@@ -89,6 +89,7 @@ class DatabaseWrapper(local):
                 'db': settings.DATABASE_NAME,
                 'passwd': settings.DATABASE_PASSWORD,
                 'conv': django_conversions,
+                'use_unicode': True,
             }
             if settings.DATABASE_HOST.startswith('/'):
                 kwargs['unix_socket'] = settings.DATABASE_HOST
@@ -101,6 +102,7 @@ class DatabaseWrapper(local):
             cursor = self.connection.cursor()
             if self.connection.get_server_info() >= '4.1':
                 cursor.execute("SET NAMES 'utf8'")
+                cursor.execute("SET CHARACTER SET 'utf8'")
         else:
             cursor = self.connection.cursor()
         if settings.DEBUG:

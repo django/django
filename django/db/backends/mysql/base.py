@@ -81,7 +81,7 @@ class DatabaseWrapper(local):
             kwargs = {
                 'conv': django_conversions,
                 'charset': 'utf8',
-                'use_unicode': False,
+                'use_unicode': True,
             }
             if settings.DATABASE_USER:
                 kwargs['user'] = settings.DATABASE_USER

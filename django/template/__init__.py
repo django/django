@@ -60,6 +60,7 @@ from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry
 from django.utils.text import smart_split
+from django.utils.encoding import smart_unicode, smart_str
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -118,15 +119,18 @@ class TemplateSyntaxError(Exception):
 class TemplateDoesNotExist(Exception):
     pass
 
+class TemplateEncodingError(Exception):
+    pass
+
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
         self.msg = msg
         self.params = params
-    
+
     def __str__(self):
         return self.msg % self.params
-    
+
 class InvalidTemplateLibrary(Exception):
     pass
 
@@ -151,6 +155,10 @@ class StringOrigin(Origin):
 class Template(object):
     def __init__(self, template_string, origin=None, name='<Unknown Template>'):
         "Compilation stage"
+        try:
+            template_string = smart_unicode(template_string)
+        except UnicodeDecodeError:
+            raise TemplateEncodingError("Templates can only be constructed from unicode or UTF-8 strings.")
         if settings.TEMPLATE_DEBUG and origin == None:
             origin = StringOrigin(template_string)
             # Could do some crazy stack-frame stuff to record where this string
@@ -705,7 +713,7 @@ class NodeList(list):
                 bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
-        return ''.join(bits)
+        return ''.join([smart_str(b, settings.DEFAULT_CHARSET) for b in bits])
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -715,7 +723,7 @@ class NodeList(list):
         return nodes
 
     def render_node(self, node, context):
-        return(node.render(context))
+        return node.render(context)
 
 class DebugNodeList(NodeList):
     def render_node(self, node, context):
@@ -750,32 +758,17 @@ class VariableNode(Node):
     def __repr__(self):
         return "<Variable Node: %s>" % self.filter_expression
 
-    def encode_output(self, output):
-        # Check type so that we don't run str() on a Unicode object
-        if not isinstance(output, basestring):
-            try:
-                return str(output)
-            except UnicodeEncodeError:
-                # If __str__() returns a Unicode object, convert it to bytestring.
-                return unicode(output).encode(settings.DEFAULT_CHARSET)
-        elif isinstance(output, unicode):
-            return output.encode(settings.DEFAULT_CHARSET)
-        else:
-            return output
-
     def render(self, context):
-        output = self.filter_expression.resolve(context)
-        return self.encode_output(output)
+        return self.filter_expression.resolve(context)
 
 class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
-            output = self.filter_expression.resolve(context)
+            return self.filter_expression.resolve(context)
         except TemplateSyntaxError, e:
             if not hasattr(e, 'source'):
                 e.source = self.source
             raise
-        return self.encode_output(output)
 
 def generic_tag_compiler(params, defaults, name, node_class, parser, token):
     "Returns a template.Node subclass."

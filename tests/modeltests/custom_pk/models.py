@@ -62,7 +62,7 @@ DoesNotExist: Employee matching query does not exist.
 >>> Employee.objects.filter(last_name__exact='Jones')
 [<Employee: Dan Jones>, <Employee: Fran Jones>]
 >>> Employee.objects.in_bulk(['ABC123', 'XYZ456'])
-{'XYZ456': <Employee: Fran Jones>, 'ABC123': <Employee: Dan Jones>}
+{u'XYZ456': <Employee: Fran Jones>, u'ABC123': <Employee: Dan Jones>}
 
 >>> b = Business(name='Sears')
 >>> b.save()
@@ -72,7 +72,7 @@ DoesNotExist: Employee matching query does not exist.
 >>> fran.business_set.all()
 [<Business: Sears>]
 >>> Business.objects.in_bulk(['Sears'])
-{'Sears': <Business: Sears>}
+{u'Sears': <Business: Sears>}
 
 >>> Business.objects.filter(name__exact='Sears')
 [<Business: Sears>]
