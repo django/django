@@ -1732,7 +1732,7 @@ msgstr "Ikke godkjent URL: %s"
 #: core/validators.py:206 core/validators.py:208
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "Internettadresse fører til en side som ikke virker."
+msgstr "Internettadresse %s fører til en side som ikke virker."
 
 #: core/validators.py:214
 msgid "Enter a valid U.S. state abbreviation."
@@ -1881,7 +1881,7 @@ msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"\"%(attr)s\" tillegg på linje $(line)s har en ikke godkjent verdi. (Linjen "
+"\"%(attr)s\" tillegg på linje %(line)s har en ikke godkjent verdi. (Linjen "
 "starter med \"%(start)s\".)"
 
 #: db/models/manipulators.py:302
@@ -1892,7 +1892,7 @@ msgstr "%(object)s med %(type)s finnes allerede for angitt %(field)s."
 #: db/models/fields/__init__.py:40
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "$(optname)s med %(fieldname)s finnes allerede."
+msgstr "%(optname)s med %(fieldname)s finnes allerede."
 
 #: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
