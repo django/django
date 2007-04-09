@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-A brazilian mapping of state misspellings/abbreviations to normalized
-abbreviations, and an alphabetical list of states for use as `choices
-in a formfield.
+An alphabetical list of Brazilian states for use as `choices` in a formfield.
 
-This exists in this standalone file so that it's only imported into
-memory when explicitly needed.
+This exists in this standalone file so that it's only imported into memory
+when explicitly needed.
 """
 
 STATE_CHOICES = (
