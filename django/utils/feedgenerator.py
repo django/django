@@ -132,6 +132,7 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement(u"category", cat)
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement(u"copyright", self.feed['feed_copyright'])
+        handler.addQuickElement(u"lastBuildDate", rfc2822_date(self.latest_post_date()).decode('ascii'))
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
