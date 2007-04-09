@@ -789,11 +789,12 @@ def startapp(app_name, directory):
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
     project_dir = os.path.normpath(os.path.join(directory, '..'))
-    project_name = os.path.basename(project_dir)
-    if app_name == os.path.basename(directory):
+    parent_dir = os.path.basename(project_dir)
+    project_name = os.path.basename(directory)
+    if app_name == project_name:
         sys.stderr.write(style.ERROR("Error: You cannot create an app with the same name (%r) as your project.\n" % app_name))
         sys.exit(1)
-    _start_helper('app', app_name, directory, project_name)
+    _start_helper('app', app_name, directory, parent_dir)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
