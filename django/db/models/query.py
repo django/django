@@ -189,7 +189,7 @@ class QuerySet(object):
                 raise StopIteration
             for row in rows:
                 if fill_cache:
-                    obj, index_end = get_cached_row(klass=self.model, row=row, 
+                    obj, index_end = get_cached_row(klass=self.model, row=row,
                                                     index_start=0, max_depth=self._max_related_depth)
                 else:
                     obj = self.model(*row[:index_end])
@@ -201,14 +201,14 @@ class QuerySet(object):
         """
         Performs a SELECT COUNT() and returns the number of records as an
         integer.
-        
+
         If the queryset is already cached (i.e. self._result_cache is set) this
         simply returns the length of the cached results set to avoid multiple
         SELECT COUNT(*) calls.
         """
         if self._result_cache is not None:
             return len(self._result_cache)
-            
+
         counter = self._clone()
         counter._order_by = ()
         counter._select_related = False
@@ -488,9 +488,9 @@ class QuerySet(object):
 
         # Add additional tables and WHERE clauses based on select_related.
         if self._select_related:
-            fill_table_cache(opts, select, tables, where, 
-                             old_prefix=opts.db_table, 
-                             cache_tables_seen=[opts.db_table], 
+            fill_table_cache(opts, select, tables, where,
+                             old_prefix=opts.db_table,
+                             cache_tables_seen=[opts.db_table],
                              max_depth=self._max_related_depth)
 
         # Add any additional SELECTs.
@@ -738,11 +738,11 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0):
     """Helper function that recursively returns an object with cache filled"""
-    
+
     # If we've got a max_depth set and we've exceeded that depth, bail now.
     if max_depth and cur_depth > max_depth:
         return None
-    
+
     index_end = index_start + len(klass._meta.fields)
     obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
@@ -758,11 +758,11 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen,
     Helper function that recursively populates the select, tables and where (in
     place) for select_related queries.
     """
-    
+
     # If we've got a max_depth set and we've exceeded that depth, bail now.
     if max_depth and cur_depth > max_depth:
         return None
-    
+
     qn = backend.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
@@ -826,7 +826,7 @@ def parse_lookup(kwarg_items, opts):
             # Interpret '__exact=None' as the sql '= NULL'; otherwise, reject
             # all uses of None as a query value.
             if lookup_type != 'exact':
-                raise ValueError, "Cannot use None as a query value"      
+                raise ValueError, "Cannot use None as a query value"
         elif callable(value):
             value = value()
 
