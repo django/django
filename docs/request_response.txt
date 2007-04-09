@@ -483,8 +483,8 @@ In order to use the ``Http404`` exception to its fullest, you should create a
 template that is displayed when a 404 error is raised. This template should be
 called ``404.html`` and located in the top level of your template tree.
 
-Customing error views
----------------------
+Customizing error views
+-----------------------
 
 The 404 (page not found) view
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -144,6 +144,7 @@ def technical_404_response(request, exception):
     t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
+        'request_path': request.path[1:], # Trim leading slash
         'urlpatterns': tried,
         'reason': str(exception),
         'request': request,
@@ -591,7 +592,7 @@ TECHNICAL_404_TEMPLATE = """
           <li>{{ pattern|escape }}</li>
         {% endfor %}
       </ol>
-      <p>The current URL, <code>{{ request.path|escape }}</code>, didn't match any of these.</p>
+      <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
     {% else %}
       <p>{{ reason|escape }}</p>
     {% endif %}

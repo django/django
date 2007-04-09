@@ -159,7 +159,7 @@ represented by a ChoiceField.
 <option value="1">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></td></tr>
-<tr><th>Article:</th><td><textarea name="article"></textarea></td></tr>
+<tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -199,7 +199,7 @@ current values are inserted as 'initial' data in each Field.
 <option value="1" selected="selected">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></li>
-<li>Article: <textarea name="article">Hello.</textarea></li>
+<li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -231,7 +231,7 @@ Add some categories and test the many-to-many form output.
 <option value="1" selected="selected">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></li>
-<li>Article: <textarea name="article">Hello.</textarea></li>
+<li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1" selected="selected">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -309,7 +309,7 @@ the data in the database when the form is instantiated.
 <option value="1">Mike Royko</option>
 <option value="2">Bob Woodward</option>
 </select></li>
-<li>Article: <textarea name="article"></textarea></li>
+<li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -328,7 +328,7 @@ the data in the database when the form is instantiated.
 <option value="2">Bob Woodward</option>
 <option value="3">Carl Bernstein</option>
 </select></li>
-<li>Article: <textarea name="article"></textarea></li>
+<li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
