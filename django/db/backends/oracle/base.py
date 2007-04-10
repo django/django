@@ -225,8 +225,34 @@ def get_sequence_name(table):
 
 def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
-    # TODO: Run ALTER statements to reset Oracle sequence w/out dropping it.
-    return []
+    from django.db import models
+    output = []
+    query = """
+        DECLARE
+            startvalue integer;
+            cval integer;
+        BEGIN
+            SELECT NVL(MAX(id), 0) INTO startvalue FROM %(table)s;
+            SELECT %(sequence)s.nextval INTO cval FROM dual;
+            cval := startvalue - cval;
+            IF cval != 0 THEN
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s MINVALUE 0 INCREMENT BY '||cval;
+                SELECT %(sequence)s.nextval INTO cval FROM dual;
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s INCREMENT BY 1';
+            END IF;
+        END; """
+    for model in model_list:
+        for f in model._meta.fields:
+            if isinstance(f, models.AutoField):
+                sequence_name = get_sequence_name(model._meta.db_table)
+                query1 = query % {'sequence':sequence_name, 'table':model._meta.db_table}
+                output.append(query1)
+                break # Only one AutoField is allowed per model, so don't bother continuing.
+        for f in model._meta.many_to_many:
+            sequence_name = get_sequence_name(f.m2m_db_table())
+            query2 = query % {'sequence':sequence_name, 'table':f.m2m_db_table()}
+            output.append(query2)
+    return output
 
 def get_trigger_name(table):
     name_length = get_max_name_length() - 3
