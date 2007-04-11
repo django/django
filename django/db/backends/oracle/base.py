@@ -183,6 +183,25 @@ def get_autoinc_sql(table):
     END;\n""" % (tr_name, quote_name(table), sq_name)
     return sequence_sql, trigger_sql
 
+def _get_sequence_reset_sql():
+    # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
+    return """
+        DECLARE
+            startvalue integer;
+            cval integer;
+        BEGIN
+            LOCK TABLE %(table)s IN SHARE MODE;
+            SELECT NVL(MAX(id), 0) INTO startvalue FROM %(table)s;
+            SELECT %(sequence)s.nextval INTO cval FROM dual;
+            cval := startvalue - cval;
+            IF cval != 0 THEN
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s MINVALUE 0 INCREMENT BY '||cval;
+                SELECT %(sequence)s.nextval INTO cval FROM dual;
+                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s INCREMENT BY 1';
+            END IF;
+            COMMIT;
+        END;\n"""
+
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
@@ -198,23 +217,14 @@ def get_sql_flush(style, tables, sequences):
                  style.SQL_KEYWORD('FROM'),
                  style.SQL_FIELD(quote_name(table))
                  ) for table in tables]
-        # You can't ALTER SEQUENCE back to 1 in Oracle.  You must DROP and
-        # CREATE the sequence.
-        # What?  You got something better to do than marching up and
-        # down the square?
+        # Since we've just deleted all the rows, running our sequence
+        # ALTER code will reset the sequence to 0.
         for sequence_info in sequences:
             table_name = sequence_info['table']
             seq_name = get_sequence_name(table_name)
-            sql.append('%s %s %s;' % \
-                (style.SQL_KEYWORD('DROP'),
-                 style.SQL_KEYWORD('SEQUENCE'),
-                 style.SQL_FIELD(seq_name))
-                )
-            sql.append('%s %s %s;' % \
-                (style.SQL_KEYWORD('CREATE'),
-                 style.SQL_KEYWORD('SEQUENCE'),
-                 style.SQL_FIELD(seq_name))
-                )
+            query = _get_sequence_reset_sql() % {'sequence':seq_name,
+                                                 'table':quote_name(table_name)}
+            sql.append(query)
         return sql
     else:
         return []
@@ -227,31 +237,18 @@ def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
     from django.db import models
     output = []
-    query = """
-        DECLARE
-            startvalue integer;
-            cval integer;
-        BEGIN
-            SELECT NVL(MAX(id), 0) INTO startvalue FROM %(table)s;
-            SELECT %(sequence)s.nextval INTO cval FROM dual;
-            cval := startvalue - cval;
-            IF cval != 0 THEN
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s MINVALUE 0 INCREMENT BY '||cval;
-                SELECT %(sequence)s.nextval INTO cval FROM dual;
-                EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s INCREMENT BY 1';
-            END IF;
-        END; """
+    query = _get_sequence_reset_sql()
     for model in model_list:
         for f in model._meta.fields:
             if isinstance(f, models.AutoField):
                 sequence_name = get_sequence_name(model._meta.db_table)
-                query1 = query % {'sequence':sequence_name, 'table':model._meta.db_table}
-                output.append(query1)
+                output.append(query % {'sequence':sequence_name,
+                                       'table':model._meta.db_table})
                 break # Only one AutoField is allowed per model, so don't bother continuing.
         for f in model._meta.many_to_many:
             sequence_name = get_sequence_name(f.m2m_db_table())
-            query2 = query % {'sequence':sequence_name, 'table':f.m2m_db_table()}
-            output.append(query2)
+            output.append(query % {'sequence':sequence_name,
+                                   'table':f.m2m_db_table()})
     return output
 
 def get_trigger_name(table):
