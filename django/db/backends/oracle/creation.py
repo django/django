@@ -17,7 +17,7 @@ DATA_TYPES = {
     'FloatField':                   'NUMBER(%(max_digits)s, %(decimal_places)s)',
     'ImageField':                   'VARCHAR2(100)',
     'IntegerField':                 'NUMBER(11)',
-    'IPAddressField':               'CHAR(15)',
+    'IPAddressField':               'VARCHAR2(15)',
     'ManyToManyField':              None,
     'NullBooleanField':             'NUMBER(1) CHECK ((%(column)s IN (0,1)) OR (%(column)s IS NULL))',
     'OneToOneField':                'NUMBER(11)',
