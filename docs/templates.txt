@@ -702,11 +702,11 @@ Example::
 Note that you can backslash-escape a format string if you want to use the
 "raw" value. In this example, "f" is backslash-escaped, because otherwise
 "f" is a format string that displays the time. The "o" doesn't need to be
-escaped, because it's not a format character.::
+escaped, because it's not a format character::
 
     It is the {% now "jS o\f F" %}
 
-(Displays "It is the 4th of September" %}
+This would display as "It is the 4th of September".
 
 regroup
 ~~~~~~~

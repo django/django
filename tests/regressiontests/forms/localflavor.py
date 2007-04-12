@@ -193,7 +193,7 @@ as its choices.
 <option value="CA">California</option>
 <option value="CO">Colorado</option>
 <option value="CT">Connecticut</option>
-<option value="DE">Deleware</option>
+<option value="DE">Delaware</option>
 <option value="DC">District of Columbia</option>
 <option value="FM">Federated States of Micronesia</option>
 <option value="FL">Florida</option>

@@ -70,6 +70,33 @@ installed.
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
 
+Remove any old versions of Django
+=================================
+
+If you are upgrading your installation of Django from a previous version, 
+you will need to uninstall the old Django version before installing the 
+new version. 
+
+If you installed Django using ``setup.py install``, uninstalling
+is as simple as deleting the ``django`` directory from your Python 
+``site-packages``.
+
+If you installed Django from a Python Egg, remove the Django ``.egg` file,
+and remove the reference to the egg in the file named ``easy-install.pth``. 
+This file should also be located in your ``site-packages`` directory.
+
+.. admonition:: Where are my ``site-packages`` stored?
+
+    The location of the ``site-packages`` directory depends on the operating
+    system, and the location in which Python was installed. However, the
+    following locations are common:
+    
+    * If you're using Linux: ``/usr/lib/python2.X/site-packages``
+
+    * If you're using Windows: ``C:\Python2.X\lib\site-packages``
+
+    * If you're using MacOSX: ``/Library/Python2.X/site-packages``
+
 Install the Django code
 =======================
 
