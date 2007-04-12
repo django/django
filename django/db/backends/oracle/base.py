@@ -298,18 +298,37 @@ def get_query_set_class(DefaultQuerySet):
 
             def resolve_cols(row):
                 for field in row:
+                    value = field
                     if isinstance(field, Database.LOB):
-                        yield str(field)
-                    # cx_Oracle returns datetime.datetime objects for DATE
-                    # columns, but Django wants a datetime.date.
-                    # A workaround is to return a date if time fields are 0.
-                    # A safer fix would involve either patching cx_Oracle,
+                        value = field.read()
+                    # cx_Oracle always returns datetime.datetime objects for
+                    # DATE and TIMESTAMP columns, but Django wants to see a
+                    # python datetime.date, .time, or .datetime.
+                    # As a workaround, we cast to date if all the time-related
+                    # fields are 0, or to time if the date is 1/1/1900.
+                    # A better fix would involve either patching cx_Oracle
                     # or checking the Model here, neither of which is good.
-                    elif isinstance(field, datetime.datetime) and \
-                        field.hour == field.minute == field.second == field.microsecond == 0:
-                        yield field.date()
-                    else:
-                        yield field
+                    elif isinstance(field, datetime.datetime):
+                        if field.hour == field.minute == field.second == field.microsecond == 0:
+                            value = field.date()
+                        elif field.year == 1900 and field.month == field.day == 1:
+                            value = field.time()
+                    # In Python 2.3, the cx_Oracle driver returns its own
+                    # Timestamp object that we must convert to a datetime class.
+                    elif isinstance(field, Database.Timestamp):
+                        if field.hour == field.minute == field.second == field.fsecond == 0:
+                            value = datetime.date(field.year, field.month, field.day)
+                        elif field.year == 1900 and field.month == field.day == 1:
+                            value = datetime.time(field.hour, field.minute, field.second, field.fsecond)
+                        else:
+                            value = datetime.datetime(field.year, field.month, field.day, field.hour,
+                                                      field.minute, field.second, field.fsecond)
+                    # Since Oracle won't distinguish between NULL and an empty
+                    # string (''), we store empty strings as a space.  Here is
+                    # where we undo that treachery.
+                    if value == ' ':
+                        value = ''
+                    yield value
 
             while 1:
                 rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
