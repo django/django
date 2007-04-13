@@ -494,14 +494,15 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if isinstance(value, datetime.datetime):
-            if settings.DATABASE_ENGINE != 'oracle':
-                # Oracle does not need a string conversion
+        if settings.DATABASE_ENGINE != 'oracle':
+            if isinstance(value, datetime.datetime):
                 value = value.date().strftime('%Y-%m-%d')
-        elif isinstance(value, datetime.date):
-            if settings.DATABASE_ENGINE != 'oracle':
-                # Oracle does not need a string conversion
+            elif isinstance(value, datetime.date):
                 value = value.strftime('%Y-%m-%d')
+        else:
+            # cx_Oracle needs a conversion to datetime.datetime instead.
+            if isinstance(value, datetime.date):
+                value = datetime.datetime.combine(value, datetime.time())
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
