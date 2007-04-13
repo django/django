@@ -21,7 +21,7 @@ A companion to this document is the `official repository of model examples`_.
 (In the Django source distribution, these examples are in the
 ``tests/modeltests`` directory.)
 
-.. _Database API reference: http://www.djangoproject.com/documentation/db_api/
+.. _Database API reference: ../db-api/
 .. _official repository of model examples: http://www.djangoproject.com/documentation/models/
 
 Quick example
@@ -57,7 +57,7 @@ Some technical notes:
       syntax, but it's worth noting Django uses SQL tailored to the database
       backend specified in your `settings file`_.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/
 
 Fields
 ======
@@ -501,7 +501,7 @@ For each model field that has ``choices`` set, Django will add a method to
 retrieve the human-readable name for the field's current value. See
 `get_FOO_display`_ in the database API documentation.
 
-.. _get_FOO_display: ../db_api/#get-foo-display
+.. _get_FOO_display: ../db-api/#get-foo-display
 
 Finally, note that choices can be any iterable object -- not necessarily a
 list or tuple. This lets you construct choices dynamically. But if you find
@@ -626,7 +626,7 @@ that takes the parameters ``field_data, all_data`` and raises
 
 Django comes with quite a few validators. They're in ``django.core.validators``.
 
-.. _validator docs: http://www.djangoproject.com/documentation/forms/#validators
+.. _validator docs: ../forms/#validators
 
 Verbose field names
 -------------------
@@ -792,8 +792,8 @@ relationship should work. All are optional:
                              the related object.
     =======================  ============================================================
 
-.. _`Database API reference`: http://www.djangoproject.com/documentation/db_api/
-.. _related objects documentation: http://www.djangoproject.com/documentation/db_api/#related-objects
+.. _`Database API reference`: ../db-api/
+.. _related objects documentation: ../db-api/#related-objects
 
 Many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -963,7 +963,7 @@ Example::
 
 See the `docs for latest()`_ for more.
 
-.. _docs for latest(): http://www.djangoproject.com/documentation/db_api/#latest-field-name-none
+.. _docs for latest(): ../db-api/#latest-field-name-none
 
 ``order_with_respect_to``
 -------------------------
@@ -1397,7 +1397,7 @@ if one of the ``list_display`` fields is a ``ForeignKey``.
 
 For more on ``select_related()``, see `the select_related() docs`_.
 
-.. _the select_related() docs: http://www.djangoproject.com/documentation/db_api/#select-related
+.. _the select_related() docs: ../db-api/#select-related
 
 ``ordering``
 ------------
@@ -1502,7 +1502,7 @@ The way ``Manager`` classes work is documented in the `Retrieving objects`_
 section of the database API docs, but this section specifically touches on
 model options that customize ``Manager`` behavior.
 
-.. _Retrieving objects: http://www.djangoproject.com/documentation/db_api/#retrieving-objects
+.. _Retrieving objects: ../db-api/#retrieving-objects
 
 Manager names
 -------------
@@ -1825,7 +1825,7 @@ just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
 API. See `Other lookup options`_.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
-.. _Other lookup options: http://www.djangoproject.com/documentation/db_api/#extra-params-select-where-tables
+.. _Other lookup options: ../db-api/#extra-params-select-where-tables
 
 Overriding default model methods
 --------------------------------
@@ -1858,7 +1858,7 @@ You can also prevent saving::
             else:
                 super(Blog, self).save() # Call the "real" save() method.
 
-.. _database API docs: http://www.djangoproject.com/documentation/db_api/
+.. _database API docs: ../db-api/
 
 Models across files
 ===================
@@ -1924,7 +1924,7 @@ order in which they're executed. The only thing you can assume is that, by the
 time your custom data files are executed, all the database tables already will
 have been created.
 
-.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlcustom-appname-appname
+.. _`manage.py documentation`: ../django_admin/#sqlcustom-appname-appname
 
 Database-backend-specific SQL data
 ----------------------------------
