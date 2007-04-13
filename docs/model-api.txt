@@ -1915,7 +1915,7 @@ Each SQL file, if given, is expected to contain valid SQL. The SQL files are
 piped directly into the database after all of the models' table-creation
 statements have been executed.
 
-The SQL files are read by the ``sqlinitialdata``, ``sqlreset``, ``sqlall`` and
+The SQL files are read by the ``sqlcustom``, ``sqlreset``, ``sqlall`` and
 ``reset`` commands in ``manage.py``. Refer to the `manage.py documentation`_
 for more information.
 
@@ -1924,7 +1924,7 @@ order in which they're executed. The only thing you can assume is that, by the
 time your custom data files are executed, all the database tables already will
 have been created.
 
-.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlinitialdata-appname-appname
+.. _`manage.py documentation`: http://www.djangoproject.com/documentation/django_admin/#sqlcustom-appname-appname
 
 Database-backend-specific SQL data
 ----------------------------------
