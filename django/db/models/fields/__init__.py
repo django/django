@@ -830,10 +830,15 @@ class TimeField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
+        def prep(value):
+            if settings.DATABASE_ENGINE == 'oracle' and isinstance(value, datetime.time):
+                # Oracle requires a date in order to parse.
+                value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
+            return str(value)
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [prep(v) for v in value]
         else:
-            value = str(value)
+            value = prep(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def pre_save(self, model_instance, add):
