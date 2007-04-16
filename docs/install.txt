@@ -58,6 +58,7 @@ installed.
   If you're on Windows, check out the unofficial `compiled Windows version`_.
   
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
+  You will also want to read the database-specific notes for the `MySQL backend`_.
 
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
@@ -69,6 +70,7 @@ installed.
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
+.. _MySQL backend: ../databases/
 
 Remove any old versions of Django
 =================================
