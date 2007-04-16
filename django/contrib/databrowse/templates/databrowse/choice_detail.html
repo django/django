@@ -1,0 +1,17 @@
+{% extends "databrowse/base.html" %}
+
+{% block title %}{{ model.verbose_name_plural|capfirst }} by {{ field.field.verbose_name }}: {{ value|escape }}{% endblock %}
+
+{% block content %}
+
+<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a> / <a href="{{ field.url }}">By {{ field.field.verbose_name }}</a> / {{ value|escape }}</div>
+
+<h1>{{ model.verbose_name_plural|capfirst }} by {{ field.field.verbose_name }}: {{ value|escape }}</h1>
+
+<ul class="objectlist">
+{% for object in object_list %}
+<li class="{% cycle odd,even %}"><a href="{{ object.url }}">{{ object }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}
