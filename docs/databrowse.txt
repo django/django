@@ -52,3 +52,5 @@ How to use Databrowse
        whatever you'd like.
 
     4. Run the Django server and visit ``/databrowse/`` in your browser.
+
+.. _template loader docs: ../templates_python/#loader-types
