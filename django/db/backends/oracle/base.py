@@ -296,46 +296,12 @@ def get_query_set_class(DefaultQuerySet):
             # 1. retrieve each row in turn
             # 2. convert NCLOBs
 
-            def resolve_cols(row):
-                for field in row:
-                    value = field
-                    if isinstance(field, Database.LOB):
-                        value = field.read()
-                    # cx_Oracle always returns datetime.datetime objects for
-                    # DATE and TIMESTAMP columns, but Django wants to see a
-                    # python datetime.date, .time, or .datetime.
-                    # As a workaround, we cast to date if all the time-related
-                    # fields are 0, or to time if the date is 1/1/1900.
-                    # A better fix would involve either patching cx_Oracle
-                    # or checking the Model here, neither of which is good.
-                    elif isinstance(field, datetime.datetime):
-                        if field.hour == field.minute == field.second == field.microsecond == 0:
-                            value = field.date()
-                        elif field.year == 1900 and field.month == field.day == 1:
-                            value = field.time()
-                    # In Python 2.3, the cx_Oracle driver returns its own
-                    # Timestamp object that we must convert to a datetime class.
-                    elif isinstance(field, Database.Timestamp):
-                        if field.hour == field.minute == field.second == field.fsecond == 0:
-                            value = datetime.date(field.year, field.month, field.day)
-                        elif field.year == 1900 and field.month == field.day == 1:
-                            value = datetime.time(field.hour, field.minute, field.second, field.fsecond)
-                        else:
-                            value = datetime.datetime(field.year, field.month, field.day, field.hour,
-                                                      field.minute, field.second, field.fsecond)
-                    # Since Oracle won't distinguish between NULL and an empty
-                    # string (''), we store empty strings as a space.  Here is
-                    # where we undo that treachery.
-                    if value == ' ':
-                        value = ''
-                    yield value
-
             while 1:
                 rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
                 if not rows:
                     raise StopIteration
                 for row in rows:
-                    row = list(resolve_cols(row))
+                    row = self.resolve_columns(row)
                     if fill_cache:
                         obj, index_end = get_cached_row(klass=self.model, row=row,
                                                         index_start=0, max_depth=self._max_related_depth)
@@ -478,6 +444,46 @@ def get_query_set_class(DefaultQuerySet):
                 return select, " ".join(sql), params, full_query
             else:
                 return select, " ".join(sql), params
+
+        def resolve_columns(self, row, fields=()):
+            from django.db.models.fields import DateField, DateTimeField, TimeField
+            values = []
+            for value, field in map(None, row, fields):
+                if isinstance(value, Database.LOB):
+                    value = value.read()
+                # Since Oracle won't distinguish between NULL and an empty
+                # string (''), we store empty strings as a space.  Here is
+                # where we undo that treachery.
+                if value == ' ':
+                    value = ''
+                # cx_Oracle always returns datetime.datetime objects for
+                # DATE and TIMESTAMP columns, but Django wants to see a
+                # python datetime.date, .time, or .datetime.  We use the type
+                # of the Field to determine which to cast to, but it's not
+                # always available.
+                # As a workaround, we cast to date if all the time-related
+                # values are 0, or to time if the date is 1/1/1900.
+                # This could be cleaned a bit by adding a method to the Field
+                # classes to normalize values from the database (the to_python
+                # method is used for validation and isn't what we want here).
+                elif isinstance(value, Database.Timestamp):
+                    # In Python 2.3, the cx_Oracle driver returns its own
+                    # Timestamp object that we must convert to a datetime class.
+                    if not isinstance(value, datetime.datetime):
+                        value = datetime.datetime(value.year, value.month, value.day, value.hour,
+                                                  value.minute, value.second, value.fsecond)
+                    if isinstance(field, DateTimeField):
+                        pass  # DateTimeField subclasses DateField so must be checked first.
+                    elif isinstance(field, DateField):
+                        value = value.date()
+                    elif isinstance(field, TimeField):
+                        value = value.time()
+                    elif value.hour == value.minute == value.second == value.microsecond == 0:
+                        value = value.date()
+                    elif value.year == 1900 and value.month == value.day == 1:
+                        value = value.time()
+                values.append(value)
+            return values
 
     return OracleQuerySet
 

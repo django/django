@@ -184,11 +184,14 @@ class _QuerySet(object):
 
         fill_cache = self._select_related
         index_end = len(self.model._meta.fields)
+        has_resolve_columns = hasattr(self, 'resolve_columns')
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
             if not rows:
                 raise StopIteration
             for row in rows:
+                if has_resolve_columns:
+                    row = self.resolve_columns(row)
                 if fill_cache:
                     obj, index_end = get_cached_row(klass=self.model, row=row,
                                                     index_start=0, max_depth=self._max_related_depth)
@@ -573,20 +576,24 @@ class ValuesQuerySet(QuerySet):
 
         # self._fields is a list of field names to fetch.
         if self._fields:
-            columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
-            field_names = self._fields
+            fields = [self.model._meta.get_field(f, many_to_many=False) for f in self._fields]
         else: # Default to all fields.
-            columns = [f.column for f in self.model._meta.fields]
-            field_names = [f.attname for f in self.model._meta.fields]
+            fields = self.model._meta.fields
+        columns = [f.column for f in fields]
+        field_names = [f.attname for f in fields]
 
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+
+        has_resolve_columns = hasattr(self, 'resolve_columns')
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
             if not rows:
                 raise StopIteration
             for row in rows:
+                if has_resolve_columns:
+                    row = self.resolve_columns(row, fields)
                 yield dict(zip(field_names, row))
 
     def _clone(self, klass=None, **kwargs):
@@ -597,6 +604,7 @@ class ValuesQuerySet(QuerySet):
 class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
+        from django.db.models.fields import DateTimeField
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
@@ -620,10 +628,25 @@ class DateQuerySet(QuerySet):
             backend.quote_name(self._field.column))), sql, group_by, self._order)
         cursor = connection.cursor()
         cursor.execute(sql, params)
-        if backend.needs_datetime_string_cast:
-            return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
-        else:
-            return [row[0] for row in cursor.fetchall()]
+
+        has_resolve_columns = hasattr(self, 'resolve_columns')
+        needs_datetime_string_cast = backend.needs_datetime_string_cast
+        dates = []
+        # It would be better to use self._field here instead of DateTimeField(),
+        # but in Oracle that will result in a list of datetime.date instead of
+        # datetime.datetime.
+        fields = [DateTimeField()]
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                return dates
+            for row in rows:
+                date = row[0]
+                if has_resolve_columns:
+                    date = self.resolve_columns([date], fields)[0]
+                elif needs_datetime_string_cast:
+                    date = typecast_timestamp(str(date))
+                dates.append(date)
 
     def _clone(self, klass=None, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, **kwargs)
