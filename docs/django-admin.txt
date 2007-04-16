@@ -332,7 +332,7 @@ sqlall [appname appname ...]
 
 Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
 
-Refer to the description of ``sqlinitialdata`` for an explanation of how to
+Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
 sqlclear [appname appname ...]

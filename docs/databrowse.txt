@@ -1,0 +1,56 @@
+==========
+Databrowse
+==========
+
+Databrowse is a Django application that lets you browse your data.
+
+As the Django admin dynamically creates an admin interface by introspecting
+your models, Databrowse dynamically creates a rich, browsable Web site by
+introspecting your models.
+
+.. admonition:: Note
+
+    Databrowse is **very** new and is currently under active development. It
+    may change substantially before the next Django release.
+
+    With that said, it's easy to use, and it doesn't require writing any
+    code. So you can play around with it today, with very little investment in
+    time or coding.
+
+How to use Databrowse
+=====================
+
+    1. Point Django at the default Databrowse templates. There are two ways to
+       do this:
+
+       * Add ``'django.contrib.databrowse'`` to your ``INSTALLED_APPS``
+         setting. This will work if your ``TEMPLATE_LOADERS`` setting includes
+         the ``app_directories`` template loader (which is the case by
+         default). See the `template loader docs`_ for more.
+
+       * Otherwise, determine the full filesystem path to the
+         ``django/contrib/databrowse/templates`` directory, and add that
+         directory to your ``TEMPLATE_DIRS`` setting.
+
+    2. Register a number of models with the Databrowse site::
+
+           from django.contrib import databrowse
+
+           databrowse.site.register(SomeModel)
+           databrowse.site.register(SomeOtherModel)
+
+       Note that you should register the model *classes*, not instances.
+
+       It doesn't matter where you put this, as long as it gets executed at
+       some point. A good place for it is in your URLconf file (``urls.py``).
+
+    3. Add the following line to your URLconf::
+
+           (r'^databrowse/(.*)', databrowse.site.root),
+
+       The prefix doesn't matter -- you can use ``databrowse/`` or ``db/`` or
+       whatever you'd like.
+
+    4. Run the Django server and visit ``/databrowse/`` in your browser.
+
+.. _template loader docs: ../templates_python/#loader-types
