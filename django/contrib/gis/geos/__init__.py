@@ -1,19 +1,18 @@
-from geos import geomFromWKT, geomToWKT, geomFromHEX, geomToHEX
+from GEOSGeometry import GEOSGeometry, GEOSException
 
 def hex_to_wkt(hex):
-    "Converts EWKBHEX into WKT."
-    return geomToWKT(geomFromHEX(hex))
+    "Converts HEXEWKB into WKT."
+    return GEOSGeometry(hex, 'hex').wkt
 
 def wkt_to_hex(wkt):
-    "Converts WKT into EWKBHEX."
-    return geomToHEX(geomFromWKT(wkt))
+    "Converts WKT into HEXEWKB."
+    return GEOSGeometry(wkt, 'wkt').hex
 
-def centroid(hex):
-    "Returns the centroid of the geometry (given in EWKBHEX)."
-    center = (geomFromHEX(hex)).getCentroid()
-    return geomToWKT(center)
+def centroid(input, geom_type='hex'):
+    "Returns the centroid of the geometry (given in HEXEWKB)."
+    return GEOSGeometry(input, geom_type).centroid.wkt
 
-def area(hex):
-    "Returns the area of the geometry (given in EWKBHEX)."
-    return (geomFromHEX(hex)).area()
+def area(input, geom_type='hex'):
+    "Returns the area of the geometry (given in HEXEWKB)."
+    return GEOSGeometry(input, geom_type).area
     

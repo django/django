@@ -60,6 +60,7 @@ class GeometryField(Field):
         super(GeometryField, self).contribute_to_class(cls, name)
 
         # Adding the WKT accessor function for geometry
+        setattr(cls, 'get_%s_geos' % self.name, curry(cls._get_GEOM_geos, field=self))
         setattr(cls, 'get_%s_wkt' % self.name, curry(cls._get_GEOM_wkt, field=self))
         setattr(cls, 'get_%s_centroid' % self.name, curry(cls._get_GEOM_centroid, field=self))
         setattr(cls, 'get_%s_area' % self.name, curry(cls._get_GEOM_area, field=self))

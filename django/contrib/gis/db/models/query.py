@@ -1,4 +1,4 @@
-from django.db.models.query import Q, QNot, QuerySet
+from django.db.models.query import Q, QuerySet
 from django.contrib.gis.db.models.postgis import parse_lookup
 import operator
 
