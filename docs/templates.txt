@@ -1293,3 +1293,11 @@ A collection of template filters that implement these common markup languages:
     * Textile
     * Markdown
     * ReST (ReStructured Text)
+
+django.contrib.webdesign
+------------------------
+
+A collection of template tags that can be useful while designing a website,
+such as a generator of Lorem Ipsum text. See the `webdesign documentation`_.
+
+.. _webdesign documentation: ../webdesign/
