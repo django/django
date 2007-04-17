@@ -105,6 +105,7 @@ autoindexes_primary_keys = False
 needs_datetime_string_cast = True
 needs_upper_for_iops = False
 supports_constraints = False
+supports_tablespaces = False
 uses_case_insensitive_names = False
 
 def quote_name(name):
@@ -192,7 +193,7 @@ def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
     # No sequence reset required
     return []
-    
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)

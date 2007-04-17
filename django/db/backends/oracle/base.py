@@ -72,6 +72,7 @@ autoindexes_primary_keys = True
 needs_datetime_string_cast = False
 needs_upper_for_iops = True
 supports_constraints = True
+supports_tablespaces = True
 uses_case_insensitive_names = True
 
 class FormatStylePlaceholderCursor(Database.Cursor):
@@ -167,6 +168,9 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return None
+
+def get_tablespace_sql():
+    return "TABLESPACE %s"
 
 def get_autoinc_sql(table):
     # To simulate auto-incrementing primary keys in Oracle, we have to

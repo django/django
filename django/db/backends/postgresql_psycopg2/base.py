@@ -78,6 +78,7 @@ autoindexes_primary_keys = False
 needs_datetime_string_cast = False
 needs_upper_for_iops = False
 supports_constraints = True
+supports_tablespaces = True
 uses_case_insensitive_names = True
 
 def quote_name(name):
@@ -132,6 +133,9 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
+
+def get_tablespace_sql():
+    return "TABLESPACE %s"
 
 def get_autoinc_sql(table):
     return None

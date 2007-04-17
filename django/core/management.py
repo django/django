@@ -210,7 +210,10 @@ def _get_sql_model_create(model, known_models=set()):
     full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(backend.quote_name(opts.db_table)) + ' (']
     for i, line in enumerate(table_output): # Combine and add commas.
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
-    full_statement.append(');')
+    full_statement.append(')')
+    if opts.tablespace and backend.supports_tablespaces:
+        full_statement.append(backend.get_tablespace_sql() % backend.quote_name(opts.tablespace))
+    full_statement.append(';')
     final_output.append('\n'.join(full_statement))
 
     if opts.has_auto_field and hasattr(backend, 'get_autoinc_sql'):
@@ -282,7 +285,10 @@ def _get_many_to_many_sql_for_model(model):
                 (style.SQL_KEYWORD('UNIQUE'),
                 style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
                 style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
-            table_output.append(');')
+            table_output.append(')')
+            if opts.tablespace and backend.supports_tablespaces:
+                table_output.append(backend.get_tablespace_sql() % opts.tablespace)
+            table_output.append(';')
             final_output.append('\n'.join(table_output))
 
             # Add any extra SQL needed to support auto-incrementing PKs
@@ -1355,7 +1361,7 @@ def load_data(fixture_labels, verbosity=1):
     # Keep a count of the installed objects and fixtures
     count = [0,0]
     models = set()
-    
+
     humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
 
     # Get a cursor (even though we don't need one yet). This has

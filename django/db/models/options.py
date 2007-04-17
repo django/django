@@ -13,7 +13,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label')
+                 'order_with_respect_to', 'app_label', 'tablespace')
 
 class Options(object):
     def __init__(self, meta):
@@ -27,6 +27,7 @@ class Options(object):
         self.object_name, self.app_label = None, None
         self.get_latest_by = None
         self.order_with_respect_to = None
+        self.tablespace = None
         self.admin = None
         self.meta = meta
         self.pk = None
@@ -92,10 +93,10 @@ class Options(object):
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-        
+
     def __str__(self):
         return "%s.%s" % (self.app_label, self.module_name)
-        
+
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
