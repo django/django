@@ -3,11 +3,12 @@ These classes are light wrappers around Django's database API that provide
 convenience functionality and permalink functions for the databrowse app.
 """
 
-from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.db import models
 from django.utils import dateformat
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
+
+EMPTY_VALUE = '(None)'
 
 class EasyModel(object):
     def __init__(self, site, model):
@@ -132,13 +133,16 @@ class EasyInstanceField(object):
         Returns a list of values for this field for this instance. It's a list
         so we can accomodate many-to-many fields.
         """
+        # This import is deliberately inside the function because it causes
+        # some settings to be imported, and we don't want to do that at the
+        # module level.
         if self.field.rel:
             if isinstance(self.field.rel, models.ManyToOneRel):
                 objs = getattr(self.instance.instance, self.field.name)
             elif isinstance(self.field.rel, models.ManyToManyRel): # ManyToManyRel
                 return list(getattr(self.instance.instance, self.field.name).all())
         elif self.field.choices:
-            objs = dict(self.field.choices).get(self.raw_value, EMPTY_CHANGELIST_VALUE)
+            objs = dict(self.field.choices).get(self.raw_value, EMPTY_VALUE)
         elif isinstance(self.field, models.DateField) or isinstance(self.field, models.TimeField):
             if self.raw_value:
                 date_format, datetime_format, time_format = get_date_formats()
@@ -149,7 +153,7 @@ class EasyInstanceField(object):
                 else:
                     objs = capfirst(dateformat.format(self.raw_value, date_format))
             else:
-                objs = EMPTY_CHANGELIST_VALUE
+                objs = EMPTY_VALUE
         elif isinstance(self.field, models.BooleanField) or isinstance(self.field, models.NullBooleanField):
             objs = {True: 'Yes', False: 'No', None: 'Unknown'}[self.raw_value]
         else:
