@@ -5,7 +5,9 @@ from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.conf import settings
-import datetime, operator, re
+import datetime
+import operator
+import re
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):

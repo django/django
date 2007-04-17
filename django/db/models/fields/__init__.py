@@ -494,15 +494,12 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if settings.DATABASE_ENGINE != 'oracle':
-            if isinstance(value, datetime.datetime):
-                value = value.date().strftime('%Y-%m-%d')
-            elif isinstance(value, datetime.date):
-                value = value.strftime('%Y-%m-%d')
-        else:
+        if settings.DATABASE_ENGINE == 'oracle':
             # cx_Oracle needs a conversion to datetime.datetime instead.
             if isinstance(value, datetime.date):
                 value = datetime.datetime.combine(value, datetime.time())
+        elif value is not None:
+            value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
@@ -825,11 +822,14 @@ class TimeField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        def prep(value):
-            if settings.DATABASE_ENGINE == 'oracle' and isinstance(value, datetime.time):
-                # Oracle requires a date in order to parse.
-                value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
-            return str(value)
+        if settings.DATABASE_ENGINE == 'oracle':
+            # Oracle requires a date in order to parse.
+            def prep(value):
+                if isinstance(value, datetime.time):
+                    value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
+                return str(value)
+        else:
+            prep = str
         if lookup_type == 'range':
             value = [prep(v) for v in value]
         else:
@@ -849,15 +849,13 @@ class TimeField(Field):
         if value is not None:
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
+            if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-                value = str(value)
-            elif settings.DATABASE_ENGINE == 'oracle':
-                if hasattr(value, 'microsecond'):
-                    value = value.replace(microsecond=0)
-                    # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
+            if settings.DATABASE_ENGINE == 'oracle':
+                # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
+                if isinstance(value, datetime.time):
                     value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
-                else:
+                elif isinstance(value, basestring):
                     value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
             else:
                 value = str(value)
