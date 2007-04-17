@@ -3,7 +3,6 @@ These classes are light wrappers around Django's database API that provide
 convenience functionality and permalink functions for the databrowse app.
 """
 
-from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.db import models
 from django.utils import dateformat
 from django.utils.text import capfirst
@@ -132,6 +131,10 @@ class EasyInstanceField(object):
         Returns a list of values for this field for this instance. It's a list
         so we can accomodate many-to-many fields.
         """
+        # This import is deliberately inside the function because it causes
+        # some settings to be imported, and we don't want to do that at the
+        # module level.
+        from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
         if self.field.rel:
             if isinstance(self.field.rel, models.ManyToOneRel):
                 objs = getattr(self.instance.instance, self.field.name)
