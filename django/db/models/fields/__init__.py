@@ -580,13 +580,8 @@ class DateTimeField(DateField):
     def flatten_data(self,follow, obj = None):
         val = self._get_val_from_obj(obj)
         date_field, time_field = self.get_manipulator_field_names('')
-        # cx_Oracle does not support strftime
-        if settings.DATABASE_ENGINE == 'oracle':
-            return {date_field: (val is not None or ''),
-                    time_field: (val is not None or '')}
-        else:
-            return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
-                    time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
+        return {date_field: (val is not None and val.strftime("%Y-%m-%d") or ''),
+                time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
     def formfield(self, **kwargs):
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
