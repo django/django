@@ -178,6 +178,7 @@ def _get_sql_model_create(model, known_models=set()):
             rel_field = f
             data_type = f.get_internal_type()
         col_type = data_types[data_type]
+        tablespace = f.tablespace or opts.tablespace
         if col_type is not None:
             # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
             field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
@@ -187,6 +188,10 @@ def _get_sql_model_create(model, known_models=set()):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
             if f.primary_key:
                 field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+            if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
+                # We must specify the index tablespace inline, because we
+                # won't be generating a CREATE INDEX statement for this field.
+                field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
             if f.rel:
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
@@ -212,7 +217,7 @@ def _get_sql_model_create(model, known_models=set()):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(')')
     if opts.tablespace and backend.supports_tablespaces:
-        full_statement.append(backend.get_tablespace_sql() % backend.quote_name(opts.tablespace))
+        full_statement.append(backend.get_tablespace_sql(opts.tablespace))
     full_statement.append(';')
     final_output.append('\n'.join(full_statement))
 
@@ -261,12 +266,18 @@ def _get_many_to_many_sql_for_model(model):
     final_output = []
     for f in opts.many_to_many:
         if not isinstance(f.rel, GenericRel):
+            tablespace = f.tablespace or opts.tablespace
+            if tablespace and backend.supports_tablespaces and backend.autoindexes_primary_keys:
+                tablespace_sql = ' ' + backend.get_tablespace_sql(tablespace, inline=True)
+            else:
+                tablespace_sql = ''
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
-            table_output.append('    %s %s %s,' % \
+            table_output.append('    %s %s %s%s,' % \
                 (style.SQL_FIELD(backend.quote_name('id')),
                 style.SQL_COLTYPE(data_types['AutoField']),
-                style.SQL_KEYWORD('NOT NULL PRIMARY KEY')))
+                style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
+                tablespace_sql))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
                 style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
@@ -281,13 +292,15 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
                 style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column)),
                 backend.get_deferrable_sql()))
-            table_output.append('    %s (%s, %s)' % \
+            table_output.append('    %s (%s, %s)%s' % \
                 (style.SQL_KEYWORD('UNIQUE'),
                 style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-                style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name()))))
+                style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
+                tablespace_sql))
             table_output.append(')')
             if opts.tablespace and backend.supports_tablespaces:
-                table_output.append(backend.get_tablespace_sql() % opts.tablespace)
+                # f.tablespace is only for indices, so ignore its value here.
+                table_output.append(backend.get_tablespace_sql(opts.tablespace))
             table_output.append(';')
             final_output.append('\n'.join(table_output))
 
@@ -468,14 +481,20 @@ def get_sql_indexes_for_model(model):
     output = []
 
     for f in model._meta.fields:
-        if f.db_index and not (f.primary_key and backend.autoindexes_primary_keys):
+        if f.db_index and not ((f.primary_key or f.unique) and backend.autoindexes_primary_keys):
             unique = f.unique and 'UNIQUE ' or ''
+            tablespace = f.tablespace or model._meta.tablespace
+            if tablespace and backend.supports_tablespaces:
+                tablespace_sql = ' ' + backend.get_tablespace_sql(tablespace)
+            else:
+                tablespace_sql = ''
             output.append(
                 style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
                 style.SQL_TABLE(backend.quote_name('%s_%s' % (model._meta.db_table, f.column))) + ' ' + \
                 style.SQL_KEYWORD('ON') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
-                "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
+                "(%s)" % style.SQL_FIELD(backend.quote_name(f.column)) + \
+                "%s;" % tablespace_sql
             )
     return output
 

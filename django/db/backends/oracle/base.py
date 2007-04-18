@@ -169,8 +169,8 @@ def get_max_name_length():
 def get_start_transaction_sql():
     return None
 
-def get_tablespace_sql():
-    return "TABLESPACE %s"
+def get_tablespace_sql(tablespace, inline=False):
+    return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))
 
 def get_autoinc_sql(table):
     # To simulate auto-incrementing primary keys in Oracle, we have to

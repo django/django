@@ -154,8 +154,8 @@ def get_max_name_length():
 def get_start_transaction_sql():
     return "BEGIN;"
 
-def get_tablespace_sql():
-    return "ON %s"
+def get_tablespace_sql(tablespace, inline=False):
+    return "ON %s" % quote_name(tablespace)
 
 def get_autoinc_sql(table):
     return None
