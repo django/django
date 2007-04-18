@@ -187,6 +187,9 @@ def get_autoinc_sql(table):
     END;\n""" % (tr_name, quote_name(table), sq_name)
     return sequence_sql, trigger_sql
 
+def get_drop_sequence(table):
+    return "DROP SEQUENCE %s;" % quote_name(get_sequence_name(table))
+
 def _get_sequence_reset_sql():
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
     return """

@@ -369,8 +369,8 @@ def get_sql_delete(app):
                         style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
                         style.SQL_FIELD(truncate_name(r_name, backend.get_max_name_length()))))
                 del references_to_delete[model]
-                if hasattr(backend, 'get_drop_sequence'):
-                    output.append(backend.get_drop_sequence(model._meta.db_table))
+            if hasattr(backend, 'get_drop_sequence'):
+                output.append(backend.get_drop_sequence(model._meta.db_table))
 
     # Output DROP TABLE statements for many-to-many tables.
     for model in app_models:
