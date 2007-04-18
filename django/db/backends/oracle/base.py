@@ -294,7 +294,8 @@ def get_query_set_class(DefaultQuerySet):
             cursor.execute(full_query, params)
 
             fill_cache = self._select_related
-            index_end = len(self.model._meta.fields)
+            fields = self.model._meta.fields
+            index_end = len(fields)
 
             # so here's the logic;
             # 1. retrieve each row in turn
@@ -305,7 +306,7 @@ def get_query_set_class(DefaultQuerySet):
                 if not rows:
                     raise StopIteration
                 for row in rows:
-                    row = self.resolve_columns(row)
+                    row = self.resolve_columns(row, fields)
                     if fill_cache:
                         obj, index_end = get_cached_row(klass=self.model, row=row,
                                                         index_start=0, max_depth=self._max_related_depth)
@@ -480,12 +481,10 @@ def get_query_set_class(DefaultQuerySet):
                         pass  # DateTimeField subclasses DateField so must be checked first.
                     elif isinstance(field, DateField):
                         value = value.date()
-                    elif isinstance(field, TimeField):
+                    elif isinstance(field, TimeField) or (value.year == 1900 and value.month == value.day == 1):
                         value = value.time()
                     elif value.hour == value.minute == value.second == value.microsecond == 0:
                         value = value.date()
-                    elif value.year == 1900 and value.month == value.day == 1:
-                        value = value.time()
                 values.append(value)
             return values
 

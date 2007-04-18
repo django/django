@@ -185,7 +185,8 @@ class _QuerySet(object):
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
 
         fill_cache = self._select_related
-        index_end = len(self.model._meta.fields)
+        fields = self.model._meta.fields
+        index_end = len(fields)
         has_resolve_columns = hasattr(self, 'resolve_columns')
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
@@ -193,7 +194,7 @@ class _QuerySet(object):
                 raise StopIteration
             for row in rows:
                 if has_resolve_columns:
-                    row = self.resolve_columns(row)
+                    row = self.resolve_columns(row, fields)
                 if fill_cache:
                     obj, index_end = get_cached_row(klass=self.model, row=row,
                                                     index_start=0, max_depth=self._max_related_depth)
