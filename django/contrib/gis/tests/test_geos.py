@@ -149,6 +149,28 @@ class GeosTest2(unittest.TestCase):
     #    "Testing LinearRing objects."
     #    pass
 
+    def test08_coord_seq(self):
+        "Testing Coordinate Sequence objects."
+        for p in polygons:
+            if p.ext_ring_cs:
+                poly = GEOSGeometry(p.wkt)
+                cs = poly.exterior_ring.coord_seq
+
+                self.assertEqual(p.ext_ring_cs, cs.tuple) # done in the Polygon test too.
+                self.assertEqual(len(p.ext_ring_cs), len(cs)) # Making sure __len__ works
+
+                # Checks __getitem__ and __setitem__
+                for i in xrange(len(p.ext_ring_cs)):
+                    c1 = p.ext_ring_cs[i]
+                    c2 = cs[i]
+                    self.assertEqual(c1, c2)
+                    if len(c1) == 2: tset = (5, 23)
+                    else: tset = (5, 23, 8)
+                    cs[i] = tset
+                    for j in range(len(tset)):
+                        cs[i] = tset
+                        self.assertEqual(tset, cs[i])
+
     def test09_relate_pattern(self):
         "Testing relate() and relate_pattern()."
 

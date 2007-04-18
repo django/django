@@ -30,7 +30,7 @@
 # Trying not to pollute the namespace.
 from ctypes import \
      CDLL, CFUNCTYPE, byref, string_at, create_string_buffer, \
-     c_char_p, c_double, c_float, c_int, c_uint, c_size_t, c_ubyte
+     c_char_p, c_double, c_float, c_int, c_uint, c_size_t
 import os, sys
 
 """
@@ -43,10 +43,10 @@ import os, sys
         installation of SWIG.
     (2) The PCL implementation is over 2K+ lines of C and would make
         PCL a requisite package for the GeoDjango application stack.
-    (3) Windows compatibility becomes substantially easier, and does not require the
-        additional compilation of PCL or GEOS and SWIG -- all that is needed is
-        a Win32 compiled GEOS C library (dll) in a location that Python can read
-        (e.g. C:\Python25).
+    (3) Windows and Mac compatibility becomes substantially easier, and does not
+        require the additional compilation of PCL or GEOS and SWIG -- all that
+        is needed is a Win32 or Mac compiled GEOS C library (dll or dylib)
+        in a location that Python can read (e.g. 'C:\Python25').
 
   In summary, I wanted to wrap GEOS in a more maintainable and portable way using
    only Python and the excellent ctypes library (now standard in Python 2.5).
@@ -65,13 +65,22 @@ import os, sys
 """
 
 # Setting the appropriate name for the GEOS-C library, depending on which
-# platform we're running.
+# OS and POSIX platform we're running.
 if os.name == 'nt':
     # Windows NT library
     lib_name = 'libgeos_c-1.dll'
+elif os.name == 'posix':
+    platform = os.uname()[0] # Using os.uname()
+    if platform == 'Linux':
+        # Linux shared library
+        lib_name = 'libgeos_c.so'
+    elif platform == 'Darwin':
+        # Mac OSX Shared Library (Thanks Matt!)
+        lib_name = 'libgeos_c.dylib'
+    else:
+        raise GEOSException, 'Unknown POSIX platform "%s"' % platform
 else:
-    # Linux shared library
-    lib_name = 'libgeos_c.so'
+    raise GEOSException, 'Unsupported OS "%s"' % os.name
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 #  both *NIX and Windows.
@@ -79,7 +88,7 @@ else:
 #  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
 lgeos = CDLL(lib_name)
 
-# The notice and error handlers
+# The notice and error handler C function callback definitions.
 #  Supposed to mimic the GEOS message handler (C below):
 #  "typedef void (*GEOSMessageHandler)(const char *fmt, ...);"
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
@@ -89,6 +98,7 @@ notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 def error_h(fmt, list):
+    # TODO: Figure out why improper format code given w/some GEOS errors
     if not list:
         sys.stderr.write(fmt)
     else:
@@ -102,6 +112,7 @@ error_h = ERRORFUNC(error_h)
 lgeos.initGEOS(notice_h, error_h)
 
 class GEOSException:
+    "Exception class for any GEOS-related errors."
     def __init__(self, msg):
         self.msg = msg
     def __str__(self):
@@ -289,7 +300,7 @@ class GEOSGeometry:
         if s == 0:
             return None
         else:
-            return lgeos.GEOSGetSRID(self._g)
+            return s
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
@@ -408,14 +419,11 @@ class GEOSCoordSeq:
             yield self.__getitem__(i)
 
     def __len__(self):
-        return self.size
+        return int(self.size)
 
     def __str__(self):
         "The string representation of the coordinate sequence."
-        rep = []
-        for i in xrange(self.size):
-            rep.append(self.__getitem__(i))
-        return str(tuple(rep))
+        return str(self.tuple)
 
     def _checkindex(self, index):
         "Checks the index."
@@ -445,9 +453,9 @@ class GEOSCoordSeq:
             set_3d = False
         if len(value) != n_args:
             raise GEOSException, 'Improper value given!'
-        self.setX(index, value)
-        self.setY(index, value)
-        if set_3d: self.setZ(index, value)
+        self.setX(index, value[0])
+        self.setY(index, value[1])
+        if set_3d: self.setZ(index, value[2])
         
     # Getting and setting the X coordinate for the given index.
     def getX(self, index):
@@ -460,15 +468,15 @@ class GEOSCoordSeq:
     def getY(self, index):
         return self.getOrdinate(1, index)
 
-    def setY(self, index):
-        self.setOrdinate(1, index)
+    def setY(self, index, value):
+        self.setOrdinate(1, index, value)
 
     # Getting and setting the Z coordinate for the given index
     def getZ(self, index):
         return self.getOrdinate(2, index)
 
-    def setZ(self, index):
-        self.setOrdinate(2, index)
+    def setZ(self, index, value):
+        self.setOrdinate(2, index, value)
 
     def getOrdinate(self, dimension, index):
         "Gets the value for the given dimension and index."
@@ -488,16 +496,15 @@ class GEOSCoordSeq:
 
     def setOrdinate(self, dimension, index, value):
         "Sets the value for the given dimension and index."
-        self._checkindex(idnex)
+        self._checkindex(index)
         self._checkdim(dimension)
 
         # Wrapping the dimension, index
         dim = c_uint(dimension)
         idx = c_uint(index)
 
-        # 'd' is the value of the point
-        d = c_double(value)
-        status = lgeos.GEOSCoordSeq_getOrdinate(self._cs, idx, dim, byref(d))
+        # Setting the ordinate
+        status = lgeos.GEOSCoordSeq_setOrdinate(self._cs, idx, dim, c_double(value))
         if status == 0:
             raise GEOSException, 'Could not set the ordinate for (dim, index): (%d, %d)' % (dimension, index)
 
