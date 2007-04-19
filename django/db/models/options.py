@@ -13,7 +13,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label', 'tablespace')
+                 'order_with_respect_to', 'app_label', 'db_tablespace')
 
 class Options(object):
     def __init__(self, meta):
@@ -27,7 +27,7 @@ class Options(object):
         self.object_name, self.app_label = None, None
         self.get_latest_by = None
         self.order_with_respect_to = None
-        self.tablespace = None
+        self.db_tablespace = None
         self.admin = None
         self.meta = meta
         self.pk = None
