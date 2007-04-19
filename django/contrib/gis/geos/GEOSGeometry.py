@@ -82,6 +82,9 @@ elif os.name == 'posix':
 else:
     raise GEOSException, 'Unsupported OS "%s"' % os.name
 
+# The GEOSException class
+class GEOSException(Exception): pass
+
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 #  both *NIX and Windows.
 # See the GEOS C API source code for more details on the library function calls:
@@ -98,11 +101,11 @@ notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
 def error_h(fmt, list):
-    # TODO: Figure out why improper format code given w/some GEOS errors
-    if not list:
-        sys.stderr.write(fmt)
+    if list:
+        err_msg = fmt % list
     else:
-        sys.stderr.write('ERROR: %s' % str(list))
+        err_msg = fmt
+    sys.stderr.write(err_msg)
 error_h = ERRORFUNC(error_h)
 
 # The initGEOS routine should be called first, however, that routine takes
@@ -111,44 +114,42 @@ error_h = ERRORFUNC(error_h)
 #  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
 lgeos.initGEOS(notice_h, error_h)
 
-class GEOSException:
-    "Exception class for any GEOS-related errors."
-    def __init__(self, msg):
-        self.msg = msg
-    def __str__(self):
-        return repr(self.msg)
-
 class GEOSGeometry:
     "A class that, generally, encapsulates a GEOS geometry."
 
     #### Python 'magic' routines ####
     def __init__(self, input, geom_type='wkt'):
         "Takes an input and the type of the input for initialization."
+
         if geom_type == 'wkt':
             # If the geometry is in WKT form
-            self._g = lgeos.GEOSGeomFromWKT(c_char_p(input))
+            buf = create_string_buffer(input)
+            g = lgeos.GEOSGeomFromWKT(buf)
         elif geom_type == 'hex':
-            # If the geometry is in EWHEX form.
+            # If the geometry is in HEX form.
             sz = c_size_t(len(input))
             buf = create_string_buffer(input)
-            self._g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
+            g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
         elif geom_type == 'geos':
             # When the input is a C pointer (Python integer)
-            self._g = input
+            g = input
         else:
             # Invalid geometry type.
             raise GEOSException, 'Improper geometry input type!'
 
+        # If the geometry pointer is NULL (0), then raise an exception.
+        if not g:
+            self._g = False # Setting this before raising the exception
+            raise GEOSException, 'Invalid %s given!' % geom_type.upper()
+        else:
+            self._g = g
+
         # Setting the class type (e.g. 'Point', 'Polygon', etc.)
         self.__class__ = GEO_CLASSES[self.geom_type]
 
-        # If the geometry pointer is NULL (0), then raise an exception.
-        if not self._g:
-            raise GEOSException, 'Could not initialize on input!'
-
     def __del__(self):
         "This cleans up the memory allocated for the geometry."
-        lgeos.GEOSGeom_destroy(self._g)
+        if self._g: lgeos.GEOSGeom_destroy(self._g)
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -412,7 +413,7 @@ class GEOSCoordSeq:
         self._z = z
 
     def __del__(self):
-        lgeos.GEOSCoordSeq_destroy(self._cs)
+        if self._cs: lgeos.GEOSCoordSeq_destroy(self._cs)
 
     def __iter__(self):
         for i in xrange(self.size):
@@ -487,7 +488,7 @@ class GEOSCoordSeq:
         dim = c_uint(dimension)
         idx = c_uint(index)
 
-        # 'd' is the value of the point
+        # 'd' is the value of the point, passed in by reference
         d = c_double()
         status = lgeos.GEOSCoordSeq_getOrdinate(self._cs, idx, dim, byref(d))
         if status == 0:

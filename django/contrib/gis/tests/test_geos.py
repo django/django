@@ -5,18 +5,26 @@ from geometries import *
 
 class GeosTest2(unittest.TestCase):
 
-    def test010_wkt(self):
+    def test0100_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
             geom = GEOSGeometry(g.wkt)
             self.assertEqual(g.ewkt, geom.wkt)
 
-    def test011_hex(self):
+    def test0101_hex(self):
         "Testing HEX output."
         for g in hex_wkt:
             geom = GEOSGeometry(g.wkt)
             self.assertEqual(g.hex, geom.hex)
 
+    def test0102_errors(self):
+        "Testing the Error handlers."
+        for err in errors:
+            if err.hex:
+                self.assertRaises(GEOSException, GEOSGeometry, err.wkt, 'hex')
+            else:
+                self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
+                
     def test02_points(self):
         "Testing Point objects."
         prev = GEOSGeometry('POINT(0 0)')
