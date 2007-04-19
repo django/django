@@ -495,11 +495,7 @@ class DateField(Field):
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
-        if settings.DATABASE_ENGINE == 'oracle':
-            # cx_Oracle needs a conversion to datetime.datetime instead.
-            if isinstance(value, datetime.date):
-                value = datetime.datetime.combine(value, datetime.time())
-        elif value is not None:
+        if value is not None:
             value = value.strftime('%Y-%m-%d')
         return Field.get_db_prep_save(self, value)
 
@@ -541,9 +537,6 @@ class DateTimeField(DateField):
             # neither database supports microseconds.
             if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            # cx_Oracle wants the raw datetime instead of a string.
-            if settings.DATABASE_ENGINE != 'oracle':
-                value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
