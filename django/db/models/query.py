@@ -771,15 +771,11 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     except KeyError:
         pass
     if lookup_type == 'in':
-        in_string = ','.join(['%s' for id in value])
-        if in_string:
-            if value:
-                value_set = ','.join(['%s' for v in value])
-            else:
-                value_set = 'NULL'
-            return '%s%s IN (%s)' % (table_prefix, field_name, value_set)
+        if value:
+            value_set = ','.join(['%s' for v in value])
         else:
-            raise EmptyResultSet
+            value_set = 'NULL'
+        return '%s%s IN (%s)' % (table_prefix, field_name, value_set)
     elif lookup_type in ('range', 'year'):
         return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
     elif lookup_type in ('month', 'day'):
