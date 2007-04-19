@@ -62,6 +62,8 @@ installed.
 
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
+* If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher.
+
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
@@ -71,6 +73,7 @@ installed.
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
 .. _MySQL backend: ../databases/
+.. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 
 Remove any old versions of Django
 =================================
