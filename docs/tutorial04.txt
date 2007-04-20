@@ -256,4 +256,4 @@ installments:
     * Advanced admin features: Permissions
     * Advanced admin features: Custom JavaScript
 
-.. _Tutorial 3: ../tutorial3/
+.. _Tutorial 3: ../tutorial03/

@@ -9,7 +9,7 @@ utilities to automate as much of this process as possible.
 This document assumes you know the Django basics, as covered in the
 `official tutorial`_.
 
-.. _official tutorial: ../tutorial1/
+.. _official tutorial: ../tutorial01/
 
 Give Django your database parameters
 ====================================

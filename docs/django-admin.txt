@@ -61,7 +61,7 @@ Prints the admin-index template snippet for the given appnames.
 Use admin-index template snippets if you want to customize the look and feel of
 your admin's index page. See `Tutorial 2`_ for more information.
 
-.. _Tutorial 2: ../tutorial2/
+.. _Tutorial 2: ../tutorial02/
 
 createcachetable [tablename]
 ----------------------------
