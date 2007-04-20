@@ -1020,7 +1020,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
 
-.. _tutorials: ../tutorial1/#creating-models
+.. _tutorials: ../tutorial01/#creating-models
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

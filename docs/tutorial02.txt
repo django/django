@@ -5,7 +5,7 @@ Writing your first Django app, part 2
 This tutorial begins where `Tutorial 1`_ left off. We're continuing the Web-poll
 application and will focus on Django's automatically-generated admin site.
 
-.. _Tutorial 1: ../tutorial1/
+.. _Tutorial 1: ../tutorial01/
 
 .. admonition:: Philosophy
 
@@ -434,4 +434,4 @@ When you're comfortable with the admin site, read `part 3 of this tutorial`_ to
 start working on public poll views.
 
 .. _Django admin CSS guide: ../admin_css/
-.. _part 3 of this tutorial: ../tutorial3/
+.. _part 3 of this tutorial: ../tutorial03/

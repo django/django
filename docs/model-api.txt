@@ -1924,7 +1924,7 @@ order in which they're executed. The only thing you can assume is that, by the
 time your custom data files are executed, all the database tables already will
 have been created.
 
-.. _`manage.py documentation`: ../django_admin/#sqlcustom-appname-appname
+.. _`manage.py documentation`: ../django-admin/#sqlcustom-appname-appname
 
 Database-backend-specific SQL data
 ----------------------------------

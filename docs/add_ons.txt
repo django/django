@@ -24,7 +24,7 @@ admin
 The automatic Django administrative interface. For more information, see
 `Tutorial 2`_.
 
-.. _Tutorial 2: ../tutorial2/
+.. _Tutorial 2: ../tutorial02/
 
 auth
 ====
