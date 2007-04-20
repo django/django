@@ -537,6 +537,7 @@ class DateTimeField(DateField):
             # neither database supports microseconds.
             if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
+            value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
