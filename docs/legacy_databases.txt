@@ -52,7 +52,7 @@ Once you've cleaned up your models, name the file ``models.py`` and put it in
 the Python package that holds your app. Then add the app to your
 ``INSTALLED_APPS`` setting.
 
-.. _django-admin.py documentation: ../django_admin/
+.. _django-admin.py documentation: ../django-admin/
 
 Install the core Django tables
 ==============================

@@ -59,7 +59,7 @@ Use the ``--settings`` command-line argument to specify the settings manually::
 
     django-admin.py runserver --settings=mysite.settings
 
-.. _django-admin.py: ../django_admin/
+.. _django-admin.py: ../django-admin/
 
 On the server (mod_python)
 --------------------------
@@ -102,7 +102,7 @@ between the current settings file and Django's default settings.
 
 For more, see the `diffsettings documentation`_.
 
-.. _diffsettings documentation: ../django_admin/#diffsettings
+.. _diffsettings documentation: ../django-admin/#diffsettings
 
 Using settings in Python code
 =============================
@@ -462,7 +462,7 @@ A tuple of strings designating all applications that are enabled in this Django
 installation. Each string should be a full Python path to a Python package that
 contains a Django application, as created by `django-admin.py startapp`_.
 
-.. _django-admin.py startapp: ../django_admin/#startapp-appname
+.. _django-admin.py startapp: ../django-admin/#startapp-appname
 
 INTERNAL_IPS
 ------------

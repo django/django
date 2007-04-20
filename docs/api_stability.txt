@@ -101,7 +101,7 @@ change:
 .. _caching: ../cache/
 .. _custom template tags and libraries: ../templates_python/
 .. _database lookup: ../db_api/
-.. _django-admin utility: ../django_admin/
+.. _django-admin utility: ../django-admin/
 .. _fastcgi integration: ../fastcgi/
 .. _flatpages: ../flatpages/
 .. _generic views: ../generic_views/
