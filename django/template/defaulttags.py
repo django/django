@@ -41,7 +41,10 @@ class FilterNode(Node):
     def render(self, context):
         output = self.nodelist.render(context)
         # apply filters
-        return self.filter_expr.resolve(Context({'var': output}))
+        context.update({'var': output})
+        filtered = self.filter_expr.resolve(context)
+        context.pop()
+        return filtered
 
 class FirstOfNode(Node):
     def __init__(self, vars):
