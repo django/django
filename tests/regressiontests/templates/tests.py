@@ -654,6 +654,9 @@ class Templates(unittest.TestCase):
             'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
             'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
 
+            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+
             ### NOW TAG ########################################################
             # Simple case
             'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
