@@ -90,11 +90,18 @@ def technical_500_response(request, exc_type, exc_value, tb):
         exc_type, exc_value, tb, template_info = get_template_exception_info(exc_type, exc_value, tb)
     frames = []
     while tb is not None:
+        # support for __traceback_hide__ which is used by a few libraries
+        # to hide internal frames.
+        if tb.tb_frame.f_locals.get('__traceback_hide__'):
+            tb = tb.tb_next
+            continue
         filename = tb.tb_frame.f_code.co_filename
         function = tb.tb_frame.f_code.co_name
         lineno = tb.tb_lineno - 1
-        pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7)
-        if pre_context_lineno:
+        loader = tb.tb_frame.f_globals.get('__loader__')
+        module_name = tb.tb_frame.f_globals.get('__name__')
+        pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7, loader, module_name)
+        if pre_context_lineno is not None:
             frames.append({
                 'tb': tb,
                 'filename': filename,
@@ -161,23 +168,34 @@ def empty_urlconf(request):
     })
     return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
-def _get_lines_from_file(filename, lineno, context_lines):
+def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
     """
     Returns context_lines before and after lineno from file.
     Returns (pre_context_lineno, pre_context, context_line, post_context).
     """
-    try:
-        source = open(filename).readlines()
-        lower_bound = max(0, lineno - context_lines)
-        upper_bound = lineno + context_lines
-
-        pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
-        context_line = source[lineno].strip('\n')
-        post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
-
-        return lower_bound, pre_context, context_line, post_context
-    except (OSError, IOError):
+    source = None
+    if loader is not None:
+        source = loader.get_source(module_name).splitlines()
+    else:
+        try:
+            f = open(filename)
+            try:
+                source = f.readlines()
+            finally:
+                f.close()
+        except (OSError, IOError):
+            pass
+    if source is None:
         return None, [], None, []
+
+    lower_bound = max(0, lineno - context_lines)
+    upper_bound = lineno + context_lines
+
+    pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
+    context_line = source[lineno].strip('\n')
+    post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
+
+    return lower_bound, pre_context, context_line, post_context
 
 #
 # Templates are embedded in the file so that we know the error handler will
@@ -314,7 +332,7 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Location:</th>
-      <td>{{ lastframe.filename }} in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
+      <td>{{ lastframe.filename|escape }} in {{ lastframe.function|escape }}, line {{ lastframe.lineno }}</td>
     </tr>
   </table>
 </div>
@@ -361,7 +379,7 @@ TECHNICAL_500_TEMPLATE = """
     <ul class="traceback">
       {% for frame in frames %}
         <li class="frame">
-          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
+          <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
