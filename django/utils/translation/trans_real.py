@@ -3,6 +3,7 @@
 import os, re, sys
 import gettext as gettext_module
 from cStringIO import StringIO
+from django.utils.encoding import smart_str, smart_unicode
 
 try:
     import threading
@@ -57,10 +58,10 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         # the output charset. Before 2.4, the output charset is
         # identical with the translation file charset.
         try:
-            self.set_output_charset(settings.DEFAULT_CHARSET)
+            self.set_output_charset('utf-8')
         except AttributeError:
             pass
-        self.django_output_charset = settings.DEFAULT_CHARSET
+        self.django_output_charset = 'utf-8'
         self.__language = '??'
 
     def merge(self, other):
@@ -238,6 +239,20 @@ def catalog():
         _default = translation(settings.LANGUAGE_CODE)
     return _default
 
+def do_translate(message, translation_function):
+    """
+    Translate 'message' using the given 'translation_function' name -- which
+    will be either gettext or ugettext.
+    """
+    global _default, _active
+    t = _active.get(currentThread(), None)
+    if t is not None:
+        return getattr(t, translation_function)(message)
+    if _default is None:
+        from django.conf import settings
+        _default = translation(settings.LANGUAGE_CODE)
+    return getattr(_default, translation_function)(message)
+
 def gettext(message):
     """
     This function will be patched into the builtins module to provide the _
@@ -245,42 +260,51 @@ def gettext(message):
     the translation object to use. If no current translation is activated, the
     message will be run through the default translation object.
     """
-    global _default, _active
-    t = _active.get(currentThread(), None)
-    if t is not None:
-        return t.gettext(message)
-    if _default is None:
-        from django.conf import settings
-        _default = translation(settings.LANGUAGE_CODE)
-    return _default.gettext(message)
+    return do_translate(message, 'gettext')
+
+def ugettext(message):
+    return do_translate(message, 'ugettext')
 
 def gettext_noop(message):
     """
     Marks strings for translation but doesn't translate them now. This can be
     used to store strings in global variables that should stay in the base
-    language (because they might be used externally) and will be translated later.
+    language (because they might be used externally) and will be translated
+    later.
     """
     return message
 
-def ngettext(singular, plural, number):
-    """
-    Returns the translation of either the singular or plural, based on the number.
-    """
+def do_ntranslate(singular, plural, number, translation_function):
     global _default, _active
 
     t = _active.get(currentThread(), None)
     if t is not None:
-        return t.ngettext(singular, plural, number)
+        return getattr(t, translation_function)(singular, plural, number)
     if _default is None:
         from django.conf import settings
         _default = translation(settings.LANGUAGE_CODE)
-    return _default.ngettext(singular, plural, number)
+    return getattr(_default, translation_function)(singular, plural, number)
+
+def ngettext(singular, plural, number):
+    """
+    Returns a UTF-8 bytestring of the translation of either the singular or
+    plural, based on the number.
+    """
+    return do_ntranslate(singular, plural, number, 'ngettext')
+
+def ungettext(singular, plural, number):
+    """
+    Returns a unicode strings of the translation of either the singular or
+    plural, based on the number.
+    """
+    return do_ntranslate(singular, plural, number, 'ungettext')
 
 def check_for_language(lang_code):
     """
-    Checks whether there is a global language file for the given language code.
-    This is used to decide whether a user-provided language is available. This is
-    only used for language codes from either the cookies or session.
+    Checks whether there is a global language file for the given language
+    code. This is used to decide whether a user-provided language is
+    available. This is only used for language codes from either the cookies or
+    session.
     """
     from django.conf import settings
     globalpath = os.path.join(os.path.dirname(sys.modules[settings.__module__].__file__), 'locale')
@@ -291,9 +315,10 @@ def check_for_language(lang_code):
 
 def get_language_from_request(request):
     """
-    Analyzes the request to find what language the user wants the system to show.
-    Only languages listed in settings.LANGUAGES are taken into account. If the user
-    requests a sublanguage where we have a main language, we send out the main language.
+    Analyzes the request to find what language the user wants the system to
+    show. Only languages listed in settings.LANGUAGES are taken into account.
+    If the user requests a sublanguage where we have a main language, we send
+    out the main language.
     """
     global _accepted
     from django.conf import settings

@@ -7,7 +7,8 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
         'get_language', 'get_language_bidi', 'get_date_formats',
         'get_partial_date_formats', 'check_for_language', 'to_locale',
-        'get_language_from_request', 'install', 'templatize']
+        'get_language_from_request', 'install', 'templatize', 'ugettext',
+        'ungettext']
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -48,18 +49,27 @@ del g, delayed_loader
 def gettext_noop(message):
     return real_gettext_noop(message)
 
+ugettext_noop = gettext_noop
+
 def gettext(message):
     return real_gettext(message)
-
 
 def ngettext(singular, plural, number):
     return real_ngettext(singular, plural, number)
 
+def ugettext(message):
+    return real_ugettext(message)
+
+def ungettext(singular, plural, number):
+    return real_ungettext(singular, plural, number)
+
 def string_concat(*strings):
     return real_string_concat(*strings)
 
-ngettext_lazy = lazy(ngettext, str, unicode)
-gettext_lazy = lazy(gettext, str, unicode)
+ngettext_lazy = lazy(ngettext, str)
+gettext_lazy = lazy(gettext, str)
+ungettext_lazy = lazy(ungettext, unicode)
+ugettext_lazy = lazy(ugettext, unicode)
 string_concat = lazy(string_concat, str, unicode)
 
 def activate(language):
