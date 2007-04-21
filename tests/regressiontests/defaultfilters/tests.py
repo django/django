@@ -2,186 +2,186 @@
 
 r"""
 >>> floatformat(7.7)
-'7.7'
+u'7.7'
 >>> floatformat(7.0)
-'7'
+u'7'
 >>> floatformat(0.7)
-'0.7'
+u'0.7'
 >>> floatformat(0.07)
-'0.1'
+u'0.1'
 >>> floatformat(0.007)
-'0.0'
+u'0.0'
 >>> floatformat(0.0)
-'0'
+u'0'
 >>> floatformat(7.7,3)
-'7.700'
+u'7.700'
 >>> floatformat(6.000000,3)
-'6.000'
+u'6.000'
 >>> floatformat(13.1031,-3)
-'13.103'
+u'13.103'
 >>> floatformat(11.1197, -2)
-'11.12'
+u'11.12'
 >>> floatformat(11.0000, -2)
-'11'
+u'11'
 >>> floatformat(11.000001, -2)
-'11.00'
+u'11.00'
 >>> floatformat(8.2798, 3)
-'8.280'
->>> floatformat('foo')
-''
->>> floatformat(13.1031, 'bar')
-'13.1031'
->>> floatformat('foo', 'bar')
-''
+u'8.280'
+>>> floatformat(u'foo')
+u''
+>>> floatformat(13.1031, u'bar')
+u'13.1031'
+>>> floatformat(u'foo', u'bar')
+u''
 
->>> addslashes('"double quotes" and \'single quotes\'')
-'\\"double quotes\\" and \\\'single quotes\\\''
+>>> addslashes(u'"double quotes" and \'single quotes\'')
+u'\\"double quotes\\" and \\\'single quotes\\\''
 
->>> addslashes(r'\ : backslashes, too')
-'\\\\ : backslashes, too'
+>>> addslashes(ur'\ : backslashes, too')
+u'\\\\ : backslashes, too'
 
->>> capfirst('hello world')
-'Hello world'
+>>> capfirst(u'hello world')
+u'Hello world'
 
->>> fix_ampersands('Jack & Jill & Jeroboam')
-'Jack &amp; Jill &amp; Jeroboam'
+>>> fix_ampersands(u'Jack & Jill & Jeroboam')
+u'Jack &amp; Jill &amp; Jeroboam'
 
->>> linenumbers('line 1\nline 2')
-'1. line 1\n2. line 2'
+>>> linenumbers(u'line 1\nline 2')
+u'1. line 1\n2. line 2'
 
->>> linenumbers('\n'.join(['x'] * 10))
-'01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. x\n08. x\n09. x\n10. x'
+>>> linenumbers(u'\n'.join([u'x'] * 10))
+u'01. x\n02. x\n03. x\n04. x\n05. x\n06. x\n07. x\n08. x\n09. x\n10. x'
 
 >>> lower('TEST')
-'test'
+u'test'
 
 >>> lower(u'\xcb') # uppercase E umlaut
 u'\xeb'
 
 >>> make_list('abc')
-['a', 'b', 'c']
+[u'a', u'b', u'c']
 
 >>> make_list(1234)
-['1', '2', '3', '4']
+[u'1', u'2', u'3', u'4']
 
 >>> slugify(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/')
-'jack-jill-like-numbers-123-and-4-and-silly-characters'
+u'jack-jill-like-numbers-123-and-4-and-silly-characters'
 
->>> stringformat(1, '03d')
-'001'
+>>> stringformat(1, u'03d')
+u'001'
 
->>> stringformat(1, 'z')
-''
+>>> stringformat(1, u'z')
+u''
 
 >>> title('a nice title, isn\'t it?')
-"A Nice Title, Isn't It?"
+u"A Nice Title, Isn't It?"
 
 
->>> truncatewords('A sentence with a few words in it', 1)
-'A ...'
+>>> truncatewords(u'A sentence with a few words in it', 1)
+u'A ...'
 
->>> truncatewords('A sentence with a few words in it', 5)
-'A sentence with a few ...'
+>>> truncatewords(u'A sentence with a few words in it', 5)
+u'A sentence with a few ...'
 
->>> truncatewords('A sentence with a few words in it', 100)
-'A sentence with a few words in it'
+>>> truncatewords(u'A sentence with a few words in it', 100)
+u'A sentence with a few words in it'
 
->>> truncatewords('A sentence with a few words in it', 'not a number')
-'A sentence with a few words in it'
+>>> truncatewords(u'A sentence with a few words in it', 'not a number')
+u'A sentence with a few words in it'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 0)
-''
+>>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 0)
+u''
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 2)
-'<p>one <a href="#">two ...</a></p>'
+>>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 2)
+u'<p>one <a href="#">two ...</a></p>'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 4)
-'<p>one <a href="#">two - three <br>four ...</a></p>'
+>>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 4)
+u'<p>one <a href="#">two - three <br>four ...</a></p>'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 5)
-'<p>one <a href="#">two - three <br>four</a> five</p>'
+>>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 5)
+u'<p>one <a href="#">two - three <br>four</a> five</p>'
 
->>> truncatewords_html('<p>one <a href="#">two - three <br>four</a> five</p>', 100)
-'<p>one <a href="#">two - three <br>four</a> five</p>'
+>>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 100)
+u'<p>one <a href="#">two - three <br>four</a> five</p>'
 
->>> upper('Mixed case input')
-'MIXED CASE INPUT'
+>>> upper(u'Mixed case input')
+u'MIXED CASE INPUT'
 
 >>> upper(u'\xeb') # lowercase e umlaut
 u'\xcb'
 
 
->>> urlencode('jack & jill')
-'jack%20%26%20jill'
+>>> urlencode(u'jack & jill')
+u'jack%20%26%20jill'
 >>> urlencode(1)
-'1'
+u'1'
 
 
->>> urlizetrunc('http://short.com/', 20)
-'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'
+>>> urlizetrunc(u'http://short.com/', 20)
+u'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'
 
->>> urlizetrunc('http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
-'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google.co...</a>'
+>>> urlizetrunc(u'http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
+u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google.co...</a>'
 
->>> wordcount('')
+>>> wordcount(u'')
 0
 
->>> wordcount('oneword')
+>>> wordcount(u'oneword')
 1
 
->>> wordcount('lots of words')
+>>> wordcount(u'lots of words')
 3
 
->>> wordwrap('this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14)
-"this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI'm afraid"
+>>> wordwrap(u'this is a long paragraph of text that really needs to be wrapped I\'m afraid', 14)
+u"this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI'm afraid"
 
->>> wordwrap('this is a short paragraph of text.\n  But this line should be indented',14)
-'this is a\nshort\nparagraph of\ntext.\n  But this\nline should be\nindented'
+>>> wordwrap(u'this is a short paragraph of text.\n  But this line should be indented',14)
+u'this is a\nshort\nparagraph of\ntext.\n  But this\nline should be\nindented'
 
->>> wordwrap('this is a short paragraph of text.\n  But this line should be indented',15)
-'this is a short\nparagraph of\ntext.\n  But this line\nshould be\nindented'
+>>> wordwrap(u'this is a short paragraph of text.\n  But this line should be indented',15)
+u'this is a short\nparagraph of\ntext.\n  But this line\nshould be\nindented'
 
->>> ljust('test', 10)
-'test      '
+>>> ljust(u'test', 10)
+u'test      '
 
->>> ljust('test', 3)
-'test'
+>>> ljust(u'test', 3)
+u'test'
 
->>> rjust('test', 10)
-'      test'
+>>> rjust(u'test', 10)
+u'      test'
 
->>> rjust('test', 3)
-'test'
+>>> rjust(u'test', 3)
+u'test'
 
->>> center('test', 6)
-' test '
+>>> center(u'test', 6)
+u' test '
 
->>> cut('a string to be mangled', 'a')
-' string to be mngled'
+>>> cut(u'a string to be mangled', 'a')
+u' string to be mngled'
 
->>> cut('a string to be mangled', 'ng')
-'a stri to be maled'
+>>> cut(u'a string to be mangled', 'ng')
+u'a stri to be maled'
 
->>> cut('a string to be mangled', 'strings')
-'a string to be mangled'
+>>> cut(u'a string to be mangled', 'strings')
+u'a string to be mangled'
 
->>> escape('<some html & special characters > here')
-'&lt;some html &amp; special characters &gt; here'
+>>> escape(u'<some html & special characters > here')
+u'&lt;some html &amp; special characters &gt; here'
 
 >>> escape(u'<some html & special characters > here ĐÅ€£')
 u'&lt;some html &amp; special characters &gt; here \xc4\x90\xc3\x85\xe2\x82\xac\xc2\xa3'
 
->>> linebreaks('line 1')
-'<p>line 1</p>'
+>>> linebreaks(u'line 1')
+u'<p>line 1</p>'
 
->>> linebreaks('line 1\nline 2')
-'<p>line 1<br />line 2</p>'
+>>> linebreaks(u'line 1\nline 2')
+u'<p>line 1<br />line 2</p>'
 
->>> removetags('some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags', 'script img')
-'some <b>html</b> with alert("You smell") disallowed  tags'
+>>> removetags(u'some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags', 'script img')
+u'some <b>html</b> with alert("You smell") disallowed  tags'
 
->>> striptags('some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags')
-'some html with alert("You smell") disallowed  tags'
+>>> striptags(u'some <b>html</b> with <script>alert("You smell")</script> disallowed <img /> tags')
+u'some html with alert("You smell") disallowed  tags'
 
 >>> dictsort([{'age': 23, 'name': 'Barbara-Ann'},
 ...           {'age': 63, 'name': 'Ra Ra Rasputin'},
@@ -196,16 +196,16 @@ u'&lt;some html &amp; special characters &gt; here \xc4\x90\xc3\x85\xe2\x82\xac\
 >>> first([0,1,2])
 0
 
->>> first('')
-''
+>>> first(u'')
+u''
 
->>> first('test')
-'t'
+>>> first(u'test')
+u't'
 
->>> join([0,1,2], 'glue')
-'0glue1glue2'
+>>> join([0,1,2], u'glue')
+u'0glue1glue2'
 
->>> length('1234')
+>>> length(u'1234')
 4
 
 >>> length([1,2,3,4])
@@ -220,37 +220,37 @@ False
 >>> length_is('a', 1)
 True
 
->>> length_is('a', 10)
+>>> length_is(u'a', 10)
 False
 
->>> slice_('abcdefg', '0')
-''
+>>> slice_(u'abcdefg', u'0')
+u''
 
->>> slice_('abcdefg', '1')
-'a'
+>>> slice_(u'abcdefg', u'1')
+u'a'
 
->>> slice_('abcdefg', '-1')
-'abcdef'
+>>> slice_(u'abcdefg', u'-1')
+u'abcdef'
 
->>> slice_('abcdefg', '1:2')
-'b'
+>>> slice_(u'abcdefg', u'1:2')
+u'b'
 
->>> slice_('abcdefg', '1:3')
-'bc'
+>>> slice_(u'abcdefg', u'1:3')
+u'bc'
 
->>> slice_('abcdefg', '0::2')
-'aceg'
+>>> slice_(u'abcdefg', u'0::2')
+u'aceg'
 
->>> unordered_list(['item 1', []])
-'\t<li>item 1</li>'
+>>> unordered_list([u'item 1', []])
+u'\t<li>item 1</li>'
 
->>> unordered_list(['item 1', [['item 1.1', []]]])
-'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>'
+>>> unordered_list([u'item 1', [[u'item 1.1', []]]])
+u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>'
 
->>> unordered_list(['item 1', [['item 1.1', []], ['item 1.2', []]]])
-'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>'
+>>> unordered_list([u'item 1', [[u'item 1.1', []], [u'item 1.2', []]]])
+u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>'
 
->>> add('1', '2')
+>>> add(u'1', u'2')
 3
 
 >>> get_digit(123, 1)
@@ -268,43 +268,43 @@ False
 >>> get_digit(123, 0)
 123
 
->>> get_digit('xyz', 0)
-'xyz'
+>>> get_digit(u'xyz', 0)
+u'xyz'
 
 # real testing of date() is in dateformat.py
->>> date(datetime.datetime(2005, 12, 29), "d F Y")
-'29 December 2005'
->>> date(datetime.datetime(2005, 12, 29), r'jS o\f F')
-'29th of December'
+>>> date(datetime.datetime(2005, 12, 29), u"d F Y")
+u'29 December 2005'
+>>> date(datetime.datetime(2005, 12, 29), ur'jS o\f F')
+u'29th of December'
 
 # real testing of time() is done in dateformat.py
->>> time(datetime.time(13), "h")
-'01'
+>>> time(datetime.time(13), u"h")
+u'01'
 
->>> time(datetime.time(0), "h")
-'12'
+>>> time(datetime.time(0), u"h")
+u'12'
 
 # real testing is done in timesince.py, where we can provide our own 'now'
 >>> timesince(datetime.datetime.now() - datetime.timedelta(1))
-'1 day'
+u'1 day'
 
->>> default("val", "default")
-'val'
+>>> default(u"val", u"default")
+u'val'
 
->>> default(None, "default")
-'default'
+>>> default(None, u"default")
+u'default'
 
->>> default('', "default")
-'default'
+>>> default(u'', u"default")
+u'default'
 
->>> default_if_none("val", "default")
-'val'
+>>> default_if_none(u"val", u"default")
+u'val'
 
->>> default_if_none(None, "default")
-'default'
+>>> default_if_none(None, u"default")
+u'default'
 
->>> default_if_none('', "default")
-''
+>>> default_if_none(u'', u"default")
+u''
 
 >>> divisibleby(4, 2)
 True
@@ -313,139 +313,139 @@ True
 False
 
 >>> yesno(True)
-'yes'
+u'yes'
 
 >>> yesno(False)
-'no'
+u'no'
 
 >>> yesno(None)
-'maybe'
+u'maybe'
 
->>> yesno(True, 'certainly,get out of town,perhaps')
-'certainly'
+>>> yesno(True, u'certainly,get out of town,perhaps')
+u'certainly'
 
->>> yesno(False, 'certainly,get out of town,perhaps')
-'get out of town'
+>>> yesno(False, u'certainly,get out of town,perhaps')
+u'get out of town'
 
->>> yesno(None, 'certainly,get out of town,perhaps')
-'perhaps'
+>>> yesno(None, u'certainly,get out of town,perhaps')
+u'perhaps'
 
->>> yesno(None, 'certainly,get out of town')
-'get out of town'
+>>> yesno(None, u'certainly,get out of town')
+u'get out of town'
 
 >>> filesizeformat(1023)
-'1023 bytes'
+u'1023 bytes'
 
 >>> filesizeformat(1024)
-'1.0 KB'
+u'1.0 KB'
 
 >>> filesizeformat(10*1024)
-'10.0 KB'
+u'10.0 KB'
 
 >>> filesizeformat(1024*1024-1)
-'1024.0 KB'
+u'1024.0 KB'
 
 >>> filesizeformat(1024*1024)
-'1.0 MB'
+u'1.0 MB'
 
 >>> filesizeformat(1024*1024*50)
-'50.0 MB'
+u'50.0 MB'
 
 >>> filesizeformat(1024*1024*1024-1)
-'1024.0 MB'
+u'1024.0 MB'
 
 >>> filesizeformat(1024*1024*1024)
-'1.0 GB'
+u'1.0 GB'
 
 >>> pluralize(1)
-''
+u''
 
 >>> pluralize(0)
-'s'
+u's'
 
 >>> pluralize(2)
-'s'
+u's'
 
 >>> pluralize([1])
-''
+u''
 
 >>> pluralize([])
-'s'
+u's'
 
 >>> pluralize([1,2,3])
-'s'
+u's'
 
->>> pluralize(1,'es')
-''
+>>> pluralize(1,u'es')
+u''
 
->>> pluralize(0,'es')
-'es'
+>>> pluralize(0,u'es')
+u'es'
 
->>> pluralize(2,'es')
-'es'
+>>> pluralize(2,u'es')
+u'es'
 
->>> pluralize(1,'y,ies')
-'y'
+>>> pluralize(1,u'y,ies')
+u'y'
 
->>> pluralize(0,'y,ies')
-'ies'
+>>> pluralize(0,u'y,ies')
+u'ies'
 
->>> pluralize(2,'y,ies')
-'ies'
+>>> pluralize(2,u'y,ies')
+u'ies'
 
->>> pluralize(0,'y,ies,error')
-''
+>>> pluralize(0,u'y,ies,error')
+u''
 
->>> phone2numeric('0800 flowers')
-'0800 3569377'
+>>> phone2numeric(u'0800 flowers')
+u'0800 3569377'
 
 # Filters shouldn't break if passed non-strings
 >>> addslashes(123)
-'123'
+u'123'
 >>> linenumbers(123)
-'1. 123'
+u'1. 123'
 >>> lower(123)
-'123'
+u'123'
 >>> make_list(123)
-['1', '2', '3']
+[u'1', u'2', u'3']
 >>> slugify(123)
-'123'
+u'123'
 >>> title(123)
-'123'
+u'123'
 >>> truncatewords(123, 2)
-'123'
+u'123'
 >>> upper(123)
-'123'
+u'123'
 >>> urlencode(123)
-'123'
+u'123'
 >>> urlize(123)
-'123'
+u'123'
 >>> urlizetrunc(123, 1)
-'123'
+u'123'
 >>> wordcount(123)
 1
 >>> wordwrap(123, 2)
-'123'
+u'123'
 >>> ljust('123', 4)
-'123 '
+u'123 '
 >>> rjust('123', 4)
-' 123'
+u' 123'
 >>> center('123', 5)
-' 123 '
+u' 123 '
 >>> center('123', 6)
-' 123  '
+u' 123  '
 >>> cut(123, '2')
-'13'
+u'13'
 >>> escape(123)
-'123'
+u'123'
 >>> linebreaks(123)
-'<p>123</p>'
+u'<p>123</p>'
 >>> linebreaksbr(123)
-'123'
+u'123'
 >>> removetags(123, 'a')
-'123'
+u'123'
 >>> striptags(123)
-'123'
+u'123'
 
 """
 

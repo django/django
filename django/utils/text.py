@@ -1,6 +1,6 @@
 import re
-
 from django.conf import settings
+from django.utils.encoding import smart_unicode
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and x[0].upper() + x[1:]
@@ -10,6 +10,7 @@ def wrap(text, width):
     A word-wrap function that preserves existing line breaks and most spaces in
     the text. Expects that existing line breaks are posix newlines.
     """
+    text = smart_unicode(text)
     def _generator():
         it = iter(text.split(' '))
         word = it.next()
@@ -29,26 +30,29 @@ def wrap(text, width):
                 if len(lines) > 1:
                     pos = len(lines[-1])
             yield word
-    return "".join(_generator())
+    return u''.join(_generator())
 
 def truncate_words(s, num):
     "Truncates a string after a certain number of words."
+    s = smart_unicode(s)
     length = int(num)
     words = s.split()
     if len(words) > length:
         words = words[:length]
         if not words[-1].endswith('...'):
             words.append('...')
-    return ' '.join(words)
+    return u' '.join(words)
 
 def truncate_html_words(s, num):
     """
-    Truncates html to a certain number of words (not counting tags and comments).
-    Closes opened tags if they were correctly closed in the given html.
+    Truncates html to a certain number of words (not counting tags and
+    comments). Closes opened tags if they were correctly closed in the given
+    html.
     """
+    s = smart_unicode(s)
     length = int(num)
     if length <= 0:
-        return ''
+        return u''
     html4_singlets = ('br', 'col', 'link', 'base', 'img', 'param', 'area', 'hr', 'input')
     # Set up regular expressions
     re_words = re.compile(r'&.*?;|<.*?>|([A-Za-z0-9][\w-]*)')
@@ -110,10 +114,10 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = s.strip().replace(' ', '_')
+    s = smart_unicode(s).strip().replace(' ', '_')
     return re.sub(r'[^-A-Za-z0-9_.]', '', s)
 
-def get_text_list(list_, last_word='or'):
+def get_text_list(list_, last_word=u'or'):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
@@ -126,22 +130,18 @@ def get_text_list(list_, last_word='or'):
     >>> get_text_list([])
     ''
     """
-    if len(list_) == 0: return ''
-    if len(list_) == 1: return list_[0]
-    return '%s %s %s' % (', '.join([str(i) for i in list_][:-1]), last_word, list_[-1])
+    if len(list_) == 0: return u''
+    if len(list_) == 1: return smart_unicode(list_[0])
+    return u'%s %s %s' % (', '.join([smart_unicode(i) for i in list_][:-1]), smart_unicode(last_word), smart_unicode(list_[-1]))
 
 def normalize_newlines(text):
-    return re.sub(r'\r\n|\r|\n', '\n', text)
+    return smart_unicode(re.sub(r'\r\n|\r|\n', '\n', text))
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
-#     capwords = ()
-    text = text.lower()
+    text = smart_unicode(text).lower()
     capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
-#     for capword in capwords:
-#         capwordRE = re.compile(r'\b%s\b' % capword, re.I)
-#         text = capwordRE.sub(capword, text)
     return text
 
 def phone2numeric(phone):
@@ -172,7 +172,7 @@ def javascript_quote(s, quote_double_quotes=False):
         return r"\u%04x" % ord(match.group(1))
 
     if type(s) == str:
-        s = s.decode(settings.DEFAULT_CHARSET)
+        s = s.decode('utf-8')
     elif type(s) != unicode:
         raise TypeError, s
     s = s.replace('\\', '\\\\')
@@ -195,6 +195,7 @@ def smart_split(text):
     >>> list(smart_split('This is "a person\'s" test.'))
     ['This', 'is', '"a person\'s"', 'test.']
     """
+    text = smart_unicode(text)
     for bit in smart_split_re.finditer(text):
         bit = bit.group(0)
         if bit[0] == '"' and bit[-1] == '"':

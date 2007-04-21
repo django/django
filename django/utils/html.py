@@ -25,7 +25,7 @@ del x # Temporary variable
 def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
     if not isinstance(html, basestring):
-        html = str(html)
+        html = smart_unicode(html)
     return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 
 def linebreaks(value):
@@ -33,7 +33,7 @@ def linebreaks(value):
     value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
     paras = re.split('\n{2,}', value)
     paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
-    return '\n\n'.join(paras)
+    return u'\n\n'.join(paras)
 
 def strip_tags(value):
     "Returns the given HTML with all tags stripped"
@@ -80,7 +80,7 @@ def urlize(text, trim_url_limit=None, nofollow=False):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
                 words[i] = lead + middle + trail
-    return ''.join(words)
+    return u''.join(words)
 
 def clean_html(text):
     """
@@ -108,7 +108,7 @@ def clean_html(text):
         s = match.group().replace('</p>', '</li>')
         for d in DOTS:
             s = s.replace('<p>%s' % d, '<li>')
-        return '<ul>\n%s\n</ul>' % s
+        return u'<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
     text = trailing_empty_content_re.sub('', text)
