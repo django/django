@@ -265,6 +265,7 @@ class Templates(unittest.TestCase):
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
+            'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
@@ -659,6 +660,9 @@ class Templates(unittest.TestCase):
             ### WITH TAG ########################################################
             'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
             'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
+
+            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
 
             ### NOW TAG ########################################################
             # Simple case

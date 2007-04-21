@@ -124,7 +124,7 @@ It worked!
 
     Full docs for the development server are at `django-admin documentation`_.
 
-.. _django-admin documentation: ../django_admin/
+.. _django-admin documentation: ../django-admin/
 
 Database setup
 --------------
@@ -382,7 +382,7 @@ If you're interested, also run the following commands:
       statements for this app.
 
     * ``python manage.py sqlall polls`` -- A combination of all the SQL from
-      the 'sql', 'sqlinitialdata', and 'sqlindexes' commands.
+      the 'sql', 'sqlcustom', and 'sqlindexes' commands.
 
 Looking at the output of those commands can help you understand what's actually
 happening under the hood.
@@ -400,7 +400,7 @@ as you like, and it will only ever create the tables that don't exist.
 Read the `django-admin.py documentation`_ for full information on what the
 ``manage.py`` utility can do.
 
-.. _django-admin.py documentation: ../django_admin/
+.. _django-admin.py documentation: ../django-admin/
 
 Playing with the API
 ====================
@@ -578,4 +578,4 @@ When you're comfortable with the API, read `part 2 of this tutorial`_ to get
 Django's automatic admin working.
 
 .. _Database API reference: ../db_api/
-.. _part 2 of this tutorial: ../tutorial2/
+.. _part 2 of this tutorial: ../tutorial02/

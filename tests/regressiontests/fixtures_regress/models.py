@@ -7,6 +7,13 @@ class Animal(models.Model):
     def __str__(self):
         return self.common_name    
 
+class Plant(models.Model):
+    name = models.CharField(maxlength=150)
+
+    class Meta:
+        # For testing when upper case letter in app name; regression for #4057
+        db_table = "Fixtures_regress_plant"
+
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
 

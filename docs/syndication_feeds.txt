@@ -114,6 +114,9 @@ Note:
       `object-relational mapper`_, ``items()`` doesn't have to return model
       instances. Although you get a few bits of functionality "for free" by
       using Django models, ``items()`` can return any type of object you want.
+    * If you're creating an Atom feed, rather than an RSS feed, set the
+      ``subtitle`` attribute instead of the ``description`` attribute. See
+      `Publishing Atom and RSS feeds in tandem`_, later, for an example.
 
 One thing's left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 ``<link>`` and ``<description>``. We need to tell the framework what data to
@@ -298,7 +301,7 @@ Publishing Atom and RSS feeds in tandem
 ---------------------------------------
 
 Some developers like to make available both Atom *and* RSS versions of their
-feeds. That's easy to do with Django: Just create a subclass of your ``feed``
+feeds. That's easy to do with Django: Just create a subclass of your ``Feed``
 class and set the ``feed_type`` to something different. Then update your
 URLconf to add the extra versions.
 
@@ -318,6 +321,20 @@ Here's a full example::
 
     class AtomSiteNewsFeed(RssSiteNewsFeed):
         feed_type = Atom1Feed
+        subtitle = RssSiteNewsFeed.description
+
+.. Note::
+    In this example, the RSS feed uses a ``description`` while the Atom feed
+    uses a ``subtitle``. That's because Atom feeds don't provide for a
+    feed-level "description," but they *do* provide for a "subtitle."
+
+    If you provide a ``description`` in your ``Feed`` class, Django will *not*
+    automatically put that into the ``subtitle`` element, because a subtitle
+    and description are not necessarily the same thing. Instead, you should
+    define a ``subtitle`` attribute.
+
+    In the above example, we simply set the Atom feed's ``subtitle`` to the
+    RSS feed's ``description``, because it's quite short already.
 
 And the accompanying URLconf::
 

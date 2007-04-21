@@ -70,6 +70,7 @@ class Feed(object):
 
         feed = self.feed_type(
             title = self.__get_dynamic_attr('title', obj),
+            subtitle = self.__get_dynamic_attr('subtitle', obj),
             link = link,
             description = self.__get_dynamic_attr('description', obj),
             language = settings.LANGUAGE_CODE.decode(),

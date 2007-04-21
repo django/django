@@ -66,8 +66,10 @@ class CommonMiddleware(object):
                 path = request.get_full_path()
                 if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
                     ua = request.META.get('HTTP_USER_AGENT', '<none>')
+                    ip = request.META.get('REMOTE_ADDR', '<none>')
                     mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\n" % (referer, request.get_full_path(), ua))
+                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" \
+                                  % (referer, request.get_full_path(), ua, ip))
                 return response
 
         # Use ETags, if requested.

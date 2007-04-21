@@ -278,7 +278,7 @@ How do I get started?
 
 .. _`Download the code`: http://www.djangoproject.com/download/
 .. _`installation guide`: ../install/
-.. _tutorial:  ../tutorial1/
+.. _tutorial:  ../tutorial01/
 .. _documentation: ../
 .. _ask questions: http://www.djangoproject.com/community/
 
