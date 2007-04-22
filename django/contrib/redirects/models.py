@@ -20,5 +20,5 @@ class Redirect(models.Model):
         list_filter = ('site',)
         search_fields = ('old_path', 'new_path')
 
-    def __str__(self):
-        return "%s ---> %s" % (self.old_path, self.new_path)
+    def __unicode__(self):
+        return u"%s ---> %s" % (self.old_path, self.new_path)

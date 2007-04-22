@@ -19,5 +19,5 @@ class Site(models.Model):
         list_display = ('domain', 'name')
         search_fields = ('domain', 'name')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.domain

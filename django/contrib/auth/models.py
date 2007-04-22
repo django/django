@@ -45,8 +45,8 @@ class Permission(models.Model):
         unique_together = (('content_type', 'codename'),)
         ordering = ('content_type', 'codename')
 
-    def __str__(self):
-        return "%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
+    def __unicode__(self):
+        return u"%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -66,7 +66,7 @@ class Group(models.Model):
     class Admin:
         search_fields = ('name',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class UserManager(models.Manager):
@@ -122,7 +122,7 @@ class User(models.Model):
         list_filter = ('is_staff', 'is_superuser')
         search_fields = ('username', 'first_name', 'last_name', 'email')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.username
 
     def get_absolute_url(self):
@@ -262,7 +262,7 @@ class Message(models.Model):
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))
 
-    def __str__(self):
+    def __unicode__(self):
         return self.message
 
 class AnonymousUser(object):
@@ -272,8 +272,8 @@ class AnonymousUser(object):
     def __init__(self):
         pass
 
-    def __str__(self):
-        return 'AnonymousUser'
+    def __unicode__(self):
+        return u'AnonymousUser'
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
