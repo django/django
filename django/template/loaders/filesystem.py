@@ -14,7 +14,7 @@ def load_template_source(template_name, template_dirs=None):
     tried = []
     for filepath in get_template_sources(template_name, template_dirs):
         try:
-            return (open(filepath).read(), filepath)
+            return (open(filepath).read().decode(settings.FILE_CHARSET), filepath)
         except IOError:
             tried.append(filepath)
     if tried:

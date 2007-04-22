@@ -379,11 +379,11 @@ def get_custom_sql_for_model(model):
     for sql_file in sql_files:
         if os.path.exists(sql_file):
             fp = open(sql_file, 'U')
-            for statement in statements.split(fp.read()):
+            for statement in statements.split(fp.read().decode(settings.FILE_CHARSET)):
                 # Remove any comments from the file
-                statement = re.sub(r"--.*[\n\Z]", "", statement)
+                statement = re.sub(ur"--.*[\n\Z]", "", statement)
                 if statement.strip():
-                    output.append(statement + ";")
+                    output.append(statement + u";")
             fp.close()
 
     return output

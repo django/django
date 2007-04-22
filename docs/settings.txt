@@ -426,6 +426,14 @@ Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+FILE_CHARSET
+------------
+
+Default: ``'utf-8'``
+
+The character encoding used to decode any files read from disk. This includes
+template files and initial SQL data files.
+
 FIXTURE_DIRS
 -------------
 
