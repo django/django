@@ -86,6 +86,8 @@ class Model(object):
         return '<%s: %s>' % (self.__class__.__name__, self)
 
     def __str__(self):
+        if hasattr(self, '__unicode__'):
+            return unicode(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
