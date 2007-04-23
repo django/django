@@ -332,7 +332,9 @@ class NullBooleanField(BooleanField):
         return {True: True, False: False}.get(value, None)
 
 class ChoiceField(Field):
-    def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None, help_text=None):
+    widget = Select
+
+    def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None):
         super(ChoiceField, self).__init__(required, widget, label, initial, help_text)
         self.choices = choices
 
@@ -364,9 +366,7 @@ class ChoiceField(Field):
 
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
-
-    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None, help_text=None):
-        super(MultipleChoiceField, self).__init__(choices, required, widget, label, initial, help_text)
+    widget = SelectMultiple
 
     def clean(self, value):
         """

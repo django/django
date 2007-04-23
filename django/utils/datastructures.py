@@ -211,7 +211,7 @@ class MultiValueDict(dict):
     def update(self, *args, **kwargs):
         "update() extends rather than replaces existing key lists. Also accepts keyword args."
         if len(args) > 1:
-            raise TypeError, "update expected at most 1 arguments, got %d", len(args)
+            raise TypeError, "update expected at most 1 arguments, got %d" % len(args)
         if args:
             other_dict = args[0]
             if isinstance(other_dict, MultiValueDict):

@@ -41,7 +41,10 @@ class FilterNode(Node):
     def render(self, context):
         output = self.nodelist.render(context)
         # apply filters
-        return self.filter_expr.resolve(Context({'var': output}))
+        context.update({'var': output})
+        filtered = self.filter_expr.resolve(context)
+        context.pop()
+        return filtered
 
 class FirstOfNode(Node):
     def __init__(self, vars):
@@ -990,7 +993,7 @@ def do_with(parser, token):
     """
     Add a value to the context (inside of this block) for caching and easy
     access.
-    
+
     For example::
 
         {% with person.some_sql_method as total %}
@@ -999,7 +1002,7 @@ def do_with(parser, token):
     """
     bits = list(token.split_contents())
     if len(bits) != 4 or bits[2] != "as":
-        raise TemplateSyntaxError, "%r expected format is 'value as name'" % tagname
+        raise TemplateSyntaxError, "%r expected format is 'value as name'" % bits[0]
     var = parser.compile_filter(bits[1])
     name = bits[3]
     nodelist = parser.parse(('endwith',))
