@@ -260,8 +260,8 @@ class RadioSelect(Select):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
         str_value = smart_unicode(value) # Normalize to string.
-        attrs = attrs or {}
-        return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
+        final_attrs = self.build_attrs(attrs)
+        return RadioFieldRenderer(name, str_value, final_attrs, list(chain(self.choices, choices)))
 
     def id_for_label(self, id_):
         # RadioSelect is represented by multiple <input type="radio"> fields,
@@ -327,13 +327,24 @@ class MultiWidget(Widget):
         if not isinstance(value, list):
             value = self.decompress(value)
         output = []
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
         for i, widget in enumerate(self.widgets):
             try:
                 widget_value = value[i]
-            except KeyError:
+            except IndexError:
                 widget_value = None
-            output.append(widget.render(name + '_%s' % i, widget_value, attrs))
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         return self.format_output(output)
+
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, name):
         return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]

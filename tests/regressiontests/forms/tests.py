@@ -658,9 +658,30 @@ Traceback (most recent call last):
 ...
 IndexError: list index out of range
 
+# Unicode choices are correctly rendered as HTML
 >>> w = RadioSelect()
 >>> unicode(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]))
 u'<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+
+# Attributes provided at instantiation are passed to the constituent inputs
+>>> w = RadioSelect(attrs={'id':'foo'})
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label></li>
+<li><label><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
+<li><label><input type="radio" id="foo_2" value="G" name="beatle" /> George</label></li>
+<li><label><input type="radio" id="foo_3" value="R" name="beatle" /> Ringo</label></li>
+</ul>
+
+# Attributes provided at render-time are passed to the constituent inputs
+>>> w = RadioSelect()
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), attrs={'id':'bar'})
+<ul>
+<li><label><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></li>
+<li><label><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
+<li><label><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
+<li><label><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
+</ul>
 
 # CheckboxSelectMultiple Widget ###############################################
 
@@ -783,6 +804,11 @@ u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li
 u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
 >>> w.render('name', 'john__lennon')
 u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
+>>> w.render('name', 'john__lennon', attrs={'id':'foo'})
+u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><input id="foo_1" type="text" class="small" value="lennon" name="name_1" />'
+>>> w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
+>>> w.render('name', ['john', 'lennon'])
+u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
 
 # SplitDateTimeWidget #########################################################
 
