@@ -66,6 +66,6 @@ Redirects are represented by a standard `Django model`_, which lives in
 `django/contrib/redirects/models.py`_. You can access redirect
 objects via the `Django database API`_.
 
-.. _Django model: ../model_api/
+.. _Django model: ../model-api/
 .. _django/contrib/redirects/models.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/redirects/models.py
-.. _Django database API: ../db_api/
+.. _Django database API: ../db-api/

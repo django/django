@@ -512,7 +512,7 @@ type, create an initial data file and put something like this in it::
 As explained in the `SQL initial data file`_ documentation, this SQL file can
 contain arbitrary SQL, so you can make any sorts of changes you need to make.
 
-.. _SQL initial data file: ../model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model-api/#providing-initial-sql-data
 
 Why is Django leaking memory?
 -----------------------------

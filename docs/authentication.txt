@@ -144,7 +144,7 @@ custom methods:
       Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
       doesn't allow profiles.
 
-.. _Django model: ../model_api/
+.. _Django model: ../model-api/
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
 Manager functions
@@ -757,7 +757,7 @@ This example model creates three custom permissions::
 The only thing this does is create those extra permissions when you run
 ``syncdb``.
 
-.. _model Meta attribute: ../model_api/#meta-options
+.. _model Meta attribute: ../model-api/#meta-options
 
 API reference
 -------------
