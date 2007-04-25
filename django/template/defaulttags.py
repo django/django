@@ -956,6 +956,7 @@ def url(parser, token):
         for arg in bits[2].split(','):
             if '=' in arg:
                 k, v = arg.split('=', 1)
+                k = k.strip()
                 kwargs[k] = parser.compile_filter(v)
             else:
                 args.append(parser.compile_filter(arg))

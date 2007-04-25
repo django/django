@@ -17,6 +17,7 @@ except ImportError:
     mx = None
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 # We need to use a special Cursor class because adodbapi expects question-mark
 # param style, but Django expects "%s". This cursor converts question marks to

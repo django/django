@@ -93,6 +93,7 @@ All attributes except ``session`` should be considered read-only.
         * ``CONTENT_TYPE``
         * ``HTTP_ACCEPT_ENCODING``
         * ``HTTP_ACCEPT_LANGUAGE``
+        * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
         * ``HTTP_REFERER`` -- The referring page, if any.
         * ``HTTP_USER_AGENT`` -- The client's user-agent string.
         * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.

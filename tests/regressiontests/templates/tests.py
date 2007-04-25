@@ -694,7 +694,7 @@ class Templates(unittest.TestCase):
             ### URL TAG ########################################################
             # Successes
             'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
-            'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04' : ('{% url named-client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
 

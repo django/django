@@ -691,5 +691,5 @@ fails. If no message is passed in, a default message is used.
     document for more details).
 
 .. _`generic views`: ../generic_views/
-.. _`models API`: ../model_api/
+.. _`models API`: ../model-api/
 .. _settings: ../settings/

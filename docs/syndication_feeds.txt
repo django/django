@@ -159,7 +159,7 @@ put into those elements.
              {{ obj.description }}
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
-.. _object-relational mapper: ../db_api/
+.. _object-relational mapper: ../db-api/
 .. _Django templates: ../templates/
 
 A complex example

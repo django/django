@@ -16,6 +16,7 @@ import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 django_conversions = conversions.copy()
 django_conversions.update({

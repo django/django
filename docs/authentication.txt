@@ -144,7 +144,7 @@ custom methods:
       Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
       doesn't allow profiles.
 
-.. _Django model: ../model_api/
+.. _Django model: ../model-api/
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
 
 Manager functions
@@ -204,9 +204,11 @@ The ``password`` attribute of a ``User`` object is a string in this format::
 
 That's hashtype, salt and hash, separated by the dollar-sign character.
 
-Hashtype is either ``sha1`` (default) or ``md5`` -- the algorithm used to
-perform a one-way hash of the password. Salt is a random string used to salt
-the raw password to create the hash.
+Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
+used to perform a one-way hash of the password. Salt is a random string used
+to salt the raw password to create the hash. Note that the ``crypt`` method is
+only supported on platforms that have the standard Python ``crypt`` module
+available.
 
 For example::
 
@@ -387,14 +389,15 @@ introduced in Python 2.4::
 
 ``login_required`` does the following:
 
-    * If the user isn't logged in, redirect to ``/accounts/login/``, passing
-      the current absolute URL in the query string as ``next``. For example:
+    * If the user isn't logged in, redirect to ``settings.LOGIN_URL``
+      (``/accounts/login/`` by default), passing the current absolute URL
+      in the query string as ``next``. For example:
       ``/accounts/login/?next=/polls/3/``.
     * If the user is logged in, execute the view normally. The view code is
       free to assume the user is logged in.
 
-Note that you'll need to map the appropriate Django view to ``/accounts/login/``.
-To do this, add the following line to your URLconf::
+Note that you'll need to map the appropriate Django view to ``settings.LOGIN_URL``.
+For example, using the defaults, add the following line to your URLconf::
 
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
 
@@ -405,9 +408,9 @@ Here's what ``django.contrib.auth.views.login`` does:
 
     * If called via ``POST``, it tries to log the user in. If login is
       successful, the view redirects to the URL specified in ``next``. If
-      ``next`` isn't provided, it redirects to ``/accounts/profile/`` (which is
-      currently hard-coded). If login isn't successful, it redisplays the login
-      form.
+      ``next`` isn't provided, it redirects to ``settings.LOGIN_REDIRECT_URL``
+      (which defaults to ``/accounts/profile/``). If login isn't successful,
+      it redisplays the login form.
 
 It's your responsibility to provide the login form in a template called
 ``registration/login.html`` by default. This template gets passed three
@@ -487,7 +490,7 @@ Logs a user out, then redirects to the login page.
 **Optional arguments:**
 
     * ``login_url``: The URL of the login page to redirect to. This
-      will default to ``/accounts/login/`` if not supplied.
+      will default to ``settings.LOGIN_URL`` if not supplied.
 
 ``django.contrib.auth.views.password_change``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -569,7 +572,7 @@ successful login.
 **Optional arguments:**
 
     * ``login_url``: The URL of the login page to redirect to. This
-      will default to ``/accounts/login/`` if not supplied.
+      will default to ``settings.LOGIN_URL`` if not supplied.
 
 Built-in manipulators
 ---------------------
@@ -636,7 +639,7 @@ Note that ``user_passes_test`` does not automatically check that the ``User``
 is not anonymous.
 
 ``user_passes_test()`` takes an optional ``login_url`` argument, which lets you
-specify the URL for your login page (``/accounts/login/`` by default).
+specify the URL for your login page (``settings.LOGIN_URL`` by default).
 
 Example in Python 2.3 syntax::
 
@@ -680,7 +683,7 @@ parameter. Example::
     my_view = permission_required('polls.can_vote', login_url='/loginpage/')(my_view)
 
 As in the ``login_required`` decorator, ``login_url`` defaults to
-``'/accounts/login/'``.
+``settings.LOGIN_URL``.
 
 Limiting access to generic views
 --------------------------------
@@ -757,7 +760,7 @@ This example model creates three custom permissions::
 The only thing this does is create those extra permissions when you run
 ``syncdb``.
 
-.. _model Meta attribute: ../model_api/#meta-options
+.. _model Meta attribute: ../model-api/#meta-options
 
 API reference
 -------------

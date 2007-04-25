@@ -16,6 +16,7 @@ from django.utils.datastructures import SortedDict
 
 
 DatabaseError = Database.Error
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+

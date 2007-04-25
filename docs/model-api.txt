@@ -194,14 +194,23 @@ This doesn't accept ``maxlength``; its ``maxlength`` is automatically set to
 ``FileField``
 ~~~~~~~~~~~~~
 
-A file-upload field.
+A file-upload field. Has one **required** argument:
 
-Has an extra required argument, ``upload_to``, a local filesystem path to
-which files should be upload. This path may contain `strftime formatting`_,
-which will be replaced by the date/time of the file upload (so that
-uploaded files don't fill up the given directory).
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``upload_to``           A local filesystem path that will be appended to
+                            your ``MEDIA_ROOT`` setting to determine the
+                            output of the ``get_<fieldname>_url()`` helper
+                            function.
+    ======================  ===================================================
 
-The admin represents this as an ``<input type="file">`` (a file-upload widget).
+This path may contain `strftime formatting`_, which will be replaced by the
+date/time of the file upload (so that uploaded files don't fill up the given
+directory).
+
+The admin represents this field as an ``<input type="file">`` (a file-upload
+widget).
 
 Using a ``FileField`` or an ``ImageField`` (see below) in a model takes a few
 steps:
@@ -246,7 +255,7 @@ visiting its URL on your site. Don't allow that.
 
 A field whose choices are limited to the filenames in a certain directory
 on the filesystem. Has three special arguments, of which the first is
-required:
+**required**:
 
     ======================  ===================================================
     Argument                Description

@@ -100,14 +100,14 @@ change:
      
 .. _caching: ../cache/
 .. _custom template tags and libraries: ../templates_python/
-.. _database lookup: ../db_api/
+.. _database lookup: ../db-api/
 .. _django-admin utility: ../django-admin/
 .. _fastcgi integration: ../fastcgi/
 .. _flatpages: ../flatpages/
 .. _generic views: ../generic_views/
 .. _internationalization: ../i18n/
 .. _legacy database integration: ../legacy_databases/
-.. _model definition: ../model_api/
+.. _model definition: ../model-api/
 .. _mod_python integration: ../modpython/
 .. _redirects: ../redirects/
 .. _request/response objects: ../request_response/

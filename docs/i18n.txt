@@ -175,7 +175,7 @@ class, though::
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _Django models: ../model_api/
+.. _Django models: ../model-api/
 
 Pluralization
 ~~~~~~~~~~~~~
