@@ -99,6 +99,13 @@ class SortedDict(dict):
         obj.keyOrder = self.keyOrder
         return obj
 
+    def __repr__(self):
+        """
+        Replaces the normal dict.__repr__ with a version that returns the keys
+        in their sorted order.
+        """
+        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
+
 class MultiValueDictKeyError(KeyError):
     pass
 

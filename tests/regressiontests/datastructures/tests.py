@@ -52,6 +52,8 @@
 'not one'
 >>> d.keys() == d.copy().keys()
 True
+>>> print repr(d)
+{'one': 'not one', 'two': 'two', 'three': 'three'}
 
 ### DotExpandedDict ############################################################
 
