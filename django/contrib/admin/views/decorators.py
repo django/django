@@ -90,8 +90,6 @@ def staff_member_required(view_func):
             if user.is_active and user.is_staff:
                 login(request, user)
                 # TODO: set last_login with an event.
-                user.last_login = datetime.datetime.now()
-                user.save()
                 if request.POST.has_key('post_data'):
                     post_data = _decode_post_data(request.POST['post_data'])
                     if post_data and not post_data.has_key(LOGIN_FORM_KEY):

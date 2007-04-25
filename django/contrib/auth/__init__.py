@@ -1,3 +1,4 @@
+import datetime
 from django.core.exceptions import ImproperlyConfigured
 
 SESSION_KEY = '_auth_user_id'
@@ -48,6 +49,8 @@ def login(request, user):
     if user is None:
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
+    user.last_login = datetime.datetime.now()
+    user.save()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
 
