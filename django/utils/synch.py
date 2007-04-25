@@ -1,6 +1,6 @@
 """
 Synchronization primitives:
-    
+
     - reader-writer lock (preference to writers)
 
 (Contributed to Django by eugene@lazutkin.com)
@@ -14,17 +14,16 @@ except ImportError:
 class RWLock:
     """
     Classic implementation of reader-writer lock with preference to writers.
-    
+
     Readers can access a resource simultaneously.
     Writers get an exclusive access.
-    
+
     API is self-descriptive:
         reader_enters()
         reader_leaves()
         writer_enters()
         writer_leaves()
     """
-    
     def __init__(self):
         self.mutex     = threading.RLock()
         self.can_read  = threading.Semaphore(0)
@@ -33,7 +32,7 @@ class RWLock:
         self.active_writers  = 0
         self.waiting_readers = 0
         self.waiting_writers = 0
-        
+
     def reader_enters(self):
         self.mutex.acquire()
         try:
@@ -45,7 +44,7 @@ class RWLock:
         finally:
             self.mutex.release()
         self.can_read.acquire()
-        
+
     def reader_leaves(self):
         self.mutex.acquire()
         try:
@@ -56,7 +55,7 @@ class RWLock:
                 self.can_write.release()
         finally:
             self.mutex.release()
-    
+
     def writer_enters(self):
         self.mutex.acquire()
         try:
@@ -68,7 +67,7 @@ class RWLock:
         finally:
             self.mutex.release()
         self.can_write.acquire()
-        
+
     def writer_leaves(self):
         self.mutex.acquire()
         try:
