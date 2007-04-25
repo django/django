@@ -105,9 +105,11 @@ class Serializer(object):
 
     def getvalue(self):
         """
-        Return the fully serialized queryset.
+        Return the fully serialized queryset (or None if the output stream is
+        not seekable).
         """
-        return self.stream.getvalue()
+        if callable(getattr(self.stream, 'getvalue', None)):
+            return self.stream.getvalue()
 
 class Deserializer(object):
     """
