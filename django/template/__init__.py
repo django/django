@@ -123,10 +123,10 @@ class VariableDoesNotExist(Exception):
     def __init__(self, msg, params=()):
         self.msg = msg
         self.params = params
-    
+
     def __str__(self):
         return self.msg % self.params
-    
+
 class InvalidTemplateLibrary(Exception):
     pass
 
@@ -555,7 +555,7 @@ class FilterExpression(object):
                 filters.append( (filter_func,args))
                 upto = match.end()
         if upto != len(token):
-            raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
+            raise TemplateSyntaxError, "Could not parse the remainder: '%s' from '%s'" % (token[upto:], token)
         self.var, self.filters = var, filters
 
     def resolve(self, context, ignore_failures=False):
