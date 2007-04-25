@@ -2,7 +2,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
-LOGIN_URL = '/accounts/login/'
 REDIRECT_FIELD_NAME = 'next'
 
 def load_backend(path):

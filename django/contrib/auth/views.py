@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.contrib.sites.models import Site
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import LOGIN_URL, REDIRECT_FIELD_NAME
+from django.contrib.auth import REDIRECT_FIELD_NAME
 
 def login(request, template_name='registration/login.html'):
     "Displays the login form and handles the login action."
@@ -17,7 +17,8 @@ def login(request, template_name='registration/login.html'):
         if not errors:
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
-                redirect_to = '/accounts/profile/'
+                from django.conf import settings
+                redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login
             login(request, manipulator.get_user())
             request.session.delete_test_cookie()
@@ -41,12 +42,18 @@ def logout(request, next_page=None, template_name='registration/logged_out.html'
         # Redirect to this page until the session has been cleared.
         return HttpResponseRedirect(next_page or request.path)
 
-def logout_then_login(request, login_url=LOGIN_URL):
+def logout_then_login(request, login_url=None):
     "Logs out the user if he is logged in. Then redirects to the log-in page."
+    if not login_url:
+        from django.conf import settings
+        login_url = settings.LOGIN_URL
     return logout(request, login_url)
 
-def redirect_to_login(next, login_url=LOGIN_URL):
+def redirect_to_login(next, login_url=None):
     "Redirects the user to the login page, passing the given 'next' page"
+    if not login_url:
+        from django.conf import settings
+        login_url = settings.LOGIN_URL
     return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, next))
 
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',

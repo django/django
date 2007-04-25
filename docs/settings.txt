@@ -562,6 +562,21 @@ strings for translation, but the translation won't happen at runtime -- so
 you'll have to remember to wrap the languages in the *real* ``gettext()`` in
 any code that uses ``LANGUAGES`` at runtime.
 
+LOGIN_URL
+---------
+
+Default: ``'/accounts/login/'``
+
+The URL where requests are redirected for login, specially when using the
+`@login_required`_ decorator.
+
+LOGOUT_URL
+----------
+
+Default: ``'/accounts/logout/'``
+
+LOGIN_URL counterpart.
+
 MANAGERS
 --------
 
@@ -619,6 +634,16 @@ locales have different formats. For example, U.S. English would say
 
 See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
 TIME_FORMAT and YEAR_MONTH_FORMAT.
+
+LOGIN_REDIRECT_URL
+------------------
+
+Default: ``'/accounts/profile/'``
+
+The URL where requests are redirected after login when the
+``contrib.auth.login`` view gets no ``next`` parameter.
+
+This is used by the `@login_required`_ decorator, for example.
 
 PREPEND_WWW
 -----------
@@ -1011,6 +1036,8 @@ Also, it's an error to call ``configure()`` more than once, or to call
 
 It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
+
+.. _@login_required: ../authentication/#the-login-required-decorator
 
 Error reporting via e-mail
 ==========================
