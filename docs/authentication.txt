@@ -204,9 +204,11 @@ The ``password`` attribute of a ``User`` object is a string in this format::
 
 That's hashtype, salt and hash, separated by the dollar-sign character.
 
-Hashtype is either ``sha1`` (default) or ``md5`` -- the algorithm used to
-perform a one-way hash of the password. Salt is a random string used to salt
-the raw password to create the hash.
+Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
+used to perform a one-way hash of the password. Salt is a random string used
+to salt the raw password to create the hash. Note that the ``crypt`` method is
+only supported on platforms that have the standard Python ``crypt`` module
+available.
 
 For example::
 

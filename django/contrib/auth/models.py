@@ -17,6 +17,12 @@ def check_password(raw_password, enc_password):
     elif algo == 'sha1':
         import sha
         return hsh == sha.new(salt+raw_password).hexdigest()
+    elif algo == 'crypt':
+        try:
+            import crypt
+        except ImportError:
+            raise ValueError, "Crypt password algorithm not supported in this environment."
+        return hsh == crypt.crypt(raw_password, salt)
     raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
