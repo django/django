@@ -1,6 +1,7 @@
 """
 Chile specific form helpers.
 """
+
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
 from django.utils.translation import gettext
@@ -26,7 +27,7 @@ class CLRutField(RegexField):
 
     def clean(self, value):
         """
-        Check and clean the chilean rut.
+        Check and clean the Chilean RUT.
         """
         super(CLRutField, self).clean(value)
         if value in EMPTY_VALUES:
