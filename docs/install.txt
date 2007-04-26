@@ -52,8 +52,8 @@ Additionally, you'll need to make sure your Python database bindings are
 installed.
 
 * If you're using PostgreSQL, you'll need the psycopg_ package (version 2 is
-  recommended with ``postgresql_psycopg2`` backend, version 1.1 works also with the
-  ``postgresql``` backend). 
+  recommended with ``postgresql_psycopg2`` backend, version 1.1 works also
+  with the ``postgresql`` backend).
   
   If you're on Windows, check out the unofficial `compiled Windows version`_.
   
