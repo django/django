@@ -217,10 +217,10 @@ def post_comment(request):
     errors = manipulator.get_validation_errors(new_data)
     # If user gave correct username/password and wasn't already logged in, log them in
     # so they don't have to enter a username/password again.
-    if manipulator.get_user() and not manipulator.get_user().is_authenticated() and new_data.has_key('password') and manipulator.get_user().check_password(new_data['password']):
+    if manipulator.get_user() and not manipulator.get_user().is_authenticated() and 'password' in new_data and manipulator.get_user().check_password(new_data['password']):
         from django.contrib.auth import login
         login(request, manipulator.get_user())
-    if errors or request.POST.has_key('preview'):
+    if errors or 'preview' in request.POST:
         class CommentFormWrapper(oldforms.FormWrapper):
             def __init__(self, manipulator, new_data, errors, rating_choices):
                 oldforms.FormWrapper.__init__(self, manipulator, new_data, errors)
@@ -244,7 +244,7 @@ def post_comment(request):
             'rating_range': rating_range,
             'rating_choices': rating_choices,
         }, context_instance=RequestContext(request))
-    elif request.POST.has_key('post'):
+    elif 'post' in request.POST:
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
@@ -298,7 +298,7 @@ def post_free_comment(request):
     new_data['is_public'] = IS_PUBLIC in option_list
     manipulator = PublicFreeCommentManipulator()
     errors = manipulator.get_validation_errors(new_data)
-    if errors or request.POST.has_key('preview'):
+    if errors or 'preview' in request.POST:
         comment = errors and '' or manipulator.get_comment(new_data)
         return render_to_response('comments/free_preview.html', {
             'comment': comment,
@@ -307,7 +307,7 @@ def post_free_comment(request):
             'target': target,
             'hash': security_hash,
         }, context_instance=RequestContext(request))
-    elif request.POST.has_key('post'):
+    elif 'post' in request.POST:
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
@@ -330,7 +330,7 @@ def comment_was_posted(request):
             The object the comment was posted on
     """
     obj = None
-    if request.GET.has_key('c'):
+    if 'c' in request.GET:
         content_type_id, object_id = request.GET['c'].split(':')
         try:
             content_type = ContentType.objects.get(pk=content_type_id)

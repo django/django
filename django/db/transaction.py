@@ -46,12 +46,12 @@ def enter_transaction_management():
     when no current block is running).
     """
     thread_ident = thread.get_ident()
-    if state.has_key(thread_ident) and state[thread_ident]:
+    if thread_ident in state and state[thread_ident]:
         state[thread_ident].append(state[thread_ident][-1])
     else:
         state[thread_ident] = []
         state[thread_ident].append(settings.TRANSACTIONS_MANAGED)
-    if not dirty.has_key(thread_ident):
+    if thread_ident not in dirty:
         dirty[thread_ident] = False
 
 def leave_transaction_management():
@@ -61,7 +61,7 @@ def leave_transaction_management():
     those from outside. (Commits are on connection level.)
     """
     thread_ident = thread.get_ident()
-    if state.has_key(thread_ident) and state[thread_ident]:
+    if thread_ident in state and state[thread_ident]:
         del state[thread_ident][-1]
     else:
         raise TransactionManagementError("This code isn't under transaction management")
@@ -84,7 +84,7 @@ def set_dirty():
     changes waiting for commit.
     """
     thread_ident = thread.get_ident()
-    if dirty.has_key(thread_ident):
+    if thread_ident in dirty:
         dirty[thread_ident] = True
     else:
         raise TransactionManagementError("This code isn't under transaction management")
@@ -96,7 +96,7 @@ def set_clean():
     should happen.
     """
     thread_ident = thread.get_ident()
-    if dirty.has_key(thread_ident):
+    if thread_ident in dirty:
         dirty[thread_ident] = False
     else:
         raise TransactionManagementError("This code isn't under transaction management")
@@ -106,7 +106,7 @@ def is_managed():
     Checks whether the transaction manager is in manual or in auto state.
     """
     thread_ident = thread.get_ident()
-    if state.has_key(thread_ident):
+    if thread_ident in state:
         if state[thread_ident]:
             return state[thread_ident][-1]
     return settings.TRANSACTIONS_MANAGED

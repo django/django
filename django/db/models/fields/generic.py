@@ -37,7 +37,7 @@ class GenericForeignKey(object):
     def instance_pre_init(self, signal, sender, args, kwargs):
         # Handle initalizing an object with the generic FK instaed of 
         # content-type/object-id fields.        
-        if kwargs.has_key(self.name):
+        if self.name in kwargs:
             value = kwargs.pop(self.name)
             kwargs[self.ct_field] = self.get_content_type(value)
             kwargs[self.fk_field] = value._get_pk_val()

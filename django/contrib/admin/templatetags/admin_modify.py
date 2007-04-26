@@ -74,7 +74,7 @@ class FieldWidgetNode(template.Node):
         self.bound_field_var = bound_field_var
 
     def get_nodelist(cls, klass):
-        if not cls.nodelists.has_key(klass):
+        if klass not in cls.nodelists:
             try:
                 field_class_name = klass.__name__
                 template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)

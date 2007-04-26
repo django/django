@@ -12,7 +12,7 @@ LOGIN_FORM_KEY = 'this_is_the_login_form'
 
 def _display_login_form(request, error_message=''):
     request.session.set_test_cookie()
-    if request.POST and request.POST.has_key('post_data'):
+    if request.POST and 'post_data' in request.POST:
         # User has failed login BUT has previously saved post data.
         post_data = request.POST['post_data']
     elif request.POST:
@@ -48,7 +48,7 @@ def staff_member_required(view_func):
     def _checklogin(request, *args, **kwargs):
         if request.user.is_authenticated() and request.user.is_staff:
             # The user is valid. Continue to the admin page.
-            if request.POST.has_key('post_data'):
+            if 'post_data' in request.POST:
                 # User must have re-authenticated through a different window
                 # or tab.
                 request.POST = _decode_post_data(request.POST['post_data'])
@@ -57,7 +57,7 @@ def staff_member_required(view_func):
         assert hasattr(request, 'session'), "The Django admin requires session middleware to be installed. Edit your MIDDLEWARE_CLASSES setting to insert 'django.contrib.sessions.middleware.SessionMiddleware'."
 
         # If this isn't already the login page, display it.
-        if not request.POST.has_key(LOGIN_FORM_KEY):
+        if LOGIN_FORM_KEY not in request.POST:
             if request.POST:
                 message = _("Please log in again, because your session has expired. Don't worry: Your submission has been saved.")
             else:
@@ -90,9 +90,9 @@ def staff_member_required(view_func):
             if user.is_active and user.is_staff:
                 login(request, user)
                 # TODO: set last_login with an event.
-                if request.POST.has_key('post_data'):
+                if 'post_data' in request.POST:
                     post_data = _decode_post_data(request.POST['post_data'])
-                    if post_data and not post_data.has_key(LOGIN_FORM_KEY):
+                    if post_data and LOGIN_FORM_KEY not in post_data:
                         # overwrite request.POST with the saved post_data, and continue
                         request.POST = post_data
                         request.user = user

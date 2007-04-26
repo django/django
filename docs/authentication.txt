@@ -208,7 +208,8 @@ Hashtype is either ``sha1`` (default), ``md5`` or ``crypt`` -- the algorithm
 used to perform a one-way hash of the password. Salt is a random string used
 to salt the raw password to create the hash. Note that the ``crypt`` method is
 only supported on platforms that have the standard Python ``crypt`` module
-available.
+available, and ``crypt`` support is only available in the Django development
+version.
 
 For example::
 

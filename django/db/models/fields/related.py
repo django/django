@@ -471,7 +471,7 @@ class ForeignKey(RelatedField, Field):
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
-        if kwargs.has_key('edit_inline_type'):
+        if 'edit_inline_type' in kwargs:
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
@@ -564,7 +564,7 @@ class OneToOneField(RelatedField, IntegerField):
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
-        if kwargs.has_key('edit_inline_type'):
+        if 'edit_inline_type' in kwargs:
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')

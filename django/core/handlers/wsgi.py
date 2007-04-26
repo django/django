@@ -103,7 +103,7 @@ class WSGIRequest(http.HttpRequest):
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
 
     def is_secure(self):
-        return self.environ.has_key('HTTPS') and self.environ['HTTPS'] == 'on'
+        return 'HTTPS' in self.environ and self.environ['HTTPS'] == 'on'
 
     def _load_post_and_files(self):
         # Populates self._post and self._files
