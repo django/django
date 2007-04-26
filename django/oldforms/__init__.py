@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf import settings
-from django.utils.translation import gettext, ngettext
+from django.utils.translation import ugettext, ungettext
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -66,7 +66,7 @@ class Manipulator(object):
                     errors.setdefault(field.field_name, []).extend(e.messages)
 
 #            if field.is_required and not new_data.get(field.field_name, False):
-#                errors.setdefault(field.field_name, []).append(gettext_lazy('This field is required.'))
+#                errors.setdefault(field.field_name, []).append(ugettext_lazy('This field is required.'))
 #                continue
 #            try:
 #                validator_list = field.validator_list
@@ -354,7 +354,7 @@ class FormField(object):
     def get_validation_errors(self, new_data):
         errors = {}
         if self.is_required and not new_data.get(self.field_name, False):
-            errors.setdefault(self.field_name, []).append(gettext('This field is required.'))
+            errors.setdefault(self.field_name, []).append(ugettext('This field is required.'))
             return errors
         try:
             for validator in self.validator_list:
@@ -389,12 +389,12 @@ class TextField(FormField):
 
     def isValidLength(self, data, form):
         if data and self.maxlength and len(data.decode(settings.DEFAULT_CHARSET)) > self.maxlength:
-            raise validators.ValidationError, ngettext("Ensure your text is less than %s character.",
+            raise validators.ValidationError, ungettext("Ensure your text is less than %s character.",
                 "Ensure your text is less than %s characters.", self.maxlength) % self.maxlength
 
     def hasNoNewlines(self, data, form):
         if data and '\n' in data:
-            raise validators.ValidationError, gettext("Line breaks are not allowed here.")
+            raise validators.ValidationError, ugettext("Line breaks are not allowed here.")
 
     def render(self, data):
         if data is None:
@@ -495,7 +495,7 @@ class SelectField(FormField):
         str_data = str(data)
         str_choices = [str(item[0]) for item in self.choices]
         if str_data not in str_choices:
-            raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data': str_data, 'choices': str_choices}
+            raise validators.ValidationError, ugettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data': str_data, 'choices': str_choices}
 
 class NullSelectField(SelectField):
     "This SelectField converts blank fields to None"
@@ -568,7 +568,7 @@ class RadioSelectField(FormField):
         str_data = str(data)
         str_choices = [str(item[0]) for item in self.choices]
         if str_data not in str_choices:
-            raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':str_data, 'choices':str_choices}
+            raise validators.ValidationError, ugettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':str_data, 'choices':str_choices}
 
 class NullBooleanField(SelectField):
     "This SelectField provides 'Yes', 'No' and 'Unknown', mapping results to True, False or None"
@@ -607,7 +607,7 @@ class SelectMultipleField(SelectField):
         str_choices = [str(item[0]) for item in self.choices]
         for val in map(str, field_data):
             if val not in str_choices:
-                raise validators.ValidationError, gettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':val, 'choices':str_choices}
+                raise validators.ValidationError, ugettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data':val, 'choices':str_choices}
 
     def html2python(data):
         if data is None:
@@ -669,9 +669,9 @@ class FileUploadField(FormField):
         try:
             content = field_data['content']
         except TypeError:
-            raise validators.CriticalValidationError, gettext("No file was submitted. Check the encoding type on the form.")
+            raise validators.CriticalValidationError, ugettext("No file was submitted. Check the encoding type on the form.")
         if not content:
-            raise validators.CriticalValidationError, gettext("The submitted file is empty.")
+            raise validators.CriticalValidationError, ugettext("The submitted file is empty.")
 
     def render(self, data):
         return '<input type="file" id="%s" class="v%s" name="%s" />' % \
@@ -727,7 +727,7 @@ class SmallIntegerField(IntegerField):
 
     def isSmallInteger(self, field_data, all_data):
         if not -32768 <= int(field_data) <= 32767:
-            raise validators.CriticalValidationError, gettext("Enter a whole number between -32,768 and 32,767.")
+            raise validators.CriticalValidationError, ugettext("Enter a whole number between -32,768 and 32,767.")
 
 class PositiveIntegerField(IntegerField):
     def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=None):
@@ -737,7 +737,7 @@ class PositiveIntegerField(IntegerField):
 
     def isPositive(self, field_data, all_data):
         if int(field_data) < 0:
-            raise validators.CriticalValidationError, gettext("Enter a positive number.")
+            raise validators.CriticalValidationError, ugettext("Enter a positive number.")
 
 class PositiveSmallIntegerField(IntegerField):
     def __init__(self, field_name, length=5, maxlength=None, is_required=False, validator_list=None):
@@ -747,7 +747,7 @@ class PositiveSmallIntegerField(IntegerField):
 
     def isPositiveSmall(self, field_data, all_data):
         if not 0 <= int(field_data) <= 32767:
-            raise validators.CriticalValidationError, gettext("Enter a whole number between 0 and 32,767.")
+            raise validators.CriticalValidationError, ugettext("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
     def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=None):

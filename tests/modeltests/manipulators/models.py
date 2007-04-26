@@ -41,24 +41,24 @@ True
 
 # Attempt to add a Musician without a first_name.
 >>> man.get_validation_errors(MultiValueDict({'last_name': ['Blakey']}))
-{'first_name': ['This field is required.']}
+{'first_name': [u'This field is required.']}
 
 # Attempt to add a Musician without a first_name and last_name.
 >>> man.get_validation_errors(MultiValueDict({}))
-{'first_name': ['This field is required.'], 'last_name': ['This field is required.']}
+{'first_name': [u'This field is required.'], 'last_name': [u'This field is required.']}
 
 # Attempt to create an Album without a name or musician.
 >>> man = Album.AddManipulator()
 >>> man.get_validation_errors(MultiValueDict({}))
-{'musician': ['This field is required.'], 'name': ['This field is required.']}
+{'musician': [u'This field is required.'], 'name': [u'This field is required.']}
 
 # Attempt to create an Album with an invalid musician.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['foo']}))
-{'musician': ["Select a valid choice; 'foo' is not in ['', '1']."]}
+{'musician': [u"Select a valid choice; 'foo' is not in ['', '1']."]}
 
 # Attempt to create an Album with an invalid release_date.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['1'], 'release_date': 'today'}))
-{'release_date': ['Enter a valid date in YYYY-MM-DD format.']}
+{'release_date': [u'Enter a valid date in YYYY-MM-DD format.']}
 
 # Create an Album without a release_date (because it's optional).
 >>> data = MultiValueDict({'name': ['Ella and Basie'], 'musician': ['1']})

@@ -2,7 +2,7 @@
 Field classes
 """
 
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 from django.utils.encoding import smart_unicode
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
@@ -77,7 +77,7 @@ class Field(object):
         Raises ValidationError for any errors.
         """
         if self.required and value in EMPTY_VALUES:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         return value
 
     def widget_attrs(self, widget):
@@ -100,9 +100,9 @@ class CharField(Field):
             return u''
         value = smart_unicode(value)
         if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
+            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
         if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(gettext(u'Ensure this value has at least %d characters.') % self.min_length)
+            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
         return value
 
     def widget_attrs(self, widget):
@@ -125,11 +125,11 @@ class IntegerField(Field):
         try:
             value = int(value)
         except (ValueError, TypeError):
-            raise ValidationError(gettext(u'Enter a whole number.'))
+            raise ValidationError(ugettext(u'Enter a whole number.'))
         if self.max_value is not None and value > self.max_value:
-            raise ValidationError(gettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
+            raise ValidationError(ugettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
         if self.min_value is not None and value < self.min_value:
-            raise ValidationError(gettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
+            raise ValidationError(ugettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
         return value
 
 DEFAULT_DATE_INPUT_FORMATS = (
@@ -162,7 +162,7 @@ class DateField(Field):
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
                 continue
-        raise ValidationError(gettext(u'Enter a valid date.'))
+        raise ValidationError(ugettext(u'Enter a valid date.'))
 
 DEFAULT_TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
@@ -189,7 +189,7 @@ class TimeField(Field):
                 return datetime.time(*time.strptime(value, format)[3:6])
             except ValueError:
                 continue
-        raise ValidationError(gettext(u'Enter a valid time.'))
+        raise ValidationError(ugettext(u'Enter a valid time.'))
 
 DEFAULT_DATETIME_INPUT_FORMATS = (
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
@@ -225,7 +225,7 @@ class DateTimeField(Field):
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:
                 continue
-        raise ValidationError(gettext(u'Enter a valid date/time.'))
+        raise ValidationError(ugettext(u'Enter a valid date/time.'))
 
 class RegexField(Field):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
@@ -239,7 +239,7 @@ class RegexField(Field):
             regex = re.compile(regex)
         self.regex = regex
         self.max_length, self.min_length = max_length, min_length
-        self.error_message = error_message or gettext(u'Enter a valid value.')
+        self.error_message = error_message or ugettext(u'Enter a valid value.')
 
     def clean(self, value):
         """
@@ -253,9 +253,9 @@ class RegexField(Field):
         if value == u'':
             return value
         if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(gettext(u'Ensure this value has at most %d characters.') % self.max_length)
+            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
         if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(gettext(u'Ensure this value has at least %d characters.') % self.min_length)
+            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
@@ -268,7 +268,7 @@ email_re = re.compile(
 class EmailField(RegexField):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         RegexField.__init__(self, email_re, max_length, min_length,
-            gettext(u'Enter a valid e-mail address.'), *args, **kwargs)
+            ugettext(u'Enter a valid e-mail address.'), *args, **kwargs)
 
 url_re = re.compile(
     r'^https?://' # http:// or https://
@@ -286,7 +286,7 @@ except ImportError:
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
-        super(URLField, self).__init__(url_re, max_length, min_length, gettext(u'Enter a valid URL.'), *args, **kwargs)
+        super(URLField, self).__init__(url_re, max_length, min_length, ugettext(u'Enter a valid URL.'), *args, **kwargs)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
@@ -308,9 +308,9 @@ class URLField(RegexField):
                 req = urllib2.Request(value, None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
-                raise ValidationError(gettext(u'Enter a valid URL.'))
+                raise ValidationError(ugettext(u'Enter a valid URL.'))
             except: # urllib2.URLError, httplib.InvalidURL, etc.
-                raise ValidationError(gettext(u'This URL appears to be a broken link.'))
+                raise ValidationError(ugettext(u'This URL appears to be a broken link.'))
         return value
 
 class BooleanField(Field):
@@ -361,7 +361,7 @@ class ChoiceField(Field):
             return value
         valid_values = set([str(k) for k, v in self.choices])
         if value not in valid_values:
-            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class MultipleChoiceField(ChoiceField):
@@ -373,11 +373,11 @@ class MultipleChoiceField(ChoiceField):
         Validates that the input is a list or tuple.
         """
         if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(gettext(u'Enter a list of values.'))
+            raise ValidationError(ugettext(u'Enter a list of values.'))
         new_value = []
         for val in value:
             val = smart_unicode(val)
@@ -386,7 +386,7 @@ class MultipleChoiceField(ChoiceField):
         valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:
             if val not in valid_values:
-                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
         return new_value
 
 class ComboField(Field):
@@ -449,18 +449,18 @@ class MultiValueField(Field):
         clean_data = []
         errors = ErrorList()
         if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         elif not self.required and not value:
             return self.compress([])
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(gettext(u'Enter a list of values.'))
+            raise ValidationError(ugettext(u'Enter a list of values.'))
         for i, field in enumerate(self.fields):
             try:
                 field_value = value[i]
             except KeyError:
                 field_value = None
             if self.required and field_value in EMPTY_VALUES:
-                raise ValidationError(gettext(u'This field is required.'))
+                raise ValidationError(ugettext(u'This field is required.'))
             try:
                 clean_data.append(field.clean(field_value))
             except ValidationError, e:

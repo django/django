@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy
+from django.utils.translation import ugettext, ugettext_lazy
 import datetime, os, time
 
 class NOT_PROVIDED:
@@ -39,7 +39,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
-    raise validators.ValidationError, gettext("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
+    raise validators.ValidationError, ugettext("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
 # A guide to Field parameters:
 #
@@ -114,7 +114,7 @@ class Field(object):
         Subclasses should implement validate(), not validate_full().
         """
         if not self.blank and not field_data:
-            return [gettext_lazy('This field is required.')]
+            return [ugettext_lazy('This field is required.')]
         try:
             self.validate(field_data, all_data)
         except validators.ValidationError, e:
@@ -271,7 +271,7 @@ class Field(object):
                     core_field_names.extend(f.get_manipulator_field_names(name_prefix))
             # Now, if there are any, add the validator to this FormField.
             if core_field_names:
-                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, gettext_lazy("This field is required.")))
+                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, ugettext_lazy("This field is required.")))
 
         # Finally, add the field_names.
         field_names = self.get_manipulator_field_names(name_prefix)
@@ -364,7 +364,7 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            raise validators.ValidationError, gettext("This value must be an integer.")
+            raise validators.ValidationError, ugettext("This value must be an integer.")
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
@@ -399,7 +399,7 @@ class BooleanField(Field):
         if value in (True, False): return value
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, gettext("This value must be either True or False.")
+        raise validators.ValidationError, ugettext("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
@@ -420,7 +420,7 @@ class CharField(Field):
             if self.null:
                 return value
             else:
-                raise validators.ValidationError, gettext_lazy("This field cannot be null.")
+                raise validators.ValidationError, ugettext_lazy("This field cannot be null.")
         return str(value)
 
     def formfield(self, **kwargs):
@@ -454,7 +454,7 @@ class DateField(Field):
         try:
             return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
         except ValueError:
-            raise validators.ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
+            raise validators.ValidationError, ugettext('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
@@ -523,7 +523,7 @@ class DateTimeField(DateField):
                 try:
                     return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3])
                 except ValueError:
-                    raise validators.ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+                    raise validators.ValidationError, ugettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
@@ -607,7 +607,7 @@ class FileField(Field):
                         self.always_test = True
                     def __call__(self, field_data, all_data):
                         if not all_data.get(self.other_file_field_name, False):
-                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, gettext_lazy("This field is required."))
+                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, ugettext_lazy("This field is required."))
                             c(field_data, all_data)
                 # First, get the core fields, if any.
                 core_field_names = []
@@ -618,7 +618,7 @@ class FileField(Field):
                 if core_field_names:
                     field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
             else:
-                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, gettext_lazy("This field is required."))
+                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, ugettext_lazy("This field is required."))
                 v.always_test = True
                 field_list[0].validator_list.append(v)
                 field_list[0].is_required = field_list[1].is_required = False
@@ -748,7 +748,7 @@ class NullBooleanField(Field):
         if value in ('None'): return None
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, gettext("This value must be either None, True or False.")
+        raise validators.ValidationError, ugettext("This value must be either None, True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]

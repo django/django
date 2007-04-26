@@ -42,7 +42,7 @@ __test__ = {'API_TESTS':"""
 
 >>> p = Person(**dict(valid_params, id='foo'))
 >>> p.validate()
-{'id': ['This value must be an integer.']}
+{'id': [u'This value must be an integer.']}
 
 >>> p = Person(**dict(valid_params, id=None))
 >>> p.validate()
@@ -76,7 +76,7 @@ False
 
 >>> p = Person(**dict(valid_params, is_child='foo'))
 >>> p.validate()
-{'is_child': ['This value must be either True or False.']}
+{'is_child': [u'This value must be either True or False.']}
 
 >>> p = Person(**dict(valid_params, name=u'Jose'))
 >>> p.validate()
@@ -116,7 +116,7 @@ datetime.date(2000, 5, 3)
 
 >>> p = Person(**dict(valid_params, birthdate='foo'))
 >>> p.validate()
-{'birthdate': ['Enter a valid date in YYYY-MM-DD format.']}
+{'birthdate': [u'Enter a valid date in YYYY-MM-DD format.']}
 
 >>> p = Person(**dict(valid_params, favorite_moment=datetime.datetime(2002, 4, 3, 13, 23)))
 >>> p.validate()
@@ -144,10 +144,10 @@ u'john@example.com'
 
 >>> p = Person(**dict(valid_params, email=22))
 >>> p.validate()
-{'email': ['Enter a valid e-mail address.']}
+{'email': [u'Enter a valid e-mail address.']}
 
 # Make sure that Date and DateTime return validation errors and don't raise Python errors.
 >>> Person(name='John Doe', is_child=True, email='abc@def.com').validate()
-{'favorite_moment': ['This field is required.'], 'birthdate': ['This field is required.']}
+{'favorite_moment': [u'This field is required.'], 'birthdate': [u'This field is required.']}
 
 """}
