@@ -7,6 +7,7 @@ from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
+from django.utils.encoding import smart_str
 import types
 
 def add_manipulators(sender):
@@ -111,7 +112,7 @@ class AutomaticManipulator(oldforms.Manipulator):
         if self.change:
             self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
             for f in self.opts.fields:
-                if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
+                if not f.primary_key and smart_str(getattr(self.original_object, f.attname)) != smart_str(getattr(new_object, f.attname)):
                     self.fields_changed.append(f.verbose_name)
 
         # Save many-to-many objects. Example: Set sites for a poll.
@@ -211,7 +212,7 @@ class AutomaticManipulator(oldforms.Manipulator):
                                 self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
                             else:
                                 for f in related.opts.fields:
-                                    if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
+                                    if not f.primary_key and f != related.field and smart_str(getattr(old_rel_obj, f.attname)) != smart_str(getattr(new_rel_obj, f.attname)):
                                         self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                         # Save many-to-many objects.
