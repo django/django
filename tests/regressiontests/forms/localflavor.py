@@ -851,15 +851,15 @@ ValidationError: [u'This field is required.']
 >>> f.clean('12-345-678/9012-10')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Invalid CNPJ number']
+ValidationError: [u'Invalid CNPJ number.']
 >>> f.clean('12.345.678/9012-10')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Invalid CNPJ number']
+ValidationError: [u'Invalid CNPJ number.']
 >>> f.clean('12345678/9012-10')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Invalid CNPJ number']
+ValidationError: [u'Invalid CNPJ number.']
 >>> f.clean('64.132.916/0001-88')
 '64.132.916/0001-88'
 >>> f.clean('64-132-916/0001-88')
@@ -869,7 +869,7 @@ ValidationError: [u'Invalid CNPJ number']
 >>> f.clean('64.132.916/0001-XX')
 Traceback (most recent call last):
 ...
-ValidationError: [u'This field requires only numbers']
+ValidationError: [u'This field requires only numbers.']
 >>> f = BRCNPJField(required=False)
 >>> f.clean('')
 u''

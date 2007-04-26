@@ -31,7 +31,7 @@ class BRPhoneNumberField(Field):
 
 class BRStateSelect(Select):
     """
-    A Select widget that uses a list of brazilian states/territories
+    A Select widget that uses a list of Brazilian states/territories
     as its choices.
     """
     def __init__(self, attrs=None):
@@ -47,7 +47,7 @@ def DV_maker(v):
 class BRCPFField(CharField):
     """
     This field validate a CPF number or a CPF string. A CPF number is
-    compounded by XXX.XXX.XXX-VD, the two last digits are check digits.
+    compounded by XXX.XXX.XXX-VD. The two last digits are check digits.
 
     More information:
     http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
@@ -69,7 +69,7 @@ class BRCPFField(CharField):
         try:
             int(value)
         except ValueError:
-            raise ValidationError(gettext("This field requires only numbers"))
+            raise ValidationError(gettext("This field requires only numbers."))
         if len(value) != 11:
             raise ValidationError(gettext("This field requires at most 11 digits or 14 characters."))
         orig_dv = value[-2:]
@@ -100,7 +100,7 @@ class BRCNPJField(Field):
         try:
             int(value)
         except ValueError:
-            raise ValidationError("This field requires only numbers")
+            raise ValidationError("This field requires only numbers.")
         if len(value) != 14:
             raise ValidationError(
                 gettext("This field requires at least 14 digits"))
@@ -113,7 +113,7 @@ class BRCNPJField(Field):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(gettext("Invalid CNPJ number"))
+            raise ValidationError(gettext("Invalid CNPJ number."))
 
         return orig_value
 
