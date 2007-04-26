@@ -45,16 +45,16 @@ Get your database running
 =========================
 
 If you plan to use Django's database API functionality, you'll need to
-make sure a database server is running. Django works with PostgreSQL_
-(recommended), MySQL_ and SQLite_.
+make sure a database server is running. Django works with PostgreSQL_,
+MySQL_ and SQLite_.
 
 Additionally, you'll need to make sure your Python database bindings are
 installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package (version 2 is
-  recommended with ``postgresql_psycopg2`` backend, version 1.1 works also
-  with the ``postgresql`` backend).
-  
+* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
+  both version 1 and 2. (When you configure Django's database layer, specify
+  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+
   If you're on Windows, check out the unofficial `compiled Windows version`_.
   
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
