@@ -5,6 +5,7 @@ from regressions import regression_tests
 form_tests = r"""
 >>> from django.newforms import *
 >>> import datetime
+>>> import time
 >>> import re
 
 ###########
@@ -3296,6 +3297,94 @@ True
 <option value="2015">2015</option>
 <option value="2016">2016</option>
 </select>
+
+# MultiWidget and MultiValueField #############################################
+# MultiWidgets are widgets composed of other widgets. They are usually 
+# combined with MultiValueFields - a field that is composed of other fields.
+# MulitWidgets can themselved be composed of other MultiWidgets.
+# SplitDateTimeWidget is one example of a MultiWidget.
+
+>>> class ComplexMultiWidget(MultiWidget):
+...     def __init__(self, attrs=None):
+...         widgets = (
+...             TextInput(), 
+...             SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+...             SplitDateTimeWidget(),
+...         )
+...         super(ComplexMultiWidget, self).__init__(widgets, attrs)
+...
+...     def decompress(self, value):
+...         if value:
+...             data = value.split(',')
+...             return [data[0], data[1], datetime.datetime(*time.strptime(data[2], "%Y-%m-%d %H:%M:%S")[0:6])]
+...         return [None, None, None]
+...     def format_output(self, rendered_widgets):
+...         return u'\n'.join(rendered_widgets)
+>>> w = ComplexMultiWidget()
+>>> print w.render('name', 'some text,JP,2007-04-25 06:24:00')
+<input type="text" name="name_0" value="some text" />
+<select multiple="multiple" name="name_1">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="name_2_0" value="2007-04-25" /><input type="text" name="name_2_1" value="06:24:00" />
+
+>>> class ComplexField(MultiValueField):
+...     def __init__(self, required=True, widget=None, label=None, initial=None): 
+...         fields = (
+...             CharField(), 
+...             MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+...             SplitDateTimeField()
+...         )
+...         super(ComplexField, self).__init__(fields, required, widget, label, initial) 
+...
+...     def compress(self, data_list):
+...         if data_list:
+...             return '%s,%s,%s' % (data_list[0],''.join(data_list[1]),data_list[2])
+...         return None
+
+>>> f = ComplexField(widget=w)
+>>> f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']])
+u'some text,JP,2007-04-25 06:24:00'
+>>> f.clean(['some text',['X'], ['2007-04-25','6:24:00']])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. X is not one of the available choices.']
+
+# If insufficient data is provided, None is substituted
+>>> f.clean(['some text',['JP']])
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> class ComplexFieldForm(Form):
+...     field1 = ComplexField(widget=w)
+>>> f = ComplexFieldForm()
+>>> print f
+<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
+<select multiple="multiple" name="field1_1" id="id_field1_1">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>
+
+>>> f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
+>>> print f
+<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+<select multiple="multiple" name="field1_1" id="id_field1_1">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
+
+>>> f.clean_data
+{'field1': u'some text,JP,2007-04-25 06:24:00'}
 
 #################################
 # Tests of underlying functions #

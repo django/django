@@ -457,7 +457,7 @@ class MultiValueField(Field):
         for i, field in enumerate(self.fields):
             try:
                 field_value = value[i]
-            except KeyError:
+            except IndexError:
                 field_value = None
             if self.required and field_value in EMPTY_VALUES:
                 raise ValidationError(gettext(u'This field is required.'))

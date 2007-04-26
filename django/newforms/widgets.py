@@ -347,7 +347,7 @@ class MultiWidget(Widget):
     id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, name):
-        return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]
+        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets):
         return u''.join(rendered_widgets)
