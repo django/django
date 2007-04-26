@@ -840,6 +840,40 @@ ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-123')
 u'12345-123'
 
+# BRCNPJField ############################################################
+
+>>> from django.contrib.localflavor.br.forms import BRCNPJField
+>>> f = BRCNPJField(required=True)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('12-345-678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number']
+>>> f.clean('12.345.678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number']
+>>> f.clean('12345678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number']
+>>> f.clean('64.132.916/0001-88')
+'64.132.916/0001-88'
+>>> f.clean('64-132-916/0001-88')
+'64-132-916/0001-88'
+>>> f.clean('64132916/0001-88')
+'64132916/0001-88'
+>>> f.clean('64.132.916/0001-XX')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers']
+>>> f = BRCNPJField(required=False)
+>>> f.clean('')
+u''
+
 # BRPhoneNumberField #########################################################
 
 >>> from django.contrib.localflavor.br.forms import BRPhoneNumberField
