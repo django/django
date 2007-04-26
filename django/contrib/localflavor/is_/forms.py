@@ -1,11 +1,11 @@
 """
 Iceland specific form helpers.
 """
+
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
 from django.newforms.widgets import Select
 from django.utils.translation import gettext
-
 
 class ISIdNumberField(RegexField):
     """
@@ -15,7 +15,6 @@ class ISIdNumberField(RegexField):
     def __init__(self, *args, **kwargs):
         error_msg = gettext(u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.')
         kwargs['min_length'],kwargs['max_length'] = 10,11
-
         super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$', error_message=error_msg, *args, **kwargs)
 
     def clean(self, value):
@@ -29,7 +28,6 @@ class ISIdNumberField(RegexField):
             return self._format(value)
         else:
             raise ValidationError(gettext(u'The Icelandic identification number is not valid.'))
-
 
     def _canonify(self, value):
         """
@@ -52,7 +50,6 @@ class ISIdNumberField(RegexField):
         """
         return value[:6]+'-'+value[6:]
 
-
 class ISPhoneNumberField(RegexField):
     """
     Icelandic phone number. Seven digits with an optional hyphen or space after
@@ -69,7 +66,6 @@ class ISPhoneNumberField(RegexField):
             return u''
 
         return value.replace('-', '').replace(' ', '')
-
 
 class ISPostalCodeSelect(Select):
     """
