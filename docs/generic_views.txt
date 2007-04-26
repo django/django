@@ -71,7 +71,7 @@ are first evaluated, so if you want to pass in a QuerySet via
 ``extra_context`` that is always fresh you need to wrap it in a function or
 lambda that returns the QuerySet.
 
-.. _database API docs: ../db_api/
+.. _database API docs: ../db-api/
 
 "Simple" generic views
 ======================

@@ -16,9 +16,9 @@ class MergeDict(object):
 
     def __contains__(self, key):
         return self.has_key(key)
-        
-    def __copy__(self): 
-        return self.__class__(*self.dicts) 
+
+    def __copy__(self):
+        return self.__class__(*self.dicts)
 
     def get(self, key, default=None):
         try:
@@ -45,9 +45,9 @@ class MergeDict(object):
             if dict.has_key(key):
                 return True
         return False
-        
-    def copy(self): 
-        """ returns a copy of this object""" 
+
+    def copy(self):
+        """ returns a copy of this object"""
         return self.__copy__()
 
 class SortedDict(dict):
@@ -98,6 +98,13 @@ class SortedDict(dict):
         obj = self.__class__(self)
         obj.keyOrder = self.keyOrder
         return obj
+
+    def __repr__(self):
+        """
+        Replaces the normal dict.__repr__ with a version that returns the keys
+        in their sorted order.
+        """
+        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
 
 class MultiValueDictKeyError(KeyError):
     pass
@@ -211,7 +218,7 @@ class MultiValueDict(dict):
     def update(self, *args, **kwargs):
         "update() extends rather than replaces existing key lists. Also accepts keyword args."
         if len(args) > 1:
-            raise TypeError, "update expected at most 1 arguments, got %d", len(args)
+            raise TypeError, "update expected at most 1 arguments, got %d" % len(args)
         if args:
             other_dict = args[0]
             if isinstance(other_dict, MultiValueDict):

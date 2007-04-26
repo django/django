@@ -219,7 +219,7 @@ template. Note that we use ``dict()`` to return an altered dictionary in place.
     If you'd like to know more about how that works, The Django database API
     documentation `explains the lazy nature of QuerySet objects`_.
 
-.. _explains the lazy nature of QuerySet objects: ../db_api/#querysets-are-lazy
+.. _explains the lazy nature of QuerySet objects: ../db-api/#querysets-are-lazy
 
 In previous parts of the tutorial, the templates have been provided with a context
 that contains the ``poll`` and ``latest_poll_list`` context variables. However,

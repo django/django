@@ -315,6 +315,12 @@ BANNED_IPS = ()
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
+LOGIN_URL = '/accounts/login/'
+
+LOGOUT_URL = '/accounts/logout/'
+
+LOGIN_REDIRECT_URL = '/accounts/profile/'
+
 ###########
 # TESTING #
 ###########

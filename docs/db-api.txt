@@ -6,7 +6,7 @@ Once you've created your `data models`_, Django automatically gives you a
 database-abstraction API that lets you create, retrieve, update and delete
 objects. This document explains that API.
 
-.. _`data models`: ../model_api/
+.. _`data models`: ../model-api/
 
 Throughout this reference, we'll refer to the following models, which comprise
 a weblog application::
@@ -85,7 +85,7 @@ There's no way to tell what the value of an ID will be before you call
 unless you explicitly specify ``primary_key=True`` on a field. See the
 `AutoField documentation`_.)
 
-.. _AutoField documentation: ../model_api/#autofield
+.. _AutoField documentation: ../model-api/#autofield
 
 Explicitly specifying auto-primary-key values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1801,4 +1801,4 @@ interface to your database. You can access your database via other tools,
 programming languages or database frameworks; there's nothing Django-specific
 about your database.
 
-.. _Executing custom SQL: ../model_api/#executing-custom-sql
+.. _Executing custom SQL: ../model-api/#executing-custom-sql

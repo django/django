@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy
 import datetime
 
 def check_password(raw_password, enc_password):
@@ -17,6 +17,12 @@ def check_password(raw_password, enc_password):
     elif algo == 'sha1':
         import sha
         return hsh == sha.new(salt+raw_password).hexdigest()
+    elif algo == 'crypt':
+        try:
+            import crypt
+        except ImportError:
+            raise ValueError, "Crypt password algorithm not supported in this environment."
+        return hsh == crypt.crypt(raw_password, salt)
     raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
@@ -273,7 +279,7 @@ class AnonymousUser(object):
         pass
 
     def __unicode__(self):
-        return u'AnonymousUser'
+        return ugettext_lazy('AnonymousUser')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

@@ -563,7 +563,7 @@ class FilterExpression(object):
                 filters.append( (filter_func,args))
                 upto = match.end()
         if upto != len(token):
-            raise TemplateSyntaxError, "Could not parse the remainder: %s" % token[upto:]
+            raise TemplateSyntaxError, "Could not parse the remainder: '%s' from '%s'" % (token[upto:], token)
         self.var, self.filters = var, filters
 
     def resolve(self, context, ignore_failures=False):

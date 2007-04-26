@@ -2,7 +2,7 @@
 
 from django.template import resolve_variable, Library
 from django.conf import settings
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import smart_unicode, smart_str
 import re
 import random as random_module
@@ -501,12 +501,12 @@ def filesizeformat(bytes):
         return u"0 bytes"
 
     if bytes < 1024:
-        return u"%d byte%s" % (bytes, bytes != 1 and u's' or u'')
+        return ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
     if bytes < 1024 * 1024:
-        return u"%.1f KB" % (bytes / 1024)
+        return ugettext("%.1f KB") % (bytes / 1024)
     if bytes < 1024 * 1024 * 1024:
-        return u"%.1f MB" % (bytes / (1024 * 1024))
-    return u"%.1f GB" % (bytes / (1024 * 1024 * 1024))
+        return ugettext("%.1f MB") % (bytes / (1024 * 1024))
+    return ugettext("%.1f GB") % (bytes / (1024 * 1024 * 1024))
 
 def pluralize(value, arg=u's'):
     """

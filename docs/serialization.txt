@@ -27,7 +27,7 @@ data to (see `Serialization formats`_) and a QuerySet_ to serialize.
 (Actually, the second argument can be any iterator that yields Django objects,
 but it'll almost always be a QuerySet).
 
-.. _QuerySet: ../db_api/#retrieving-objects
+.. _QuerySet: ../db-api/#retrieving-objects
 
 You can also use a serializer object directly::
 

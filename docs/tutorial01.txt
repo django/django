@@ -577,5 +577,5 @@ For full details on the database API, see our `Database API reference`_.
 When you're comfortable with the API, read `part 2 of this tutorial`_ to get
 Django's automatic admin working.
 
-.. _Database API reference: ../db_api/
+.. _Database API reference: ../db-api/
 .. _part 2 of this tutorial: ../tutorial02/

@@ -13,6 +13,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+

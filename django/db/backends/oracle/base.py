@@ -12,6 +12,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
 
 DatabaseError = Database.Error
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+
