@@ -102,6 +102,14 @@ class RegexURLPattern(object):
         self.default_args = default_args or {}
         self.name = name
 
+    def add_prefix(self, prefix):
+        """
+        Adds the prefix string to a string-based callback.
+        """
+        if not prefix or not hasattr(self, '_callback_str'):
+            return
+        self._callback_str = prefix + '.' + self._callback_str
+
     def resolve(self, path):
         match = self.regex.search(path)
         if match:
