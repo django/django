@@ -42,7 +42,7 @@ def lazy(func, *resultclasses):
                 res = self.__func(*self.__args, **self.__kw)
                 return self.__dispatch[type(res)][funcname](res, *args, **kw)
 
-            if not self.__dispatch.has_key(klass):
+            if klass not in self.__dispatch:
                 self.__dispatch[klass] = {}
             self.__dispatch[klass][funcname] = func
             return __wrapper__

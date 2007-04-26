@@ -48,7 +48,7 @@ class UnicodeCursorWrapper(object):
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
+        if attr in self.__dict__:
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)

@@ -244,7 +244,7 @@ class BoundField(StrAndUnicode):
     def as_widget(self, widget, attrs=None):
         attrs = attrs or {}
         auto_id = self.auto_id
-        if auto_id and not attrs.has_key('id') and not widget.attrs.has_key('id'):
+        if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
             attrs['id'] = auto_id
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)

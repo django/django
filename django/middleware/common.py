@@ -25,7 +25,7 @@ class CommonMiddleware(object):
         """
 
         # Check for denied User-Agents
-        if request.META.has_key('HTTP_USER_AGENT'):
+        if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')

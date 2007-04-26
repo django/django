@@ -314,7 +314,7 @@ def get_sql_delete(app):
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(model):
+            if backend.supports_constraints and model in references_to_delete:
                 for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
@@ -843,7 +843,7 @@ def inspectdb():
                 att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
 
-            if relations.has_key(i):
+            if i in relations:
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
                 field_type = 'ForeignKey(%s' % rel_to
                 if att_name.endswith('_id'):
@@ -1550,7 +1550,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action = args[0]
     except IndexError:
         parser.print_usage_and_exit()
-    if not action_mapping.has_key(action):
+    if action not in action_mapping:
         print_error("Your action, %r, was invalid." % action, argv[0])
 
     # Switch to English, because django-admin.py creates database content

@@ -16,7 +16,7 @@ def index(request, sitemaps):
 def sitemap(request, sitemaps, section=None):
     maps, urls = [], []
     if section is not None:
-        if not sitemaps.has_key(section):
+        if section not in sitemaps:
             raise Http404("No sitemap available for section: %r" % section)
         maps.append(sitemaps[section])
     else:

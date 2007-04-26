@@ -779,7 +779,7 @@ class SlugField(Field):
         kwargs['maxlength'] = kwargs.get('maxlength', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
-        if not kwargs.has_key('db_index'):
+        if 'db_index' not in kwargs:
             kwargs['db_index'] = True
         Field.__init__(self, *args, **kwargs)
 

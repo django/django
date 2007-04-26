@@ -42,7 +42,7 @@ class MergeDict(object):
 
     def has_key(self, key):
         for dict in self.dicts:
-            if dict.has_key(key):
+            if key in dict:
                 return True
         return False
 

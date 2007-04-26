@@ -29,12 +29,12 @@ class HttpRequest(object):
 
     def __getitem__(self, key):
         for d in (self.POST, self.GET):
-            if d.has_key(key):
+            if key in d:
                 return d[key]
         raise KeyError, "%s not found in either POST or GET" % key
 
     def has_key(self, key):
-        return self.GET.has_key(key) or self.POST.has_key(key)
+        return key in self.GET or key in self.POST
 
     def get_full_path(self):
         return ''
@@ -57,7 +57,7 @@ def parse_file_upload(header_dict, post_data):
             # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
             # or {'name': 'blah'} for POST fields
             # We assume all uploaded files have a 'filename' set.
-            if name_dict.has_key('filename'):
+            if 'filename' in name_dict:
                 assert type([]) != type(submessage.get_payload()), "Nested MIME messages are not supported"
                 if not name_dict['filename'].strip():
                     continue
@@ -66,7 +66,7 @@ def parse_file_upload(header_dict, post_data):
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
                 FILES.appendlist(name_dict['name'], {
                     'filename': filename,
-                    'content-type': (submessage.has_key('Content-Type') and submessage['Content-Type'] or None),
+                    'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
                     'content': submessage.get_payload(),
                 })
             else:
