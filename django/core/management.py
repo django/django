@@ -1318,6 +1318,8 @@ def load_data(fixture_labels, verbosity=1):
     from django.conf import settings
     import sys
 
+    disable_termcolors()
+
     # Keep a count of the installed objects and fixtures
     count = [0,0]
     models = set()
