@@ -201,7 +201,7 @@ class Lexer(object):
             in_tag = not in_tag
         return result
 
-    def create_token(self, token_string, in_tag=False):
+    def create_token(self, token_string, in_tag):
         """
         Convert the given token string into a new Token object and return it.
         If tag is True, we are processing something that matched a tag,
