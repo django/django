@@ -127,6 +127,18 @@ class Templates(unittest.TestCase):
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
+            # Don't get confused when parsing something that is almost, but not
+            # quite, a template tag.
+            'basic-syntax21': ("a {{ moo %} b", {}, "a {{ moo %} b"),
+            'basic-syntax22': ("{{ moo #}", {}, "{{ moo #}"),
+
+            # Will try to treat "moo #} {{ cow" as the variable. Not ideal, but
+            # costly to work around, so this triggers an error.
+            'basic-syntax23': ("{{ moo #} {{ cow }}", {"cow": "cow"}, template.TemplateSyntaxError),
+
+            # Embedded newlines make it not-a-tag.
+            'basic-syntax24': ("{{ moo\n }}", {}, "{{ moo\n }}"),
+
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
 
