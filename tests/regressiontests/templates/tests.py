@@ -151,60 +151,61 @@ class Templates(unittest.TestCase):
             'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
 
             # Basic filter usage
-            'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax01': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Chained filters
-            'basic-syntax22': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
+            'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
 
             # Raise TemplateSyntaxError for space between a variable and filter pipe
-            'basic-syntax23': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax03': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for space after a filter pipe
-            'basic-syntax24': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax04': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for a nonexistent filter
-            'basic-syntax25': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
+            'filter-syntax05': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError when trying to access a filter containing an illegal character
-            'basic-syntax26': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
+            'filter-syntax06': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for invalid block tags
-            'basic-syntax27': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
+            'filter-syntax07': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for empty block tags
-            'basic-syntax28': ("{% %}", {}, template.TemplateSyntaxError),
+            'filter-syntax08': ("{% %}", {}, template.TemplateSyntaxError),
 
             # Chained filters, with an argument to the first one
-            'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
+            'filter-syntax09': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
             # Escaped string as argument
-            'basic-syntax30': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
+            'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
 
             # Variable as argument
-            'basic-syntax31': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
+            'filter-syntax11': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
 
             # Default argument testing
-            'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
+            'filter-syntax12': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
-            # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
-            'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
+            # Fail silently for methods that raise an exception with a
+            # "silent_variable_failure" attribute
+            'filter-syntax13': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
-            # In methods that raise an exception without a "silent_variable_attribute" set to True,
-            # the exception propagates
-            'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
+            # In methods that raise an exception without a
+            # "silent_variable_attribute" set to True, the exception propagates
+            'filter-syntax14': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
             # Escaped backslash in argument
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
+            'filter-syntax15': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
 
             # Escaped backslash using known escape char
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
+            'filter-syntax16': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
 
             # Empty strings can be passed as arguments to filters
-            'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
+            'filter-syntax17': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the value
-            # will be converted to a bytestring.
-            'basic-syntax37': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            # If a variable has a __str__() that returns a Unicode object, the
+            # value will be converted to a bytestring.
+            'basic-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
