@@ -47,13 +47,10 @@ def smart_str(s, encoding='utf-8', strings_only=False):
 
 class StrAndUnicode(object):
     """
-    A class whose __str__ returns its __unicode__ as a bytestring
-    according to settings.DEFAULT_CHARSET.
+    A class whose __str__ returns its __unicode__ as a UTF-8 bytestring.
 
     Useful as a mix-in.
     """
     def __str__(self):
-        # XXX: (Malcolm) Correct encoding? Be variable and use UTF-8 as
-        # default?
-        return self.__unicode__().encode(settings.DEFAULT_CHARSET)
+        return self.__unicode__().encode('utf-8')
 
