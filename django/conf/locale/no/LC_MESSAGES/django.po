@@ -1,4 +1,4 @@
-# SOME DESCRIPTIVE TITLE.
+# translation of django.po to
 # Copyright (C) 2005 and beyond
 # This file is distributed under the same license as the PACKAGE package.
 # Espen Grindhaug <espen@grindhaug.org>, Nov 2005.
@@ -6,74 +6,73 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:12+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Espen Grndhaug <espen@grindhaug.org>\n"
-"Language-Team: Norwegian\n"
+"PO-Revision-Date: 2007-04-27 06:48+0200\n"
+"Last-Translator: \n"
+"Language-Team:  <en@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
-#, fuzzy
 msgid "object ID"
-msgstr "Vis objekt ID"
+msgstr "objekt ID"
 
 #: contrib/comments/models.py:68
 msgid "headline"
-msgstr ""
+msgstr "overskrift"
 
 #: contrib/comments/models.py:69 contrib/comments/models.py:90
 #: contrib/comments/models.py:167
-#, fuzzy
 msgid "comment"
-msgstr "innhold"
+msgstr "kommentar"
 
 #: contrib/comments/models.py:70
 msgid "rating #1"
-msgstr ""
+msgstr "rangering #1 "
 
 #: contrib/comments/models.py:71
 msgid "rating #2"
-msgstr ""
+msgstr "rangering #2"
 
 #: contrib/comments/models.py:72
 msgid "rating #3"
-msgstr ""
+msgstr "rangering #3"
 
 #: contrib/comments/models.py:73
 msgid "rating #4"
-msgstr ""
+msgstr "rangering #4"
 
 #: contrib/comments/models.py:74
 msgid "rating #5"
-msgstr ""
+msgstr "rangering #5"
 
 #: contrib/comments/models.py:75
 msgid "rating #6"
-msgstr ""
+msgstr "rangering #6"
 
 #: contrib/comments/models.py:76
 msgid "rating #7"
-msgstr ""
+msgstr "rangering #7"
 
 #: contrib/comments/models.py:77
 msgid "rating #8"
-msgstr ""
+msgstr "rangering #8"
 
 #: contrib/comments/models.py:82
 msgid "is valid rating"
-msgstr ""
+msgstr "er gyldig rangering"
 
 #: contrib/comments/models.py:83 contrib/comments/models.py:169
 msgid "date/time submitted"
-msgstr ""
+msgstr "dato/tid for innsendelse"
 
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
-msgstr ""
+msgstr "er tilgjengelig for alle"
 
 #: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
 msgid "IP address"
@@ -81,23 +80,21 @@ msgstr "IP adresse"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
-msgstr ""
+msgstr "er fjernet"
 
 #: contrib/comments/models.py:86
 msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
-msgstr ""
+msgstr "Aktiver denne avkryssningsboksen hvis kommentaren er upasende. Beskjeden \"Denne kommentaren er blitt fjernet\" vil bli vist istedet."
 
 #: contrib/comments/models.py:91
-#, fuzzy
 msgid "comments"
-msgstr "innhold"
+msgstr "kommentarer"
 
 #: contrib/comments/models.py:131 contrib/comments/models.py:207
-#, fuzzy
 msgid "Content object"
-msgstr "innholds type"
+msgstr "innholdsobjekt"
 
 #: contrib/comments/models.py:159
 #, python-format
@@ -108,101 +105,97 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
+"Sendt av %(user)s på %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: contrib/comments/models.py:168
-#, fuzzy
 msgid "person's name"
-msgstr "fornavn"
+msgstr "personens navn"
 
 #: contrib/comments/models.py:171
-#, fuzzy
 msgid "ip address"
 msgstr "IP adresse"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
-msgstr ""
+msgstr "godkjent av moderator"
 
 #: contrib/comments/models.py:176
-#, fuzzy
 msgid "free comment"
-msgstr "tillat kommentarer"
+msgstr "åpen kommentar"
 
 #: contrib/comments/models.py:177
-#, fuzzy
 msgid "free comments"
-msgstr "tillat kommentarer"
+msgstr "åpne kommentarer"
 
 #: contrib/comments/models.py:233
 msgid "score"
-msgstr ""
+msgstr "poeng"
 
 #: contrib/comments/models.py:234
-#, fuzzy
 msgid "score date"
-msgstr "utløpsdato"
+msgstr "poeng dato"
 
 #: contrib/comments/models.py:237
 msgid "karma score"
-msgstr ""
+msgstr "karma poeng"
 
 #: contrib/comments/models.py:238
 msgid "karma scores"
-msgstr ""
+msgstr "karma poeng"
 
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr ""
+msgstr "%(score)d rangering av %(user)s"
 
 #: contrib/comments/models.py:258
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This comment was flagged by %(user)s:\n"
 "\n"
 "%(text)s"
 msgstr ""
-"Denne kommentaren er skrevet med lite omtanke:\n"
+"Denne kommentaren er flagget av %(user)s:\n"
 "\n"
 "%(text)s"
 
 #: contrib/comments/models.py:265
-#, fuzzy
 msgid "flag date"
-msgstr "flatside"
+msgstr "flagg dato"
 
 #: contrib/comments/models.py:268
-#, fuzzy
 msgid "user flag"
-msgstr "Bruker"
+msgstr "brukerflag"
 
 #: contrib/comments/models.py:269
-#, fuzzy
 msgid "user flags"
-msgstr "Brukere"
+msgstr "brukerflag"
 
 #: contrib/comments/models.py:273
 #, python-format
 msgid "Flag by %r"
-msgstr ""
+msgstr "Flagg med %r"
 
 #: contrib/comments/models.py:278
-#, fuzzy
 msgid "deletion date"
-msgstr "sesjon data"
+msgstr "fjernet dato"
 
 #: contrib/comments/models.py:280
 msgid "moderator deletion"
-msgstr ""
+msgstr "fjernet av  moderator"
 
 #: contrib/comments/models.py:281
 msgid "moderator deletions"
-msgstr ""
+msgstr "fjernet av moderator"
 
 #: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr ""
+msgstr "Fjernet av moderator med %r"
 
 #: contrib/comments/views/karma.py:19
 msgid "Anonymous users cannot vote"
@@ -214,16 +207,14 @@ msgstr "Ikke gyldig kommentar ID"
 
 #: contrib/comments/views/karma.py:25
 msgid "No voting for yourself"
-msgstr "Du kan ikke stemme selv"
+msgstr "Du kan ikke stemme på deg selv"
 
 #: contrib/comments/views/comments.py:28
-#, fuzzy
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr "Denne bla bla.."
+msgid "This rating is required because you've entered at least one other rating."
+msgstr "Denne rangeringen er påkrevd fordi du har rangert en eller flere ting fra før "
 
 #: contrib/comments/views/comments.py:112
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comment:\n"
@@ -246,13 +237,13 @@ msgstr[1] ""
 "%(text)s"
 
 #: contrib/comments/views/comments.py:117
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
 "\n"
 "%(text)s"
 msgstr ""
-"Denne kommentaren er skrevet med lite omtanke:\n"
+"Denne kommentaren er skrevet av en upålitelig bruker:\n"
 "\n"
 "%(text)s"
 
@@ -281,8 +272,7 @@ msgstr "Skjemaet hadde en ugyldig verdi - objekt IDen var ugyldig"
 #: contrib/comments/views/comments.py:257
 #: contrib/comments/views/comments.py:321
 msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
-"Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
+msgstr "Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
@@ -296,9 +286,8 @@ msgid "Password:"
 msgstr "Passord:"
 
 #: contrib/comments/templates/comments/form.html:6
-#, fuzzy
 msgid "Forgotten your password?"
-msgstr "Endre passord"
+msgstr "Har du glemt passordet ditt ?"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -323,38 +312,35 @@ msgstr "Log ut"
 
 #: contrib/comments/templates/comments/form.html:12
 msgid "Ratings"
-msgstr ""
+msgstr "Rangeringer"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Required"
-msgstr ""
+msgstr "Påkrevd"
 
 #: contrib/comments/templates/comments/form.html:12
 #: contrib/comments/templates/comments/form.html:23
 msgid "Optional"
-msgstr ""
+msgstr "Valgfri"
 
 #: contrib/comments/templates/comments/form.html:23
 msgid "Post a photo"
-msgstr ""
+msgstr "Send et foto"
 
 #: contrib/comments/templates/comments/form.html:27
 #: contrib/comments/templates/comments/freeform.html:5
-#, fuzzy
 msgid "Comment:"
-msgstr "tillat kommentarer"
+msgstr "Kommentar:"
 
 #: contrib/comments/templates/comments/form.html:32
 #: contrib/comments/templates/comments/freeform.html:9
-#, fuzzy
 msgid "Preview comment"
-msgstr "tillat kommentarer"
+msgstr "Forhåndvis kommentar"
 
 #: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
 msgid "Your name:"
-msgstr "brukernavn"
+msgstr "Ditt navn:"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -416,7 +402,7 @@ msgstr "objekt repr"
 
 #: contrib/admin/models.py:21
 msgid "action flag"
-msgstr "handlings flagg"
+msgstr "handlingsflagg"
 
 #: contrib/admin/models.py:22
 msgid "change message"
@@ -424,11 +410,11 @@ msgstr "endre melding"
 
 #: contrib/admin/models.py:25
 msgid "log entry"
-msgstr "logg notis"
+msgstr "logg post"
 
 #: contrib/admin/models.py:26
 msgid "log entries"
-msgstr "logg innlegg"
+msgstr "logg poster"
 
 #: contrib/admin/templatetags/admin_list.py:228
 msgid "All dates"
@@ -440,8 +426,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Vær snill å angi korrekt brukernavn og passord. La merke til at små og "
-"store bokstaver er betraktet ulik."
+"Vennligst angi korrekt brukernavn og passord. Merk at små og "
+"store bokstaver er betraktet ulikt."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:25
@@ -452,18 +438,15 @@ msgstr "Logg inn"
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
-msgstr ""
-"Du må logge inn igjen, fordi sesjonen din har gått ut på dato, men ikke ikke "
-"bekjymr deg informasjonen du sendte ble lagret."
+msgstr "Du må logge inn igjen, fordi økten din har gått ut, men innlegget ditt ble lagret."
 
 #: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Det ser ut som om nettleseren din ikke vill ta i mot informasjonskapsler "
-"('cookies'). Vennligst omkonfigurer nettleseren din, last siden på ny og "
-"prøv igjen."
+"Det ser ut som om nettleseren din ikke støtter informasjonskapsler "
+"('cookies'). Vennligst konfigurer nettleseren din, og prøv igjen."
 
 #: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
@@ -500,7 +483,7 @@ msgstr "Ny %s"
 #: contrib/admin/views/main.py:336
 #, python-format
 msgid "Added %s."
-msgstr "Lagt til %s"
+msgstr "La til %s"
 
 #: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
 #: contrib/admin/views/main.py:340
@@ -528,8 +511,7 @@ msgstr "%(name)s \"%(obj)s\" ble endret."
 
 #: contrib/admin/views/main.py:354
 #, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
 
 #: contrib/admin/views/main.py:392
@@ -742,8 +724,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"Det har vært en feil. Feilen er blitt rapportert til administrator via e-"
-"mail, og vill bli fikset snart. Takk for din tålmodighet."
+"Det har oppstått en feil. Feilen er blitt rapportert til administrator via e-"
+"post, og vil bli fikset snart. Takk for din tålmodighet."
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -909,7 +891,7 @@ msgstr "Tilbakestill mitt passord"
 
 #: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Takk for å bruke tid på internett siden i dag."
+msgstr "Takk for at du valgte å bruke kvalitetstid på nettstedet idag."
 
 #: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
@@ -954,8 +936,7 @@ msgstr "Endre passord"
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
-"Du har mottatt denne e-posten fordi du ba om å tilbakestille passordet ditt"
+msgstr "Du har mottatt denne e-posten fordi du ba om å tilbakestille passordet ditt"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -1002,6 +983,12 @@ msgid ""
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
 msgstr ""
+"\n"
+"<p class=\"help\">For å installere bokmerker, dra linken til verktøylinja\n"
+"for bokmerker, eller høyreklikk og legg til i bokmerker. Nå kan du du velge\n"
+"bokmerket fra hvilken som helst side på nettstedet. Noen av disse\n"
+"bokmerkene krever at datamaskinen du bruker er markert som \"intern\"\n"
+"(kontakt din systemadministrator hvis du er usikker på om maskinen din er \"intern\").</p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
@@ -1033,8 +1020,7 @@ msgstr "Endre dette objektet (åpnes i dette vinduet)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Hopp til administrasjonsiden for sidene som representerer et enkelt objekt."
+msgstr "Hopp til administrasjonsiden for sidene som representerer et enkelt objekt."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
@@ -1069,7 +1055,7 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Denne burde vær en fullstendig sti, uten domene navnet. Foreksempel: '/"
+"Dette burde vært en fullstendig sti, uten domene navnet. Foreksempel: '/"
 "nyheter/les/"
 
 #: contrib/redirects/models.py:9
@@ -1081,7 +1067,7 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Denne kan enten være en fullstendig sti (som over), eller en hel "
+"Dette kan enten være en fullstendig sti (som over), eller en hel "
 "internettadresse som starter med 'http://'"
 
 #: contrib/redirects/models.py:12
@@ -1093,10 +1079,8 @@ msgid "redirects"
 msgstr "omadresserelser"
 
 #: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstrek forran og bak."
+msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr "Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstrek forran og bak."
 
 #: contrib/flatpages/models.py:9
 msgid "title"
@@ -1186,7 +1170,7 @@ msgstr "passord"
 
 #: contrib/auth/models.py:59
 msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr ""
+msgstr "Bruk '[algo]$[salt]$[hexdigest]'"
 
 #: contrib/auth/models.py:60
 msgid "staff status"
@@ -1256,7 +1240,7 @@ msgstr "Melding"
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
-msgstr ""
+msgstr "Din nettleser ser ikkeut til å støtte informasjonskapsler (cookies). Informasjonskapsler er påkrevd for å logge inn."
 
 #: contrib/contenttypes/models.py:25
 msgid "python model class name"
@@ -1698,8 +1682,7 @@ msgstr "Internettadressen %s peker ikke til et godkjent bilde."
 #: core/validators.py:159
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-"Telefon nummeret må være i XXX-XXX-XXXX format. \"%s\" er ikke godkjent."
+msgstr "Telefon nummeret må være i XXX-XXX-XXXX format. \"%s\" er ikke godkjent."
 
 #: core/validators.py:167
 #, python-format
@@ -1784,30 +1767,26 @@ msgstr "Vennligst skriv inn et godkjent desimal tall."
 #: core/validators.py:349
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s total digits."
+msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Skriv inn et desimal tall med maksimum %s total antall tall."
 msgstr[1] "Skriv inn et desimal tall med maksimum %s total antall tall."
 
 #: core/validators.py:352
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
-"Please enter a valid decimal number with at most %s decimal places."
+msgid_plural "Please enter a valid decimal number with at most %s decimal places."
 msgstr[0] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
 msgstr[1] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
 
 #: core/validators.py:362
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
-"Vær sikker på at fila du prøver å laste opp er minimum %s bytes stor."
+msgstr "Vær sikker på at fila du prøver å laste opp er minimum %s bytes stor."
 
 #: core/validators.py:363
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
-"Vær sikker på at fila du prøver å laste opp er maksimum %s bytes stor."
+msgstr "Vær sikker på at fila du prøver å laste opp er maksimum %s bytes stor."
 
 #: core/validators.py:376
 msgid "The format for this field is wrong."
@@ -1824,8 +1803,7 @@ msgstr "Klarte ikke å motta noe fra %s."
 
 #: core/validators.py:429
 #, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
+msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 "Internettadressen %(url)s returnerte en ikke godkjent Content-Type '%"
 "(contenttype)s'."
@@ -1926,16 +1904,13 @@ msgid "Separate multiple IDs with commas."
 msgstr "Separer Id-ene med kommaer."
 
 #: db/models/fields/related.py:581
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
+msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
 
 #: db/models/fields/related.py:625
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr[0] "Skriv inn gyldige %(self)s ID-er. Verdien %(value)r er ikke gyldig."
 msgstr[1] "Skriv inn gyldige %(self)s ID-er. Verdiene %(value)r er ikke gyldige."
 
