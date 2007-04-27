@@ -874,6 +874,60 @@ ValidationError: [u'This field requires only numbers.']
 >>> f.clean('')
 u''
 
+# BRCPFField #################################################################
+
+>>> from django.contrib.localflavor.br.forms import BRCPFField
+>>> f = BRCPFField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('489.294.654-54')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('295.669.575-98')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('539.315.127-22')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('663.256.017-26')
+u'663.256.017-26'
+>>> f.clean('66325601726')
+u'66325601726'
+>>> f.clean('375.788.573-20')
+u'375.788.573-20'
+>>> f.clean('84828509895')
+u'84828509895'
+>>> f.clean('375.788.573-XX')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean('375.788.573-000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 14 characters.']
+>>> f.clean('123.456.78')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 11 characters.']
+>>> f.clean('123456789555')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires at most 11 digits or 14 characters.']
+>>> f = BRCPFField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
+
 # BRPhoneNumberField #########################################################
 
 >>> from django.contrib.localflavor.br.forms import BRPhoneNumberField

@@ -2601,6 +2601,27 @@ underscores converted to spaces, and the initial letter capitalized.
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>
 
+Labels for as_* methods will only end in a colon if they don't end in other
+punctuation already.
+>>> class Questions(Form):
+...    q1 = CharField(label='The first question')
+...    q2 = CharField(label='What is your name?')
+...    q3 = CharField(label='The answer to life is:')
+...    q4 = CharField(label='Answer this question!')
+...    q5 = CharField(label='The last question. Period.')
+>>> print Questions(auto_id=False).as_p()
+<p>The first question: <input type="text" name="q1" /></p>
+<p>What is your name? <input type="text" name="q2" /></p>
+<p>The answer to life is: <input type="text" name="q3" /></p>
+<p>Answer this question! <input type="text" name="q4" /></p>
+<p>The last question. Period. <input type="text" name="q5" /></p>
+>>> print Questions().as_p()
+<p><label for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
+<p><label for="id_q2">What is your name?</label> <input type="text" name="q2" id="id_q2" /></p>
+<p><label for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
+<p><label for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
+<p><label for="id_q5">The last question. Period.</label> <input type="text" name="q5" id="id_q5" /></p>
+
 A label can be a Unicode object or a bytestring with special characters.
 >>> class UserRegistration(Form):
 ...    username = CharField(max_length=10, label='ŠĐĆŽćžšđ')

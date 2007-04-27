@@ -173,6 +173,8 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
+            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
+                rel_field = rel_field.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
             rel_field = f
@@ -1376,6 +1378,8 @@ def load_data(fixture_labels, verbosity=1):
     from django.db import connection, transaction, backend
     from django.conf import settings
     import sys
+
+    disable_termcolors()
 
     # Keep a count of the installed objects and fixtures
     count = [0,0]

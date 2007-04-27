@@ -517,7 +517,7 @@ to put punctuation at the end of your validation messages.
 When are validators called?
 ---------------------------
 
-After a form has been submitted, Django validates each field in turn. First, 
+After a form has been submitted, Django validates each field in turn. First,
 if the field is required, Django checks that it is present and non-empty. Then,
 if that test passes *and the form submission contained data* for that field, all
 the validators for that field are called in turn. The emphasized portion in the
@@ -615,14 +615,18 @@ fails. If no message is passed in, a default message is used.
     ``other_value``, then the validators in ``validator_list`` are all run
     against the current field.
 
+``RequiredIfOtherFieldGiven``
+    Takes a field name of the current field is only required if the other
+    field has a value.
+
+``RequiredIfOtherFieldsGiven``
+    Similar to ``RequiredIfOtherFieldGiven``, except that it takes a list of
+    field names and if any one of the supplied fields has a value provided,
+    the current field being validated is required.
+
 ``RequiredIfOtherFieldNotGiven``
     Takes the name of the other field and this field is only required if the
     other field has no value.
-
-``RequiredIfOtherFieldsNotGiven``
-    Similar to ``RequiredIfOtherFieldNotGiven``, except that it takes a list
-    of field names and if any one of the supplied fields does not have a value
-    provided, the field being validated is required.
 
 ``RequiredIfOtherFieldEquals`` and ``RequiredIfOtherFieldDoesNotEqual``
     Each of these validator classes takes a field name and a value (in that
@@ -650,8 +654,8 @@ fails. If no message is passed in, a default message is used.
 ``NumberIsInRange``
     Takes two boundary numbers, ``lower`` and ``upper``, and checks that the
     field is greater than ``lower`` (if given) and less than ``upper`` (if
-    given).  
-    
+    given).
+
     Both checks are inclusive. That is, ``NumberIsInRange(10, 20)`` will allow
     values of both 10 and 20. This validator only checks numeric values
     (e.g., float and integer values).

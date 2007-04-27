@@ -395,8 +395,9 @@ EMAIL_HOST_PASSWORD
 
 Default: ``''`` (Empty string)
 
-Username to use for the SMTP server defined in ``EMAIL_HOST``. If empty,
-Django won't attempt authentication.
+Password to use for the SMTP server defined in ``EMAIL_HOST``. This setting is
+used in conjunction with EMAIL_HOST_USER when authenticating to the SMTP server.
+If either of these settings is empty, Django won't attempt authenticaion.
 
 See also ``EMAIL_HOST_USER``.
 

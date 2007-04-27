@@ -122,7 +122,14 @@ class BaseForm(StrAndUnicode):
             else:
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
-                label = bf.label and bf.label_tag(escape(bf.label + ':')) or ''
+                if bf.label:
+                    label = escape(bf.label)
+                    # Only add a colon if the label does not end in punctuation.
+                    if label[-1] not in ':?.!':
+                        label += ':'
+                    label = bf.label_tag(label) or ''
+                else:
+                    label = ''
                 if field.help_text:
                     help_text = help_text_html % field.help_text
                 else:
