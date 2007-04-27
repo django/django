@@ -168,6 +168,8 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
+            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
+                rel_field = rel_field.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
             rel_field = f
