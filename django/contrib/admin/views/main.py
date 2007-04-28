@@ -436,6 +436,10 @@ class ChangeList(object):
                     other_qs = other_qs.select_related()
                 other_qs = other_qs.filter(reduce(operator.or_, or_queries))
                 qs = qs & other_qs
+            for field_name in self.search_fields:
+                if '__' in field_name:
+                    qs = qs.distinct()
+                    break
 
         if self.opts.one_to_one_field:
             qs = qs.complex_filter(self.opts.one_to_one_field.rel.limit_choices_to)
