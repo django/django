@@ -395,6 +395,7 @@ class ChangeList(object):
         # If the order-by field is a field with a relationship, order by the
         # value in the related table.
         lookup_order_field = self.order_field
+        order_type = self.order_type == 'desc' and '-' or ''
         try:
             f = self.lookup_opts.get_field(self.order_field, many_to_many=False)
         except models.FieldDoesNotExist:
@@ -405,10 +406,16 @@ class ChangeList(object):
                 pass
             elif isinstance(f.rel, models.ManyToOneRel):
                 rel_ordering = f.rel.to._meta.ordering and f.rel.to._meta.ordering[0] or f.rel.to._meta.pk.column
+                if rel_ordering[0] == '-':
+                    rel_ordering = rel_ordering[1:]
+                    order_type = not order_type and '-' or ''
                 lookup_order_field = '%s.%s' % (f.rel.to._meta.db_table, rel_ordering)
+                # FIXME: Must use select_related() becuase the lookup field may
+                # be in a table not otherwise referenced yet.
+                qs = qs.select_related()
 
         # Set ordering.
-        qs = qs.order_by((self.order_type == 'desc' and '-' or '') + lookup_order_field)
+        qs = qs.order_by(order_type + lookup_order_field)
 
         # Apply keyword searches.
         def construct_search(field_name):
