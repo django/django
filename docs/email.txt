@@ -21,9 +21,8 @@ In two lines::
         ['to@example.com'], fail_silently=False)
 
 Mail will be sent using the SMTP host and port specified in the `EMAIL_HOST`_
-and `EMAIL_PORT`_ settings.  The `EMAIL_HOST_USER`_ and `EMAIL_HOST_PASSWORD`_
-settings, if set, will be used to authenticate to the
-SMTP server.
+and `EMAIL_PORT`_ settings. The `EMAIL_HOST_USER`_ and `EMAIL_HOST_PASSWORD`_
+settings, if set, will be used to authenticate to the SMTP server.
 
 .. note::
 
