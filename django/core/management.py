@@ -168,6 +168,8 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
+            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
+                rel_field = rel_field.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
             rel_field = f
@@ -314,7 +316,7 @@ def get_sql_delete(app):
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(model):
+            if backend.supports_constraints and model in references_to_delete:
                 for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
@@ -843,7 +845,7 @@ def inspectdb():
                 att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
 
-            if relations.has_key(i):
+            if i in relations:
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
                 field_type = 'ForeignKey(%s' % rel_to
                 if att_name.endswith('_id'):
@@ -1318,6 +1320,8 @@ def load_data(fixture_labels, verbosity=1):
     from django.conf import settings
     import sys
 
+    disable_termcolors()
+
     # Keep a count of the installed objects and fixtures
     count = [0,0]
     models = set()
@@ -1550,7 +1554,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action = args[0]
     except IndexError:
         parser.print_usage_and_exit()
-    if not action_mapping.has_key(action):
+    if action not in action_mapping:
         print_error("Your action, %r, was invalid." % action, argv[0])
 
     # Switch to English, because django-admin.py creates database content

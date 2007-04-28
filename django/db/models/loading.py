@@ -103,7 +103,7 @@ def register_models(app_label, *models):
         # in the _app_models dictionary
         model_name = model._meta.object_name.lower()
         model_dict = _app_models.setdefault(app_label, {})
-        if model_dict.has_key(model_name):
+        if model_name in model_dict:
             # The same model may be imported via different paths (e.g.
             # appname.models and project.appname.models). We use the source
             # filename as a means to detect identity.

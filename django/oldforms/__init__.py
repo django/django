@@ -341,7 +341,7 @@ class FormField(object):
 
     def convert_post_data(self, new_data):
         name = self.get_member_name()
-        if new_data.has_key(self.field_name):
+        if self.field_name in new_data:
             d = new_data.getlist(self.field_name)
             try:
                 converted_data = [self.__class__.html2python(data) for data in d]

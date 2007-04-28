@@ -88,7 +88,7 @@ class ForNode(Node):
 
     def render(self, context):
         nodelist = NodeList()
-        if context.has_key('forloop'):
+        if 'forloop' in context:
             parentloop = context['forloop']
         else:
             parentloop = {}
@@ -134,7 +134,7 @@ class IfChangedNode(Node):
         self._varlist = varlist
 
     def render(self, context):
-        if context.has_key('forloop') and context['forloop']['first']:
+        if 'forloop' in context and context['forloop']['first']:
             self._last_seen = None
         try:
             if self._varlist:
@@ -433,7 +433,7 @@ def cycle(parser, token):
         name = args[1]
         if not hasattr(parser, '_namedCycleNodes'):
             raise TemplateSyntaxError("No named cycles in template: '%s' is not defined" % name)
-        if not parser._namedCycleNodes.has_key(name):
+        if name not in parser._namedCycleNodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 
@@ -912,7 +912,7 @@ def templatetag(parser, token):
     if len(bits) != 2:
         raise TemplateSyntaxError, "'templatetag' statement takes one argument"
     tag = bits[1]
-    if not TemplateTagNode.mapping.has_key(tag):
+    if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError, "Invalid templatetag argument: '%s'. Must be one of: %s" % \
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)

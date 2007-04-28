@@ -230,7 +230,7 @@ class RadioInput(StrAndUnicode):
         return self.value == self.choice_value
 
     def tag(self):
-        if self.attrs.has_key('id'):
+        if 'id' in self.attrs:
             self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
@@ -276,7 +276,7 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
-        has_id = attrs and attrs.has_key('id')
+        has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
@@ -347,7 +347,7 @@ class MultiWidget(Widget):
     id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, name):
-        return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]
+        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets):
         return u''.join(rendered_widgets)

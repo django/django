@@ -200,7 +200,7 @@ def deactivate():
     will resolve against the default translation object, again.
     """
     global _active
-    if _active.has_key(currentThread()):
+    if currentThread() in _active:
         del _active[currentThread()]
 
 def get_language():

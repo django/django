@@ -55,8 +55,10 @@ class Tester(unittest.TestCase):
         for t in self.ts:
             if hasattr(t, 'x'):
                 self.assert_(sd.has_key(safeRef(t.x)))
+                self.assert_(safeRef(t.x) in sd)
             else:
                 self.assert_(sd.has_key(safeRef(t)))
+                self.assert_(safeRef(t) in sd)
     
     def testRepresentation (self):
         """Test that the reference object's representation works
