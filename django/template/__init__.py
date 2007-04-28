@@ -239,7 +239,7 @@ class DebugLexer(Lexer):
 
     def create_token(self, token_string, source, in_tag):
         token = super(DebugLexer, self).create_token(token_string, in_tag)
-        token.source = source
+        token.source = self.origin, source
         return token
 
 class Parser(object):
