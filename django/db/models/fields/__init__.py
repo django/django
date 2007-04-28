@@ -344,6 +344,8 @@ class Field(object):
     def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        if self.choices:
+            defaults['widget'] = forms.Select(choices=self.get_choices())
         defaults.update(kwargs)
         return form_class(**defaults)
 
