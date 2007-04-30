@@ -112,7 +112,7 @@ the previous record in the database::
     b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
     b4.save()  # Overrides the previous blog with ID=3!
 
-See _`How Django knows to UPDATE vs. INSERT`, below, for the reason this
+See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
 happens.
 
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
@@ -714,7 +714,7 @@ QuerySet methods that do not return QuerySets
 The following ``QuerySet`` methods evaluate the ``QuerySet`` and return
 something *other than* a ``QuerySet``.
 
-These methods do not use a cache (see _`Caching and QuerySets` below). Rather,
+These methods do not use a cache (see `Caching and QuerySets`_ below). Rather,
 they query the database each time they're called.
 
 ``get(**kwargs)``
@@ -906,8 +906,8 @@ The database API supports the following lookup types:
 exact
 ~~~~~
 
-Exact match. If the value provided for comparison is ``None``, it will 
-be interpreted as an SQL ``NULL`` (See isnull_ for more details).  
+Exact match. If the value provided for comparison is ``None``, it will
+be interpreted as an SQL ``NULL`` (See isnull_ for more details).
 
 Examples::
 

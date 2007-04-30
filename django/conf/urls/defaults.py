@@ -22,5 +22,7 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
         # For include(...) processing.
         return RegexURLResolver(regex, view[0], kwargs)
     else:
-        return RegexURLPattern(regex, prefix and (prefix + '.' + view) or view, kwargs, name)
+        if prefix and isinstance(view, basestring):
+            view = prefix + '.' + view
+        return RegexURLPattern(regex, view, kwargs, name)
 

@@ -21,20 +21,19 @@ In two lines::
         ['to@example.com'], fail_silently=False)
 
 Mail will be sent using the SMTP host and port specified in the `EMAIL_HOST`_
-and `EMAIL_PORT`_ settings.  The `EMAIL_HOST_USER`_ and `EMAIL_HOST_PASSWORD`_
-settings, if set, will be used to authenticate to the
-SMTP server.
+and `EMAIL_PORT`_ settings. The `EMAIL_HOST_USER`_ and `EMAIL_HOST_PASSWORD`_
+settings, if set, will be used to authenticate to the SMTP server.
 
 .. note::
 
     The character set of email sent with ``django.core.mail`` will be set to
     the value of your `DEFAULT_CHARSET setting`_.
 
-.. _DEFAULT_CHARSET setting: ../settings/#DEFAULT_CHARSET
-.. _EMAIL_HOST: ../settings/#EMAIL_HOST
-.. _EMAIL_PORT: ../settings/#EMAIL_PORT
-.. _EMAIL_HOST_USER: ../settings/#EMAIL_HOST_USER
-.. _EMAIL_HOST_PASSWORD: ../settings/#EMAIL_HOST_PASSWORD
+.. _DEFAULT_CHARSET setting: ../settings/#default-charset
+.. _EMAIL_HOST: ../settings/#email-host
+.. _EMAIL_PORT: ../settings/#email-port
+.. _EMAIL_HOST_USER: ../settings/#email-host-user
+.. _EMAIL_HOST_PASSWORD: ../settings/#email-host-password
 
 
 send_mail()

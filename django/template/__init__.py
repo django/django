@@ -204,7 +204,7 @@ class Lexer(object):
     def create_token(self, token_string, in_tag):
         """
         Convert the given token string into a new Token object and return it.
-        If tag is True, we are processing something that matched a tag,
+        If in_tag is True, we are processing something that matched a tag,
         otherwise it should be treated as a literal string.
         """
         if in_tag:
@@ -239,7 +239,7 @@ class DebugLexer(Lexer):
 
     def create_token(self, token_string, source, in_tag):
         token = super(DebugLexer, self).create_token(token_string, in_tag)
-        token.source = source
+        token.source = self.origin, source
         return token
 
 class Parser(object):
