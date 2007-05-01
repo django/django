@@ -174,13 +174,13 @@ False
 >>> Article.objects.filter(reporter_id__exact=1)
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'reporter_id' into field
+TypeError: Cannot resolve keyword 'reporter_id' into field, choices are: id, headline, pub_date, reporter
 
 # You need to specify a comparison clause
 >>> Article.objects.filter(reporter_id=1)
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'reporter_id' into field
+TypeError: Cannot resolve keyword 'reporter_id' into field, choices are: id, headline, pub_date, reporter
 
 # You can also instantiate an Article by passing
 # the Reporter's ID instead of a Reporter object.
