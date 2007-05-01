@@ -598,6 +598,7 @@ def syncdb(verbosity=1, interactive=True):
     # Install custom SQL for the app (but only if this
     # is a model we've just created)
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         for model in models.get_models(app):
             if model in created_models:
                 custom_sql = get_custom_sql_for_model(model)

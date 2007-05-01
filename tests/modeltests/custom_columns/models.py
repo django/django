@@ -71,7 +71,7 @@ __test__ = {'API_TESTS':"""
 >>> Author.objects.filter(firstname__exact='John')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'firstname' into field
+TypeError: Cannot resolve keyword 'firstname' into field, choices are: article, id, first_name, last_name
 
 >>> a = Author.objects.get(last_name__exact='Smith')
 >>> a.first_name
