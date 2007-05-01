@@ -206,7 +206,7 @@ class GEOSGeometry:
         return GEOSCoordSeq(clone, z=self.hasz)
 
     def normalize(self):
-        "Converts this Geometry to normal form (or canonical form).Converts this Geometry to normal form (or canonical form)."
+        "Converts this Geometry to normal form (or canonical form)."
         status = lgeos.GEOSNormalize(self._g)
         if status == -1: raise GEOSException, 'failed to normalize geometry'
 
@@ -326,13 +326,13 @@ class GEOSGeometry:
         Geometry is less than or equal to distance. Calculations are in the
         Spatial Reference System of this Geometry. The optional third parameter sets
         the number of segment used to approximate a quarter circle (defaults to 8).
-        [Text from PostGIS documentation at ch. 6.2.2 <-- verify]
+        (Text from PostGIS documentation at ch. 6.1.3)
         """
         if type(width) != type(0.0):
             raise TypeError, 'width parameter must be a float'
         if type(quadsegs) != type(0):
             raise TypeError, 'quadsegs parameter must be an integer'
-        b = lgeos.GEOSBuffer(self._g, c_float(width), c_int(quadsegs))
+        b = lgeos.GEOSBuffer(self._g, c_double(width), c_int(quadsegs))
         return GEOSGeometry(b, 'geos')
 
     @property
