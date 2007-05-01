@@ -869,6 +869,12 @@ class USStateField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.USStateField]
 
+    def formfield(self, **kwargs):
+        from django.contrib.localflavor.us.forms import USStateSelect
+        defaults = {'widget': USStateSelect}
+        defaults.update(kwargs)
+        return super(USStateField, self).formfield(**defaults)
+
 class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):
         self.schema_path = schema_path
