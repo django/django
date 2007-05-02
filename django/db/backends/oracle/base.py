@@ -95,8 +95,11 @@ class FormatStylePlaceholderCursor(Database.Cursor):
                         params[i] = str(param)
         args = [(':arg%d' % i) for i in range(len(params))]
         query = query % tuple(args)
-        # cx_Oracle cannot execute a query with the closing ';'
-        if query.endswith(';'):
+        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # characters must be included in the original query in case the query
+        # is being passed to SQL*Plus.
+        if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
         return query, params
 
@@ -185,7 +188,8 @@ def get_autoinc_sql(table):
   WHEN (new.id IS NULL)
     BEGIN
       SELECT %s.nextval INTO :new.id FROM dual;
-    END;\n""" % (tr_name, quote_name(table), sq_name)
+    END;
+    /""" % (tr_name, quote_name(table), sq_name)
     return sequence_sql, trigger_sql
 
 def get_drop_sequence(table):
@@ -208,7 +212,8 @@ def _get_sequence_reset_sql():
                 EXECUTE IMMEDIATE 'ALTER SEQUENCE %(sequence)s INCREMENT BY 1';
             END IF;
             COMMIT;
-        END;\n"""
+        END;
+        /"""
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
