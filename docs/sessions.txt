@@ -107,7 +107,7 @@ posts a comment. It doesn't let a user post a comment more than once::
 This simplistic view logs in a "member" of the site::
 
     def login(request):
-        m = members.get_object(username__exact=request.POST['username'])
+        m = Member.objects.get(username=request.POST['username'])
         if m.password == request.POST['password']:
             request.session['member_id'] = m.id
             return HttpResponse("You're logged in.")
