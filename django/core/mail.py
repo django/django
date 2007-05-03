@@ -142,7 +142,8 @@ class SMTPConnection(object):
             return False
         try:
             self.connection.sendmail(email_message.from_email,
-                    email_message.to, email_message.message().as_string())
+                    email_message.recipients(),
+                    email_message.message().as_string())
         except:
             if not self.fail_silently:
                 raise
@@ -153,12 +154,10 @@ class EmailMessage(object):
     """
     A container for email information.
     """
-    def __init__(self, subject='', body='', from_email=None, to=None, connection=None):
+    def __init__(self, subject='', body='', from_email=None, to=None, bcc=None, connection=None):
         self.to = to or []
-        if from_email is None:
-            self.from_email = settings.DEFAULT_FROM_EMAIL
-        else:
-            self.from_email = from_email
+        self.bcc = bcc or []
+        self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
         self.connection = connection
@@ -175,7 +174,16 @@ class EmailMessage(object):
         msg['To'] = ', '.join(self.to)
         msg['Date'] = formatdate()
         msg['Message-ID'] = make_msgid()
+        if self.bcc:
+            msg['Bcc'] = ', '.join(self.bcc)
         return msg
+
+    def recipients(self):
+        """
+        Returns a list of all recipients of the email (includes direct
+        addressees as well as Bcc entries).
+        """
+        return self.to + self.bcc
 
     def send(self, fail_silently=False):
         """Send the email message."""
