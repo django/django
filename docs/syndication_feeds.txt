@@ -646,15 +646,15 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         def item_enclosure_mime_type(self, item):
             """
             Takes an item, as returned by items(), and returns the item's
-            enclosure mime type.
+            enclosure MIME type.
             """
 
         def item_enclosure_mime_type(self):
             """
-            Returns the enclosure length, in bytes, for every item in the feed.
+            Returns the enclosure MIME type for every item in the feed.
             """
 
-        item_enclosure_mime_type = "audio/mpeg" # Hard-coded enclosure mime-type.
+        item_enclosure_mime_type = "audio/mpeg" # Hard-coded enclosure MIME type.
 
         # ITEM PUBDATE -- It's optional to use one of these three. This is a
         # hook that specifies how to get the pubdate for a given item.
