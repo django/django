@@ -22,7 +22,8 @@ In two lines::
 
 Mail will be sent using the SMTP host and port specified in the `EMAIL_HOST`_
 and `EMAIL_PORT`_ settings. The `EMAIL_HOST_USER`_ and `EMAIL_HOST_PASSWORD`_
-settings, if set, will be used to authenticate to the SMTP server.
+settings, if set, will be used to authenticate to the SMTP server and the
+`EMAIL_USE_TLS`_ settings will control whether a secure connection is used.
 
 .. note::
 
@@ -34,6 +35,7 @@ settings, if set, will be used to authenticate to the SMTP server.
 .. _EMAIL_PORT: ../settings/#email-port
 .. _EMAIL_HOST_USER: ../settings/#email-host-user
 .. _EMAIL_HOST_PASSWORD: ../settings/#email-host-password
+.. _EMAIL_USE_TLS: ../settings/#email-use-tls
 
 
 send_mail()

@@ -70,15 +70,12 @@ class SMTPConnection(object):
     """
 
     def __init__(self, host=None, port=None, username=None, password=None,
-                 fail_silently=False):
-        if host is None:
-            self.host = settings.EMAIL_HOST
-        if port is None:
-            self.port = settings.EMAIL_PORT
-        if username is None:
-        	self.username = settings.EMAIL_HOST_USER
-        if password is None:
-	        self.password = settings.EMAIL_HOST_PASSWORD
+            use_tls=None, fail_silently=False):
+        self.host = host or settings.EMAIL_HOST
+        self.port = (port is not None) and port or settings.EMAIL_PORT
+        self.username = username or settings.EMAIL_HOST_USER
+        self.password = password or settings.EMAIL_HOST_PASSWORD
+        self.use_tls = (use_tls is not None) and use_tls or settings.EMAIL_USE_TLS
         self.fail_silently = fail_silently
         self.connection = None
 
@@ -92,6 +89,10 @@ class SMTPConnection(object):
             return False
         try:
             self.connection = smtplib.SMTP(self.host, self.port)
+            if self.use_tls:
+                self.connection.ehlo()
+                self.connection.starttls()
+                self.connection.ehlo()
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
             return True
@@ -104,6 +105,10 @@ class SMTPConnection(object):
         try:
             try:
                 self.connection.quit()
+            except socket.sslerror:
+                # This happens when calling quit() on a TLS connection
+                # sometimes.
+                self.connection.close()
             except:
                 if self.fail_silently:
                     return

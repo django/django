@@ -428,6 +428,13 @@ Subject-line prefix for e-mail messages sent with ``django.core.mail.mail_admins
 or ``django.core.mail.mail_managers``. You'll probably want to include the
 trailing space.
 
+EMAIL_USE_TLS
+-------------
+
+Default: ``False``
+
+Whether to use a TLS (secure) connection when talking to the SMTP server.
+
 FIXTURE_DIRS
 -------------
 
