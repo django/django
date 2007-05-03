@@ -6,11 +6,16 @@ from django.conf import settings
 from email.MIMEText import MIMEText
 from email.Header import Header
 from email.Utils import formatdate
+from email import Charset
 import os
 import smtplib
 import socket
 import time
 import random
+
+# Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
+# some spam filters.
+Charset.add_charset('utf-8', Charset.SHORTEST, Charset.QP, 'utf-8')
 
 # Cache the hostname, but do it lazily: socket.getfqdn() can take a couple of
 # seconds, which slows down the restart of the server.
