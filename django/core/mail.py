@@ -132,7 +132,7 @@ class SMTPConnection(object):
             return False
         try:
             self.connection.sendmail(email_message.from_email,
-                    email_message.to, email_message.message.as_string()())
+                    email_message.to, email_message.message().as_string())
         except:
             if not self.fail_silently:
                 raise
@@ -165,6 +165,7 @@ class EmailMessage(object):
         msg['To'] = ', '.join(self.to)
         msg['Date'] = formatdate()
         msg['Message-ID'] = make_msgid()
+        return msg
 
     def send(self, fail_silently=False):
         """Send the email message."""
