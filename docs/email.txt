@@ -183,3 +183,49 @@ from the request's POST data, sends that to admin@example.com and redirects to
             return HttpResponse('Make sure all fields are entered and valid.')
 
 .. _Header injection: http://securephp.damonkohler.com/index.php/Email_Injection
+
+The EmailMessage and SMTPConnection classes
+===========================================
+
+Django's `send_mail()` and `send_mass_mail()` functions are actually thin
+wrappers that make use of the `EmailMessage` and `SMTPConnection` classes in
+`django.mail`.  If you ever need to customize the way Django sends email, you
+can subclass these two classes to suit your needs.
+
+.. note::
+    Not all features of the `EmailMessage` class are available through the
+    `send_mail()` and related wrapper functions. If you wish to use advanced
+    features such as including BCC recipients or multi-part email, you will
+    need to create `EmailMessage` instances directly.
+
+In general, `EmailMessage` is responsible for creating the email message
+itself. `SMTPConnection` is responsible for the network connection side of the
+operation. This means you can reuse the same connection (an `SMTPConnection`
+instance) for multiple messages.
+
+The `EmailMessage` class has the following methods that you can use:
+
+ * `send()` sends the message, using either the connection that is specified
+   in the `connection` attribute, or creating a new connection if none already
+   exists.
+ * `message()` constructs a `django.core.mail.SafeMIMEText` object (a
+   sub-class of Python's `email.MIMEText.MIMEText` class) holding the message
+   to be sent. If you ever need to extend the `EmailMessage` class, you will
+   probably want to override this method to put the content you wish into the
+   MIME object.
+
+The `SMTPConnection` class is initialized with the host, port, username and
+password for the SMTP server. If you don't specify one or more of those
+options, they are read from your settings file.
+
+If you are sending lots of messages at once, the `send_messages()` method of
+the `SMTPConnection` class will be useful. It takes a list of `EmailMessage`
+instances (or sub-classes) and sends them over a single connection. For
+example, if you have a function called `get_notification_email()` that returns a
+list of `EmailMessage` objects representing some periodic email you wish to
+send out, you could send this with::
+
+    connection = SMTPConnection()   # Use default settings for connection
+    messages = get_notification_email()
+    connection.send_messages(messages)
+
