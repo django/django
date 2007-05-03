@@ -431,6 +431,8 @@ trailing space.
 EMAIL_USE_TLS
 -------------
 
+**New in Django development version**
+
 Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
