@@ -72,7 +72,7 @@ class SMTPConnection(object):
     def __init__(self, host=None, port=None, username=None, password=None,
             use_tls=None, fail_silently=False):
         self.host = host or settings.EMAIL_HOST
-        self.port = (port is not None) and port or settings.EMAIL_PORT
+        self.port = port or settings.EMAIL_PORT
         self.username = username or settings.EMAIL_HOST_USER
         self.password = password or settings.EMAIL_HOST_PASSWORD
         self.use_tls = (use_tls is not None) and use_tls or settings.EMAIL_USE_TLS
