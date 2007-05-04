@@ -272,7 +272,7 @@ def get_query_set_class(DefaultQuerySet):
     "Create a custom QuerySet class for Oracle."
 
     from django.db import backend, connection
-    from django.db.models.query import EmptyResultSet, GET_ITERATOR_CHUNK_SIZE
+    from django.db.models.query import EmptyResultSet, GET_ITERATOR_CHUNK_SIZE, quote_only_if_word
 
     class OracleQuerySet(DefaultQuerySet):
 
