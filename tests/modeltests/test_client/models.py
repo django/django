@@ -127,18 +127,19 @@ class ClientTest(TestCase):
         response = self.client.get('/test_client/login_protected_view/')
         self.assertRedirects(response, '/accounts/login/')
         
+        # Log in
+        self.client.login(username='testclient', password='password')
+
         # Request a page that requires a login
-        response = self.client.login('/test_client/login_protected_view/', 'testclient', 'password')
-        self.failUnless(response)
+        response = self.client.get('/test_client/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
-        self.assertEqual(response.template.name, 'Login Template')
 
     def test_view_with_bad_login(self):
         "Request a page that is protected with @login, but use bad credentials"
 
-        response = self.client.login('/test_client/login_protected_view/', 'otheruser', 'nopassword')
-        self.failIf(response)
+        login = self.client.login(username='otheruser', password='nopassword')
+        self.failIf(login)
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
