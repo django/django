@@ -166,7 +166,7 @@ To assist in testing various features of your application, Django provides
 tools that can be used to establish tests and test conditions.
 
 * `Test Client`_
-* Fixtures_
+* `TestCase`_
 
 Test Client
 -----------
@@ -357,8 +357,30 @@ The following is a simple unit test using the Test Client::
             # Check that the rendered context contains 5 customers
             self.failUnlessEqual(len(response.context['customers']), 5)
 
-Fixtures
+TestCase
 --------
+
+Normal python unit tests extend a base class of ``unittest.testCase``. 
+Django provides an extension of this base class - ``django.test.TestCase`` 
+- that provides some additional capabilities that can be useful for 
+testing web sites. 
+
+Moving from a normal unittest TestCase to a Django TestCase is easy - just
+change the base class of your test from ``unittest.TestCase`` to 
+``django.test.TestCase``. All of the standard Python unit test facilities
+will continue to be available, but they will be augmented with some useful
+extra facilities.
+
+Default Test Client
+~~~~~~~~~~~~~~~~~~~
+** New in Django development version **
+
+Every test case in a ``django.test.TestCase`` instance has access to an
+instance of a Django `Test Client`_. This Client can be accessed as 
+``self.client``. This client is recreated for each test.
+
+Fixture loading
+~~~~~~~~~~~~~~~
 
 A test case for a database-backed website isn't much use if there isn't any
 data in the database. To make it easy to put test data into the database,
@@ -376,16 +398,14 @@ multiple applications.
     This provides a mechanism to populate a new database with any initial
     data (such as a default set of categories). Fixtures with other names
     can be installed manually using ``django-admin.py loaddata``. 
-    
 
 However, for the purposes of unit testing, each test must be able to 
 guarantee the contents of the database at the start of each and every
-test. To do this, Django provides a TestCase baseclass that can integrate
-with fixtures.
+test. 
 
-Moving from a normal unittest TestCase to a Django TestCase is easy - just
-change the base class of your test, and define a list of fixtures
-to be used. For example, the test case from `Writing unittests`_ would 
+To define a fixture for a test, all you need to do is add a class
+attribute to your test describing the fixtures you want the test to use.
+For example, the test case from `Writing unittests`_ would 
 look like::
 
     from django.test import TestCase
@@ -410,6 +430,24 @@ This flush/load procedure is repeated for each test in the test case, so you
 can be certain that the outcome of a test will not be affected by 
 another test, or the order of test execution.
 
+Assertions
+~~~~~~~~~~
+** New in Django development version **
+
+Normal Python unit tests have a wide range of assertions, such as 
+``assertTrue`` and ``assertEquals`` that can be used to validate behavior. 
+``django.TestCase`` adds to these, providing some assertions
+that can be useful in testing the behavior of web sites.
+
+``assertRedirects(response, expected_path)``
+    Assert that the response received redirects the browser to the provided
+    path, and that the expected_path can be retrieved.
+
+``assertContains(response, text, count=1)``
+    Assert that a response indicates that a page was retreived successfully,
+    (i.e., the HTTP status code was 200), and that ``text`` occurs ``count`` 
+    times in the content of the response.
+    
 Running tests
 =============
 

@@ -345,7 +345,7 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
       ``request.user.get_and_delete_messages()`` for every request. That method
       collects the user's messages and deletes them from the database.
 
-      Note that messages are set with ``user.add_message()``. See the
+      Note that messages are set with ``user.message_set.create``. See the
       `message docs`_ for more.
 
     * ``perms`` -- An instance of

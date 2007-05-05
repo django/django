@@ -94,12 +94,10 @@ Formatting
 
 The text documentation is written in ReST (ReStructured Text) format. That
 means it's easy to read but is also formatted in a way that makes it easy to
-convert into other formats, such as HTML. If you're interested, the script that
-converts the ReST text docs into djangoproject.com's HTML lives at
-`djangoproject.com/django_website/apps/docs/parts/build_documentation.py`_ in
-the Django Subversion repository.
+convert into other formats, such as HTML. If you have the `reStructuredText`_
+library installed, you can use ``rst2html`` to generate your own HTML files.
 
-.. _djangoproject.com/django_website/apps/docs/parts/build_documentation.py: http://code.djangoproject.com/browser/djangoproject.com/django_website/apps/docs/parts/build_documentation.py
+.. _reStructuredText: http://docutils.sourceforge.net/rst.html
 
 Differences between versions
 ============================

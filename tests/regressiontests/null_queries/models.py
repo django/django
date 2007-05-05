@@ -32,7 +32,7 @@ __test__ = {'API_TESTS':"""
 >>> Choice.objects.filter(foo__exact=None) 
 Traceback (most recent call last):
 ...
-TypeError: Cannot resolve keyword 'foo' into field
+TypeError: Cannot resolve keyword 'foo' into field, choices are: id, poll, choice
 
 # Can't use None on anything other than __exact
 >>> Choice.objects.filter(id__gt=None)

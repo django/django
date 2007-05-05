@@ -853,6 +853,13 @@ def find_field(name, field_list, related_query):
         return None
     return matches[0]
 
+def field_choices(field_list, related_query):
+    if related_query:
+        choices = [f.field.related_query_name() for f in field_list]
+    else:
+        choices = [f.name for f in field_list]
+    return choices
+
 def lookup_inner(path, lookup_type, value, opts, table, column):
     qn = backend.quote_name
     joins, where, params = SortedDict(), [], []
@@ -937,7 +944,11 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     except FieldFound: # Match found, loop has been shortcut.
         pass
     else: # No match found.
-        raise TypeError, "Cannot resolve keyword '%s' into field" % name
+        choices = field_choices(current_opts.many_to_many, False) + \
+            field_choices(current_opts.get_all_related_many_to_many_objects(), True) + \
+            field_choices(current_opts.get_all_related_objects(), True) + \
+            field_choices(current_opts.fields, False)
+        raise TypeError, "Cannot resolve keyword '%s' into field, choices are: %s" % (name, ", ".join(choices))
 
     # Check whether an intermediate join is required between current_table
     # and new_table.

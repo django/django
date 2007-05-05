@@ -24,19 +24,14 @@ from django.test import Client, TestCase
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
     
-    def setUp(self):
-        "Set up test environment"
-        self.client = Client()
-        
     def test_get_view(self):
         "GET a view"
         response = self.client.get('/test_client/get_view/')
         
         # Check some response details
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This is a test')
         self.assertEqual(response.context['var'], 42)
         self.assertEqual(response.template.name, 'GET Template')
-        self.failUnless('This is a test.' in response.content)
 
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
@@ -80,7 +75,7 @@ class ClientTest(TestCase):
         response = self.client.get('/test_client/redirect_view/')
         
         # Check that the response was a 302 (redirect)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/test_client/get_view/')
 
     def test_valid_form(self):
         "POST valid data to a form"
@@ -102,7 +97,7 @@ class ClientTest(TestCase):
             'value': 37            
         }
         response = self.client.post('/test_client/form_view/', post_data)
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This field is required', 3)
         self.assertEqual(response.template.name, "Invalid POST Template")
 
     def test_form_error(self):
@@ -130,7 +125,7 @@ class ClientTest(TestCase):
         
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/')
         
         # Request a page that requires a login
         response = self.client.login('/test_client/login_protected_view/', 'testclient', 'password')
