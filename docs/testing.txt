@@ -2,19 +2,29 @@
 Testing Django applications
 ===========================
 
-Automated testing is an extremely useful weapon in the bug-killing arsenal
-of the modern developer. When initially writing code, a test suite can be
-used to validate that code behaves as expected. When refactoring or
-modifying code, tests serve as a guide to ensure that behavior hasn't
-changed unexpectedly as a result of the refactor.
+Automated testing is an extremely useful bug-killing tool for the modern
+Web developer. You can use a collection of tests -- a **test suite** -- to
+to solve, or avoid, a number of problems:
 
-Testing a web application is a complex task, as there are many
-components of a web application that must be validated and tested. To
-help you test your application, Django provides a test execution
-framework, and range of utilities that can be used to simulate and
-inspect various facets of a web application.
+    * When you're writing new code, you can use tests to validate your code
+      works as expected.
 
-    This testing framework is currently under development, and may change
+    * When you're refactoring or modifying old code, you can use tests to
+      ensure your changes haven't affected your application's behavior
+      unexpectedly.
+
+Testing a Web application is a complex task, because a Web application is made
+of several layers of logic -- from HTTP-level request handling, to form
+validation and processing, to template rendering. With Django's test-execution
+framework and assorted utilities, you can simulate requests, insert test data,
+inspect your application's output and generally verify your code is doing what
+it should be doing.
+
+The best part is, it's really easy.
+
+.. admonition:: Note
+
+    This testing framework is currently under development. It may change
     slightly before the next official Django release.
 
     (That's *no* excuse not to write tests, though!)
@@ -216,21 +226,21 @@ can be invoked on the ``Client`` instance.
 
 ``post(path, data={}, content_type=MULTIPART_CONTENT)``
     Make a POST request on the provided ``path``. If you provide a content type
-    (e.g., ``text/xml`` for an XML payload), the contents of ``data`` will be 
-    sent as-is in the POST request, using the content type in the HTTP 
+    (e.g., ``text/xml`` for an XML payload), the contents of ``data`` will be
+    sent as-is in the POST request, using the content type in the HTTP
     ``Content-Type`` header.
-    
-    If you do not provide a value for ``content_type``, the values in 
+
+    If you do not provide a value for ``content_type``, the values in
     ``data`` will be transmitted with a content type of ``multipart/form-data``.
     The key-value pairs in the data dictionary will be encoded as a multipart
     message and used to create the POST data payload.
-    
-    To submit multiple values for a given key (for example, to specify 
-    the selections for a multiple selection list), provide the values as a 
+
+    To submit multiple values for a given key (for example, to specify
+    the selections for a multiple selection list), provide the values as a
     list or tuple for the required key. For example, a data dictionary of
     ``{'choices': ('a','b','d')}`` would submit three selected rows for the
     field named ``choices``.
-    
+
     Submitting files is a special case. To POST a file, you need only
     provide the file field name as a key, and a file handle to the file you wish to
     upload as a value. The Test Client will populate the two POST fields (i.e.,
@@ -248,31 +258,31 @@ can be invoked on the ``Client`` instance.
 
 ``login(**credentials)``
     ** New in Django development version **
-    
+
     On a production site, it is likely that some views will be protected from
     anonymous access through the use of the @login_required decorator, or some
     other login checking mechanism. The ``login()`` method can be used to
     simulate the effect of a user logging into the site. As a result of calling
     this method, the Client will have all the cookies and session data required
     to pass any login-based tests that may form part of a view.
-    
-    In most cases, the ``credentials`` required by this method are the username 
-    and password of the user that wants to log in, provided as keyword 
+
+    In most cases, the ``credentials`` required by this method are the username
+    and password of the user that wants to log in, provided as keyword
     arguments::
-    
+
         c = Client()
         c.login(username='fred', password='secret')
         # Now you can access a login protected view
 
     If you are using a different authentication backend, this method may
     require different credentials.
-    
-    ``login()`` returns ``True`` if it the credentials were accepted and login 
-    was successful. 
-        
+
+    ``login()`` returns ``True`` if it the credentials were accepted and login
+    was successful.
+
     Note that since the test suite will be executed using the test database,
     which contains no users by default. As a result, logins that are valid
-    on your production site will not work under test conditions. You will 
+    on your production site will not work under test conditions. You will
     need to create users as part of the test suite (either manually, or
     using a test fixture).
 
@@ -373,13 +383,13 @@ The following is a simple unit test using the Test Client::
 TestCase
 --------
 
-Normal python unit tests extend a base class of ``unittest.testCase``. 
-Django provides an extension of this base class - ``django.test.TestCase`` 
-- that provides some additional capabilities that can be useful for 
-testing web sites. 
+Normal python unit tests extend a base class of ``unittest.testCase``.
+Django provides an extension of this base class - ``django.test.TestCase``
+- that provides some additional capabilities that can be useful for
+testing web sites.
 
 Moving from a normal unittest TestCase to a Django TestCase is easy - just
-change the base class of your test from ``unittest.TestCase`` to 
+change the base class of your test from ``unittest.TestCase`` to
 ``django.test.TestCase``. All of the standard Python unit test facilities
 will continue to be available, but they will be augmented with some useful
 extra facilities.
@@ -389,7 +399,7 @@ Default Test Client
 ** New in Django development version **
 
 Every test case in a ``django.test.TestCase`` instance has access to an
-instance of a Django `Test Client`_. This Client can be accessed as 
+instance of a Django `Test Client`_. This Client can be accessed as
 ``self.client``. This client is recreated for each test.
 
 Fixture loading
@@ -405,20 +415,20 @@ comprise the fixture can be distributed over multiple directories, in
 multiple applications.
 
 .. note::
-    If you have synchronized a Django project, you have already experienced 
+    If you have synchronized a Django project, you have already experienced
     the use of one fixture -- the ``initial_data`` fixture. Every time you
     synchronize the database, Django installs the ``initial_data`` fixture.
     This provides a mechanism to populate a new database with any initial
     data (such as a default set of categories). Fixtures with other names
-    can be installed manually using ``django-admin.py loaddata``. 
+    can be installed manually using ``django-admin.py loaddata``.
 
-However, for the purposes of unit testing, each test must be able to 
+However, for the purposes of unit testing, each test must be able to
 guarantee the contents of the database at the start of each and every
-test. 
+test.
 
 To define a fixture for a test, all you need to do is add a class
 attribute to your test describing the fixtures you want the test to use.
-For example, the test case from `Writing unittests`_ would 
+For example, the test case from `Writing unittests`_ would
 look like::
 
     from django.test import TestCase
@@ -426,29 +436,29 @@ look like::
 
     class AnimalTestCase(TestCase):
         fixtures = ['mammals.json', 'birds']
-        
+
         def setUp(self):
             # test definitions as before
 
 At the start of each test case, before ``setUp()`` is run, Django will
-flush the database, returning the database the state it was in directly 
-after ``syncdb`` was called. Then, all the named fixtures are installed. 
+flush the database, returning the database the state it was in directly
+after ``syncdb`` was called. Then, all the named fixtures are installed.
 In this example, any JSON fixture called ``mammals``, and any fixture
-named ``birds`` will be installed. See the documentation on 
+named ``birds`` will be installed. See the documentation on
 `loading fixtures`_ for more details on defining and installing fixtures.
 
 .. _`loading fixtures`: ../django-admin/#loaddata-fixture-fixture
 
-This flush/load procedure is repeated for each test in the test case, so you 
-can be certain that the outcome of a test will not be affected by 
+This flush/load procedure is repeated for each test in the test case, so you
+can be certain that the outcome of a test will not be affected by
 another test, or the order of test execution.
 
 Assertions
 ~~~~~~~~~~
 ** New in Django development version **
 
-Normal Python unit tests have a wide range of assertions, such as 
-``assertTrue`` and ``assertEquals`` that can be used to validate behavior. 
+Normal Python unit tests have a wide range of assertions, such as
+``assertTrue`` and ``assertEquals`` that can be used to validate behavior.
 ``django.TestCase`` adds to these, providing some assertions
 that can be useful in testing the behavior of web sites.
 
@@ -458,9 +468,9 @@ that can be useful in testing the behavior of web sites.
 
 ``assertContains(response, text, count=1)``
     Assert that a response indicates that a page was retreived successfully,
-    (i.e., the HTTP status code was 200), and that ``text`` occurs ``count`` 
+    (i.e., the HTTP status code was 200), and that ``text`` occurs ``count``
     times in the content of the response.
-    
+
 Running tests
 =============
 
@@ -519,11 +529,11 @@ failed::
 
     FAILED (failures=1)
 
-The return code for the script is the total number of failed and erroneous 
+The return code for the script is the total number of failed and erroneous
 tests. If all the tests pass, the return code is 0.
 
 Regardless of whether the tests pass or fail, the test database is destroyed when
-all the tests have been executed. 
+all the tests have been executed.
 
 Using a different testing framework
 ===================================
@@ -534,7 +544,7 @@ it does provide a mechanism to allow you to invoke tests constructed for
 an alternative framework as if they were normal Django tests.
 
 When you run ``./manage.py test``, Django looks at the ``TEST_RUNNER``
-setting to determine what to do. By default, ``TEST_RUNNER`` points to 
+setting to determine what to do. By default, ``TEST_RUNNER`` points to
 ``django.test.simple.run_tests``. This method defines the default Django
 testing behavior. This behavior involves:
 
@@ -564,7 +574,7 @@ arguments:
     Verbosity determines the amount of notification and debug information that
     will be printed to the console; `0` is no output, `1` is normal output,
     and `2` is verbose output.
-    
+
     This method should return the number of tests that failed.
 
 Testing utilities
