@@ -948,7 +948,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
             field_choices(current_opts.get_all_related_many_to_many_objects(), True) + \
             field_choices(current_opts.get_all_related_objects(), True) + \
             field_choices(current_opts.fields, False)
-        raise TypeError, "Cannot resolve keyword '%s' into field, choices are: %s" % (name, ", ".join(choices))
+        raise TypeError, "Cannot resolve keyword '%s' into field. Choices are: %s" % (name, ", ".join(choices))
 
     # Check whether an intermediate join is required between current_table
     # and new_table.
