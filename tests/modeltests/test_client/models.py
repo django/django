@@ -33,6 +33,13 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['var'], 42)
         self.assertEqual(response.template.name, 'GET Template')
 
+    def test_no_template_view(self):
+        "Check that template usage assersions work then templates aren't in use"
+        response = self.client.get('/test_client/no_template_view/')
+
+        # Check that the no template case doesn't mess with the template assertions
+        self.assertTemplateNotUsed(response, 'GET Template')
+        
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/test_client/post_view/', {})
@@ -40,6 +47,8 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty GET Template')
+        self.assertTemplateUsed(response, 'Empty GET Template')
+        self.assertTemplateNotUsed(response, 'Empty POST Template')
         
     def test_empty_post(self):
         "POST an empty dictionary to a view"
@@ -48,6 +57,8 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty POST Template')
+        self.assertTemplateNotUsed(response, 'Empty GET Template')
+        self.assertTemplateUsed(response, 'Empty POST Template')
         
     def test_post(self):
         "POST some data to a view"
@@ -88,7 +99,7 @@ class ClientTest(TestCase):
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Valid POST Template")
+        self.assertTemplateUsed(response, "Valid POST Template")
 
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
@@ -97,8 +108,13 @@ class ClientTest(TestCase):
             'value': 37            
         }
         response = self.client.post('/test_client/form_view/', post_data)
-        self.assertContains(response, 'This field is required', 3)
-        self.assertEqual(response.template.name, "Invalid POST Template")
+        self.assertContains(response, 'This field is required.', 3)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+        self.assertFormError(response, 'form', 'single', 'This field is required.')
+        self.assertFormError(response, 'form', 'multi', 'This field is required.')
 
     def test_form_error(self):
         "POST erroneous data to a form"
@@ -111,7 +127,57 @@ class ClientTest(TestCase):
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Invalid POST Template")
+        self.assertTemplateUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+
+    def test_valid_form_with_template(self):
+        "POST valid data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'foo@example.com',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data OK')
+        self.assertTemplateUsed(response, "form_view.html")
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Valid POST Template")
+
+    def test_incomplete_data_form_with_template(self):
+        "POST incomplete data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'value': 37            
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data has errors')
+        self.assertTemplateUsed(response, 'form_view.html')
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+        self.assertFormError(response, 'form', 'single', 'This field is required.')
+        self.assertFormError(response, 'form', 'multi', 'This field is required.')
+
+    def test_form_error_with_template(self):
+        "POST erroneous data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'not an email address',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data has errors')
+        self.assertTemplateUsed(response, "form_view.html")
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
         
     def test_unknown_page(self):
         "GET an invalid URL"
