@@ -4,6 +4,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.newforms.forms import Form
 from django.newforms import fields
+from django.shortcuts import render_to_response
+
+def no_template_view(request):
+    "A simple view that expects a GET request, and returns a rendered template"
+    return HttpResponse("No template used")
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -79,6 +84,25 @@ def form_view(request):
         c = Context({'form': form})
     
     return HttpResponse(t.render(c))
+
+def form_view_with_template(request):
+    "A view that tests a simple form"
+    if request.method == 'POST':
+        form = TestForm(request.POST)
+        if form.is_valid():
+            message = 'POST data OK'
+        else:
+            message = 'POST data has errors'
+    else:
+        form = TestForm()
+        message = 'GET form page'
+    return render_to_response('form_view.html', 
+        { 
+            'form': form,
+            'message': message
+        }
+    )
+
         
 def login_protected_view(request):
     "A simple view that is login protected."
