@@ -367,11 +367,11 @@ msgstr "Abmelden"
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "Django Systemverwaltung"
+msgstr "Django-Systemverwaltung"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "Django Verwaltung"
+msgstr "Django-Verwaltung"
 
 #: contrib/admin/templates/admin/change_form.html:15
 #: contrib/admin/templates/admin/index.html:28
@@ -385,7 +385,7 @@ msgstr "Geschichte"
 
 #: contrib/admin/templates/admin/change_form.html:22
 msgid "View on site"
-msgstr "Im Web Anzeigen"
+msgstr "Im Web anzeigen"
 
 #: contrib/admin/templates/admin/change_form.html:32
 #: contrib/admin/templates/admin/auth/user/change_password.html:24
@@ -614,7 +614,7 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">Um Bookmarklets zu installieren müssen diese Links in die\n"
+"<p class=\"help\">Um Bookmarklets zu installieren, müssen diese Links in die\n"
 "Browser-Werkzeugleiste gezogen werden, oder mittels rechter Maustaste in "
 "die\n"
 "Bookmarks gespeichert werden. Danach können die Bookmarklets von jeder "
@@ -998,7 +998,7 @@ msgstr "%s ist scheinbar kein urlpattern Objekt"
 
 #: contrib/admin/views/main.py:223
 msgid "Site administration"
-msgstr "Website Verwaltung"
+msgstr "Website-Verwaltung"
 
 #: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
 #, python-format
@@ -1023,7 +1023,7 @@ msgstr "und"
 #: contrib/admin/views/main.py:337
 #, python-format
 msgid "Changed %s."
-msgstr "%s geändert"
+msgstr "%s geändert."
 
 #: contrib/admin/views/main.py:339
 #, python-format
@@ -1490,8 +1490,8 @@ msgstr "Ihr Name:"
 msgid ""
 "This rating is required because you've entered at least one other rating."
 msgstr ""
-"Diese Abstimmung ist zwingend erforderlich, da Du an mindestens einer "
-"weiteren Abstimmung teilnimmst."
+"Diese Abstimmung ist zwingend erforderlich, da Sie an mindestens einer "
+"weiteren Abstimmung teilnehmen."
 
 #: contrib/comments/views/comments.py:111
 #, python-format

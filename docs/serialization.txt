@@ -109,7 +109,7 @@ serializer, you must pass ``ensure_ascii=False`` as a parameter to the
 
 For example::
 
-    json_serializer = serializers.get_serializer("json")
+    json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
 Writing custom serializers

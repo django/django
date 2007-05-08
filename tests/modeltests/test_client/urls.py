@@ -11,5 +11,7 @@ urlpatterns = patterns('',
     (r'^form_view_with_template/$', views.form_view_with_template),
     (r'^login_protected_view/$', views.login_protected_view),
     (r'^session_view/$', views.session_view),
-    (r'^broken_view/$', views.broken_view)
+    (r'^broken_view/$', views.broken_view),
+    (r'^mail_sending_view/$', views.mail_sending_view),
+    (r'^mass_mail_sending_view/$', views.mass_mail_sending_view)
 )

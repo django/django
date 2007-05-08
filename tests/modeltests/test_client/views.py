@@ -1,4 +1,5 @@
 from xml.dom.minidom import parseString
+from django.core.mail import EmailMessage, SMTPConnection
 from django.template import Context, Template
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
@@ -124,3 +125,28 @@ def session_view(request):
 def broken_view(request):
     """A view which just raises an exception, simulating a broken view."""
     raise KeyError("Oops! Looks like you wrote some bad code.")
+
+def mail_sending_view(request):
+    EmailMessage(
+        "Test message", 
+        "This is a test email", 
+        "from@example.com", 
+        ['first@example.com', 'second@example.com']).send()
+    return HttpResponse("Mail sent")
+
+def mass_mail_sending_view(request):
+    m1 = EmailMessage(
+        'First Test message', 
+        'This is the first test email', 
+        'from@example.com', 
+        ['first@example.com', 'second@example.com'])
+    m2 = EmailMessage(
+        'Second Test message', 
+        'This is the second test email', 
+        'from@example.com', 
+        ['second@example.com', 'third@example.com'])
+    
+    c = SMTPConnection()
+    c.send_messages([m1,m2])
+    
+    return HttpResponse("Mail sent")

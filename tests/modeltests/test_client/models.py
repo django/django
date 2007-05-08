@@ -20,6 +20,7 @@ rather than the HTML rendered to the end-user.
 
 """
 from django.test import Client, TestCase
+from django.core import mail
 
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
@@ -232,3 +233,36 @@ class ClientTest(TestCase):
             self.fail('Should raise an error')
         except KeyError:
             pass
+    
+    def test_mail_sending(self):
+        "Test that mail is redirected to a dummy outbox during test setup"
+        
+        response = self.client.get('/test_client/mail_sending_view/')
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Test message')
+        self.assertEqual(mail.outbox[0].body, 'This is a test email')
+        self.assertEqual(mail.outbox[0].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
+        self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
+
+    def test_mass_mail_sending(self):
+        "Test that mass mail is redirected to a dummy outbox during test setup"
+        
+        response = self.client.get('/test_client/mass_mail_sending_view/')
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, 'First Test message')
+        self.assertEqual(mail.outbox[0].body, 'This is the first test email')
+        self.assertEqual(mail.outbox[0].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
+        self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
+
+        self.assertEqual(mail.outbox[1].subject, 'Second Test message')
+        self.assertEqual(mail.outbox[1].body, 'This is the second test email')
+        self.assertEqual(mail.outbox[1].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
+        self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
+        

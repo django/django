@@ -99,6 +99,10 @@ libraries = {}
 # global list of libraries to load by default for a new parser
 builtins = []
 
+# True if TEMPLATE_STRING_IF_INVALID contains a format string (%s). None means
+# uninitialised.
+invalid_var_format_string = None
+
 class TemplateSyntaxError(Exception):
     def __str__(self):
         try:
@@ -575,6 +579,11 @@ class FilterExpression(object):
                 obj = None
             else:
                 if settings.TEMPLATE_STRING_IF_INVALID:
+                    global invalid_var_format_string
+                    if invalid_var_format_string is None:
+                        invalid_var_format_string = '%s' in settings.TEMPLATE_STRING_IF_INVALID
+                    if invalid_var_format_string:
+                        return settings.TEMPLATE_STRING_IF_INVALID % self.var
                     return settings.TEMPLATE_STRING_IF_INVALID
                 else:
                     obj = settings.TEMPLATE_STRING_IF_INVALID

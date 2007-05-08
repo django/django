@@ -260,14 +260,14 @@ def _get_sql_for_pending_references(model, pending_references):
 
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
-    from django.db.models import GenericRel
+    from django.contrib.contenttypes import generic
 
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
     for f in opts.many_to_many:
-        if not isinstance(f.rel, GenericRel):
+        if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
             if tablespace and backend.supports_tablespaces and backend.autoindexes_primary_keys:
                 tablespace_sql = ' ' + backend.get_tablespace_sql(tablespace, inline=True)
