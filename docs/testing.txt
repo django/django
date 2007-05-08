@@ -516,6 +516,10 @@ database settings will the same as they would be for the project normally.
 If you wish to use a name other than the default for the test database,
 you can use the ``TEST_DATABASE_NAME`` setting to provide a name.
 
+The test database is created by the user in the ``DATABASE_USER`` setting.
+This user needs to have sufficient privileges to create a new database on the
+system.
+
 Once the test database has been established, Django will run your tests.
 If everything goes well, at the end you'll see::
 
