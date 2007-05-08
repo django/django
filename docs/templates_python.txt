@@ -866,7 +866,7 @@ current context, available in the ``render`` method::
             try:
                 actual_date = resolve_variable(self.date_to_be_formatted, context)
                 return actual_date.strftime(self.format_string)
-            except VariableDoesNotExist:
+            except template.VariableDoesNotExist:
                 return ''
 
 ``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
