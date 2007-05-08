@@ -241,14 +241,14 @@ def _get_sql_for_pending_references(model, pending_references):
 
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
-    from django.db.models import GenericRel
+    from django.contrib.contenttypes import generic
 
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
     for f in opts.many_to_many:
-        if not isinstance(f.rel, GenericRel):
+        if not isinstance(f.rel, generic.GenericRel):
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s,' % \

@@ -1,9 +1,9 @@
 from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
-from django.db.models.fields.generic import GenericRelation
-from django.db.models import signals
+from django.db.models import signals, loading
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+from django.contrib.contenttypes import generic
 import operator
 import re
 
@@ -1041,7 +1041,7 @@ def delete_objects(seen_objs):
 
         pk_list = [pk for pk,instance in seen_objs[cls]]
         for related in cls._meta.get_all_related_many_to_many_objects():
-            if not isinstance(related.field, GenericRelation):
+            if not isinstance(related.field, generic.GenericRelation):
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     cursor.execute("DELETE FROM %s WHERE %s IN (%s)" % \
                         (qn(related.field.m2m_db_table()),
@@ -1049,7 +1049,7 @@ def delete_objects(seen_objs):
                             ','.join(['%s' for pk in pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE]])),
                         pk_list[offset:offset+GET_ITERATOR_CHUNK_SIZE])
         for f in cls._meta.many_to_many:
-            if isinstance(f, GenericRelation):
+            if isinstance(f, generic.GenericRelation):
                 from django.contrib.contenttypes.models import ContentType
                 query_extra = 'AND %s=%%s' % f.rel.to._meta.get_field(f.content_type_field_name).column
                 args_extra = [ContentType.objects.get_for_model(cls).id]
