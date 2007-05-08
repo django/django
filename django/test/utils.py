@@ -1,7 +1,7 @@
 import sys, time
 from django.conf import settings
 from django.db import connection, transaction, backend
-from django.core import management
+from django.core import management, mail
 from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
@@ -18,23 +18,53 @@ def instrumented_test_render(self, context):
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)
     
+class TestSMTPConnection(object):
+    """A substitute SMTP connection for use during test sessions.
+    The test connection stores email messages in a dummy outbox,
+    rather than sending them out on the wire.
+    
+    """
+    def __init__(*args, **kwargs):
+        pass
+    def open(self):
+        "Mock the SMTPConnection open() interface"
+        pass
+    def close(self):
+        "Mock the SMTPConnection close() interface"
+        pass
+    def send_messages(self, messages):
+        "Redirect messages to the dummy outbox"
+        mail.outbox.extend(messages)
+
 def setup_test_environment():
     """Perform any global pre-test setup. This involves:
         
         - Installing the instrumented test renderer
+        - Diverting the email sending functions to a test buffer
         
     """
     Template.original_render = Template.render
     Template.render = instrumented_test_render
     
+    mail.original_SMTPConnection = mail.SMTPConnection
+    mail.SMTPConnection = TestSMTPConnection
+
+    mail.outbox = []
+    
 def teardown_test_environment():
     """Perform any global post-test teardown. This involves:
 
         - Restoring the original test renderer
+        - Restoring the email sending functions
         
     """
     Template.render = Template.original_render
     del Template.original_render
+    
+    mail.SMTPConnection = mail.original_SMTPConnection
+    del mail.original_SMTPConnection
+    
+    del mail.outbox
     
 def _set_autocommit(connection):
     "Make sure a connection is in autocommit mode."

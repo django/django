@@ -1,7 +1,7 @@
 import re, doctest, unittest
 from urlparse import urlparse
 from django.db import transaction
-from django.core import management
+from django.core import management, mail
 from django.db.models import get_apps
 from django.test.client import Client
 
@@ -33,23 +33,27 @@ class DocTestRunner(doctest.DocTestRunner):
         transaction.rollback_unless_managed()
 
 class TestCase(unittest.TestCase):    
-    def install_fixtures(self):
-        """If the Test Case class has a 'fixtures' member, clear the database and
-        install the named fixtures at the start of each test.
+    def _pre_setup(self):
+        """Perform any pre-test setup. This includes:
         
+            * If the Test Case class has a 'fixtures' member, clearing the 
+            database and installing the named fixtures at the start of each test.
+            * Clearing the mail test outbox.
+            
         """
         management.flush(verbosity=0, interactive=False)
         if hasattr(self, 'fixtures'):
             management.load_data(self.fixtures, verbosity=0)
-
+        mail.outbox = []
+        
     def run(self, result=None):
-        """Wrapper around default run method so that user-defined Test Cases 
-        automatically call install_fixtures without having to include a call to 
-        super().
+        """Wrapper around default run method to perform common Django test set up.
+        This means that user-defined Test Cases aren't required to include a call 
+        to super().setUp().
         
         """
         self.client = Client()
-        self.install_fixtures()
+        self._pre_setup()
         super(TestCase, self).run(result)
 
     def assertRedirects(self, response, expected_path):
