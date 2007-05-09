@@ -1,121 +1,171 @@
 # translation of Django.
 # Copyright (C) 2006 THE Django'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Django package.
+# Meir Kriheli <meir@mksoft.co.il>, 2007.
 # 
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Django 0.95\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-06-15 12:42+0300\n"
-"PO-Revision-Date: 2006-06-15 12:40+0300\n"
-"Last-Translator: Meir Kriheli <meir@mksoft.co.il>\n"
-"Language-Team: Hebrew\n"
+"POT-Creation-Date: 2007-05-04 19:38+0300\n"
+"PO-Revision-Date: 2007-05-06 12:43+0300\n"
+"Last-Translator: meir <(null)>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
-#: template/defaultfilters.py:389
-msgid "yes,no,maybe"
-msgstr "כן,לא,אולי"
+#: newforms/models.py:165 newforms/fields.py:364
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "יש לבחור אפשרות חוקית; '%(data)s' אינו בין %(choices)s."
 
-#: forms/__init__.py:346 db/models/fields/__init__.py:114
-#: db/models/fields/__init__.py:265 db/models/fields/__init__.py:545
-#: db/models/fields/__init__.py:556
+#: newforms/models.py:178 newforms/fields.py:80 newforms/fields.py:376
+#: newforms/fields.py:452 newforms/fields.py:463
+#: db/models/fields/__init__.py:117 db/models/fields/__init__.py:274
+#: db/models/fields/__init__.py:612 db/models/fields/__init__.py:623
+#: oldforms/__init__.py:357
 msgid "This field is required."
 msgstr "יש להזין תוכן בשדה זה."
 
-#: forms/__init__.py:381
+#: newforms/models.py:182 newforms/fields.py:380 newforms/fields.py:456
+msgid "Enter a list of values."
+msgstr "יש להזין רשימת ערכים"
+
+#: newforms/models.py:188 newforms/fields.py:389
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "נא לוודא שהטקסט שלך מכיל פחות מ %s תו."
-msgstr[1] "נא לוודא שהטקסט שלך מכיל פחות מ %s תווים."
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "יש לבחור אפשרות חוקית. %s אינו בין האפשרויות הזמינות."
 
-#: forms/__init__.py:386
-msgid "Line breaks are not allowed here."
-msgstr "מעברי שורה אסורים כאן."
+#: newforms/widgets.py:180 oldforms/__init__.py:577
+#: contrib/admin/filterspecs.py:150
+msgid "Unknown"
+msgstr "לא ידוע"
 
-#: forms/__init__.py:485 forms/__init__.py:558 forms/__init__.py:597
+#: newforms/widgets.py:180 oldforms/__init__.py:577
+#: contrib/admin/filterspecs.py:143
+msgid "Yes"
+msgstr "כן"
+
+#: newforms/widgets.py:180 oldforms/__init__.py:577
+#: contrib/admin/filterspecs.py:143
+msgid "No"
+msgstr "לא"
+
+#: newforms/fields.py:103 newforms/fields.py:256
 #, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "יש לבחור אפשרות חוקית; '%(data)s' אינו בין %(choices)s."
+msgid "Ensure this value has at most %d characters."
+msgstr "נא לוודא שהטקסט שלך מכיל %d תווים לכל היותר."
 
-#: forms/__init__.py:659 core/validators.py:151 core/validators.py:376
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr "לא נשלח שום קובץ. נא לבדוק את סוג הקידוד של הטופס."
+#: newforms/fields.py:105 newforms/fields.py:258
+#, python-format
+msgid "Ensure this value has at least %d characters."
+msgstr "נא לוודא שערך זה מכיל לפחות %d תווים"
 
-#: forms/__init__.py:661
-msgid "The submitted file is empty."
-msgstr "הקובץ שנשלח ריק."
+#: newforms/fields.py:128 core/validators.py:120
+msgid "Enter a whole number."
+msgstr "נא להזין מספר שלם."
 
-#: forms/__init__.py:717
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "חש להזין מספר שלם בין ‎-32,768 ל- 32,767."
+#: newforms/fields.py:130
+#, python-format
+msgid "Ensure this value is less than or equal to %s."
+msgstr "יש לוודא שערך זה פחות מ או שווה ל %s."
 
-#: forms/__init__.py:727
-msgid "Enter a positive number."
-msgstr "יש להזין מספר חיובי."
+#: newforms/fields.py:132
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr "יש לוודא שהערך גדול מ או שווה ל %s."
 
-#: forms/__init__.py:737
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "יש להזין מספר שלם בין 0 ל- 32,767."
+#: newforms/fields.py:165
+msgid "Enter a valid date."
+msgstr "יש להזין תאריך חוקי."
 
-#: utils/translation.py:363
-msgid "DATE_FORMAT"
-msgstr "d.m.Y"
+#: newforms/fields.py:192
+msgid "Enter a valid time."
+msgstr "יש להזין שעה חוקית."
 
-#: utils/translation.py:364
-msgid "DATETIME_FORMAT"
-msgstr "d.m.y H:i:s"
+#: newforms/fields.py:228
+msgid "Enter a valid date/time."
+msgstr "יש להזין תאריך ושעה חוקיים."
 
-#: utils/translation.py:365
-msgid "TIME_FORMAT"
-msgstr "H:i:s"
+#: newforms/fields.py:242
+msgid "Enter a valid value."
+msgstr "יש להזין ערך חוקי."
 
-#: utils/translation.py:381
-msgid "YEAR_MONTH_FORMAT"
-msgstr "d.m.Y"
+#: newforms/fields.py:271 core/validators.py:162
+msgid "Enter a valid e-mail address."
+msgstr "יש להזין כתובת דוא\"ל חוקית."
 
-#: utils/translation.py:382
-msgid "MONTH_DAY_FORMAT"
-msgstr "d.m.Y"
+#: newforms/fields.py:289 newforms/fields.py:311
+msgid "Enter a valid URL."
+msgstr "יש להזין URL חוקי."
 
-#: utils/timesince.py:12
-msgid "year"
-msgid_plural "years"
-msgstr[0] "שנה"
-msgstr[1] "שנים"
+#: newforms/fields.py:313
+msgid "This URL appears to be a broken link."
+msgstr "ה-URL‏ הזה כנראה מכיל קישור שבור."
 
-#: utils/timesince.py:13
-msgid "month"
-msgid_plural "months"
-msgstr[0] "חודש"
-msgstr[1] "חודשים"
+#: db/models/manipulators.py:307
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(object)s עם %(type)s קיים כבר עבור %(field)s נתון."
 
-#: utils/timesince.py:14
-msgid "week"
-msgid_plural "weeks"
-msgstr[0] "שבוע"
-msgstr[1] "שבועות"
+#: db/models/manipulators.py:308 contrib/admin/views/main.py:335
+#: contrib/admin/views/main.py:337 contrib/admin/views/main.py:339
+msgid "and"
+msgstr "ו"
 
-#: utils/timesince.py:15
-msgid "day"
-msgid_plural "days"
-msgstr[0] "יום"
-msgstr[1] "ימים"
+#: db/models/fields/related.py:53
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "יש להזין %s חוקי."
 
-#: utils/timesince.py:16
-msgid "hour"
-msgid_plural "hours"
-msgstr[0] "שעה"
-msgstr[1] "שעות"
+#: db/models/fields/related.py:642
+msgid "Separate multiple IDs with commas."
+msgstr "יש להפריד מזהים מרובים בפסיקים."
 
-#: utils/timesince.py:17
-msgid "minute"
-msgid_plural "minutes"
-msgstr[0] "דקה"
-msgstr[1] "דקות"
+#: db/models/fields/related.py:644
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "החזק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
+
+#: db/models/fields/related.py:691
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr "נא להזין זיהוי %(self)s חוקי. הערך %(value)r אינו חוקי."
+
+#: db/models/fields/__init__.py:42
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(optname)s·עם·%(fieldname)s·זה קיימת כבר."
+
+#: db/models/fields/__init__.py:369
+msgid "This value must be an integer."
+msgstr "ערך זה חייב להיות מספר שלם."
+
+#: db/models/fields/__init__.py:404
+msgid "This value must be either True or False."
+msgstr "ערך זה חייב להיות אמת או שקר."
+
+#: db/models/fields/__init__.py:425
+msgid "This field cannot be null."
+msgstr "שדה זה אינו יכול להכיל null."
+
+#: db/models/fields/__init__.py:459 core/validators.py:148
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "יש להזין תאריך במבנה YYYY-MM-DD."
+
+#: db/models/fields/__init__.py:528 core/validators.py:157
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "יש להזין תאריך ושעה במבנה YYYY-MM-DD HH:MM."
+
+#: db/models/fields/__init__.py:632
+msgid "Enter a valid filename."
+msgstr "יש להזין שם קובץ חוקי."
+
+#: db/models/fields/__init__.py:753
+msgid "This value must be either None, True or False."
+msgstr "ערך זה חייב להיות כלום, אמת או שקר."
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -269,147 +319,411 @@ msgstr "נוב'"
 msgid "Dec."
 msgstr "דצמ'"
 
-#: db/models/manipulators.py:302
+#: utils/timesince.py:12
+msgid "year"
+msgstr "שנה"
+
+#: utils/timesince.py:13
+msgid "month"
+msgstr "חודש"
+
+#: utils/timesince.py:14
+msgid "week"
+msgstr "שבוע"
+
+#: utils/timesince.py:15
+msgid "day"
+msgstr "יום"
+
+#: utils/timesince.py:16
+msgid "hour"
+msgstr "שעה"
+
+#: utils/timesince.py:17
+msgid "minute"
+msgstr "דקה"
+
+#: utils/timesince.py:40
 #, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s עם %(type)s קיים כבר עבור %(field)s נתון."
+msgid "%d milliseconds"
+msgstr "%d מילישניות"
 
-#: db/models/fields/__init__.py:40
+#: utils/timesince.py:41
 #, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s·עם·%(fieldname)s·זה קיימת כבר."
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
 
-#: db/models/fields/__init__.py:337
-msgid "This value must be an integer."
-msgstr "ערך זה חייב להיות מספר שלם."
-
-#: db/models/fields/__init__.py:369
-msgid "This value must be either True or False."
-msgstr "ערך זה חייב להיות אמת או שקר."
-
-#: db/models/fields/__init__.py:385
-msgid "This field cannot be null."
-msgstr "שדה זה אינו יכול להכיל null."
-
-#: db/models/fields/__init__.py:471 core/validators.py:135
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "יש להזין תאריך ושעה במבנה YYYY-MM-DD HH:MM."
-
-#: db/models/fields/__init__.py:565
-msgid "Enter a valid filename."
-msgstr "יש להזין שם קובץ חוקי."
-
-#: db/models/fields/related.py:43
+#: utils/timesince.py:47
 #, python-format
-msgid "Please enter a valid %s."
-msgstr "יש להזין %s חוקי."
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
 
-#: db/models/fields/related.py:579
-msgid "Separate multiple IDs with commas."
-msgstr "יש להפריד מזהים מרובים בפסיקים."
+#: utils/dateformat.py:40
+msgid "p.m."
+msgstr "אחר הצהריים"
 
-#: db/models/fields/related.py:581
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "החזק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
+#: utils/dateformat.py:41
+msgid "a.m."
+msgstr "בבוקר"
 
-#: db/models/fields/related.py:625
+#: utils/dateformat.py:46
+msgid "PM"
+msgstr "אחר הצהריים"
+
+#: utils/dateformat.py:47
+msgid "AM"
+msgstr "בבוקר"
+
+#: utils/dateformat.py:95
+msgid "midnight"
+msgstr "חצות"
+
+#: utils/dateformat.py:97
+msgid "noon"
+msgstr "צהריים"
+
+#: utils/translation/trans_real.py:358
+msgid "DATE_FORMAT"
+msgstr "d.m.Y"
+
+#: utils/translation/trans_real.py:359
+msgid "DATETIME_FORMAT"
+msgstr "d.m.y H:i:s"
+
+#: utils/translation/trans_real.py:360
+msgid "TIME_FORMAT"
+msgstr "H:i:s"
+
+#: utils/translation/trans_real.py:376
+msgid "YEAR_MONTH_FORMAT"
+msgstr "d.m.Y"
+
+#: utils/translation/trans_real.py:377
+msgid "MONTH_DAY_FORMAT"
+msgstr "d.m.Y"
+
+#: conf/global_settings.py:39
+msgid "Arabic"
+msgstr "ערבית"
+
+#: conf/global_settings.py:40
+msgid "Bengali"
+msgstr "בנגאלית - Bengali"
+
+#: conf/global_settings.py:41
+msgid "Catalan"
+msgstr "קאטלונית - Catalan"
+
+#: conf/global_settings.py:42
+msgid "Czech"
+msgstr "צ'כית - Czech"
+
+#: conf/global_settings.py:43
+msgid "Welsh"
+msgstr "וולשית - Welsh"
+
+#: conf/global_settings.py:44
+msgid "Danish"
+msgstr "דנית - Danish"
+
+#: conf/global_settings.py:45
+msgid "German"
+msgstr "גרמנית - German"
+
+#: conf/global_settings.py:46
+msgid "Greek"
+msgstr "יוונית - Greek"
+
+#: conf/global_settings.py:47
+msgid "English"
+msgstr "אנגלית - English"
+
+#: conf/global_settings.py:48
+msgid "Spanish"
+msgstr "ספרדית - Spanish"
+
+#: conf/global_settings.py:49
+msgid "Argentinean Spanish"
+msgstr "ספרדית ארגנטינאית - Argentinean Spanish"
+
+#: conf/global_settings.py:50
+msgid "Finnish"
+msgstr "פינית - Finnish"
+
+#: conf/global_settings.py:51
+msgid "French"
+msgstr "צרפתית - French"
+
+#: conf/global_settings.py:52
+msgid "Galician"
+msgstr "גאליצית - Galician"
+
+#: conf/global_settings.py:53
+msgid "Hungarian"
+msgstr "הונגרית (Hungarian)"
+
+#: conf/global_settings.py:54
+msgid "Hebrew"
+msgstr "עברית - Hebrew"
+
+#: conf/global_settings.py:55
+msgid "Icelandic"
+msgstr "איסלנדית - Icelandic"
+
+#: conf/global_settings.py:56
+msgid "Italian"
+msgstr "איטלקית - Italian"
+
+#: conf/global_settings.py:57
+msgid "Japanese"
+msgstr "יפנית - Japanese"
+
+#: conf/global_settings.py:58
+msgid "Korean"
+msgstr "קוריאנית - Korean"
+
+#: conf/global_settings.py:59
+msgid "Kannada"
+msgstr "קנדה - Kannada"
+
+#: conf/global_settings.py:60
+msgid "Latvian"
+msgstr "לטבית - Latvian"
+
+#: conf/global_settings.py:61
+msgid "Macedonian"
+msgstr "מקדונית - Macedonian"
+
+#: conf/global_settings.py:62
+msgid "Dutch"
+msgstr "הולנדית - Dutch"
+
+#: conf/global_settings.py:63
+msgid "Norwegian"
+msgstr "נורווגית - Norwegian"
+
+#: conf/global_settings.py:64
+msgid "Polish"
+msgstr "פולנית - Polish"
+
+#: conf/global_settings.py:65
+msgid "Portugese"
+msgstr "פורטוגזית - Portugese"
+
+#: conf/global_settings.py:66
+msgid "Brazilian"
+msgstr "ברזילאית - Brazilian"
+
+#: conf/global_settings.py:67
+msgid "Romanian"
+msgstr "רומנית - Romanian"
+
+#: conf/global_settings.py:68
+msgid "Russian"
+msgstr "רוסית - Russian"
+
+#: conf/global_settings.py:69
+msgid "Slovak"
+msgstr "סלובקית - Slovak"
+
+#: conf/global_settings.py:70
+msgid "Slovenian"
+msgstr "סלובנית - Slovenian"
+
+#: conf/global_settings.py:71
+msgid "Serbian"
+msgstr "סרבית - Serbian"
+
+#: conf/global_settings.py:72
+msgid "Swedish"
+msgstr "שוודית - Swedish"
+
+#: conf/global_settings.py:73
+msgid "Tamil"
+msgstr ""
+
+#: conf/global_settings.py:74
+msgid "Telugu"
+msgstr ""
+
+#: conf/global_settings.py:75
+msgid "Turkish"
+msgstr "טורקית - Turkish"
+
+#: conf/global_settings.py:76
+msgid "Ukrainian"
+msgstr "אוקראינית - Ukrainian"
+
+#: conf/global_settings.py:77
+msgid "Simplified Chinese"
+msgstr "סינית פשוטה - Simplified·Chinese"
+
+#: conf/global_settings.py:78
+msgid "Traditional Chinese"
+msgstr "סינית מסורתית - Traditional·Chinese"
+
+#: template/defaultfilters.py:491
+msgid "yes,no,maybe"
+msgstr "כן,לא,אולי"
+
+#: template/defaultfilters.py:520
 #, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "נא להזין זיהוי %(self)s חוקי. הערך %(value)r אינו חוקי."
-msgstr[1] ""
-"נא להזין זיהויי %(self)s חוקיים. הערכים %(value)r אינם חוקיים."
+msgid "%(size)d byte"
+msgstr "%(size)d בתים"
 
-#: core/validators.py:63
+#: template/defaultfilters.py:522
+#, python-format
+msgid "%.1f KB"
+msgstr "%.1f KB"
+
+#: template/defaultfilters.py:524
+#, python-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: template/defaultfilters.py:525
+#, python-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "ה-%(verbose_name)s  נוצר בהצלחה."
+
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "ה-%(verbose_name)s עודכן בהצלחה."
+
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "ה-%(verbose_name)s נמחק."
+
+#: oldforms/__init__.py:392
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgstr "נא לוודא שהטקסט שלך מכיל פחות מ %s תו."
+
+#: oldforms/__init__.py:397
+msgid "Line breaks are not allowed here."
+msgstr "מעברי שורה אסורים כאן."
+
+#: oldforms/__init__.py:498 oldforms/__init__.py:571 oldforms/__init__.py:610
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr "יש לבחור אפשרות חוקית; '%(data)s' אינו בין %(choices)s."
+
+#: oldforms/__init__.py:672 core/validators.py:174 core/validators.py:445
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "לא נשלח שום קובץ. נא לבדוק את סוג הקידוד של הטופס."
+
+#: oldforms/__init__.py:674
+msgid "The submitted file is empty."
+msgstr "הקובץ שנשלח ריק."
+
+#: oldforms/__init__.py:730
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "חש להזין מספר שלם בין ‎-32,768 ל- 32,767."
+
+#: oldforms/__init__.py:740
+msgid "Enter a positive number."
+msgstr "יש להזין מספר חיובי."
+
+#: oldforms/__init__.py:750
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "יש להזין מספר שלם בין 0 ל- 32,767."
+
+#: core/validators.py:64
 msgid "This value must contain only letters, numbers and underscores."
 msgstr "ערך זה חייב להכיל אותיות, ספרות וקווים תחתונים בלבד."
 
-#: core/validators.py:67
+#: core/validators.py:68
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr "ערך זה חייב להכיל אותיות, ספרות, מקפים, קווים תחתונים ונטויים בלבד."
 
-#: core/validators.py:75
+#: core/validators.py:72
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr "ערך זה חייב להכיל אותיות, ספרות, מקפים וקווים תחתונים בלבד."
+
+#: core/validators.py:76
 msgid "Uppercase letters are not allowed here."
 msgstr "אסור להשתמש באותיות גדולות."
 
-#: core/validators.py:79
+#: core/validators.py:80
 msgid "Lowercase letters are not allowed here."
 msgstr "אסור להשתמש באותיות קטנות."
 
-#: core/validators.py:86
+#: core/validators.py:87
 msgid "Enter only digits separated by commas."
 msgstr "יש להזין רק ספרות מופרדות בפסיקים."
 
-#: core/validators.py:98
+#: core/validators.py:99
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "יש להזין רק כתובות דוא\"ל מופרדות בפסיקים."
 
-#: core/validators.py:102
+#: core/validators.py:103
 msgid "Please enter a valid IP address."
 msgstr "נא להזין כתובת IP חוקית."
 
-#: core/validators.py:106
+#: core/validators.py:107
 msgid "Empty values are not allowed here."
 msgstr "חובה להזין ערך בשדה זה."
 
-#: core/validators.py:110
+#: core/validators.py:111
 msgid "Non-numeric characters aren't allowed here."
 msgstr "מותר להזין ספרות בלבד."
 
-#: core/validators.py:114
+#: core/validators.py:115
 msgid "This value can't be comprised solely of digits."
 msgstr "ערך זה אינו יכול להכיל ספרות בלבד."
 
-#: core/validators.py:119
-msgid "Enter a whole number."
-msgstr "נא להזין מספר שלם."
-
-#: core/validators.py:123
+#: core/validators.py:124
 msgid "Only alphabetical characters are allowed here."
 msgstr "יש להזין כאן אותיות בלבד."
 
-#: core/validators.py:127
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "יש להזין תאריך במבנה YYYY-MM-DD."
+#: core/validators.py:139
+msgid "Year must be 1900 or later."
+msgstr "שנה צריכה להיות 1900 ומעלה."
 
-#: core/validators.py:131
+#: core/validators.py:143
+#, python-format
+msgid "Invalid date: %s"
+msgstr "תאריך שגוי: %s"
+
+#: core/validators.py:153
 msgid "Enter a valid time in HH:MM format."
 msgstr "יש להזין שעה במבנה HH:MM."
 
-#: core/validators.py:139
-msgid "Enter a valid e-mail address."
-msgstr "יש להזין כתובת דוא\"ל חוקית."
-
-#: core/validators.py:155
+#: core/validators.py:178
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr "נא להעלות תמונה חוקית. הקובץ שהעלת אינו תמונה אומכיל תמונה מקולקלת."
 
-#: core/validators.py:162
+#: core/validators.py:185
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "ה-URL %s אנו מצביע לתמונה חוקית."
 
-#: core/validators.py:166
+#: core/validators.py:189
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "מספרי טלפון חייבים להיות במבנה XXX-XXX-XXXX.‏ \"%s\" אינו חוקי."
 
-#: core/validators.py:174
+#: core/validators.py:197
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "ה-URL‏ %s אינו מצביע לסרטון QuickTime חוקי."
 
-#: core/validators.py:178
+#: core/validators.py:201
 msgid "A valid URL is required."
 msgstr "יש להזין URL חוקי."
 
-#: core/validators.py:192
+#: core/validators.py:215
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -418,123 +732,141 @@ msgstr ""
 "יש להזין HTML חוקי. שגיאות ספציפיות:\n"
 "%s"
 
-#: core/validators.py:199
+#: core/validators.py:222
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "מבנה XML שגוי: %s"
 
-#: core/validators.py:209
+#: core/validators.py:239
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "URL שגוי: %s"
 
-#: core/validators.py:213 core/validators.py:215
+#: core/validators.py:244 core/validators.py:246
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "ה-URL‏ %s הוא קישור שבור."
 
-#: core/validators.py:221
+#: core/validators.py:252
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "יש להזין קיצור חוקי למדינה בארה\"ב."
 
-#: core/validators.py:236
+#: core/validators.py:266
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "שמור על לשונך! המילה %s אסורה לשימוש כאן."
-msgstr[1] "שמור על לשונך! המילים %s אסורות לשימוש כאן."
+msgstr "שמור על לשונך! המילה %s אסורה לשימוש כאן."
 
-#: core/validators.py:243
+#: core/validators.py:273
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "תוכן השדה חייב להיות זהה לשדה '%s'."
 
-#: core/validators.py:262
+#: core/validators.py:292
 msgid "Please enter something for at least one field."
 msgstr "יש להזין תוכן בלפחות אחד מהשדות."
 
-#: core/validators.py:271 core/validators.py:282
+#: core/validators.py:301 core/validators.py:312
 msgid "Please enter both fields or leave them both empty."
 msgstr "יש להזין תוכן בשני השדות או להשאיר את שניהם ריקים."
 
-#: core/validators.py:289
+#: core/validators.py:320
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "יש להזין מידע בשדה זה אם שדה %(field)s מכיל %(value)s"
 
-#: core/validators.py:301
+#: core/validators.py:333
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "יש להזין תוכן בשדה זה אם תוכן שדה %(field)s אינו %(value)s"
 
-#: core/validators.py:320
+#: core/validators.py:352
 msgid "Duplicate values are not allowed."
 msgstr "לא ניתן להזין ערכים כפולים."
 
-#: core/validators.py:343
+#: core/validators.py:367
+#, python-format
+msgid "This value must be between %(lower)s and %(upper)s."
+msgstr "ערך זה חייב להיות בין %(lower)s ל-%(upper)s."
+
+#: core/validators.py:369
+#, python-format
+msgid "This value must be at least %s."
+msgstr "ערך זה חייב להיות לפחות %s."
+
+#: core/validators.py:371
+#, python-format
+msgid "This value must be no more than %s."
+msgstr "ערך זה אינו יכול להיות יותר מ-%s."
+
+#: core/validators.py:407
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "ערך זה חייב להיות חזקה של %s."
 
-#: core/validators.py:354
+#: core/validators.py:418
 msgid "Please enter a valid decimal number."
 msgstr "יש להזין מספר עשרוני חוקי."
 
-#: core/validators.py:356
+#: core/validators.py:422
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "נא להזין מספר עשרוני חוקי עם %s ספרה לכל היותר."
-msgstr[1] ""
-"נא להזין מספר עשרוני חוקי עם %s ספרות לכל היותר."
+msgstr "נא להזין מספר עשרוני חוקי עם %s ספרה לכל היותר."
+"נא להזין מספר עשורני חוקי עם %s ספרות לכל היותר."
 
-#: core/validators.py:359
+#: core/validators.py:425
+#, python-format
+msgid ""
+"Please enter a valid decimal number with a whole part of at most %s digit."
+"Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr ""
+"נא להזין מספר עשרוני המכיל מספר שלם עם %s ספרה לכל היותר."
+"נא להזין מספר עשרוני המכיל מספר שלם עם %s ספרות לכל היותר."
+
+#: core/validators.py:428
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "נא להזין מספר עשרוני חוקי עם %s ספרה אחרי הנקודה לכל היותר."
-msgstr[1] ""
-"נא להזין מספר עשרוני חוקי עם %s ספרות אחרי הנקודה לכל היותר."
+msgstr "נא להזין מספר עשרוני חוקי בעל %s ספרה לכל היותר במקום העשרוני."
+"נא להזין מספר עשרוני חוקי בעל %s ספרות לכל היותר במקום העשרוני."
 
-#: core/validators.py:369
+#: core/validators.py:438
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "יש להעלות קובץ בגודל %s בתים לפחות."
 
-#: core/validators.py:370
+#: core/validators.py:439
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "יש לוודא שהקובץ שהעלת הוא בגודל %s בתים לכל היותר."
 
-#: core/validators.py:387
+#: core/validators.py:456
 msgid "The format for this field is wrong."
 msgstr "מבנה תוכן שדה זה שגוי."
 
-#: core/validators.py:402
+#: core/validators.py:471
 msgid "This field is invalid."
 msgstr "שדה זה אינו חוקי."
 
-#: core/validators.py:438
+#: core/validators.py:507
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "לא ניתן לאחזר כלום מ %s."
 
-#: core/validators.py:441
+#: core/validators.py:510
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "ה-URL·%(url)s·החזיר כותרת·Content-Type·לא חוקית·'%(contenttype)s'."
 
-#: core/validators.py:474
+#: core/validators.py:543
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr "נא לסגור את תג·%(tag)s·בשורה·%(line)s.·(השורה מתחילה ב·\"%(start)s\".)"
 
-#: core/validators.py:478
+#: core/validators.py:547
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
@@ -542,7 +874,7 @@ msgid ""
 msgstr ""
 "חלק מהטקסט בשורה·%(line)s·אסור בהקשר זה.·(השורה·מתחילה ב·\"%(start)s\".)"
 
-#: core/validators.py:483
+#: core/validators.py:552
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
@@ -550,7 +882,7 @@ msgid ""
 msgstr ""
 "\"%(attr)s\"·בשורה·%(line)s·אינה תכונה חוקית.·(השורה מתחילה ב·\"%(start)s\".)"
 
-#: core/validators.py:488
+#: core/validators.py:557
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
@@ -558,16 +890,16 @@ msgid ""
 msgstr ""
 "\"<%(tag)s>\"·בשורה·%(line)s·אינו תג חוקי.·(השורה מתחילה ב·\"%(start)s\".)"
 
-#: core/validators.py:492
+#: core/validators.py:561
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"לתג בשורה %(line)s חסרה תכונה אחת או יותר נדרשות. (השורה מתחילה ב-\"%"
-"(start)s\".)"
+"לתג בשורה %(line)s חסרה תכונה אחת או יותר נדרשות. (השורה מתחילה ב-\"%(start)s"
+"\".)"
 
-#: core/validators.py:497
+#: core/validators.py:566
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
@@ -575,138 +907,6 @@ msgid ""
 msgstr ""
 "לתכונה·\"%(attr)s\"·בשורה·%(line)s·יש ערך לא חוקי.·(השורה·מתחילה ב·\"%(start)"
 "s\".)"
-
-#: conf/global_settings.py:37
-msgid "Bengali"
-msgstr "בנגאלית - Bengali"
-
-#: conf/global_settings.py:38
-msgid "Czech"
-msgstr "צ'כית - Czech"
-
-#: conf/global_settings.py:39
-msgid "Welsh"
-msgstr "וולשית - Welsh"
-
-#: conf/global_settings.py:40
-msgid "Danish"
-msgstr "דנית - Danish"
-
-#: conf/global_settings.py:41
-msgid "German"
-msgstr "גרמנית - German"
-
-#: conf/global_settings.py:42
-msgid "Greek"
-msgstr "יוונית - Greek"
-
-#: conf/global_settings.py:43
-msgid "English"
-msgstr "אנגלית - English"
-
-#: conf/global_settings.py:44
-msgid "Spanish"
-msgstr "ספרדית - Spanish"
-
-#: conf/global_settings.py:45
-msgid "Argentinean Spanish"
-msgstr "ספרדית ארגנטינאית - Argentinean Spanish"
-
-#: conf/global_settings.py:46
-msgid "French"
-msgstr "צרפתית - French"
-
-#: conf/global_settings.py:47
-msgid "Galician"
-msgstr "גאליצית - Galician"
-
-#: conf/global_settings.py:48
-msgid "Hungarian"
-msgstr "הונגרית (Hungarian)"
-
-#: conf/global_settings.py:49
-msgid "Hebrew"
-msgstr "עברית - Hebrew"
-
-#: conf/global_settings.py:50
-msgid "Icelandic"
-msgstr "איסלנדית - Icelandic"
-
-#: conf/global_settings.py:51
-msgid "Italian"
-msgstr "איטלקית - Italian"
-
-#: conf/global_settings.py:52
-msgid "Japanese"
-msgstr "יפנית - Japanese"
-
-#: conf/global_settings.py:53
-msgid "Dutch"
-msgstr "הולנדית - Dutch"
-
-#: conf/global_settings.py:54
-msgid "Norwegian"
-msgstr "נורווגית - Norwegian"
-
-#: conf/global_settings.py:55
-msgid "Brazilian"
-msgstr "ברזילאית - Brazilian"
-
-#: conf/global_settings.py:56
-msgid "Romanian"
-msgstr "רומנית - Romanian"
-
-#: conf/global_settings.py:57
-msgid "Russian"
-msgstr "רוסית - Russian"
-
-#: conf/global_settings.py:58
-msgid "Slovak"
-msgstr "סלובקית - Slovak"
-
-#: conf/global_settings.py:59
-msgid "Slovenian"
-msgstr "סלובנית - Slovenian"
-
-#: conf/global_settings.py:60
-msgid "Serbian"
-msgstr "סרבית - Serbian"
-
-#: conf/global_settings.py:61
-msgid "Swedish"
-msgstr "שוודית - Swedish"
-
-#: conf/global_settings.py:62
-msgid "Ukrainian"
-msgstr "אוקראינית - Ukrainian"
-
-#: conf/global_settings.py:63
-msgid "Simplified Chinese"
-msgstr "סינית פשוטה - Simplified·Chinese"
-
-#: conf/global_settings.py:64
-msgid "Traditional Chinese"
-msgstr "סינית מסורתית - Traditional·Chinese"
-
-#: contrib/sessions/models.py:35
-msgid "session key"
-msgstr "מפתח התחברות (session key)"
-
-#: contrib/sessions/models.py:36
-msgid "session data"
-msgstr "מידע התחברות (session data)"
-
-#: contrib/sessions/models.py:37
-msgid "expire date"
-msgstr "תאריך פג תוקף"
-
-#: contrib/sessions/models.py:41
-msgid "session"
-msgstr "התחברות"
-
-#: contrib/sessions/models.py:42
-msgid "sessions"
-msgstr "התחברויות"
 
 #: contrib/sites/models.py:10
 msgid "domain name"
@@ -723,18 +923,6 @@ msgstr "אתר"
 #: contrib/sites/models.py:16
 msgid "sites"
 msgstr "אתרים"
-
-#: contrib/contenttypes/models.py:25
-msgid "python model class name"
-msgstr "שם ה-class של מודל פייתון"
-
-#: contrib/contenttypes/models.py:28
-msgid "content type"
-msgstr "סוג תוכן"
-
-#: contrib/contenttypes/models.py:29
-msgid "content types"
-msgstr "סוגי תוכן"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -793,7 +981,7 @@ msgstr "תאריך/שעת הגשה"
 msgid "is public"
 msgstr "ציבורי"
 
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:292
+#: contrib/comments/models.py:85 contrib/admin/views/doc.py:304
 msgid "IP address"
 msgstr "כתובת IP"
 
@@ -917,103 +1105,31 @@ msgstr "מחיקות מודרטור"
 msgid "Moderator deletion by %r"
 msgstr "מחיקת מודרציה ע\"י %r"
 
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "שמך:"
-
-#: contrib/comments/templates/comments/freeform.html:5
-#: contrib/comments/templates/comments/form.html:27
-msgid "Comment:"
-msgstr "תגובה:"
-
-#: contrib/comments/templates/comments/freeform.html:9
-#: contrib/comments/templates/comments/form.html:32
-msgid "Preview comment"
-msgstr "תצוגה מקדימה של התגובה"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "שם משתמש:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "סיסמה:"
-
-#: contrib/comments/templates/comments/form.html:6
-msgid "Forgotten your password?"
-msgstr "שכחת את סיסמתך ?"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Log out"
-msgstr "יציאה"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "דירוג"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "נדרש"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "אופציונלי"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "שליחת תמונה"
-
-#: contrib/comments/views/comments.py:28
+#: contrib/comments/views/comments.py:27
 msgid ""
 "This rating is required because you've entered at least one other rating."
 msgstr "הדירוג נדרש מאחר והזנת לפחות דרוג אחד אחר."
 
-#: contrib/comments/views/comments.py:112
+#: contrib/comments/views/comments.py:111
 #, python-format
 msgid ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comment:\n"
 "\n"
 "%(text)s"
-msgid_plural ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr[0] ""
-"התגובה נשלחה ע\"י משתמש אשר שלח פחות מ-%(count)s "
-"תגובה:\n"
+msgstr ""
+"התגובה נשלחה ע\"י משתמש אשר שלח פחות מ-%(count)s תגובה:\n"
 "\n"
 "%(text)s"
-msgstr[1] ""
-"התגובה נשלחה ע\"י משתמש אשר שלח פחות מ-%(count)s "
-"תגובות:\n"
+"התגובה נשלחה ע\"י משתמש אשר שלח פחות מ-%(count)s תגובות:\n"
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:117
+#: contrib/comments/views/comments.py:116
 #, python-format
 msgid ""
 "This comment was posted by a sketchy user:\n"
@@ -1024,22 +1140,22 @@ msgstr ""
 "\n"
 "%(text)s"
 
-#: contrib/comments/views/comments.py:189
+#: contrib/comments/views/comments.py:188
 #: contrib/comments/views/comments.py:280
 msgid "Only POSTs are allowed"
 msgstr "רק פעולות POST מותרות"
 
-#: contrib/comments/views/comments.py:193
+#: contrib/comments/views/comments.py:192
 #: contrib/comments/views/comments.py:284
 msgid "One or more of the required fields wasn't submitted"
 msgstr "אחד או יותר מהשדות הנדרשים אינו נשלח."
 
-#: contrib/comments/views/comments.py:197
+#: contrib/comments/views/comments.py:196
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
 msgstr "מישהו התעסק עם טופס התגובה (הפרת אבטחה)"
 
-#: contrib/comments/views/comments.py:207
+#: contrib/comments/views/comments.py:206
 #: contrib/comments/views/comments.py:292
 msgid ""
 "The comment form had an invalid 'target' parameter -- the object ID was "
@@ -1063,51 +1179,141 @@ msgstr "מזהה תגובה שגוי"
 msgid "No voting for yourself"
 msgstr "לא ניתן להצביע לעצמך"
 
-#: contrib/admin/filterspecs.py:40
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:17
+msgid "Username:"
+msgstr "שם משתמש:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Log out"
+msgstr "יציאה"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:20
+msgid "Password:"
+msgstr "סיסמה:"
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "שכחת את סיסמתך ?"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr "דירוג"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "נדרש"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "אופציונלי"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "שליחת תמונה"
+
+#: contrib/comments/templates/comments/form.html:28
+#: contrib/comments/templates/comments/freeform.html:5
+msgid "Comment:"
+msgstr "תגובה:"
+
+#: contrib/comments/templates/comments/form.html:35
+#: contrib/comments/templates/comments/freeform.html:10
+msgid "Preview comment"
+msgstr "תצוגה מקדימה של התגובה"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "שמך:"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "th"
+msgstr "רביעי"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "st"
+msgstr "ראשון"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "nd"
+msgstr "שני"
+
+#: contrib/humanize/templatetags/humanize.py:17
+msgid "rd"
+msgstr "שלישי"
+
+#: contrib/humanize/templatetags/humanize.py:47
 #, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>ע\"י %s:</h3>\n"
-"<ul>\n"
+msgid "%(value).1f million"
+msgstr "%(value).1f מיליון"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-msgid "All"
-msgstr "הכל"
+#: contrib/humanize/templatetags/humanize.py:50
+#, python-format
+msgid "%(value).1f billion"
+msgstr "%(value).1f ביליון"
 
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "כל תאריך"
+#: contrib/humanize/templatetags/humanize.py:53
+#, python-format
+msgid "%(value).1f trillion"
+msgstr "%(value).1f טריליון"
 
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "היום"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "one"
+msgstr "אחד"
 
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "בשבוע האחרון"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "two"
+msgstr "שניים"
 
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "החודש"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "three"
+msgstr "שלושה"
 
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "השנה"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "four"
+msgstr "ארבעה"
 
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "כן"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "five"
+msgstr "חמישה"
 
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "לא"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "six"
+msgstr "שישה"
 
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "לא ידוע"
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "seven"
+msgstr "שבעה"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "eight"
+msgstr "שמונה"
+
+#: contrib/humanize/templatetags/humanize.py:68
+msgid "nine"
+msgstr "תשעה"
 
 #: contrib/admin/models.py:16
 msgid "action time"
@@ -1137,76 +1343,377 @@ msgstr "רישום יומן"
 msgid "log entries"
 msgstr "רישומי יומן"
 
-#: contrib/admin/templatetags/admin_list.py:230
+#: contrib/admin/filterspecs.py:40
+#, python-format
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
+msgstr ""
+"<h3>ע\"י %s:</h3>\n"
+"<ul>\n"
+
+#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
+#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+msgid "All"
+msgstr "הכל"
+
+#: contrib/admin/filterspecs.py:109
+msgid "Any date"
+msgstr "כל תאריך"
+
+#: contrib/admin/filterspecs.py:110
+msgid "Today"
+msgstr "היום"
+
+#: contrib/admin/filterspecs.py:113
+msgid "Past 7 days"
+msgstr "בשבוע האחרון"
+
+#: contrib/admin/filterspecs.py:115
+msgid "This month"
+msgstr "החודש"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This year"
+msgstr "השנה"
+
+#: contrib/admin/templatetags/admin_list.py:247
 msgid "All dates"
 msgstr "כל התאריכים"
 
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "הנוכחי."
+#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"נא להזין שם משתמש וסיסמה נכונים. בשני השדות גודל האותיות האנגליות משנה."
 
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "שינוי:"
+#: contrib/admin/views/decorators.py:24
+#: contrib/admin/templates/admin/login.html:25
+msgid "Log in"
+msgstr "כניסה"
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "תאריך:"
+#: contrib/admin/views/decorators.py:62
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"נא להתחבר שוב, מאחר ופג תוקף ההתחברות הנוכחית. אל דאגה: המידע ששלחת נשמר."
 
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "שעה:"
+#: contrib/admin/views/decorators.py:69
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"נראה שהדפדפן שלך אינו מוגדר לקבל עוגיות. נא לאפשר עוגיות, לטעון מחדש את הדף "
+"ולנסות שוב."
+
+#: contrib/admin/views/decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "שם משתמש אינו יכול להכיל את התו '@'."
+
+#: contrib/admin/views/decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "כתובת הדוא\"ל שלך אינה שם המשתמש שלך. נסה/י '%s' במקום."
+
+#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
+#: contrib/admin/views/doc.py:50
+msgid "tag:"
+msgstr "תג:"
+
+#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
+#: contrib/admin/views/doc.py:81
+msgid "filter:"
+msgstr "סינון:"
+
+#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
+#: contrib/admin/views/doc.py:139
+msgid "view:"
+msgstr "צפיה (view):"
+
+#: contrib/admin/views/doc.py:164
+#, python-format
+msgid "App %r not found"
+msgstr "יישום %r לא נמצא"
+
+#: contrib/admin/views/doc.py:171
+#, python-format
+msgid "Model %(name)r not found in app %(label)r"
+msgstr "מודל %(name)r לא נמצא ביישום %(label)r"
+
+#: contrib/admin/views/doc.py:183
+#, python-format
+msgid "the related `%(label)s.%(type)s` object"
+msgstr "האובייקט `%(label)s.%(type)s` הקשור"
+
+#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
+#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
+msgid "model:"
+msgstr "מודל:"
+
+#: contrib/admin/views/doc.py:214
+#, python-format
+msgid "related `%(label)s.%(name)s` objects"
+msgstr "אובייקטי `%(label)s.%(name)s` מקושרים"
+
+#: contrib/admin/views/doc.py:219
+#, python-format
+msgid "all %s"
+msgstr "כל %s"
+
+#: contrib/admin/views/doc.py:224
+#, python-format
+msgid "number of %s"
+msgstr "מספר %s"
+
+#: contrib/admin/views/doc.py:229
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Fields on %s objects"
+
+#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
+#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
+msgid "Integer"
+msgstr "מספר שלם"
+
+#: contrib/admin/views/doc.py:292
+msgid "Boolean (Either True or False)"
+msgstr "בוליאני (אמת או שקר)"
+
+#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
+#, python-format
+msgid "String (up to %(maxlength)s)"
+msgstr "מחרוזת (עד %(maxlength)s תווים)"
+
+#: contrib/admin/views/doc.py:294
+msgid "Comma-separated integers"
+msgstr "מספרים שלמים מופרדים בפסיקים"
+
+#: contrib/admin/views/doc.py:295
+msgid "Date (without time)"
+msgstr "תאריך (ללא שעה)"
+
+#: contrib/admin/views/doc.py:296
+msgid "Date (with time)"
+msgstr "תאריך (כולל שעה)"
+
+#: contrib/admin/views/doc.py:297
+msgid "E-mail address"
+msgstr "כתובת דוא\"ל"
+
+#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
+#: contrib/admin/views/doc.py:302
+msgid "File path"
+msgstr "נתיב קובץ"
+
+#: contrib/admin/views/doc.py:300
+msgid "Decimal number"
+msgstr "מספר עשרוני"
+
+#: contrib/admin/views/doc.py:306
+msgid "Boolean (Either True, False or None)"
+msgstr "בוליאני (אמת, שקר או כלום)"
+
+#: contrib/admin/views/doc.py:307
+msgid "Relation to parent model"
+msgstr "יחס למודל אב"
+
+#: contrib/admin/views/doc.py:308
+msgid "Phone number"
+msgstr "מספר טלפון"
+
+#: contrib/admin/views/doc.py:313
+msgid "Text"
+msgstr "טקסט"
+
+#: contrib/admin/views/doc.py:314
+msgid "Time"
+msgstr "זמן"
+
+#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL"
+
+#: contrib/admin/views/doc.py:316
+msgid "U.S. state (two uppercase letters)"
+msgstr "מדינה בארה\"ב (שתי אותיות גדולות)"
+
+#: contrib/admin/views/doc.py:317
+msgid "XML text"
+msgstr "טקסט XML"
+
+#: contrib/admin/views/doc.py:343
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "לא נראה ש-%s הוא אובייקט urlpattern"
+
+#: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:257
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
+
+#: contrib/admin/views/auth.py:24 contrib/admin/views/main.py:261
+#: contrib/admin/views/main.py:347
+msgid "You may edit it again below."
+msgstr "ניתן לערוך שוב מתחת"
+
+#: contrib/admin/views/auth.py:30
+msgid "Add user"
+msgstr "הוספת משתמש"
+
+#: contrib/admin/views/auth.py:57
+msgid "Password changed successfully."
+msgstr "הסיסמה שונתה בהצלחה."
+
+#: contrib/admin/views/auth.py:64
+#, python-format
+msgid "Change password: %s"
+msgstr "שינוי סיסמה: %s"
+
+#: contrib/admin/views/main.py:223
+msgid "Site administration"
+msgstr "ניהול אתר"
+
+#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
+#, python-format
+msgid "You may add another %s below."
+msgstr "ניתן להוסיף %s נוסף מתחת."
+
+#: contrib/admin/views/main.py:289
+#, python-format
+msgid "Add %s"
+msgstr "הוספת %s"
+
+#: contrib/admin/views/main.py:335
+#, python-format
+msgid "Added %s."
+msgstr "%s התווסף."
+
+#: contrib/admin/views/main.py:337
+#, python-format
+msgid "Changed %s."
+msgstr "%s שונה."
+
+#: contrib/admin/views/main.py:339
+#, python-format
+msgid "Deleted %s."
+msgstr "%s נמחק."
+
+#: contrib/admin/views/main.py:342
+msgid "No fields changed."
+msgstr "אף שדה לא השתנה."
+
+#: contrib/admin/views/main.py:345
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
+
+#: contrib/admin/views/main.py:353
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
+
+#: contrib/admin/views/main.py:391
+#, python-format
+msgid "Change %s"
+msgstr "שינוי %s"
+
+#: contrib/admin/views/main.py:476
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "אחד או יותר %(fieldname)s ב%(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:481
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "אחד או יותר %(fieldname)s ב%(name)s:"
+
+#: contrib/admin/views/main.py:514
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
+
+#: contrib/admin/views/main.py:517
+msgid "Are you sure?"
+msgstr "האם את/ה בטוח/ה ?"
+
+#: contrib/admin/views/main.py:539
+#, python-format
+msgid "Change history: %s"
+msgstr "היסטוריית שינוי: %s"
+
+#: contrib/admin/views/main.py:573
+#, python-format
+msgid "Select %s"
+msgstr "בחירת %s"
+
+#: contrib/admin/views/main.py:573
+#, python-format
+msgid "Select %s to change"
+msgstr "בחירת %s לשינוי"
+
+#: contrib/admin/views/main.py:768
+msgid "Database error"
+msgstr "שגיאת בסיס נתונים"
+
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+msgid "Change password"
+msgstr "שינוי סיסמה"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/base.html:29
-#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/base.html:30
 #: contrib/admin/templates/admin/change_form.html:13
 #: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/invalid_setup.html:4
 #: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:5
 #: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/admin/auth/user/change_password.html:12
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Home"
 msgstr "דף הבית"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/base.html:25
 #: contrib/admin/templates/admin/change_form.html:10
 #: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
 #: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
 msgid "Documentation"
 msgstr "תיעוד"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "ייסומניות"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Change password"
-msgstr "שינוי סיסמה"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
@@ -1266,64 +1773,132 @@ msgstr "עריכת אובייקט זה (בחלון חדש)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "כנ\"ל, אך דף הניהול ייפתח בחלון חדש."
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "האם <a href=\"/password_reset/\">שכחת את הסיסמה שלך</a>?"
-
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:23
-msgid "Log in"
-msgstr "כניסה"
-
-#: contrib/admin/templates/admin/submit_line.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-msgid "Delete"
-msgstr "מחיקה"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "שמירה כחדש"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "שמירה והוספת אחר"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "שמירה והמשך עריכה"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "שמירה"
-
-#: contrib/admin/templates/admin/base.html:24
-msgid "Welcome,"
-msgstr "שלום"
-
 #: contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
 msgstr "סינון"
 
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "בצע"
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "שלום"
 
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "תוצאה אחת"
-msgstr[1] "%(counter)s תוצאות"
+#: contrib/admin/templates/admin/change_form.html:15
+#: contrib/admin/templates/admin/index.html:28
+msgid "Add"
+msgstr "הוספה"
 
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s סה\"כ"
-
+#: contrib/admin/templates/admin/change_form.html:21
 #: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
 msgid "History"
 msgstr "היסטוריה"
+
+#: contrib/admin/templates/admin/change_form.html:22
+msgid "View on site"
+msgstr "צפיה באתר"
+
+#: contrib/admin/templates/admin/change_form.html:32
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+msgid "Please correct the error below."
+msgstr "נא לתקן את השגיאה המופיעה מתחת."
+
+#: contrib/admin/templates/admin/change_form.html:50
+msgid "Ordering"
+msgstr "מיון"
+
+#: contrib/admin/templates/admin/change_form.html:53
+msgid "Order:"
+msgstr "מיון:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "מחיקה"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"מחיקת %(object_name)s '%(escaped_object)s' מצריכה מחיקת "
+"אובייקטים מקושרים, אך לחשבון שלך אין הרשאות למחיקת"
+"סוגי האובייקטים הבאים:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:21
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"האם ברצונך למחוק את %(object_name)s \"%(escaped_object)s\"? "
+"כל הפריטים הקשורים הבאים יימחקו:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "כן, אני בטוח/ה"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " לפי %(filter_title)s "
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "שגיאת שרת"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "שגיאת שרת (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "שגיאת שרת <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"התרחשה שגיאה. היא דווחה למנהלי האתר בדוא\"ל ותתוקן בקרוב. תודה על סבלנותך."
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "מודלים זמינים ביישום %(name)s."
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "שינוי"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "אין לך הרשאות לעריכה"
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "פעולות אחרונות"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "הפעולות שלי"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "לא נמצאו"
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"משהו שגוי בהתקנת בסיס הנתונים שלך. נא לוודא שנוצרו טבלאות בסיס הנתונים "
+"המתאימות, ובסיס הנתונים ניתן לקריאה על ידי המשתמש המתאים."
 
 #: contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
@@ -1348,40 +1923,21 @@ msgid ""
 msgstr ""
 "לאובייקט זה אין היסטוריית שינוי. כנראה לא השתמשו בממשק הניהול הזה להוספתו."
 
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
-msgid "Add"
-msgstr "הוספה"
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "שמירה כחדש"
 
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "צפיה באתר"
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "שמירה והוספת אחר"
 
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "נא לתקן את השגיאה המופיעה מתחת."
-msgstr[1] "נא לתקן את השגיאות המופיעות מתחת."
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "שמירה והמשך עריכה"
 
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "מיון"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "מיון:"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "ניהול אתר Django"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "ניהול Django"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "הצג הכל"
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "שמירה"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -1392,91 +1948,126 @@ msgstr "דף לא קיים"
 msgid "We're sorry, but the requested page could not be found."
 msgstr "אנו מצטערים, לא ניתן למצוא את הדף המבוקש."
 
-#: contrib/admin/templates/admin/filter.html:2
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "בצע"
+
+#: contrib/admin/templates/admin/search_form.html:10
 #, python-format
-msgid " By %(title)s "
-msgstr " לפי %(title)s "
+msgid "1 result"
+msgstr "תוצאה אחת"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: contrib/admin/templates/admin/search_form.html:10
 #, python-format
-msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
-msgstr ""
-"מחיקת %(object_name)s '%(object)s' תמחק אובייקטים קשורים, אך לחשבון שלך אין "
-"הרשאות למחיקת אובייקטים מהסוג הבא:"
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s סה\"כ"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"האם ברצונך למחוק את %(object_name)s·\"%(object)s\"? כלהפריטים הקשורים הבאים "
-"יימחקו:"
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "הצג הכל"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "כן, אני בטוח/ה"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-"משהו שגוי בהתקנת בסיס הנתונים שלך. נא לוודא שנוצרו טבלאות בסיס הנתונים "
-"המתאימות, ובסיס הנתונים ניתן לקריאה על ידי המשתמש המתאים."
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "מודלים זמינים ביישום %(name)s."
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "שינוי"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "אין לך הרשאות לעריכה"
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "פעולות אחרונות"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "הפעולות שלי"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "לא נמצאו"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "שגיאת שרת"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "שגיאת שרת (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "שגיאת שרת <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"התרחשה שגיאה. היא דווחה למנהלי האתר בדוא\"ל ותתוקן בקרוב. תודה על סבלנותך."
-
-#: contrib/admin/templates/admin/change_list.html:11
+#: contrib/admin/templates/admin/change_list.html:12
 #, python-format
 msgid "Add %(name)s"
 msgstr "הוספת %(name)s"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "ניהול אתר Django"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "ניהול Django"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "ראשית יש להזין שם משתמש וסיסמה. לאחר מכן יהיה ביכולתך לערוך אפשרויות"
+"נוספות עבור המשתמש"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "שם משתמש"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
+msgid "Password"
+msgstr "סיסמה"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+msgid "Password (again)"
+msgstr "סיסמה (שוב)"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+msgid "Enter the same password as above, for verification."
+msgstr "יש להזין את אותה סיסנה שוב,לאימות."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "יש להזין סיסמה חדשה עבור המשתמש <strong>%(username)s</strong>."
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "הנוכחי."
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "שינוי:"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "תאריך:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "שעה:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "איפוס סיסמה"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"שכחת את סיסמתך ? נא להזין את כתובת הדוא\"ל מתחת, אנו נאפסאת הסיסמה ונשלח את "
+"החדשה אליך."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "כתובת דוא\"ל:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "אפס את סיסמתי"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "תודה על בילוי זמן איכות עם האתר."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "התחבר/י שוב"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "הסיסמה אופסה בהצלחה"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"שלחנו את הסיסמה החדשה לכתובת הדוא\"ל שהזנת. היא אמורה להתקבל תוך זמן קצר."
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
@@ -1509,12 +2100,21 @@ msgstr "תודה על השימוש באתר שלנו!"
 msgid "The %(site_name)s team"
 msgstr "צוות %(site_name)s"
 
+#: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
 #: contrib/admin/templates/registration/password_change_form.html:6
 #: contrib/admin/templates/registration/password_change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:4
 msgid "Password change"
 msgstr "שינוי סיסמה"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "הסיסמה שונתה בהצלחה"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "סיסמתך שונתה."
 
 #: contrib/admin/templates/registration/password_change_form.html:12
 msgid ""
@@ -1540,262 +2140,712 @@ msgstr "אימות סיסמה:"
 msgid "Change my password"
 msgstr "שנה את סיסמתי"
 
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "הסיסמה שונתה בהצלחה"
+#: contrib/localflavor/it/forms.py:16
+msgid "Enter a valid zip code."
+msgstr "יש להזין מיקוד חוקי."
 
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "סיסמתך שונתה."
+#: contrib/localflavor/it/forms.py:41
+msgid "Enter a valid Social Security number."
+msgstr "יש להזין מספר ביטוח לאומי חוקי."
 
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "תודה על בילוי זמן איכות עם האתר."
+#: contrib/localflavor/it/forms.py:68
+msgid "Enter a valid VAT number."
+msgstr "יש להזין מספר מעמ חוקי"
 
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "התחבר/י שוב"
+#: contrib/localflavor/us/forms.py:18
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr "יש להזין מיקוד חוקי בתחביר XXXXX או XXXXX-XXXX."
 
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-msgid "Password reset"
-msgstr "איפוס סיסמה"
+#: contrib/localflavor/us/forms.py:51
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr "יש להזין מספר ביטוח לאומי אמריקאי בתחביר XXX-XX-XXXX."
 
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "הסיסמה אופסה בהצלחה"
+#: contrib/localflavor/fr/forms.py:17 contrib/localflavor/fi/forms.py:14
+#: contrib/localflavor/de/forms.py:16
+msgid "Enter a zip code in the format XXXXX."
+msgstr "יש להזין מיקוד בתחביר XXXXX."
 
-#: contrib/admin/templates/registration/password_reset_done.html:12
+#: contrib/localflavor/ch/forms.py:18 contrib/localflavor/no/forms.py:15
+msgid "Enter a zip code in the format XXXX."
+msgstr "יש להזין מיקוד בתחביר XXXX."
+
+#: contrib/localflavor/ch/forms.py:90
 msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
+"Enter a valid Swiss identity or passport card number in X1234567<0 or "
+"1234567890 format."
 msgstr ""
-"שלחנו את הסיסמה החדשה לכתובת הדוא\"ל שהזנת. היא אמורה להתקבל תוך זמן קצר."
+"יש להזין מספר זיהוי או דרכון שוויצרי בתחביר X1234567<0 או "
+"1234567890."
 
-#: contrib/admin/templates/registration/password_reset_form.html:12
+#: contrib/localflavor/ch/ch_states.py:5
+msgid "Aargau"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:6
+msgid "Appenzell Innerrhoden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:7
+msgid "Appenzell Ausserrhoden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:8
+msgid "Basel-Stadt"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:9
+msgid "Basel-Land"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:10
+msgid "Berne"
+msgstr "ברן"
+
+#: contrib/localflavor/ch/ch_states.py:11
+msgid "Fribourg"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:12
+msgid "Geneva"
+msgstr "ג'נבה"
+
+#: contrib/localflavor/ch/ch_states.py:13
+msgid "Glarus"
+msgstr "גלרוס"
+
+#: contrib/localflavor/ch/ch_states.py:14
+msgid "Graubuenden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:15
+msgid "Jura"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:16
+msgid "Lucerne"
+msgstr "לוצרן"
+
+#: contrib/localflavor/ch/ch_states.py:17
+msgid "Neuchatel"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:18
+msgid "Nidwalden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:19
+msgid "Obwalden"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:20
+msgid "Schaffhausen"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:21
+msgid "Schwyz"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:22
+msgid "Solothurn"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:23
+msgid "St. Gallen"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:24
+msgid "Thurgau"
+msgstr "Thurgau"
+
+#: contrib/localflavor/ch/ch_states.py:25
+msgid "Ticino"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:26
+msgid "Uri"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:27
+msgid "Valais"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:28
+msgid "Vaud"
+msgstr ""
+
+#: contrib/localflavor/ch/ch_states.py:29
+msgid "Zug"
+msgstr "צוג"
+
+#: contrib/localflavor/ch/ch_states.py:30
+msgid "Zurich"
+msgstr ""
+
+#: contrib/localflavor/no/forms.py:36
+msgid "Enter a valid Norwegian social security number."
+msgstr "יש להזין מספר ביטוח לאומי נורבגי חוקי."
+
+#: contrib/localflavor/br/forms.py:18
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "יש להזין מיקוד בתחביר XXXXX-XXX."
+
+#: contrib/localflavor/br/forms.py:30
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr "מספרי טלפון חייבים להיות בתחביר XX-XXXX-XXXX."
+
+#: contrib/localflavor/br/forms.py:72
+msgid "This field requires only numbers."
+msgstr "יש להזין רק ספרות בשדה זה."
+
+#: contrib/localflavor/br/forms.py:74
+msgid "This field requires at most 11 digits or 14 characters."
+msgstr "שדה זה דורש 11 או 14 ספרות לכל היותר."
+
+#: contrib/localflavor/br/forms.py:84
+msgid "Invalid CPF number."
+msgstr "מספר CPF לא חוקי"
+
+#: contrib/localflavor/br/forms.py:106
+msgid "This field requires at least 14 digits"
+msgstr "שדה זה דורש לפחות 14 ספרות."
+
+#: contrib/localflavor/br/forms.py:116
+msgid "Invalid CNPJ number."
+msgstr "מספר CNPJ לא חוקי"
+
+#: contrib/localflavor/uk/forms.py:18
+msgid "Enter a postcode. A space is required between the two postcode parts."
+msgstr "יש להזין קוד דואר. נדרש רווח בין שני חלקי הקוד."
+
+#: contrib/localflavor/is_/forms.py:16
 msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
 msgstr ""
-"שכחת את סיסמתך ? נא להזין את כתובת הדוא\"ל מתחת, אנו נאפסאת הסיסמה ונשלח את "
-"החדשה אליך."
+"יש להזין מספר זיהוי איסלנדי חוקי. התחביר הוא XXXXXX-XXXX."
 
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "כתובת דוא\"ל:"
+#: contrib/localflavor/is_/forms.py:30
+msgid "The Icelandic identification number is not valid."
+msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "אפס את סיסמתי"
+#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:45
+msgid "Enter a valid Finnish social security number."
+msgstr "יש להזין מספר ביטוח לאומי פיני חוקי."
 
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:289
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:297
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:300
-msgid "Integer"
-msgstr "מספר שלם"
+#: contrib/localflavor/cl/forms.py:21
+msgid "Enter valid a Chilean RUT. The format is XX.XXX.XXX-X."
+msgstr "יש להזין RUT צ'יליאני חוקי. התחביר הוא XX.XXX.XXX-X."
 
-#: contrib/admin/views/doc.py:280
-msgid "Boolean (Either True or False)"
-msgstr "בוליאני (אמת או שקר)"
+#: contrib/localflavor/cl/forms.py:26
+msgid "Enter valid a Chilean RUT"
+msgstr "יש להזין RUT צ'יליאני חוקי."
 
-#: contrib/admin/views/doc.py:281 contrib/admin/views/doc.py:299
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "מחרוזת (עד %(maxlength)s תווים)"
+#: contrib/localflavor/au/forms.py:18
+msgid "Enter a 4 digit post code."
+msgstr "יש להזין קוד דואר בן 4 ספרות."
 
-#: contrib/admin/views/doc.py:282
-msgid "Comma-separated integers"
-msgstr "מספרים שלמים מופרדים בפסיקים"
+#: contrib/localflavor/de/forms.py:60
+msgid ""
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format."
+msgstr ""
+"יש להזין מספר זיהוי גרמני חוקי בתחביר XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
-#: contrib/admin/views/doc.py:283
-msgid "Date (without time)"
-msgstr "תאריך (ללא שעה)"
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
+msgstr ""
 
-#: contrib/admin/views/doc.py:284
-msgid "Date (with time)"
-msgstr "תאריך (כולל שעה)"
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr "באווריה"
 
-#: contrib/admin/views/doc.py:285
-msgid "E-mail address"
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr "ברלין"
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr "ברמן"
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr "המבורג"
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr "הסה"
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr ""
+
+#: contrib/localflavor/jp/forms.py:21
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr "יש להזין קוד דואר בתחביר XXXXXXX או XXX-XXXX."
+
+#: contrib/localflavor/jp/jp_prefectures.py:4
+msgid "Hokkaido"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:5
+msgid "Aomori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:6
+msgid "Iwate"
+msgstr "Iwate"
+
+#: contrib/localflavor/jp/jp_prefectures.py:7
+msgid "Miyagi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:8
+msgid "Akita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:9
+msgid "Yamagata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:10
+msgid "Fukushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:11
+msgid "Ibaraki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:12
+msgid "Tochigi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:13
+msgid "Gunma"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:14
+msgid "Saitama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:15
+msgid "Chiba"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:16
+msgid "Tokyo"
+msgstr "טוקיו"
+
+#: contrib/localflavor/jp/jp_prefectures.py:17
+msgid "Kanagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:18
+msgid "Yamanashi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:19
+msgid "Nagano"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:20
+msgid "Niigata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:21
+msgid "Toyama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:22
+msgid "Ishikawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:23
+msgid "Fukui"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:24
+msgid "Gifu"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:25
+msgid "Shizuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:26
+msgid "Aichi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:27
+msgid "Mie"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:28
+msgid "Shiga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:29
+msgid "Kyoto"
+msgstr "קיוטו"
+
+#: contrib/localflavor/jp/jp_prefectures.py:30
+msgid "Osaka"
+msgstr "אוסקה"
+
+#: contrib/localflavor/jp/jp_prefectures.py:31
+msgid "Hyogo"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:32
+msgid "Nara"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:33
+msgid "Wakayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:34
+msgid "Tottori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:35
+msgid "Shimane"
+msgstr "Shimane"
+
+#: contrib/localflavor/jp/jp_prefectures.py:36
+msgid "Okayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:37
+msgid "Hiroshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:38
+msgid "Yamaguchi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:39
+msgid "Tokushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:40
+msgid "Kagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:41
+msgid "Ehime"
+msgstr "Ehime"
+
+#: contrib/localflavor/jp/jp_prefectures.py:42
+msgid "Kochi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:43
+msgid "Fukuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:44
+msgid "Saga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:45
+msgid "Nagasaki"
+msgstr "נגסקי"
+
+#: contrib/localflavor/jp/jp_prefectures.py:46
+msgid "Kumamoto"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:47
+msgid "Oita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:48
+msgid "Miyazaki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:49
+msgid "Kagoshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:50
+msgid "Okinawa"
+msgstr "אוקינאווה"
+
+#: contrib/sessions/models.py:68
+msgid "session key"
+msgstr "מפתח התחברות (session key)"
+
+#: contrib/sessions/models.py:69
+msgid "session data"
+msgstr "מידע התחברות (session data)"
+
+#: contrib/sessions/models.py:70
+msgid "expire date"
+msgstr "תאריך פג תוקף"
+
+#: contrib/sessions/models.py:74
+msgid "session"
+msgstr "התחברות"
+
+#: contrib/sessions/models.py:75
+msgid "sessions"
+msgstr "התחברויות"
+
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+msgid "The two password fields didn't match."
+msgstr "שני שדות הסיסמה אינם זהים."
+
+#: contrib/auth/forms.py:25
+msgid "A user with that username already exists."
+msgstr "משתמש עם שם משתמש זה קיים כבר"
+
+#: contrib/auth/forms.py:53
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך.הן נדרשות כדי להתחבר."
+
+#: contrib/auth/forms.py:62
+msgid "This account is inactive."
+msgstr "חשבון זה אינו פעיל."
+
+#: contrib/auth/forms.py:85
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "כתובת דואר אלקטרוני זו אינה משוייכת למשתמש. בטוח שנרשמת ?"
+
+#: contrib/auth/forms.py:117
+msgid "The two 'new password' fields didn't match."
+msgstr "שני שדות 'הסיסמה החדשה' אינם זהים."
+
+#: contrib/auth/forms.py:124
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "סיסמתך הישנה הוזנה בצורה השגויה. נא להזינה שוב."
+
+#: contrib/auth/models.py:44 contrib/auth/models.py:64
+msgid "name"
+msgstr "שם"
+
+#: contrib/auth/models.py:46
+msgid "codename"
+msgstr "שם קוד"
+
+#: contrib/auth/models.py:49
+msgid "permission"
+msgstr "הרשאה"
+
+#: contrib/auth/models.py:50 contrib/auth/models.py:65
+msgid "permissions"
+msgstr "הרשאות"
+
+#: contrib/auth/models.py:68
+msgid "group"
+msgstr "קבוצה"
+
+#: contrib/auth/models.py:69 contrib/auth/models.py:109
+msgid "groups"
+msgstr "קבוצות"
+
+#: contrib/auth/models.py:99
+msgid "username"
+msgstr "שם משתמש"
+
+#: contrib/auth/models.py:99
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr "דורש 30 תווים או פחות. תווים אלפאנומריים בלבד (אותיות, ספרות וקווים תחתונים)."
+
+#: contrib/auth/models.py:100
+msgid "first name"
+msgstr "שם פרטי"
+
+#: contrib/auth/models.py:101
+msgid "last name"
+msgstr "שם משפחה"
+
+#: contrib/auth/models.py:102
+msgid "e-mail address"
 msgstr "כתובת דוא\"ל"
 
-#: contrib/admin/views/doc.py:286 contrib/admin/views/doc.py:287
-#: contrib/admin/views/doc.py:290
-msgid "File path"
-msgstr "נתיב קובץ"
+#: contrib/auth/models.py:103
+msgid "password"
+msgstr "סיסמה"
 
-#: contrib/admin/views/doc.py:288
-msgid "Decimal number"
-msgstr "מספר עשרוני"
-
-#: contrib/admin/views/doc.py:294
-msgid "Boolean (Either True, False or None)"
-msgstr "בוליאני (אמת, שקר או כלום)"
-
-#: contrib/admin/views/doc.py:295
-msgid "Relation to parent model"
-msgstr "יחס למודל אב"
-
-#: contrib/admin/views/doc.py:296
-msgid "Phone number"
-msgstr "מספר טלפון"
-
-#: contrib/admin/views/doc.py:301
-msgid "Text"
-msgstr "טקסט"
-
-#: contrib/admin/views/doc.py:302
-msgid "Time"
-msgstr "זמן"
-
-#: contrib/admin/views/doc.py:303 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:304
-msgid "U.S. state (two uppercase letters)"
-msgstr "מדינה בארה\"ב (שתי אותיות גדולות)"
-
-#: contrib/admin/views/doc.py:305
-msgid "XML text"
-msgstr "טקסט XML"
-
-#: contrib/admin/views/main.py:226
-msgid "Site administration"
-msgstr "ניהול אתר"
-
-#: contrib/admin/views/main.py:260
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
-
-#: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
-msgid "You may edit it again below."
-msgstr "ניתן לערוך שוב מתחת"
-
-#: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
-#, python-format
-msgid "You may add another %s below."
-msgstr "ניתן להוסיף %s נוסף מתחת."
-
-#: contrib/admin/views/main.py:290
-#, python-format
-msgid "Add %s"
-msgstr "הוספת %s"
-
-#: contrib/admin/views/main.py:336
-#, python-format
-msgid "Added %s."
-msgstr "%s התווסף."
-
-#: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
-#: contrib/admin/views/main.py:340
-msgid "and"
-msgstr "ו"
-
-#: contrib/admin/views/main.py:338
-#, python-format
-msgid "Changed %s."
-msgstr "%s שונה."
-
-#: contrib/admin/views/main.py:340
-#, python-format
-msgid "Deleted %s."
-msgstr "%s נמחק."
-
-#: contrib/admin/views/main.py:343
-msgid "No fields changed."
-msgstr "אף שדה לא השתנה."
-
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
-
-#: contrib/admin/views/main.py:354
-#, python-format
+#: contrib/auth/models.py:103
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
-
-#: contrib/admin/views/main.py:392
-#, python-format
-msgid "Change %s"
-msgstr "שינוי %s"
-
-#: contrib/admin/views/main.py:470
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "אחד או יותר %(fieldname)s ב%(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:475
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "אחד או יותר %(fieldname)s ב%(name)s:"
-
-#: contrib/admin/views/main.py:508
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
-
-#: contrib/admin/views/main.py:511
-msgid "Are you sure?"
-msgstr "האם את/ה בטוח/ה ?"
-
-#: contrib/admin/views/main.py:533
-#, python-format
-msgid "Change history: %s"
-msgstr "היסטוריית שינוי: %s"
-
-#: contrib/admin/views/main.py:567
-#, python-format
-msgid "Select %s"
-msgstr "בחירת %s"
-
-#: contrib/admin/views/main.py:567
-#, python-format
-msgid "Select %s to change"
-msgstr "בחירת %s לשינוי"
-
-#: contrib/admin/views/main.py:743
-msgid "Database error"
-msgstr "שגיאת בסיס נתונים"
-
-#: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
-#: contrib/auth/forms.py:43
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
 msgstr ""
-"נא להזין שם משתמש וסיסמה נכונים. בשני השדות גודל האותיות האנגליות משנה."
+"יש להזין '[algo]$[salt]$[hexdigest]' או להשתמש ב<a href=\"password/\">טופס "
+"שינוי הסיסמה</a>."
 
-#: contrib/admin/views/decorators.py:61
+#: contrib/auth/models.py:104
+msgid "staff status"
+msgstr "סטטוס איש צוות"
+
+#: contrib/auth/models.py:104
+msgid "Designates whether the user can log into this admin site."
+msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
+
+#: contrib/auth/models.py:105
+msgid "active"
+msgstr "פעיל"
+
+#: contrib/auth/models.py:105
 msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-"נא להתחבר שוב, מאחר ופג תוקף ההתחברות הנוכחית. אל דאגה: המידע ששלחת נשמר."
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול. יש לבטל בחירה זו"
+"במקום למחוק חשבונות משתמשים."
 
-#: contrib/admin/views/decorators.py:68
+#: contrib/auth/models.py:106
+msgid "superuser status"
+msgstr "סטטוס משתמש על"
+
+#: contrib/auth/models.py:106
 msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "מציין שלמשתמש זה יש את כל ההרשאות ללא הצורך המפורש בהענקתן."
+
+#: contrib/auth/models.py:107
+msgid "last login"
+msgstr "כניסה אחרונה"
+
+#: contrib/auth/models.py:108
+msgid "date joined"
+msgstr "תאריך הצטרפות"
+
+#: contrib/auth/models.py:110
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
 msgstr ""
-"נראה שהדפדפן שלך אינו מוגדר לקבל עוגיות. נא לאפשר עוגיות, לטעון מחדש את הדף "
-"ולנסות שוב."
+"בנוסף לכל ההרשאות שהוקצו ידנית, יוענקו למשתמש גם כל ההרשאות של כל קבוצה "
+"המשוייכת אליו."
 
-#: contrib/admin/views/decorators.py:82
-msgid "Usernames cannot contain the '@' character."
-msgstr "שם משתמש אינו יכול להכיל את התו '@'."
+#: contrib/auth/models.py:111
+msgid "user permissions"
+msgstr "הרשאות משתמש"
 
-#: contrib/admin/views/decorators.py:84
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "כתובת הדוא\"ל שלך אינה שם המשתמש שלך. נסה/י '%s' במקום."
+#: contrib/auth/models.py:115
+msgid "user"
+msgstr "משתמש"
+
+#: contrib/auth/models.py:116
+msgid "users"
+msgstr "משתמשים"
+
+#: contrib/auth/models.py:122
+msgid "Personal info"
+msgstr "מידע אישי"
+
+#: contrib/auth/models.py:123
+msgid "Permissions"
+msgstr "הרשאות"
+
+#: contrib/auth/models.py:124
+msgid "Important dates"
+msgstr "תאריכים חשובים"
+
+#: contrib/auth/models.py:125
+msgid "Groups"
+msgstr "קבוצות"
+
+#: contrib/auth/models.py:269
+msgid "message"
+msgstr "הודעה"
+
+#: contrib/auth/models.py:282
+msgid "AnonymousUser"
+msgstr "משתמש אנונימי"
+
+#: contrib/auth/views.py:40
+msgid "Logged out"
+msgstr "יצאת מהמערכת"
+
+#: contrib/flatpages/models.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"לדוגמא: '/about/contact/'. יש לוודא הימצאות הקווים הנטויים בהתחלה ובסוף."
+
+#: contrib/flatpages/models.py:9
+msgid "title"
+msgstr "כותרת"
+
+#: contrib/flatpages/models.py:10
+msgid "content"
+msgstr "תוכן"
+
+#: contrib/flatpages/models.py:11
+msgid "enable comments"
+msgstr "אפשר תגובות"
+
+#: contrib/flatpages/models.py:12
+msgid "template name"
+msgstr "שם תבנית"
+
+#: contrib/flatpages/models.py:13
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"דוגמא: 'flatpages/contact_page.html'. אם זה לא צויין, המערכת "
+"תשתמש ב-'flatpages/default.html'."
+
+#: contrib/flatpages/models.py:14
+msgid "registration required"
+msgstr "הרשמה נדרשת"
+
+#: contrib/flatpages/models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr "אם זה מסומך, רק משתמשים מחוברים יוכלו לצפות בדף."
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "דף פשוט"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "דפים פשוטים"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -1825,175 +2875,15 @@ msgstr "הפניה"
 msgid "redirects"
 msgstr "הפניות"
 
-#: contrib/auth/forms.py:30
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "נראה שעוגיות לא מאופשרות בדפדפן שלך.הן נדרשות כדי להתחבר."
+#: contrib/contenttypes/models.py:36
+msgid "python model class name"
+msgstr "שם ה-class של מודל פייתון"
 
-#: contrib/auth/forms.py:45
-msgid "This account is inactive."
-msgstr "חשבון זה אינו פעיל."
+#: contrib/contenttypes/models.py:39
+msgid "content type"
+msgstr "סוג תוכן"
 
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "יצאת מהמערכת"
-
-#: contrib/auth/models.py:13 contrib/auth/models.py:26
-msgid "name"
-msgstr "שם"
-
-#: contrib/auth/models.py:15
-msgid "codename"
-msgstr "שם קוד"
-
-#: contrib/auth/models.py:17
-msgid "permission"
-msgstr "הרשאה"
-
-#: contrib/auth/models.py:18 contrib/auth/models.py:27
-msgid "permissions"
-msgstr "הרשאות"
-
-#: contrib/auth/models.py:29
-msgid "group"
-msgstr "קבוצה"
-
-#: contrib/auth/models.py:30 contrib/auth/models.py:65
-msgid "groups"
-msgstr "קבוצות"
-
-#: contrib/auth/models.py:55
-msgid "username"
-msgstr "שם משתמש"
-
-#: contrib/auth/models.py:56
-msgid "first name"
-msgstr "שם פרטי"
-
-#: contrib/auth/models.py:57
-msgid "last name"
-msgstr "שם משפחה"
-
-#: contrib/auth/models.py:58
-msgid "e-mail address"
-msgstr "כתובת דוא\"ל"
-
-#: contrib/auth/models.py:59
-msgid "password"
-msgstr "סיסמה"
-
-#: contrib/auth/models.py:59
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "השתמש ב '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:60
-msgid "staff status"
-msgstr "סטטוס איש צוות"
-
-#: contrib/auth/models.py:60
-msgid "Designates whether the user can log into this admin site."
-msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
-
-#: contrib/auth/models.py:61
-msgid "active"
-msgstr "פעיל"
-
-#: contrib/auth/models.py:62
-msgid "superuser status"
-msgstr "סטטוס משתמש על"
-
-#: contrib/auth/models.py:63
-msgid "last login"
-msgstr "כניסה אחרונה"
-
-#: contrib/auth/models.py:64
-msgid "date joined"
-msgstr "תאריך הצטרפות"
-
-#: contrib/auth/models.py:66
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-"בנוסף לכל ההרשאות שהוקצו ידנית, יוענקו למשתמש גם כל ההרשאות של כל קבוצה "
-"המשוייכת אליו."
-
-#: contrib/auth/models.py:67
-msgid "user permissions"
-msgstr "הרשאות משתמש"
-
-#: contrib/auth/models.py:70
-msgid "user"
-msgstr "משתמש"
-
-#: contrib/auth/models.py:71
-msgid "users"
-msgstr "משתמשים"
-
-#: contrib/auth/models.py:76
-msgid "Personal info"
-msgstr "מידע אישי"
-
-#: contrib/auth/models.py:77
-msgid "Permissions"
-msgstr "הרשאות"
-
-#: contrib/auth/models.py:78
-msgid "Important dates"
-msgstr "תאריכים חשובים"
-
-#: contrib/auth/models.py:79
-msgid "Groups"
-msgstr "קבוצות"
-
-#: contrib/auth/models.py:219
-msgid "message"
-msgstr "הודעה"
-
-#: contrib/flatpages/models.py:8
-msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"לדוגמא: '/about/contact/'. יש לוודא הימצאות הקווים הנטויים בהתחלה ובסוף."
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "כותרת"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "תוכן"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "אפשר תגובות"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "שם תבנית"
-
-#: contrib/flatpages/models.py:13
-msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
-msgstr ""
-"דוגמא: 'flatpages/contact_page'. האם אינו קיים, המערכתתשתמש ב 'flatpages/"
-"default'."
-
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "הרשמה נדרשת"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "אם זה מסומך, רק משתמשים מחוברים יוכלו לצפות בדף."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "דף פשוט"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "דפים פשוטים"
+#: contrib/contenttypes/models.py:40
+msgid "content types"
+msgstr "סוגי תוכן"
 
