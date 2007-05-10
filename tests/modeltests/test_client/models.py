@@ -34,13 +34,6 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['var'], 42)
         self.assertEqual(response.template.name, 'GET Template')
 
-    def test_no_template_view(self):
-        "Check that template usage assersions work then templates aren't in use"
-        response = self.client.get('/test_client/no_template_view/')
-
-        # Check that the no template case doesn't mess with the template assertions
-        self.assertTemplateNotUsed(response, 'GET Template')
-        
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/test_client/post_view/', {})
@@ -75,6 +68,7 @@ class ClientTest(TestCase):
         self.failUnless('Data received' in response.content)
         
     def test_raw_post(self):
+        "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
         response = self.client.post("/test_client/raw_post_view/", test_doc,
                                     content_type="text/xml")
@@ -88,6 +82,28 @@ class ClientTest(TestCase):
         
         # Check that the response was a 302 (redirect)
         self.assertRedirects(response, '/test_client/get_view/')
+
+    def test_permanent_redirect(self):
+        "GET a URL that redirects permanently elsewhere"
+        response = self.client.get('/test_client/permanent_redirect_view/')
+        
+        # Check that the response was a 301 (permanent redirect)
+        self.assertRedirects(response, '/test_client/get_view/', status_code=301)
+
+    def test_redirect_to_strange_location(self):
+        "GET a URL that redirects to a non-200 page"
+        response = self.client.get('/test_client/double_redirect_view/')
+        
+        # Check that the response was a 302, and that
+        # the attempt to get the redirection location returned 301 when retrieved
+        self.assertRedirects(response, '/test_client/permanent_redirect_view/', target_status_code=301)
+
+    def test_notfound_response(self):
+        "GET a URL that responds as '404:Not Found'"
+        response = self.client.get('/test_client/bad_view/')
+        
+        # Check that the response was a 404, and that the content contains MAGIC
+        self.assertContains(response, 'MAGIC', status_code=404)
 
     def test_valid_form(self):
         "POST valid data to a form"

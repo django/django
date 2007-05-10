@@ -472,9 +472,9 @@ Normal Python unit tests have a wide range of assertions, such as
 ``django.TestCase`` adds to these, providing some assertions
 that can be useful in testing the behavior of web sites.
 
-``assertContains(response, text, count=1)``
-    Assert that a response indicates that a page was retrieved successfully,
-    (i.e., the HTTP status code was 200), and that ``text`` occurs ``count``
+``assertContains(response, text, count=1, status_code=200)``
+    Assert that a response indicates that a page could be retrieved and
+    produced the nominated status code, and that ``text`` occurs ``count``
     times in the content of the response.
 
 ``assertFormError(response, form, field, errors)``
@@ -493,9 +493,10 @@ that can be useful in testing the behavior of web sites.
     Assert that the template with the given name was *not* used in rendering
     the response.
 
-``assertRedirects(response, expected_path)``
-    Assert that the response received redirects the browser to the provided
-    path, and that the expected_path can be retrieved.
+``assertRedirects(response, expected_path, status_code=302, target_status_code=200)``
+    Assert that the response received produced the nominated status code,
+    redirects the browser to the provided path, and that retrieving the provided
+    path yields a response with the target status code.
 
 ``assertTemplateUsed(response, template_name)``
     Assert that the template with the given name was used in rendering the
