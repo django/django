@@ -7,10 +7,6 @@ from django.newforms.forms import Form
 from django.newforms import fields
 from django.shortcuts import render_to_response
 
-def no_template_view(request):
-    "A simple view that expects a GET request, and returns a rendered template"
-    return HttpResponse("No template used")
-
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
     t = Template('This is a test. {{ var }} is the value.', name='GET Template')

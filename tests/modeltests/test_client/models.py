@@ -34,13 +34,6 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['var'], 42)
         self.assertEqual(response.template.name, 'GET Template')
 
-    def test_no_template_view(self):
-        "Template usage assertions work then templates aren't in use"
-        response = self.client.get('/test_client/no_template_view/')
-
-        # Check that the no template case doesn't mess with the template assertions
-        self.assertTemplateNotUsed(response, 'GET Template')
-        
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/test_client/post_view/', {})
