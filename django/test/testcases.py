@@ -56,32 +56,35 @@ class TestCase(unittest.TestCase):
         self._pre_setup()
         super(TestCase, self).run(result)
 
-    def assertRedirects(self, response, expected_path):
-        """Assert that a response redirected to a specific URL, and that the 
+    def assertRedirects(self, response, expected_path, status_code=302, target_status_code=200):
+        """Assert that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
         
         """
-        self.assertEqual(response.status_code, 302, 
-            "Response didn't redirect: Reponse code was %d" % response.status_code)
+        self.assertEqual(response.status_code, status_code, 
+            "Response didn't redirect: Reponse code was %d (expected %d)" % 
+                (response.status_code, status_code))
         scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
         self.assertEqual(path, expected_path, 
             "Response redirected to '%s', expected '%s'" % (path, expected_path))
         redirect_response = self.client.get(path)
-        self.assertEqual(redirect_response.status_code, 200, 
-            "Couldn't retrieve redirection page '%s'" % path)
+        self.assertEqual(redirect_response.status_code, target_status_code, 
+            "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
+                (path, response.status_code, status_code))
     
-    def assertContains(self, response, text, count=1):
+    def assertContains(self, response, text, count=1, status_code=200):
         """Assert that a response indicates that a page was retreived successfully,
-        (i.e., the HTTP status code was 200), and that ``text`` occurs ``count`` 
+        (i.e., the HTTP status code was as expected), and that ``text`` occurs ``count``
         times in the content of the response.
         
         """
-        self.assertEqual(response.status_code, 200,
-            "Couldn't retrieve page'")
+        self.assertEqual(response.status_code, status_code,
+            "Couldn't retrieve page: Response code was %d (expected %d)'" % 
+                (response.status_code, status_code))
         real_count = response.content.count(text)
         self.assertEqual(real_count, count,
-            "Could only find %d of %d instances of '%s' in response" % (real_count, count, text))
-
+            "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
+    
     def assertFormError(self, response, form, field, errors):
         "Assert that a form used to render the response has a specific field error"
         if not response.context:

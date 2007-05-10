@@ -1,7 +1,7 @@
 from xml.dom.minidom import parseString
 from django.core.mail import EmailMessage, SMTPConnection
 from django.template import Context, Template
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.newforms.forms import Form
 from django.newforms import fields
@@ -53,6 +53,14 @@ def raw_post_view(request):
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client/get_view/')
+
+def double_redirect_view(request):
+    "A view that redirects all requests to a redirection view"
+    return HttpResponseRedirect('/test_client/permanent_redirect_view/')
+
+def bad_view(request):
+    "A view that returns a 404 with some error content"
+    return HttpResponseNotFound('Not found!. This page contains some MAGIC content')
 
 TestChoices = (
     ('a', 'First Choice'),
