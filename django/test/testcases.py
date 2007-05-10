@@ -105,18 +105,21 @@ class TestCase(unittest.TestCase):
         for i,context in enumerate(contexts):
             if form in context:
                 found_form = True
-                try:
-                    for err in errors:
-                        if field:
+                for err in errors:
+                    if field:
+                        if field in context[form].errors:
                             self.assertTrue(err in context[form].errors[field], 
-                                "The field '%s' on form '%s' in context %d does not contain the error '%s' (actual errors: %s)" % 
-                                    (field, form, i, err, list(context[form].errors[field])))
+                            "The field '%s' on form '%s' in context %d does not contain the error '%s' (actual errors: %s)" % 
+                                (field, form, i, err, list(context[form].errors[field])))
+                        elif field in context[form].fields:
+                            self.fail("The field '%s' on form '%s' in context %d contains no errors" % 
+                                (field, form, i))
                         else:
-                            self.assertTrue(err in context[form].non_field_errors(), 
-                                "The form '%s' in context %d does not contain the non-field error '%s' (actual errors: %s)" % 
-                                    (form, i, err, list(context[form].non_field_errors())))
-                except KeyError:
-                    self.fail("The form '%s' in context %d does not contain the field '%s'" % (form, i, field))
+                            self.fail("The form '%s' in context %d does not contain the field '%s'" % (form, i, field))
+                    else:
+                        self.assertTrue(err in context[form].non_field_errors(), 
+                            "The form '%s' in context %d does not contain the non-field error '%s' (actual errors: %s)" % 
+                                (form, i, err, list(context[form].non_field_errors())))
         if not found_form:
             self.fail("The form '%s' was not used to render the response" % form)
             
