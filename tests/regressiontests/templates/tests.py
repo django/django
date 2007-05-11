@@ -592,6 +592,8 @@ class Templates(unittest.TestCase):
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
             'invalidstr04': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
+            'invalidstr05': ('{{ var }}', {}, ('', 'INVALID %s', 'var')),
+            'invalidstr06': ('{{ var.prop }}', {'var': {}}, ('', 'INVALID %s', 'var.prop')),
 
             ### MULTILINE #############################################################
 
@@ -743,6 +745,7 @@ class Templates(unittest.TestCase):
 
         # Set TEMPLATE_STRING_IF_INVALID to a known string
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
+        expected_invalid_str = 'INVALID'
 
         for name, vals in tests:
             install()
@@ -750,6 +753,10 @@ class Templates(unittest.TestCase):
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
                 invalid_string_result = vals[2][1]
+                if '%s' in invalid_string_result:
+                    expected_invalid_str = 'INVALID %s'
+                    invalid_string_result = invalid_string_result % vals[2][2]
+                    template.invalid_var_format_string = True
             else:
                 normal_string_result = vals[2]
                 invalid_string_result = vals[2]
@@ -760,7 +767,7 @@ class Templates(unittest.TestCase):
                 activate('en-us')
 
             for invalid_str, result in [('', normal_string_result),
-                                        ('INVALID', invalid_string_result)]:
+                                        (expected_invalid_str, invalid_string_result)]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 try:
                     output = loader.get_template(name).render(template.Context(vals[1]))
@@ -773,6 +780,10 @@ class Templates(unittest.TestCase):
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
+
+            if template.invalid_var_format_string:
+                expected_invalid_str = 'INVALID'
+                template.invalid_var_format_string = False
 
         loader.template_source_loaders = old_template_loaders
         deactivate()

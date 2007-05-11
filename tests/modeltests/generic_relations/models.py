@@ -11,6 +11,7 @@ from complete).
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 class TaggedItem(models.Model):
     """A tag on an item."""
@@ -18,7 +19,7 @@ class TaggedItem(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     
-    content_object = models.GenericForeignKey()
+    content_object = generic.GenericForeignKey()
     
     class Meta:
         ordering = ["tag"]
@@ -30,7 +31,7 @@ class Animal(models.Model):
     common_name = models.CharField(maxlength=150)
     latin_name = models.CharField(maxlength=150)
     
-    tags = models.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem)
 
     def __str__(self):
         return self.common_name
@@ -39,7 +40,7 @@ class Vegetable(models.Model):
     name = models.CharField(maxlength=150)
     is_yucky = models.BooleanField(default=True)
     
-    tags = models.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem)
     
     def __str__(self):
         return self.name

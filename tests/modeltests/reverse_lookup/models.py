@@ -55,5 +55,5 @@ __test__ = {'API_TESTS':"""
 >>> Poll.objects.get(choice__name__exact="This is the answer")
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'choice' into field, choices are: poll_choice, related_choice, id, question, creator
+TypeError: Cannot resolve keyword 'choice' into field. Choices are: poll_choice, related_choice, id, question, creator
 """}

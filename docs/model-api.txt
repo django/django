@@ -459,7 +459,7 @@ string, not ``NULL``.
 ``blank``
 ~~~~~~~~~
 
-If ``True``, the field is allowed to be blank.
+If ``True``, the field is allowed to be blank. Default is ``False``.
 
 Note that this is different than ``null``. ``null`` is purely
 database-related, whereas ``blank`` is validation-related. If a field has
