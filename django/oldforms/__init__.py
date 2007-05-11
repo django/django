@@ -400,7 +400,7 @@ class TextField(FormField):
             self.member_name = member_name
 
     def isValidLength(self, data, form):
-        if data and self.maxlength and len(data.decode(settings.DEFAULT_CHARSET)) > self.maxlength:
+        if data and self.maxlength and len(smart_unicode(data)) > self.maxlength:
             raise validators.ValidationError, ungettext("Ensure your text is less than %s character.",
                 "Ensure your text is less than %s characters.", self.maxlength) % self.maxlength
 
