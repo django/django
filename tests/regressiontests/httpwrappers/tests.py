@@ -96,6 +96,12 @@ MultiValueDictKeyError: "Key 'foo' not found in <MultiValueDict: {}>"
 >>> q['name']
 'john'
 
+>>> del q['name']
+>>> 'name' in q
+False
+
+>>> q['name'] = 'john'
+
 >>> q.get('foo', 'default')
 'default'
 
@@ -366,6 +372,11 @@ AttributeError: This QueryDict instance is immutable
 
 >>> q.urlencode()
 'vote=yes&vote=no'
+
+>>> del q['vote']
+Traceback (most recent call last):
+...
+AttributeError: This QueryDict instance is immutable
 
 """
 

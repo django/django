@@ -59,8 +59,11 @@ def words(count, common=True):
         word_list = []
     c = len(word_list)
     if count > c:
-        count = min(count - c, len(WORDS))
-        word_list += random.sample(WORDS, count - c)
+        count -= c
+        while count > 0:
+            c = min(count, len(WORDS))
+            count -= c
+            word_list += random.sample(WORDS, c)
     else:
         word_list = word_list[:count]
     return ' '.join(word_list)
