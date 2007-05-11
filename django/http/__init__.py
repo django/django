@@ -3,6 +3,7 @@ from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode, quote
 from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import smart_str
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -74,10 +75,23 @@ def parse_file_upload(header_dict, post_data):
     return POST, FILES
 
 class QueryDict(MultiValueDict):
-    """A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it."""
-    def __init__(self, query_string, mutable=False):
+    """
+    A specialized MultiValueDict that takes a query string when initialized.
+    This is immutable unless you create a copy of it.
+
+    Values retrieved from this class are converted from the default encoding to
+    unicode (this is done on retrieval, rather than input to avoid breaking
+    references or mutating referenced objects).
+    """
+    def __init__(self, query_string, mutable=False, encoding=None):
         MultiValueDict.__init__(self)
+        if not encoding:
+            # *Important*: do not import settings any earlier because of note
+            # in core.handlers.modpython.
+            from django.conf import settings
+            self.encoding = settings.DEFAULT_CHARSET
+        else:
+            self.encoding = encoding
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
             self.appendlist(key, value)
@@ -87,9 +101,15 @@ class QueryDict(MultiValueDict):
         if not self._mutable:
             raise AttributeError, "This QueryDict instance is immutable"
 
+    def __getitem__(self, key):
+        return str_to_unicode(MultiValueDict.__getitem__(self, key), self.encoding)
+
     def __setitem__(self, key, value):
         self._assert_mutable()
         MultiValueDict.__setitem__(self, key, value)
+
+    def get(self, key, default=None):
+        return str_to_unicode(MultiValueDict.get(self, key, default), self.encoding)
 
     def __copy__(self):
         result = self.__class__('', mutable=True)
@@ -105,9 +125,23 @@ class QueryDict(MultiValueDict):
             dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
+    def getlist(self, key):
+        """
+        Returns a copy of the list associated with "key". This isn't a
+        reference to the original list because this method converts all the
+        values to unicode (without changing the original).
+        """
+        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.getlist(self, key)]
+
     def setlist(self, key, list_):
         self._assert_mutable()
         MultiValueDict.setlist(self, key, list_)
+
+    def setlistdefault(self, key, default_list=()):
+        self._assert_mutable()
+        if key not in self:
+            self.setlist(key, default_list)
+        return MultiValueDict.getlist(self, key)
 
     def appendlist(self, key, value):
         self._assert_mutable()
@@ -119,11 +153,24 @@ class QueryDict(MultiValueDict):
 
     def pop(self, key):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key)
+        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.pop(self, key)]
 
     def popitem(self):
         self._assert_mutable()
-        return MultiValueDict.popitem(self)
+        key, values = MultiValueDict.popitem(self)
+        return str_to_unicode(key, self.encoding), [str_to_unicode(v, self.encoding) for v in values]
+
+    def keys(self):
+        return [str_to_unicode(k, self.encoding) for k in MultiValueDict.keys(self)]
+
+    def values(self):
+        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.values(self)]
+
+    def items(self):
+        return [(str_to_unicode(k, self.encoding), str_to_unicode(v, self.encoding)) for k, v in MultiValueDict.items(self)]
+
+    def lists(self):
+        return [(str_to_unicode(k, self.encoding), [str_to_unicode(v, self.encoding) for v in v_list]) for k, v_list in MultiValueDict.lists(self)]
 
     def clear(self):
         self._assert_mutable()
@@ -140,7 +187,8 @@ class QueryDict(MultiValueDict):
     def urlencode(self):
         output = []
         for k, list_ in self.lists():
-            output.extend([urlencode({k: v}) for v in list_])
+            k = smart_str(k, self.encoding)
+            output.extend([urlencode({k: smart_str(v, self.encoding)}) for v in list_])
         return '&'.join(output)
 
 def parse_cookie(cookie):
@@ -306,3 +354,18 @@ def get_host(request):
     if not host:
         host = request.META.get('HTTP_HOST', '')
     return host
+
+# It's neither necessary nor appropriate to use
+# django.utils.encoding.smart_unicode for parsing URLs and form inputs. Thus,
+# this slightly more restricted function.
+def str_to_unicode(s, encoding):
+    """
+    Convert basestring objects to unicode, using the given encoding.
+
+    Returns any non-basestring objects without change.
+    """
+    if isinstance(s, str):
+        return unicode(s, encoding)
+    else:
+        return s
+
