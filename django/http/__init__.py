@@ -91,6 +91,10 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.__setitem__(self, key, value)
 
+    def __delitem__(self, key):
+        self._assert_mutable()
+        super(QueryDict, self).__delitem__(key)
+
     def __copy__(self):
         result = self.__class__('', mutable=True)
         for key, value in dict.items(self):
