@@ -188,6 +188,17 @@ def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_na
     if source is None:
         return None, [], None, []
 
+    encoding=None
+    for line in source[:2]:
+        # File coding may be specified (and may not be UTF-8). Match
+        # pattern from PEP-263 (http://www.python.org/dev/peps/pep-0263/)
+        match = re.search(r'coding[:=]\s*([-\w.]+)', line)
+        if match:
+            encoding = match.group(1)
+            break
+    if encoding:
+        source = [unicode(sline, encoding) for sline in source]
+
     lower_bound = max(0, lineno - context_lines)
     upper_bound = lineno + context_lines
 
