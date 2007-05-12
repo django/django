@@ -1,5 +1,6 @@
 import datetime
 from time import time
+from django.utils.encoding import smart_unicode
 
 class CursorDebugWrapper(object):
     def __init__(self, cursor, db):
@@ -17,7 +18,7 @@ class CursorDebugWrapper(object):
             if not isinstance(params, (tuple, dict)):
                 params = tuple(params)
             self.db.queries.append({
-                'sql': sql % params,
+                'sql': smart_unicode(sql) % params,
                 'time': "%.3f" % (stop - start),
             })
 
