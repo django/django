@@ -76,4 +76,8 @@ __test__ = {'API_TESTS': ur"""
 >>> fx.save()
 >>> Foo.objects.get(viking__contains=u'\xf3')
 <Foo: Foo Bjorn>
+
+# We can also do the above query using UTF-8 strings.
+>>> Foo.objects.get(viking__contains='\xc3\xb3')
+<Foo: Foo Bjorn>
 """}
