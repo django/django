@@ -724,6 +724,11 @@ class Node(object):
         return nodes
 
 class NodeList(list):
+    # How invalid encoding sequences are handled. The default 'strict' is not
+    # appropriate, because the framework is not in control of all the string
+    # data.
+    codec_errors = 'replace'
+
     def render(self, context):
         bits = []
         for node in self:
@@ -731,7 +736,8 @@ class NodeList(list):
                 bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
-        return ''.join([smart_str(b, settings.DEFAULT_CHARSET) for b in bits])
+        encoding = settings.DEFAULT_CHARSET
+        return ''.join([smart_str(b, encoding, errors=self.codec_errors) for b in bits])
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"

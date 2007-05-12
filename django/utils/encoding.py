@@ -2,7 +2,7 @@ import types
 from django.conf import settings
 from django.utils.functional import Promise
 
-def smart_unicode(s, encoding='utf-8'):
+def smart_unicode(s, encoding='utf-8', errors='strict'):
     """
     Returns a unicode object representing 's'. Treats bytestrings using the
     'encoding' codec.
@@ -20,12 +20,12 @@ def smart_unicode(s, encoding='utf-8'):
         if hasattr(s, '__unicode__'):
             s = unicode(s)
         else:
-            s = unicode(str(s), encoding)
+            s = unicode(str(s), encoding, errors)
     elif not isinstance(s, unicode):
-        s = unicode(s, encoding)
+        s = unicode(s, encoding, errors)
     return s
 
-def smart_str(s, encoding='utf-8', strings_only=False):
+def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Returns a bytestring version of 's', encoded as specified in 'encoding'.
 
@@ -37,11 +37,11 @@ def smart_str(s, encoding='utf-8', strings_only=False):
         try:
             return str(s)
         except UnicodeEncodeError:
-            return unicode(s).encode(encoding)
+            return unicode(s).encode(encoding, errors)
     elif isinstance(s, unicode):
-        return s.encode(encoding)
+        return s.encode(encoding, errors)
     elif s and encoding != 'utf-8':
-        return s.decode('utf-8').encode(encoding)
+        return s.decode('utf-8', errors).encode(encoding, errors)
     else:
         return s
 
