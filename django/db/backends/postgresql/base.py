@@ -223,7 +223,7 @@ def get_sql_sequence_reset(style, model_list):
             if isinstance(f, models.AutoField):
                 output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
+                    style.SQL_FIELD(quote_name('%s_%s_seq' % (model._meta.db_table, f.column))),
                     style.SQL_KEYWORD('SELECT'),
                     style.SQL_FIELD(quote_name(f.column)),
                     style.SQL_KEYWORD('FROM'),
@@ -232,7 +232,7 @@ def get_sql_sequence_reset(style, model_list):
         for f in model._meta.many_to_many:
             output.append("%s setval('%s', (%s max(%s) %s %s));" % \
                 (style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
+                style.SQL_FIELD(quote_name('%s_id_seq' % f.m2m_db_table())),
                 style.SQL_KEYWORD('SELECT'),
                 style.SQL_FIELD(quote_name('id')),
                 style.SQL_KEYWORD('FROM'),
