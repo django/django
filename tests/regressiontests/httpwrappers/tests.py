@@ -367,6 +367,16 @@ AttributeError: This QueryDict instance is immutable
 >>> q.urlencode()
 'vote=yes&vote=no'
 
+# QueryDicts must be able to handle invalid input encoding (in this case, bad
+# UTF-8 encoding).
+>>> q = QueryDict('foo=bar&foo=\xff')
+
+>>> q['foo']
+u'\ufffd'
+
+>>> q.getlist('foo')
+[u'bar', u'\ufffd']
+
 """
 
 from django.http import QueryDict

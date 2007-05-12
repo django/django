@@ -360,12 +360,14 @@ def get_host(request):
 # this slightly more restricted function.
 def str_to_unicode(s, encoding):
     """
-    Convert basestring objects to unicode, using the given encoding.
+    Convert basestring objects to unicode, using the given encoding. Illegaly
+    encoded input characters are replaced with Unicode "unknown" codepoint
+    (\ufffd).
 
     Returns any non-basestring objects without change.
     """
     if isinstance(s, str):
-        return unicode(s, encoding)
+        return unicode(s, encoding, 'replace')
     else:
         return s
 
