@@ -2752,6 +2752,64 @@ then the latter will get precedence.
 <li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 
+# Callable initial data ########################################################
+
+The previous technique dealt with raw values as initial data, but it's also
+possible to specify callable data.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+We need to define functions that get called later.
+>>> def initial_django():
+...     return 'django'
+>>> def initial_stephane():
+...     return 'stephane'
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A callable 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': initial_django})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial=initial_django)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': initial_stephane}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
 # Help text ###################################################################
 
 You can specify descriptive text for a field by using the 'help_text' argument
