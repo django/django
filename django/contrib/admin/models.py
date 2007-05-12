@@ -28,7 +28,7 @@ class LogEntry(models.Model):
         ordering = ('-action_time',)
 
     def __repr__(self):
-        return str(self.action_time)
+        return smart_unicode(self.action_time)
 
     def is_addition(self):
         return self.action_flag == ADDITION
@@ -48,4 +48,4 @@ class LogEntry(models.Model):
         Returns the admin URL to edit the object represented by this log entry.
         This is relative to the Django admin index page.
         """
-        return "%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id)
+        return u"%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id)

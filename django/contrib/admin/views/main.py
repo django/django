@@ -12,6 +12,7 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
+from django.utils.encoding import smart_unicode
 import operator
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
@@ -142,7 +143,7 @@ class AdminBoundField(object):
             if isinstance(self.field.rel, models.ManyToOneRel):
                 self._display = getattr(self.original, self.field.name)
             elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.name).all()])
+                self._display = u", ".join([smart_unicode(obj) for obj in getattr(self.original, self.field.name).all()])
             return self._display
 
     def __repr__(self):
@@ -253,7 +254,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         if not errors:
             new_object = manipulator.save(new_data)
             pk_value = new_object._get_pk_val()
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, smart_unicode(new_object), ADDITION)
             msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
@@ -266,7 +267,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                 if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
                     pk_value = '"%s"' % pk_value.replace('"', '\\"')
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (pk_value, str(new_object).replace('"', '\\"')))
+                    (pk_value, smart_unicode(new_object).replace('"', '\\"')))
             elif "_addanother" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect(request.path)
@@ -340,7 +341,7 @@ def change_stage(request, app_label, model_name, object_id):
             change_message = ' '.join(change_message)
             if not change_message:
                 change_message = _('No fields changed.')
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, smart_unicode(new_object), CHANGE, change_message)
 
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
             if "_continue" in request.POST:
@@ -443,11 +444,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(str(sub_obj))), []])
+                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -461,7 +462,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-       
+
         # related.get_accessor_name() could return None for symmetrical relationships
         if rel_opts_name:
             rel_objs = getattr(obj, rel_opts_name, None)
@@ -474,13 +475,13 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                        {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
+                        {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(sub_obj)}, []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
                         (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
                         (' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
@@ -501,14 +502,14 @@ def delete_stage(request, app_label, model_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
+    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(obj)), []]
     perms_needed = sets.Set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
     if request.POST: # The user has already confirmed the deletion.
         if perms_needed:
             raise PermissionDenied
-        obj_display = str(obj)
+        obj_display = smart_unicode(obj)
         obj.delete()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
         request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
