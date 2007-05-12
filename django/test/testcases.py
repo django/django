@@ -1,4 +1,5 @@
 import re, doctest, unittest
+import sys
 from urlparse import urlparse
 from django.db import transaction
 from django.core import management, mail
@@ -45,16 +46,16 @@ class TestCase(unittest.TestCase):
         if hasattr(self, 'fixtures'):
             management.load_data(self.fixtures, verbosity=0)
         mail.outbox = []
-        
-    def run(self, result=None):
-        """Wrapper around default run method to perform common Django test set up.
-        This means that user-defined Test Cases aren't required to include a call 
-        to super().setUp().
-        
+
+    def __call__(self, result=None):
+        """
+        Wrapper around default __call__ method to perform common Django test
+        set up. This means that user-defined Test Cases aren't required to
+        include a call to super().setUp().
         """
         self.client = Client()
         self._pre_setup()
-        super(TestCase, self).run(result)
+        super(TestCase, self).__call__(result)
 
     def assertRedirects(self, response, expected_path, status_code=302, target_status_code=200):
         """Assert that a response redirected to a specific URL, and that the
@@ -108,7 +109,7 @@ class TestCase(unittest.TestCase):
                 for err in errors:
                     if field:
                         if field in context[form].errors:
-                            self.assertTrue(err in context[form].errors[field], 
+                            self.failUnless(err in context[form].errors[field], 
                             "The field '%s' on form '%s' in context %d does not contain the error '%s' (actual errors: %s)" % 
                                 (field, form, i, err, list(context[form].errors[field])))
                         elif field in context[form].fields:
@@ -117,7 +118,7 @@ class TestCase(unittest.TestCase):
                         else:
                             self.fail("The form '%s' in context %d does not contain the field '%s'" % (form, i, field))
                     else:
-                        self.assertTrue(err in context[form].non_field_errors(), 
+                        self.failUnless(err in context[form].non_field_errors(), 
                             "The form '%s' in context %d does not contain the non-field error '%s' (actual errors: %s)" % 
                                 (form, i, err, list(context[form].non_field_errors())))
         if not found_form:
@@ -127,7 +128,7 @@ class TestCase(unittest.TestCase):
         "Assert that the template with the provided name was used in rendering the response"
         if isinstance(response.template, list):
             template_names = [t.name for t in response.template]
-            self.assertTrue(template_name in template_names,
+            self.failUnless(template_name in template_names,
                 "Template '%s' was not one of the templates used to render the response. Templates used: %s" %
                     (template_name, template_names))
         elif response.template:
@@ -140,7 +141,7 @@ class TestCase(unittest.TestCase):
     def assertTemplateNotUsed(self, response, template_name):
         "Assert that the template with the provided name was NOT used in rendering the response"
         if isinstance(response.template, list):            
-            self.assertFalse(template_name in [t.name for t in response.template],
+            self.failIf(template_name in [t.name for t in response.template],
                 "Template '%s' was used unexpectedly in rendering the response" % template_name)
         elif response.template:
             self.assertNotEqual(template_name, response.template.name,
