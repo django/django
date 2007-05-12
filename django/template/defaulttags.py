@@ -41,7 +41,10 @@ class FilterNode(Node):
     def render(self, context):
         output = self.nodelist.render(context)
         # apply filters
-        return self.filter_expr.resolve(Context({'var': output}))
+        context.update({'var': output})
+        filtered = self.filter_expr.resolve(context)
+        context.pop()
+        return filtered
 
 class FirstOfNode(Node):
     def __init__(self, vars):
@@ -84,7 +87,7 @@ class ForNode(Node):
 
     def render(self, context):
         nodelist = NodeList()
-        if context.has_key('forloop'):
+        if 'forloop' in context:
             parentloop = context['forloop']
         else:
             parentloop = {}
@@ -130,7 +133,7 @@ class IfChangedNode(Node):
         self._varlist = varlist
 
     def render(self, context):
-        if context.has_key('forloop') and context['forloop']['first']:
+        if 'forloop' in context and context['forloop']['first']:
             self._last_seen = None
         try:
             if self._varlist:
@@ -429,7 +432,7 @@ def cycle(parser, token):
         name = args[1]
         if not hasattr(parser, '_namedCycleNodes'):
             raise TemplateSyntaxError("No named cycles in template: '%s' is not defined" % name)
-        if not parser._namedCycleNodes.has_key(name):
+        if name not in parser._namedCycleNodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 
@@ -908,7 +911,7 @@ def templatetag(parser, token):
     if len(bits) != 2:
         raise TemplateSyntaxError, "'templatetag' statement takes one argument"
     tag = bits[1]
-    if not TemplateTagNode.mapping.has_key(tag):
+    if tag not in TemplateTagNode.mapping:
         raise TemplateSyntaxError, "Invalid templatetag argument: '%s'. Must be one of: %s" % \
             (tag, TemplateTagNode.mapping.keys())
     return TemplateTagNode(tag)
@@ -953,6 +956,7 @@ def url(parser, token):
         for arg in bits[2].split(','):
             if '=' in arg:
                 k, v = arg.split('=', 1)
+                k = k.strip()
                 kwargs[k] = parser.compile_filter(v)
             else:
                 args.append(parser.compile_filter(arg))
@@ -990,7 +994,7 @@ def do_with(parser, token):
     """
     Add a value to the context (inside of this block) for caching and easy
     access.
-    
+
     For example::
 
         {% with person.some_sql_method as total %}
@@ -999,7 +1003,7 @@ def do_with(parser, token):
     """
     bits = list(token.split_contents())
     if len(bits) != 4 or bits[2] != "as":
-        raise TemplateSyntaxError, "%r expected format is 'value as name'" % tagname
+        raise TemplateSyntaxError, "%r expected format is 'value as name'" % bits[0]
     var = parser.compile_filter(bits[1])
     name = bits[3]
     nodelist = parser.parse(('endwith',))

@@ -5,7 +5,7 @@ Writing your first Django app, part 3
 This tutorial begins where `Tutorial 2`_ left off. We're continuing the Web-poll
 application and will focus on creating the public interface -- "views."
 
-.. _Tutorial 2: ../tutorial2/
+.. _Tutorial 2: ../tutorial02/
 
 Philosophy
 ==========
@@ -463,4 +463,4 @@ All the poll app cares about is its relative URLs, not its absolute URLs.
 When you're comfortable with writing views, read `part 4 of this tutorial`_ to
 learn about simple form processing and generic views.
 
-.. _part 4 of this tutorial: ../tutorial4/
+.. _part 4 of this tutorial: ../tutorial04/

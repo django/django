@@ -25,6 +25,7 @@ import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 # MySQLdb-1.2.1 supports the Python boolean type, and only uses datetime
 # module for time-related columns; older versions could have used mx.DateTime

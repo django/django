@@ -1,0 +1,41 @@
+{% extends "databrowse/base.html" %}
+
+{% block title %}{{ object.model.verbose_name|capfirst }}: {{ object }}{% endblock %}
+
+{% block content %}
+
+<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ object.model.url }}">{{ object.model.verbose_name_plural|capfirst }}</a> / {{ object }}</div>
+
+<h1>{{ object.model.verbose_name|capfirst }}: {{ object }}</h1>
+
+<table class="objectinfo">
+{% for field in object.fields %}
+<tr class="{% cycle odd,even %}">
+<th>{{ field.field.verbose_name|capfirst }}</th>
+<td>
+{% if field.urls %}
+{% for urlvalue in field.urls %}
+{% if urlvalue.1 %}<a href="{{ urlvalue.1 }}">{% endif %}{{ urlvalue.0 }}{% if urlvalue.1 %}</a>{% endif %}{% if not forloop.last %}, {% endif %}
+{% endfor %}
+{% else %}None{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
+
+{% for related_object in object.related_objects %}
+  <div class="related">
+  <h2>Appears in "{{ related_object.related_field }}" in the following {{ related_object.model.verbose_name_plural }}:</h2>
+  {% if related_object.object_list %}
+  <ul class="objectlist">
+    {% for object in related_object.object_list %}
+    <li class="{% cycle odd,even %}"><a href="{{ object.url }}">{{ object }}</a></li>
+    {% endfor %}
+  </ul>
+  </div>
+  {% else %}
+  <p class="quiet">(None)</p>
+  {% endif %}
+{% endfor %}
+
+{% endblock %}

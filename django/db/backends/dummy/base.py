@@ -15,6 +15,9 @@ def complain(*args, **kwargs):
 class DatabaseError(Exception):
     pass
 
+class IntegrityError(DatabaseError):
+    pass
+
 class DatabaseWrapper:
     cursor = complain
     _commit = complain

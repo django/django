@@ -1,9 +1,11 @@
 from xml.dom.minidom import parseString
+from django.core.mail import EmailMessage, SMTPConnection
 from django.template import Context, Template
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.newforms.forms import Form
 from django.newforms import fields
+from django.shortcuts import render_to_response
 
 def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
@@ -48,6 +50,14 @@ def redirect_view(request):
     "A view that redirects all requests to the GET view"
     return HttpResponseRedirect('/test_client/get_view/')
 
+def double_redirect_view(request):
+    "A view that redirects all requests to a redirection view"
+    return HttpResponseRedirect('/test_client/permanent_redirect_view/')
+
+def bad_view(request):
+    "A view that returns a 404 with some error content"
+    return HttpResponseNotFound('Not found!. This page contains some MAGIC content')
+
 TestChoices = (
     ('a', 'First Choice'),
     ('b', 'Second Choice'),
@@ -79,6 +89,25 @@ def form_view(request):
         c = Context({'form': form})
     
     return HttpResponse(t.render(c))
+
+def form_view_with_template(request):
+    "A view that tests a simple form"
+    if request.method == 'POST':
+        form = TestForm(request.POST)
+        if form.is_valid():
+            message = 'POST data OK'
+        else:
+            message = 'POST data has errors'
+    else:
+        form = TestForm()
+        message = 'GET form page'
+    return render_to_response('form_view.html', 
+        { 
+            'form': form,
+            'message': message
+        }
+    )
+
         
 def login_protected_view(request):
     "A simple view that is login protected."
@@ -100,3 +129,28 @@ def session_view(request):
 def broken_view(request):
     """A view which just raises an exception, simulating a broken view."""
     raise KeyError("Oops! Looks like you wrote some bad code.")
+
+def mail_sending_view(request):
+    EmailMessage(
+        "Test message", 
+        "This is a test email", 
+        "from@example.com", 
+        ['first@example.com', 'second@example.com']).send()
+    return HttpResponse("Mail sent")
+
+def mass_mail_sending_view(request):
+    m1 = EmailMessage(
+        'First Test message', 
+        'This is the first test email', 
+        'from@example.com', 
+        ['first@example.com', 'second@example.com'])
+    m2 = EmailMessage(
+        'Second Test message', 
+        'This is the second test email', 
+        'from@example.com', 
+        ['second@example.com', 'third@example.com'])
+    
+    c = SMTPConnection()
+    c.send_messages([m1,m2])
+    
+    return HttpResponse("Mail sent")

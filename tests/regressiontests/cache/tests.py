@@ -46,6 +46,11 @@ class Cache(unittest.TestCase):
         self.assertEqual(cache.has_key("hello"), True)
         self.assertEqual(cache.has_key("goodbye"), False)
 
+    def test_in(self): 
+        cache.set("hello", "goodbye") 
+        self.assertEqual("hello" in cache, True) 
+        self.assertEqual("goodbye" in cache, False) 
+
     def test_data_types(self):
         # test data types
         stuff = {

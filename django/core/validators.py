@@ -284,7 +284,7 @@ class ValidateIfOtherFieldEquals(object):
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value:
+        if self.other_field in all_data and all_data[self.other_field] == self.other_value:
             for v in self.validator_list:
                 v(field_data, all_data)
 
@@ -322,7 +322,7 @@ class RequiredIfOtherFieldEquals(object):
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value and not field_data:
+        if self.other_field in all_data and all_data[self.other_field] == self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
 class RequiredIfOtherFieldDoesNotEqual(object):
@@ -335,7 +335,7 @@ class RequiredIfOtherFieldDoesNotEqual(object):
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] != self.other_value and not field_data:
+        if self.other_field in all_data and all_data[self.other_field] != self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
 class IsLessThanOtherField(object):

@@ -1,12 +1,16 @@
+import datetime
 import sys
 from cStringIO import StringIO
 from urlparse import urlparse
 from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.contrib.sessions.models import Session
+from django.contrib.sessions.middleware import SessionWrapper
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
 from django.dispatch import dispatcher
-from django.http import urlencode, SimpleCookie
+from django.http import urlencode, SimpleCookie, HttpRequest
 from django.test import signals
 from django.utils.functional import curry
 
@@ -113,7 +117,6 @@ class Client:
         self.handler = ClientHandler()
         self.defaults = defaults
         self.cookies = SimpleCookie()
-        self.session = {}
         self.exc_info = None
         
     def store_exc_info(self, *args, **kwargs):
@@ -123,6 +126,15 @@ class Client:
         """
         self.exc_info = sys.exc_info()
 
+    def _session(self):
+        "Obtain the current session variables"
+        if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
+            if cookie:
+                return SessionWrapper(cookie.value)
+        return {}
+    session = property(_session)
+    
     def request(self, **request):
         """
         The master request method. Composes the environment dictionary
@@ -171,16 +183,10 @@ class Client:
         if self.exc_info:
             raise self.exc_info[1], None, self.exc_info[2]
         
-        # Update persistent cookie and session data
+        # Update persistent cookie data
         if response.cookies:
             self.cookies.update(response.cookies)
 
-        if 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            from django.contrib.sessions.middleware import SessionWrapper
-            cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
-            if cookie:
-                self.session = SessionWrapper(cookie.value)
-            
         return response
 
     def get(self, path, data={}, **extra):
@@ -215,42 +221,34 @@ class Client:
 
         return self.request(**r)
 
-    def login(self, path, username, password, **extra):
+    def login(self, **credentials):
+        """Set the Client to appear as if it has sucessfully logged into a site.
+
+        Returns True if login is possible; False if the provided credentials
+        are incorrect, or if the Sessions framework is not available.
         """
-        A specialized sequence of GET and POST to log into a view that
-        is protected by a @login_required access decorator.
+        user = authenticate(**credentials)
+        if user and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            obj = Session.objects.get_new_session_object()
 
-        path should be the URL of the page that is login protected.
+            # Create a fake request to store login details
+            request = HttpRequest()
+            request.session = SessionWrapper(obj.session_key)
+            login(request, user)
 
-        Returns the response from GETting the requested URL after
-        login is complete. Returns False if login process failed.
-        """
-        # First, GET the page that is login protected.
-        # This page will redirect to the login page.
-        response = self.get(path)
-        if response.status_code != 302:
+            # Set the cookie to represent the session
+            self.cookies[settings.SESSION_COOKIE_NAME] = obj.session_key
+            self.cookies[settings.SESSION_COOKIE_NAME]['max-age'] = None
+            self.cookies[settings.SESSION_COOKIE_NAME]['path'] = '/'
+            self.cookies[settings.SESSION_COOKIE_NAME]['domain'] = settings.SESSION_COOKIE_DOMAIN
+            self.cookies[settings.SESSION_COOKIE_NAME]['secure'] = settings.SESSION_COOKIE_SECURE or None
+            self.cookies[settings.SESSION_COOKIE_NAME]['expires'] = None
+
+            # Set the session values
+            Session.objects.save(obj.session_key, request.session._session,
+                datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))        
+
+            return True
+        else:
             return False
-
-        _, _, login_path, _, data, _= urlparse(response['Location'])
-        next = data.split('=')[1]
-
-        # Second, GET the login page; required to set up cookies
-        response = self.get(login_path, **extra)
-        if response.status_code != 200:
-            return False
-
-        # Last, POST the login data.
-        form_data = {
-            'username': username,
-            'password': password,
-            'next' : next,
-        }
-        response = self.post(login_path, data=form_data, **extra)
-
-        # Login page should 302 redirect to the originally requested page
-        if (response.status_code != 302 or 
-                urlparse(response['Location'])[2] != path):
-            return False
-
-        # Since we are logged in, request the actual page again
-        return self.get(path)
+            

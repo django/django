@@ -212,21 +212,24 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+If ``TEMPLATE_STRING_IF_INVALID`` contains a ``'%s'``, the format marker will
+be replaced with the name of the invalid variable.
+
 .. admonition:: For debug purposes only!
 
-    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
-    it is a bad idea to turn it on as a 'development default'. 
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool,
+    it is a bad idea to turn it on as a 'development default'.
     
-    Many templates, including those in the Admin site, rely upon the 
-    silence of the template system when a non-existent variable is 
+    Many templates, including those in the Admin site, rely upon the
+    silence of the template system when a non-existent variable is
     encountered. If you assign a value other than ``''`` to
-    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering
     problems with these templates and sites.
     
-    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
-    in order to debug a specific template problem, then cleared 
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled
+    in order to debug a specific template problem, then cleared
     once debugging is complete.
-        
+
 Playing with Context objects
 ----------------------------
 
@@ -345,7 +348,7 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
       ``request.user.get_and_delete_messages()`` for every request. That method
       collects the user's messages and deletes them from the database.
 
-      Note that messages are set with ``user.add_message()``. See the
+      Note that messages are set with ``user.message_set.create``. See the
       `message docs`_ for more.
 
     * ``perms`` -- An instance of
@@ -714,7 +717,7 @@ object::
             # split_contents() knows not to split quoted strings.
             tag_name, format_string = token.split_contents()
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return CurrentTimeNode(format_string[1:-1])
@@ -843,7 +846,7 @@ Now your tag should begin to look like this::
             # split_contents() knows not to split quoted strings.
             tag_name, date_to_be_formatted, format_string = token.split_contents()
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents.split()[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
@@ -866,7 +869,7 @@ current context, available in the ``render`` method::
             try:
                 actual_date = resolve_variable(self.date_to_be_formatted, context)
                 return actual_date.strftime(self.format_string)
-            except VariableDoesNotExist:
+            except template.VariableDoesNotExist:
                 return ''
 
 ``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
@@ -1020,7 +1023,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
 
-.. _tutorials: ../tutorial1/#creating-models
+.. _tutorials: ../tutorial01/#creating-models
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1077,7 +1080,7 @@ class, like so::
             # Splitting by None == splitting by spaces.
             tag_name, arg = token.contents.split(None, 1)
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
         m = re.search(r'(.*?) as (\w+)', arg)
         if not m:
             raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name

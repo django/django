@@ -69,9 +69,12 @@ For now, InnoDB is probably your best choice.
 MySQLdb
 -------
 
-`MySQLdb`_ is the Python interface to MySQL. 1.2.1 is the first version that
-has support for MySQL 4.1 and newer. If you are trying to use an older version
-of MySQL, then 1.2.0 *might* work for you.
+`MySQLdb`_ is the Python interface to MySQL. Version 1.2.1p2 or later is
+required for full MySQL support in Django. Earlier versions will not work with
+the ``mysql`` backend.
+
+If you are trying to use an older version of MySQL and the ``mysql_old``
+backend, then 1.2.0 *might* work for you.
 
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 

@@ -168,6 +168,8 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
+            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
+                rel_field = rel_field.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
             rel_field = f
@@ -239,14 +241,14 @@ def _get_sql_for_pending_references(model, pending_references):
 
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
-    from django.db.models import GenericRel
+    from django.contrib.contenttypes import generic
 
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
     for f in opts.many_to_many:
-        if not isinstance(f.rel, GenericRel):
+        if not isinstance(f.rel, generic.GenericRel):
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s,' % \
@@ -314,7 +316,7 @@ def get_sql_delete(app):
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(model):
+            if backend.supports_constraints and model in references_to_delete:
                 for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
@@ -537,6 +539,7 @@ def syncdb(verbosity=1, interactive=True):
     # Install custom SQL for the app (but only if this
     # is a model we've just created)
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         for model in models.get_models(app):
             if model in created_models:
                 custom_sql = get_custom_sql_for_model(model)
@@ -789,11 +792,12 @@ def startapp(app_name, directory):
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
     project_dir = os.path.normpath(os.path.join(directory, '..'))
-    project_name = os.path.basename(project_dir)
-    if app_name == os.path.basename(directory):
+    parent_dir = os.path.basename(project_dir)
+    project_name = os.path.basename(directory)
+    if app_name == project_name:
         sys.stderr.write(style.ERROR("Error: You cannot create an app with the same name (%r) as your project.\n" % app_name))
         sys.exit(1)
-    _start_helper('app', app_name, directory, project_name)
+    _start_helper('app', app_name, directory, parent_dir)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
@@ -842,7 +846,7 @@ def inspectdb():
                 att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
 
-            if relations.has_key(i):
+            if i in relations:
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
                 field_type = 'ForeignKey(%s' % rel_to
                 if att_name.endswith('_id'):
@@ -1320,6 +1324,8 @@ def load_data(fixture_labels, verbosity=1):
     from django.conf import settings
     import sys
 
+    disable_termcolors()
+
     # Keep a count of the installed objects and fixtures
     count = [0,0]
     models = set()
@@ -1552,7 +1558,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action = args[0]
     except IndexError:
         parser.print_usage_and_exit()
-    if not action_mapping.has_key(action):
+    if action not in action_mapping:
         print_error("Your action, %r, was invalid." % action, argv[0])
 
     # Switch to English, because django-admin.py creates database content

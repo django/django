@@ -276,8 +276,8 @@ you want your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you define
 ``CurrentSiteManager``.
 
-.. _manager: ../model_api/#managers
-.. _manager documentation: ../model_api/#managers
+.. _manager: ../model-api/#managers
+.. _manager documentation: ../model-api/#managers
 
 How Django uses the sites framework
 ===================================

@@ -42,11 +42,11 @@ class ModelBase(type):
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
 
-        model_module = sys.modules[new_class.__module__]
 
         if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
             # For 'django.contrib.sites.models', this would be 'sites'.
+            model_module = sys.modules[new_class.__module__]
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Bail out early if we have already created this class.

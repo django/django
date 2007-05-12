@@ -1,6 +1,6 @@
 import datetime, math, time
 from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import ngettext
+from django.utils.translation import ngettext, gettext
 
 def timesince(d, now=None):
     """
@@ -37,14 +37,14 @@ def timesince(d, now=None):
         if count != 0:
             break
     if count < 0:
-        return '%d milliseconds' % math.floor((now - d).microseconds / 1000)
-    s = '%d %s' % (count, name(count))
+        return gettext('%d milliseconds') % math.floor((now - d).microseconds / 1000)
+    s = gettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
     if i + 1 < len(chunks):
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
         count2 = (since - (seconds * count)) / seconds2
         if count2 != 0:
-            s += ', %d %s' % (count2, name2(count2))
+            s += gettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
     return s
 
 def timeuntil(d, now=None):

@@ -16,6 +16,7 @@ import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 django_conversions = conversions.copy()
 django_conversions.update({
@@ -52,7 +53,7 @@ class MysqlDebugWrapper:
             raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
 
     def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
+        if attr in self.__dict__:
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)

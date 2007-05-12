@@ -17,9 +17,10 @@ class Serializer(PythonSerializer):
     """
     def end_serialization(self):
         simplejson.dump(self.objects, self.stream, cls=DateTimeAwareJSONEncoder, **self.options)
-        
+
     def getvalue(self):
-        return self.stream.getvalue()
+        if callable(getattr(self.stream, 'getvalue', None)):
+            return self.stream.getvalue()
 
 def Deserializer(stream_or_string, **options):
     """
@@ -31,15 +32,15 @@ def Deserializer(stream_or_string, **options):
         stream = stream_or_string
     for obj in PythonDeserializer(simplejson.load(stream)):
         yield obj
-        
+
 class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
     """
     JSONEncoder subclass that knows how to encode date/time types
     """
-    
-    DATE_FORMAT = "%Y-%m-%d" 
+
+    DATE_FORMAT = "%Y-%m-%d"
     TIME_FORMAT = "%H:%M:%S"
-    
+
     def default(self, o):
         if isinstance(o, datetime.datetime):
             return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))

@@ -208,15 +208,15 @@ def guess_scheme(environ):
     else:
         return 'http'
 
-_hoppish = {
+_hop_headers = {
     'connection':1, 'keep-alive':1, 'proxy-authenticate':1,
     'proxy-authorization':1, 'te':1, 'trailers':1, 'transfer-encoding':1,
     'upgrade':1
-}.has_key
+}
 
 def is_hop_by_hop(header_name):
     """Return true if 'header_name' is an HTTP/1.1 "Hop-by-Hop" header"""
-    return _hoppish(header_name.lower())
+    return header_name.lower() in _hop_headers
 
 class ServerHandler(object):
     """Manage the invocation of a WSGI application"""
@@ -334,7 +334,7 @@ class ServerHandler(object):
 
         Subclasses can extend this to add other defaults.
         """
-        if not self.headers.has_key('Content-Length'):
+        if 'Content-Length' not in self.headers:
             self.set_content_length()
 
     def start_response(self, status, headers,exc_info=None):
@@ -368,11 +368,11 @@ class ServerHandler(object):
         if self.origin_server:
             if self.client_is_modern():
                 self._write('HTTP/%s %s\r\n' % (self.http_version,self.status))
-                if not self.headers.has_key('Date'):
+                if 'Date' not in self.headers:
                     self._write(
                         'Date: %s\r\n' % time.asctime(time.gmtime(time.time()))
                     )
-                if self.server_software and not self.headers.has_key('Server'):
+                if self.server_software and 'Server' not in self.headers:
                     self._write('Server: %s\r\n' % self.server_software)
         else:
             self._write('Status: %s\r\n' % self.status)

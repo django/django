@@ -127,6 +127,18 @@ class Templates(unittest.TestCase):
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
+            # Don't get confused when parsing something that is almost, but not
+            # quite, a template tag.
+            'basic-syntax21': ("a {{ moo %} b", {}, "a {{ moo %} b"),
+            'basic-syntax22': ("{{ moo #}", {}, "{{ moo #}"),
+
+            # Will try to treat "moo #} {{ cow" as the variable. Not ideal, but
+            # costly to work around, so this triggers an error.
+            'basic-syntax23': ("{{ moo #} {{ cow }}", {"cow": "cow"}, template.TemplateSyntaxError),
+
+            # Embedded newlines make it not-a-tag.
+            'basic-syntax24': ("{{ moo\n }}", {}, "{{ moo\n }}"),
+
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
 
@@ -151,60 +163,61 @@ class Templates(unittest.TestCase):
             'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
 
             # Basic filter usage
-            'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax01': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Chained filters
-            'basic-syntax22': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
+            'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
 
             # Raise TemplateSyntaxError for space between a variable and filter pipe
-            'basic-syntax23': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax03': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for space after a filter pipe
-            'basic-syntax24': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax04': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for a nonexistent filter
-            'basic-syntax25': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
+            'filter-syntax05': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError when trying to access a filter containing an illegal character
-            'basic-syntax26': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
+            'filter-syntax06': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for invalid block tags
-            'basic-syntax27': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
+            'filter-syntax07': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for empty block tags
-            'basic-syntax28': ("{% %}", {}, template.TemplateSyntaxError),
+            'filter-syntax08': ("{% %}", {}, template.TemplateSyntaxError),
 
             # Chained filters, with an argument to the first one
-            'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
+            'filter-syntax09': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
             # Escaped string as argument
-            'basic-syntax30': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
+            'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
 
             # Variable as argument
-            'basic-syntax31': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
+            'filter-syntax11': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
 
             # Default argument testing
-            'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
+            'filter-syntax12': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
-            # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
-            'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
+            # Fail silently for methods that raise an exception with a
+            # "silent_variable_failure" attribute
+            'filter-syntax13': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
-            # In methods that raise an exception without a "silent_variable_attribute" set to True,
-            # the exception propagates
-            'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
+            # In methods that raise an exception without a
+            # "silent_variable_attribute" set to True, the exception propagates
+            'filter-syntax14': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
             # Escaped backslash in argument
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
+            'filter-syntax15': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
 
             # Escaped backslash using known escape char
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
+            'filter-syntax16': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
 
             # Empty strings can be passed as arguments to filters
-            'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
+            'filter-syntax17': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the value
-            # will be converted to a bytestring.
-            'basic-syntax37': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            # If a variable has a __str__() that returns a Unicode object, the
+            # value will be converted to a bytestring.
+            'filter-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
@@ -259,6 +272,7 @@ class Templates(unittest.TestCase):
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
+            'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
@@ -572,6 +586,8 @@ class Templates(unittest.TestCase):
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
             'invalidstr04': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
+            'invalidstr05': ('{{ var }}', {}, ('', 'INVALID %s', 'var')),
+            'invalidstr06': ('{{ var.prop }}', {'var': {}}, ('', 'INVALID %s', 'var.prop')),
 
             ### MULTILINE #############################################################
 
@@ -654,6 +670,9 @@ class Templates(unittest.TestCase):
             'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
             'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
 
+            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+
             ### NOW TAG ########################################################
             # Simple case
             'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
@@ -690,7 +709,7 @@ class Templates(unittest.TestCase):
             ### URL TAG ########################################################
             # Successes
             'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
-            'url02' : ('{% url regressiontests.templates.views.client_action client.id,action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04' : ('{% url named-client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
 
@@ -720,6 +739,7 @@ class Templates(unittest.TestCase):
 
         # Set TEMPLATE_STRING_IF_INVALID to a known string
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
+        expected_invalid_str = 'INVALID'
 
         for name, vals in tests:
             install()
@@ -727,6 +747,10 @@ class Templates(unittest.TestCase):
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
                 invalid_string_result = vals[2][1]
+                if '%s' in invalid_string_result:
+                    expected_invalid_str = 'INVALID %s'
+                    invalid_string_result = invalid_string_result % vals[2][2]
+                    template.invalid_var_format_string = True
             else:
                 normal_string_result = vals[2]
                 invalid_string_result = vals[2]
@@ -737,7 +761,7 @@ class Templates(unittest.TestCase):
                 activate('en-us')
 
             for invalid_str, result in [('', normal_string_result),
-                                        ('INVALID', invalid_string_result)]:
+                                        (expected_invalid_str, invalid_string_result)]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 try:
                     output = loader.get_template(name).render(template.Context(vals[1]))
@@ -750,6 +774,10 @@ class Templates(unittest.TestCase):
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
+
+            if template.invalid_var_format_string:
+                expected_invalid_str = 'INVALID'
+                template.invalid_var_format_string = False
 
         loader.template_source_loaders = old_template_loaders
         deactivate()

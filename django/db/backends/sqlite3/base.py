@@ -18,6 +18,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 Database.register_converter("bool", lambda s: str(s) == '1')
 Database.register_converter("time", util.typecast_time)

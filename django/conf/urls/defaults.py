@@ -11,9 +11,10 @@ def patterns(prefix, *args):
     pattern_list = []
     for t in args:
         if isinstance(t, (list, tuple)):
-            pattern_list.append(url(prefix=prefix, *t))
-        else:
-            pattern_list.append(t)
+            t = url(prefix=prefix, *t)
+        elif isinstance(t, RegexURLPattern):
+            t.add_prefix(prefix)
+        pattern_list.append(t)
     return pattern_list
 
 def url(regex, view, kwargs=None, name=None, prefix=''):
@@ -21,5 +22,7 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
         # For include(...) processing.
         return RegexURLResolver(regex, view[0], kwargs)
     else:
-        return RegexURLPattern(regex, prefix and (prefix + '.' + view) or view, kwargs, name)
+        if prefix and isinstance(view, basestring):
+            view = prefix + '.' + view
+        return RegexURLPattern(regex, view, kwargs, name)
 

@@ -42,11 +42,11 @@ class ModPythonRequest(http.HttpRequest):
 
     def is_secure(self):
         # Note: modpython 3.2.10+ has req.is_https(), but we need to support previous versions
-        return self._req.subprocess_env.has_key('HTTPS') and self._req.subprocess_env['HTTPS'] == 'on'
+        return 'HTTPS' in self._req.subprocess_env and self._req.subprocess_env['HTTPS'] == 'on'
 
     def _load_post_and_files(self):
         "Populates self._post and self._files"
-        if self._req.headers_in.has_key('content-type') and self._req.headers_in['content-type'].startswith('multipart'):
+        if 'content-type' in self._req.headers_in and self._req.headers_in['content-type'].startswith('multipart'):
             self._post, self._files = http.parse_file_upload(self._req.headers_in, self.raw_post_data)
         else:
             self._post, self._files = http.QueryDict(self.raw_post_data), datastructures.MultiValueDict()

@@ -200,7 +200,7 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-       
+
         # related.get_accessor_name() could return None for symmetrical relationships
         if rel_opts_name:
             rel_objs = getattr(obj, rel_opts_name, None)
@@ -247,12 +247,12 @@ class ChangeList(object):
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
             self.page_num = 0
-        self.show_all = request.GET.has_key(ALL_VAR)
-        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
+        self.show_all = ALL_VAR in request.GET
+        self.is_popup = IS_POPUP_VAR in request.GET
         self.params = dict(request.GET.items())
-        if self.params.has_key(PAGE_VAR):
+        if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
-        if self.params.has_key(ERROR_FLAG):
+        if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
         self.order_field, self.order_type = self.get_ordering()
@@ -282,7 +282,7 @@ class ChangeList(object):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():
-            if p.has_key(k) and v is None:
+            if k in p and v is None:
                 del p[k]
             elif v is not None:
                 p[k] = v
@@ -344,7 +344,7 @@ class ChangeList(object):
             order_field, order_type = ordering[0][1:], 'desc'
         else:
             order_field, order_type = ordering[0], 'asc'
-        if params.has_key(ORDER_VAR):
+        if ORDER_VAR in params:
             try:
                 field_name = self.list_display[int(params[ORDER_VAR])]
                 try:
@@ -362,7 +362,7 @@ class ChangeList(object):
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
-        if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
+        if ORDER_TYPE_VAR in params and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
             order_type = params[ORDER_TYPE_VAR]
         return order_field, order_type
 
@@ -370,7 +370,7 @@ class ChangeList(object):
         qs = self.root_query_set
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
-            if lookup_params.has_key(i):
+            if i in lookup_params:
                 del lookup_params[i]
 
         # Apply lookup parameters from the query string.

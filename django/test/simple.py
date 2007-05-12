@@ -49,9 +49,12 @@ def build_suite(app_module):
             pass
         else:
             # The module exists, so there must be an import error in the 
-            # test module itself. We don't need the module; close the file
-            # handle returned by find_module.
-            mod[0].close()
+            # test module itself. We don't need the module; so if the
+            # module was a single file module (i.e., tests.py), close the file
+            # handle returned by find_module. Otherwise, the test module
+            # is a directory, and there is nothing to close.
+            if mod[0]:
+                mod[0].close()
             raise
             
     return suite

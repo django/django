@@ -12,6 +12,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading psycopg module: %s" % e
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+
@@ -47,7 +48,7 @@ class UnicodeCursorWrapper(object):
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
+        if attr in self.__dict__:
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)
@@ -192,7 +193,7 @@ def get_sql_flush(style, tables, sequences):
                 sql.append("%s %s %s %s %s %s;" % \
                     (style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('SEQUENCE'),
-                    style.SQL_FIELD('%s_%s_seq' % (table_name, column_name)),
+                    style.SQL_FIELD(quote_name('%s_%s_seq' % (table_name, column_name))),
                     style.SQL_KEYWORD('RESTART'),
                     style.SQL_KEYWORD('WITH'),
                     style.SQL_FIELD('1')
@@ -203,7 +204,7 @@ def get_sql_flush(style, tables, sequences):
                 sql.append("%s %s %s %s %s %s;" % \
                     (style.SQL_KEYWORD('ALTER'),
                      style.SQL_KEYWORD('SEQUENCE'),
-                     style.SQL_FIELD('%s_id_seq' % table_name),
+                     style.SQL_FIELD(quote_name('%s_id_seq' % table_name)),
                      style.SQL_KEYWORD('RESTART'),
                      style.SQL_KEYWORD('WITH'),
                      style.SQL_FIELD('1')

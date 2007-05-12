@@ -25,7 +25,7 @@ class CommonMiddleware(object):
         """
 
         # Check for denied User-Agents
-        if request.META.has_key('HTTP_USER_AGENT'):
+        if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
@@ -66,8 +66,10 @@ class CommonMiddleware(object):
                 path = request.get_full_path()
                 if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
                     ua = request.META.get('HTTP_USER_AGENT', '<none>')
+                    ip = request.META.get('REMOTE_ADDR', '<none>')
                     mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\n" % (referer, request.get_full_path(), ua))
+                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" \
+                                  % (referer, request.get_full_path(), ua, ip))
                 return response
 
         # Use ETags, if requested.

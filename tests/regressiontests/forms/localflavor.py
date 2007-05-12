@@ -193,7 +193,7 @@ as its choices.
 <option value="CA">California</option>
 <option value="CO">Colorado</option>
 <option value="CT">Connecticut</option>
-<option value="DE">Deleware</option>
+<option value="DE">Delaware</option>
 <option value="DC">District of Columbia</option>
 <option value="FM">Federated States of Micronesia</option>
 <option value="FL">Florida</option>
@@ -633,7 +633,7 @@ u'00100'
 >>> f.clean(' 00100')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter a zip code in the format XXXXX.']
+ValidationError: [u'Enter a valid zip code.']
 
 # ITRegionSelect #############################################################
 
@@ -641,6 +641,46 @@ ValidationError: [u'Enter a zip code in the format XXXXX.']
 >>> w = ITRegionSelect()
 >>> w.render('regions', 'PMN')
 u'<select name="regions">\n<option value="ABR">Abruzzo</option>\n<option value="BAS">Basilicata</option>\n<option value="CAL">Calabria</option>\n<option value="CAM">Campania</option>\n<option value="EMR">Emilia-Romagna</option>\n<option value="FVG">Friuli-Venezia Giulia</option>\n<option value="LAZ">Lazio</option>\n<option value="LIG">Liguria</option>\n<option value="LOM">Lombardia</option>\n<option value="MAR">Marche</option>\n<option value="MOL">Molise</option>\n<option value="PMN" selected="selected">Piemonte</option>\n<option value="PUG">Puglia</option>\n<option value="SAR">Sardegna</option>\n<option value="SIC">Sicilia</option>\n<option value="TOS">Toscana</option>\n<option value="TAA">Trentino-Alto Adige</option>\n<option value="UMB">Umbria</option>\n<option value="VAO">Valle d\u2019Aosta</option>\n<option value="VEN">Veneto</option>\n</select>'
+
+# ITSocialSecurityNumberField #################################################
+
+>>> from django.contrib.localflavor.it.forms import ITSocialSecurityNumberField
+>>> f = ITSocialSecurityNumberField()
+>>> f.clean('LVSGDU99T71H501L')
+u'LVSGDU99T71H501L'
+>>> f.clean('LBRRME11A01L736W')
+u'LBRRME11A01L736W'
+>>> f.clean('lbrrme11a01l736w')
+u'LBRRME11A01L736W'
+>>> f.clean('LBR RME 11A01 L736W')
+u'LBRRME11A01L736W'
+>>> f.clean('LBRRME11A01L736A')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Social Security number.']
+>>> f.clean('%BRRME11A01L736W')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Social Security number.']
+
+# ITVatNumberField ###########################################################
+
+>>> from django.contrib.localflavor.it.forms import ITVatNumberField
+>>> f = ITVatNumberField()
+>>> f.clean('07973780013')
+u'07973780013'
+>>> f.clean('7973780013')
+u'07973780013'
+>>> f.clean(7973780013)
+u'07973780013'
+>>> f.clean('07973780014')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid VAT number.']
+>>> f.clean('A7973780013')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid VAT number.']
 
 # FIZipCodeField #############################################################
 
@@ -800,6 +840,94 @@ ValidationError: [u'Enter a zip code in the format XXXXX-XXX.']
 >>> f.clean('12345-123')
 u'12345-123'
 
+# BRCNPJField ############################################################
+
+>>> from django.contrib.localflavor.br.forms import BRCNPJField
+>>> f = BRCNPJField(required=True)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('12-345-678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number.']
+>>> f.clean('12.345.678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number.']
+>>> f.clean('12345678/9012-10')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CNPJ number.']
+>>> f.clean('64.132.916/0001-88')
+'64.132.916/0001-88'
+>>> f.clean('64-132-916/0001-88')
+'64-132-916/0001-88'
+>>> f.clean('64132916/0001-88')
+'64132916/0001-88'
+>>> f.clean('64.132.916/0001-XX')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f = BRCNPJField(required=False)
+>>> f.clean('')
+u''
+
+# BRCPFField #################################################################
+
+>>> from django.contrib.localflavor.br.forms import BRCPFField
+>>> f = BRCPFField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('489.294.654-54')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('295.669.575-98')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('539.315.127-22')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CPF number.']
+>>> f.clean('663.256.017-26')
+u'663.256.017-26'
+>>> f.clean('66325601726')
+u'66325601726'
+>>> f.clean('375.788.573-20')
+u'375.788.573-20'
+>>> f.clean('84828509895')
+u'84828509895'
+>>> f.clean('375.788.573-XX')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean('375.788.573-000')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 14 characters.']
+>>> f.clean('123.456.78')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 11 characters.']
+>>> f.clean('123456789555')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires at most 11 digits or 14 characters.']
+>>> f = BRCPFField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
+
 # BRPhoneNumberField #########################################################
 
 >>> from django.contrib.localflavor.br.forms import BRPhoneNumberField
@@ -882,6 +1010,60 @@ u'9786324830D-6104243-0910271-2'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.']
+
+# CHZipCodeField ############################################################
+
+>>> from django.contrib.localflavor.ch.forms import CHZipCodeField
+>>> f = CHZipCodeField()
+>>> f.clean('800x')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXX.']
+>>> f.clean('80 00')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a zip code in the format XXXX.']
+>>> f.clean('8000')
+u'8000'
+
+# CHPhoneNumberField ########################################################
+
+>>> from django.contrib.localflavor.ch.forms import CHPhoneNumberField
+>>> f = CHPhoneNumberField()
+>>> f.clean('01234567890')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in 0XX XXX XX XX format.']
+>>> f.clean('1234567890')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in 0XX XXX XX XX format.']
+>>> f.clean('0123456789')
+u'012 345 67 89'
+
+# CHIdentityCardNumberField #################################################
+
+>>> from django.contrib.localflavor.ch.forms import CHIdentityCardNumberField
+>>> f = CHIdentityCardNumberField()
+>>> f.clean('C1234567<0')
+u'C1234567<0'
+>>> f.clean('C1234567<1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
+>>> f.clean('2123456700')
+u'2123456700'
+>>> f.clean('2123456701')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.']
+
+# CHStateSelect #############################################################
+
+>>> from django.contrib.localflavor.ch.forms import CHStateSelect
+>>> w = CHStateSelect()
+>>> w.render('state', 'AG')
+u'<select name="state">\n<option value="AG" selected="selected">Aargau</option>\n<option value="AI">Appenzell Innerrhoden</option>\n<option value="AR">Appenzell Ausserrhoden</option>\n<option value="BS">Basel-Stadt</option>\n<option value="BL">Basel-Land</option>\n<option value="BE">Berne</option>\n<option value="FR">Fribourg</option>\n<option value="GE">Geneva</option>\n<option value="GL">Glarus</option>\n<option value="GR">Graubuenden</option>\n<option value="JU">Jura</option>\n<option value="LU">Lucerne</option>\n<option value="NE">Neuchatel</option>\n<option value="NW">Nidwalden</option>\n<option value="OW">Obwalden</option>\n<option value="SH">Schaffhausen</option>\n<option value="SZ">Schwyz</option>\n<option value="SO">Solothurn</option>\n<option value="SG">St. Gallen</option>\n<option value="TG">Thurgau</option>\n<option value="TI">Ticino</option>\n<option value="UR">Uri</option>\n<option value="VS">Valais</option>\n<option value="VD">Vaud</option>\n<option value="ZG">Zug</option>\n<option value="ZH">Zurich</option>\n</select>'
 
 ## AUPostCodeField ##########################################################
 
@@ -1012,4 +1194,166 @@ states/territories as its choices.
 <option value="VIC">Victoria</option>
 <option value="WA">Western Australia</option>
 </select>
+
+## ISIdNumberField #############################################################
+
+>>> from django.contrib.localflavor.is_.forms import *
+>>> f = ISIdNumberField()
+>>> f.clean('2308803449')
+u'230880-3449'
+>>> f.clean('230880-3449')
+u'230880-3449'
+>>> f.clean('230880 3449')
+u'230880-3449'
+>>> f.clean('230880343')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 10 characters.']
+>>> f.clean('230880343234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 11 characters.']
+>>> f.clean('abcdefghijk')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('2308803439')
+Traceback (most recent call last):
+...
+ValidationError: [u'The Icelandic identification number is not valid.']
+>>> f.clean('2308803440')
+u'230880-3440'
+>>> f = ISIdNumberField(required=False)
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+## ISPhoneNumberField #############################################################
+
+>>> from django.contrib.localflavor.is_.forms import *
+>>> f = ISPhoneNumberField()
+>>> f.clean('1234567')
+u'1234567'
+>>> f.clean('123 4567')
+u'1234567'
+>>> f.clean('123-4567')
+u'1234567'
+>>> f.clean('123-456')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid value.']
+>>> f.clean('123456')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 7 characters.']
+>>> f.clean('123456555')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 8 characters.']
+>>> f.clean('abcdefg')
+Traceback (most recent call last):
+ValidationError: [u'Enter a valid value.']
+>>> f.clean(' 1234567 ')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 8 characters.']
+>>> f.clean(' 12367  ')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid value.']
+
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f = ISPhoneNumberField(required=False)
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+## ISPostalCodeSelect #############################################################
+
+>>> from django.contrib.localflavor.is_.forms import *
+>>> f = ISPostalCodeSelect()
+
+>>> f.render('foo', 'bar')
+u'<select name="foo">\n<option value="101">101 Reykjav\xedk</option>\n<option value="103">103 Reykjav\xedk</option>\n<option value="104">104 Reykjav\xedk</option>\n<option value="105">105 Reykjav\xedk</option>\n<option value="107">107 Reykjav\xedk</option>\n<option value="108">108 Reykjav\xedk</option>\n<option value="109">109 Reykjav\xedk</option>\n<option value="110">110 Reykjav\xedk</option>\n<option value="111">111 Reykjav\xedk</option>\n<option value="112">112 Reykjav\xedk</option>\n<option value="113">113 Reykjav\xedk</option>\n<option value="116">116 Kjalarnes</option>\n<option value="121">121 Reykjav\xedk</option>\n<option value="123">123 Reykjav\xedk</option>\n<option value="124">124 Reykjav\xedk</option>\n<option value="125">125 Reykjav\xedk</option>\n<option value="127">127 Reykjav\xedk</option>\n<option value="128">128 Reykjav\xedk</option>\n<option value="129">129 Reykjav\xedk</option>\n<option value="130">130 Reykjav\xedk</option>\n<option value="132">132 Reykjav\xedk</option>\n<option value="150">150 Reykjav\xedk</option>\n<option value="155">155 Reykjav\xedk</option>\n<option value="170">170 Seltjarnarnes</option>\n<option value="172">172 Seltjarnarnes</option>\n<option value="190">190 Vogar</option>\n<option value="200">200 K\xf3pavogur</option>\n<option value="201">201 K\xf3pavogur</option>\n<option value="202">202 K\xf3pavogur</option>\n<option value="203">203 K\xf3pavogur</option>\n<option value="210">210 Gar\xf0ab\xe6r</option>\n<option value="212">212 Gar\xf0ab\xe6r</option>\n<option value="220">220 Hafnarfj\xf6r\xf0ur</option>\n<option value="221">221 Hafnarfj\xf6r\xf0ur</option>\n<option value="222">222 Hafnarfj\xf6r\xf0ur</option>\n<option value="225">225 \xc1lftanes</option>\n<option value="230">230 Reykjanesb\xe6r</option>\n<option value="232">232 Reykjanesb\xe6r</option>\n<option value="233">233 Reykjanesb\xe6r</option>\n<option value="235">235 Keflav\xedkurflugv\xf6llur</option>\n<option value="240">240 Grindav\xedk</option>\n<option value="245">245 Sandger\xf0i</option>\n<option value="250">250 Gar\xf0ur</option>\n<option value="260">260 Reykjanesb\xe6r</option>\n<option value="270">270 Mosfellsb\xe6r</option>\n<option value="300">300 Akranes</option>\n<option value="301">301 Akranes</option>\n<option value="302">302 Akranes</option>\n<option value="310">310 Borgarnes</option>\n<option value="311">311 Borgarnes</option>\n<option value="320">320 Reykholt \xed Borgarfir\xf0i</option>\n<option value="340">340 Stykkish\xf3lmur</option>\n<option value="345">345 Flatey \xe1 Brei\xf0afir\xf0i</option>\n<option value="350">350 Grundarfj\xf6r\xf0ur</option>\n<option value="355">355 \xd3lafsv\xedk</option>\n<option value="356">356 Sn\xe6fellsb\xe6r</option>\n<option value="360">360 Hellissandur</option>\n<option value="370">370 B\xfa\xf0ardalur</option>\n<option value="371">371 B\xfa\xf0ardalur</option>\n<option value="380">380 Reykh\xf3lahreppur</option>\n<option value="400">400 \xcdsafj\xf6r\xf0ur</option>\n<option value="401">401 \xcdsafj\xf6r\xf0ur</option>\n<option value="410">410 Hn\xedfsdalur</option>\n<option value="415">415 Bolungarv\xedk</option>\n<option value="420">420 S\xfa\xf0av\xedk</option>\n<option value="425">425 Flateyri</option>\n<option value="430">430 Su\xf0ureyri</option>\n<option value="450">450 Patreksfj\xf6r\xf0ur</option>\n<option value="451">451 Patreksfj\xf6r\xf0ur</option>\n<option value="460">460 T\xe1lknafj\xf6r\xf0ur</option>\n<option value="465">465 B\xedldudalur</option>\n<option value="470">470 \xdeingeyri</option>\n<option value="471">471 \xdeingeyri</option>\n<option value="500">500 Sta\xf0ur</option>\n<option value="510">510 H\xf3lmav\xedk</option>\n<option value="512">512 H\xf3lmav\xedk</option>\n<option value="520">520 Drangsnes</option>\n<option value="522">522 Kj\xf6rvogur</option>\n<option value="523">523 B\xe6r</option>\n<option value="524">524 Nor\xf0urfj\xf6r\xf0ur</option>\n<option value="530">530 Hvammstangi</option>\n<option value="531">531 Hvammstangi</option>\n<option value="540">540 Bl\xf6ndu\xf3s</option>\n<option value="541">541 Bl\xf6ndu\xf3s</option>\n<option value="545">545 Skagastr\xf6nd</option>\n<option value="550">550 Sau\xf0\xe1rkr\xf3kur</option>\n<option value="551">551 Sau\xf0\xe1rkr\xf3kur</option>\n<option value="560">560 Varmahl\xed\xf0</option>\n<option value="565">565 Hofs\xf3s</option>\n<option value="566">566 Hofs\xf3s</option>\n<option value="570">570 Flj\xf3t</option>\n<option value="580">580 Siglufj\xf6r\xf0ur</option>\n<option value="600">600 Akureyri</option>\n<option value="601">601 Akureyri</option>\n<option value="602">602 Akureyri</option>\n<option value="603">603 Akureyri</option>\n<option value="610">610 Greniv\xedk</option>\n<option value="611">611 Gr\xedmsey</option>\n<option value="620">620 Dalv\xedk</option>\n<option value="621">621 Dalv\xedk</option>\n<option value="625">625 \xd3lafsfj\xf6r\xf0ur</option>\n<option value="630">630 Hr\xedsey</option>\n<option value="640">640 H\xfasav\xedk</option>\n<option value="641">641 H\xfasav\xedk</option>\n<option value="645">645 Fossh\xf3ll</option>\n<option value="650">650 Laugar</option>\n<option value="660">660 M\xfdvatn</option>\n<option value="670">670 K\xf3pasker</option>\n<option value="671">671 K\xf3pasker</option>\n<option value="675">675 Raufarh\xf6fn</option>\n<option value="680">680 \xde\xf3rsh\xf6fn</option>\n<option value="681">681 \xde\xf3rsh\xf6fn</option>\n<option value="685">685 Bakkafj\xf6r\xf0ur</option>\n<option value="690">690 Vopnafj\xf6r\xf0ur</option>\n<option value="700">700 Egilssta\xf0ir</option>\n<option value="701">701 Egilssta\xf0ir</option>\n<option value="710">710 Sey\xf0isfj\xf6r\xf0ur</option>\n<option value="715">715 Mj\xf3ifj\xf6r\xf0ur</option>\n<option value="720">720 Borgarfj\xf6r\xf0ur eystri</option>\n<option value="730">730 Rey\xf0arfj\xf6r\xf0ur</option>\n<option value="735">735 Eskifj\xf6r\xf0ur</option>\n<option value="740">740 Neskaupsta\xf0ur</option>\n<option value="750">750 F\xe1skr\xfa\xf0sfj\xf6r\xf0ur</option>\n<option value="755">755 St\xf6\xf0varfj\xf6r\xf0ur</option>\n<option value="760">760 Brei\xf0dalsv\xedk</option>\n<option value="765">765 Dj\xfapivogur</option>\n<option value="780">780 H\xf6fn \xed Hornafir\xf0i</option>\n<option value="781">781 H\xf6fn \xed Hornafir\xf0i</option>\n<option value="785">785 \xd6r\xe6fi</option>\n<option value="800">800 Selfoss</option>\n<option value="801">801 Selfoss</option>\n<option value="802">802 Selfoss</option>\n<option value="810">810 Hverager\xf0i</option>\n<option value="815">815 \xdeorl\xe1ksh\xf6fn</option>\n<option value="820">820 Eyrarbakki</option>\n<option value="825">825 Stokkseyri</option>\n<option value="840">840 Laugarvatn</option>\n<option value="845">845 Fl\xfa\xf0ir</option>\n<option value="850">850 Hella</option>\n<option value="851">851 Hella</option>\n<option value="860">860 Hvolsv\xf6llur</option>\n<option value="861">861 Hvolsv\xf6llur</option>\n<option value="870">870 V\xedk</option>\n<option value="871">871 V\xedk</option>\n<option value="880">880 Kirkjub\xe6jarklaustur</option>\n<option value="900">900 Vestmannaeyjar</option>\n<option value="902">902 Vestmannaeyjar</option>\n</select>'
+
+## CLRutField #############################################################
+
+CLRutField is a Field that checks the validity of the Chilean
+personal identification number (RUT). It has two modes relaxed (default) and
+strict.
+
+>>> from django.contrib.localflavor.cl.forms import CLRutField
+>>> rut = CLRutField()
+
+>>> rut.clean('11-6')
+'11-6'
+>>> rut.clean('116')
+'11-6'
+
+# valid format, bad verifier.
+>>> rut.clean('11.111.111-0')
+Traceback (most recent call last):
+...
+ValidationError: [u'The Chilean RUT is not valid.']
+>>> rut.clean('111')
+Traceback (most recent call last):
+...
+ValidationError: [u'The Chilean RUT is not valid.']
+
+>>> rut.clean('767484100')
+'76.748.410-0'
+>>> rut.clean('78.412.790-7')
+'78.412.790-7'
+>>> rut.clean('8.334.6043')
+'8.334.604-3'
+>>> rut.clean('76793310-K')
+'76.793.310-K'
+
+Strict RUT usage (does not allow imposible values)
+>>> rut = CLRutField(strict=True)
+
+>>> rut.clean('11-6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+
+# valid format, bad verifier.
+>>> rut.clean('11.111.111-0')
+Traceback (most recent call last):
+...
+ValidationError: [u'The Chilean RUT is not valid.']
+
+# Correct input, invalid format.
+>>> rut.clean('767484100')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+>>> rut.clean('78.412.790-7')
+'78.412.790-7'
+>>> rut.clean('8.334.6043')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+>>> rut.clean('76793310-K')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+
 """

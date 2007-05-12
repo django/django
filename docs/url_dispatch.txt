@@ -192,10 +192,11 @@ The remaining arguments should be tuples in this format::
 
 url
 ---
-**New in development version**
 
-The ``url()`` function can be used instead of a tuple as an argument to
-``patterns()``. This is convenient if you wish to specify a name without the
+**New in Django development version**
+
+You can use the ``url()`` function, instead of a tuple, as an argument to
+``patterns()``. This is convenient if you want to specify a name without the
 optional extra arguments dictionary. For example::
 
     urlpatterns = patterns('',
@@ -498,26 +499,40 @@ the view prefix (as explained in "The view prefix" above) will have no effect.
 Naming URL patterns
 ===================
 
-**New in development version**
+**New in Django development version**
 
-It is fairly common to use the same view function in multiple URL patterns in
-your URLConf. This leads to problems when you come to do reverse URL matching,
-because the ``permalink()`` decorator and ``{% url %}`` template tag use the
-name of the view function to find a match.
+It's fairly common to use the same view function in multiple URL patterns in
+your URLconf. For example, these two URL patterns both point to the ``archive``
+view::
 
-To solve this problem, you can give a name to each of your URL patterns in
-order to distinguish them from other patterns using the same views and
-parameters. You can then use this name wherever you would otherwise use the
-name of the view function. For example, if you URLConf contains::
+    urlpatterns = patterns('',
+        (r'/archive/(\d{4})/$', archive),
+        (r'/archive-summary/(\d{4})/$', archive, {'summary': True}),
+    )
+
+This is completely valid, but it leads to problems when you try to do reverse
+URL matching (through the ``permalink()`` decorator or the ``{% url %}``
+template tag). Continuing this example, if you wanted to retrieve the URL for
+the ``archive`` view, Django's reverse URL matcher would get confused, because
+*two* URLpatterns point at that view.
+
+To solve this problem, Django supports **named URL patterns**. That is, you can
+give a name to a URL pattern in order to distinguish it from other patterns
+using the same view and parameters. Then, you can use this name in reverse URL
+matching.
+
+Here's the above example, rewritten to used named URL patterns::
 
     urlpatterns = patterns('',
         url(r'/archive/(\d{4})/$', archive, name="full-archive"),
         url(r'/archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
     )
 
-...you could refer to either the summary archive view in a template as::
+With these names in place (``full-archive`` and ``arch-summary``), you can
+target each pattern individually by using its name::
 
     {% url arch-summary 1945 %}
+    {% url full-archive 2007 %}
 
 Even though both URL patterns refer to the ``archive`` view here, using the
 ``name`` parameter to ``url()`` allows you to tell them apart in templates.
@@ -527,11 +542,12 @@ not restricted to valid Python names.
 
 .. note::
 
-    Make sure that when you name your URLs, you use names that are unlikely to
-    clash with any other application's choice of names. If you call your URL
-    pattern *comment* and another application does the same thing, there is no
-    guarantee which URL will be inserted into your template when you use this
-    name. Putting a prefix on your URL names, perhaps derived from
-    the application name, will decrease the chances of collision. Something
-    like *myapp-comment* is recommended over simply *comment*.
+    When you name your URL patterns, make sure you use names that are unlikely
+    to clash with any other application's choice of names. If you call your URL
+    pattern ``comment``, and another application does the same thing, there's
+    no guarantee which URL will be inserted into your template when you use
+    this name.
 
+    Putting a prefix on your URL names, perhaps derived from the application
+    name, will decrease the chances of collision. We recommend something like
+    ``myapp-comment`` instead of ``comment``.

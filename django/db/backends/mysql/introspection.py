@@ -85,7 +85,7 @@ DATA_TYPES_REVERSE = {
     FIELD_TYPE.LONG: 'IntegerField',
     FIELD_TYPE.LONGLONG: 'IntegerField',
     FIELD_TYPE.SHORT: 'IntegerField',
-    FIELD_TYPE.STRING: 'TextField',
+    FIELD_TYPE.STRING: 'CharField',
     FIELD_TYPE.TIMESTAMP: 'DateTimeField',
     FIELD_TYPE.TINY: 'IntegerField',
     FIELD_TYPE.TINY_BLOB: 'TextField',

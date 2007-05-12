@@ -55,6 +55,7 @@ LANGUAGES = (
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
+    ('ko', gettext_noop('Korean')),
     ('kn', gettext_noop('Kannada')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
@@ -118,6 +119,7 @@ EMAIL_PORT = 25
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
@@ -310,6 +312,12 @@ BANNED_IPS = ()
 ##################
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+
+LOGIN_URL = '/accounts/login/'
+
+LOGOUT_URL = '/accounts/logout/'
+
+LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 ###########
 # TESTING #

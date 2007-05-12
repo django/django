@@ -47,16 +47,18 @@ Fedora
 ------
 
 A Django package is available for `Fedora Linux`_, in the "Fedora Extras"
-repository. The `current Fedora package`_ is based on Django 0.95.1, and can be
-installed by typing ``yum install Django``.
+repository. The `current Fedora package`_ is based on Django 0.96, and can be
+installed by typing ``yum install Django``. The previous link is for the i386
+binary. Users of other architectures should be able to use that as a starting
+point to find their preferred version.
 
 .. _Fedora Linux: http://fedora.redhat.com/
-.. _current Fedora package: http://fedoraproject.org/extras/6/i386/repodata/repoview/Django-0-0.95.1-1.fc6.html
+.. _current Fedora package: http://download.fedora.redhat.com/pub/fedora/linux/extras/6/i386/repoview/Django.html
 
 Gentoo
 ------
 
-A Django build is available for `Gentoo Linux`_, and is based on Django 0.95.1.
+A Django build is available for `Gentoo Linux`_, and is based on Django 0.96.
 The `current Gentoo build`_ can be installed by typing ``emerge django``.
 
 .. _Gentoo Linux: http://www.gentoo.org/

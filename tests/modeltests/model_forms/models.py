@@ -24,6 +24,12 @@ a commit=True parameter.
 
 from django.db import models
 
+ARTICLE_STATUS = (
+    (1, 'Draft'),
+    (2, 'Pending'),
+    (3, 'Live'),
+)
+
 class Category(models.Model):
     name = models.CharField(maxlength=20)
     url = models.CharField('The URL', maxlength=40)
@@ -44,6 +50,7 @@ class Article(models.Model):
     writer = models.ForeignKey(Writer)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
+    status = models.IntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
     def save(self):
         import datetime
@@ -147,8 +154,8 @@ Create a couple of Writers.
 >>> w = Writer(name='Bob Woodward')
 >>> w.save()
 
-ManyToManyFields are represented by a MultipleChoiceField, and ForeignKeys are
-represented by a ChoiceField.
+ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
+fields with the 'choices' attribute are represented by a ChoiceField.
 >>> ArticleForm = form_for_model(Article)
 >>> f = ArticleForm(auto_id=False)
 >>> print f
@@ -160,6 +167,12 @@ represented by a ChoiceField.
 <option value="2">Bob Woodward</option>
 </select></td></tr>
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article"></textarea></td></tr>
+<tr><th>Status:</th><td><select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></td></tr>
 <tr><th>Categories:</th><td><select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -200,6 +213,12 @@ current values are inserted as 'initial' data in each Field.
 <option value="2">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -232,6 +251,12 @@ Add some categories and test the many-to-many form output.
 <option value="2">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article">Hello.</textarea></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1" selected="selected">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -310,6 +335,12 @@ the data in the database when the form is instantiated.
 <option value="2">Bob Woodward</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
@@ -329,6 +360,12 @@ the data in the database when the form is instantiated.
 <option value="3">Carl Bernstein</option>
 </select></li>
 <li>Article: <textarea rows="10" cols="40" name="article"></textarea></li>
+<li>Status: <select name="status">
+<option value="" selected="selected">---------</option>
+<option value="1">Draft</option>
+<option value="2">Pending</option>
+<option value="3">Live</option>
+</select></li>
 <li>Categories: <select multiple="multiple" name="categories">
 <option value="1">Entertainment</option>
 <option value="2">It&#39;s a test</option>
