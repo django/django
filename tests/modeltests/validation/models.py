@@ -88,7 +88,7 @@ u'Jose'
 >>> p.validate()
 {}
 >>> p.name
-'227'
+u'227'
 
 >>> p = Person(**dict(valid_params, birthdate=datetime.date(2000, 5, 3)))
 >>> p.validate()

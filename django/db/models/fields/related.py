@@ -5,6 +5,7 @@ from django.db.models.related import RelatedObject
 from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
+from django.utils.encoding import smart_unicode
 from django.core import validators
 from django import oldforms
 from django import newforms as forms
@@ -699,7 +700,7 @@ class ManyToManyField(RelatedField, Field):
         if obj:
             instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
             if self.rel.raw_id_admin:
-                new_data[self.name] = ",".join([str(id) for id in instance_ids])
+                new_data[self.name] = u",".join([smart_unicode(id) for id in instance_ids])
             else:
                 new_data[self.name] = instance_ids
         else:

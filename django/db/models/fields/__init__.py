@@ -9,6 +9,7 @@ from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.encoding import smart_unicode
 import datetime, os, time
 
 class NOT_PROVIDED:
@@ -22,7 +23,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -299,9 +300,9 @@ class Field(object):
             return first_choice + list(self.choices)
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
-            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+            lst = [(getattr(x, self.rel.get_related_field().attname), smart_unicode(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
         else:
-            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+            lst = [(x._get_pk_val(), smart_unicode(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
         return first_choice + lst
 
     def get_choices_default(self):
@@ -423,7 +424,7 @@ class CharField(Field):
                 return value
             else:
                 raise validators.ValidationError, ugettext_lazy("This field cannot be null.")
-        return str(value)
+        return smart_unicode(value)
 
     def formfield(self, **kwargs):
         defaults = {'max_length': self.maxlength}
@@ -460,11 +461,11 @@ class DateField(Field):
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def pre_save(self, model_instance, add):
@@ -534,14 +535,14 @@ class DateTimeField(DateField):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [smart_unicode(v) for v in value]
         else:
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def get_manipulator_field_objs(self):
@@ -811,9 +812,9 @@ class TimeField(Field):
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [smart_unicode(v) for v in value]
         else:
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def pre_save(self, model_instance, add):
@@ -831,7 +832,7 @@ class TimeField(Field):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
