@@ -942,7 +942,8 @@ the full list of conversions:
     ``TimeField``                    ``TimeField``
     ``URLField``                     ``URLField`` with ``verify_exists`` set
                                      to the model field's ``verify_exists``
-    ``USStateField``                 ``CharField with ``widget=USStateSelect``
+    ``USStateField``                 ``CharField`` with
+                                     ``widget=USStateSelect``
                                      (``USStateSelect`` is from
                                      ``django.contrib.localflavor.us``)
     ``XMLField``                     ``CharField`` with ``widget=Textarea``
@@ -1094,7 +1095,7 @@ The default field types, as described in the "Field types" table above, are
 sensible defaults; if you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
 ``form_for_model()`` gives you the flexibility of changing the form field type
-for a given model field. You do this by specifying a *formfield callback*.
+for a given model field. You do this by specifying a **formfield callback**.
 
 A formfield callback is a function that, when provided with a model field,
 returns a form field instance. When constructing a form, ``form_for_model()``
