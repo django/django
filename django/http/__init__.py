@@ -108,6 +108,10 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.__setitem__(self, key, value)
 
+    def __delitem__(self, key):
+        self._assert_mutable()
+        super(QueryDict, self).__delitem__(key)
+
     def get(self, key, default=None):
         return str_to_unicode(MultiValueDict.get(self, key, default), self.encoding)
 

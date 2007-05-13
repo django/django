@@ -1344,7 +1344,7 @@ msgstr "四月"
 
 #: utils/dates.py:19
 msgid "may"
-msgstr "三月"
+msgstr "五月"
 
 #: utils/dates.py:19
 msgid "jun"

@@ -255,6 +255,8 @@ class BoundField(StrAndUnicode):
             attrs['id'] = auto_id
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
+            if callable(data):
+                data = data()
         else:
             data = self.data
         return widget.render(self.html_name, data, attrs=attrs)

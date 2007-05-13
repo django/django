@@ -177,7 +177,7 @@ tools that can be used to establish tests and test conditions.
 
 * `Test Client`_
 * `TestCase`_
-* `Email services`_
+* `E-mail services`_
 
 Test Client
 -----------
@@ -459,9 +459,9 @@ Emptying the test outbox
 **New in Django development version**
 
 At the start of each test case, in addition to installing fixtures,
-Django clears the contents of the test email outbox.
+Django clears the contents of the test e-mail outbox.
 
-For more detail on email services during tests, see `Email services`_.
+For more detail on e-mail services during tests, see `E-mail services`_.
 
 Assertions
 ~~~~~~~~~~
@@ -502,16 +502,17 @@ that can be useful in testing the behavior of web sites.
     Assert that the template with the given name was used in rendering the
     response.
 
-Email services
+E-mail services
 --------------
+
 **New in Django development version**
 
-If your view makes use of the `Django email services`_, you don't really
-want email to be sent every time you run a test using that view.
+If your view makes use of the `Django e-mail services`_, you don't really
+want e-mail to be sent every time you run a test using that view.
 
 When the Django test framework is initialized, it transparently replaces the
 normal `SMTPConnection`_ class with a dummy implementation that redirects all
-email to a dummy outbox. This outbox, stored as ``django.core.mail.outbox``,
+e-mail to a dummy outbox. This outbox, stored as ``django.core.mail.outbox``,
 is a simple list of all `EmailMessage`_ instances that have been sent.
 For example, during test conditions, it would be possible to run the following
 code::
@@ -541,7 +542,7 @@ to mail.outbox::
     # Empty the test outbox
     mail.outbox = []
 
-.. _`Django email services`: ../email/
+.. _`Django e-mail services`: ../email/
 .. _`SMTPConnection`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`EmailMessage`: ../email/#the-emailmessage-and-smtpconnection-classes
 .. _`previously`: #emptying-the-test-outbox
@@ -669,7 +670,7 @@ a number of utility methods in the ``django.test.utils`` module.
 
 ``teardown_test_environment()``
     Performs any global post-test teardown, such as removing the instrumentation
-    of the template rendering system and restoring normal email services.
+    of the template rendering system and restoring normal e-mail services.
 
 ``create_test_db(verbosity=1, autoclobber=False)``
     Creates a new test database, and run ``syncdb`` against it.
