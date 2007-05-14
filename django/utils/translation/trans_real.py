@@ -203,6 +203,14 @@ def deactivate():
     if currentThread() in _active:
         del _active[currentThread()]
 
+def no_trans():
+    """
+    Makes the active translation object a NullTranslations() instance. This is
+    useful when we want delayed translations to appear as the original string
+    for some reason.
+    """
+    _active[currentThread()] = gettext_module.NullTranslations()
+
 def get_language():
     "Returns the currently selected language."
     t = _active.get(currentThread(), None)
@@ -510,7 +518,6 @@ def string_concat(*strings):
     """"
     lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts. Handles lazy strings and non-strings by
-    first turning all arguments to strings, before joining them.
+    first turning all arguments to unicode, before joining them.
     """
-    return ''.join([str(el) for el in strings])
-
+    return u''.join([smart_unicode(el) for el in strings])

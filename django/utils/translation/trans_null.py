@@ -15,7 +15,7 @@ def ungettext(singular, plural, number):
 
 string_concat = lambda *strings: ''.join([str(el) for el in strings])
 activate = lambda x: None
-deactivate = install = lambda: None
+deactivate = no_trans = install = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
 get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
 get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)
