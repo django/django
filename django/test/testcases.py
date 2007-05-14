@@ -62,7 +62,7 @@ class TestCase(unittest.TestCase):
         
         """
         self.assertEqual(response.status_code, status_code, 
-            "Response didn't redirect: Reponse code was %d (expected %d)" % 
+            "Response didn't redirect as expected: Reponse code was %d (expected %d)" % 
                 (response.status_code, status_code))
         scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
         self.assertEqual(path, expected_path, 
@@ -70,7 +70,7 @@ class TestCase(unittest.TestCase):
         redirect_response = self.client.get(path)
         self.assertEqual(redirect_response.status_code, target_status_code, 
             "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
-                (path, response.status_code, status_code))
+                (path, redirect_response.status_code, target_status_code))
     
     def assertContains(self, response, text, count=1, status_code=200):
         """Assert that a response indicates that a page was retreived successfully,
