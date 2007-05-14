@@ -34,4 +34,18 @@ Unicode decoding problems...
 >>> f = SomeForm()
 >>> f.as_p()
 u'<p><label for="id_somechoice_0">Somechoice:</label> <ul>\n<li><label><input type="radio" id="id_somechoice_0" value="0" name="somechoice" /> En tied\xe4</label></li>\n<li><label><input type="radio" id="id_somechoice_1" value="1" name="somechoice" /> Mies</label></li>\n<li><label><input type="radio" id="id_somechoice_2" value="2" name="somechoice" /> Nainen</label></li>\n</ul></p>'
+
+#######################
+# Miscellaneous Tests #
+#######################
+
+There once was a problem with Form fields called "data". Let's make sure that
+doesn't come back.
+>>> class DataForm(Form):
+...     data = CharField(max_length=10)
+>>> f = DataForm({'data': 'xyzzy'})
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'data': u'xyzzy'}
 """

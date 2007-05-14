@@ -2303,7 +2303,7 @@ returns a list of input.
 Validation errors are HTML-escaped when output as HTML.
 >>> class EscapingForm(Form):
 ...     special_name = CharField()
-...     def clean_special_name(self):
+...     def do_clean_special_name(self):
 ...         raise ValidationError("Something's wrong with '%s'" % self.clean_data['special_name'])
 
 >>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
@@ -2326,7 +2326,7 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 ...    username = CharField(max_length=10)
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
-...    def clean_password2(self):
+...    def do_clean_password2(self):
 ...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
 ...        return self.clean_data['password2']
