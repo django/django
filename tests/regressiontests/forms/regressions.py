@@ -23,10 +23,16 @@ There were some problems with form translations in #3600
 >>> print f.as_p()
 <p><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
 
+Translations are done at rendering time, so multi-lingual apps can define forms
+early and still send back the right translation.
+
 # XFAIL
 # >>> activate('de')
 # >>> print f.as_p()
 # <p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
+# >>> activate('pl')
+# >>> f.as_p()
+# u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>'
 # >>> deactivate()
 
 Unicode decoding problems...
