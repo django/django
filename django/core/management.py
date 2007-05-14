@@ -1405,12 +1405,13 @@ def load_data(fixture_labels, verbosity=1):
                         print "No %s fixture '%s' in %s." % \
                             (format, fixture_name, humanize(fixture_dir))
                             
-    sequence_sql = backend.get_sql_sequence_reset(style, models)
-    if sequence_sql:
-        if verbosity > 1:
-            print "Resetting sequences"
-        for line in sequence_sql:
-            cursor.execute(line)
+    if count[0] > 0:
+        sequence_sql = backend.get_sql_sequence_reset(style, models)
+        if sequence_sql:
+            if verbosity > 1:
+                print "Resetting sequences"
+            for line in sequence_sql:
+                cursor.execute(line)
             
     transaction.commit()
     transaction.leave_transaction_management()
