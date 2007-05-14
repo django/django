@@ -30,10 +30,10 @@ There were some problems with form translations in #3600
 # >>> deactivate()
 
 Unicode decoding problems...
->>> GENDERS = (('0', u'En tied\xe4'), ('1', u'Mies'), ('2', u'Nainen'))
+>>> GENDERS = ((u'\xc5', u'En tied\xe4'), (u'\xf8', u'Mies'), (u'\xdf', u'Nainen'))
 >>> class SomeForm(Form):
-...     somechoice = ChoiceField(choices=GENDERS, widget=RadioSelect())
+...     somechoice = ChoiceField(choices=GENDERS, widget=RadioSelect(), label=u'\xc5\xf8\xdf')
 >>> f = SomeForm()
 >>> f.as_p()
-u'<p><label for="id_somechoice_0">Somechoice:</label> <ul>\n<li><label><input type="radio" id="id_somechoice_0" value="0" name="somechoice" /> En tied\xe4</label></li>\n<li><label><input type="radio" id="id_somechoice_1" value="1" name="somechoice" /> Mies</label></li>\n<li><label><input type="radio" id="id_somechoice_2" value="2" name="somechoice" /> Nainen</label></li>\n</ul></p>'
+u'<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>'
 """
