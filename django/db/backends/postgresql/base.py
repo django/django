@@ -40,11 +40,21 @@ class UnicodeCursorWrapper(object):
         self.cursor = cursor
         self.charset = charset
 
+    def format_params(self, params):
+        if isinstance(params, dict):
+            result = {}
+            charset = self.charset
+            for key, value in params.items():
+                result[smart_str(key, charset)] = smart_str(value, charset)
+            return result
+        else:
+            return tuple([smart_str(p, self.charset, True) for p in params])
+
     def execute(self, sql, params=()):
-        return self.cursor.execute(smart_str(sql, self.charset), [smart_str(p, self.charset, True) for p in params])
+        return self.cursor.execute(smart_str(sql, self.charset), self.format_params(params))
 
     def executemany(self, sql, param_list):
-        new_param_list = [tuple([smart_str(p, self.charset) for p in params]) for params in param_list]
+        new_param_list = [self.format_params(params) for params in param_list]
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
