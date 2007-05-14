@@ -84,7 +84,7 @@ class Model(object):
         return getattr(self, self._meta.pk.attname)
 
     def __repr__(self):
-        return smart_str(u'<%s: %s>' % (self.__class__.__name__, self))
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
 
     def __str__(self):
         if hasattr(self, '__unicode__'):

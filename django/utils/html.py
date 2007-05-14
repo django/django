@@ -32,7 +32,7 @@ def linebreaks(value):
     "Converts newlines into <p> and <br />s"
     value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
     paras = re.split('\n{2,}', value)
-    paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
+    paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
     return u'\n\n'.join(paras)
 
 def strip_tags(value):
@@ -53,14 +53,16 @@ def fix_ampersands(value):
 
 def urlize(text, trim_url_limit=None, nofollow=False):
     """
-    Converts any URLs in text into clickable links. Works on http://, https:// and
-    www. links. Links can have trailing punctuation (periods, commas, close-parens)
-    and leading punctuation (opening parens) and it'll still do the right thing.
+    Converts any URLs in text into clickable links. Works on http://, https://
+    and www. links. Links can have trailing punctuation (periods, commas,
+    close-parens) and leading punctuation (opening parens) and it'll still do
+    the right thing.
 
     If trim_url_limit is not None, the URLs in link text will be limited to
     trim_url_limit characters.
 
-    If nofollow is True, the URLs in link text will get a rel="nofollow" attribute.
+    If nofollow is True, the URLs in link text will get a rel="nofollow"
+    attribute.
     """
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (x[:limit] + (len(x) >=limit and '...' or ''))  or x
     words = word_split_re.split(text)

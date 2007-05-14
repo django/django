@@ -18,10 +18,10 @@ class ErrorDict(dict):
 
     def as_ul(self):
         if not self: return u''
-        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s%s</li>' % (k, v) for k, v in self.items()])
+        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s%s</li>' % (k, smart_unicode(v)) for k, v in self.items()])
 
     def as_text(self):
-        return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % i for i in v])) for k, v in self.items()])
+        return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % smart_unicode(i) for i in v])) for k, v in self.items()])
 
 class ErrorList(list):
     """
@@ -32,11 +32,11 @@ class ErrorList(list):
 
     def as_ul(self):
         if not self: return u''
-        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s</li>' % e for e in self])
+        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s</li>' % smart_unicode(e) for e in self])
 
     def as_text(self):
         if not self: return u''
-        return u'\n'.join([u'* %s' % e for e in self])
+        return u'\n'.join([u'* %s' % smart_unicode(e) for e in self])
 
 class ValidationError(Exception):
     def __init__(self, message):

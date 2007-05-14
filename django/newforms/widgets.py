@@ -253,7 +253,7 @@ class RadioFieldRenderer(StrAndUnicode):
 
     def __unicode__(self):
         "Outputs a <ul> for this set of radio fields."
-        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % w for w in self])
+        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % smart_unicode(w) for w in self])
 
 class RadioSelect(Select):
     def render(self, name, value, attrs=None, choices=()):

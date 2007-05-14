@@ -170,7 +170,7 @@ upper = stringfilter(upper)
 def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
-    return urllib.quote(value).decode('utf-8')
+    return smart_unicode(urllib.quote(value))
 urlencode = stringfilter(urlencode)
 
 def urlize(value):
@@ -364,10 +364,10 @@ def unordered_list(value):
     def _helper(value, tabs):
         indent = u'\t' * tabs
         if value[1]:
-            return u'%s<li>%s\n%s<ul>\n%s\n%s</ul>\n%s</li>' % (indent, value[0], indent,
+            return u'%s<li>%s\n%s<ul>\n%s\n%s</ul>\n%s</li>' % (indent, smart_unicode(value[0]), indent,
                 u'\n'.join([_helper(v, tabs+1) for v in value[1]]), indent, indent)
         else:
-            return u'%s<li>%s</li>' % (indent, value[0])
+            return u'%s<li>%s</li>' % (indent, smart_unicode(value[0]))
     return _helper(value, 1)
 
 ###################
@@ -546,7 +546,7 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception, e:
-        return u"Error in formatting:%s" % e
+        return u"Error in formatting:%s" % smart_unicode(e)
 
 # Syntax: register.filter(name of filter, callback)
 register.filter(add)
