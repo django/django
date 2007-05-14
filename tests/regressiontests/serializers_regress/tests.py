@@ -184,6 +184,12 @@ The end."""),
     (m2m_obj, 445, M2MSelfData, []),
     (m2m_obj, 446, M2MSelfData, []),
 
+    (data_obj, 450, UniqueAnchor, "UAnchor 1"),
+    (fk_obj, 451, FKDataToField, "UAnchor 1"),
+    (fk_obj, 452, FKDataToField, "UAnchor 2"),
+    (fk_obj, 453, FKDataToField, None),
+    (data_obj, 454, UniqueAnchor, "UAnchor 2"),
+    
     (data_obj, 500, Anchor, "Anchor 3"),
     (data_obj, 501, Anchor, "Anchor 4"),
 

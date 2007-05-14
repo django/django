@@ -37,7 +37,7 @@ class Serializer(base.Serializer):
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
         if related is not None:
-            related = related._get_pk_val()
+            related = getattr(related, field.rel.field_name)
         self._current[field.name] = related
     
     def handle_m2m_field(self, obj, field):
@@ -80,7 +80,10 @@ def Deserializer(object_list, **options):
                 
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
-                data[field.attname] = field.rel.to._meta.pk.to_python(field_value)
+                if field_value:
+                    data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                else:
+                    data[field.attname] = None
                     
             # Handle all other fields
             else:
