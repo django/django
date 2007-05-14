@@ -1,5 +1,4 @@
 import re, doctest, unittest
-import sys
 from urlparse import urlparse
 from django.db import transaction
 from django.core import management, mail

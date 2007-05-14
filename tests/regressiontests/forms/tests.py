@@ -1916,6 +1916,34 @@ True
 >>> p.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
+clean_data will include a key and value for *all* fields defined in the Form,
+even if the Form's data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+"nick_name" field, but clean_data includes it. For CharFields, it's set to the
+empty string.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     nick_name = CharField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+For DateFields, it's set to None.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birth_date = DateField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'birth_date': None, 'first_name': u'John', 'last_name': u'Lennon'}
+
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted. It will also put a <label> around
@@ -3378,7 +3406,7 @@ True
 </select>
 
 # MultiWidget and MultiValueField #############################################
-# MultiWidgets are widgets composed of other widgets. They are usually 
+# MultiWidgets are widgets composed of other widgets. They are usually
 # combined with MultiValueFields - a field that is composed of other fields.
 # MulitWidgets can themselved be composed of other MultiWidgets.
 # SplitDateTimeWidget is one example of a MultiWidget.
@@ -3386,7 +3414,7 @@ True
 >>> class ComplexMultiWidget(MultiWidget):
 ...     def __init__(self, attrs=None):
 ...         widgets = (
-...             TextInput(), 
+...             TextInput(),
 ...             SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeWidget(),
 ...         )
@@ -3411,13 +3439,13 @@ True
 <input type="text" name="name_2_0" value="2007-04-25" /><input type="text" name="name_2_1" value="06:24:00" />
 
 >>> class ComplexField(MultiValueField):
-...     def __init__(self, required=True, widget=None, label=None, initial=None): 
+...     def __init__(self, required=True, widget=None, label=None, initial=None):
 ...         fields = (
-...             CharField(), 
+...             CharField(),
 ...             MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeField()
 ...         )
-...         super(ComplexField, self).__init__(fields, required, widget, label, initial) 
+...         super(ComplexField, self).__init__(fields, required, widget, label, initial)
 ...
 ...     def compress(self, data_list):
 ...         if data_list:
