@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 from util import ValidationError
 from forms import BaseForm, DeclarativeFieldsMetaclass, SortedDictFromList
 from fields import Field, ChoiceField
@@ -167,7 +167,7 @@ class ModelChoiceField(ChoiceField):
         try:
             value = self.queryset.model._default_manager.get(pk=value)
         except self.queryset.model.DoesNotExist:
-            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class ModelMultipleChoiceField(ModelChoiceField):
@@ -180,17 +180,17 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def clean(self, value):
         if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(gettext(u'Enter a list of values.'))
+            raise ValidationError(ugettext(u'Enter a list of values.'))
         final_values = []
         for val in value:
             try:
                 obj = self.queryset.model._default_manager.get(pk=val)
             except self.queryset.model.DoesNotExist:
-                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
             else:
                 final_values.append(obj)
         return final_values

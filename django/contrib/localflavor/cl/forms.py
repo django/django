@@ -4,7 +4,7 @@ Chile specific form helpers.
 
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 
 class CLRutField(RegexField):
     """
@@ -18,12 +18,12 @@ class CLRutField(RegexField):
         if 'strict' in kwargs:
             del kwargs['strict']
             super(CLRutField, self).__init__(r'^(\d{1,2}\.)?\d{3}\.\d{3}-[\dkK]$',
-                error_message=gettext('Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.'),
+                error_message=ugettext('Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.'),
                 *args, **kwargs)
         else:
             # In non-strict mode, accept RUTs that validate but do not exist in
             # the real world.
-            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', error_message=gettext(u'Enter valid a Chilean RUT'), *args, **kwargs)
+            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', error_message=ugettext(u'Enter valid a Chilean RUT'), *args, **kwargs)
 
     def clean(self, value):
         """

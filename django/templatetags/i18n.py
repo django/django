@@ -11,7 +11,7 @@ class GetAvailableLanguagesNode(Node):
 
     def render(self, context):
         from django.conf import settings
-        context[self.variable] = [(k, translation.gettext(v)) for k, v in settings.LANGUAGES]
+        context[self.variable] = [(k, translation.ugettext(v)) for k, v in settings.LANGUAGES]
         return ''
 
 class GetCurrentLanguageNode(Node):

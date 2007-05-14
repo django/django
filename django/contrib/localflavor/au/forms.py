@@ -5,7 +5,7 @@ Australian-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.newforms.util import smart_unicode
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 import re
 
 PHONE_DIGITS_RE = re.compile(r'^(\d{10})$')
@@ -15,7 +15,7 @@ class AUPostCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(AUPostCodeField, self).__init__(r'^\d{4}$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a 4 digit post code.'),
+            error_message=ugettext(u'Enter a 4 digit post code.'),
             *args, **kwargs)
 
 class AUPhoneNumberField(Field):

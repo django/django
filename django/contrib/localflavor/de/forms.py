@@ -4,7 +4,7 @@ DE-specific Form helpers
 
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 import re
 
 id_re = re.compile(r"^(?P<residence>\d{10})(?P<origin>\w{1,3})[-\ ]?(?P<birthday>\d{7})[-\ ]?(?P<validity>\d{7})[-\ ]?(?P<checksum>\d{1})$")
@@ -13,7 +13,7 @@ class DEZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(DEZipCodeField, self).__init__(r'^\d{5}$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a zip code in the format XXXXX.'),
+            error_message=ugettext(u'Enter a zip code in the format XXXXX.'),
             *args, **kwargs)
 
 class DEStateSelect(Select):
@@ -57,7 +57,7 @@ class DEIdentityCardNumberField(Field):
 
     def clean(self, value):
         super(DEIdentityCardNumberField, self).clean(value)
-        error_msg = gettext(u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.')
+        error_msg = ugettext(u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.')
         if value in EMPTY_VALUES:
             return u''
         match = re.match(id_re, value)

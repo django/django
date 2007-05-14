@@ -12,7 +12,7 @@ __all__ = (
 from util import flatatt
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, smart_unicode
 from itertools import chain
 
@@ -177,7 +177,7 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', gettext('Unknown')), (u'2', gettext('Yes')), (u'3', gettext('No')))
+        choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):

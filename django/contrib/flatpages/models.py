@@ -1,7 +1,7 @@
 from django.core import validators
 from django.db import models
 from django.contrib.sites.models import Site
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 class FlatPage(models.Model):
     url = models.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL], db_index=True,

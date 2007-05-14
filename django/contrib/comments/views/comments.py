@@ -11,7 +11,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
-from django.utils.translation import ngettext
+from django.utils.translation import ungettext, ugettext as _
 import base64, datetime
 
 COMMENTS_PER_PAGE = 20
@@ -108,7 +108,7 @@ class PublicCommentManipulator(AuthenticationForm):
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
         if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
-            message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
+            message = ungettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s', settings.COMMENTS_FIRST_FEW) % \
                 {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)

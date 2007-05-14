@@ -1,5 +1,4 @@
-from django.utils.translation import ngettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ungettext, ugettext_lazy as _
 from django import template
 import re
 
@@ -44,13 +43,13 @@ def intword(value):
         return value
     if value < 1000000000:
         new_value = value / 1000000.0
-        return ngettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
+        return ungettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
     if value < 1000000000000:
         new_value = value / 1000000000.0
-        return ngettext('%(value).1f billion', '%(value).1f billion', new_value) % {'value': new_value}
+        return ungettext('%(value).1f billion', '%(value).1f billion', new_value) % {'value': new_value}
     if value < 1000000000000000:
         new_value = value / 1000000000000.0
-        return ngettext('%(value).1f trillion', '%(value).1f trillion', new_value) % {'value': new_value}
+        return ungettext('%(value).1f trillion', '%(value).1f trillion', new_value) % {'value': new_value}
     return value
 register.filter(intword)
 

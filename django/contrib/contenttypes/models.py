@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 CONTENT_TYPE_CACHE = {}
 class ContentTypeManager(models.Manager):
@@ -19,7 +19,7 @@ class ContentTypeManager(models.Manager):
                 model=key[1], defaults={'name': str(opts.verbose_name)})
             CONTENT_TYPE_CACHE[key] = ct
         return ct
-        
+
     def clear_cache(self):
         """
         Clear out the content-type cache. This needs to happen during database

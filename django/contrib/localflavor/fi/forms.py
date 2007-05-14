@@ -5,13 +5,13 @@ FI-specific Form helpers
 import re
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 
 class FIZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(FIZipCodeField, self).__init__(r'^\d{5}$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a zip code in the format XXXXX.'),
+            error_message=ugettext(u'Enter a zip code in the format XXXXX.'),
             *args, **kwargs)
 
 class FIMunicipalitySelect(Select):
@@ -37,9 +37,9 @@ class FISocialSecurityNumber(Field):
             (?P<serial>(\d{3}))
             (?P<checksum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
         if not result:
-            raise ValidationError(gettext(u'Enter a valid Finnish social security number.'))
+            raise ValidationError(ugettext(u'Enter a valid Finnish social security number.'))
         gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
             return u'%s' % value.upper()
-        raise ValidationError(gettext(u'Enter a valid Finnish social security number.'))
+        raise ValidationError(ugettext(u'Enter a valid Finnish social security number.'))
