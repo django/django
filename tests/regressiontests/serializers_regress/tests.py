@@ -159,6 +159,7 @@ The end."""),
 
     (data_obj, 300, Anchor, "Anchor 1"),
     (data_obj, 301, Anchor, "Anchor 2"),
+    (data_obj, 302, UniqueAnchor, "UAnchor 1"),
 
     (fk_obj, 400, FKData, 300), # Post reference
     (fk_obj, 401, FKData, 500), # Pre reference
@@ -184,14 +185,13 @@ The end."""),
     (m2m_obj, 445, M2MSelfData, []),
     (m2m_obj, 446, M2MSelfData, []),
 
-    (data_obj, 450, UniqueAnchor, "UAnchor 1"),
-    (fk_obj, 451, FKDataToField, "UAnchor 1"),
-    (fk_obj, 452, FKDataToField, "UAnchor 2"),
-    (fk_obj, 453, FKDataToField, None),
-    (data_obj, 454, UniqueAnchor, "UAnchor 2"),
+    (fk_obj, 450, FKDataToField, "UAnchor 1"),
+    (fk_obj, 451, FKDataToField, "UAnchor 2"),
+    (fk_obj, 452, FKDataToField, None),
     
     (data_obj, 500, Anchor, "Anchor 3"),
     (data_obj, 501, Anchor, "Anchor 4"),
+    (data_obj, 502, UniqueAnchor, "UAnchor 2"),
 
     (pk_obj, 601, BooleanPKData, True),
     (pk_obj, 602, BooleanPKData, False),

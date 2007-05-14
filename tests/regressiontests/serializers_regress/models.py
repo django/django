@@ -100,6 +100,12 @@ class Anchor(models.Model):
     something for other models to point at"""
     
     data = models.CharField(maxlength=30)
+
+class UniqueAnchor(models.Model):
+    """This is a model that can be used as 
+    something for other models to point at"""
+
+    data = models.CharField(unique=True, maxlength=30)
     
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
@@ -116,12 +122,6 @@ class FKSelfData(models.Model):
 class M2MSelfData(models.Model):
     data = models.ManyToManyField('self', null=True, symmetrical=False)
 
-
-class UniqueAnchor(models.Model):
-    """This is a model that can be used as 
-    something for other models to point at"""
-
-    data = models.CharField(unique=True, maxlength=30)
 
 class FKDataToField(models.Model):
     data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
