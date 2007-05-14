@@ -154,8 +154,13 @@ False
 >>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
 [<Article: John's second story>, <Article: This is a test>]
 
+# And should work fine with the unicode that comes out of
+# newforms.Form.cleaned_data
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='%s'" % u'Smith'])
+[<Article: John's second story>, <Article: This is a test>]
+
 # Find all Articles for the Reporter whose ID is 1.
-# Use direct ID check, pk check, and object comparison 
+# Use direct ID check, pk check, and object comparison
 >>> Article.objects.filter(reporter__id__exact=1)
 [<Article: John's second story>, <Article: This is a test>]
 >>> Article.objects.filter(reporter__pk=1)
