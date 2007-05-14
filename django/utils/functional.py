@@ -32,6 +32,8 @@ def lazy(func, *resultclasses):
                 self.__dispatch[resultclass] = {}
                 for (k, v) in resultclass.__dict__.items():
                     setattr(self, k, self.__promise__(resultclass, k, v))
+            if unicode in resultclasses:
+                setattr(self, '__unicode__', self.__unicode_cast)
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
@@ -46,6 +48,9 @@ def lazy(func, *resultclasses):
                 self.__dispatch[klass] = {}
             self.__dispatch[klass][funcname] = func
             return __wrapper__
+
+        def __unicode_cast(self):
+            return self.__func(*self.__args, **self.__kw)
 
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
