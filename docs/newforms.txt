@@ -10,9 +10,9 @@ Migration plan
 ==============
 
 ``django.newforms`` is new in Django's 0.96 release, but, as it won't be new
-forever, we plan to rename the ``django.newforms`` package to ``django.forms``
-in the future. The current ``django.forms`` package will be available as
-``django.oldforms``.
+forever, we plan to rename it to ``django.forms`` in the future. The current
+``django.forms`` package will be available as ``django.oldforms`` until Django
+1.0, when we plan to remove it for good.
 
 That has direct repercussions on the forward compatibility of your code. Please
 read the following migration plan and code accordingly:
