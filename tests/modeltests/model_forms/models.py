@@ -179,6 +179,18 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <option value="3">Third test</option>
 </select><br /> Hold down "Control", or "Command" on a Mac, to select more than one.</td></tr>
 
+You can restrict a form to a subset of the complete list of fields
+by providing a 'fields' argument. If you try to save a
+model created with such a form, you need to ensure that the fields
+that are _not_ on the form have default values, or are allowed to have
+a value of None. If a field isn't specified on a form, the object created
+from the form can't provide a value for that field!
+>>> PartialArticleForm = form_for_model(Article, fields=('headline','pub_date'))
+>>> f = PartialArticleForm(auto_id=False)
+>>> print f
+<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
+
 You can pass a custom Form class to form_for_model. Make sure it's a
 subclass of BaseForm, not Form.
 >>> class CustomForm(BaseForm):
@@ -224,7 +236,23 @@ current values are inserted as 'initial' data in each Field.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
->>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1', 'article': 'Hello.'})
+>>> f = TestArticleForm({'headline': u'Test headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
+>>> f.is_valid()
+True
+>>> test_art = f.save()
+>>> test_art.id
+1
+>>> test_art = Article.objects.get(id=1)
+>>> test_art.headline
+'Test headline'
+
+You can create a form over a subset of the available fields 
+by specifying a 'fields' argument to form_for_instance. 
+>>> PartialArticleForm = form_for_instance(art, fields=('headline','pub_date'))
+>>> f = PartialArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04'}, auto_id=False)
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 >>> f.is_valid()
 True
 >>> new_art = f.save()

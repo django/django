@@ -1916,6 +1916,34 @@ True
 >>> p.clean_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
+clean_data will include a key and value for *all* fields defined in the Form,
+even if the Form's data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+"nick_name" field, but clean_data includes it. For CharFields, it's set to the
+empty string.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     nick_name = CharField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+For DateFields, it's set to None.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birth_date = DateField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.clean_data
+{'birth_date': None, 'first_name': u'John', 'last_name': u'Lennon'}
+
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
 into which the field's name will be inserted. It will also put a <label> around
@@ -2275,7 +2303,7 @@ returns a list of input.
 Validation errors are HTML-escaped when output as HTML.
 >>> class EscapingForm(Form):
 ...     special_name = CharField()
-...     def clean_special_name(self):
+...     def do_clean_special_name(self):
 ...         raise ValidationError("Something's wrong with '%s'" % self.clean_data['special_name'])
 
 >>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
@@ -2298,7 +2326,7 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 ...    username = CharField(max_length=10)
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
-...    def clean_password2(self):
+...    def do_clean_password2(self):
 ...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
 ...        return self.clean_data['password2']
@@ -2750,6 +2778,64 @@ then the latter will get precedence.
 >>> p = UserRegistration(initial={'username': 'babik'}, auto_id=False)
 >>> print p.as_ul()
 <li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+# Callable initial data ########################################################
+
+The previous technique dealt with raw values as initial data, but it's also
+possible to specify callable data.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+We need to define functions that get called later.
+>>> def initial_django():
+...     return 'django'
+>>> def initial_stephane():
+...     return 'stephane'
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A callable 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': initial_django})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial=initial_django)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': initial_stephane}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 
 # Help text ###################################################################
@@ -3320,7 +3406,7 @@ True
 </select>
 
 # MultiWidget and MultiValueField #############################################
-# MultiWidgets are widgets composed of other widgets. They are usually 
+# MultiWidgets are widgets composed of other widgets. They are usually
 # combined with MultiValueFields - a field that is composed of other fields.
 # MulitWidgets can themselved be composed of other MultiWidgets.
 # SplitDateTimeWidget is one example of a MultiWidget.
@@ -3328,7 +3414,7 @@ True
 >>> class ComplexMultiWidget(MultiWidget):
 ...     def __init__(self, attrs=None):
 ...         widgets = (
-...             TextInput(), 
+...             TextInput(),
 ...             SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeWidget(),
 ...         )
@@ -3353,13 +3439,13 @@ True
 <input type="text" name="name_2_0" value="2007-04-25" /><input type="text" name="name_2_1" value="06:24:00" />
 
 >>> class ComplexField(MultiValueField):
-...     def __init__(self, required=True, widget=None, label=None, initial=None): 
+...     def __init__(self, required=True, widget=None, label=None, initial=None):
 ...         fields = (
-...             CharField(), 
+...             CharField(),
 ...             MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeField()
 ...         )
-...         super(ComplexField, self).__init__(fields, required, widget, label, initial) 
+...         super(ComplexField, self).__init__(fields, required, widget, label, initial)
 ...
 ...     def compress(self, data_list):
 ...         if data_list:

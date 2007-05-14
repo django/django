@@ -60,7 +60,35 @@ class AssertTemplateUsedTests(TestCase):
             self.assertTemplateUsed(response, "Valid POST Template")        
         except AssertionError, e:
             self.assertEquals(str(e), "Template 'Valid POST Template' was not one of the templates used to render the response. Templates used: ['form_view.html', 'base.html']")
+
+class AssertRedirectsTests(TestCase):
+    def test_redirect_page(self):
+        "An assertion is raised if the original page couldn't be retrieved as expected"        
+        # This page will redirect with code 301, not 302
+        response = self.client.get('/test_client/permanent_redirect_view/')        
+        try:
+            self.assertRedirects(response, '/test_client/get_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
+
+    def test_incorrect_target(self):
+        "An assertion is raised if the response redirects to another target"
+        response = self.client.get('/test_client/permanent_redirect_view/')        
+        try:
+            # Should redirect to get_view
+            self.assertRedirects(response, '/test_client/some_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
         
+    def test_target_page(self):
+        "An assertion is raised if the reponse redirect target cannot be retrieved as expected"
+        response = self.client.get('/test_client/double_redirect_view/')
+        try:
+            # The redirect target responds with a 301 code, not 200
+            self.assertRedirects(response, '/test_client/permanent_redirect_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Couldn't retrieve redirection page '/test_client/permanent_redirect_view/': response code was 301 (expected 200)")
+            
 class AssertFormErrorTests(TestCase):
     def test_unknown_form(self):
         "An assertion is raised if the form name is unknown"

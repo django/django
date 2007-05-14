@@ -184,8 +184,8 @@ class BaseForm(StrAndUnicode):
             try:
                 value = field.clean(value)
                 self.clean_data[name] = value
-                if hasattr(self, 'clean_%s' % name):
-                    value = getattr(self, 'clean_%s' % name)()
+                if hasattr(self, 'do_clean_%s' % name):
+                    value = getattr(self, 'do_clean_%s' % name)()
                 self.clean_data[name] = value
             except ValidationError, e:
                 errors[name] = e.messages
@@ -255,6 +255,8 @@ class BoundField(StrAndUnicode):
             attrs['id'] = auto_id
         if not self.form.is_bound:
             data = self.form.initial.get(self.name, self.field.initial)
+            if callable(data):
+                data = data()
         else:
             data = self.data
         return widget.render(self.html_name, data, attrs=attrs)
