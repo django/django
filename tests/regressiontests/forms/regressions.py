@@ -52,4 +52,18 @@ Russian abbreviations "мес." and "шт.".
 u'\u0448\u0442.'
 >>> f.clean('\xd1\x88\xd1\x82.')
 u'\u0448\u0442.'
+
+#######################
+# Miscellaneous Tests #
+#######################
+
+There once was a problem with Form fields called "data". Let's make sure that
+doesn't come back.
+>>> class DataForm(Form):
+...     data = CharField(max_length=10)
+>>> f = DataForm({'data': 'xyzzy'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'data': u'xyzzy'}
 """

@@ -24,7 +24,7 @@ Usage
 
 Subclass FormPreview and define a done() method:
 
-    def done(self, request, clean_data):
+    def done(self, request, cleaned_data):
         # ...
 
 This method takes an HttpRequest object and a dictionary of the form data after
@@ -113,7 +113,7 @@ class FormPreview(object):
         if f.is_valid():
             if self.security_hash(request, f) != request.POST.get(self.unused_name('hash')):
                 return self.failed_hash(request) # Security hash failed.
-            return self.done(request, f.clean_data)
+            return self.done(request, f.cleaned_data)
         else:
             return render_to_response(self.form_template,
                 {'form': f, 'stage_field': self.unused_name('stage'), 'state': self.state},
@@ -160,6 +160,9 @@ class FormPreview(object):
 
     # METHODS SUBCLASSES MUST OVERRIDE ########################################
 
-    def done(self, request, clean_data):
-        "Does something with the clean_data and returns an HttpResponseRedirect."
+    def done(self, request, cleaned_data):
+        """
+        Does something with the cleaned_data and returns an
+        HttpResponseRedirect.
+        """
         raise NotImplementedError('You must define a done() method on your %s subclass.' % self.__class__.__name__)

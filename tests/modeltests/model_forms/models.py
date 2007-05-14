@@ -18,7 +18,7 @@ other Form, with one additional method: save(). The save()
 method updates the model instance. It also takes a commit=True parameter.
 
 The function django.newforms.save_instance() takes a bound form instance and a
-model instance and saves the form's clean_data into the instance. It also takes
+model instance and saves the form's cleaned_data into the instance. It also takes
 a commit=True parameter.
 """
 
@@ -94,7 +94,7 @@ __test__ = {'API_TESTS': """
 >>> f = CategoryForm({'name': 'Entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'entertainment', 'name': u'Entertainment'}
 >>> obj = f.save()
 >>> obj
@@ -105,7 +105,7 @@ True
 >>> f = CategoryForm({'name': "It's a test", 'url': 'test'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'test', 'name': u"It's a test"}
 >>> obj = f.save()
 >>> obj
@@ -119,7 +119,7 @@ save() on the resulting model instance.
 >>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'third', 'name': u'Third test'}
 >>> obj = f.save(commit=False)
 >>> obj
@@ -134,10 +134,10 @@ If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
 >>> f.errors
 {'name': [u'This field is required.']}
->>> f.clean_data
+>>> f.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'CategoryForm' object has no attribute 'clean_data'
+AttributeError: 'CategoryForm' object has no attribute 'cleaned_data'
 >>> f.save()
 Traceback (most recent call last):
 ...
@@ -524,6 +524,6 @@ ValidationError: [u'Select a valid choice. 10 is not one of the available choice
 >>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'phone': u'312-555-1212', 'description': u'Assistance'}
 """}
