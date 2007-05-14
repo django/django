@@ -8,7 +8,7 @@ if __name__ == '__main__':
 
 from django import template
 from django.template import loader
-from django.utils.translation import activate, deactivate, install
+from django.utils.translation import activate, deactivate, install, ugettext as _
 from django.utils.tzinfo import LocalTimezone
 from datetime import datetime, timedelta
 from unicode import unicode_tests

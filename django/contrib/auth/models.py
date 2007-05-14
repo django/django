@@ -2,7 +2,7 @@ from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
 import datetime
 
 def check_password(raw_password, enc_password):

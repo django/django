@@ -8,6 +8,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 
 from django.db import models
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext as _
 import datetime
 
 class FilterSpec(object):

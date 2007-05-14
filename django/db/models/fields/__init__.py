@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode
 import datetime, os, time
 
@@ -40,7 +40,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
-    raise validators.ValidationError, ugettext("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
+    raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
 # A guide to Field parameters:
 #
@@ -367,7 +367,7 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            raise validators.ValidationError, ugettext("This value must be an integer.")
+            raise validators.ValidationError, _("This value must be an integer.")
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
@@ -402,7 +402,7 @@ class BooleanField(Field):
         if value in (True, False): return value
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, ugettext("This value must be either True or False.")
+        raise validators.ValidationError, _("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
@@ -457,7 +457,7 @@ class DateField(Field):
         try:
             return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
         except ValueError:
-            raise validators.ValidationError, ugettext('Enter a valid date in YYYY-MM-DD format.')
+            raise validators.ValidationError, _('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
@@ -526,7 +526,7 @@ class DateTimeField(DateField):
                 try:
                     return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3])
                 except ValueError:
-                    raise validators.ValidationError, ugettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
@@ -751,7 +751,7 @@ class NullBooleanField(Field):
         if value in ('None'): return None
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, ugettext("This value must be either None, True or False.")
+        raise validators.ValidationError, _("This value must be either None, True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]

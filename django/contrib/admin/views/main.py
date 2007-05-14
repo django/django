@@ -13,6 +13,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext as _
 import operator
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION

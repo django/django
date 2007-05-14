@@ -61,6 +61,7 @@ from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry
 from django.utils.text import smart_split
 from django.utils.encoding import smart_unicode, smart_str
+from django.utils.translation import ugettext as _
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 

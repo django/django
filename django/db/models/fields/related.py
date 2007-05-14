@@ -3,7 +3,7 @@ from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.text import capfirst
-from django.utils.translation import ugettext_lazy, string_concat, ungettext
+from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
 from django.utils.encoding import smart_unicode
 from django.core import validators

@@ -8,6 +8,7 @@ from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 import types
 
 def add_manipulators(sender):
