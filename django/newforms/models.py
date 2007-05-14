@@ -4,6 +4,7 @@ and database field objects.
 """
 
 from django.utils.translation import ugettext
+from django.utils.encoding import smart_unicode
 from util import ValidationError
 from forms import BaseForm, DeclarativeFieldsMetaclass, SortedDictFromList
 from fields import Field, ChoiceField
@@ -120,7 +121,7 @@ class QuerySetIterator(object):
         if self.empty_label is not None:
             yield (u"", self.empty_label)
         for obj in self.queryset:
-            yield (obj._get_pk_val(), str(obj))
+            yield (obj._get_pk_val(), smart_unicode(obj))
         # Clear the QuerySet cache if required.
         if not self.cache_choices:
             self.queryset._result_cache = None

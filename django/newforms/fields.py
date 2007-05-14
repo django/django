@@ -359,7 +359,7 @@ class ChoiceField(Field):
         value = smart_unicode(value)
         if value == u'':
             return value
-        valid_values = set([str(k) for k, v in self.choices])
+        valid_values = set([smart_unicode(k) for k, v in self.choices])
         if value not in valid_values:
             raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value

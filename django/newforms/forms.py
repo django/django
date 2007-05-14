@@ -4,7 +4,7 @@ Form classes
 
 from django.utils.datastructures import SortedDict, MultiValueDict
 from django.utils.html import escape
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import StrAndUnicode, smart_unicode
 from fields import Field
 from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
 from util import flatatt, ErrorDict, ErrorList, ValidationError
@@ -311,8 +311,8 @@ class BoundField(StrAndUnicode):
         associated Form has specified auto_id. Returns an empty string otherwise.
         """
         auto_id = self.form.auto_id
-        if auto_id and '%s' in str(auto_id):
-            return str(auto_id) % self.html_name
+        if auto_id and '%s' in smart_unicode(auto_id):
+            return smart_unicode(auto_id) % self.html_name
         elif auto_id:
             return self.html_name
         return ''

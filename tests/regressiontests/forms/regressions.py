@@ -36,4 +36,14 @@ Unicode decoding problems...
 >>> f = SomeForm()
 >>> f.as_p()
 u'<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>'
+
+Testing choice validation with UTF-8 bytestrings as input (these are the
+Russian abbreviations "мес." and "шт.".
+
+>>> UNITS = (('\xd0\xbc\xd0\xb5\xd1\x81.', '\xd0\xbc\xd0\xb5\xd1\x81.'), ('\xd1\x88\xd1\x82.', '\xd1\x88\xd1\x82.'))
+>>> f = ChoiceField(choices=UNITS)
+>>> f.clean(u'\u0448\u0442.')
+u'\u0448\u0442.'
+>>> f.clean('\xd1\x88\xd1\x82.')
+u'\u0448\u0442.'
 """
