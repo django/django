@@ -503,7 +503,7 @@ that can be useful in testing the behavior of web sites.
     response.
 
 E-mail services
---------------
+---------------
 
 **New in Django development version**
 
