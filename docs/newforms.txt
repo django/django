@@ -186,7 +186,7 @@ e-mail address::
     >>> f.is_valid()
     False
 
-Access the ``Form`` attribute ``errors`` to get a dictionary of error messages::
+Access the ``errors`` attribute to get a dictionary of error messages::
 
     >>> f.errors
     {'sender': [u'Enter a valid e-mail address.'], 'subject': [u'This field is required.']}
@@ -198,6 +198,10 @@ in lists because a field can have multiple error messages.
 You can access ``errors`` without having to call ``is_valid()`` first. The
 form's data will be validated the first time either you call ``is_valid()`` or
 access ``errors``.
+
+The validation routines will only get called once, regardless of how many times
+you access ``errors`` or call ``is_valid()``. This means that if validation has
+side effects, those side effects will only be triggered once.
 
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -275,6 +279,27 @@ but ``clean_data`` contains only the form's fields::
     True
     >>> f.clean_data # Doesn't contain extra_field_1, etc.
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
+
+``clean_data`` will include a key and value for *all* fields defined in the
+``Form``, even if the data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+``nick_name`` field, but ``clean_data`` includes it, with an empty value::
+
+    >>> class OptionalPersonForm(Form):
+    ...     first_name = CharField()
+    ...     last_name = CharField()
+    ...     nick_name = CharField(required=False)
+    >>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+    >>> f = OptionalPersonForm(data)
+    >>> f.is_valid()
+    True
+    >>> f.clean_data
+    {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+In this above example, the ``clean_data`` value for ``nick_name`` is set to an
+empty string, because ``nick_name`` is ``CharField``, and ``CharField``s treat
+empty values as an empty string. Each field type knows what its "blank" value
+is -- e.g., for ``DateField``, it's ``None`` instead of the empty string.
 
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
