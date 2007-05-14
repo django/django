@@ -14,7 +14,7 @@ __all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fie
 
 def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
     """
-    Saves bound Form ``form``'s clean_data into model instance ``instance``.
+    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
 
     Assumes ``form`` has a field for every non-AutoField database field in
     ``instance``. If commit=True, then the changes to ``instance`` will be
@@ -24,20 +24,20 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
     opts = instance.__class__._meta
     if form.errors:
         raise ValueError("The %s could not be %s because the data didn't validate." % (opts.object_name, fail_message))
-    clean_data = form.clean_data
+    cleaned_data = form.cleaned_data
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) or not f.name in clean_data:
+        if not f.editable or isinstance(f, models.AutoField) or not f.name in cleaned_data:
             continue
         if fields and f.name not in fields:
             continue
-        setattr(instance, f.name, clean_data[f.name])
+        setattr(instance, f.name, cleaned_data[f.name])
     if commit:
         instance.save()
         for f in opts.many_to_many:
             if fields and f.name not in fields:
                 continue
-            if f.name in clean_data:
-                setattr(instance, f.attname, clean_data[f.name])
+            if f.name in cleaned_data:
+                setattr(instance, f.attname, cleaned_data[f.name])
     # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
     # data will be lost. This happens because a many-to-many options cannot be
     # set on an object until after it's saved. Maybe we should raise an

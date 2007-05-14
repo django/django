@@ -230,7 +230,7 @@ object. Regardless of whether you pass it a string in the format
 it's valid.
 
 Once you've created a ``Form`` instance with a set of data and validated it,
-you can access the clean data via the ``clean_data`` attribute of the ``Form``
+you can access the clean data via the ``cleaned_data`` attribute of the ``Form``
 object::
 
     >>> data = {'subject': 'hello',
@@ -240,7 +240,7 @@ object::
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
-    >>> f.clean_data
+    >>> f.cleaned_data
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
@@ -248,7 +248,7 @@ always cleans the input into a Unicode string. We'll cover the encoding
 implications later in this document.
 
 If your data does *not* validate, your ``Form`` instance will not have a
-``clean_data`` attribute::
+``cleaned_data`` attribute::
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -257,15 +257,15 @@ If your data does *not* validate, your ``Form`` instance will not have a
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
-    >>> f.clean_data
+    >>> f.cleaned_data
     Traceback (most recent call last):
     ...
-    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+    AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
-``clean_data`` will always *only* contain a key for fields defined in the
+``cleaned_data`` will always *only* contain a key for fields defined in the
 ``Form``, even if you pass extra data when you define the ``Form``. In this
 example, we pass a bunch of extra fields to the ``ContactForm`` constructor,
-but ``clean_data`` contains only the form's fields::
+but ``cleaned_data`` contains only the form's fields::
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -277,13 +277,13 @@ but ``clean_data`` contains only the form's fields::
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
-    >>> f.clean_data # Doesn't contain extra_field_1, etc.
+    >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
-``clean_data`` will include a key and value for *all* fields defined in the
+``cleaned_data`` will include a key and value for *all* fields defined in the
 ``Form``, even if the data didn't include a value for fields that are not
 required. In this example, the data dictionary doesn't include a value for the
-``nick_name`` field, but ``clean_data`` includes it, with an empty value::
+``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
 
     >>> class OptionalPersonForm(Form):
     ...     first_name = CharField()
@@ -293,10 +293,10 @@ required. In this example, the data dictionary doesn't include a value for the
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
     True
-    >>> f.clean_data
+    >>> f.cleaned_data
     {'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
 
-In this above example, the ``clean_data`` value for ``nick_name`` is set to an
+In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
 empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
 empty values as an empty string. Each field type knows what its "blank" value
 is -- e.g., for ``DateField``, it's ``None`` instead of the empty string.
@@ -308,10 +308,10 @@ It's meaningless to request "clean" data in a form with no data, but, for the
 record, here's what happens with unbound forms::
 
     >>> f = ContactForm()
-    >>> f.clean_data
+    >>> f.cleaned_data
     Traceback (most recent call last):
     ...
-    AttributeError: 'ContactForm' object has no attribute 'clean_data'
+    AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
 Outputting forms as HTML
 ------------------------
