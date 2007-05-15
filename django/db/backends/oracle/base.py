@@ -466,10 +466,11 @@ def get_query_set_class(DefaultQuerySet):
             for value, field in map(None, row, fields):
                 if isinstance(value, Database.LOB):
                     value = value.read()
-                # Since Oracle won't distinguish between NULL and an empty
-                # string (''), we store empty strings as a space.  Here is
-                # where we undo that treachery.
-                if value == ' ':
+                # Oracle stores empty strings as null. We need to undo this in
+                # order to adhere to the Django convention of using the empty
+                # string instead of null, but only if the field accepts the
+                # empty string.
+                if value is None and field.empty_strings_allowed:
                     value = ''
                 # Convert 1 or 0 to True or False
                 elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):

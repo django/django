@@ -76,6 +76,10 @@ class Field(object):
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
+        # Oracle treats the empty string ('') as null, so coerce the null
+        # option whenever '' is a possible value.
+        if self.empty_strings_allowed and settings.DATABASE_ENGINE == 'oracle':
+            self.null = True
         self.core, self.rel, self.default = core, rel, default
         self.editable = editable
         self.serialize = serialize
@@ -162,10 +166,6 @@ class Field(object):
 
     def get_db_prep_save(self, value):
         "Returns field's value prepared for saving into a database."
-        # Oracle treats empty strings ('') the same as NULLs.
-        # To get around this wart, we need to change it to something else...
-        if settings.DATABASE_ENGINE == 'oracle' and value == '':
-            value = ' '
         return value
 
     def get_db_prep_lookup(self, lookup_type, value):
