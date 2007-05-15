@@ -34,7 +34,7 @@ def get_tag_uri(url, date):
     if date is not None:
         tag = re.sub('/', ',%s:/' % date.strftime('%Y-%m-%d'), tag, 1)
     tag = re.sub('#', '/', tag)
-    return 'tag:' + tag
+    return u'tag:' + tag
 
 class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
