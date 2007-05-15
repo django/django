@@ -33,7 +33,7 @@ class BaseFormSet(object):
         if data:
             self.management_form = ManagementForm(data, auto_id=self.auto_id, prefix=self.prefix)
             if self.management_form.is_valid():
-                self.total_forms = self.management_form.clean_data[FORM_COUNT_FIELD_NAME]
+                self.total_forms = self.management_form.cleaned_data[FORM_COUNT_FIELD_NAME]
                 self.required_forms = self.total_forms - self.num_extra
             else:
                 # not sure that ValidationError is the best thing to raise here
@@ -67,7 +67,7 @@ class BaseFormSet(object):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self.__errors and self.clean_data.
+        Cleans all of self.data and populates self.__errors and self.cleaned_data.
         """
         is_valid = True
         
@@ -75,7 +75,7 @@ class BaseFormSet(object):
         if not self.is_bound: # Stop further processing.
             self.__errors = errors
             return
-        clean_data = []
+        cleaned_data = []
         deleted_data = []
         
         self._form_list = []
@@ -103,12 +103,12 @@ class BaseFormSet(object):
                 self.add_fields(form, i)
             else:
                 # if the formset is still vaild overall and this form instance
-                # is valid, keep appending to clean_data
+                # is valid, keep appending to cleaned_data
                 if is_valid and form.is_valid():
-                    if self.deletable and form.clean_data[DELETION_FIELD_NAME]:
-                        deleted_data.append(form.clean_data)
+                    if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
+                        deleted_data.append(form.cleaned_data)
                     else:
-                        clean_data.append(form.clean_data)
+                        cleaned_data.append(form.cleaned_data)
                 else:
                     is_valid = False
                 # append to errors regardless
@@ -117,14 +117,14 @@ class BaseFormSet(object):
 
         deleted_data.reverse()
         if self.orderable:
-            clean_data.sort(lambda x,y: x[ORDERING_FIELD_NAME] - y[ORDERING_FIELD_NAME])
+            cleaned_data.sort(lambda x,y: x[ORDERING_FIELD_NAME] - y[ORDERING_FIELD_NAME])
         else:
-            clean_data.reverse()
+            cleaned_data.reverse()
         errors.reverse()
         self._form_list.reverse()
         
         if is_valid:
-            self.clean_data = clean_data
+            self.cleaned_data = cleaned_data
             self.deleted_data = deleted_data
         self.errors = errors
         self._is_valid = is_valid

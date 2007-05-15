@@ -38,14 +38,14 @@ the COUNT field appropriately.
 ... }
 
 We treat FormSet pretty much like we would treat a normal Form. FormSet has an
-is_valid method, and a clean_data or errors attribute depending on whether all
-the forms passed validation. However, unlike a Form instance, clean_data and
+is_valid method, and a cleaned_data or errors attribute depending on whether all
+the forms passed validation. However, unlike a Form instance, cleaned_data and
 errors will be a list of dicts rather than just a single dict.
 
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.clean_data
+>>> formset.cleaned_data
 [{'votes': 100, 'choice': u'Calexico'}]
 
 
@@ -64,12 +64,12 @@ False
 >>> formset.errors
 [{'votes': [u'This field is required.']}]
 
-Like a Form instance, clean_data won't exist if the formset wasn't validated.
+Like a Form instance, cleaned_data won't exist if the formset wasn't validated.
 
->>> formset.clean_data
+>>> formset.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'ChoiceFormSet' object has no attribute 'clean_data'
+AttributeError: 'ChoiceFormSet' object has no attribute 'cleaned_data'
 
 
 We can also prefill a FormSet with existing data by providing an ``initial``
@@ -99,7 +99,7 @@ Let's simulate what would happen if we submitted this form.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.clean_data
+>>> formset.cleaned_data
 [{'votes': 100, 'choice': u'Calexico'}]
 
 But the second form was blank! Shouldn't we get some errors? No. If we display
@@ -176,7 +176,7 @@ number of forms to be completed.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.clean_data
+>>> formset.cleaned_data
 []
 
 
@@ -195,7 +195,7 @@ We can just fill out one of the forms.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.clean_data
+>>> formset.cleaned_data
 [{'votes': 100, 'choice': u'Calexico'}]
 
 
@@ -262,7 +262,7 @@ False
 We can easily add deletion ability to a FormSet with an agrument to
 formset_for_form. This will add a boolean field to each form instance. When
 that boolean field is True, the cleaned data will be in formset.deleted_data
-rather than formset.clean_data
+rather than formset.cleaned_data
 
 >>> ChoiceFormSet = formset_for_form(Choice, deletable=True)
 
@@ -299,7 +299,7 @@ To delete something, we just need to set that form's special delete field to
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> formset.clean_data
+>>> formset.cleaned_data
 [{'votes': 100, 'DELETE': False, 'choice': u'Calexico'}]
 >>> formset.deleted_data
 [{'votes': 900, 'DELETE': True, 'choice': u'Fergie'}]
@@ -308,7 +308,7 @@ True
 
 We can also add ordering ability to a FormSet with an agrument to
 formset_for_form. This will add a integer field to each form instance. When
-form validation succeeds, formset.clean_data will have the data in the correct
+form validation succeeds, formset.cleaned_data will have the data in the correct
 order specified by the ordering fields. If a number is duplicated in the set
 of ordering fields, for instance form 0 and form 3 are both marked as 1, then
 the form index used as a secondary ordering criteria. In order to put
@@ -346,8 +346,8 @@ something at the front of the list, you'd need to set it's order to 0.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> for clean_data in formset.clean_data:
-...    print clean_data
+>>> for cleaned_data in formset.cleaned_data:
+...    print cleaned_data
 {'votes': 500, 'ORDER': 0, 'choice': u'The Decemberists'}
 {'votes': 100, 'ORDER': 1, 'choice': u'Calexico'}
 {'votes': 900, 'ORDER': 2, 'choice': u'Fergie'}
@@ -408,8 +408,8 @@ Let's delete Fergie, and put The Decemberists ahead of Calexico.
 >>> formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
 >>> formset.is_valid()
 True
->>> for clean_data in formset.clean_data:
-...    print clean_data
+>>> for cleaned_data in formset.cleaned_data:
+...    print cleaned_data
 {'votes': 500, 'DELETE': False, 'ORDER': 0, 'choice': u'The Decemberists'}
 {'votes': 100, 'DELETE': False, 'ORDER': 1, 'choice': u'Calexico'}
 >>> formset.deleted_data

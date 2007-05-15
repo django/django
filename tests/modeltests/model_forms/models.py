@@ -18,7 +18,7 @@ other Form, with one additional method: save(). The save()
 method updates the model instance. It also takes a commit=True parameter.
 
 The function django.newforms.save_instance() takes a bound form instance and a
-model instance and saves the form's clean_data into the instance. It also takes
+model instance and saves the form's cleaned_data into the instance. It also takes
 a commit=True parameter.
 """
 
@@ -94,7 +94,7 @@ __test__ = {'API_TESTS': """
 >>> f = CategoryForm({'name': 'Entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'entertainment', 'name': u'Entertainment'}
 >>> obj = f.save()
 >>> obj
@@ -105,7 +105,7 @@ True
 >>> f = CategoryForm({'name': "It's a test", 'url': 'test'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'test', 'name': u"It's a test"}
 >>> obj = f.save()
 >>> obj
@@ -119,7 +119,7 @@ save() on the resulting model instance.
 >>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'url': u'third', 'name': u'Third test'}
 >>> obj = f.save(commit=False)
 >>> obj
@@ -134,10 +134,10 @@ If you call save() with invalid data, you'll get a ValueError.
 >>> f = CategoryForm({'name': '', 'url': 'foo'})
 >>> f.errors
 {'name': [u'This field is required.']}
->>> f.clean_data
+>>> f.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'CategoryForm' object has no attribute 'clean_data'
+AttributeError: 'CategoryForm' object has no attribute 'cleaned_data'
 >>> f.save()
 Traceback (most recent call last):
 ...
@@ -178,6 +178,18 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select><br /> Hold down "Control", or "Command" on a Mac, to select more than one.</td></tr>
+
+You can restrict a form to a subset of the complete list of fields
+by providing a 'fields' argument. If you try to save a
+model created with such a form, you need to ensure that the fields
+that are _not_ on the form have default values, or are allowed to have
+a value of None. If a field isn't specified on a form, the object created
+from the form can't provide a value for that field!
+>>> PartialArticleForm = form_for_model(Article, fields=('headline','pub_date'))
+>>> f = PartialArticleForm(auto_id=False)
+>>> print f
+<tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+<tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 
 You can pass a custom Form class to form_for_model. Make sure it's a
 subclass of BaseForm, not Form.
@@ -224,7 +236,23 @@ current values are inserted as 'initial' data in each Field.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
->>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04', 'writer': u'1', 'article': 'Hello.'})
+>>> f = TestArticleForm({'headline': u'Test headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
+>>> f.is_valid()
+True
+>>> test_art = f.save()
+>>> test_art.id
+1
+>>> test_art = Article.objects.get(id=1)
+>>> test_art.headline
+'Test headline'
+
+You can create a form over a subset of the available fields 
+by specifying a 'fields' argument to form_for_instance. 
+>>> PartialArticleForm = form_for_instance(art, fields=('headline','pub_date'))
+>>> f = PartialArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04'}, auto_id=False)
+>>> print f.as_ul()
+<li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+<li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 >>> f.is_valid()
 True
 >>> new_art = f.save()
@@ -496,6 +524,6 @@ ValidationError: [u'Select a valid choice. 10 is not one of the available choice
 >>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'phone': u'312-555-1212', 'description': u'Assistance'}
 """}

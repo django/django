@@ -1775,7 +1775,7 @@ True
 u''
 >>> p.errors.as_text()
 u''
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> print p['first_name']
 <input type="text" name="first_name" value="John" id="id_first_name" />
@@ -1811,10 +1811,10 @@ True
 {'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
 >>> p.is_valid()
 False
->>> p.clean_data
+>>> p.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'Person' object has no attribute 'clean_data'
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1845,10 +1845,10 @@ False
 {}
 >>> p.is_valid()
 False
->>> p.clean_data
+>>> p.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'Person' object has no attribute 'clean_data'
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1887,10 +1887,10 @@ u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is re
   * This field is required.
 * birthday
   * This field is required.
->>> p.clean_data
+>>> p.cleaned_data
 Traceback (most recent call last):
 ...
-AttributeError: 'Person' object has no attribute 'clean_data'
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> p['first_name'].errors
 [u'This field is required.']
 >>> p['first_name'].errors.as_ul()
@@ -1906,16 +1906,44 @@ u'* This field is required.'
 >>> print p['birthday']
 <input type="text" name="birthday" id="id_birthday" />
 
-clean_data will always *only* contain a key for fields defined in the
+cleaned_data will always *only* contain a key for fields defined in the
 Form, even if you pass extra data when you define the Form. In this
 example, we pass a bunch of extra fields to the form constructor,
-but clean_data contains only the form's fields.
+but cleaned_data contains only the form's fields.
 >>> data = {'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9', 'extra1': 'hello', 'extra2': 'hello'}
 >>> p = Person(data)
 >>> p.is_valid()
 True
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
+cleaned_data will include a key and value for *all* fields defined in the Form,
+even if the Form's data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+"nick_name" field, but cleaned_data includes it. For CharFields, it's set to the
+empty string.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     nick_name = CharField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+For DateFields, it's set to None.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birth_date = DateField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'birth_date': None, 'first_name': u'John', 'last_name': u'Lennon'}
 
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
@@ -2265,19 +2293,19 @@ returns a list of input.
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J']}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'composers': [u'J'], 'name': u'Yesterday'}
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J', 'P']}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'composers': [u'J', u'P'], 'name': u'Yesterday'}
 
 Validation errors are HTML-escaped when output as HTML.
 >>> class EscapingForm(Form):
 ...     special_name = CharField()
 ...     def clean_special_name(self):
-...         raise ValidationError("Something's wrong with '%s'" % self.clean_data['special_name'])
+...         raise ValidationError("Something's wrong with '%s'" % self.cleaned_data['special_name'])
 
 >>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
 >>> print f
@@ -2292,7 +2320,7 @@ There are a couple of ways to do multiple-field validation. If you want the
 validation message to be associated with a particular field, implement the
 clean_XXX() method on the Form, where XXX is the field name. As in
 Field.clean(), the clean_XXX() method should return the cleaned value. In the
-clean_XXX() method, you have access to self.clean_data, which is a dictionary
+clean_XXX() method, you have access to self.cleaned_data, which is a dictionary
 of all the data that has been cleaned *so far*, in order by the fields,
 including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> class UserRegistration(Form):
@@ -2300,9 +2328,9 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean_password2(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data['password2']
+...        return self.cleaned_data['password2']
 >>> f = UserRegistration(auto_id=False)
 >>> f.errors
 {}
@@ -2315,14 +2343,14 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
 Another way of doing multiple-field validation is by implementing the
 Form's clean() method. If you do this, any ValidationError raised by that
 method will not be associated with a particular field; it will have a
 special-case association with the field named '__all__'.
-Note that in Form.clean(), you have access to self.clean_data, a dictionary of
+Note that in Form.clean(), you have access to self.cleaned_data, a dictionary of
 all the fields/values that have *not* raised a ValidationError. Also note
 Form.clean() is required to return a dictionary of all clean data.
 >>> class UserRegistration(Form):
@@ -2330,9 +2358,9 @@ Form.clean() is required to return a dictionary of all clean data.
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 >>> f = UserRegistration(auto_id=False)
 >>> f.errors
 {}
@@ -2359,7 +2387,7 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
 # Dynamic construction ########################################################
@@ -2753,6 +2781,64 @@ then the latter will get precedence.
 <li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" /></li>
 
+# Callable initial data ########################################################
+
+The previous technique dealt with raw values as initial data, but it's also
+possible to specify callable data.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+We need to define functions that get called later.
+>>> def initial_django():
+...     return 'django'
+>>> def initial_stephane():
+...     return 'stephane'
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A callable 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': initial_django})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial=initial_django)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': initial_stephane}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
 # Help text ###################################################################
 
 You can specify descriptive text for a field by using the 'help_text' argument
@@ -2869,7 +2955,7 @@ actual field name.
 {}
 >>> p.is_valid()
 True
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
 Let's try submitting some bad data to make sure form.errors and field.errors
@@ -2913,12 +2999,12 @@ of the same form.
 >>> p1 = Person(data, prefix='person1')
 >>> p1.is_valid()
 True
->>> p1.clean_data
+>>> p1.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> p2 = Person(data, prefix='person2')
 >>> p2.is_valid()
 True
->>> p2.clean_data
+>>> p2.cleaned_data
 {'first_name': u'Jim', 'last_name': u'Morrison', 'birthday': datetime.date(1943, 12, 8)}
 
 By default, forms append a hyphen between the prefix and the field name, but a
@@ -2944,7 +3030,7 @@ self.prefix.
 >>> p = Person(data, prefix='foo')
 >>> p.is_valid()
 True
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
 # Forms with NullBooleanFields ################################################
@@ -3006,16 +3092,16 @@ is different than its data. This is handled transparently, though.
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 >>> def my_function(method, post_data):
 ...     if method == 'POST':
 ...         form = UserRegistration(post_data, auto_id=False)
 ...     else:
 ...         form = UserRegistration(auto_id=False)
 ...     if form.is_valid():
-...         return 'VALID: %r' % form.clean_data
+...         return 'VALID: %r' % form.cleaned_data
 ...     t = Template('<form action="" method="post">\n<table>\n{{ form }}\n</table>\n<input type="submit" />\n</form>')
 ...     return t.render(Context({'form': form}))
 
@@ -3053,9 +3139,9 @@ VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 
 You have full flexibility in displaying form fields in a template. Just pass a
 Form instance to the template, and use "dot" access to refer to individual
@@ -3321,7 +3407,7 @@ True
 </select>
 
 # MultiWidget and MultiValueField #############################################
-# MultiWidgets are widgets composed of other widgets. They are usually 
+# MultiWidgets are widgets composed of other widgets. They are usually
 # combined with MultiValueFields - a field that is composed of other fields.
 # MulitWidgets can themselved be composed of other MultiWidgets.
 # SplitDateTimeWidget is one example of a MultiWidget.
@@ -3329,7 +3415,7 @@ True
 >>> class ComplexMultiWidget(MultiWidget):
 ...     def __init__(self, attrs=None):
 ...         widgets = (
-...             TextInput(), 
+...             TextInput(),
 ...             SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeWidget(),
 ...         )
@@ -3354,13 +3440,13 @@ True
 <input type="text" name="name_2_0" value="2007-04-25" /><input type="text" name="name_2_1" value="06:24:00" />
 
 >>> class ComplexField(MultiValueField):
-...     def __init__(self, required=True, widget=None, label=None, initial=None): 
+...     def __init__(self, required=True, widget=None, label=None, initial=None):
 ...         fields = (
-...             CharField(), 
+...             CharField(),
 ...             MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
 ...             SplitDateTimeField()
 ...         )
-...         super(ComplexField, self).__init__(fields, required, widget, label, initial) 
+...         super(ComplexField, self).__init__(fields, required, widget, label, initial)
 ...
 ...     def compress(self, data_list):
 ...         if data_list:
@@ -3405,7 +3491,7 @@ ValidationError: [u'This field is required.']
 </select>
 <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
 
->>> f.clean_data
+>>> f.cleaned_data
 {'field1': u'some text,JP,2007-04-25 06:24:00'}
 
 #################################

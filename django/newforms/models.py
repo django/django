@@ -12,19 +12,9 @@ from widgets import Select, SelectMultiple, MultipleHiddenInput
 __all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
            'ModelChoiceField', 'ModelMultipleChoiceField')
 
-def model_save(self, commit=True):
+def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
     """
-    Creates and returns model instance according to self.clean_data.
-
-    This method is created for any form_for_model Form.
-    """
-    if self.errors:
-        raise ValueError("The %s could not be created because the data didn't validate." % self._model._meta.object_name)
-    return save_instance(self, self._model(), commit)
-
-def save_instance(form, instance, commit=True):
-    """
-    Saves bound Form ``form``'s clean_data into model instance ``instance``.
+    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
 
     Assumes ``form`` has a field for every non-AutoField database field in
     ``instance``. If commit=True, then the changes to ``instance`` will be
@@ -33,30 +23,40 @@ def save_instance(form, instance, commit=True):
     from django.db import models
     opts = instance.__class__._meta
     if form.errors:
-        raise ValueError("The %s could not be changed because the data didn't validate." % opts.object_name)
-    clean_data = form.clean_data
+        raise ValueError("The %s could not be %s because the data didn't validate." % (opts.object_name, fail_message))
+    cleaned_data = form.cleaned_data
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) or not f.name in clean_data:
+        if not f.editable or isinstance(f, models.AutoField) or not f.name in cleaned_data:
             continue
-        setattr(instance, f.name, clean_data[f.name])
+        if fields and f.name not in fields:
+            continue
+        setattr(instance, f.name, cleaned_data[f.name])
     if commit:
         instance.save()
         for f in opts.many_to_many:
-            if f.name in clean_data:
-                setattr(instance, f.attname, clean_data[f.name])
+            if fields and f.name not in fields:
+                continue
+            if f.name in cleaned_data:
+                setattr(instance, f.attname, cleaned_data[f.name])
     # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
     # data will be lost. This happens because a many-to-many options cannot be
     # set on an object until after it's saved. Maybe we should raise an
     # exception in that case.
     return instance
 
-def make_instance_save(instance):
-    "Returns the save() method for a form_for_instance Form."
+def make_model_save(model, fields, fail_message):
+    "Returns the save() method for a Form."
     def save(self, commit=True):
-        return save_instance(self, instance, commit)
+        return save_instance(self, model(), fields, fail_message, commit)
+    return save
+    
+def make_instance_save(instance, fields, fail_message):
+    "Returns the save() method for a Form."
+    def save(self, commit=True):
+        return save_instance(self, instance, fields, fail_message, commit)
     return save
 
-def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield()):
+def form_for_model(model, form=BaseForm, fields=None, formfield_callback=lambda f: f.formfield()):
     """
     Returns a Form class for the given Django model class.
 
@@ -71,13 +71,16 @@ def form_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfiel
     for f in opts.fields + opts.many_to_many:
         if not f.editable:
             continue
+        if fields and not f.name in fields:
+            continue
         formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
-    fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (form,), {'base_fields': fields, '_model': model, 'save': model_save})
+    base_fields = SortedDictFromList(field_list)
+    return type(opts.object_name + 'Form', (form,), 
+        {'base_fields': base_fields, '_model': model, 'save': make_model_save(model, fields, 'created')})
 
-def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
+def form_for_instance(instance, form=BaseForm, fields=None, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
     Returns a Form class for the given Django model instance.
 
@@ -94,13 +97,15 @@ def form_for_instance(instance, form=BaseForm, formfield_callback=lambda f, **kw
     for f in opts.fields + opts.many_to_many:
         if not f.editable:
             continue
+        if fields and not f.name in fields:
+            continue
         current_value = f.value_from_object(instance)
         formfield = formfield_callback(f, initial=current_value)
         if formfield:
             field_list.append((f.name, formfield))
-    fields = SortedDictFromList(field_list)
+    base_fields = SortedDictFromList(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
-        {'base_fields': fields, '_model': model, 'save': make_instance_save(instance)})
+        {'base_fields': base_fields, '_model': model, 'save': make_instance_save(instance, fields, 'changed')})
 
 def form_for_fields(field_list):
     "Returns a Form class for the given list of Django database field instances."

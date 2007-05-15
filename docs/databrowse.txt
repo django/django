@@ -44,7 +44,11 @@ How to use Databrowse
        It doesn't matter where you put this, as long as it gets executed at
        some point. A good place for it is in your URLconf file (``urls.py``).
 
-    3. Add the following line to your URLconf::
+    3. Change your URLconf to import the ``databrowse`` module::
+
+           from django.contrib import databrowse
+
+       ...and add the following line to your URLconf::
 
            (r'^databrowse/(.*)', databrowse.site.root),
 
