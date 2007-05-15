@@ -1759,6 +1759,15 @@ But this template code is good::
 
     <a href="{{ object.get_absolute_url }}">{{ object.name }}</a>
 
+.. note::
+    The string you return from ``get_absolute_url()`` must be use only ASCII
+    characters (required by the URI spec, `RFC 2396`_) that has been
+    URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
+    should be able to use the result directly without needing to do any
+    further processing.
+
+.. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
+
 The ``permalink`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
