@@ -19,7 +19,7 @@ class Serializer(PythonSerializer):
     """
     def end_serialization(self):
         yaml.dump(self.objects, self.stream, **self.options)
-        
+
     def getvalue(self):
         return self.stream.getvalue()
 
@@ -33,4 +33,4 @@ def Deserializer(stream_or_string, **options):
         stream = stream_or_string
     for obj in PythonDeserializer(yaml.load(stream)):
         yield obj
-        
+
