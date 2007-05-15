@@ -46,6 +46,6 @@ doesn't come back.
 >>> f = DataForm({'data': 'xyzzy'})
 >>> f.is_valid()
 True
->>> f.clean_data
+>>> f.cleaned_data
 {'data': u'xyzzy'}
 """

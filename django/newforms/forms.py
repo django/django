@@ -169,13 +169,13 @@ class BaseForm(StrAndUnicode):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self.__errors and self.clean_data.
+        Cleans all of self.data and populates self.__errors and self.cleaned_data.
         """
         errors = ErrorDict()
         if not self.is_bound: # Stop further processing.
             self.__errors = errors
             return
-        self.clean_data = {}
+        self.cleaned_data = {}
         for name, field in self.fields.items():
             # value_from_datadict() gets the data from the dictionary.
             # Each widget type knows how to retrieve its own data, because some
@@ -183,18 +183,18 @@ class BaseForm(StrAndUnicode):
             value = field.widget.value_from_datadict(self.data, self.add_prefix(name))
             try:
                 value = field.clean(value)
-                self.clean_data[name] = value
-                if hasattr(self, 'do_clean_%s' % name):
-                    value = getattr(self, 'do_clean_%s' % name)()
-                self.clean_data[name] = value
+                self.cleaned_data[name] = value
+                if hasattr(self, 'clean_%s' % name):
+                    value = getattr(self, 'clean_%s' % name)()
+                self.cleaned_data[name] = value
             except ValidationError, e:
                 errors[name] = e.messages
         try:
-            self.clean_data = self.clean()
+            self.cleaned_data = self.clean()
         except ValidationError, e:
             errors[NON_FIELD_ERRORS] = e.messages
         if errors:
-            delattr(self, 'clean_data')
+            delattr(self, 'cleaned_data')
         self.__errors = errors
 
     def clean(self):
@@ -204,7 +204,7 @@ class BaseForm(StrAndUnicode):
         not be associated with a particular field; it will have a special-case
         association with the field named '__all__'.
         """
-        return self.clean_data
+        return self.cleaned_data
 
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
