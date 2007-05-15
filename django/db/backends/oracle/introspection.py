@@ -93,6 +93,6 @@ DATA_TYPES_REVERSE = {
     cx_Oracle.FIXED_CHAR: 'CharField',
     cx_Oracle.NCLOB: 'TextField',
     cx_Oracle.NUMBER: 'FloatField',
-    cx_Oracle.STRING: 'TextField',
+    cx_Oracle.STRING: 'CharField',
     cx_Oracle.TIMESTAMP: 'DateTimeField',
 }
