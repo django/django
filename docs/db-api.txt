@@ -1780,7 +1780,7 @@ get_list_or_404()
 -----------------
 
 ``get_list_or_404`` behaves the same was as ``get_object_or_404()`` 
--- except the it uses using ``filter()`` instead of ``get()``. It raises 
+-- except that it uses using ``filter()`` instead of ``get()``. It raises 
 ``Http404`` if the list is empty.
 
 Falling back to raw SQL
