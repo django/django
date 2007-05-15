@@ -13,12 +13,8 @@ class CursorDebugWrapper(object):
             return self.cursor.execute(sql, params)
         finally:
             stop = time()
-            # If params was a list, convert it to a tuple, because string
-            # formatting with '%' only works with tuples or dicts.
-            if not isinstance(params, (tuple, dict)):
-                params = tuple(params)
             self.db.queries.append({
-                'sql': smart_unicode(sql) % params,
+                'sql': smart_unicode(sql) % convert_args(params),
                 'time': "%.3f" % (stop - start),
             })
 
@@ -29,7 +25,7 @@ class CursorDebugWrapper(object):
         finally:
             stop = time()
             self.db.queries.append({
-                'sql': 'MANY: ' + sql + ' ' + str(tuple(param_list)),
+                'sql': 'MANY: ' + sql + ' ' + smart_unicode(tuple(param_list)),
                 'time': "%.3f" % (stop - start),
             })
 
@@ -38,6 +34,15 @@ class CursorDebugWrapper(object):
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)
+
+def convert_args(args):
+    """
+    Convert sequence or dictionary to contain unicode values.
+    """
+    if isinstance(args, (list, tuple)):
+        return tuple([smart_unicode(val) for val in args])
+    else:
+        return dict([(smart_unicode(k), smart_unicode(v)) for k, v in args.items()])
 
 ###############################################
 # Converters from database (string) to Python #
