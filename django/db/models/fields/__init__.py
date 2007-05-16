@@ -844,7 +844,7 @@ class TimeField(Field):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            elif settings.DATABASE_ENGINE == 'oracle':
+            if settings.DATABASE_ENGINE == 'oracle':
                 # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
                 if isinstance(value, datetime.time):
                     value = datetime.datetime(1900, 1, 1, value.hour, value.minute,
