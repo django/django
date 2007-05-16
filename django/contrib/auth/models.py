@@ -2,6 +2,7 @@ from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy, ugettext as _
 import datetime
 import urllib
@@ -14,16 +15,16 @@ def check_password(raw_password, enc_password):
     algo, salt, hsh = enc_password.split('$')
     if algo == 'md5':
         import md5
-        return hsh == md5.new(salt+raw_password).hexdigest()
+        return hsh == md5.new(smart_str(salt + raw_password)).hexdigest()
     elif algo == 'sha1':
         import sha
-        return hsh == sha.new(salt+raw_password).hexdigest()
+        return hsh == sha.new(smart_str(salt + raw_password)).hexdigest()
     elif algo == 'crypt':
         try:
             import crypt
         except ImportError:
             raise ValueError, "Crypt password algorithm not supported in this environment."
-        return hsh == crypt.crypt(raw_password, salt)
+        return hsh == crypt.crypt(smart_str(raw_password), smart_str(salt))
     raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
@@ -153,7 +154,7 @@ class User(models.Model):
         import sha, random
         algo = 'sha1'
         salt = sha.new(str(random.random())).hexdigest()[:5]
-        hsh = sha.new(salt+raw_password).hexdigest()
+        hsh = sha.new(salt + smart_str(raw_password)).hexdigest()
         self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
@@ -165,7 +166,7 @@ class User(models.Model):
         # algorithm or salt.
         if '$' not in self.password:
             import md5
-            is_correct = (self.password == md5.new(raw_password).hexdigest())
+            is_correct = (self.password == md5.new(smart_str(raw_password)).hexdigest())
             if is_correct:
                 # Convert the password to the new, more secure format.
                 self.set_password(raw_password)
