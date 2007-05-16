@@ -4,13 +4,16 @@ and database field objects.
 """
 
 from django.utils.translation import gettext
+
 from util import ValidationError
-from forms import BaseForm, DeclarativeFieldsMetaclass, SortedDictFromList
+from forms import BaseForm, SortedDictFromList
 from fields import Field, ChoiceField
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
-__all__ = ('save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
-           'ModelChoiceField', 'ModelMultipleChoiceField')
+__all__ = (
+    'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
+    'ModelChoiceField', 'ModelMultipleChoiceField'
+)
 
 def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
     """

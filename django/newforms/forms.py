@@ -2,13 +2,15 @@
 Form classes
 """
 
-from django.utils.datastructures import SortedDict, MultiValueDict
+import copy
+
+from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from django.utils.encoding import StrAndUnicode
+
 from fields import Field
-from widgets import TextInput, Textarea, HiddenInput, MultipleHiddenInput
+from widgets import TextInput, Textarea
 from util import flatatt, ErrorDict, ErrorList, ValidationError
-import copy
 
 __all__ = ('BaseForm', 'Form')
 
