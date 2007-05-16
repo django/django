@@ -15,14 +15,14 @@ class AUPostCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(AUPostCodeField, self).__init__(r'^\d{4}$',
             max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a 4 digit post code.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a 4 digit post code.'),
+                    *args, **kwargs)
 
 class AUPhoneNumberField(Field):
     """Australian phone number field."""
     def clean(self, value):
-        """Validate a phone number. Strips parentheses, whitespace and
-        hyphens.
+        """
+        Validate a phone number. Strips parentheses, whitespace and hyphens.
         """
         super(AUPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -39,5 +39,5 @@ class AUStateSelect(Select):
     choices.
     """
     def __init__(self, attrs=None):
-        from au_states import STATE_CHOICES # relative import
+        from au_states import STATE_CHOICES
         super(AUStateSelect, self).__init__(attrs, choices=STATE_CHOICES)

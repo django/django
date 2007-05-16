@@ -11,15 +11,15 @@ class FIZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(FIZipCodeField, self).__init__(r'^\d{5}$',
             max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a zip code in the format XXXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXXX.'),
+                    *args, **kwargs)
 
 class FIMunicipalitySelect(Select):
     """
     A Select widget that uses a list of Finnish municipalities as its choices.
     """
     def __init__(self, attrs=None):
-        from fi_municipalities import MUNICIPALITY_CHOICES # relative import
+        from fi_municipalities import MUNICIPALITY_CHOICES
         super(FIMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class FISocialSecurityNumber(Field):
@@ -37,9 +37,9 @@ class FISocialSecurityNumber(Field):
             (?P<serial>(\d{3}))
             (?P<checksum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
         if not result:
-            raise ValidationError(ugettext(u'Enter a valid Finnish social security number.'))
+            raise ValidationError(ugettext('Enter a valid Finnish social security number.'))
         gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
             return u'%s' % value.upper()
-        raise ValidationError(ugettext(u'Enter a valid Finnish social security number.'))
+        raise ValidationError(ugettext('Enter a valid Finnish social security number.'))

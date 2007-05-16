@@ -13,15 +13,15 @@ class ITZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(ITZipCodeField, self).__init__(r'^\d{5}$',
         max_length=None, min_length=None,
-        error_message=ugettext(u'Enter a valid zip code.'),
-        *args, **kwargs)
+        error_message=ugettext('Enter a valid zip code.'),
+                *args, **kwargs)
 
 class ITRegionSelect(Select):
     """
     A Select widget that uses a list of IT regions as its choices.
     """
     def __init__(self, attrs=None):
-        from it_region import REGION_CHOICES # relative import
+        from it_region import REGION_CHOICES
         super(ITRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class ITProvinceSelect(Select):
@@ -29,7 +29,7 @@ class ITProvinceSelect(Select):
     A Select widget that uses a list of IT regions as its choices.
     """
     def __init__(self, attrs=None):
-        from it_province import PROVINCE_CHOICES # relative import
+        from it_province import PROVINCE_CHOICES
         super(ITProvinceSelect, self).__init__(attrs, choices=PROVINCE_CHOICES)
 
 class ITSocialSecurityNumberField(RegexField):

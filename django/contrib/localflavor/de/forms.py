@@ -13,15 +13,15 @@ class DEZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(DEZipCodeField, self).__init__(r'^\d{5}$',
             max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a zip code in the format XXXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXXX.'),
+                    *args, **kwargs)
 
 class DEStateSelect(Select):
     """
     A Select widget that uses a list of DE states as its choices.
     """
     def __init__(self, attrs=None):
-        from de_states import STATE_CHOICES # relative import
+        from de_states import STATE_CHOICES
         super(DEStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 class DEIdentityCardNumberField(Field):
@@ -57,7 +57,7 @@ class DEIdentityCardNumberField(Field):
 
     def clean(self, value):
         super(DEIdentityCardNumberField, self).clean(value)
-        error_msg = ugettext(u'Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.')
+        error_msg = ugettext('Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.')
         if value in EMPTY_VALUES:
             return u''
         match = re.match(id_re, value)
@@ -71,7 +71,7 @@ class DEIdentityCardNumberField(Field):
         if residence == '0000000000' or birthday == '0000000' or validity == '0000000':
             raise ValidationError(error_msg)
 
-        all_digits = "%s%s%s%s" % (residence, birthday, validity, checksum)
+        all_digits = u"%s%s%s%s" % (residence, birthday, validity, checksum)
         if not self.has_valid_checksum(residence) or not self.has_valid_checksum(birthday) or \
             not self.has_valid_checksum(validity) or not self.has_valid_checksum(all_digits):
                 raise ValidationError(error_msg)

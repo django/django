@@ -16,7 +16,7 @@ class BRZipCodeField(RegexField):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
             max_length=None, min_length=None,
             error_message=ugettext('Enter a zip code in the format XXXXX-XXX.'),
-            *args, **kwargs)
+                    *args, **kwargs)
 
 class BRPhoneNumberField(Field):
     def clean(self, value):
@@ -27,7 +27,7 @@ class BRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(ugettext(u'Phone numbers must be in XX-XXXX-XXXX format.'))
+        raise ValidationError(ugettext('Phone numbers must be in XX-XXXX-XXXX format.'))
 
 class BRStateSelect(Select):
     """
@@ -35,7 +35,7 @@ class BRStateSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from br_states import STATE_CHOICES # relative import
+        from br_states import STATE_CHOICES
         super(BRStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 

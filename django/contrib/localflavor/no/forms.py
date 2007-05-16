@@ -12,8 +12,8 @@ class NOZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(NOZipCodeField, self).__init__(r'^\d{4}$',
             max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a zip code in the format XXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXX.'),
+                    *args, **kwargs)
 
 class NOMunicipalitySelect(Select):
     """
@@ -60,7 +60,7 @@ class NOSocialSecurityNumber(Field):
             self.gender = 'F'
         else:
             self.gender = 'M'
-        
+
         digits = map(int, list(value))
         weight_1 = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0]
         weight_2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
@@ -74,4 +74,4 @@ class NOSocialSecurityNumber(Field):
             raise ValidationError(msg)
 
         return value
-    
+

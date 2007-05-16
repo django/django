@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 """
 An alphabetical list of Norwegian municipalities (fylker) fro use as `choices`
 in a formfield.
@@ -15,18 +15,18 @@ MUNICIPALITY_CHOICES = (
     ('hedmark', u'Hedmark'),
     ('hordaland', u'Hordaland'),
     ('janmayen', u'Jan Mayen'),
-    ('moreogromsdal', u'Møre og Romsdal'),
-    ('nordtrondelag', u'Nord-Trøndelag'),
+    ('moreogromsdal', u'MÃ¸re og Romsdal'),
+    ('nordtrondelag', u'Nord-TrÃ¸ndelag'),
     ('nordland', u'Nordland'),
     ('oppland', u'Oppland'),
     ('oslo', u'Oslo'),
     ('rogaland', u'Rogaland'),
     ('sognogfjordane', u'Sogn og Fjordane'),
     ('svalbard', u'Svalbard'),
-    ('sortrondelag', u'Sør-Trøndelag'),
+    ('sortrondelag', u'SÃ¸r-TrÃ¸ndelag'),
     ('telemark', u'Telemark'),
     ('troms', u'Troms'),
     ('vestagder', u'Vest-Agder'),
     ('vestfold', u'Vestfold'),
-    ('ostfold', u'Østfold')
+    ('ostfold', u'Ã˜stfold')
 )

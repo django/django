@@ -6,6 +6,7 @@ from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
 from django.newforms.widgets import Select
 from django.utils.translation import ugettext
+from django.utils.encoding import smart_unicode
 
 class ISIdNumberField(RegexField):
     """
@@ -13,7 +14,7 @@ class ISIdNumberField(RegexField):
     of Iceland has.
     """
     def __init__(self, *args, **kwargs):
-        error_msg = ugettext(u'Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.')
+        error_msg = ugettext('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.')
         kwargs['min_length'],kwargs['max_length'] = 10,11
         super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$', error_message=error_msg, *args, **kwargs)
 
@@ -48,7 +49,7 @@ class ISIdNumberField(RegexField):
         Takes in the value in canonical form and returns it in the common
         display format.
         """
-        return value[:6]+'-'+value[6:]
+        return smart_unicode(value[:6]+'-'+value[6:])
 
 class ISPhoneNumberField(RegexField):
     """
