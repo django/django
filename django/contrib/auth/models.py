@@ -4,6 +4,7 @@ from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy, ugettext as _
 import datetime
+import urllib
 
 def check_password(raw_password, enc_password):
     """
@@ -132,7 +133,7 @@ class User(models.Model):
         return self.username
 
     def get_absolute_url(self):
-        return "/users/%s/" % self.username
+        return "/users/%s/" % urllib.quote(smart_str(self.username))
 
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
@@ -145,7 +146,7 @@ class User(models.Model):
 
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = u'%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def set_password(self, raw_password):
@@ -206,7 +207,7 @@ class User(models.Model):
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
             import sets
-            self._perm_cache = sets.Set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
+            self._perm_cache = sets.Set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
