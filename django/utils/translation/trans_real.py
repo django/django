@@ -203,7 +203,7 @@ def deactivate():
     if currentThread() in _active:
         del _active[currentThread()]
 
-def no_trans():
+def deactivate_all():
     """
     Makes the active translation object a NullTranslations() instance. This is
     useful when we want delayed translations to appear as the original string

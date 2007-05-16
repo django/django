@@ -8,7 +8,7 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'get_language', 'get_language_bidi', 'get_date_formats',
         'get_partial_date_formats', 'check_for_language', 'to_locale',
         'get_language_from_request', 'install', 'templatize', 'ugettext',
-        'ungettext', 'no_trans']
+        'ungettext', 'deactivate_all']
 
 # Here be dragons, so a short explanation of the logic won't hurt:
 # We are trying to solve two problems: (1) access settings, in particular
@@ -105,6 +105,6 @@ def install():
 def templatize(src):
     return real_templatize(src)
 
-def no_trans():
-    return real_no_trans()
+def deactivate_all():
+    return real_deactivate_all()
 

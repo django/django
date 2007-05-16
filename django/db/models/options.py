@@ -5,6 +5,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
+from django.utils.translation import activate, deactivate_all, get_language
 from bisect import bisect
 import re
 
@@ -41,6 +42,15 @@ class Options(object):
         self.object_name = cls.__name__
         self.module_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
+
+        # There are a few places where the untranslated verbose name is needed
+        # (so that we get the same value regardless of currently active
+        # locale).
+        lang = get_language()
+        deactivate_all()
+        self.verbose_name_raw = unicode(self.verbose_name)
+        activate(lang)
+
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__
