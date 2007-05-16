@@ -20,6 +20,7 @@ A example: i18n middleware would need to distinguish caches by the
 import datetime, md5, re
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.encoding import smart_str
 
 cc_delim_re = re.compile(r'\s*,\s*')
 
@@ -46,7 +47,7 @@ def patch_cache_control(response, **kwargs):
         if t[1] == True:
             return t[0]
         else:
-            return t[0] + '=' + str(t[1])
+            return t[0] + '=' + smart_str(t[1])
 
     if response.has_header('Cache-Control'):
         cc = cc_delim_re.split(response['Cache-Control'])
