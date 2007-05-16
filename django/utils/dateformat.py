@@ -14,6 +14,7 @@ Usage:
 from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_unicode
 from calendar import isleap, monthrange
 import re, time
 
@@ -25,7 +26,7 @@ class Formatter(object):
         pieces = []
         for i, piece in enumerate(re_formatchars.split(formatstr)):
             if i % 2:
-                pieces.append(str(getattr(self, piece)()))
+                pieces.append(smart_unicode(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return u''.join(pieces)
