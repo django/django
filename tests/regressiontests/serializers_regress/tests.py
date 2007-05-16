@@ -2,7 +2,7 @@
 A test spanning all the capabilities of all the serializers.
 
 This class defines sample data and a dynamically generated
-test case that is capable of testing the capabilities of 
+test case that is capable of testing the capabilities of
 the serializers. This includes all valid data values, plus
 forward, backwards and self references.
 """
@@ -14,6 +14,7 @@ from django.utils.functional import curry
 from django.core import serializers
 from django.db import transaction
 from django.core import management
+from django.conf import settings
 
 from models import *
 
@@ -22,7 +23,7 @@ from models import *
 def data_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data
-    instance.save()    
+    instance.save()
     return instance
 
 def generic_create(pk, klass, data):
@@ -32,13 +33,13 @@ def generic_create(pk, klass, data):
     for tag in data[1:]:
         instance.tags.create(data=tag)
     return instance
-    
+
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
     setattr(instance, 'data_id', data)
     instance.save()
     return instance
-    
+
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
     instance.save()
@@ -61,14 +62,14 @@ def pk_create(pk, klass, data):
 # test data objects of various kinds
 def data_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
-    testcase.assertEqual(data, instance.data, 
+    testcase.assertEqual(data, instance.data,
                          "Objects with PK=%d not equal; expected '%s' (%s), got '%s' (%s)" % (pk,data, type(data), instance.data, type(instance.data)))
 
 def generic_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data[0], instance.data)
     testcase.assertEqual(data[1:], [t.data for t in instance.tags.all()])
-    
+
 def fk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data, instance.data_id)
@@ -84,7 +85,7 @@ def o2o_compare(testcase, pk, klass, data):
 def pk_compare(testcase, pk, klass, data):
     instance = klass.objects.get(data=data)
     testcase.assertEqual(data, instance.data)
-        
+
 # Define some data types. Each data type is
 # actually a pair of functions; one to create
 # and one to compare objects of that type
@@ -96,7 +97,7 @@ o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
 
 test_data = [
-    # Format: (data type, PK value, Model Class, data)  
+    # Format: (data type, PK value, Model Class, data)
     (data_obj, 1, BooleanData, True),
     (data_obj, 2, BooleanData, False),
     (data_obj, 10, CharData, "Test Char Data"),
@@ -111,10 +112,13 @@ test_data = [
     (data_obj, 31, DateTimeData, None),
     (data_obj, 40, EmailData, "hovercraft@example.com"),
     (data_obj, 41, EmailData, None),
+    (data_obj, 42, EmailData, ""),
     (data_obj, 50, FileData, 'file:///foo/bar/whiz.txt'),
     (data_obj, 51, FileData, None),
+    (data_obj, 52, FileData, ""),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
     (data_obj, 61, FilePathData, None),
+    (data_obj, 62, FilePathData, ""),
     (data_obj, 70, FloatData, 12.345),
     (data_obj, 71, FloatData, -12.345),
     (data_obj, 72, FloatData, 0.0),
@@ -126,6 +130,7 @@ test_data = [
     #(XX, ImageData
     (data_obj, 90, IPAddressData, "127.0.0.1"),
     (data_obj, 91, IPAddressData, None),
+    (data_obj, 92, IPAddressData, ""),
     (data_obj, 100, NullBooleanData, True),
     (data_obj, 101, NullBooleanData, False),
     (data_obj, 102, NullBooleanData, None),
@@ -137,10 +142,11 @@ test_data = [
     (data_obj, 131, PositiveSmallIntegerData, None),
     (data_obj, 140, SlugData, "this-is-a-slug"),
     (data_obj, 141, SlugData, None),
-    (data_obj, 150, SmallData, 12), 
-    (data_obj, 151, SmallData, -12), 
-    (data_obj, 152, SmallData, 0), 
-    (data_obj, 153, SmallData, None), 
+    (data_obj, 142, SlugData, ""),
+    (data_obj, 150, SmallData, 12),
+    (data_obj, 151, SmallData, -12),
+    (data_obj, 152, SmallData, 0),
+    (data_obj, 153, SmallData, None),
     (data_obj, 160, TextData, """This is a long piece of text.
 It contains line breaks.
 Several of them.
@@ -151,8 +157,10 @@ The end."""),
     (data_obj, 171, TimeData, None),
     (data_obj, 180, USStateData, "MA"),
     (data_obj, 181, USStateData, None),
+    (data_obj, 182, USStateData, ""),
     (data_obj, 190, XMLData, "<foo></foo>"),
     (data_obj, 191, XMLData, None),
+    (data_obj, 192, XMLData, ""),
 
     (generic_obj, 200, GenericData, ['Generic Object 1', 'tag1', 'tag2']),
     (generic_obj, 201, GenericData, ['Generic Object 2', 'tag2', 'tag3']),
@@ -188,7 +196,7 @@ The end."""),
     (fk_obj, 450, FKDataToField, "UAnchor 1"),
     (fk_obj, 451, FKDataToField, "UAnchor 2"),
     (fk_obj, 452, FKDataToField, None),
-    
+
     (data_obj, 500, Anchor, "Anchor 3"),
     (data_obj, 501, Anchor, "Anchor 4"),
     (data_obj, 502, UniqueAnchor, "UAnchor 2"),
@@ -215,9 +223,9 @@ The end."""),
     (pk_obj, 720, PositiveIntegerPKData, 123456789),
     (pk_obj, 730, PositiveSmallIntegerPKData, 12),
     (pk_obj, 740, SlugPKData, "this-is-a-slug"),
-    (pk_obj, 750, SmallPKData, 12), 
-    (pk_obj, 751, SmallPKData, -12), 
-    (pk_obj, 752, SmallPKData, 0), 
+    (pk_obj, 750, SmallPKData, 12),
+    (pk_obj, 751, SmallPKData, -12),
+    (pk_obj, 752, SmallPKData, 0),
 #     (pk_obj, 760, TextPKData, """This is a long piece of text.
 # It contains line breaks.
 # Several of them.
@@ -226,7 +234,16 @@ The end."""),
     (pk_obj, 780, USStatePKData, "MA"),
 #     (pk_obj, 790, XMLPKData, "<foo></foo>"),
 ]
-    
+
+# Because Oracle treats the empty string as NULL, Oracle is expected to fail
+# when field.empty_strings_allowed is True and the value is None; skip these
+# tests.
+if settings.DATABASE_ENGINE == 'oracle':
+    test_data = [data for data in test_data
+                 if not (data[0] == data_obj and
+                         data[2]._meta.get_field('data').empty_strings_allowed and
+                         data[3] is None)]
+
 # Dynamically create serializer tests to ensure that all
 # registered serializers are automatically tested.
 class SerializerTests(unittest.TestCase):
@@ -234,7 +251,7 @@ class SerializerTests(unittest.TestCase):
 
 def serializerTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)    
+    management.flush(verbosity=0, interactive=False)
 
     # Create all the objects defined in the test data
     objects = []
@@ -245,14 +262,14 @@ def serializerTest(format, self):
     transaction.commit()
     transaction.leave_transaction_management()
 
-    # Add the generic tagged objects to the object list 
+    # Add the generic tagged objects to the object list
     objects.extend(Tag.objects.all())
-    
+
     # Serialize the test database
     serialized_data = serializers.serialize(format, objects, indent=2)
 
     # Flush the database and recreate from the serialized data
-    management.flush(verbosity=0, interactive=False)    
+    management.flush(verbosity=0, interactive=False)
     transaction.enter_transaction_management()
     transaction.managed(True)
     for obj in serializers.deserialize(format, serialized_data):
@@ -260,10 +277,10 @@ def serializerTest(format, self):
     transaction.commit()
     transaction.leave_transaction_management()
 
-    # Assert that the deserialized data is the same 
+    # Assert that the deserialized data is the same
     # as the original source
     for (func, pk, klass, datum) in test_data:
         func[1](self, pk, klass, datum)
-    
+
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_'+format+'_serializer', curry(serializerTest, format))
