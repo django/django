@@ -145,7 +145,7 @@ def get_date_trunc_sql(lookup_type, field_name):
     return sql
 
 def get_datetime_cast_sql():
-    return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS')"
+    return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
 def get_limit_offset_sql(limit, offset=None):
     # Limits and offset are too complicated to be handled here.
