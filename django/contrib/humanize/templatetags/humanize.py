@@ -1,4 +1,5 @@
 from django.utils.translation import ungettext, ugettext_lazy as _
+from django.utils.encoding import smart_unicode
 from django import template
 import re
 
@@ -15,8 +16,8 @@ def ordinal(value):
         return value
     t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return "%d%s" % (value, t[0])
-    return '%d%s' % (value, t[value % 10])
+        return u"%d%s" % (value, t[0])
+    return u'%d%s' % (value, t[value % 10])
 register.filter(ordinal)
 
 def intcomma(value):
@@ -24,8 +25,8 @@ def intcomma(value):
     Converts an integer to a string containing commas every three digits.
     For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
-    orig = str(value)
-    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', str(value))
+    orig = smart_unicode(value)
+    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', smart_unicode(value))
     if orig == new:
         return new
     else:
