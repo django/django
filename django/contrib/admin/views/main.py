@@ -12,7 +12,7 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, smart_str
 from django.utils.translation import ugettext as _
 import operator
 
@@ -686,6 +686,12 @@ class ChangeList(object):
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if i in lookup_params:
                 del lookup_params[i]
+        for key, value in lookup_params.items():
+            if not isinstance(key, str):
+                # 'key' will be used as a keyword argument later, so Python
+                # requires it to be a string.
+                del lookup_params[key]
+                lookup_params[smart_str(key)] = value
 
         # Apply lookup parameters from the query string.
         qs = qs.filter(**lookup_params)
