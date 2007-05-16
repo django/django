@@ -535,18 +535,14 @@ class DateTimeField(DateField):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            # MySQL/Oracle will throw a warning if microseconds are given, because
-            # neither database supports microseconds.
-            if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
+            # MySQL will throw a warning if microseconds are given, because it
+            # doesn't support microseconds.
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
             value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        # Oracle will throw an error if microseconds are given, because it
-        # doesn't support microseconds.
-        if settings.DATABASE_ENGINE == 'oracle' and hasattr(value, 'microsecond'):
-            value = value.replace(microsecond=0)
         if lookup_type == 'range':
             value = [str(v) for v in value]
         else:
@@ -846,12 +842,13 @@ class TimeField(Field):
         if value is not None:
             # MySQL will throw a warning if microseconds are given, because it
             # doesn't support microseconds.
-            if settings.DATABASE_ENGINE in ('mysql', 'oracle') and hasattr(value, 'microsecond'):
+            if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            if settings.DATABASE_ENGINE == 'oracle':
+            elif settings.DATABASE_ENGINE == 'oracle':
                 # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
                 if isinstance(value, datetime.time):
-                    value = datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second)
+                    value = datetime.datetime(1900, 1, 1, value.hour, value.minute,
+                                              value.second, value.microsecond)
                 elif isinstance(value, basestring):
                     value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
             else:
