@@ -279,6 +279,15 @@ Please follow these coding standards when writing code for inclusion in Django:
     * Mark all strings for internationalization; see the `i18n documentation`_
       for details.
 
+    * Please don't put your name in the code you contribute. Our policy is to
+      keep contributors' names in the ``AUTHORS`` file distributed with Django
+      -- not scattered throughout the codebase itself. Feel free to include a
+      change to the ``AUTHORS`` file in your patch if you make more than a
+      single trivial change.
+
+Template style
+--------------
+
     * In Django template code, put one (and only one) space between the curly
       brackets and the tag contents.
 
@@ -289,6 +298,9 @@ Please follow these coding standards when writing code for inclusion in Django:
       Don't do this::
 
           {{foo}}
+
+View style
+----------
 
     * In Django views, the first parameter in a view function should be called
       ``request``.
@@ -303,11 +315,72 @@ Please follow these coding standards when writing code for inclusion in Django:
           def my_view(req, foo):
               # ...
 
-    * Please don't put your name in the code you contribute. Our policy is to
-      keep contributors' names in the ``AUTHORS`` file distributed with Django
-      -- not scattered throughout the codebase itself. Feel free to include a
-      change to the ``AUTHORS`` file in your patch if you make more than a
-      single trivial change.
+Model style
+-----------
+
+    * Field names should be all lowercase, using underscores instead of
+      camelCase.
+
+      Do this::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+
+      Don't do this::
+
+          class Person(models.Model):
+              FirstName = models.CharField(maxlength=20)
+              Last_Name = models.CharField(maxlength=40)
+
+    * The ``class Meta`` should appear *after* the fields are defined, with
+      a single blank line separating the fields and the class definition.
+
+      Do this::
+
+          class Person(models.Model):
+              first_name = models.CharField(maxlength=20)
+              last_name = models.CharField(maxlength=40)
+
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      Don't do this::
+
+          class Person(models.Model):
+              FirstName = models.CharField(maxlength=20)
+              Last_Name = models.CharField(maxlength=40)
+              class Meta:
+                  verbose_name_plural = 'people'
+
+      Don't do this, either::
+
+          class Person(models.Model):
+              class Meta:
+                  verbose_name_plural = 'people'
+
+              FirstName = models.CharField(maxlength=20)
+              Last_Name = models.CharField(maxlength=40)
+
+    * The order of model inner classes and standard methods should be as
+      follows (noting that these are not all required):
+
+        * All database fields
+        * ``class Meta``
+        * ``class Admin``
+        * ``def __str__()``
+        * ``def save()``
+        * ``def get_absolute_url()``
+        * Any custom methods
+
+    * If ``choices`` is defined for a given model field, define the choices as
+      a tuple of tuples, with an all-uppercase name, either near the top of the
+      model module or just above the model class. Example::
+
+          GENDER_CHOICES = (
+              ('M', 'Male'),
+              ('F', 'Female'),
+          )
 
 Committing code
 ===============
