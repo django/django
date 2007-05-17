@@ -68,23 +68,43 @@ In Python code
 Standard translation
 ~~~~~~~~~~~~~~~~~~~~
 
-Specify a translation string by using the function ``_()``. (Yes, the name of
-the function is the "underscore" character.) This function is available
-globally in any Python module; you don't have to import it.
+Specify a translation string by using the function ``ugettext()``. Since you
+may well be typing this a lot, it's often worthwhile importing it as a shorter
+alias and ``_`` is a very common choice (i.e. the function is called as
+``_()``).
+
+.. note::
+    Python's standard library ``gettext`` module installs ``_()`` into the
+    global namespace, as an alias for ``gettext()``. In Django, we have chosen
+    not to follow this practice, for a couple of reasons:
+
+      1. For international character set (unicode) support, you really wanting
+         to be using ``ugettext()``, rather than ``gettext()``. Sometimes, you
+         should be using ``ugettext_lazy()`` more often. By not installing
+         ``_`` directly, the developer is required to think about which is the
+         most appropriate function to use.
+
+      2. Python's interactive shell uses ``_`` to represent "the previous
+         result". This is also used in doctest tests and having ``_()`` causes
+         interference. Explicitly importing ``ugettext()`` as ``_()`` avoids
+         this problem.
 
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
+
+    from django.utils.translation import ugettext as _
 
     def my_view(request):
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-The function ``django.utils.translation.gettext()`` is identical to ``_()``.
-This example is identical to the previous one::
+Obviously you could code this without using the alias. This example is
+identical to the previous one::
 
-    from django.utils.translation import gettext
+    from django.utils.translation import ugettext
+
     def my_view(request):
-        output = gettext("Welcome to my site.")
+        output = ugettext("Welcome to my site.")
         return HttpResponse(output)
 
 Translation works on computed values. This example is identical to the previous
@@ -107,7 +127,7 @@ examples, is that Django's translation-string-detecting utility,
 ``make-messages.py``, won't be able to find these strings. More on
 ``make-messages`` later.)
 
-The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
+The strings you pass to ``_()`` or ``ugettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
     def my_view(request, n):
@@ -120,14 +140,14 @@ while a Spanish translation may be ``"Me llamo Adrian."`` -- with the
 placeholder (the name) placed after the translated text instead of before it.
 
 For this reason, you should use named-string interpolation (e.g., ``%(name)s``)
-instead of positional interpolation (e.g., ``%s`` or ``%d``). If you used
-positional interpolation, translations wouldn't be able to reorder placeholder
-text.
+instead of positional interpolation (e.g., ``%s`` or ``%d``) whenever you
+have more than a single parameter. If you used positional interpolation,
+translations wouldn't be able to reorder placeholder text.
 
 Marking strings as no-op
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.gettext_noop()`` to mark a string
+Use the function ``django.utils.translation.ugettext_noop()`` to mark a string
 as a translation string without translating it. The string is later translated
 from a variable.
 
@@ -139,25 +159,25 @@ as when the string is presented to the user.
 Lazy translation
 ~~~~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.gettext_lazy()`` to translate
+Use the function ``django.utils.translation.ugettext_lazy()`` to translate
 strings lazily -- when the value is accessed rather than when the
-``gettext_lazy()`` function is called.
+``ugettext_lazy()`` function is called.
 
 For example, to translate a model's ``help_text``, do the following::
 
-    from django.utils.translation import gettext_lazy
+    from django.utils.translation import ugettext_lazy
 
     class MyThing(models.Model):
-        name = models.CharField(help_text=gettext_lazy('This is the help text'))
+        name = models.CharField(help_text=ugettext_lazy('This is the help text'))
 
-In this example, ``gettext_lazy()`` stores a lazy reference to the string --
+In this example, ``ugettext_lazy()`` stores a lazy reference to the string --
 not the actual translation. The translation itself will be done when the string
 is used in a string context, such as template rendering on the Django admin site.
 
-If you don't like the verbose name ``gettext_lazy``, you can just alias it as
+If you don't like the verbose name ``ugettext_lazy``, you can just alias it as
 ``_`` (underscore), like so::
 
-    from django.utils.translation import gettext_lazy as _
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(help_text=_('This is the help text'))
@@ -167,7 +187,7 @@ translations for the field names and table names, too. This means writing
 explicit ``verbose_name`` and ``verbose_name_plural`` options in the ``Meta``
 class, though::
 
-    from django.utils.translation import gettext_lazy as _
+    from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
         name = models.CharField(_('name'), help_text=_('This is the help text'))
@@ -180,24 +200,24 @@ class, though::
 Pluralization
 ~~~~~~~~~~~~~
 
-Use the function ``django.utils.translation.ngettext()`` to specify pluralized
+Use the function ``django.utils.translation.ungettext()`` to specify pluralized
 messages. Example::
 
-    from django.utils.translation import ngettext
+    from django.utils.translation import ungettext
     def hello_world(request, count):
-        page = ngettext('there is %(count)d object', 'there are %(count)d objects', count) % {
+        page = ungettext('there is %(count)d object', 'there are %(count)d objects', count) % {
             'count': count,
         }
         return HttpResponse(page)
 
-``ngettext`` takes three arguments: the singular translation string, the plural
+``ungettext`` takes three arguments: the singular translation string, the plural
 translation string and the number of objects (which is passed to the
 translation languages as the ``count`` variable).
 
 In template code
 ----------------
 
-Using translations in `Django templates`_ uses two template tags and a slightly
+Translations in `Django templates`_ uses two template tags and a slightly
 different syntax than in Python code. To give your template access to these
 tags, put ``{% load i18n %}`` toward the top of your template.
 
@@ -243,7 +263,7 @@ To pluralize, specify both the singular and plural forms with the
     {% endblocktrans %}
 
 Internally, all block and inline translations use the appropriate
-``gettext`` / ``ngettext`` call.
+``ugettext`` / ``ungettext`` call.
 
 Each ``RequestContext`` has access to two translation-specific variables:
 
@@ -487,26 +507,26 @@ Notes:
 
     * If you define a custom ``LANGUAGES`` setting, as explained in the
       previous bullet, it's OK to mark the languages as translation strings
-      -- but use a "dummy" ``gettext()`` function, not the one in
+      -- but use a "dummy" ``ugettext()`` function, not the one in
       ``django.utils.translation``. You should *never* import
       ``django.utils.translation`` from within your settings file, because that
       module in itself depends on the settings, and that would cause a circular
       import.
 
-      The solution is to use a "dummy" ``gettext()`` function. Here's a sample
+      The solution is to use a "dummy" ``ugettext()`` function. Here's a sample
       settings file::
 
-          gettext = lambda s: s
+          ugettext = lambda s: s
 
           LANGUAGES = (
-              ('de', gettext('German')),
-              ('en', gettext('English')),
+              ('de', ugettext('German')),
+              ('en', ugettext('English')),
           )
 
       With this arrangement, ``make-messages.py`` will still find and mark
       these strings for translation, but the translation won't happen at
       runtime -- so you'll have to remember to wrap the languages in the *real*
-      ``gettext()`` in any code that uses ``LANGUAGES`` at runtime.
+      ``ugettext()`` in any code that uses ``LANGUAGES`` at runtime.
 
     * The ``LocaleMiddleware`` can only select languages for which there is a
       Django-provided base translation. If you want to provide translations
@@ -712,23 +732,23 @@ interface to access it::
 
     document.write(gettext('this is to be translated'));
 
-There even is a ``ngettext`` interface and a string interpolation function::
+There even is a ``ungettext`` interface and a string interpolation function::
 
     d = {
         count: 10
     };
-    s = interpolate(ngettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
+    s = interpolate(ungettext('this is %(count)s object', 'this are %(count)s objects', d.count), d);
 
 The ``interpolate`` function supports both positional interpolation and named
 interpolation. So the above could have been written as::
 
-    s = interpolate(ngettext('this is %s object', 'this are %s objects', 11), [11]);
+    s = interpolate(ungettext('this is %s object', 'this are %s objects', 11), [11]);
 
 The interpolation syntax is borrowed from Python. You shouldn't go over the top
 with string interpolation, though: this is still JavaScript, so the code will
 have to do repeated regular-expression substitutions. This isn't as fast as
 string interpolation  in Python, so keep it to those cases where you really
-need it (for example, in conjunction with ``ngettext`` to produce proper
+need it (for example, in conjunction with ``ungettext`` to produce proper
 pluralizations).
 
 Creating JavaScript translation catalogs
@@ -750,16 +770,13 @@ Specialities of Django translation
 If you know ``gettext``, you might note these specialities in the way Django
 does translation:
 
-    * The string domain is ``django`` or ``djangojs``. The string domain is used to
-      differentiate between different programs that store their data in a
-      common message-file library (usually ``/usr/share/locale/``). The ``django``
-      domain is used for python and template translation strings and is loaded into
-      the global translation catalogs. The ``djangojs`` domain is only used for
-      JavaScript translation catalogs to make sure that those are as small as
-      possible.
-    * Django only uses ``gettext`` and ``gettext_noop``. That's because Django
-      always uses ``DEFAULT_CHARSET`` strings internally. There isn't much use
-      in using ``ugettext``, because you'll always need to produce utf-8
-      anyway.
+    * The string domain is ``django`` or ``djangojs``. The string domain is
+      used to differentiate between different programs that store their data
+      in a common message-file library (usually ``/usr/share/locale/``). The
+      ``django`` domain is used for python and template translation strings
+      and is loaded into the global translation catalogs. The ``djangojs``
+      domain is only used for JavaScript translation catalogs to make sure
+      that those are as small as possible.
     * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
       ``xgettext`` and ``msgfmt``. That's mostly for convenience.
+

@@ -1764,7 +1764,9 @@ But this template code is good::
     characters (required by the URI spec, `RFC 2396`_) that has been
     URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
     should be able to use the result directly without needing to do any
-    further processing.
+    further processing. You may wish to use the
+    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+    are using unicode strings a lot.
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 
