@@ -1,6 +1,16 @@
 import types
+import urllib
 from django.conf import settings
 from django.utils.functional import Promise
+
+class StrAndUnicode(object):
+    """
+    A class whose __str__ returns its __unicode__ as a UTF-8 bytestring.
+
+    Useful as a mix-in.
+    """
+    def __str__(self):
+        return self.__unicode__().encode('utf-8')
 
 def smart_unicode(s, encoding='utf-8', errors='strict'):
     """
@@ -45,12 +55,16 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     else:
         return s
 
-class StrAndUnicode(object):
+def iri_to_uri(iri):
     """
-    A class whose __str__ returns its __unicode__ as a UTF-8 bytestring.
+    Convert an Internationalized Resource Identifier (IRI) portion to a URI
+    portion that is suitable for inclusion in a URL.
 
-    Useful as a mix-in.
+    This is the algorithm from section 3.1 of RFC 3987.  However, since we are
+    assuming input is either UTF-8 or unicode already, we can simplify things a
+    little from the full method.
+
+    Returns an ASCII string containing the encoded result.
     """
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
+    return urllib.quote(smart_str(iri), safe='/#%[]')
 

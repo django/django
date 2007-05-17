@@ -3,12 +3,11 @@ These classes are light wrappers around Django's database API that provide
 convenience functionality and permalink functions for the databrowse app.
 """
 
-import urllib
 from django.db import models
 from django.utils import dateformat
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
 
 EMPTY_VALUE = '(None)'
 
@@ -77,7 +76,7 @@ class EasyChoice(object):
         return smart_str(u'<EasyChoice for %s.%s>' % (self.model.model._meta.object_name, self.field.name))
 
     def url(self):
-        return '%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, urllib.quote(smart_str(self.value)))
+        return '%s%s/%s/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.field.name, iri_to_uri(self.value))
 
 class EasyInstance(object):
     def __init__(self, easy_model, instance):
@@ -99,7 +98,7 @@ class EasyInstance(object):
         return self.instance._get_pk_val()
 
     def url(self):
-        return '%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, urllib.quote(smart_str(self.pk())))
+        return '%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, iri_to_uri(self.pk()))
 
     def fields(self):
         """
@@ -180,18 +179,18 @@ class EasyInstanceField(object):
             if self.field.rel.to in self.model.model_list:
                 lst = []
                 for value in self.values():
-                    url = '%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, urllib.quote(smart_str(value._get_pk_val())))
+                    url = '%s%s/%s/objects/%s/' % (self.model.site.root_url, m.model._meta.app_label, m.model._meta.module_name, iri_to_uri(value._get_pk_val()))
                     lst.append((smart_unicode(value), url))
             else:
                 lst = [(value, None) for value in self.values()]
         elif self.field.choices:
             lst = []
             for value in self.values():
-                url = '%s%s/%s/fields/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name, urllib.quote(smart_str(self.raw_value)))
+                url = '%s%s/%s/fields/%s/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, self.field.name, iri_to_uri(self.raw_value))
                 lst.append((value, url))
         elif isinstance(self.field, models.URLField):
             val = self.values()[0]
-            lst = [(val, urllib.quote(smart_str(val)))]
+            lst = [(val, iri_to_uri(val))]
         else:
             lst = [(self.values()[0], None)]
         return lst
