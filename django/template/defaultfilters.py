@@ -170,7 +170,7 @@ upper = stringfilter(upper)
 def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
-    return smart_unicode(urllib.quote(value))
+    return smart_unicode(urllib.quote(smart_str(value)))
 urlencode = stringfilter(urlencode)
 
 def urlize(value):
