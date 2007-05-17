@@ -10,10 +10,10 @@ from django.template import Template
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
 
-def instrumented_test_render(self, context):
-    """An instrumented Template render method, providing a signal 
+def instrumented_test_render(self, context, unused=None):
+    """
+    An instrumented Template render method, providing a signal
     that can be intercepted by the test system Client
-    
     """
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)

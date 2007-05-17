@@ -176,9 +176,9 @@ class Template(object):
             for subnode in node:
                 yield subnode
 
-    def render(self, context):
+    def render(self, context, encoding=None):
         "Display stage -- can be called many times"
-        return self.nodelist.render(context)
+        return self.nodelist.render(context, encoding)
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
@@ -730,14 +730,15 @@ class NodeList(list):
     # data.
     codec_errors = 'replace'
 
-    def render(self, context):
+    def render(self, context, encoding=None):
+        if encoding is None:
+            encoding = settings.DEFAULT_CHARSET
         bits = []
         for node in self:
             if isinstance(node, Node):
                 bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
-        encoding = settings.DEFAULT_CHARSET
         return ''.join([smart_str(b, encoding, errors=self.codec_errors) for b in bits])
 
     def get_nodes_by_type(self, nodetype):

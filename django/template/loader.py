@@ -87,7 +87,7 @@ def get_template_from_string(source, origin=None, name=None):
     """
     return Template(source, origin, name)
 
-def render_to_string(template_name, dictionary=None, context_instance=None):
+def render_to_string(template_name, dictionary=None, context_instance=None, encoding=None):
     """
     Loads the given template_name and renders it with the given dictionary as
     context. The template_name may be a string to load a single template using
@@ -103,7 +103,7 @@ def render_to_string(template_name, dictionary=None, context_instance=None):
         context_instance.update(dictionary)
     else:
         context_instance = Context(dictionary)
-    return t.render(context_instance)
+    return t.render(context_instance, encoding)
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."

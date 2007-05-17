@@ -26,5 +26,5 @@ def sitemap(request, sitemaps, section=None):
             urls.extend(site().get_urls())
         else:
             urls.extend(site.get_urls())
-    xml = loader.render_to_string('sitemap.xml', {'urlset': urls})
+    xml = loader.render_to_string('sitemap.xml', {'urlset': urls}, encoding='utf-8')
     return HttpResponse(xml, mimetype='application/xml')
