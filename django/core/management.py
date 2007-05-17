@@ -578,7 +578,7 @@ def syncdb(verbosity=1, interactive=True):
     # Install the 'initialdata' fixture, using format discovery
     load_data(['initial_data'], verbosity=verbosity)
 syncdb.help_doc = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-syncdb.args = '[--verbosity] [--interactive]'
+syncdb.args = '[--verbosity] [--noinput]'
 
 def get_admin_index(app):
     "Returns admin-index template snippet (in list form) for the given app."
@@ -672,7 +672,7 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
     else:
         print "Reset cancelled."
 reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
-reset.args = '[--interactive]' + APP_ARGS
+reset.args = '[--noinput]' + APP_ARGS
 
 def flush(verbosity=1, interactive=True):
     "Returns all tables in the database to the same state they were in immediately after syncdb."
@@ -733,7 +733,7 @@ The full error: """ % settings.DATABASE_NAME + style.ERROR_OUTPUT(str(e)) + '\n'
     else:
         print "Flush cancelled."
 flush.help_doc = "Executes ``sqlflush`` on the current database."
-flush.args = '[--verbosity] [--interactive]'
+flush.args = '[--verbosity] [--noinput]'
 
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -1452,7 +1452,7 @@ def dump_data(app_labels, format='json', indent=None):
     except Exception, e:
         sys.stderr.write(style.ERROR("Unable to serialize database: %s\n" % e))
 dump_data.help_doc = 'Output the contents of the database as a fixture of the given format'
-dump_data.args = '[--format]' + APP_ARGS
+dump_data.args = '[--format] [--indent]' + APP_ARGS
 
 # Utilities for command-line script
 

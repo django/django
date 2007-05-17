@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.utils.html import escape
-from django.utils.functional import Promise, lazy
 from django.utils.encoding import smart_unicode
 
 # Converts a dictionary to a single string with key="value", XML-style with

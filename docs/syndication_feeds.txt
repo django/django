@@ -146,7 +146,10 @@ put into those elements.
       exist, it tries calling a method ``item_link()`` in the ``Feed`` class,
       passing it a single parameter, ``item``, which is the object itself.
       Both ``get_absolute_url()`` and ``item_link()`` should return the item's
-      URL as a normal Python string.
+      URL as a normal Python string. As with ``get_absolute_url()``, the
+      result of ``item_link()`` will be included directly in the URL, so you
+      are responsible for doing all necessary URL quoting and conversion to
+      ASCII inside the method itself.
 
     * For the LatestEntries example above, we could have very simple feed templates:
 
