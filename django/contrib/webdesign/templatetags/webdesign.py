@@ -18,7 +18,7 @@ class LoremNode(template.Node):
             paras = paragraphs(count, common=self.common)
         if self.method == 'p':
             paras = ['<p>%s</p>' % p for p in paras]
-        return '\n\n'.join(paras)
+        return u'\n\n'.join(paras)
 
 #@register.tag
 def lorem(parser, token):
