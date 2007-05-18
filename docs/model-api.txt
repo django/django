@@ -1761,7 +1761,7 @@ But this template code is good::
 
 .. note::
     The string you return from ``get_absolute_url()`` must be use only ASCII
-    characters (required by the URI spec, `RFC 2396`_) that has been
+    characters (required by the URI spec, `RFC 2396`_) that have been
     URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
     should be able to use the result directly without needing to do any
     further processing.
