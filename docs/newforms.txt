@@ -313,6 +313,31 @@ record, here's what happens with unbound forms::
     ...
     AttributeError: 'ContactForm' object has no attribute 'cleaned_data'
 
+
+Example View
+~~~~~~~~~~~~
+
+Putting this all together, here is a simple view method that uses our contact
+form::
+
+    from django.shortcuts import render_to_response
+    from django import newforms as forms
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        sender = forms.EmailField()
+        cc_myself = forms.BooleanField()
+
+    def contact(request):
+        if request.POST:
+            f = ContactForm(request.POST)
+            if f.is_valid:
+                # ... do something with f.cleaned_data
+        else:
+            f = ContactForm()
+        return render_to_response('contact.html', {'form': f})
+
 Outputting forms as HTML
 ------------------------
 
@@ -389,6 +414,12 @@ containing one field::
     <p><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></p>
     <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
+In a template, you can invoke this if the form has been handed into the
+context. For example::
+
+    {{ f.as_p }}
+
+
 ``as_ul()``
 ~~~~~~~~~~~
 
@@ -405,6 +436,11 @@ so that you can specify any HTML attributes on the ``<ul>`` for flexibility::
     <li><label for="id_sender">Sender:</label> <input type="text" name="sender" id="id_sender" /></li>
     <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
 
+In a template, you can invoke this if the form has been handed into the
+context. For example::
+
+    {{ f.as_ul }}
+
 ``as_table()``
 ~~~~~~~~~~~~~~
 
@@ -420,6 +456,18 @@ calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" /></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="text" name="sender" id="id_sender" /></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself" /></td></tr>
+
+In a template, you can invoke this if the form has been handed into the
+context. For example::
+
+    {{ f.as_table }}
+
+which is the same as
+
+::
+
+    {{ f }}
+
 
 Configuring HTML ``<label>`` tags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -601,6 +649,67 @@ when printed::
 
     >>> str(f['subject'].errors)
     ''
+
+In the templates
+----------------
+
+Using the above example, let's put this into a view and show how you can use
+these parts from the template designer's point of view. Assuming you start
+with a view like this::
+
+    def contact(request):
+        form = ContactForm()
+        if request.method == 'POST':
+            new_data = request.POST.copy()
+            form = ContactForm(new_data)
+            if form.is_valid():
+                # do form processing here...
+        return render_to_response('contact.html', {'form': form})
+
+...you can have a simple template that uses the shortcuts ``form.as_ul``,
+``form.as_p``, or ``form.as_table`` (which is the default rendering method for
+a form variable). An example ``contact.html`` template::
+
+    <form method="POST">
+    {{ form }}
+    </form>
+
+Equivalently, you could write::
+
+    <form method="POST">
+    {{ form.as_table }}
+    </form>
+
+If you wanted to work with the individual inputs of the form, you can either
+call out the fields directly or iterate over them::
+
+    <form method="POST">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label }}</dt>
+        <dd>{{ field }}</dd>
+        <dd>{{ field.help_text }}</dd>
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
+    </form>
+
+Alternatively::
+
+    <form method="POST">
+    <ul class="myformclass">
+        <li>{{ form.sender.label }} {{ form.sender.label }}</li>
+        <li class="helptext" >{{ form.sender.help_text }}</li>
+        {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</dd>{% endif %}
+
+        <li>{{ form.subject.label }} {{ form.subject.label }}</li>
+        <li class="helptext" >{{ form.subject.help_text }}</li>
+        {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</dd>{% endif %}
+
+        ...
+    </ul>
+    </form>
+
 
 Subclassing forms
 -----------------
