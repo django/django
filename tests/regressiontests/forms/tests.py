@@ -3515,6 +3515,15 @@ u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
 u'1'
 >>> smart_unicode('foo')
 u'foo'
+
+# flatatt tests
+>>> from django.newforms.util import flatatt
+>>> flatatt({'id': "header"})
+u' id="header"'
+>>> flatatt({'class': "news", 'title': "Read this"})
+u' class="news" title="Read this"'
+>>> flatatt({})
+u''
 """
 
 __test__ = {
