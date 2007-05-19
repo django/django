@@ -115,7 +115,7 @@ u'\xcb'
 u'jack%20%26%20jill'
 >>> urlencode(1)
 u'1'
->>> urlencode(u'S\xf8r-Tr\xf8ndelag')
+>>> iriencode(u'S\xf8r-Tr\xf8ndelag')
 u'S%C3%B8r-Tr%C3%B8ndelag'
 
 >>> urlizetrunc(u'http://short.com/', 20)

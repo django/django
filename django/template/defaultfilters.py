@@ -3,7 +3,7 @@
 from django.template import resolve_variable, Library
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
 import re
 import random as random_module
 
@@ -83,6 +83,11 @@ def floatformat(text, arg=-1):
     else:
         formatstr = u'%%.%df' % abs(d)
         return formatstr % f
+
+def iriencode(value):
+    "Escapes an IRI value for use in a URL"
+    return smart_unicode(iri_to_uri(value))
+iriencode = stringfilter(iriencode)
 
 def linenumbers(value):
     "Displays text with line numbers"
@@ -170,7 +175,7 @@ upper = stringfilter(upper)
 def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
-    return smart_unicode(urllib.quote(smart_str(value)))
+    return smart_unicode(urllib.quote(value))
 urlencode = stringfilter(urlencode)
 
 def urlize(value):
@@ -566,6 +571,7 @@ register.filter(first)
 register.filter(fix_ampersands)
 register.filter(floatformat)
 register.filter(get_digit)
+register.filter(iriencode)
 register.filter(join)
 register.filter(length)
 register.filter(length_is)

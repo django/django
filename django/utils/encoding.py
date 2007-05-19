@@ -66,5 +66,8 @@ def iri_to_uri(iri):
 
     Returns an ASCII string containing the encoded result.
     """
-    return urllib.quote(smart_str(iri), safe='/#%[]')
+    # The list of safe characters here is constructed from the printable ASCII
+    # characters that are not explicitly excluded by the list at the end of
+    # section 3.1 of RFC 3987.
+    return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?')
 
