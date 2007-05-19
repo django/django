@@ -11,8 +11,8 @@ Being a Python Web framework, Django requires Python.
 
 It works with any Python version 2.3 and higher.
 
-Get Python at www.python.org. If you're running Linux or Mac OS X, you probably
-already have it installed.
+Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
+probably already have it installed.
 
 Install Apache and mod_python
 =============================
