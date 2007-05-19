@@ -7,7 +7,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 """
 
 from django.db import models
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, iri_to_uri
 from django.utils.translation import ugettext as _
 import datetime
 
@@ -44,7 +44,7 @@ class FilterSpec(object):
             for choice in self.choices(cl):
                 t.append(u'<li%s><a href="%s">%s</a></li>\n' % \
                     ((choice['selected'] and ' class="selected"' or ''),
-                     choice['query_string'] ,
+                     iri_to_uri(choice['query_string']),
                      choice['display']))
             t.append('</ul>\n\n')
         return "".join(t)
