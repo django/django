@@ -2,24 +2,26 @@
 HTML Widget classes
 """
 
-__all__ = (
-    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'Textarea', 'CheckboxInput',
-    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
-    'MultiWidget', 'SplitDateTimeWidget',
-)
-
-from util import flatatt
-from django.utils.datastructures import MultiValueDict
-from django.utils.html import escape
-from django.utils.translation import gettext
-from django.utils.encoding import StrAndUnicode, smart_unicode
-from itertools import chain
-
 try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
+from itertools import chain
+
+from django.utils.datastructures import MultiValueDict
+from django.utils.html import escape
+from django.utils.translation import gettext
+from django.utils.encoding import StrAndUnicode, smart_unicode
+
+from util import flatatt
+
+__all__ = (
+    'Widget', 'TextInput', 'PasswordInput',
+    'HiddenInput', 'MultipleHiddenInput',
+    'FileInput', 'Textarea', 'CheckboxInput',
+    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
+    'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
+)
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.

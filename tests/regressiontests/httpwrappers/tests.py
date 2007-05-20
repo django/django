@@ -166,6 +166,9 @@ True
 >>> q.pop('foo')
 ['bar', 'baz', 'another', 'hello']
 
+>>> q.pop('foo', 'not there')
+'not there'
+
 >>> q.get('foo', 'not there')
 'not there'
 

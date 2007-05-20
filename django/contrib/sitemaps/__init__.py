@@ -1,7 +1,7 @@
 from django.core import urlresolvers
 import urllib
 
-PING_URL = "http://www.google.com/webmasters/sitemaps/ping"
+PING_URL = "http://www.google.com/webmasters/tools/ping"
 
 class SitemapNotFound(Exception):
     pass
@@ -29,7 +29,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 
     from django.contrib.sites.models import Site
     current_site = Site.objects.get_current()
-    url = "%s%s" % (current_site.domain, sitemap_url)
+    url = "http://%s%s" % (current_site.domain, sitemap_url)
     params = urllib.urlencode({'sitemap':url})
     urllib.urlopen("%s?%s" % (ping_url, params))
 
