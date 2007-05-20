@@ -675,6 +675,11 @@ The easiest way is to iterate over the form's fields, with
     <input type="submit" />
     </form>
 
+This iteration technique is useful if you want to apply the same HTML
+formatting to each field, or if you don't know the names of the form fields
+ahead of time. Note that the fields will be listed in the order in which
+they're defined in the ``Form`` class.
+
 Alternatively, you can arrange the form's fields explicitly, by name. Do that
 by accessing ``{{ form.fieldname }}``, where ``fieldname`` is the field's name.
 For example::
