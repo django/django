@@ -321,6 +321,7 @@ Putting this all together, here is a simple view method that uses our contact
 form::
 
     from django.shortcuts import render_to_response
+    from django.http import HttpResponseRedirect
     from django import newforms as forms
 
     class ContactForm(forms.Form):
@@ -334,6 +335,7 @@ form::
             f = ContactForm(request.POST)
             if f.is_valid:
                 # ... do something with f.cleaned_data
+                return HttpResponseRedirect('/url/on_success/')
         else:
             f = ContactForm()
         return render_to_response('contact.html', {'form': f})
@@ -658,12 +660,13 @@ these parts from the template designer's point of view. Assuming you start
 with a view like this::
 
     def contact(request):
-        form = ContactForm()
         if request.method == 'POST':
-            new_data = request.POST.copy()
-            form = ContactForm(new_data)
+            form = ContactForm(request.POST)
             if form.is_valid():
                 # do form processing here...
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
         return render_to_response('contact.html', {'form': form})
 
 ...you can have a simple template that uses the shortcuts ``form.as_ul``,
