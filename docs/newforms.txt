@@ -1253,10 +1253,11 @@ the full list of conversions:
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
+    ``DecimalField``                 ``DecimalField``
     ``EmailField``                   ``EmailField``
     ``FileField``                    ``CharField``
     ``FilePathField``                ``CharField``
-    ``FloatField``                   ``CharField``
+    ``FloatField``                   ``FloatField``
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
     ``ImageField``                   ``CharField``
     ``IntegerField``                 ``IntegerField``
@@ -1280,6 +1281,11 @@ the full list of conversions:
                                      ``django.contrib.localflavor.us``)
     ``XMLField``                     ``CharField`` with ``widget=Textarea``
     ===============================  ========================================
+
+
+.. note::
+    The ``FloatField`` form field and ``DecimalField`` model and form fields
+    are new in the development version.
 
 As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
 types are special cases:

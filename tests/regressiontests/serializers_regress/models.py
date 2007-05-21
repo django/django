@@ -1,7 +1,7 @@
 """
 A test spanning all the capabilities of all the serializers.
 
-This class sets up a model for each model field type 
+This class sets up a model for each model field type
 (except for image types, because of the PIL dependency).
 """
 
@@ -9,12 +9,12 @@ from django.db import models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-# The following classes are for testing basic data 
+# The following classes are for testing basic data
 # marshalling, including NULL values.
 
 class BooleanData(models.Model):
     data = models.BooleanField(null=True)
-    
+
 class CharData(models.Model):
     data = models.CharField(maxlength=30, null=True)
 
@@ -23,6 +23,9 @@ class DateData(models.Model):
 
 class DateTimeData(models.Model):
     data = models.DateTimeField(null=True)
+
+class DecimalData(models.Model):
+    data = models.DecimalField(null=True, decimal_places=3, max_digits=5)
 
 class EmailData(models.Model):
     data = models.EmailField(null=True)
@@ -34,7 +37,7 @@ class FilePathData(models.Model):
     data = models.FilePathField(null=True)
 
 class FloatData(models.Model):
-    data = models.FloatField(null=True, decimal_places=3, max_digits=5)
+    data = models.FloatField(null=True)
 
 class IntegerData(models.Model):
     data = models.IntegerField(null=True)
@@ -145,6 +148,9 @@ class CharPKData(models.Model):
 # class DateTimePKData(models.Model):
 #    data = models.DateTimeField(primary_key=True)
 
+class DecimalPKData(models.Model):
+    data = models.DecimalField(primary_key=True, decimal_places=3, max_digits=5)
+
 class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
@@ -155,7 +161,7 @@ class FilePathPKData(models.Model):
     data = models.FilePathField(primary_key=True)
 
 class FloatPKData(models.Model):
-    data = models.FloatField(primary_key=True, decimal_places=3, max_digits=5)
+    data = models.FloatField(primary_key=True)
 
 class IntegerPKData(models.Model):
     data = models.IntegerField(primary_key=True)

@@ -17,6 +17,11 @@ except ImportError, e:
         module = 'sqlite3'
     raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
 
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal # for Python 2.3
+
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
@@ -26,6 +31,8 @@ Database.register_converter("date", util.typecast_date)
 Database.register_converter("datetime", util.typecast_timestamp)
 Database.register_converter("timestamp", util.typecast_timestamp)
 Database.register_converter("TIMESTAMP", util.typecast_timestamp)
+Database.register_converter("decimal", util.typecast_decimal)
+Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
 def utf8rowFactory(cursor, row):
     def utf8(s):

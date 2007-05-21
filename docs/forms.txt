@@ -567,6 +567,7 @@ check for the given property:
     * isValidANSIDate
     * isValidANSITime
     * isValidEmail
+    * isValidFloat
     * isValidImage
     * isValidImageURL
     * isValidPhone
@@ -664,10 +665,10 @@ fails. If no message is passed in, a default message is used.
     Takes an integer argument and when called as a validator, checks that the
     field being validated is a power of the integer.
 
-``IsValidFloat``
+``IsValidDecimal``
     Takes a maximum number of digits and number of decimal places (in that
-    order) and validates whether the field is a float with less than the
-    maximum number of digits and decimal place.
+    order) and validates whether the field is a decimal with no more than the
+    maximum number of digits and decimal places.
 
 ``MatchesRegularExpression``
     Takes a regular expression (a string) as a parameter and validates the

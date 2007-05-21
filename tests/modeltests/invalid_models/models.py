@@ -8,7 +8,7 @@ from django.db import models
 
 class FieldErrors(models.Model):
     charfield = models.CharField()
-    floatfield = models.FloatField()
+    decimalfield = models.DecimalField()
     filefield = models.FileField()
     prepopulate = models.CharField(maxlength=10, prepopulate_from='bad')
     choices = models.CharField(maxlength=10, choices='bad')
@@ -87,10 +87,10 @@ class SelfClashM2M(models.Model):
     src_safe = models.CharField(maxlength=10)
     selfclashm2m = models.CharField(maxlength=10)
 
-    # Non-symmetrical M2M fields _do_ have related accessors, so 
+    # Non-symmetrical M2M fields _do_ have related accessors, so
     # there is potential for clashes.
     selfclashm2m_set = models.ManyToManyField("SelfClashM2M", symmetrical=False)
-    
+
     m2m_1 = models.ManyToManyField("SelfClashM2M", related_name='id', symmetrical=False)
     m2m_2 = models.ManyToManyField("SelfClashM2M", related_name='src_safe', symmetrical=False)
 
@@ -108,8 +108,8 @@ class Car(models.Model):
     model = models.ForeignKey(Model)
 
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "maxlength" attribute.
-invalid_models.fielderrors: "floatfield": FloatFields require a "decimal_places" attribute.
-invalid_models.fielderrors: "floatfield": FloatFields require a "max_digits" attribute.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
+invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
 invalid_models.fielderrors: "filefield": FileFields require an "upload_to" attribute.
 invalid_models.fielderrors: "prepopulate": prepopulate_from should be a list or tuple.
 invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tuple or list).

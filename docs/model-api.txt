@@ -184,6 +184,33 @@ A date and time field. Takes the same extra options as ``DateField``.
 The admin represents this as two ``<input type="text">`` fields, with
 JavaScript shortcuts.
 
+``DecimalField``
+~~~~~~~~~~~~~~
+
+A fixed-precision decimal number, represented in Python by a ``Decimal`` instance.
+Has two **required** arguments:
+
+    ======================  ===================================================
+    Argument                Description
+    ======================  ===================================================
+    ``max_digits``          The maximum number of digits allowed in the number.
+
+    ``decimal_places``      The number of decimal places to store with the
+                            number.
+    ======================  ===================================================
+
+For example, to store numbers up to 999 with a resolution of 2 decimal places,
+you'd use::
+
+    models.DecimalField(..., max_digits=5, decimal_places=2)
+
+And to store numbers up to approximately one billion with a resolution of 10
+decimal places::
+
+    models.DecimalField(..., max_digits=19, decimal_places=10)
+
+The admin represents this as an ``<input type="text">`` (a single-line input).
+
 ``EmailField``
 ~~~~~~~~~~~~~~
 
@@ -290,26 +317,7 @@ because the ``match`` applies to the base filename (``foo.gif`` and
 ``FloatField``
 ~~~~~~~~~~~~~~
 
-A floating-point number. Has two **required** arguments:
-
-    ======================  ===================================================
-    Argument                Description
-    ======================  ===================================================
-    ``max_digits``          The maximum number of digits allowed in the number.
-
-    ``decimal_places``      The number of decimal places to store with the
-                            number.
-    ======================  ===================================================
-
-For example, to store numbers up to 999 with a resolution of 2 decimal places,
-you'd use::
-
-    models.FloatField(..., max_digits=5, decimal_places=2)
-
-And to store numbers up to approximately one billion with a resolution of 10
-decimal places::
-
-    models.FloatField(..., max_digits=19, decimal_places=10)
+A floating-point number represented in Python by a ``float`` instance.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 

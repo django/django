@@ -166,8 +166,8 @@ def items_for_result(cl, result):
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 result_repr = _boolean_icon(field_val)
-            # FloatFields are special: Zero-pad the decimals.
-            elif isinstance(f, models.FloatField):
+            # DecimalFields are special: Zero-pad the decimals.
+            elif isinstance(f, models.DecimalField):
                 if field_val is not None:
                     result_repr = ('%%.%sf' % f.decimal_places) % field_val
                 else:

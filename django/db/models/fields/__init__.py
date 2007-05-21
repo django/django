@@ -10,6 +10,10 @@ from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
 
 class NOT_PROVIDED:
     pass
@@ -573,6 +577,65 @@ class DateTimeField(DateField):
         defaults.update(kwargs)
         return super(DateTimeField, self).formfield(**defaults)
 
+class DecimalField(Field):
+    empty_strings_allowed = False
+    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
+        self.max_digits, self.decimal_places = max_digits, decimal_places
+        Field.__init__(self, verbose_name, name, **kwargs)
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return decimal.Decimal(value)
+        except decimal.InvalidOperation:
+            raise validators.ValidationError, gettext("This value must be a decimal number.")
+
+    def _format(self, value):
+        if isinstance(value, basestring):
+            return value
+        else:
+            return self.format_number(value)
+
+    def format_number(self, value):
+        """
+        Formats a number into a string with the requisite number of digits and
+        decimal places.
+        """
+        num_chars = self.max_digits
+        # Allow for a decimal point
+        if self.decimal_places > 0:
+            num_chars += 1
+        # Allow for a minus sign
+        if value < 0:
+            num_chars += 1
+
+        return "%.*f" % (self.decimal_places, value)
+
+    def get_db_prep_save(self, value):
+        if value is not None:
+            value = self._format(value)
+        return super(DecimalField, self).get_db_prep_save(value)
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        if lookup_type == 'range':
+            value = [self._format(v) for v in value]
+        else:
+            value = self._format(value)
+        return super(DecimalField, self).get_db_prep_lookup(lookup_type, value)
+
+    def get_manipulator_field_objs(self):
+        return [curry(oldforms.DecimalField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'max_digits': self.max_digits,
+            'decimal_places': self.decimal_places,
+            'form_class': forms.DecimalField,
+        }
+        defaults.update(kwargs)
+        return super(DecimalField, self).formfield(**defaults)
+
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 75
@@ -683,12 +746,14 @@ class FilePathField(Field):
 
 class FloatField(Field):
     empty_strings_allowed = False
-    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
-        self.max_digits, self.decimal_places = max_digits, decimal_places
-        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [curry(oldforms.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
+        return [oldforms.FloatField]
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.FloatField}
+        defaults.update(kwargs)
+        return super(FloatField, self).formfield(**defaults)
 
 class ImageField(FileField):
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):

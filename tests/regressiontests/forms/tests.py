@@ -7,6 +7,10 @@ form_tests = r"""
 >>> import datetime
 >>> import time
 >>> import re
+>>> try:
+...     from decimal import Decimal
+... except ImportError:
+...     from django.utils._decimal import Decimal
 
 ###########
 # Widgets #
@@ -1045,6 +1049,133 @@ ValidationError: [u'Ensure this value is greater than or equal to 10.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value is less than or equal to 20.']
+
+# FloatField ##################################################################
+
+>>> f = FloatField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('1')
+1.0
+>>> isinstance(f.clean('1'), float)
+True
+>>> f.clean('23')
+23.0
+>>> f.clean('3.14')
+3.1400000000000001
+>>> f.clean('a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('1.0 ')
+1.0
+>>> f.clean(' 1.0')
+1.0
+>>> f.clean(' 1.0 ')
+1.0
+>>> f.clean('1.0a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+
+>>> f = FloatField(required=False)
+>>> f.clean('')
+
+>>> f.clean(None)
+
+>>> f.clean('1')
+1.0
+
+FloatField accepts min_value and max_value just like IntegerField:
+>>> f = FloatField(max_value=1.5, min_value=0.5)
+
+>>> f.clean('1.6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 1.5.']
+>>> f.clean('0.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
+>>> f.clean('1.5')
+1.5
+>>> f.clean('0.5')
+0.5
+
+# DecimalField ################################################################
+
+>>> f = DecimalField(max_digits=4, decimal_places=2)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('1')
+Decimal("1")
+>>> isinstance(f.clean('1'), Decimal)
+True
+>>> f.clean('23')
+Decimal("23")
+>>> f.clean('3.14')
+Decimal("3.14")
+>>> f.clean('a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('1.0 ')
+Decimal("1.0")
+>>> f.clean(' 1.0')
+Decimal("1.0")
+>>> f.clean(' 1.0 ')
+Decimal("1.0")
+>>> f.clean('1.0a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('123.45')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 4 digits in total.']
+>>> f.clean('1.234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 decimal places.']
+>>> f.clean('123.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 digits before the decimal point.']
+>>> f = DecimalField(max_digits=4, decimal_places=2, required=False)
+>>> f.clean('')
+
+>>> f.clean(None)
+
+>>> f.clean('1')
+Decimal("1")
+
+DecimalField accepts min_value and max_value just like IntegerField:
+>>> f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
+
+>>> f.clean('1.6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 1.5.']
+>>> f.clean('0.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
+>>> f.clean('1.5')
+Decimal("1.5")
+>>> f.clean('0.5')
+Decimal("0.5")
 
 # DateField ###################################################################
 
