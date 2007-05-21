@@ -461,7 +461,7 @@ def get_query_set_class(DefaultQuerySet):
 
         def resolve_columns(self, row, fields=()):
             from django.db.models.fields import DateField, DateTimeField, \
-                TimeField, BooleanField, NullBooleanField
+                TimeField, BooleanField, NullBooleanField, DecimalField
             values = []
             for value, field in map(None, row, fields):
                 if isinstance(value, Database.LOB):
@@ -475,6 +475,9 @@ def get_query_set_class(DefaultQuerySet):
                 # Convert 1 or 0 to True or False
                 elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
                     value = bool(value)
+                # Convert floats to decimals
+                elif value is not None and isinstance(field, DecimalField):
+                    value = util.typecast_decimal(field.format_number(value))
                 # cx_Oracle always returns datetime.datetime objects for
                 # DATE and TIMESTAMP columns, but Django wants to see a
                 # python datetime.date, .time, or .datetime.  We use the type
