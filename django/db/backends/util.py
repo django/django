@@ -2,6 +2,11 @@ import datetime
 import md5
 from time import time
 
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
+
 class CursorDebugWrapper(object):
     def __init__(self, cursor, db):
         self.cursor = cursor
@@ -86,12 +91,22 @@ def typecast_boolean(s):
     if not s: return False
     return str(s)[0].lower() == 't'
 
+def typecast_decimal(s):
+    if s is None:
+        return None
+    return decimal.Decimal(s)
+
 ###############################################
 # Converters from Python to database (string) #
 ###############################################
 
 def rev_typecast_boolean(obj, d):
     return obj and '1' or '0'
+
+def rev_typecast_decimal(d):
+    if d is None:
+        return None
+    return str(d)
 
 def truncate_name(name, length=None):
     """Shortens a string to a repeatable mangled version with the given length.

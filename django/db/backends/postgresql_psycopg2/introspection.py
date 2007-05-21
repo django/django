@@ -72,6 +72,7 @@ DATA_TYPES_REVERSE = {
     21: 'SmallIntegerField',
     23: 'IntegerField',
     25: 'TextField',
+    701: 'FloatField',
     869: 'IPAddressField',
     1043: 'CharField',
     1082: 'DateField',
@@ -79,5 +80,5 @@ DATA_TYPES_REVERSE = {
     1114: 'DateTimeField',
     1184: 'DateTimeField',
     1266: 'TimeField',
-    1700: 'FloatField',
+    1700: 'DecimalField',
 }

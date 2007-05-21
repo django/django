@@ -320,7 +320,7 @@ method a ``short_description`` attribute::
 
 
 Let's add another improvement to the Poll change list page: Filters. Add the
-following line to ``Poll.admin``::
+following line to ``Poll.Admin``::
 
     list_filter = ['pub_date']
 

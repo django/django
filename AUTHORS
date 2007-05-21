@@ -41,7 +41,6 @@ And here is an inevitably incomplete list of MUCH-APPRECIATED CONTRIBUTORS --
 people who have submitted patches, reported bugs, added translations, helped
 answer newbie questions, and generally made Django that much better:
 
-    adurdin@gmail.com
     alang@bright-green.com
     Marty Alchin <gulopine@gamemusic.org>
     Daniel Alves Barbosa de Oliveira Vaz <danielvaz@gmail.com>
@@ -90,6 +89,7 @@ answer newbie questions, and generally made Django that much better:
     dne@mayonnaise.net
     Maximillian Dornseif <md@hudora.de>
     Jeremy Dunck <http://dunck.us/>
+    Andrew Durdin <adurdin@gmail.com>
     Andy Dustman <farcepest@gmail.com>
     Clint Ecker
     enlight
@@ -190,7 +190,7 @@ answer newbie questions, and generally made Django that much better:
     polpak@yahoo.com
     J. Rademaker
     Michael Radziej <mir@noris.de>
-    ramiro
+    Ramiro Morales <rm0@gmx.net>
     Massimiliano Ravelli <massimiliano.ravelli@gmail.com>
     Brian Ray <http://brianray.chipy.org/>
     remco@diji.biz
@@ -209,6 +209,7 @@ answer newbie questions, and generally made Django that much better:
     sopel
     Wiliam Alves de Souza <wiliamsouza83@gmail.com>
     Georgi Stanojevski <glisha@gmail.com>
+    Vasiliy Stavenko <stavenko@gmail.com>
     Thomas Steinacher <http://www.eggdrop.ch/>
     nowell strite
     Radek Švarz <http://www.svarz.cz/translate/>

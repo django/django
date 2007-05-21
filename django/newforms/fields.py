@@ -19,7 +19,7 @@ __all__ = (
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
-    'ComboField', 'MultiValueField',
+    'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField',
 )
 
@@ -30,6 +30,11 @@ try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
+
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal   # Python 2.3 fallback
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
@@ -132,6 +137,67 @@ class IntegerField(Field):
             raise ValidationError(gettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(gettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
+        return value
+
+class FloatField(Field):
+    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
+        Field.__init__(self, *args, **kwargs)
+
+    def clean(self, value):
+        """
+        Validates that float() can be called on the input. Returns a float.
+        Returns None for empty values.
+        """
+        super(FloatField, self).clean(value)
+        if not self.required and value in EMPTY_VALUES:
+            return None
+        try:
+            value = float(value)
+        except (ValueError, TypeError):
+            raise ValidationError(gettext('Enter a number.'))
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(gettext('Ensure this value is less than or equal to %s.') % self.max_value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(gettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+        return value
+
+decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
+
+class DecimalField(Field):
+    def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
+        self.max_digits, self.decimal_places = max_digits, decimal_places
+        Field.__init__(self, *args, **kwargs)
+
+    def clean(self, value):
+        """
+        Validates that the input is a decimal number. Returns a Decimal
+        instance. Returns None for empty values. Ensures that there are no more
+        than max_digits in the number, and no more than decimal_places digits
+        after the decimal point.
+        """
+        super(DecimalField, self).clean(value)
+        if not self.required and value in EMPTY_VALUES:
+            return None
+        value = value.strip()
+        match = decimal_re.search(value)
+        if not match:
+            raise ValidationError(gettext('Enter a number.'))
+        else:
+            value = Decimal(value)
+        digits = len(match.group('digits') or '')
+        decimals = len(match.group('decimals') or '')
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(gettext('Ensure this value is less than or equal to %s.') % self.max_value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(gettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+        if self.max_digits is not None and (digits + decimals) > self.max_digits:
+            raise ValidationError(gettext('Ensure that there are no more than %s digits in total.') % self.max_digits)
+        if self.decimal_places is not None and decimals > self.decimal_places:
+            raise ValidationError(gettext('Ensure that there are no more than %s decimal places.') % self.decimal_places)
+        if self.max_digits is not None and self.decimal_places is not None and digits > (self.max_digits - self.decimal_places):
+            raise ValidationError(gettext('Ensure that there are no more than %s digits before the decimal point.') % (self.max_digits - self.decimal_places))
         return value
 
 DEFAULT_DATE_INPUT_FORMATS = (

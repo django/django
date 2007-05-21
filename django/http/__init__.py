@@ -121,9 +121,9 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.update(self, other_dict)
 
-    def pop(self, key):
+    def pop(self, key, *args):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key)
+        return MultiValueDict.pop(self, key, *args)
 
     def popitem(self):
         self._assert_mutable()

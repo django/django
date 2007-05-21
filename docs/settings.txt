@@ -1055,7 +1055,7 @@ You can tell Django to stop reporting particular 404s by tweaking the
 tuple of strings. For example::
 
     IGNORABLE_404_ENDS = ('.php', '.cgi')
-    IGNORABLE_404_STARTS = ('/phpmyadmin/')
+    IGNORABLE_404_STARTS = ('/phpmyadmin/',)
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not*
 be reported. Neither will any URL starting with ``/phpmyadmin/``.
