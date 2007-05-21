@@ -185,7 +185,9 @@ The admin represents this as two ``<input type="text">`` fields, with
 JavaScript shortcuts.
 
 ``DecimalField``
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+
+**New in Django development version**
 
 A fixed-precision decimal number, represented in Python by a ``Decimal`` instance.
 Has two **required** arguments:
@@ -317,9 +319,16 @@ because the ``match`` applies to the base filename (``foo.gif`` and
 ``FloatField``
 ~~~~~~~~~~~~~~
 
+**Changed in Django development version**
+
 A floating-point number represented in Python by a ``float`` instance.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
+
+**NOTE:** The semantics of ``FloatField`` have changed in the Django
+development version. See the `Django 0.96 documentation`_ for the old behavior.
+
+.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
 
 ``ImageField``
 ~~~~~~~~~~~~~~
@@ -751,7 +760,7 @@ relationship should work. All are optional:
     ``limit_choices_to``     A dictionary of lookup arguments and values (see
                              the `Database API reference`_) that limit the
                              available admin choices for this object. Use this
-                             with functions from the Python ``datetime`` module 
+                             with functions from the Python ``datetime`` module
                              to limit choices of objects by date. For example::
 
                                 limit_choices_to = {'pub_date__lte': datetime.now}
