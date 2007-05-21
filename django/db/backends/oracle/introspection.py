@@ -46,5 +46,5 @@ DATA_TYPES_REVERSE = {
     1114: 'DateTimeField',
     1184: 'DateTimeField',
     1266: 'TimeField',
-    1700: 'FloatField',
+    1700: 'DecimalField',
 }

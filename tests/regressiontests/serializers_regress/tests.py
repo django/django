@@ -16,6 +16,10 @@ from django.db import transaction
 from django.core import management
 
 from models import *
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds
@@ -118,10 +122,14 @@ test_data = [
     (data_obj, 51, FileData, None),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
     (data_obj, 61, FilePathData, None),
-    (data_obj, 70, FloatData, 12.345),
-    (data_obj, 71, FloatData, -12.345),
-    (data_obj, 72, FloatData, 0.0),
-    (data_obj, 73, FloatData, None),
+    (data_obj, 70, DecimalData, decimal.Decimal('12.345')),
+    (data_obj, 71, DecimalData, decimal.Decimal('-12.345')),
+    (data_obj, 72, DecimalData, decimal.Decimal('0.0')),
+    (data_obj, 73, DecimalData, None),
+    (data_obj, 74, FloatData, 12.345),
+    (data_obj, 75, FloatData, -12.345),
+    (data_obj, 76, FloatData, 0.0),
+    (data_obj, 77, FloatData, None),
     (data_obj, 80, IntegerData, 123456789),
     (data_obj, 81, IntegerData, -123456789),
     (data_obj, 82, IntegerData, 0),
@@ -204,9 +212,12 @@ The end."""),
     (pk_obj, 640, EmailPKData, "hovercraft@example.com"),
     (pk_obj, 650, FilePKData, 'file:///foo/bar/whiz.txt'),
     (pk_obj, 660, FilePathPKData, "/foo/bar/whiz.txt"),
-    (pk_obj, 670, FloatPKData, 12.345),
-    (pk_obj, 671, FloatPKData, -12.345),
-    (pk_obj, 672, FloatPKData, 0.0),
+    (pk_obj, 670, DecimalPKData, decimal.Decimal('12.345')),
+    (pk_obj, 671, DecimalPKData, decimal.Decimal('-12.345')),
+    (pk_obj, 672, DecimalPKData, decimal.Decimal('0.0')),
+    (pk_obj, 673, FloatPKData, 12.345),
+    (pk_obj, 674, FloatPKData, -12.345),
+    (pk_obj, 675, FloatPKData, 0.0),
     (pk_obj, 680, IntegerPKData, 123456789),
     (pk_obj, 681, IntegerPKData, -123456789),
     (pk_obj, 682, IntegerPKData, 0),

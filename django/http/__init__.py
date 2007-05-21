@@ -155,9 +155,12 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.update(self, other_dict)
 
-    def pop(self, key):
+    def pop(self, key, *args):
         self._assert_mutable()
-        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.pop(self, key)]
+        val = MultiValueDict.pop(self, key, *args)
+        if isinstance(val, list):
+            return [str_to_unicode(v, self.encoding) for v in val]
+        return str_to_unicode(val, self.encoding)
 
     def popitem(self):
         self._assert_mutable()

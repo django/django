@@ -3,11 +3,15 @@
 import os, sys, traceback
 import unittest
 
+import django.contrib as contrib
+CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
+
 TEST_DATABASE_NAME = 'django_test_db'
 TEST_TEMPLATE_DIR = 'templates'
 
+CONTRIB_DIR = os.path.dirname(contrib.__file__)
 MODEL_TEST_DIR = os.path.join(os.path.dirname(__file__), MODEL_TESTS_DIR_NAME)
 REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_DIR_NAME)
 
@@ -24,7 +28,7 @@ ALWAYS_INSTALLED_APPS = [
 
 def get_test_models():
     models = []
-    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR):
+    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
             if f.startswith('__init__') or f.startswith('.') or f.startswith('sql') or f.startswith('invalid'):
                 continue
@@ -33,7 +37,7 @@ def get_test_models():
 
 def get_invalid_models():
     models = []
-    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR):
+    for loc, dirpath in (MODEL_TESTS_DIR_NAME, MODEL_TEST_DIR), (REGRESSION_TESTS_DIR_NAME, REGRESSION_TEST_DIR), (CONTRIB_DIR_NAME, CONTRIB_DIR):
         for f in os.listdir(dirpath):
             if f.startswith('__init__') or f.startswith('.') or f.startswith('sql'):
                 continue
@@ -109,8 +113,10 @@ def django_tests(verbosity, tests_to_run):
                 if verbosity >= 1:
                     print "Importing model %s" % model_name
                 mod = load_app(model_label)
-                settings.INSTALLED_APPS.append(model_label)
-                test_models.append(mod)
+                if mod:
+                    if model_label not in settings.INSTALLED_APPS:
+                        settings.INSTALLED_APPS.append(model_label)
+                    test_models.append(mod)
         except Exception, e:
             sys.stderr.write("Error while importing %s:" % model_name + ''.join(traceback.format_exception(*sys.exc_info())[1:]))
             continue

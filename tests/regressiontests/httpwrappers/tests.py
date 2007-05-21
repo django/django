@@ -166,6 +166,9 @@ u'hello'
 >>> q.pop('foo')
 [u'bar', u'baz', u'another', u'hello']
 
+>>> q.pop('foo', 'not there')
+u'not there'
+
 >>> q.get('foo', 'not there')
 u'not there'
 
