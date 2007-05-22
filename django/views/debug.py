@@ -2,6 +2,7 @@ from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
+from django.utils.encoding import smart_unicode
 import os, re
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
@@ -125,7 +126,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
-        'exception_value': smart_unicode(exc_value, errors='replace')
+        'exception_value': smart_unicode(exc_value, errors='replace'),
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
