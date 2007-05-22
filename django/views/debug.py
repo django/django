@@ -125,7 +125,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
-        'exception_value': exc_value,
+        'exception_value': smart_unicode(exc_value, errors='replace')
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
