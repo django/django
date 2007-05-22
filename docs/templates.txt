@@ -1012,6 +1012,16 @@ right-most digit, 2 is the second-right-most digit, etc. Returns the original
 value for invalid input (if input or argument is not an integer, or if argument
 is less than 1). Otherwise, output is always an integer.
 
+iriencode
+~~~~~~~~~
+
+Converts an IRI (Internationalized Resource Identifier) to a string that is
+suitable for including in a URL. This is necessary if you are trying to use
+strings containing non-ASCII characters in a URL.
+
+You can use this filter after you have used the ``urlencode`` filter on a
+string, without harm.
+
 join
 ~~~~
 

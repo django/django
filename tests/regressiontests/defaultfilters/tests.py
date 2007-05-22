@@ -117,6 +117,8 @@ u'jack%20%26%20jill'
 u'1'
 >>> iriencode(u'S\xf8r-Tr\xf8ndelag')
 u'S%C3%B8r-Tr%C3%B8ndelag'
+>>> iriencode(urlencode(u'jack & jill'))
+u'jack%20%26%20jill'
 
 >>> urlizetrunc(u'http://short.com/', 20)
 u'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'
