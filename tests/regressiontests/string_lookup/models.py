@@ -3,7 +3,7 @@ from django.db import models
 
 class Foo(models.Model):
     name = models.CharField(maxlength=50)
-    viking = models.CharField(maxlength=50, blank=True)
+    friend = models.CharField(maxlength=50, blank=True)
 
     def __unicode__(self):
         return "Foo %s" % self.name
@@ -71,13 +71,15 @@ __test__ = {'API_TESTS': ur"""
 
 # Regression tests for #3937: make sure we can use unicode characters in
 # queries.
+# BUG: These tests fail on MySQL, but it's a problem with the test setup. A
+# properly configured UTF-8 database can handle this.
 
->>> fx = Foo(name='Bjorn', viking=u'Freydís Eiríksdóttir')
+>>> fx = Foo(name='Bjorn', friend=u'François')
 >>> fx.save()
->>> Foo.objects.get(viking__contains=u'\xf3')
+>>> Foo.objects.get(friend__contains=u'\xe7')
 <Foo: Foo Bjorn>
 
 # We can also do the above query using UTF-8 strings.
->>> Foo.objects.get(viking__contains='\xc3\xb3')
+>>> Foo.objects.get(friend__contains='\xc3\xa7')
 <Foo: Foo Bjorn>
 """}
