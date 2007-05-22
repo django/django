@@ -6,6 +6,10 @@ WEEKDAYS = {
     0:_('Monday'), 1:_('Tuesday'), 2:_('Wednesday'), 3:_('Thursday'), 4:_('Friday'),
     5:_('Saturday'), 6:_('Sunday')
 }
+WEEKDAYS_ABBR = {
+    0:_('Mon'), 1:_('Tue'), 2:_('Wed'), 3:_('Thu'), 4:_('Fri'),
+    5:_('Sat'), 6:_('Sun')
+}
 WEEKDAYS_REV = {
     'monday':0, 'tuesday':1, 'wednesday':2, 'thursday':3, 'friday':4,
     'saturday':5, 'sunday':6

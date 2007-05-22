@@ -119,7 +119,7 @@ class Field(object):
         Subclasses should implement validate(), not validate_full().
         """
         if not self.blank and not field_data:
-            return [ugettext_lazy('This field is required.')]
+            return [_('This field is required.')]
         try:
             self.validate(field_data, all_data)
         except validators.ValidationError, e:

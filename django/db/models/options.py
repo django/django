@@ -5,7 +5,7 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
-from django.utils.translation import activate, deactivate_all, get_language
+from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from bisect import bisect
 import re
 
@@ -60,12 +60,12 @@ class Options(object):
                 setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', self.verbose_name + 's'))
+            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
                 raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         else:
-            self.verbose_name_plural = self.verbose_name + 's'
+            self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
     def _prepare(self, model):

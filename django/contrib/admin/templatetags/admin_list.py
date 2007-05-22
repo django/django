@@ -7,7 +7,7 @@ from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats, get_partial_date_formats, ugettext as _
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.template import Library
 import datetime
 
@@ -181,7 +181,7 @@ def items_for_result(cl, result):
                 result_repr = dict(f.choices).get(field_val, EMPTY_CHANGELIST_VALUE)
             else:
                 result_repr = escape(field_val)
-        if result_repr == '':
+        if force_unicode(result_repr) == '':
             result_repr = '&nbsp;'
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:

@@ -3,7 +3,7 @@ def curry(_curried_func, *args, **kwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
     return _curried
 
-class Promise:
+class Promise(object):
     """
     This is just a base class for the proxy class created in
     the closure of the lazy function. It can be used to recognize
@@ -57,3 +57,19 @@ def lazy(func, *resultclasses):
         return __proxy__(args, kw)
 
     return __wrapper__
+
+def allow_lazy(func, *resultclasses):
+    """
+    A decorator that allows a function to be called with one or more lazy
+    arguments. If none of the args are lazy, the function is evaluated
+    immediately, otherwise a __proxy__ is returned that will evaluate the
+    function when needed.
+    """
+    def wrapper(*args, **kwargs):
+        for arg in list(args) + kwargs.values():
+            if isinstance(arg, Promise):
+                break
+        else:
+            return func(*args, **kwargs)
+        return lazy(func, *resultclasses)(*args, **kwargs)
+    return wrapper

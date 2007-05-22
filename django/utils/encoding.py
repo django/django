@@ -17,15 +17,16 @@ def smart_unicode(s, encoding='utf-8', errors='strict'):
     Returns a unicode object representing 's'. Treats bytestrings using the
     'encoding' codec.
     """
-    #if isinstance(s, Promise):
-    #    # The input is the result of a gettext_lazy() call, or similar. It will
-    #    # already be encoded in DEFAULT_CHARSET on evaluation and we don't want
-    #    # to evaluate it until render time.
-    #    # FIXME: This isn't totally consistent, because it eventually returns a
-    #    # bytestring rather than a unicode object. It works wherever we use
-    #    # smart_unicode() at the moment. Fixing this requires work in the
-    #    # i18n internals.
-    #    return s
+    if isinstance(s, Promise):
+        # The input is the result of a gettext_lazy() call.
+        return s
+    return force_unicode(s, encoding, errors)
+
+def force_unicode(s, encoding='utf-8', errors='strict'):
+    """
+    Similar to smart_unicode, except that lazy instances are resolved to
+    strings, rather than kept as lazy objects.
+    """
     if not isinstance(s, basestring,):
         if hasattr(s, '__unicode__'):
             s = unicode(s)

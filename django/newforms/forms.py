@@ -6,7 +6,7 @@ import copy
 
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape
-from django.utils.encoding import StrAndUnicode, smart_unicode
+from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 
 from fields import Field
 from widgets import TextInput, Textarea
@@ -125,7 +125,7 @@ class BaseForm(StrAndUnicode):
                 if errors_on_separate_row and bf_errors:
                     output.append(error_row % bf_errors)
                 if bf.label:
-                    label = escape(bf.label)
+                    label = escape(force_unicode(bf.label))
                     # Only add a colon if the label does not end in punctuation.
                     if label[-1] not in ':?.!':
                         label += ':'

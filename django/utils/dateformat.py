@@ -11,10 +11,10 @@ Usage:
 >>>
 """
 
-from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS
+from django.utils.dates import MONTHS, MONTHS_3, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR
 from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import ugettext as _
-from django.utils.encoding import smart_unicode
+from django.utils.translation import string_concat, ugettext as _
+from django.utils.encoding import force_unicode
 from calendar import isleap, monthrange
 import re, time
 
@@ -24,9 +24,9 @@ re_escaped = re.compile(r'\\(.)')
 class Formatter(object):
     def format(self, formatstr):
         pieces = []
-        for i, piece in enumerate(re_formatchars.split(formatstr)):
+        for i, piece in enumerate(re_formatchars.split(force_unicode(formatstr))):
             if i % 2:
-                pieces.append(smart_unicode(getattr(self, piece)()))
+                pieces.append(force_unicode(getattr(self, piece)()))
             elif piece:
                 pieces.append(re_escaped.sub(r'\1', piece))
         return u''.join(pieces)
@@ -123,7 +123,7 @@ class DateFormat(TimeFormat):
 
     def D(self):
         "Day of the week, textual, 3 letters; e.g. 'Fri'"
-        return WEEKDAYS[self.data.weekday()][0:3]
+        return WEEKDAYS_ABBR[self.data.weekday()]
 
     def F(self):
         "Month, textual, long; e.g. 'January'"

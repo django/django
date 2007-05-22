@@ -3,7 +3,7 @@
 import os, re, sys
 import gettext as gettext_module
 from cStringIO import StringIO
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import force_unicode
 
 try:
     import threading
@@ -516,8 +516,7 @@ def templatize(src):
 
 def string_concat(*strings):
     """"
-    lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts. Handles lazy strings and non-strings by
-    first turning all arguments to unicode, before joining them.
+    Lazy variant of string concatenation, needed for translations that are
+    constructed from multiple parts.
     """
-    return u''.join([smart_unicode(el) for el in strings])
+    return u''.join([force_unicode(s) for s in strings])

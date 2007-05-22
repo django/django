@@ -3,7 +3,7 @@
 from django.template import resolve_variable, Library
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
-from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
+from django.utils.encoding import force_unicode, smart_str, iri_to_uri
 import re
 import random as random_module
 
@@ -15,13 +15,14 @@ register = Library()
 
 def stringfilter(func):
     """
-    Decorator for filters which should only receive unicode objects. The object passed
-    as the first positional argument will be converted to a unicode object.
+    Decorator for filters which should only receive unicode objects. The object
+    passed as the first positional argument will be converted to a unicode
+    object.
     """
     def _dec(*args, **kwargs):
         if args:
             args = list(args)
-            args[0] = smart_unicode(args[0])
+            args[0] = force_unicode(args[0])
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
@@ -76,7 +77,7 @@ def floatformat(text, arg=-1):
     try:
         d = int(arg)
     except ValueError:
-        return smart_unicode(f)
+        return force_unicode(f)
     m = f - int(f)
     if not m and d < 0:
         return u'%d' % int(f)
@@ -86,7 +87,7 @@ def floatformat(text, arg=-1):
 
 def iriencode(value):
     "Escapes an IRI value for use in a URL"
-    return smart_unicode(iri_to_uri(value))
+    return force_unicode(iri_to_uri(value))
 iriencode = stringfilter(iriencode)
 
 def linenumbers(value):
@@ -175,7 +176,7 @@ upper = stringfilter(upper)
 def urlencode(value):
     "Escapes a value for use in a URL"
     import urllib
-    return smart_unicode(urllib.quote(value))
+    return force_unicode(urllib.quote(value))
 urlencode = stringfilter(urlencode)
 
 def urlize(value):
@@ -309,7 +310,7 @@ def first(value):
 def join(value, arg):
     "Joins a list with a string, like Python's ``str.join(list)``"
     try:
-        return arg.join(map(smart_unicode, value))
+        return arg.join(map(force_unicode, value))
     except AttributeError: # fail silently but nicely
         return value
 
@@ -369,10 +370,10 @@ def unordered_list(value):
     def _helper(value, tabs):
         indent = u'\t' * tabs
         if value[1]:
-            return u'%s<li>%s\n%s<ul>\n%s\n%s</ul>\n%s</li>' % (indent, smart_unicode(value[0]), indent,
+            return u'%s<li>%s\n%s<ul>\n%s\n%s</ul>\n%s</li>' % (indent, force_unicode(value[0]), indent,
                 u'\n'.join([_helper(v, tabs+1) for v in value[1]]), indent, indent)
         else:
-            return u'%s<li>%s</li>' % (indent, smart_unicode(value[0]))
+            return u'%s<li>%s</li>' % (indent, force_unicode(value[0]))
     return _helper(value, 1)
 
 ###################
@@ -551,7 +552,7 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception, e:
-        return u"Error in formatting:%s" % smart_unicode(e)
+        return u"Error in formatting:%s" % force_unicode(e)
 
 # Syntax: register.filter(name of filter, callback)
 register.filter(add)

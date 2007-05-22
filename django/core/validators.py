@@ -12,6 +12,7 @@ import urllib2
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
 from django.utils.functional import Promise, lazy
+from django.utils.encoding import force_unicode
 import re
 
 _datere = r'\d{4}-\d{1,2}-\d{1,2}'
@@ -38,10 +39,11 @@ class ValidationError(Exception):
     def __init__(self, message):
         "ValidationError can be passed a string or a list."
         if isinstance(message, list):
-            self.messages = message
+            self.messages = [force_unicode(msg) for msg in message]
         else:
             assert isinstance(message, (basestring, Promise)), ("%s should be a string" % repr(message))
-            self.messages = [message]
+            self.messages = [force_unicode(message)]
+
     def __str__(self):
         # This is needed because, without a __str__(), printing an exception
         # instance would result in this:
@@ -53,10 +55,11 @@ class CriticalValidationError(Exception):
     def __init__(self, message):
         "ValidationError can be passed a string or a list."
         if isinstance(message, list):
-            self.messages = message
+            self.messages = [force_unicode(msg) for msg in message]
         else:
             assert isinstance(message, (basestring, Promise)), ("'%s' should be a string" % message)
-            self.messages = [message]
+            self.messages = [force_unicode(message)]
+
     def __str__(self):
         return str(self.messages)
 

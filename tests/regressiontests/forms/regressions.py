@@ -27,13 +27,13 @@ Translations are done at rendering time, so multi-lingual apps can define forms
 early and still send back the right translation.
 
 # XFAIL
-# >>> activate('de')
-# >>> print f.as_p()
-# <p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
-# >>> activate('pl')
-# >>> f.as_p()
-# u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>'
-# >>> deactivate()
+>>> activate('de')
+>>> print f.as_p()
+<p><label for="id_username">Benutzername:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>
+>>> activate('pl')
+>>> f.as_p()
+u'<p><label for="id_username">Nazwa u\u017cytkownika:</label> <input id="id_username" type="text" name="username" maxlength="10" /></p>'
+>>> deactivate()
 
 Unicode decoding problems...
 >>> GENDERS = ((u'\xc5', u'En tied\xe4'), (u'\xf8', u'Mies'), (u'\xdf', u'Nainen'))
