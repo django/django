@@ -35,7 +35,6 @@ def Deserializer(stream_or_string, **options):
         stream = StringIO(stream_or_string)
     else:
         stream = stream_or_string
-    #for obj in PythonDeserializer(simplejson.load(stream, cls=DjangoJSONDecoder)):
     for obj in PythonDeserializer(simplejson.load(stream)):
         yield obj
 
@@ -62,25 +61,3 @@ class DjangoJSONEncoder(simplejson.JSONEncoder):
 # Older, deprecated class name (for backwards compatibility purposes).
 DateTimeAwareJSONEncoder = DjangoJSONEncoder
 
-## Our override for simplejson.JSONNumber, because we want to use decimals in
-## preference to floats (we can convert decimal -> float when they stored, if
-## needed, but cannot go the other way).
-#def DjangoNumber(match, context):
-#    match = DjangoNumber.regex.match(match.string, *match.span())
-#    integer, frac, exp = match.groups()
-#    if exp:
-#        res = float(integer + (frac or '') + (exp or ''))
-#    elif frac:
-#        res = decimal.Decimal(integer + frac)
-#    else:
-#        res = int(integer)
-#    return res, None
-#decoder.pattern(r'(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?')(DjangoNumber)
-#
-#converters = decoder.ANYTHING[:]
-#converters[-1] = DjangoNumber
-#decoder.JSONScanner = decoder.Scanner(converters)
-#
-#class DjangoJSONDecoder(simplejson.JSONDecoder):
-#    _scanner = decoder.Scanner(converters)
-#
