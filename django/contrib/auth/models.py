@@ -3,7 +3,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import ugettext_lazy as _
 import datetime
 import urllib
 
@@ -281,7 +281,7 @@ class AnonymousUser(object):
         pass
 
     def __unicode__(self):
-        return ugettext_lazy('AnonymousUser')
+        return _('AnonymousUser')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

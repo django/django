@@ -78,7 +78,7 @@ def result_headers(cl):
             # attribute "short_description". If that doesn't exist, fall back
             # to the method name. And __str__ and __unicode__ are special-cases.
             if field_name == '__unicode__':
-                header = smart_unicode(lookup_opts.verbose_name)
+                header = force_unicode(lookup_opts.verbose_name)
             elif field_name == '__str__':
                 header = smart_str(lookup_opts.verbose_name)
             else:

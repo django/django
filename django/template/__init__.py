@@ -58,9 +58,9 @@ import re
 from inspect import getargspec
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
-from django.utils.functional import curry
+from django.utils.functional import curry, Promise
 from django.utils.text import smart_split
-from django.utils.encoding import smart_unicode, smart_str
+from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.utils.translation import ugettext as _
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
@@ -705,6 +705,8 @@ def resolve_variable(path, context):
                     else:
                         raise
             del bits[0]
+    if isinstance(current, (basestring, Promise)):
+        current = force_unicode(current)
     return current
 
 class Node(object):

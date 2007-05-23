@@ -215,7 +215,7 @@ class AdminOptions(object):
         save_on_top=False, list_select_related=False, manager=None, list_per_page=100):
         self.fields = fields
         self.js = js or []
-        self.list_display = list_display or ['__str__']
+        self.list_display = list_display or ['__unicode__']
         self.list_display_links = list_display_links or []
         self.list_filter = list_filter or []
         self.date_hierarchy = date_hierarchy

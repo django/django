@@ -12,7 +12,7 @@ from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, force_unicode
 from django.conf import settings
 from itertools import izip
 import types
@@ -88,7 +88,7 @@ class Model(object):
 
     def __str__(self):
         if hasattr(self, '__unicode__'):
-            return unicode(self).encode('utf-8')
+            return force_unicode(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
@@ -320,7 +320,7 @@ class Model(object):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return dict(field.choices).get(value, value)
+        return force_unicode(dict(field.choices).get(value, value))
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
