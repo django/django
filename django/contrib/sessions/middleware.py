@@ -36,6 +36,9 @@ class SessionWrapper(object):
     def get(self, key, default=None):
         return self._session.get(key, default)
 
+    def pop(self, key, *args):
+        return self._session.pop(key, *args)
+
     def set_test_cookie(self):
         self[TEST_COOKIE_NAME] = TEST_COOKIE_VALUE
 

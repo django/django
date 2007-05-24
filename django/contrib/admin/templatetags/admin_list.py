@@ -72,6 +72,7 @@ def result_headers(cl):
     for i, field_name in enumerate(cl.list_display):
         try:
             f = lookup_opts.get_field(field_name)
+            admin_order_field = None
         except models.FieldDoesNotExist:
             # For non-field list_display values, check for the function
             # attribute "short_description". If that doesn't exist, fall
@@ -86,7 +87,8 @@ def result_headers(cl):
                     header = field_name.replace('_', ' ')
 
             # It is a non-field, but perhaps one that is sortable
-            if not getattr(getattr(cl.model, field_name), "admin_order_field", None):
+            admin_order_field = getattr(getattr(cl.model, field_name), "admin_order_field", None)
+            if not admin_order_field:
                 yield {"text": header}
                 continue
 
@@ -101,7 +103,7 @@ def result_headers(cl):
 
         th_classes = []
         new_order_type = 'asc'
-        if field_name == cl.order_field:
+        if field_name == cl.order_field or admin_order_field == cl.order_field:
             th_classes.append('sorted %sending' % cl.order_type.lower())
             new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
 
@@ -166,8 +168,8 @@ def items_for_result(cl, result):
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
                 result_repr = _boolean_icon(field_val)
-            # FloatFields are special: Zero-pad the decimals.
-            elif isinstance(f, models.FloatField):
+            # DecimalFields are special: Zero-pad the decimals.
+            elif isinstance(f, models.DecimalField):
                 if field_val is not None:
                     result_repr = ('%%.%sf' % f.decimal_places) % field_val
                 else:

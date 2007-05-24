@@ -25,6 +25,7 @@ email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
 integer_re = re.compile(r'^-?\d+$')
 ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
@@ -406,27 +407,34 @@ class IsAPowerOf(object):
         if val != int(val):
             raise ValidationError, gettext("This value must be a power of %s.") % self.power_of
 
-class IsValidFloat(object):
+class IsValidDecimal(object):
     def __init__(self, max_digits, decimal_places):
         self.max_digits, self.decimal_places = max_digits, decimal_places
 
     def __call__(self, field_data, all_data):
-        data = str(field_data)
-        try:
-            float(data)
-        except ValueError:
+        match = decimal_re.search(str(field_data))
+        if not match:
             raise ValidationError, gettext("Please enter a valid decimal number.")
-        # Negative floats require more space to input.
-        max_allowed_length = data.startswith('-') and (self.max_digits + 2) or (self.max_digits + 1)
-        if len(data) > max_allowed_length:
+        
+        digits = len(match.group('digits') or '')
+        decimals = len(match.group('decimals') or '')
+        
+        if digits + decimals > self.max_digits:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
+        if digits > (self.max_digits - self.decimal_places):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
-        if '.' in data and len(data.split('.')[1]) > self.decimal_places:
+        if decimals > self.decimal_places:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s decimal place.",
                 "Please enter a valid decimal number with at most %s decimal places.", self.decimal_places) % self.decimal_places
+
+def isValidFloat(field_data, all_data):
+    data = str(field_data)
+    try:
+        float(data)
+    except ValueError:
+        raise ValidationError, gettext("Please enter a valid floating point number.")
 
 class HasAllowableSize(object):
     """

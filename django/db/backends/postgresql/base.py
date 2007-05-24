@@ -249,6 +249,7 @@ except AttributeError:
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
+Database.register_type(Database.new_type((1700,), "NUMERIC", util.typecast_decimal))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

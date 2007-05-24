@@ -870,7 +870,7 @@ def inspectdb():
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
-                if field_type == 'FloatField':
+                if field_type == 'DecimalField':
                     extra_params['max_digits'] = row[4]
                     extra_params['decimal_places'] = row[5]
 
@@ -945,11 +945,11 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                 e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
-            if isinstance(f, models.FloatField):
+            if isinstance(f, models.DecimalField):
                 if f.decimal_places is None:
-                    e.add(opts, '"%s": FloatFields require a "decimal_places" attribute.' % f.name)
+                    e.add(opts, '"%s": DecimalFields require a "decimal_places" attribute.' % f.name)
                 if f.max_digits is None:
-                    e.add(opts, '"%s": FloatFields require a "max_digits" attribute.' % f.name)
+                    e.add(opts, '"%s": DecimalFields require a "max_digits" attribute.' % f.name)
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
