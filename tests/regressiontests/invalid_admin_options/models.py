@@ -123,9 +123,6 @@ class ListFilterBadOne(models.Model):
     class Admin:
         list_filter = 'first_name'     
 
-    def __unicode__(self):
-        return self.first_name
-
 model_errors += """invalid_admin_options.listfilterbadone: "admin.list_filter", if given, must be set to a list or tuple.
 """
 
@@ -143,9 +140,6 @@ class ListFilterBadTwo(models.Model):
     class Admin:
         list_filter = ['first_name','last_name','full_name']
 
-    def __unicode__(self):
-        return self.first_name
-
 model_errors += """invalid_admin_options.listfilterbadtwo: "admin.list_filter" refers to 'last_name', which isn't a field.
 invalid_admin_options.listfilterbadtwo: "admin.list_filter" refers to 'full_name', which isn't a field.
 """
@@ -157,10 +151,7 @@ class DateHierarchyBadOne(models.Model):
     
     class Admin:
         date_hierarchy = 'first_name'
-
-    def __unicode__(self):
-        return self.first_name
-
+        
 # TODO: Date Hierarchy needs to check if field is a date/datetime field.
 #model_errors += """invalid_admin_options.datehierarchybadone: "admin.date_hierarchy" refers to 'first_name', which isn't a date field or datetime field.
 #"""
@@ -173,9 +164,6 @@ class DateHierarchyBadTwo(models.Model):
     class Admin:
         date_hierarchy = 'nonexistent'          
 
-    def __unicode__(self):
-        return self.first_name
-
 model_errors += """invalid_admin_options.datehierarchybadtwo: "admin.date_hierarchy" refers to 'nonexistent', which isn't a field.
 """
 
@@ -186,9 +174,6 @@ class DateHierarchyGood(models.Model):
     
     class Admin:
         date_hierarchy = 'birth_day' 
-
-    def __unicode__(self):
-        return self.first_name
       
 class SearchFieldsBadOne(models.Model):
     "Test search_fields, must be a list or tuple."
@@ -196,9 +181,6 @@ class SearchFieldsBadOne(models.Model):
     
     class Admin:
         search_fields = ('nonexistent')         
-
-    def __unicode__(self):
-        return self.first_name
 
 # TODO: Add search_fields validation
 #model_errors += """invalid_admin_options.seacrhfieldsbadone: "admin.search_fields", if given, must be set to a list or tuple.
@@ -215,9 +197,6 @@ class SearchFieldsBadTwo(models.Model):
     class Admin:
         search_fields = ['first_name','last_name']         
 
-    def __unicode__(self):
-        return self.first_name
-
 # TODO: Add search_fields validation
 #model_errors += """invalid_admin_options.seacrhfieldsbadone: "admin.search_fields" refers to 'last_name', which isn't a field.
 #"""
@@ -230,8 +209,6 @@ class SearchFieldsGood(models.Model):
     class Admin:
         search_fields = ['first_name','last_name']
 
-    def __unicode__(self):
-        return self.first_name
 
 class JsBadOne(models.Model):
     "Test js, must be a list or tuple"
@@ -239,9 +216,6 @@ class JsBadOne(models.Model):
     
     class Admin:
         js = 'test.js'
-
-    def __unicode__(self):
-        return self.name
         
 # TODO: Add a js validator
 #model_errors += """invalid_admin_options.jsbadone: "admin.js", if given, must be set to a list or tuple.
@@ -254,9 +228,6 @@ class SaveAsBad(models.Model):
     class Admin:
         save_as = 'not True or False'
 
-    def __unicode__(self):
-        return self.name
-
 # TODO: Add a save_as validator.       
 #model_errors += """invalid_admin_options.saveasbad: "admin.save_as", if given, must be set to True or False.
 #"""
@@ -267,9 +238,6 @@ class SaveOnTopBad(models.Model):
     
     class Admin:
         save_on_top = 'not True or False'
-
-    def __unicode__(self):
-        return self.name
 
 # TODO: Add a save_on_top validator.       
 #model_errors += """invalid_admin_options.saveontopbad: "admin.save_on_top", if given, must be set to True or False.
@@ -282,9 +250,6 @@ class ListSelectRelatedBad(models.Model):
     class Admin:
         list_select_related = 'not True or False'
 
-    def __unicode__(self):
-        return self.name
-
 # TODO: Add a list_select_related validator.       
 #model_errors += """invalid_admin_options.listselectrelatebad: "admin.list_select_related", if given, must be set to True or False.
 #"""
@@ -295,9 +260,6 @@ class ListPerPageBad(models.Model):
     
     class Admin:
         list_per_page = 89.3
-
-    def __unicode__(self):
-        return self.name
 
 # TODO: Add a list_per_page validator.       
 #model_errors += """invalid_admin_options.listperpagebad: "admin.list_per_page", if given, must be a positive integer.
@@ -311,9 +273,6 @@ class FieldsBadOne(models.Model):
     class Admin:
         fields = 'not a tuple'
 
-    def __unicode__(self):
-        return self.first_name
-
 # TODO: Add a fields validator.       
 #model_errors += """invalid_admin_options.fieldsbadone: "admin.fields", if given, must be a tuple.
 #"""
@@ -325,9 +284,6 @@ class FieldsBadTwo(models.Model):
     
     class Admin:
         fields = ('Name', {'description': 'this fieldset needs fields'})
-
-    def __unicode__(self):
-        return self.first_name
         
 # TODO: Add a fields validator.       
 #model_errors += """invalid_admin_options.fieldsbadtwo: "admin.fields" each fieldset must include a 'fields' dict.
@@ -340,9 +296,6 @@ class FieldsBadThree(models.Model):
     
     class Admin:
         fields = ('Name', {'fields': ('first_name','last_name'),'badoption': 'verybadoption'})
-
-    def __unicode__(self):
-        return self.first_name
 
 # TODO: Add a fields validator.       
 #model_errors += """invalid_admin_options.fieldsbadthree: "admin.fields" fieldset options must be either 'classes' or 'description'.
@@ -359,9 +312,6 @@ class FieldsGood(models.Model):
                   ('Name', {'fields': ('first_name','last_name'),'classes': 'collapse'}),
                   (None, {'fields': ('birth_day',),'description': 'enter your b-day'})
                   )
-
-    def __unicode__(self):
-        return self.first_name
                   
 class OrderingBad(models.Model):
     "Test ordering, must be a field."
@@ -370,9 +320,6 @@ class OrderingBad(models.Model):
     
     class Admin:
         ordering = 'nonexistent'
-
-    def __unicode__(self):
-        return self.first_name
 
 # TODO: Add a ordering validator.       
 #model_errors += """invalid_admin_options.orderingbad: "admin.ordering" refers to 'nonexistent', which isn't a field.

@@ -44,7 +44,9 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     if strings_only and isinstance(s, (types.NoneType, int)):
         return s
-    if not isinstance(s, basestring):
+    if isinstance(s, Promise):
+        return unicode(s).encode(encoding, errors)
+    elif not isinstance(s, basestring):
         try:
             return str(s)
         except UnicodeEncodeError:
