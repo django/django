@@ -20,7 +20,7 @@ for adding data. By default, it displays 1 blank form. It can display more,
 but we'll look at how to do so later.
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" /></li>
@@ -78,7 +78,7 @@ an extra blank form is included.
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>
@@ -150,7 +150,7 @@ num_extra argument to formset_for_form.
 >>> ChoiceFormSet = formset_for_form(Choice, num_extra=3)
 
 >>> formset = ChoiceFormSet(auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" /></li>
@@ -223,7 +223,7 @@ data.
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>
@@ -268,7 +268,7 @@ rather than formset.cleaned_data
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>
@@ -318,7 +318,7 @@ something at the front of the list, you'd need to set it's order to 0.
 
 >>> initial = [{'choice': u'Calexico', 'votes': 100}, {'choice': u'Fergie', 'votes': 900}]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>
@@ -364,7 +364,7 @@ Let's try throwing ordering and deletion into the same form.
 ...     {'choice': u'The Decemberists', 'votes': 500},
 ... ]
 >>> formset = ChoiceFormSet(initial=initial, auto_id=False, prefix='choices')
->>> for form in formset.form_list:
+>>> for form in formset.forms:
 ...    print form.as_ul()
 <li>Choice: <input type="text" name="choices-0-choice" value="Calexico" /></li>
 <li>Votes: <input type="text" name="choices-0-votes" value="100" /></li>

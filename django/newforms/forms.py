@@ -226,6 +226,12 @@ class BaseForm(StrAndUnicode):
         """
         return self.cleaned_data
 
+    def reset(self):
+        """Return this form to the state it was in before data was passed to it."""
+        self.data = {}
+        self.is_bound = False
+        self.__errors = None
+
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
