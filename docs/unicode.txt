@@ -54,7 +54,7 @@ encoded using UTF-8.
 If your code only uses ASCII data, you are quite safe to simply use your normal
 strings (since ASCII is a subset of UTF-8) and pass them around at will.
 
-Do not be fooled into thinking that if you ``DEFAULT_CHARSET`` setting is set
+Do not be fooled into thinking that if your ``DEFAULT_CHARSET`` setting is set
 to something other than ``utf-8`` you can use that encoding in your
 bytestrings!  The ``DEFAULT_CHARSET`` only applies to the strings generated as
 the result of template rendering (and email). Django will always assume UTF-8
@@ -214,10 +214,11 @@ bytestring or not (the result of ``__str__()`` is *always* a bytestring, even
 if you accidentally try to return a unicode object).
 
 You can still create a ``__str__()`` method on your models if you wish, of
-course. However, Django's ``Model`` base class automatically provides you with a ``__str__()`` method
-that calls your ``__unicode__()`` method and then encodes the result correctly
-into UTF-8. So you would normally only create a ``__unicode__()`` method and
-let Django handle the coercion to a bytestring when required.
+course. However, Django's ``Model`` base class automatically provides you with
+a ``__str__()`` method that calls your ``__unicode__()`` method and then
+encodes the result correctly into UTF-8. So you would normally only create a
+``__unicode__()`` method and let Django handle the coercion to a bytestring
+when required.
 
 Taking care in ``get_absolute_url()``
 -------------------------------------
