@@ -1,5 +1,6 @@
 from django import template
 from django.db.models import get_models
+from django.utils.encoding import force_unicode
 
 register = template.Library()
 
@@ -36,8 +37,8 @@ class AdminApplistNode(template.Node):
                         # If so, add the module to the model_list.
                         if True in perms.values():
                             model_list.append({
-                                'name': capfirst(m._meta.verbose_name_plural),
-                                'admin_url': '%s/%s/' % (app_label, m.__name__.lower()),
+                                'name': force_unicode(capfirst(m._meta.verbose_name_plural)),
+                                'admin_url': u'%s/%s/' % (force_unicode(app_label), m.__name__.lower()),
                                 'perms': perms,
                             })
 

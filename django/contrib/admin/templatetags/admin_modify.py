@@ -2,7 +2,7 @@ from django import template
 from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
 from django.utils.text import capfirst
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import force_unicode
 from django.db import models
 from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
@@ -64,7 +64,7 @@ def field_label(bound_field):
         colon = ":"
     class_str = class_names and u' class="%s"' % u' '.join(class_names) or u''
     return u'<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
-        capfirst(bound_field.field.verbose_name), colon)
+        force_unicode(capfirst(bound_field.field.verbose_name)), colon)
 field_label = register.simple_tag(field_label)
 
 class FieldWidgetNode(template.Node):
@@ -176,7 +176,7 @@ class EditInlineNode(template.Node):
         return output
 
 def output_all(form_fields):
-    return u''.join([smart_unicode(f) for f in form_fields])
+    return u''.join([force_unicode(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
 
 def auto_populated_field_script(auto_pop_fields, change = False):
