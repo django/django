@@ -9,6 +9,7 @@ a string) and returns a tuple in this format:
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.utils.encoding import iri_to_uri
 import re
 
 class Resolver404(Http404):
@@ -248,4 +249,4 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None):
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     resolver = RegexURLResolver(r'^/', urlconf)
-    return '/' + resolver.reverse(viewname, *args, **kwargs)
+    return iri_to_uri(u'/' + resolver.reverse(viewname, *args, **kwargs))
