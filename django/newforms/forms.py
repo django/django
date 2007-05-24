@@ -119,11 +119,11 @@ class BaseForm(StrAndUnicode):
             bf_errors = ErrorList([escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, e) for e in bf_errors])
+                    top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
                 hidden_fields.append(unicode(bf))
             else:
                 if errors_on_separate_row and bf_errors:
-                    output.append(error_row % bf_errors)
+                    output.append(error_row % force_unicode(bf_errors))
                 if bf.label:
                     label = escape(force_unicode(bf.label))
                     # Only add a colon if the label does not end in punctuation.
@@ -133,10 +133,10 @@ class BaseForm(StrAndUnicode):
                 else:
                     label = ''
                 if field.help_text:
-                    help_text = help_text_html % field.help_text
+                    help_text = help_text_html % force_unicode(field.help_text)
                 else:
                     help_text = u''
-                output.append(normal_row % {'errors': bf_errors, 'label': label, 'field': unicode(bf), 'help_text': help_text})
+                output.append(normal_row % {'errors': bf_errors, 'label': force_unicode(label), 'field': unicode(bf), 'help_text': help_text})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
