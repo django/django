@@ -706,7 +706,12 @@ def resolve_variable(path, context):
                         raise
             del bits[0]
     if isinstance(current, (basestring, Promise)):
-        current = force_unicode(current)
+        try:
+            current = force_unicode(current)
+        except UnicodeDecodeError:
+            # Failing to convert to unicode can happen sometimes (e.g. debug
+            # tracebacks). So we allow it in this particular instance.
+            pass
     return current
 
 class Node(object):
