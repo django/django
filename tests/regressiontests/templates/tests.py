@@ -69,10 +69,10 @@ class OtherClass:
     def method(self):
         return "OtherClass.method"
 
-class UnicodeInStrClass:
-    "Class whose __str__ returns a Unicode object."
+class UTF8Class:
+    "Class whose __str__ returns non-ASCII data"
     def __str__(self):
-        return u'ŠĐĆŽćžšđ'
+        return u'ŠĐĆŽćžšđ'.encode('utf-8')
 
 class Templates(unittest.TestCase):
     def test_templates(self):
@@ -223,7 +223,7 @@ class Templates(unittest.TestCase):
 
             # Make sure that any unicode strings are converted to bytestrings
             # in the final output.
-            'filter-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
