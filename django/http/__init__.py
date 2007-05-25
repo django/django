@@ -18,6 +18,10 @@ class Http404(Exception):
 
 class HttpRequest(object):
     "A basic HTTP request"
+
+    # The encoding used in GET/POST dicts. None means use default setting.
+    _encoding = None
+
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
@@ -42,6 +46,21 @@ class HttpRequest(object):
 
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
+
+    def _set_encoding(self, val):
+        """
+        Sets the encoding used for GET/POST accesses.
+        """
+        self._encoding = val
+        if hasattr(self, '_get'):
+            self.GET.encoding = val
+        if hasattr(self, '_post'):
+            self.POST.encoding = val
+
+    def _get_encoding(self):
+        return self._encoding
+
+    encoding = property(_get_encoding, _set_encoding)
 
 def parse_file_upload(header_dict, post_data):
     "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"

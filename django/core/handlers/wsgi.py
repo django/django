@@ -113,9 +113,9 @@ class WSGIRequest(http.HttpRequest):
                 header_dict['Content-Type'] = self.environ.get('CONTENT_TYPE', '')
                 self._post, self._files = http.parse_file_upload(header_dict, self.raw_post_data)
             else:
-                self._post, self._files = http.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
+                self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
         else:
-            self._post, self._files = http.QueryDict(''), datastructures.MultiValueDict()
+            self._post, self._files = http.QueryDict('', encoding=self._encoding), datastructures.MultiValueDict()
 
     def _get_request(self):
         if not hasattr(self, '_request'):
@@ -125,7 +125,7 @@ class WSGIRequest(http.HttpRequest):
     def _get_get(self):
         if not hasattr(self, '_get'):
             # The WSGI spec says 'QUERY_STRING' may be absent.
-            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''))
+            self._get = http.QueryDict(self.environ.get('QUERY_STRING', ''), encoding=self._encoding)
         return self._get
 
     def _set_get(self, get):
