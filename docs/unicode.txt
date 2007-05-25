@@ -149,8 +149,8 @@ a little tricky, so Django provides some assistance.
     * The function ``django.utils.encoding.iri_to_uri()`` implements the
       conversion from IRI to URI as required by `the specification`_.
 
-    * The functions ``django.utils.html.urlquote()`` and
-      ``django.utils.html.urlquote_plus()`` are versions of Python's standard
+    * The functions ``django.utils.http.urlquote()`` and
+      ``django.utils.http.urlquote_plus()`` are versions of Python's standard
       ``urllib.quote()`` and ``urllib.quote_plus()`` that work with non-ASCII
       characters (the data is converted to UTF-8 prior to encoding).
 
@@ -235,7 +235,7 @@ encoding yourself. Normally, this would involve a combination of the
 example::
 
     from django.utils.encoding import iri_to_uri
-    from django.utils.html import urlquote
+    from django.utils.http import urlquote
 
     def get_absolute_url(self):
         url = u'/person/%s/?x=0&y=0' % urlquote(self.location)

@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 38. Testing using the Test Client
 
@@ -27,11 +28,14 @@ class ClientTest(TestCase):
     
     def test_get_view(self):
         "GET a view"
-        response = self.client.get('/test_client/get_view/')
+        # The data is ignored, but let's check it doesn't crash the system
+        # anyway.
+        data = {'var': u'\xf2'}
+        response = self.client.get('/test_client/get_view/', data)
         
         # Check some response details
         self.assertContains(response, 'This is a test')
-        self.assertEqual(response.context['var'], 42)
+        self.assertEqual(response.context['var'], u'\xf2')
         self.assertEqual(response.template.name, 'GET Template')
 
     def test_get_post_view(self):

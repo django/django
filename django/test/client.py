@@ -10,10 +10,11 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
 from django.dispatch import dispatcher
-from django.http import urlencode, SimpleCookie, HttpRequest
+from django.http import SimpleCookie, HttpRequest
 from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import smart_str
+from django.utils.http import urlencode
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY

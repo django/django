@@ -17,7 +17,7 @@ r"""
 friends'
 
 ### urlquote #############################################################
->>> from django.utils.html import urlquote, urlquote_plus
+>>> from django.utils.http import urlquote, urlquote_plus
 >>> urlquote(u'Paris & Orl\xe9ans')
 u'Paris%20%26%20Orl%C3%A9ans'
 >>> urlquote_plus(u'Paris & Orl\xe9ans')
