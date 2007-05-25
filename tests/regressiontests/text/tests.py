@@ -31,4 +31,8 @@ u'Paris+%26+Orl%C3%A9ans'
 '/blog/for/J%C3%BCrgen%20M%C3%BCnster/'
 >>> iri_to_uri(u'locations/%s' % urlquote_plus(u'Paris & Orl\xe9ans'))
 'locations/Paris+%26+Orl%C3%A9ans'
+
+iri_to_uri() is idempotent:
+>>> iri_to_uri(iri_to_uri(u'red%09ros\xe9#red'))
+'red%09ros%C3%A9#red'
 """
