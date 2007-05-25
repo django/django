@@ -87,6 +87,11 @@ if you examine an object and it claims to be a
 Calling ``unicode()`` with the translation as the argument will generate a
 string in the current locale.
 
+For more details about lazy translation objects, refer to the
+internationalization_ documentation.
+
+.. _internationalization: ../i18n/#lazy-translation
+
 .. _utility functions:
 
 Useful utility functions
@@ -147,7 +152,8 @@ characters). Getting the quoting and conversion from IRI to URI correct can be
 a little tricky, so Django provides some assistance.
 
     * The function ``django.utils.encoding.iri_to_uri()`` implements the
-      conversion from IRI to URI as required by `the specification`_.
+      conversion from IRI to URI as required by the specification (`RFC
+      3987`_).
 
     * The functions ``django.utils.http.urlquote()`` and
       ``django.utils.http.urlquote_plus()`` are versions of Python's standard
@@ -187,9 +193,17 @@ you can construct your IRI without worrying about whether it contains
 non-ASCII characters and then, right at the end, call ``iri_to_uri()`` on the
 result.
 
+The ``iri_to_uri()`` function is also idempotent, which means the following is
+always true::
+
+    iri_to_uri(iri_to_uri(some_string)) = iri_to_uri(some_string)
+
+So you can safely call it multiple times on the same IRI without risking
+double-quoting problems.
+
 .. _URI: http://www.ietf.org/rfc/rfc2396.txt
 .. _IRI: http://www.ietf.org/rfc/rfc3987.txt
-.. _the specification: IRI_
+.. _RFC 3987: IRI_
 
 Models
 ======
@@ -246,7 +260,6 @@ something like "Jack visited Paris & Orléans". (In fact, the ``iri_to_uri()``
 call isn't strictly necessary in the above example, because all the
 non-ASCII characters would have been removed in quoting in the first line.)
 
-.. _RFC 3987: IRI_
 .. _above: uri_and_iri_
 
 The database API
@@ -274,6 +287,20 @@ When a template is rendered for sending out as an HTML document or an e-mail,
 it may be convenient to use an encoding other than UTF-8. You should set the
 ``DEFAULT_CHARSET`` parameter to control the rendered template encoding (the
 default setting is utf-8).
+
+Template tags and filters
+-------------------------
+
+A couple of tips to remember when writing your own template tags and filters:
+
+    * Always return Unicode strings from a template tag's ``render()`` method
+      and from template filters.
+
+    * Use ``force_unicode()`` in preference to ``smart_unicode()`` in these
+      places. Tag rendering and filter calls occur as the template is being
+      rendered, so there is no advantage to postponing the conversion of lazy
+      transation objects into strings any longer. It is easier to work solely
+      with Unicode strings at this point.
 
 E-mail
 ======
