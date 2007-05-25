@@ -25,7 +25,6 @@ django_conversions.update({
     FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
     FIELD_TYPE.DECIMAL: util.typecast_decimal,
-    FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
