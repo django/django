@@ -27,6 +27,7 @@ POSTGIS_OPERATORS = {
     # The "~=" operator is the "same as" operator. It tests actual geometric equality of two features. So if
     # A and B are the same feature, vertex-by-vertex, the operator returns true.
     'same_as' : '~= %s',
+    'exact' : '~= %s',
     # The "@" operator returns true if A's bounding box is completely contained by B's bounding box.
     'contained' : '@ %s',
     # The "~" operator returns true if A's bounding box completely contains B's bounding box.
@@ -49,6 +50,11 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
     'intersects' : 'Intersects',
     'relate' : 'Relate',
     }
+
+# The quotation used for postgis (uses single quotes).
+def quotename(value, dbl=False):
+    if dbl: return '"%s"' % value
+    else: return "'%s'" % value
 
 # These are the PostGIS-customized QUERY_TERMS, combines both the operators
 # and the geometry functions.

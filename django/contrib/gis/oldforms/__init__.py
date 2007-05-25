@@ -6,7 +6,11 @@ class WKTField(LargeTextField):
     
     def render(self, data):
         # PostGIS uses EWKBHEX to store its values internally, converting
-        # to WKT for the admin first.
-        return super(WKTField, self).render(hex_to_wkt(data))
+        # to WKT for the admin first -- unless there's no data, then just
+        # pass None to LargeTextField's render.
+        if not data:
+            return super(WKTField, self).render(None)
+        else:
+            return super(WKTField, self).render(hex_to_wkt(data))
     
                                         

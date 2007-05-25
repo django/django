@@ -1,60 +1,78 @@
 # The Django base Field class.
 from django.db.models.fields import Field
-from django.contrib.gis.db.models.postgis import POSTGIS_TERMS
+from django.contrib.gis.db.models.postgis import POSTGIS_TERMS, quotename
 from django.contrib.gis.oldforms import WKTField
 from django.utils.functional import curry
-
-#TODO: add db.quotename.
-
-# Creates the SQL to add the model to the database. 
-def _add_geom(geom, srid, style, model, field, dim=2):
-    # Constructing the AddGeometryColumn(...) command -- the style
-    # object is passed in from the management module and is used
-    # to syntax highlight the command for 'sqlall'
-    sql = style.SQL_KEYWORD('SELECT ') + \
-          style.SQL_TABLE('AddGeometryColumn') + "('" + \
-          style.SQL_TABLE(model) + "', '" + \
-          style.SQL_FIELD(field) + "', " + \
-          style.SQL_FIELD(str(srid)) + ", '" + \
-          style.SQL_COLTYPE(geom) + "', " + \
-          style.SQL_KEYWORD(str(dim)) + \
-          ');'
-    return sql
-
-# Creates an index for the given geometry.
-def _geom_index(geom, style, model, field,
-                index_type='GIST',
-                index_opts='GIST_GEOMETRY_OPS'):
-    sql = style.SQL_KEYWORD('CREATE INDEX ') + \
-          style.SQL_TABLE('"%s_%s_id"' % (model, field)) + \
-          style.SQL_KEYWORD(' ON ') + \
-          style.SQL_TABLE('"%s"' % model) + \
-          style.SQL_KEYWORD(' USING ') + \
-          style.SQL_COLTYPE(index_type) + ' ( ' + \
-          style.SQL_FIELD('"%s"' % field) + ' ' + \
-          style.SQL_KEYWORD(index_opts) + ' );'
-    return sql
+from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
 class GeometryField(Field):
-    "The base GIS field -- maps to the OpenGIS Geometry type."
+    "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
     # The OpenGIS Geometry name.
     _geom = 'GEOMETRY'
 
-    def __init__(self, srid=4326, index=False, **kwargs):
-        #TODO: SRID a standard, or specific to postgis?
-        # Whether or not index this field, defaults to False
-        # Why can't we just use db_index? 
-        # TODO: Move index creation (and kwarg lookup, and...)
-        #  into Field rather than core.management and db.models.query.
+    def __init__(self, srid=4326, index=True, dim=2, **kwargs):
+        """The initialization function for geometry fields.  Takes the following
+        as keyword arguments:
+
+          srid  - The spatial reference system identifier.  An OGC standard.
+                  Defaults to 4326 (WGS84)
+
+          index - Indicates whether to create a GiST index.  Defaults to True.
+                  Set this instead of 'db_index' for geographic fields since index
+                  creation is different for geometry columns.
+                  
+          dim   - The number of dimensions for this geometry.  Defaults to 2.
+        """
         self._index = index
-
-        # The SRID for the geometry, defaults to 4326.
         self._srid = srid
+        self._dim = dim
+        super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
-        # Calling the Field initialization function first
-        super(GeometryField, self).__init__(**kwargs)
+    def _add_geom(self, style, db_table, field):
+        """Constructs the addition of the geometry to the table using the
+        AddGeometryColumn(...) PostGIS (and OGC standard) function.
 
+        Takes the style object (provides syntax highlighting) as well as the
+         database table and field.  The dimensions can be specified via
+         the dim keyword as well.
+        """
+        sql = style.SQL_KEYWORD('SELECT ') + \
+              style.SQL_TABLE('AddGeometryColumn') + '(' + \
+              style.SQL_TABLE(quotename(db_table)) + ', ' + \
+              style.SQL_FIELD(quotename(field)) + ', ' + \
+              style.SQL_FIELD(str(self._srid)) + ', ' + \
+              style.SQL_COLTYPE(quotename(self._geom)) + ', ' + \
+              style.SQL_KEYWORD(str(self._dim)) + ');'
+        return sql
+
+    def _geom_index(self, style, db_table, field,
+                    index_type='GIST', index_opts='GIST_GEOMETRY_OPS'):
+        "Creates a GiST index for this geometry field."
+        sql = style.SQL_KEYWORD('CREATE INDEX ') + \
+              style.SQL_TABLE(quotename('%s_%s_id' % (db_table, field), dbl=True)) + \
+              style.SQL_KEYWORD(' ON ') + \
+              style.SQL_TABLE(quotename(db_table, dbl=True)) + \
+              style.SQL_KEYWORD(' USING ') + \
+              style.SQL_COLTYPE(index_type) + ' ( ' + \
+              style.SQL_FIELD(quotename(field, dbl=True)) + ' ' + \
+              style.SQL_KEYWORD(index_opts) + ' );'
+        return sql
+
+    def _post_create_sql(self, style, db_table, field):
+        """Returns SQL that will be executed after the model has been
+        created. Geometry columns must be added after creation with the
+        PostGIS AddGeometryColumn() function."""
+
+        # Getting the AddGeometryColumn() SQL necessary to create a PostGIS
+        # geometry field.
+        post_sql = self._add_geom(style, db_table, field)
+
+        # If the user wants to index this data, then get the indexing SQL as well.
+        if self._index:
+            return '%s\n%s' % (post_sql, self._geom_index(style, db_table, field))
+        else:
+            return post_sql
 
     def contribute_to_class(self, cls, name):
         super(GeometryField, self).contribute_to_class(cls, name)
@@ -64,26 +82,10 @@ class GeometryField(Field):
         setattr(cls, 'get_%s_wkt' % self.name, curry(cls._get_GEOM_wkt, field=self))
         setattr(cls, 'get_%s_centroid' % self.name, curry(cls._get_GEOM_centroid, field=self))
         setattr(cls, 'get_%s_area' % self.name, curry(cls._get_GEOM_area, field=self))
-
+        
     def get_internal_type(self):
         return "NoField"
-    
-    def _post_create_sql(self, *args, **kwargs):
-        """Returns SQL that will be executed after the model has been created.  Geometry
-        columns must be added after creation with the PostGIS AddGeometryColumn() function."""
-
-        #TODO: clean up *args/**kwargs.
-
-        # Getting the AddGeometryColumn() SQL necessary to create a PostGIS
-        # geometry field.
-        post_sql = _add_geom(self._geom, self._srid, *args, **kwargs)
-
-        # If the user wants to index this data, then get the indexing SQL as well.
-        if self._index:
-            return '%s\n%s' % (post_sql, _geom_index(self._geom, *args, **kwargs))
-        else:
-            return post_sql
-
+                                                                
     def get_db_prep_lookup(self, lookup_type, value):
         """Returns field's value prepared for database lookup; the SRID of the geometry is
         included by default in these queries."""
