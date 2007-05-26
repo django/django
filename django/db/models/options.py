@@ -43,14 +43,6 @@ class Options(object):
         self.module_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
 
-        # There are a few places where the untranslated verbose name is needed
-        # (so that we get the same value regardless of currently active
-        # locale).
-        lang = get_language()
-        deactivate_all()
-        self.verbose_name_raw = unicode(self.verbose_name)
-        activate(lang)
-
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__
@@ -101,7 +93,20 @@ class Options(object):
         
     def __str__(self):
         return "%s.%s" % (self.app_label, self.module_name)
-        
+
+    def verbose_name_raw(self):
+        """
+        There are a few places where the untranslated verbose name is needed
+        (so that we get the same value regardless of currently active
+        locale).
+        """
+        lang = get_language()
+        deactivate_all()
+        raw = unicode(self.verbose_name)
+        activate(lang)
+        return raw
+    verbose_name_raw = property(verbose_name_raw)
+
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
