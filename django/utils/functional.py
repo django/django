@@ -33,7 +33,8 @@ def lazy(func, *resultclasses):
                 for (k, v) in resultclass.__dict__.items():
                     setattr(self, k, self.__promise__(resultclass, k, v))
             if unicode in resultclasses:
-                setattr(self, '__unicode__', self.__unicode_cast)
+                self.__unicode__ = self.__unicode_cast
+            self._delegate_str  = str in resultclasses
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
@@ -51,6 +52,15 @@ def lazy(func, *resultclasses):
 
         def __unicode_cast(self):
             return self.__func(*self.__args, **self.__kw)
+
+        def __str__(self):
+            # As __str__ is always a method on the type (class), it is looked
+            # up (and found) there first. So we can't just assign to it on a
+            # per-instance basis in __init__.
+            if self._delegate_str:
+                return str(self.__func(*self.__args, **self.__kw))
+            else:
+                return Promise.__str__(self)
 
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
