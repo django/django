@@ -188,9 +188,11 @@ class BaseForm(StrAndUnicode):
                 self.cleaned_data[name] = value
                 if hasattr(self, 'clean_%s' % name):
                     value = getattr(self, 'clean_%s' % name)()
-                self.cleaned_data[name] = value
+                    self.cleaned_data[name] = value
             except ValidationError, e:
                 errors[name] = e.messages
+                if name in self.cleaned_data:
+                    del self.cleaned_data[name]
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:
