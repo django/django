@@ -63,7 +63,7 @@ class BaseForm(StrAndUnicode):
         self.auto_id = auto_id
         self.prefix = prefix
         self.initial = initial or {}
-        self.__errors = None # Stores the errors after clean() has been called.
+        self._errors = None # Stores the errors after clean() has been called.
 
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
@@ -87,12 +87,12 @@ class BaseForm(StrAndUnicode):
             raise KeyError('Key %r not found in Form' % name)
         return BoundField(self, field, name)
 
-    def _errors(self):
+    def _get_errors(self):
         "Returns an ErrorDict for self.data"
-        if self.__errors is None:
+        if self._errors is None:
             self.full_clean()
-        return self.__errors
-    errors = property(_errors)
+        return self._errors
+    errors = property(_get_errors)
 
     def is_valid(self):
         """
@@ -171,11 +171,12 @@ class BaseForm(StrAndUnicode):
 
     def full_clean(self):
         """
-        Cleans all of self.data and populates self.__errors and self.cleaned_data.
+        Cleans all of self.data and populates self._errors and
+        self.cleaned_data.
         """
         errors = ErrorDict()
         if not self.is_bound: # Stop further processing.
-            self.__errors = errors
+            self._errors = errors
             return
         self.cleaned_data = {}
         for name, field in self.fields.items():
@@ -199,7 +200,7 @@ class BaseForm(StrAndUnicode):
             errors[NON_FIELD_ERRORS] = e.messages
         if errors:
             delattr(self, 'cleaned_data')
-        self.__errors = errors
+        self._errors = errors
 
     def clean(self):
         """
