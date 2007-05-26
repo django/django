@@ -174,9 +174,8 @@ class BaseForm(StrAndUnicode):
         Cleans all of self.data and populates self._errors and
         self.cleaned_data.
         """
-        errors = ErrorDict()
+        self._errors = ErrorDict()
         if not self.is_bound: # Stop further processing.
-            self._errors = errors
             return
         self.cleaned_data = {}
         for name, field in self.fields.items():
@@ -191,16 +190,15 @@ class BaseForm(StrAndUnicode):
                     value = getattr(self, 'clean_%s' % name)()
                     self.cleaned_data[name] = value
             except ValidationError, e:
-                errors[name] = e.messages
+                self._errors[name] = e.messages
                 if name in self.cleaned_data:
                     del self.cleaned_data[name]
         try:
             self.cleaned_data = self.clean()
         except ValidationError, e:
-            errors[NON_FIELD_ERRORS] = e.messages
-        if errors:
+            self._errors[NON_FIELD_ERRORS] = e.messages
+        if self._errors:
             delattr(self, 'cleaned_data')
-        self._errors = errors
 
     def clean(self):
         """
