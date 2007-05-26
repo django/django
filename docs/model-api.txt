@@ -463,8 +463,10 @@ If ``True``, Django will store empty values as ``NULL`` in the database.
 Default is ``False``.
 
 Note that empty string values will always get stored as empty strings, not
-as ``NULL`` -- so use ``null=True`` for non-string fields such as integers,
-booleans and dates.
+as ``NULL``. Only use ``null=True`` for non-string fields such as integers,
+booleans and dates. For both types of fields, you will also need to set
+``blank=True`` if you wish to permit empty values in forms, as the ``null``
+parameter only affects database storage (see blank_, below).
 
 Avoid using ``null`` on string-based fields such as ``CharField`` and
 ``TextField`` unless you have an excellent reason. If a string-based field
