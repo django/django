@@ -256,4 +256,8 @@ installments:
     * Advanced admin features: Permissions
     * Advanced admin features: Custom JavaScript
 
+In the meantime, you can read through the rest of the `Django documentation`_
+and start writing your own applications.
+
 .. _Tutorial 3: ../tutorial03/
+.. _Django documentation: http://www.djangoproject.com/documentation/
