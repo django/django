@@ -269,6 +269,13 @@ For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
+If you want to retrieve the upload file's on-disk filename, or a URL that
+refers to that file, or the file's size, you can use the
+``get_FOO_filename()``, ``get_FOO_url()`` and ``get_FOO_size()`` methods.
+They are all documented here__.
+
+__ ../db-api/#get-foo-filename
+
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
@@ -338,9 +345,14 @@ image. Has two extra optional arguments, ``height_field`` and
 ``width_field``, which, if set, will be auto-populated with the height and
 width of the image each time a model instance is saved.
 
+In addition to the special ``get_FOO_*`` methods that are available for
+``FileField``, an ``ImageField`` also has ``get_FOO_height()`` and
+``get_FOO_width()`` methods. These are documented elsewhere_.
+
 Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
+.. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
