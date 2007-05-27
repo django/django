@@ -686,11 +686,11 @@ For example::
 
     <form method="post">
     <ul class="myformclass">
-        <li>{{ form.sender.label }} {{ form.sender.label }}</li>
+        <li>{{ form.sender.label }} {{ form.sender }}</li>
         <li class="helptext">{{ form.sender.help_text }}</li>
         {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</ul>{% endif %}
 
-        <li>{{ form.subject.label }} {{ form.subject.label }}</li>
+        <li>{{ form.subject.label }} {{ form.subject }}</li>
         <li class="helptext">{{ form.subject.help_text }}</li>
         {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</ul>{% endif %}
 
