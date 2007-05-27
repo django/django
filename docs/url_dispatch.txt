@@ -564,7 +564,7 @@ code, Django provides the ``django.core.urlresolvers.reverse()``. The
 
     reverse(viewname, urlconf=None, args=None, kwargs=None)
 
-The view name is either the function name or the `URL pattern name`_).
+The view name is either the function name or the `URL pattern name`_.
 Normally you will not need to worry about the ``urlconf`` parameter and will
 only pass in the positional and keyword arguments to use in the url matching.
 For example::
