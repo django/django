@@ -551,3 +551,37 @@ not restricted to valid Python names.
     Putting a prefix on your URL names, perhaps derived from the application
     name, will decrease the chances of collision. We recommend something like
     ``myapp-comment`` instead of ``comment``.
+
+Utility methods
+===============
+
+reverse()
+---------
+
+If you need to use something similar to the ``{% url %}`` template tag in your
+code, Django provides the ``django.core.urlresolvers.reverse()``. The
+``reverse()`` function has the following signature::
+
+    reverse(viewname, urlconf=None, args=None, kwargs=None)
+
+The view name is either the function name or the `URL pattern name`_).
+Normally you will not need to worry about the ``urlconf`` parameter and will
+only pass in the positional and keyword arguments to use in the url matching.
+For example::
+
+    from django.core.urlresolvers import reverse
+
+    def myview(request):
+        return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+
+.. _URL pattern name: `Naming URL patterns`_
+
+permalink()
+-----------
+
+The ``permalink()`` decorator is useful for writing short methods that return
+a full URL path. For example, a model's ``get_absolute_url()`` method. Refer
+to the `model API documentation`_ for more information about ``permalink()``.
+
+.. _model API documentation: ../model-api/#the-permalink-decorator
+
