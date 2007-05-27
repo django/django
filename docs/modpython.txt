@@ -211,6 +211,41 @@ Here are two recommended approaches:
     2. Or, copy the admin media files so that they live within your Apache
        document root.
 
+Using eggs with mod_python
+==========================
+
+If you installed Django from a Python egg_ or are using eggs in your Django
+project, some extra configuration is required. Create an extra file in your
+project (or somewhere else) that contains something like the following::
+
+    import os
+    os.environ['PYTHON_EGG_CACHE'] = '/some/directory'
+
+Here, ``/some/directory`` is a directory that the Apache webserver process can
+write to. It will be used as the location for any unpacking of code the eggs
+need to do.
+
+Then you have to tell mod_python to import this file before doing anything
+else. This is done using the PythonImport_ directive to mod_python. You need
+to ensure that you have specified the ``PythonInterpreter`` directive to
+mod_python as described above__ (you need to do this even if you aren't
+serving multiple installations in this case). Then add the ``PythonImport``
+line inside the ``Location`` or ``VirtualHost`` section. For example::
+
+    PythonInterpreter my_django
+    PythonImport /path/to/my/project/file.py my_django
+
+Note that you can use an absolute path here (or a normal dotted import path),
+as described in the `mod_python manual`_. We use an absolute path in the
+above example because if any Python path modifications are required to access
+your project, they will not have been done at the time the ``PythonImport``
+line is processed.
+
+.. _Egg: http://peak.telecommunity.com/DevCenter/PythonEggs
+.. _PythonImport: http://www.modpython.org/live/current/doc-html/dir-other-pimp.html
+.. _mod_python manual: PythonImport_
+__ `Multiple Django installations on the same Apache`_
+
 Error handling
 ==============
 
@@ -256,3 +291,5 @@ as necessary.
 .. _Expat Causing Apache Crash: http://www.dscpl.com.au/articles/modpython-006.html
 .. _mod_python FAQ entry: http://modpython.org/FAQ/faqw.py?req=show&file=faq02.013.htp
 .. _Getting mod_python Working: http://www.dscpl.com.au/articles/modpython-001.html
+
+
