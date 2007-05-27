@@ -264,6 +264,11 @@ MySQL will connect via a Unix socket to the specified socket. For example::
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
 
+If you're using PostgreSQL, an empty string means to use a Unix domain socket
+for the connection, rather than a network connection to localhost. If you
+explictly need to use a TCP/IP connection on the local machine with
+PostgreSQL, specify ``localhost`` here.
+
 DATABASE_NAME
 -------------
 
