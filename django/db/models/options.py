@@ -6,6 +6,7 @@ from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
+from django.utils.encoding import force_unicode, smart_str
 from bisect import bisect
 import re
 
@@ -90,9 +91,9 @@ class Options(object):
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-        
+
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.module_name)
+        return "%s.%s" % (smart_str(self.app_label), smart_str(self.module_name))
 
     def verbose_name_raw(self):
         """
@@ -102,7 +103,7 @@ class Options(object):
         """
         lang = get_language()
         deactivate_all()
-        raw = unicode(self.verbose_name)
+        raw = force_unicode(self.verbose_name)
         activate(lang)
         return raw
     verbose_name_raw = property(verbose_name_raw)
