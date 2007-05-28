@@ -197,6 +197,8 @@ The end."""),
     (fk_obj, 451, FKDataToField, "UAnchor 2"),
     (fk_obj, 452, FKDataToField, None),
 
+    (fk_obj, 460, FKDataToO2O, 300),
+
     (data_obj, 500, Anchor, "Anchor 3"),
     (data_obj, 501, Anchor, "Anchor 4"),
     (data_obj, 502, UniqueAnchor, "UAnchor 2"),
