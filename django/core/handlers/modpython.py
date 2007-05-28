@@ -160,7 +160,7 @@ class ModPythonHandler(BaseHandler):
         req.content_type = response['Content-Type']
         for key, value in response.headers.items():
             if key != 'Content-Type':
-                req.headers_out[key] = value
+                req.headers_out[str(key)] = str(value)
         for c in response.cookies.values():
             req.headers_out.add('Set-Cookie', c.output(header=''))
         req.status = response.status_code
