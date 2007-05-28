@@ -97,7 +97,9 @@ This file should also be located in your ``site-packages`` directory.
 
     * If you're using Windows: ``C:\Python2.X\lib\site-packages``
 
-    * If you're using MacOSX: ``/Library/Python2.X/site-packages``
+    * If you're using MacOSX: ``/Library/Python2.X/site-packages`` or
+      ``/Library/Frameworks/Python.framework/Versions/2.X/lib/python2.X/site-packages/``
+      (in later releases).
 
 Install the Django code
 =======================
