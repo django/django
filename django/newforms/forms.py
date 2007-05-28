@@ -136,7 +136,7 @@ class BaseForm(StrAndUnicode):
                     help_text = help_text_html % force_unicode(field.help_text)
                 else:
                     help_text = u''
-                output.append(normal_row % {'errors': bf_errors, 'label': force_unicode(label), 'field': unicode(bf), 'help_text': help_text})
+                output.append(normal_row % {'errors': force_unicode(bf_errors), 'label': force_unicode(label), 'field': unicode(bf), 'help_text': help_text})
         if top_errors:
             output.insert(0, error_row % top_errors)
         if hidden_fields: # Insert any hidden fields in the last row.
