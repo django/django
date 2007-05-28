@@ -63,7 +63,7 @@ class HttpRequest(object):
     encoding = property(_get_encoding, _set_encoding)
 
 def parse_file_upload(header_dict, post_data):
-    "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"
+    "Returns a tuple of (POST QueryDict, FILES MultiValueDict)"
     import email, email.Message
     from cgi import parse_header
     raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
