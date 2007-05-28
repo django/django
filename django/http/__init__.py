@@ -69,7 +69,7 @@ def parse_file_upload(header_dict, post_data):
     raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
     raw_message += '\r\n\r\n' + post_data
     msg = email.message_from_string(raw_message)
-    POST = MultiValueDict()
+    POST = QueryDict('', mutable=True)
     FILES = MultiValueDict()
     for submessage in msg.get_payload():
         if submessage and isinstance(submessage, email.Message.Message):
