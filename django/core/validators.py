@@ -33,7 +33,7 @@ phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNO
 slug_re = re.compile(r'^[-\w]+$')
 url_re = re.compile(r'^https?://\S+$')
 
-lazy_inter = lazy(lambda a,b: str(a) % b, str)
+lazy_inter = lazy(lambda a,b: force_unicode(a) % b, unicode)
 
 class ValidationError(Exception):
     def __init__(self, message):
