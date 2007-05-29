@@ -3655,6 +3655,25 @@ u' id="header"'
 u' class="news" title="Read this"'
 >>> flatatt({})
 u''
+
+####################################
+# Test accessing errors in clean() #
+####################################
+
+>>> class UserForm(Form):
+...     username = CharField(max_length=10)
+...     password = CharField(widget=PasswordInput)
+...     def clean(self):
+...         data = self.cleaned_data
+...         if not self.errors:
+...             data['username'] = data['username'].lower()
+...         return data
+
+>>> f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data['username']
+u'sirrobin'
 """
 
 __test__ = {

@@ -1138,7 +1138,7 @@ def validate(outfile=sys.stdout, silent_success=False):
             return
         outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
     except ImproperlyConfigured:
-        outfile.write("Skipping validation because things aren't configured properly.")
+        outfile.write("Skipping validation because things aren't configured properly.\n")
 validate.args = ''
 
 def _check_for_validation_errors(app=None):

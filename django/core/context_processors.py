@@ -42,6 +42,13 @@ def i18n(request):
 
     return context_extras
 
+def media(request):
+    """
+    Adds media-related context variables to the context.
+
+    """
+    return {'MEDIA_URL': settings.MEDIA_URL}
+
 def request(request):
     return {'request': request}
 

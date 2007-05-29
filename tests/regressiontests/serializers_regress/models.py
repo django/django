@@ -129,6 +129,9 @@ class M2MSelfData(models.Model):
 class FKDataToField(models.Model):
     data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
 
+class FKDataToO2O(models.Model):
+    data = models.ForeignKey(O2OData, null=True)
+
 # The following test classes are for validating the
 # deserialization of objects that use a user-defined
 # field as the primary key.

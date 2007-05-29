@@ -60,9 +60,10 @@ arguments from the dictionary (an optional third item in the tuple).
 For more on ``HTTPRequest`` objects, see the `request and response documentation`_.
 For more details on URLconfs, see the `URLconf documentation`_.
 
-When you ran ``python manage.py startproject mysite`` at the beginning of
+When you ran ``python django-admin.py startproject mysite`` at the beginning of
 Tutorial 1, it created a default URLconf in ``mysite/urls.py``. It also
-automatically set your ``ROOT_URLCONF`` setting to point at that file::
+automatically set your ``ROOT_URLCONF`` setting (in ``settings.py``) to point
+at that file::
 
     ROOT_URLCONF = 'mysite.urls'
 
