@@ -294,7 +294,8 @@ return a dictionary of items to be merged into the context. By default,
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -389,6 +390,15 @@ See the `internationalization docs`_ for more.
 .. _LANGUAGES setting: ../settings/#languages
 .. _LANGUAGE_CODE setting: ../settings/#language-code
 .. _internationalization docs: ../i18n/
+
+django.core.context_processors.media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processors, every
+``RequestContext`` will contain ``MEDIA_URL``,  providing the 
+value of the `MEDIA_URL setting`_.
+
+.. _MEDIA_URL setting: ../settings/#media-url
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

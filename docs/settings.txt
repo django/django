@@ -776,7 +776,8 @@ Default::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
