@@ -332,6 +332,13 @@ TEST_RUNNER = 'django.test.simple.run_tests'
 # If None, a name of 'test_' + DATABASE_NAME will be assumed
 TEST_DATABASE_NAME = None
 
+# Strings used to set the character set and collation order for the test
+# database. These values are passed literally to the server, so they are
+# backend-dependent. If None, no special settings are sent (system defaults are
+# used).
+TEST_DATABASE_CHARSET = None
+TEST_DATABASE_COLLATION = None
+
 ############
 # FIXTURES #
 ############

@@ -571,6 +571,16 @@ database settings will the same as they would be for the project normally.
 If you wish to use a name other than the default for the test database,
 you can use the ``TEST_DATABASE_NAME`` setting to provide a name.
 
+
+**New in Django development version:** If you wish to have fine-grained
+control over the character set encoding used in your database, you can control
+this with the ``TEST_DATABASE_CHARSET`` setting. For MySQL users, you can also
+control the particular collation used by the test database with the
+``TEST_DATABASE_COLLATION`` setting. Refer to the settings_ documentation for
+details of these advanced settings.
+
+.. _settings: ../settings.txt
+
 The test database is created by the user in the ``DATABASE_USER`` setting.
 This user needs to have sufficient privileges to create a new database on the
 system.
