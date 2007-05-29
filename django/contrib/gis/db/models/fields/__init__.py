@@ -5,6 +5,10 @@ from django.contrib.gis.oldforms import WKTField
 from django.utils.functional import curry
 from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
+#TODO: Flesh out widgets.
+#TODO: geos operations through fields as proxy.
+#TODO: pythonic usage, like "for point in zip.polygon" and "if point in polygon".
+
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
