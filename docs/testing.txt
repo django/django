@@ -579,7 +579,7 @@ control the particular collation used by the test database with the
 ``TEST_DATABASE_COLLATION`` setting. Refer to the settings_ documentation for
 details of these advanced settings.
 
-.. _settings: ../settings.txt
+.. _settings: ../settings/
 
 The test database is created by the user in the ``DATABASE_USER`` setting.
 This user needs to have sufficient privileges to create a new database on the
