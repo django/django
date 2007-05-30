@@ -1748,7 +1748,8 @@ Shortcuts
 
 As you develop views, you will discover a number of common idioms in the
 way you use the database API. Django encodes some of these idioms as
-shortcuts that can be used to simplify the process of writing views.
+shortcuts that can be used to simplify the process of writing views. These
+functions are in the ``django.shortcuts`` module.
 
 get_object_or_404()
 -------------------

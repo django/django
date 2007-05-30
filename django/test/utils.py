@@ -73,6 +73,20 @@ def _set_autocommit(connection):
     elif hasattr(connection.connection, "set_isolation_level"):
         connection.connection.set_isolation_level(0)
 
+def get_mysql_create_suffix():
+    suffix = []
+    if settings.TEST_DATABASE_CHARSET:
+        suffix.append('CHARACTER SET %s' % settings.TEST_DATABASE_CHARSET)
+    if settings.TEST_DATABASE_COLLATION:
+        suffix.append('COLLATE %s' % settings.TEST_DATABASE_COLLATION)
+    return ' '.join(suffix)
+
+def get_postgresql_create_suffix():
+    assert settings.TEST_DATABASE_COLLATION is None, "PostgreSQL does not support collation setting at database creation time."
+    if settings.TEST_DATABASE_CHARSET:
+        return "WITH ENCODING '%s'" % settings.TEST_DATABASE_CHARSET
+    return ''
+
 def create_test_db(verbosity=1, autoclobber=False):
     # If the database backend wants to create the test DB itself, let it
     creation_module = get_creation_module()
@@ -87,6 +101,12 @@ def create_test_db(verbosity=1, autoclobber=False):
     if settings.DATABASE_ENGINE == "sqlite3":
         TEST_DATABASE_NAME = ":memory:"
     else:
+        suffix = {
+            'postgresql': get_postgresql_create_suffix,
+            'postgresql_psycopg2': get_postgresql_create_suffix,
+            'mysql': get_mysql_create_suffix,
+            'mysql_old': get_mysql_create_suffix,
+        }.get(settings.DATABASE_ENGINE, lambda: '')()
         if settings.TEST_DATABASE_NAME:
             TEST_DATABASE_NAME = settings.TEST_DATABASE_NAME
         else:
@@ -98,7 +118,7 @@ def create_test_db(verbosity=1, autoclobber=False):
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+            cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
         except Exception, e:            
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -110,7 +130,7 @@ def create_test_db(verbosity=1, autoclobber=False):
                     cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+                    cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)

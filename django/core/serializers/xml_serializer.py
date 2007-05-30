@@ -82,7 +82,13 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related = getattr(obj, field.name)
         if related is not None:
-            self.xml.characters(str(getattr(related, field.rel.field_name)))
+            if field.rel.field_name == related._meta.pk.name:
+                # Related to remote object via primary key
+                related = related._get_pk_val()
+            else:
+                # Related to remote object via other field
+                related = getattr(related, field.rel.field_name)
+            self.xml.characters(str(related))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")

@@ -1,4 +1,5 @@
 from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
+from django.core.exceptions import ImproperlyConfigured
 
 __all__ = ['handler404', 'handler500', 'include', 'patterns', 'url']
 
@@ -22,7 +23,10 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
         # For include(...) processing.
         return RegexURLResolver(regex, view[0], kwargs)
     else:
-        if prefix and isinstance(view, basestring):
-            view = prefix + '.' + view
+        if isinstance(view, basestring):
+            if not view:
+                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
+            if prefix:
+                view = prefix + '.' + view
         return RegexURLPattern(regex, view, kwargs, name)
 

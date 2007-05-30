@@ -113,8 +113,8 @@ msgstr "Demà"
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr ""
+msgstr "Mostrar"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr ""
+msgstr "Ocultar"

@@ -37,7 +37,12 @@ class Serializer(base.Serializer):
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
         if related is not None:
-            related = getattr(related, field.rel.field_name)
+            if field.rel.field_name == related._meta.pk.name:
+                # Related to remote object via primary key
+                related = related._get_pk_val()
+            else:
+                # Related to remote object via other field
+                related = getattr(related, field.rel.field_name)
         self._current[field.name] = related
     
     def handle_m2m_field(self, obj, field):

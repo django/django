@@ -4,7 +4,7 @@ Testing Django applications
 
 Automated testing is an extremely useful bug-killing tool for the modern
 Web developer. You can use a collection of tests -- a **test suite** -- to
-to solve, or avoid, a number of problems:
+solve, or avoid, a number of problems:
 
     * When you're writing new code, you can use tests to validate your code
       works as expected.
@@ -570,6 +570,16 @@ the database name specified by the ``DATABASE_NAME`` setting; all other
 database settings will the same as they would be for the project normally.
 If you wish to use a name other than the default for the test database,
 you can use the ``TEST_DATABASE_NAME`` setting to provide a name.
+
+
+**New in Django development version:** If you wish to have fine-grained
+control over the character set encoding used in your database, you can control
+this with the ``TEST_DATABASE_CHARSET`` setting. For MySQL users, you can also
+control the particular collation used by the test database with the
+``TEST_DATABASE_COLLATION`` setting. Refer to the settings_ documentation for
+details of these advanced settings.
+
+.. _settings: ../settings/
 
 The test database is created by the user in the ``DATABASE_USER`` setting.
 This user needs to have sufficient privileges to create a new database on the
