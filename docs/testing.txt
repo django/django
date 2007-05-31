@@ -147,7 +147,7 @@ doctests or unit tests are right for you.
 If you've been using Python for a while, ``doctest`` will probably feel more
 "pythonic". It's designed to make writing tests as easy as possible, so
 there's no overhead of writing classes or methods; you simply put tests in
-docstrings. This gives the added advantage of given your modules automatic
+docstrings. This gives the added advantage of giving your modules automatic
 documentation -- well-written doctests can kill both the documentation and the
 testing bird with a single stone.
 
