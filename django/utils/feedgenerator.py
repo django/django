@@ -19,6 +19,7 @@ http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 
 from django.utils.xmlutils import SimplerXMLGenerator
+from django.utils.encoding import force_unicode, iri_to_uri
 import datetime, re, time
 import email.Utils
 
@@ -41,18 +42,20 @@ class SyndicationFeed(object):
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
             feed_url=None, feed_copyright=None):
+        if categories:
+            categories = [force_unicode(c) for c in categories]
         self.feed = {
-            'title': title,
-            'link': link,
-            'description': description,
-            'language': language,
-            'author_email': author_email,
-            'author_name': author_name,
-            'author_link': author_link,
-            'subtitle': subtitle,
+            'title': force_unicode(title),
+            'link': iri_to_uri(link),
+            'description': force_unicode(description),
+            'language': force_unicode(language),
+            'author_email': force_unicode(author_email),
+            'author_name': force_unicode(author_name),
+            'author_link': iri_to_uri(author_link),
+            'subtitle': force_unicode(subtitle),
             'categories': categories or (),
-            'feed_url': feed_url,
-            'feed_copyright': feed_copyright,
+            'feed_url': iri_to_uri(feed_url),
+            'feed_copyright': force_unicode(feed_copyright),
         }
         self.items = []
 
@@ -64,19 +67,21 @@ class SyndicationFeed(object):
         objects except pubdate, which is a datetime.datetime object, and
         enclosure, which is an instance of the Enclosure class.
         """
+        if categories:
+            categories = [force_unicode(c) for c in categories]
         self.items.append({
-            'title': title,
-            'link': link,
-            'description': description,
-            'author_email': author_email,
-            'author_name': author_name,
-            'author_link': author_link,
+            'title': force_unicode(title),
+            'link': iri_to_uri(link),
+            'description': force_unicode(description),
+            'author_email': force_unicode(author_email),
+            'author_name': force_unicode(author_name),
+            'author_link': iri_to_uri(author_link),
             'pubdate': pubdate,
-            'comments': comments,
-            'unique_id': unique_id,
+            'comments': force_unicode(comments),
+            'unique_id': force_unicode(unique_id),
             'enclosure': enclosure,
             'categories': categories or (),
-            'item_copyright': item_copyright,
+            'item_copyright': force_unicode(item_copyright),
         })
 
     def num_items(self):
@@ -114,7 +119,8 @@ class Enclosure(object):
     "Represents an RSS enclosure"
     def __init__(self, url, length, mime_type):
         "All args are expected to be Python Unicode objects"
-        self.url, self.length, self.mime_type = url, length, mime_type
+        self.length, self.mime_type = length, mime_type
+        self.url = iri_to_uri(url)
 
 class RssFeed(SyndicationFeed):
     mime_type = 'application/rss+xml'
