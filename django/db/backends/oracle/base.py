@@ -461,7 +461,7 @@ def get_query_set_class(DefaultQuerySet):
 
         def resolve_columns(self, row, fields=()):
             from django.db.models.fields import DateField, DateTimeField, \
-                TimeField, BooleanField, NullBooleanField, DecimalField
+                TimeField, BooleanField, NullBooleanField, DecimalField, Field
             values = []
             for value, field in map(None, row, fields):
                 if isinstance(value, Database.LOB):
@@ -470,7 +470,7 @@ def get_query_set_class(DefaultQuerySet):
                 # order to adhere to the Django convention of using the empty
                 # string instead of null, but only if the field accepts the
                 # empty string.
-                if value is None and field.empty_strings_allowed:
+                if value is None and isinstance(field, Field) and field.empty_strings_allowed:
                     value = ''
                 # Convert 1 or 0 to True or False
                 elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
