@@ -3,7 +3,7 @@
 # settings.USE_I18N = False can use this module rather than trans_real.py.
 
 from django.conf import settings
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import force_unicode
 
 def ngettext(singular, plural, number):
     if number == 1: return singular
@@ -11,9 +11,9 @@ def ngettext(singular, plural, number):
 ngettext_lazy = ngettext
 
 def ungettext(singular, plural, number):
-    return smart_unicode(ngettext(singular, plural, number))
+    return force_unicode(ngettext(singular, plural, number))
 
-string_concat = lambda *strings: u''.join([smart_unicode(el) for el in strings])
+string_concat = lambda *strings: u''.join([force_unicode(el) for el in strings])
 activate = lambda x: None
 deactivate = deactivate_all = install = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
@@ -35,7 +35,7 @@ def gettext(message):
     return TECHNICAL_ID_MAP.get(message, message)
 
 def ugettext(message):
-    return smart_unicode(gettext(message))
+    return force_unicode(gettext(message))
 
 gettext_noop = gettext_lazy = _ = gettext
 
