@@ -114,8 +114,10 @@ error_h = ERRORFUNC(error_h)
 #  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
 lgeos.initGEOS(notice_h, error_h)
 
-class GEOSGeometry:
+class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
+    
+    _g = 0  # Initially NULL
 
     #### Python 'magic' routines ####
     def __init__(self, input, geom_type='wkt'):
@@ -123,8 +125,7 @@ class GEOSGeometry:
 
         if geom_type == 'wkt':
             # If the geometry is in WKT form
-            buf = create_string_buffer(input)
-            g = lgeos.GEOSGeomFromWKT(buf)
+            g = lgeos.GEOSGeomFromWKT(c_char_p(input))
         elif geom_type == 'hex':
             # If the geometry is in HEX form.
             sz = c_size_t(len(input))
@@ -139,7 +140,6 @@ class GEOSGeometry:
 
         # If the geometry pointer is NULL (0), then raise an exception.
         if not g:
-            self._g = False # Setting this before raising the exception
             raise GEOSException, 'Invalid %s given!' % geom_type.upper()
         else:
             self._g = g
@@ -251,8 +251,7 @@ class GEOSGeometry:
         the two Geometrys match the elements in pattern."""
         if len(pattern) > 9:
             raise GEOSException, 'invalid intersection matrix pattern'
-        pat = create_string_buffer(pattern)
-        return self._predicate(lgeos.GEOSRelatePattern(self._g, other._g, pat))
+        return self._predicate(lgeos.GEOSRelatePattern(self._g, other._g, c_char_p(pattern)))
 
     def disjoint(self, other):
         "Returns true if the DE-9IM intersection matrix for the two Geometrys is FF*FF****."
@@ -404,7 +403,7 @@ class GEOSGeometry:
         else:
             return a.value
 
-class GEOSCoordSeq:
+class GEOSCoordSeq(object):
     "The internal representation of a list of coordinates inside a Geometry."
 
     def __init__(self, ptr, z=False):
@@ -413,13 +412,16 @@ class GEOSCoordSeq:
         self._z = z
 
     def __del__(self):
+        "Destroys the reference to this coordinate sequence."
         if self._cs: lgeos.GEOSCoordSeq_destroy(self._cs)
 
     def __iter__(self):
+        "Iterates over each point in the coordinate sequence."
         for i in xrange(self.size):
             yield self.__getitem__(i)
 
     def __len__(self):
+        "Returns the number of points in the coordinate sequence."
         return int(self.size)
 
     def __str__(self):
@@ -536,6 +538,7 @@ class GEOSCoordSeq:
     ### Other Methods ###
     @property
     def tuple(self):
+        "Returns a tuple version of this coordinate sequence."
         n = self.size
         if n == 1:
             return self.__getitem__(0)
@@ -587,18 +590,70 @@ class LineString(GEOSGeometry):
         "Caches the coordinate sequence."
         if not hasattr(self, '_cs'): self._cs = self.coord_seq 
 
+    def __getitem__(self, index):
+        "Gets the point at the specified index."
+        self._cache_cs()
+        if index < 0 or index >= self._cs.size:
+            raise IndexError, 'index out of range'
+        else:
+            return self._cs[index]
+
+    def __iter__(self):
+        "Allows iteration over this LineString."
+        self._cache_cs()
+        for i in xrange(self._cs.size):
+            yield self.__getitem__(index)
+
+    def __len__(self):
+        "Returns the number of points in this LineString."
+        self._cache_cs()
+        return len(self._cs)
+
     @property
     def tuple(self):
         "Returns a tuple version of the geometry from the coordinate sequence."
         self._cache_cs()
         return self._cs.tuple
 
-class LinearRing(LineString):
-    pass
+# LinearRings are LineStrings used within Polygons.
+class LinearRing(LineString): pass
 
 class Polygon(GEOSGeometry):
 
-    #### Polygon Routines ####
+    def __getitem__(self, index):
+        """Returns the ring at the specified index.  The first index, 0, will always
+        return the exterior ring.  Indices > 0 will return the interior ring."""
+        if index < 0 or index > self.num_interior_rings:
+            raise IndexError, 'index out of range'
+        else:
+            if index == 0:
+                return self.exterior_ring
+            else:
+                # Getting the interior ring, have to subtract 1 from the index.
+                return self.get_interior_ring(index-1) 
+
+    def __iter__(self):
+        "Iterates over each ring in the polygon."
+        for i in xrange(self.__len__()):
+            yield self.__getitem__(i)
+
+    def __len__(self):
+        "Returns the number of rings in this Polygon."
+        return self.num_interior_rings + 1
+                        
+
+    def get_interior_ring(self, ring_i):
+        "Gets the interior ring at the specified index."
+
+        # Making sure the ring index is within range
+        if ring_i >= self.num_interior_rings:
+            raise GEOSException, 'Invalid ring index.'
+        
+        # Getting a clone of the ring geometry at the given ring index.
+        r = lgeos.GEOSGeom_clone(lgeos.GEOSGetInteriorRingN(self._g, c_int(ring_i)))
+        return GEOSGeometry(r, 'geos')
+                                                        
+    #### Polygon Properties ####
     @property
     def num_interior_rings(self):
         "Returns the number of interior rings."
@@ -610,17 +665,6 @@ class Polygon(GEOSGeometry):
         if n == -1: raise GEOSException, 'Error getting the number of interior rings!'
         else: return n
 
-    def get_interior_ring(self, ring_i):
-        "Gets the interior ring at the specified index."
-
-        # Making sure the ring index is within range
-        if ring_i >= self.num_interior_rings:
-            raise GEOSException, 'Invalid ring index.'
-
-        # Getting a clone of the ring geometry at the given ring index.
-        r = lgeos.GEOSGeom_clone(lgeos.GEOSGetInteriorRingN(self._g, c_int(ring_i)))
-        return GEOSGeometry(r, 'geos')
-
     @property
     def exterior_ring(self):
         "Gets the exterior ring of the Polygon."
@@ -628,7 +672,17 @@ class Polygon(GEOSGeometry):
         # Getting a clone of the ring geometry
         r = lgeos.GEOSGeom_clone(lgeos.GEOSGetExteriorRing(self._g))
         return GEOSGeometry(r, 'geos')
+
+    @property
+    def shell(self):
+        "Gets the shell (exterior ring) of the Polygon."
+        return self.exterior_ring
     
+    @property
+    def tuple(self):
+        "Gets the tuple for each ring in this Polygon."
+        return tuple(self.__getitem__(i).tuple for i in xrange(self.__len__()))
+
 class GeometryCollection(GEOSGeometry):
 
     def _checkindex(self, index):
@@ -648,16 +702,13 @@ class GeometryCollection(GEOSGeometry):
         return GEOSGeometry(item, 'geos')
 
     def __len__(self):
+        "Returns the number of geometries in this collection."
         return self.num_geom
 
-class MultiPoint(GeometryCollection):
-    pass
-
-class MultiLineString(GeometryCollection):
-    pass
-
-class MultiPolygon(GeometryCollection):
-    pass
+# MultiPoint, MultiLineString, and MultiPolygon class definitions.
+class MultiPoint(GeometryCollection): pass
+class MultiLineString(GeometryCollection): pass
+class MultiPolygon(GeometryCollection): pass
 
 # Class mapping dictionary
 GEO_CLASSES = {'Point' : Point,

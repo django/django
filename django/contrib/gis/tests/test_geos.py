@@ -82,6 +82,7 @@ class GeosTest2(unittest.TestCase):
             self.assertEqual(poly.empty, False)
             self.assertEqual(poly.ring, False)
             self.assertEqual(p.n_i, poly.num_interior_rings)
+            self.assertEqual(p.n_i + 1, len(poly)) # Testing __len__
 
             # Testing the geometry equivalence
             self.assertEqual(True, poly == GEOSGeometry(p.wkt))
@@ -94,6 +95,7 @@ class GeosTest2(unittest.TestCase):
             self.assertEqual(ring.geom_typeid, 2)
             if p.ext_ring_cs:
                 self.assertEqual(p.ext_ring_cs, ring.tuple)
+                self.assertEqual(p.ext_ring_cs, poly[0].tuple) # Testing __getitem__
 
     def test03_multipolygons(self):
         "Testing MultiPolygon objects."
