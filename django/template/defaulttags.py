@@ -237,7 +237,7 @@ class RegroupNode(Node):
             return ''
         output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
         for obj in obj_list:
-            grouper = self.expression.resolve(Context({'var': obj}), True)
+            grouper = self.expression.resolve(obj, True)
             # TODO: Is this a sensible way to determine equality?
             if output and repr(output[-1]['grouper']) == repr(grouper):
                 output[-1]['list'].append(obj)
@@ -847,7 +847,7 @@ def regroup(parser, token):
     if lastbits_reversed[1][::-1] != 'as':
         raise TemplateSyntaxError, "next-to-last argument to 'regroup' tag must be 'as'"
 
-    expression = parser.compile_filter('var.%s' % lastbits_reversed[2][::-1])
+    expression = parser.compile_filter(lastbits_reversed[2][::-1])
 
     var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target, expression, var_name)
