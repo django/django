@@ -20,7 +20,7 @@ class Person(models.Model):
     name = models.CharField(maxlength=20)
     gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

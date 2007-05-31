@@ -24,7 +24,7 @@ class TaggedItem(models.Model):
     class Meta:
         ordering = ["tag"]
     
-    def __str__(self):
+    def __unicode__(self):
         return self.tag
 
 class Animal(models.Model):
@@ -33,7 +33,7 @@ class Animal(models.Model):
     
     tags = generic.GenericRelation(TaggedItem)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.common_name
         
 class Vegetable(models.Model):
@@ -42,7 +42,7 @@ class Vegetable(models.Model):
     
     tags = generic.GenericRelation(TaggedItem)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
     
 class Mineral(models.Model):
@@ -51,7 +51,7 @@ class Mineral(models.Model):
     
     # note the lack of an explicit GenericRelation here...
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
         
 __test__ = {'API_TESTS':"""

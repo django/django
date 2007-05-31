@@ -12,7 +12,7 @@ from django.db import models
 class Publication(models.Model):
     title = models.CharField(maxlength=30)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
     class Meta:
@@ -22,7 +22,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     publications = models.ManyToManyField(Publication)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:

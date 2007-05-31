@@ -15,8 +15,8 @@ class Employee(models.Model):
     class Meta:
         ordering = ('last_name', 'first_name')
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 class Business(models.Model):
     name = models.CharField(maxlength=20, primary_key=True)
@@ -24,7 +24,7 @@ class Business(models.Model):
     class Meta:
         verbose_name_plural = 'businesses'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

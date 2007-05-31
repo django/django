@@ -14,7 +14,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:

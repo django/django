@@ -11,8 +11,8 @@ class Person(models.Model):
     first_name = models.CharField(maxlength=20)
     last_name = models.CharField(maxlength=20)
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
     def save(self):
         print "Before save"

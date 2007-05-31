@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404, get_list_or_404
 class Author(models.Model):
     name = models.CharField(maxlength=50)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class ArticleManager(models.Manager):
@@ -30,7 +30,7 @@ class Article(models.Model):
     objects = models.Manager()
     by_a_sir = ArticleManager()
     
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
 __test__ = {'API_TESTS':"""

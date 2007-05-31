@@ -21,8 +21,8 @@ class Author(models.Model):
     first_name = models.CharField(maxlength=30, db_column='firstname')
     last_name = models.CharField(maxlength=30, db_column='last')
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u'%s %s' % (self.first_name, self.last_name)
 
     class Meta:
         db_table = 'my_author_table'
@@ -32,7 +32,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:

@@ -4,23 +4,23 @@ class Place(models.Model):
     name = models.CharField(maxlength=50)
     address = models.CharField(maxlength=80)
 
-    def __str__(self):
-        return "%s the place" % self.name
+    def __unicode__(self):
+        return u"%s the place" % self.name
 
 class Restaurant(models.Model):
     place = models.OneToOneField(Place)
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
-    def __str__(self):
-        return "%s the restaurant" % self.place.name
+    def __unicode__(self):
+        return u"%s the restaurant" % self.place.name
 
 class Favorites(models.Model):
     name = models.CharField(maxlength = 50)
     restaurants = models.ManyToManyField(Restaurant)
 
-    def __str__(self):
-        return "Favorites for %s" % self.name
+    def __unicode__(self):
+        return u"Favorites for %s" % self.name
 
 __test__ = {'API_TESTS':"""
 # Regression test for #1064 and #1506: Check that we create models via the m2m

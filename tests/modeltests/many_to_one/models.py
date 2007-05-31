@@ -11,15 +11,15 @@ class Reporter(models.Model):
     last_name = models.CharField(maxlength=30)
     email = models.EmailField()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:

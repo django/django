@@ -2,24 +2,27 @@
 """
 2. Adding __str__() or __unicode__() to models
 
-Although it's not a strict requirement, each model should have a ``__str__()``
-method to return a "human-readable" representation of the object. Do this not
-only for your own sanity when dealing with the interactive prompt, but also
-because objects' representations are used throughout Django's
-automatically-generated admin.
+Although it's not a strict requirement, each model should have a
+``_str__()`` or ``__unicode__()`` method to return a "human-readable"
+representation of the object. Do this not only for your own sanity when dealing
+with the interactive prompt, but also because objects' representations are used
+throughout Django's automatically-generated admin.
 
-For international applications, you should write ``__unicode__``() method
-instead.
+Normally,  you should write ``__unicode__``() method, since this will work for
+all field types (and Django will automatically provide an appropriate
+``__str__()`` method). However, you can write a ``__str__()`` method directly,
+if you prefer. You must be careful to encode the results correctly, though.
 """
 
 from django.db import models
+from django.utils.encoding import smart_str
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateTimeField()
 
     def __str__(self):
-        return self.headline
+        return smart_str(self.headline)
 
 class InternationalArticle(models.Model):
     headline = models.CharField(maxlength=100)

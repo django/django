@@ -16,7 +16,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField(default=datetime.now)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""

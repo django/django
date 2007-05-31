@@ -34,13 +34,13 @@ class Category(models.Model):
     name = models.CharField(maxlength=20)
     url = models.CharField('The URL', maxlength=40)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Writer(models.Model):
     name = models.CharField(maxlength=50, help_text='Use both first and last names.')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -58,14 +58,14 @@ class Article(models.Model):
             self.created = datetime.date.today()
         return super(Article, self).save()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
     description = models.CharField(maxlength=20)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.phone
 
 __test__ = {'API_TESTS': """

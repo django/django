@@ -14,7 +14,7 @@ class Person(models.Model):
     mother = models.ForeignKey('self', null=True, related_name='mothers_child_set')
     father = models.ForeignKey('self', null=True, related_name='fathers_child_set')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.full_name
 
 __test__ = {'API_TESTS':"""

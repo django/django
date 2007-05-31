@@ -19,7 +19,7 @@ class Person(models.Model):
     friends = models.ManyToManyField('self')
     idols = models.ManyToManyField('self', symmetrical=False, related_name='stalkers')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

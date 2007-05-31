@@ -23,8 +23,8 @@ class Person(models.Model):
     fun = models.BooleanField()
     objects = PersonManager()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 # An example of a custom manager that sets get_query_set().
 
@@ -39,7 +39,7 @@ class Book(models.Model):
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
 # An example of providing multiple custom managers.
@@ -55,7 +55,7 @@ class Car(models.Model):
     cars = models.Manager()
     fast_cars = FastCarManager()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

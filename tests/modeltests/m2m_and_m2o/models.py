@@ -14,8 +14,8 @@ class Issue(models.Model):
     cc = models.ManyToManyField(User, blank=True, related_name='test_issue_cc')
     client = models.ForeignKey(User, related_name='test_issue_client')
 
-    def __str__(self):
-        return str(self.num)
+    def __unicode__(self):
+        return unicode(self.num)
 
     class Meta:
         ordering = ('num',)
