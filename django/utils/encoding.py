@@ -27,6 +27,8 @@ def force_unicode(s, encoding='utf-8', errors='strict'):
     Similar to smart_unicode, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
     """
+    if s is None:
+        return s
     if not isinstance(s, basestring,):
         if hasattr(s, '__unicode__'):
             s = unicode(s)
@@ -72,5 +74,7 @@ def iri_to_uri(iri):
     # The list of safe characters here is constructed from the printable ASCII
     # characters that are not explicitly excluded by the list at the end of
     # section 3.1 of RFC 3987.
+    if iri is None:
+        return iri
     return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?')
 
