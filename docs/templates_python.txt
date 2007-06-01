@@ -394,8 +394,8 @@ See the `internationalization docs`_ for more.
 django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processors, every
-``RequestContext`` will contain ``MEDIA_URL``,  providing the 
+If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
+``RequestContext`` will contain ``MEDIA_URL``,  providing the
 value of the `MEDIA_URL setting`_.
 
 .. _MEDIA_URL setting: ../settings/#media-url
