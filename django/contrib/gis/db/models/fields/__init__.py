@@ -6,7 +6,7 @@ from django.utils.functional import curry
 from django.contrib.gis.geos import GEOSGeometry, GEOSException
 
 #TODO: Flesh out widgets.
-#TODO: geos operations through fields as proxy.
+#TODO: GEOS and GDAL/OGR operations through fields as proxy.
 #TODO: pythonic usage, like "for point in zip.polygon" and "if point in polygon".
 
 class GeometryField(Field):
@@ -38,8 +38,7 @@ class GeometryField(Field):
         AddGeometryColumn(...) PostGIS (and OGC standard) function.
 
         Takes the style object (provides syntax highlighting) as well as the
-         database table and field.  The dimensions can be specified via
-         the dim keyword as well.
+         database table and field.
         """
         sql = style.SQL_KEYWORD('SELECT ') + \
               style.SQL_TABLE('AddGeometryColumn') + '(' + \
@@ -81,8 +80,9 @@ class GeometryField(Field):
     def contribute_to_class(self, cls, name):
         super(GeometryField, self).contribute_to_class(cls, name)
 
-        # Adding the WKT accessor function for geometry
+        # Adding needed accessor functions
         setattr(cls, 'get_%s_geos' % self.name, curry(cls._get_GEOM_geos, field=self))
+        setattr(cls, 'get_%s_ogr' % self.name, curry(cls._get_GEOM_ogr, field=self, srid=self._srid))
         setattr(cls, 'get_%s_wkt' % self.name, curry(cls._get_GEOM_wkt, field=self))
         setattr(cls, 'get_%s_centroid' % self.name, curry(cls._get_GEOM_centroid, field=self))
         setattr(cls, 'get_%s_area' % self.name, curry(cls._get_GEOM_area, field=self))

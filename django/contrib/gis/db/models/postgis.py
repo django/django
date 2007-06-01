@@ -1,6 +1,5 @@
 # This module is meant to re-define the helper routines used by the
 # django.db.models.query objects to be customized for PostGIS.
-from copy import copy
 from django.db import backend
 from django.db.models.query import LOOKUP_SEPARATOR, find_field, FieldFound, QUERY_TERMS, get_where_clause
 from django.utils.datastructures import SortedDict
