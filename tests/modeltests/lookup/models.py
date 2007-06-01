@@ -131,6 +131,27 @@ True
 [('headline', 'Article 7'), ('id', 7)]
 [('headline', 'Article 1'), ('id', 1)]
 
+
+# you can use values() even on extra fields
+>>> for d in Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_one'):
+...     i = d.items()
+...     i.sort()
+...     i
+[('id', 5), ('id_plus_one', 6)]
+[('id', 6), ('id_plus_one', 7)]
+[('id', 4), ('id_plus_one', 5)]
+[('id', 2), ('id_plus_one', 3)]
+[('id', 3), ('id_plus_one', 4)]
+[('id', 7), ('id_plus_one', 8)]
+[('id', 1), ('id_plus_one', 2)]
+
+# however, an exception FieldDoesNotExist will still be thrown 
+# if you try to access non-existent field (field that is neither on the model nor extra)
+>>> Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_two')
+Traceback (most recent call last):
+    ...
+FieldDoesNotExist: Article has no field named 'id_plus_two'
+
 # if you don't specify which fields, all are returned
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
 True
