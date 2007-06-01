@@ -395,7 +395,7 @@ django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
-``RequestContext`` will contain ``MEDIA_URL``,  providing the
+``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the `MEDIA_URL setting`_.
 
 .. _MEDIA_URL setting: ../settings/#media-url
