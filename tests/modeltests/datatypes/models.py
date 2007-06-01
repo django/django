@@ -1,6 +1,4 @@
 """
-1. Simple data types testing.
-
 This is a basic model to test saving and loading boolean and date-related
 types, which in the past were problematic for some database backends.
 """
