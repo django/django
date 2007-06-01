@@ -59,7 +59,7 @@ be serialized.
 .. note::
 
     Depending on your model, you may find that it is not possible to deserialize
-    a model that only serializes a subset of it's fields. If a serialized object
+    a model that only serializes a subset of its fields. If a serialized object
     doesn't specify all the fields that are required by a model, the deserializer
     will not be able to save deserialized instances.
 
@@ -113,8 +113,7 @@ Django "ships" with a few included serializers:
                 used as a base for other serializers.
     
     ``yaml``    Serializes to YAML (Yet Another Markup Lanuage). This 
-                serializer will only be made available if PyYAML_ is installed.
-                
+                serializer is only available if PyYAML_ is installed. 
     ==========  ==============================================================
 
 .. _json: http://json.org/
