@@ -44,6 +44,25 @@ This is useful if you want to serialize data directly to a file-like object
 
 .. _HTTPResponse: ../request_response/#httpresponse-objects
 
+Subset of fields
+~~~~~~~~~~~~~~~~
+
+If you only want a subset of fields to be serialized, you can 
+specify a `fields` argument to the serializer::
+
+    from django.core import serializers
+    data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
+
+In this example, only the `name` and `size` attributes of each model will
+be serialized. 
+
+.. note::
+
+    Depending on your model, you may find that it is not possible to deserialize
+    a model that only serializes a subset of it's fields. If a serialized object
+    doesn't specify all the fields that are required by a model, the deserializer
+    will not be able to save deserialized instances.
+
 Deserializing data
 ------------------
 
@@ -92,10 +111,15 @@ Django "ships" with a few included serializers:
     ``python``  Translates to and from "simple" Python objects (lists, dicts,
                 strings, etc.).  Not really all that useful on its own, but
                 used as a base for other serializers.
+    
+    ``yaml``    Serializes to YAML (Yet Another Markup Lanuage). This 
+                serializer will only be made available if PyYAML_ is installed.
+                
     ==========  ==============================================================
 
 .. _json: http://json.org/
 .. _simplejson: http://undefined.org/python/#simplejson
+.. _PyYAML: http://www.pyyaml.org/
 
 Notes for specific serialization formats
 ----------------------------------------
