@@ -3,7 +3,7 @@ Tools for sending email.
 """
 
 from django.conf import settings
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_str, force_unicode
 from email.MIMEText import MIMEText
 from email.Header import Header
 from email.Utils import formatdate, parseaddr, formataddr
@@ -62,7 +62,7 @@ class SafeMIMEText(MIMEText):
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
         try:
-            val = str(smart_unicode(val))
+            val = str(force_unicode(val))
         except UnicodeEncodeError:
             if name.lower() in ('to', 'from', 'cc'):
                 result = []
@@ -72,7 +72,7 @@ class SafeMIMEText(MIMEText):
                     result.append(formataddr((nm, str(addr))))
                 val = ', '.join(result)
             else:
-                val = Header(smart_unicode(val), settings.DEFAULT_CHARSET)
+                val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
         MIMEText.__setitem__(self, name, val)
 
 class SMTPConnection(object):

@@ -69,7 +69,7 @@ def Deserializer(object_list, **options):
         # Handle each field
         for (field_name, field_value) in d["fields"].iteritems():
             if isinstance(field_value, str):
-                field_value = smart_unicode(field_value, options.get("encoding", settings.DEFAULT_CHARSET))
+                field_value = smart_unicode(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
 
             field = Model._meta.get_field(field_name)
 

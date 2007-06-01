@@ -142,7 +142,7 @@ class AdminBoundField(object):
             return self._display
         except AttributeError:
             if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = force_unicode(getattr(self.original, self.field.name))
+                self._display = force_unicode(getattr(self.original, self.field.name), strings_only=True)
             elif isinstance(self.field.rel, models.ManyToManyRel):
                 self._display = u", ".join([force_unicode(obj) for obj in getattr(self.original, self.field.name).all()])
             return self._display

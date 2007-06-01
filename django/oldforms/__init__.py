@@ -479,7 +479,7 @@ class SelectField(FormField):
     def __init__(self, field_name, choices=None, size=1, is_required=False, validator_list=None, member_name=None):
         if validator_list is None: validator_list = []
         if choices is None: choices = []
-        choices = [(k, smart_unicode(v)) for k, v in choices]
+        choices = [(k, smart_unicode(v, strings_only=True)) for k, v in choices]
         self.field_name = field_name
         # choices is a list of (value, human-readable key) tuples because order matters
         self.choices, self.size, self.is_required = choices, size, is_required

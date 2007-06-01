@@ -12,22 +12,26 @@ class StrAndUnicode(object):
     def __str__(self):
         return self.__unicode__().encode('utf-8')
 
-def smart_unicode(s, encoding='utf-8', errors='strict'):
+def smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Returns a unicode object representing 's'. Treats bytestrings using the
     'encoding' codec.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
     """
     if isinstance(s, Promise):
         # The input is the result of a gettext_lazy() call.
         return s
-    return force_unicode(s, encoding, errors)
+    return force_unicode(s, encoding, strings_only, errors)
 
-def force_unicode(s, encoding='utf-8', errors='strict'):
+def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     Similar to smart_unicode, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
+
+    If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if s is None:
+    if strings_only and isinstance(s, (types.NoneType, int)):
         return s
     if not isinstance(s, basestring,):
         if hasattr(s, '__unicode__'):

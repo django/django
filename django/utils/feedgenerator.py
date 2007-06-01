@@ -42,20 +42,21 @@ class SyndicationFeed(object):
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
             feed_url=None, feed_copyright=None):
+        to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
             categories = [force_unicode(c) for c in categories]
         self.feed = {
-            'title': force_unicode(title),
+            'title': to_unicode(title),
             'link': iri_to_uri(link),
-            'description': force_unicode(description),
+            'description': to_unicode(description),
             'language': force_unicode(language),
-            'author_email': force_unicode(author_email),
-            'author_name': force_unicode(author_name),
+            'author_email': to_unicode(author_email),
+            'author_name': to_unicode(author_name),
             'author_link': iri_to_uri(author_link),
-            'subtitle': force_unicode(subtitle),
+            'subtitle': to_unicode(subtitle),
             'categories': categories or (),
             'feed_url': iri_to_uri(feed_url),
-            'feed_copyright': force_unicode(feed_copyright),
+            'feed_copyright': to_unicode(feed_copyright),
         }
         self.items = []
 
@@ -67,21 +68,22 @@ class SyndicationFeed(object):
         objects except pubdate, which is a datetime.datetime object, and
         enclosure, which is an instance of the Enclosure class.
         """
+        to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
-            categories = [force_unicode(c) for c in categories]
+            categories = [to_unicode(c) for c in categories]
         self.items.append({
-            'title': force_unicode(title),
+            'title': to_unicode(title),
             'link': iri_to_uri(link),
-            'description': force_unicode(description),
-            'author_email': force_unicode(author_email),
-            'author_name': force_unicode(author_name),
+            'description': to_unicode(description),
+            'author_email': to_unicode(author_email),
+            'author_name': to_unicode(author_name),
             'author_link': iri_to_uri(author_link),
             'pubdate': pubdate,
-            'comments': force_unicode(comments),
-            'unique_id': force_unicode(unique_id),
+            'comments': to_unicode(comments),
+            'unique_id': to_unicode(unique_id),
             'enclosure': enclosure,
             'categories': categories or (),
-            'item_copyright': force_unicode(item_copyright),
+            'item_copyright': to_unicode(item_copyright),
         })
 
     def num_items(self):

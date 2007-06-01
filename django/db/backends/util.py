@@ -1,6 +1,6 @@
 import datetime
 from time import time
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 
 try:
     import decimal
@@ -44,10 +44,11 @@ def convert_args(args):
     """
     Convert sequence or dictionary to contain unicode values.
     """
+    to_unicode = lambda s: force_unicode(s, strings_only=True)
     if isinstance(args, (list, tuple)):
-        return tuple([smart_unicode(val) for val in args])
+        return tuple([to_unicode(val) for val in args])
     else:
-        return dict([(smart_unicode(k), smart_unicode(v)) for k, v in args.items()])
+        return dict([(to_unicode(k), to_unicode(v)) for k, v in args.items()])
 
 ###############################################
 # Converters from database (string) to Python #
