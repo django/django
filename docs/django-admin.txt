@@ -403,9 +403,10 @@ this command to install the default apps.
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
 
-``syncdb`` will also search for and install any fixture named ``initial_data``.
-See the documentation for ``loaddata`` for details on the specification of
-fixture data files.
+``syncdb`` will also search for and install any fixture named ``initial_data``
+with an appropriate extension (e.g. ``json`` or ``xml``). See the
+documentation for ``loaddata`` for details on the specification of fixture
+data files.
 
 test
 ----
