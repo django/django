@@ -295,7 +295,7 @@ Serving static files with the development server
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By default, the development server doesn't serve any static files for your site
-(such as CSS files, images, things under ``MEDIA_ROOT_URL`` and so forth). If
+(such as CSS files, images, things under ``MEDIA_URL`` and so forth). If
 you want to configure Django to serve static media, read the `serving static files`_
 documentation.
 
