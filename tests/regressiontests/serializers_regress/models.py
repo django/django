@@ -205,3 +205,7 @@ class USStatePKData(models.Model):
 # class XMLPKData(models.Model):
 #     data = models.XMLField(primary_key=True)
 
+class ComplexModel(models.Model):
+    field1 = models.CharField(maxlength=10)
+    field2 = models.CharField(maxlength=10)
+    field3 = models.CharField(maxlength=10)

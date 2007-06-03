@@ -99,6 +99,9 @@ which is a dictionary of the parameters captured in the URL.
       dictionary is callable, the generic view will call it
       just before rendering the template.
 
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
+
 **Example:**
 
 Given the following URL patterns::
