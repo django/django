@@ -70,7 +70,7 @@ ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
 ungettext_lazy = lazy(ungettext, unicode)
 ugettext_lazy = lazy(ugettext, unicode)
-string_concat = lazy(string_concat, str, unicode)
+string_concat = lazy(string_concat, unicode)
 
 def activate(language):
     return real_activate(language)

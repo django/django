@@ -32,9 +32,11 @@ def lazy(func, *resultclasses):
                 self.__dispatch[resultclass] = {}
                 for (k, v) in resultclass.__dict__.items():
                     setattr(self, k, self.__promise__(resultclass, k, v))
-            if unicode in resultclasses:
+            self._delegate_str = str in resultclasses
+            self._delegate_unicode = unicode in resultclasses
+            assert not (self._delegate_str and self._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
+            if self._delegate_unicode:
                 self.__unicode__ = self.__unicode_cast
-            self._delegate_str  = str in resultclasses
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
@@ -61,6 +63,14 @@ def lazy(func, *resultclasses):
                 return str(self.__func(*self.__args, **self.__kw))
             else:
                 return Promise.__str__(self)
+
+        def __mod__(self, rhs):
+            if self._delegate_str:
+                return str(self) % rhs
+            elif self._delegate_unicode:
+                return unicode(self) % rhs
+            else:
+                raise AssertionError('__mod__ not supported for non-string types')
 
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
