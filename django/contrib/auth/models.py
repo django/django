@@ -281,7 +281,10 @@ class AnonymousUser(object):
         pass
 
     def __unicode__(self):
-        return _('AnonymousUser')
+        return 'AnonymousUser'
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
