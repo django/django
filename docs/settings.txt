@@ -850,7 +850,7 @@ TEST_DATABASE_COLLATION
 Default: ``None``
 
 The collation order to use when creating the test database. This value is
-passed directly to the backend, so it's format is backend-specific.
+passed directly to the backend, so its format is backend-specific.
 
 Only supported for ``mysql`` and ``mysql_old`` backends (see `section 10.3.2`_
 of the MySQL manual for details).

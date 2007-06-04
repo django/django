@@ -67,7 +67,7 @@ So let's create a ``vote()`` function in ``mysite/polls/views.py``::
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
             # user hits the Back button.
-            return HttpResponseRedirect(reverse('results', args=(p.id,)))
+            return HttpResponseRedirect(reverse('mysite.polls.views.results', args=(p.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
@@ -104,7 +104,8 @@ This code includes a few things we haven't covered yet in this tutorial:
         '/polls/3/results/'
 
       ... where the ``3`` is the value of ``p.id``. This redirected URL will
-      then call the ``'results'`` view to display the final page.
+      then call the ``'results'`` view to display the final page. Note that
+      you need to use the full name of the view here (including the prefix).
 
       For more information about ``reverse()``, see the `URL dispatcher`_
       documentation.
