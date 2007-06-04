@@ -366,7 +366,7 @@ def get_sql_delete(app):
                     col = f.column
                     r_table = model._meta.db_table
                     r_col = model._meta.get_field(f.rel.field_name).column
-                    r_name = '%s_refs_%s_%x' % (col, r_col, abs(hash(table, r_table)))
+                    r_name = '%s_refs_%s_%x' % (col, r_col, abs(hash((table, r_table))))
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
