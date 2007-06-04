@@ -199,7 +199,7 @@ def get_pk_default_value():
     return "DEFAULT"
 
 def get_max_name_length():
-    return 64;
+    return None;
 
 def get_start_transaction_sql():
     return "BEGIN;"

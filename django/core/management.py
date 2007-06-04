@@ -250,7 +250,9 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_col = f.column
                 table = opts.db_table
                 col = opts.get_field(f.rel.field_name).column
-                r_name = '%s_refs_%s_%s_%s' % (r_col, col, r_table, table)
+                # For MySQL, r_name must be unique in the first 64 characters.
+                # So we are careful with character usage here.
+                r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
                     (backend.quote_name(r_table), truncate_name(r_name, backend.get_max_name_length()),
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col),
@@ -364,7 +366,7 @@ def get_sql_delete(app):
                     col = f.column
                     r_table = model._meta.db_table
                     r_col = model._meta.get_field(f.rel.field_name).column
-                    r_name = '%s_refs_%s_%s_%s' % (col, r_col, table, r_table)
+                    r_name = '%s_refs_%s_%x' % (col, r_col, abs(hash(table, r_table)))
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
@@ -479,7 +481,6 @@ get_sql_indexes.args = APP_ARGS
 def get_sql_indexes_for_model(model):
     "Returns the CREATE INDEX SQL statements for a single model"
     from django.db import backend
-    from django.db.backends.util import truncate_name
     output = []
 
     for f in model._meta.fields:
@@ -1463,7 +1464,7 @@ def load_data(fixture_labels, verbosity=1):
                     if verbosity > 1:
                         print "No %s fixture '%s' in %s." % \
                             (format, fixture_name, humanize(fixture_dir))
-                            
+
     if count[0] > 0:
         sequence_sql = backend.get_sql_sequence_reset(style, models)
         if sequence_sql:
@@ -1471,10 +1472,10 @@ def load_data(fixture_labels, verbosity=1):
                 print "Resetting sequences"
             for line in sequence_sql:
                 cursor.execute(line)
-            
+
     transaction.commit()
     transaction.leave_transaction_management()
-    
+
     if count[0] == 0:
         if verbosity > 0:
             print "No fixtures found."
