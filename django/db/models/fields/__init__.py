@@ -206,7 +206,7 @@ class Field(object):
             if callable(self.default):
                 return self.default()
             return self.default
-        if not self.empty_strings_allowed or self.null:
+        if not self.empty_strings_allowed or (self.null and settings.DATABASE_ENGINE != 'oracle'):
             return None
         return ""
 
