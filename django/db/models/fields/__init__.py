@@ -811,6 +811,7 @@ class IPAddressField(Field):
         validators.isValidIPAddress4(field_data, None)
 
 class NullBooleanField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
         Field.__init__(self, *args, **kwargs)
