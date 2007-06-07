@@ -91,9 +91,12 @@ Filters can be "chained." The output of one filter is applied to the next.
 ``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
 then converting line breaks to ``<p>`` tags.
 
-Some filters take arguments. A filter argument looks like this:
-``{{ bio|truncatewords:"30" }}``. This will display the first 30 words of the
-``bio`` variable. Filter arguments always are in double quotes.
+Some filters take arguments. A filter argument looks like this: ``{{
+bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
+variable.
+
+Filter arguments that contain spaces must be quoted; for example, to join a list
+with commas and spaced you'd use ``{{ list|join:", " }}``.
 
 The `Built-in filter reference`_ below describes all the built-in filters.
 
