@@ -782,7 +782,7 @@ class DecimalField(TextField):
         try: 
             import decimal 
         except ImportError:
-            from django.utils import decimal
+            from django.utils import _decimal as decimal
         try: 
             return decimal.Decimal(data) 
         except decimal.InvalidOperation, e: 

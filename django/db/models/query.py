@@ -554,9 +554,8 @@ class QuerySet(object):
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
         super(ValuesQuerySet, self).__init__(*args, **kwargs)
-        # select_related and select aren't supported in values().
+        # select_related isn't supported in values().
         self._select_related = False
-        self._select = {}
 
     def iterator(self):
         try:
@@ -566,13 +565,28 @@ class ValuesQuerySet(QuerySet):
 
         # self._fields is a list of field names to fetch.
         if self._fields:
-            columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
+            #columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
+            if not self._select:
+                columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
+            else:
+                columns = []
+                for f in self._fields:
+                    if f in [field.name for field in self.model._meta.fields]:
+                        columns.append( self.model._meta.get_field(f, many_to_many=False).column )
+                    elif not self._select.has_key( f ):
+                        raise FieldDoesNotExist, '%s has no field named %r' % ( self.model._meta.object_name, f )
+
             field_names = self._fields
         else: # Default to all fields.
             columns = [f.column for f in self.model._meta.fields]
             field_names = [f.attname for f in self.model._meta.fields]
 
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
+
+        # Add any additional SELECTs.
+        if self._select:
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
         while 1:

@@ -129,6 +129,9 @@ class M2MSelfData(models.Model):
 class FKDataToField(models.Model):
     data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
 
+class FKDataToO2O(models.Model):
+    data = models.ForeignKey(O2OData, null=True)
+
 # The following test classes are for validating the
 # deserialization of objects that use a user-defined
 # field as the primary key.
@@ -202,3 +205,7 @@ class USStatePKData(models.Model):
 # class XMLPKData(models.Model):
 #     data = models.XMLField(primary_key=True)
 
+class ComplexModel(models.Model):
+    field1 = models.CharField(maxlength=10)
+    field2 = models.CharField(maxlength=10)
+    field3 = models.CharField(maxlength=10)

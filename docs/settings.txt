@@ -264,6 +264,11 @@ MySQL will connect via a Unix socket to the specified socket. For example::
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
 
+If you're using PostgreSQL, an empty string means to use a Unix domain socket
+for the connection, rather than a network connection to localhost. If you
+explictly need to use a TCP/IP connection on the local machine with
+PostgreSQL, specify ``localhost`` here.
+
 DATABASE_NAME
 -------------
 
@@ -771,7 +776,8 @@ Default::
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 A tuple of callables that are used to populate the context in ``RequestContext``.
 These callables take a request object as their argument and return a dictionary
@@ -820,23 +826,54 @@ misspelled) variables. See `How invalid variables are handled`_.
 
 .. _How invalid variables are handled: ../templates_python/#how-invalid-variables-are-handled
 
-TEST_RUNNER
------------
+TEST_DATABASE_CHARSET
+---------------------
 
-Default: ``'django.test.simple.run_tests'``
+**New in Django development version**
 
-The name of the method to use for starting the test suite. See 
-`Testing Django Applications`_.
+Default: ``None``
 
-.. _Testing Django Applications: ../testing/
+The character set encoding used to create the test database. The value of this
+string is passed directly through to the database, so its format is
+backend-specific.
+
+Supported for the PostgreSQL_ (``postgresql``, ``postgresql_psycopg2``) and MySQL_ (``mysql``, ``mysql_old``) backends.
+
+.. _PostgreSQL: http://www.postgresql.org/docs/8.2/static/multibyte.html
+.. _MySQL: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
+
+TEST_DATABASE_COLLATION
+------------------------
+
+**New in Django development version**
+
+Default: ``None``
+
+The collation order to use when creating the test database. This value is
+passed directly to the backend, so its format is backend-specific.
+
+Only supported for ``mysql`` and ``mysql_old`` backends (see `section 10.3.2`_
+of the MySQL manual for details).
+
+.. _section 10.3.2: http://www.mysql.org/doc/refman/5.0/en/charset-database.html
 
 TEST_DATABASE_NAME
 ------------------
 
 Default: ``None``
 
-The name of database to use when running the test suite. If a value of 
+The name of database to use when running the test suite. If a value of
 ``None`` is specified, the test database will use the name ``'test_' + settings.DATABASE_NAME``. See `Testing Django Applications`_.
+
+.. _Testing Django Applications: ../testing/
+
+TEST_RUNNER
+-----------
+
+Default: ``'django.test.simple.run_tests'``
+
+The name of the method to use for starting the test suite. See
+`Testing Django Applications`_.
 
 .. _Testing Django Applications: ../testing/
 

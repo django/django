@@ -134,6 +134,15 @@ the database until you explicitly call ``save()``.
 
 The ``save()`` method has no return value.
 
+Updating ``ForeignKey`` fields works exactly the same way; simply assign an
+object of the right type to the field in question::
+
+    joe = Author.objects.create(name="Joe")
+    entry.author = joe
+    entry.save()
+    
+Django will complain if you try to assign an object of the wrong type.
+
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
 
@@ -1229,8 +1238,8 @@ whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
 
-Escaping parenthesis and underscores in LIKE statements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Escaping percent signs and underscores in LIKE statements
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
 ``contains``, ``icontains``, ``startswith``, ``istartswith``, ``endswith``
@@ -1748,7 +1757,8 @@ Shortcuts
 
 As you develop views, you will discover a number of common idioms in the
 way you use the database API. Django encodes some of these idioms as
-shortcuts that can be used to simplify the process of writing views.
+shortcuts that can be used to simplify the process of writing views. These
+functions are in the ``django.shortcuts`` module.
 
 get_object_or_404()
 -------------------

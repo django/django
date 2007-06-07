@@ -1,5 +1,6 @@
-import unittest, doctest
+import unittest
 from django.conf import settings
+from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.utils import create_test_db, destroy_test_db
 from django.test.testcases import OutputChecker, DocTestRunner

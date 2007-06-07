@@ -1,8 +1,9 @@
-import re, doctest, unittest
+import re, unittest
 from urlparse import urlparse
 from django.db import transaction
 from django.core import management, mail
 from django.db.models import get_apps
+from django.test import _doctest as doctest
 from django.test.client import Client
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)

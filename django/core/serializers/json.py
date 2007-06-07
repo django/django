@@ -21,6 +21,8 @@ class Serializer(PythonSerializer):
     Convert a queryset to JSON.
     """
     def end_serialization(self):
+        self.options.pop('stream', None)
+        self.options.pop('fields', None)
         simplejson.dump(self.objects, self.stream, cls=DjangoJSONEncoder, **self.options)
 
     def getvalue(self):

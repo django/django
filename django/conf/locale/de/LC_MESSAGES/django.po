@@ -481,8 +481,8 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"Etwas stimmt nicht mit der Datenbankkonfiguration. Bitte sicherstellen, das "
-"die richtigen Datenbanktabellen angelegt wurden und bitte sicherstellen, das "
+"Etwas stimmt nicht mit der Datenbankkonfiguration. Bitte sicherstellen, dass "
+"die richtigen Datenbanktabellen angelegt wurden und "
 "die Datenbank vom verwendeten Datenbankbenutzer auch lesbar ist."
 
 #: contrib/admin/templates/admin/login.html:17

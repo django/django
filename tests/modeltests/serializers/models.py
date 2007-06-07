@@ -159,4 +159,8 @@ __test__ = {'API_TESTS':"""
 >>> article.author
 <Author: Agnes>
 
+# Serializer output can be restricted to a subset of fields
+>>> print serializers.serialize("json", Article.objects.all(), fields=('headline','pub_date'))
+[{"pk": "1", "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": "2", "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
+
 """}

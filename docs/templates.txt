@@ -91,9 +91,12 @@ Filters can be "chained." The output of one filter is applied to the next.
 ``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
 then converting line breaks to ``<p>`` tags.
 
-Some filters take arguments. A filter argument looks like this:
-``{{ bio|truncatewords:"30" }}``. This will display the first 30 words of the
-``bio`` variable. Filter arguments always are in double quotes.
+Some filters take arguments. A filter argument looks like this: ``{{
+bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
+variable.
+
+Filter arguments that contain spaces must be quoted; for example, to join a list
+with commas and spaced you'd use ``{{ list|join:", " }}``.
 
 The `Built-in filter reference`_ below describes all the built-in filters.
 
@@ -112,7 +115,7 @@ know how to write Python code.
 Comments
 ========
 
-To comment-out part of a template, use the comment syntax: ``{# #}``.
+To comment-out part of a line in a template, use the comment syntax: ``{# #}``.
 
 For example, this template would render as ``'hello'``::
 
@@ -121,6 +124,12 @@ For example, this template would render as ``'hello'``::
 A comment can contain any template code, invalid or not. For example::
 
     {# {% if foo %}bar{% else %} #}
+
+This syntax can only be used for single-line comments (no newlines are
+permitted between the ``{#`` and ``#}`` delimiters). If you need to comment
+out a multiline portion of the template, see the ``comment`` tag, below__.
+
+__ comment_
 
 Template inheritance
 ====================
@@ -843,10 +852,11 @@ The first argument is a path to a view function in the format
 should be comma-separated values that will be used as positional and keyword
 arguments in the URL. All arguments required by the URLconf should be present.
 
-For example, suppose you have a view, ``app_name.client``, whose URLconf takes
-a client ID. The URLconf line might look like this::
+For example, suppose you have a view, ``app_views.client``, whose URLconf
+takes a client ID (here, ``client()`` is a method inside the views file
+``app_views.py``). The URLconf line might look like this::
 
-    ('^client/(\d+)/$', 'app_name.client')
+    ('^client/(\d+)/$', 'app_views.client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this::
@@ -855,7 +865,7 @@ such as this::
 
 ...then, in a template, you can create a link to this view like this::
 
-    {% url app_name.client client.id %}
+    {% url app_views.client client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
 

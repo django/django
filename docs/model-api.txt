@@ -269,6 +269,13 @@ For example, say your ``MEDIA_ROOT`` is set to ``'/home/media'``, and
 upload a file on Jan. 15, 2007, it will be saved in the directory
 ``/home/media/photos/2007/01/15``.
 
+If you want to retrieve the upload file's on-disk filename, or a URL that
+refers to that file, or the file's size, you can use the
+``get_FOO_filename()``, ``get_FOO_url()`` and ``get_FOO_size()`` methods.
+They are all documented here__.
+
+__ ../db-api/#get-foo-filename
+
 Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
@@ -338,9 +345,14 @@ image. Has two extra optional arguments, ``height_field`` and
 ``width_field``, which, if set, will be auto-populated with the height and
 width of the image each time a model instance is saved.
 
+In addition to the special ``get_FOO_*`` methods that are available for
+``FileField``, an ``ImageField`` also has ``get_FOO_height()`` and
+``get_FOO_width()`` methods. These are documented elsewhere_.
+
 Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
+.. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -463,8 +475,10 @@ If ``True``, Django will store empty values as ``NULL`` in the database.
 Default is ``False``.
 
 Note that empty string values will always get stored as empty strings, not
-as ``NULL`` -- so use ``null=True`` for non-string fields such as integers,
-booleans and dates.
+as ``NULL``. Only use ``null=True`` for non-string fields such as integers,
+booleans and dates. For both types of fields, you will also need to set
+``blank=True`` if you wish to permit empty values in forms, as the ``null``
+parameter only affects database storage (see blank_, below).
 
 Avoid using ``null`` on string-based fields such as ``CharField`` and
 ``TextField`` unless you have an excellent reason. If a string-based field
@@ -1846,14 +1860,15 @@ rows. Example::
         row = cursor.fetchone()
         return row
 
-``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If
-you're not familiar with the Python DB-API, note that the SQL statement in
-``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
-directly within the SQL. If you use this technique, the underlying database
-library will automatically add quotes and escaping to your parameter(s) as
-necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
-``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
-the sake of consistency and sanity.)
+``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
+(except when it comes to `transaction handling`_). If you're not familiar with
+the Python DB-API, note that the SQL statement in ``cursor.execute()`` uses
+placeholders, ``"%s"``, rather than adding parameters directly within the SQL.
+If you use this technique, the underlying database library will automatically
+add quotes and escaping to your parameter(s) as necessary. (Also note that
+Django expects the ``"%s"`` placeholder, *not* the ``"?"`` placeholder, which is
+used by the SQLite Python bindings. This is for the sake of consistency and
+sanity.)
 
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
 just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
@@ -1861,6 +1876,7 @@ API. See `Other lookup options`_.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _Other lookup options: ../db-api/#extra-params-select-where-tables
+.. _transaction handling: ../transactions/
 
 Overriding default model methods
 --------------------------------
