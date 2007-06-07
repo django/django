@@ -134,6 +134,15 @@ the database until you explicitly call ``save()``.
 
 The ``save()`` method has no return value.
 
+Updating ``ForeignKey`` fields works exactly the same way; simply assign an
+object of the right type to the field in question::
+
+    joe = Author.objects.create(name="Joe")
+    entry.author = joe
+    entry.save()
+    
+Django will complain if you try to assign an object of the wrong type.
+
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
 
