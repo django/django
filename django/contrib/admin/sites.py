@@ -234,11 +234,12 @@ class AdminSite(object):
         Displays the main admin index page, which lists all of the installed
         apps that have been registered in this site.
         """
-        app_list = []
+        app_dict = {}
         user = request.user
         for model, model_admin in self._registry.items():
             app_label = model._meta.app_label
             has_module_perms = user.has_module_perms(app_label)
+
             if has_module_perms:
                 perms = {
                     'add': user.has_perm("%s.%s" % (app_label, model._meta.get_add_permission())),
@@ -254,11 +255,23 @@ class AdminSite(object):
                         'admin_url': '%s/%s/' % (app_label, model.__name__.lower()),
                         'perms': perms,
                     }
-                    app_list.append({
-                        'name': app_label.title(),
-                        'has_module_perms': has_module_perms,
-                        'models': [model_dict],
-                    })
+                    if app_label in app_dict:
+                        app_dict[app_label]['models'].append(model_dict)
+                    else:
+                        app_dict[app_label] = {
+                            'name': app_label.title(),
+                            'has_module_perms': has_module_perms,
+                            'models': [model_dict],
+                        }
+
+        # Sort the apps alphabetically.
+        app_list = app_dict.values()
+        app_list.sort(lambda x, y: cmp(x['name'], y['name']))
+
+        # Sort the models alphabetically within each app.
+        for app in app_list:
+            app['models'].sort(lambda x, y: cmp(x['name'], y['name']))
+
         return render_to_response('admin/index.html', {
             'title': _('Site administration'),
             'app_list': app_list,
