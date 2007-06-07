@@ -299,12 +299,14 @@ required. In this example, the data dictionary doesn't include a value for the
 In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
 empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
 empty values as an empty string. Each field type knows what its "blank" value
-is -- e.g., for ``DateField``, it's ``None`` instead of the empty string.
+is -- e.g., for ``DateField``, it's ``None`` instead of the empty string. For
+full details on each field's behavior in this case, see the "Empty value" note
+for each field in the "Built-in ``Field`` classes" section below.
 
 Behavior of unbound forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's meaningless to request "clean" data in a form with no data, but, for the
+It's meaningless to request "cleaned" data in a form with no data, but, for the
 record, here's what happens with unbound forms::
 
     >>> f = ContactForm()
@@ -606,8 +608,13 @@ Using forms in views and templates
 ----------------------------------
 
 Let's put this all together and use the ``ContactForm`` example in a Django
-view and template. This example view displays the contact form by default and
-validates/processes it if accessed via a POST request::
+view and template.
+
+Simple view example
+~~~~~~~~~~~~~~~~~~~
+
+This example view displays the contact form by default and validates/processes
+it if accessed via a POST request::
 
     def contact(request):
         if request.method == 'POST':
@@ -619,12 +626,12 @@ validates/processes it if accessed via a POST request::
             form = ContactForm()
         return render_to_response('contact.html', {'form': form})
 
-Simple template output
-~~~~~~~~~~~~~~~~~~~~~~
+Simple template example
+~~~~~~~~~~~~~~~~~~~~~~~
 
-The template, ``contact.html``, is responsible for displaying the form as HTML.
-To do this, we can use the techniques outlined in the "Outputting forms as HTML"
-section above.
+The template in the above view example, ``contact.html``, is responsible for
+displaying the form as HTML. To do this, we can use the techniques outlined in
+the "Outputting forms as HTML" section above.
 
 The simplest way to display a form's HTML is to use the variable on its own,
 like this::
@@ -677,7 +684,7 @@ The easiest way is to iterate over the form's fields, with
 
 This iteration technique is useful if you want to apply the same HTML
 formatting to each field, or if you don't know the names of the form fields
-ahead of time. Note that the fields will be listed in the order in which
+ahead of time. Note that the fields will be iterated over in the order in which
 they're defined in the ``Form`` class.
 
 Alternatively, you can arrange the form's fields explicitly, by name. Do that
@@ -701,7 +708,10 @@ For example::
 Subclassing forms
 -----------------
 
-If you subclass a custom ``Form`` class, the resulting ``Form`` class will
+If you have multiple ``Form`` classes that share fields, you can use
+subclassing to remove redundancy.
+
+When you subclass a custom ``Form`` class, the resulting subclass will
 include all fields of the parent class(es), followed by the fields you define
 in the subclass.
 
@@ -1201,6 +1211,36 @@ custom ``Field`` classes. To do this, just create a subclass of
 ``clean()`` method and that its ``__init__()`` method accept the core arguments
 mentioned above (``required``, ``label``, ``initial``, ``widget``,
 ``help_text``).
+
+A simple example
+~~~~~~~~~~~~~~~~
+
+Here's a simple example of a custom field that validates its input is a string
+containing comma-separated e-mail addresses, with at least one address. We'll
+keep it simple and assume e-mail validation is contained in a function called
+``is_valid_email()``. The full class::
+
+    from django import newforms as forms
+
+    class MultiEmailField(forms.Field):
+        def clean(self, value):
+            emails = value.split(',')
+            for email in emails:
+                if not is_valid_email(email):
+                    raise forms.ValidationError('%s is not a valid e-mail address.' % email)
+            if not emails:
+                raise forms.ValidationError('Enter at least one e-mail address.')
+            return emails
+
+Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
+this in a form. Simply use ``MultiEmailField`` instead of ``forms.EmailField``,
+like so::
+
+    class ContactForm(forms.Form):
+        subject = forms.CharField(max_length=100)
+        message = forms.CharField()
+        senders = MultiEmailField()
+        cc_myself = forms.BooleanField()
 
 Generating forms for models
 ===========================
