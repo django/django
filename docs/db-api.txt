@@ -1238,7 +1238,7 @@ whose ``headline`` contains ``'Lennon'``::
 
     Blog.objects.filter(entry__headline__contains='Lennon')
 
-Escaping percent sings and underscores in LIKE statements
+Escaping percent signs and underscores in LIKE statements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The field lookups that equate to ``LIKE`` SQL statements (``iexact``,
