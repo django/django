@@ -6,8 +6,9 @@ Django aims to follow Python's `"batteries included" philosophy`_. It ships
 with a variety of extra, optional tools that solve common Web-development
 problems.
 
-This code lives in ``django/contrib`` in the Django distribution. Here's a
-rundown of the packages in ``contrib``:
+This code lives in ``django/contrib`` in the Django distribution. This document
+gives a rundown of the packages in ``contrib``, along with any dependancies
+those packages have.
 
 .. admonition:: Note
 
@@ -25,6 +26,8 @@ The automatic Django administrative interface. For more information, see
 `Tutorial 2`_.
 
 .. _Tutorial 2: ../tutorial02/
+
+Requires the auth_ and contenttypes_ contrib packages to be installed.
 
 auth
 ====
@@ -143,6 +146,8 @@ A framework for managing simple "flat" HTML content in a database.
 See the `flatpages documentation`_.
 
 .. _flatpages documentation: ../flatpages/
+
+Requires the sites_ contrib package to be installed as well.
 
 localflavor
 ===========
