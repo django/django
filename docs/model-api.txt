@@ -1860,14 +1860,15 @@ rows. Example::
         row = cursor.fetchone()
         return row
 
-``connection`` and ``cursor`` simply use the standard `Python DB-API`_. If
-you're not familiar with the Python DB-API, note that the SQL statement in
-``cursor.execute()`` uses placeholders, ``"%s"``, rather than adding parameters
-directly within the SQL. If you use this technique, the underlying database
-library will automatically add quotes and escaping to your parameter(s) as
-necessary. (Also note that Django expects the ``"%s"`` placeholder, *not* the
-``"?"`` placeholder, which is used by the SQLite Python bindings. This is for
-the sake of consistency and sanity.)
+``connection`` and ``cursor`` mostly implement the standard `Python DB-API`_
+(except when it comes to `transaction handling`_). If you're not familiar with
+the Python DB-API, note that the SQL statement in ``cursor.execute()`` uses
+placeholders, ``"%s"``, rather than adding parameters directly within the SQL.
+If you use this technique, the underlying database library will automatically
+add quotes and escaping to your parameter(s) as necessary. (Also note that
+Django expects the ``"%s"`` placeholder, *not* the ``"?"`` placeholder, which is
+used by the SQLite Python bindings. This is for the sake of consistency and
+sanity.)
 
 A final note: If all you want to do is a custom ``WHERE`` clause, you can just
 just the ``where``, ``tables`` and ``params`` arguments to the standard lookup
@@ -1875,6 +1876,7 @@ API. See `Other lookup options`_.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
 .. _Other lookup options: ../db-api/#extra-params-select-where-tables
+.. _transaction handling: ../transactions/
 
 Overriding default model methods
 --------------------------------
