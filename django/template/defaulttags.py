@@ -5,6 +5,7 @@ from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 import sys
+import re
 
 register = Library()
 
@@ -61,8 +62,8 @@ class FirstOfNode(Node):
         return ''
 
 class ForNode(Node):
-    def __init__(self, loopvar, sequence, reversed, nodelist_loop):
-        self.loopvar, self.sequence = loopvar, sequence
+    def __init__(self, loopvars, sequence, reversed, nodelist_loop):
+        self.loopvars, self.sequence = loopvars, sequence
         self.reversed = reversed
         self.nodelist_loop = nodelist_loop
 
@@ -72,7 +73,7 @@ class ForNode(Node):
         else:
             reversed = ''
         return "<For Node: for %s in %s, tail_len: %d%s>" % \
-            (self.loopvar, self.sequence, len(self.nodelist_loop), reversed)
+            (', '.join( self.loopvars ), self.sequence, len(self.nodelist_loop), reversed)
 
     def __iter__(self):
         for node in self.nodelist_loop:
@@ -107,6 +108,7 @@ class ForNode(Node):
                 for index in range(len(data)-1, -1, -1):
                     yield data[index]
             values = reverse(values)
+        unpack = len(self.loopvars) > 1
         for i, item in enumerate(values):
             context['forloop'] = {
                 # shortcuts for current loop iteration number
@@ -120,9 +122,20 @@ class ForNode(Node):
                 'last': (i == len_values - 1),
                 'parentloop': parentloop,
             }
-            context[self.loopvar] = item
+            if unpack:
+                # If there are multiple loop variables, unpack the item into them.
+                context.update(dict(zip(self.loopvars, item)))
+            else:
+                context[self.loopvars[0]] = item
             for node in self.nodelist_loop:
                 nodelist.append(node.render(context))
+            if unpack:
+                # The loop variables were pushed on to the context so pop them
+                # off again. This is necessary because the tag lets the length
+                # of loopvars differ to the length of each set of items and we
+                # don't want to leave any vars from the previous loop on the
+                # context.
+                context.pop()
         context.pop()
         return nodelist.render(context)
 
@@ -486,7 +499,7 @@ def do_filter(parser, token):
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)
-filter = register.tag("filter", do_filter)
+do_filter = register.tag("filter", do_filter)
 
 #@register.tag
 def firstof(parser, token):
@@ -530,8 +543,14 @@ def do_for(parser, token):
         {% endfor %}
         </ul>
 
-    You can also loop over a list in reverse by using
+    You can loop over a list in reverse by using
     ``{% for obj in list reversed %}``.
+    
+    You can also unpack multiple values from a two-dimensional array::
+    
+        {% for key,value in dict.items %}
+            {{ key }}: {{ value }}
+        {% endfor %}
 
     The for loop sets a number of variables available within the loop:
 
@@ -552,18 +571,23 @@ def do_for(parser, token):
 
     """
     bits = token.contents.split()
-    if len(bits) == 5 and bits[4] != 'reversed':
-        raise TemplateSyntaxError, "'for' statements with five words should end in 'reversed': %s" % token.contents
-    if len(bits) not in (4, 5):
-        raise TemplateSyntaxError, "'for' statements should have either four or five words: %s" % token.contents
-    if bits[2] != 'in':
-        raise TemplateSyntaxError, "'for' statement must contain 'in' as the second word: %s" % token.contents
-    loopvar = bits[1]
-    sequence = parser.compile_filter(bits[3])
-    reversed = (len(bits) == 5)
+    if len(bits) < 4:
+        raise TemplateSyntaxError, "'for' statements should have at least four words: %s" % token.contents
+
+    reversed = bits[-1] == 'reversed'
+    in_index = reversed and -3 or -2
+    if bits[in_index] != 'in':
+        raise TemplateSyntaxError, "'for' statements should use the format 'for x in y': %s" % token.contents
+
+    loopvars = re.sub(r' *, *', ',', ' '.join(bits[1:in_index])).split(',')
+    for var in loopvars:
+        if not var or ' ' in var:
+            raise TemplateSyntaxError, "'for' tag received an invalid argument: %s" % token.contents
+
+    sequence = parser.compile_filter(bits[in_index+1])
     nodelist_loop = parser.parse(('endfor',))
     parser.delete_first_token()
-    return ForNode(loopvar, sequence, reversed, nodelist_loop)
+    return ForNode(loopvars, sequence, reversed, nodelist_loop)
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
