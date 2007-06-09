@@ -91,9 +91,12 @@ Filters can be "chained." The output of one filter is applied to the next.
 ``{{ text|escape|linebreaks }}`` is a common idiom for escaping text contents,
 then converting line breaks to ``<p>`` tags.
 
-Some filters take arguments. A filter argument looks like this:
-``{{ bio|truncatewords:"30" }}``. This will display the first 30 words of the
-``bio`` variable. Filter arguments always are in double quotes.
+Some filters take arguments. A filter argument looks like this: ``{{
+bio|truncatewords:30 }}``. This will display the first 30 words of the ``bio``
+variable.
+
+Filter arguments that contain spaces must be quoted; for example, to join a list
+with commas and spaced you'd use ``{{ list|join:", " }}``.
 
 The `Built-in filter reference`_ below describes all the built-in filters.
 
@@ -444,7 +447,7 @@ for
 ~~~
 
 Loop over each item in an array.  For example, to display a list of athletes
-given ``athlete_list``::
+provided in ``athlete_list``::
 
     <ul>
     {% for athlete in athlete_list %}
@@ -452,7 +455,25 @@ given ``athlete_list``::
     {% endfor %}
     </ul>
 
-You can also loop over a list in reverse by using ``{% for obj in list reversed %}``.
+You can loop over a list in reverse by using ``{% for obj in list reversed %}``.
+
+**New in Django development version**
+If you need to loop over a list of lists, you can unpack the values
+in eachs sub-list into a set of known names. For example, if your context contains
+a list of (x,y) coordinates called ``points``, you could use the following
+to output the list of points:: 
+
+    {% for x, y in points %}
+        There is a point at {{ x }},{{ y }}
+    {% endfor %}
+    
+This can also be useful if you need to access the items in a dictionary. 
+For example, if your context contained a dictionary ``data``, the following
+would display the keys and values of the dictionary::
+
+    {% for key, value in data.items %}
+        {{ key }}: {{ value }}
+    {% endfor %}
 
 The for loop sets a number of variables available within the loop:
 

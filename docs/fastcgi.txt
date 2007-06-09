@@ -203,7 +203,7 @@ This is probably the most common case, if you're using Django's admin site::
       DocumentRoot /home/user/public_html
       Alias /media /home/user/python/django/contrib/admin/media
       RewriteEngine On
-      RewriteRule ^/(media.*)$ /$1 [QSA,L]
+      RewriteRule ^/(media.*)$ /$1 [QSA,L,PT]
       RewriteCond %{REQUEST_FILENAME} !-f
       RewriteRule ^/(.*)$ /mysite.fcgi/$1 [QSA,L]
     </VirtualHost>
