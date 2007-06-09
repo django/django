@@ -388,7 +388,7 @@ def get_custom_sql_for_model(model):
 
     for f in opts.fields:
         if hasattr(f, '_post_create_sql'):
-            output.append(f._post_create_sql(style, model._meta.db_table, f.column))
+            output.append(f._post_create_sql(style, model._meta.db_table))
 
     return output
 
