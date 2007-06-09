@@ -4,7 +4,7 @@ from django.template import Node, NodeList, Template, Context, resolve_variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, smart_unicode
 import sys
 import re
 
@@ -59,8 +59,8 @@ class FirstOfNode(Node):
             except VariableDoesNotExist:
                 continue
             if value:
-                return str(value)
-        return ''
+                return smart_unicode(value)
+        return u''
 
 class ForNode(Node):
     def __init__(self, loopvars, sequence, reversed, nodelist_loop):
