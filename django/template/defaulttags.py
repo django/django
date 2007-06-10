@@ -7,6 +7,14 @@ from django.conf import settings
 import sys
 import re
 
+if not hasattr(__builtins__, 'reversed'):
+    # For Python 2.3.
+    # From http://www.python.org/doc/current/tut/node11.html
+    def reversed(data):
+        for index in xrange(len(data)-1, -1, -1):
+            yield data[index]
+
+
 register = Library()
 
 class CommentNode(Node):
@@ -103,11 +111,7 @@ class ForNode(Node):
             values = list(values)
         len_values = len(values)
         if self.reversed:
-            # From http://www.python.org/doc/current/tut/node11.html
-            def reverse(data):
-                for index in range(len(data)-1, -1, -1):
-                    yield data[index]
-            values = reverse(values)
+            values = reversed(values)
         unpack = len(self.loopvars) > 1
         for i, item in enumerate(values):
             context['forloop'] = {
