@@ -3,13 +3,16 @@
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
+import os, re, shutil, sys, textwrap
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
+
+# For backwards compatibility: get_version() used to be in this module.
+get_version = django.get_version
 
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
     <tr>
@@ -92,14 +95,6 @@ def _get_sequence_list():
 # referred field type. Otherwise, the foreign key should be the same type of
 # field as the field to which it points.
 get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
-
-def get_version():
-    "Returns the version as a human-format string."
-    from django import VERSION
-    v = '.'.join([str(i) for i in VERSION[:-1]])
-    if VERSION[-1]:
-        v += '-' + VERSION[-1]
-    return v
 
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
