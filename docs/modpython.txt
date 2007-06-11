@@ -51,9 +51,17 @@ whereas ``<Location>`` points at places in the URL structure of a Web site.
 ``<Directory>`` would be meaningless here.
 
 Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
-on it, you'll need to tell mod_python::
+on it, you'll need to tell mod_python:
 
-    PythonPath "['/path/to/project'] + sys.path"
+.. parsed-literal::
+
+    <Location "/mysite/">
+        SetHandler python-program
+        PythonHandler django.core.handlers.modpython
+        SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+        PythonDebug On
+        **PythonPath "['/path/to/project'] + sys.path"**
+    </Location>
 
 .. caution::
 
