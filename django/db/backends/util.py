@@ -98,7 +98,7 @@ def typecast_boolean(s):
     return str(s)[0].lower() == 't'
 
 def typecast_decimal(s):
-    if s is None:
+    if s is None or s == '':
         return None
     return decimal.Decimal(s)
 

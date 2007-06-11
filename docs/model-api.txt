@@ -447,6 +447,11 @@ and doesn't give a 404 response).
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
+``URLField`` takes an optional argument, ``maxlength``, the maximum length (in
+characters) of the field. The maxlength is enforced at the database level and
+in Django's validation. If you don't specify ``maxlength``, a default of 200
+is used.
+
 ``USStateField``
 ~~~~~~~~~~~~~~~~
 
