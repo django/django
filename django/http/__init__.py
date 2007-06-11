@@ -1,9 +1,9 @@
 import os
 from Cookie import SimpleCookie
 from pprint import pformat
-from urllib import urlencode, quote
+from urllib import urlencode
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import smart_str
+from django.utils.encoding import smart_str, iri_to_uri
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -334,14 +334,14 @@ class HttpResponseRedirect(HttpResponse):
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
+        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponsePermanentRedirect(HttpResponse):
     status_code = 301
 
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
+        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseNotModified(HttpResponse):
     status_code = 304

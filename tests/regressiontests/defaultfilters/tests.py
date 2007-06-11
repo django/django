@@ -111,14 +111,14 @@ u'MIXED CASE INPUT'
 u'\xcb'
 
 
->>> urlencode(u'jack & jill')
-u'jack%20%26%20jill'
+>>> urlencode(u'fran\xe7ois & jill')
+u'fran%C3%A7ois%20%26%20jill'
 >>> urlencode(1)
 u'1'
 >>> iriencode(u'S\xf8r-Tr\xf8ndelag')
 u'S%C3%B8r-Tr%C3%B8ndelag'
->>> iriencode(urlencode(u'jack & jill'))
-u'jack%20%26%20jill'
+>>> iriencode(urlencode(u'fran\xe7ois & jill'))
+u'fran%C3%A7ois%20%26%20jill'
 
 >>> urlizetrunc(u'http://short.com/', 20)
 u'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'

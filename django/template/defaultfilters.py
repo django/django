@@ -175,8 +175,8 @@ upper = stringfilter(upper)
 
 def urlencode(value):
     "Escapes a value for use in a URL"
-    import urllib
-    return force_unicode(urllib.quote(value))
+    from django.utils.http import urlquote
+    return urlquote(value)
 urlencode = stringfilter(urlencode)
 
 def urlize(value):
