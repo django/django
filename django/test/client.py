@@ -65,10 +65,7 @@ def encode_multipart(boundary, data):
         if isinstance(value, file):
             lines.extend([
                 '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % key,
-                '',
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s_file"; filename="%s"' % (key, value.name),
+                'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value.name),
                 'Content-Type: application/octet-stream',
                 '',
                 value.read()
