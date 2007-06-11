@@ -16,7 +16,7 @@ Traceback (most recent call last):
 AttributeError: This QueryDict instance is immutable
 
 >>> q.get('foo', 'default')
-u'default'
+'default'
 
 >>> q.getlist('foo')
 []
@@ -103,7 +103,7 @@ False
 >>> q['name'] = 'john'
 
 >>> q.get('foo', 'default')
-u'default'
+'default'
 
 >>> q.get('name', 'default')
 u'john'
@@ -167,10 +167,10 @@ u'hello'
 [u'bar', u'baz', u'another', u'hello']
 
 >>> q.pop('foo', 'not there')
-u'not there'
+'not there'
 
 >>> q.get('foo', 'not there')
-u'not there'
+'not there'
 
 >>> q.setdefault('foo', 'bar')
 u'bar'
@@ -201,7 +201,7 @@ u'bar'
 >>> q['bar']
 Traceback (most recent call last):
 ...
-MultiValueDictKeyError: "Key 'bar' not found in <MultiValueDict: {'foo': ['bar']}>"
+MultiValueDictKeyError: "Key 'bar' not found in <MultiValueDict: {u'foo': [u'bar']}>"
 
 >>> q['something'] = 'bar'
 Traceback (most recent call last):
@@ -212,7 +212,7 @@ AttributeError: This QueryDict instance is immutable
 u'bar'
 
 >>> q.get('bar', 'default')
-u'default'
+'default'
 
 >>> q.getlist('foo')
 [u'bar']
@@ -303,7 +303,7 @@ AttributeError: This QueryDict instance is immutable
 u'no'
 
 >>> q.get('foo', 'default')
-u'default'
+'default'
 
 >>> q.getlist('vote')
 [u'yes', u'no']

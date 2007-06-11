@@ -3,7 +3,7 @@ from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import smart_str, iri_to_uri
+from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -49,13 +49,15 @@ class HttpRequest(object):
 
     def _set_encoding(self, val):
         """
-        Sets the encoding used for GET/POST accesses.
+        Sets the encoding used for GET/POST accesses. If the GET or POST
+        dictionary has already been created it is removed and recreated on the
+        next access (so that it is decoded correctly).
         """
         self._encoding = val
         if hasattr(self, '_get'):
-            self.GET.encoding = val
+            del self._get
         if hasattr(self, '_post'):
-            self.POST.encoding = val
+            del self._post
 
     def _get_encoding(self):
         return self._encoding
@@ -113,26 +115,22 @@ class QueryDict(MultiValueDict):
             self.encoding = encoding
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(key, value)
+            self.appendlist(force_unicode(key, errors='replace'), force_unicode(value, errors='replace'))
         self._mutable = mutable
 
     def _assert_mutable(self):
         if not self._mutable:
             raise AttributeError, "This QueryDict instance is immutable"
 
-    def __getitem__(self, key):
-        return str_to_unicode(MultiValueDict.__getitem__(self, key), self.encoding)
-
     def __setitem__(self, key, value):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        value = str_to_unicode(value, self.encoding)
         MultiValueDict.__setitem__(self, key, value)
 
     def __delitem__(self, key):
         self._assert_mutable()
         super(QueryDict, self).__delitem__(key)
-
-    def get(self, key, default=None):
-        return str_to_unicode(MultiValueDict.get(self, key, default), self.encoding)
 
     def __copy__(self):
         result = self.__class__('', mutable=True)
@@ -148,16 +146,10 @@ class QueryDict(MultiValueDict):
             dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
         return result
 
-    def getlist(self, key):
-        """
-        Returns a copy of the list associated with "key". This isn't a
-        reference to the original list because this method converts all the
-        values to unicode (without changing the original).
-        """
-        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.getlist(self, key)]
-
     def setlist(self, key, list_):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        list_ = [str_to_unicode(elt, self.encoding) for elt in list_]
         MultiValueDict.setlist(self, key, list_)
 
     def setlistdefault(self, key, default_list=()):
@@ -168,43 +160,33 @@ class QueryDict(MultiValueDict):
 
     def appendlist(self, key, value):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        value = str_to_unicode(value, self.encoding)
         MultiValueDict.appendlist(self, key, value)
 
     def update(self, other_dict):
         self._assert_mutable()
-        MultiValueDict.update(self, other_dict)
+        f = lambda s: str_to_unicode(s, self.encoding)
+        d = dict([(f(k), f(v)) for k, v in other_dict.items()])
+        MultiValueDict.update(self, d)
 
     def pop(self, key, *args):
         self._assert_mutable()
-        val = MultiValueDict.pop(self, key, *args)
-        if isinstance(val, list):
-            return [str_to_unicode(v, self.encoding) for v in val]
-        return str_to_unicode(val, self.encoding)
+        return MultiValueDict.pop(self, key, *args)
 
     def popitem(self):
         self._assert_mutable()
-        key, values = MultiValueDict.popitem(self)
-        return str_to_unicode(key, self.encoding), [str_to_unicode(v, self.encoding) for v in values]
-
-    def keys(self):
-        return [str_to_unicode(k, self.encoding) for k in MultiValueDict.keys(self)]
-
-    def values(self):
-        return [str_to_unicode(v, self.encoding) for v in MultiValueDict.values(self)]
-
-    def items(self):
-        return [(str_to_unicode(k, self.encoding), str_to_unicode(v, self.encoding)) for k, v in MultiValueDict.items(self)]
-
-    def lists(self):
-        return [(str_to_unicode(k, self.encoding), [str_to_unicode(v, self.encoding) for v in v_list]) for k, v_list in MultiValueDict.lists(self)]
+        return MultiValueDict.popitem(self)
 
     def clear(self):
         self._assert_mutable()
         MultiValueDict.clear(self)
 
-    def setdefault(self, *args):
+    def setdefault(self, key, default=None):
         self._assert_mutable()
-        return MultiValueDict.setdefault(self, *args)
+        key = str_to_unicode(key, self.encoding)
+        default = str_to_unicode(default, self.encoding)
+        return MultiValueDict.setdefault(self, key, default)
 
     def copy(self):
         "Returns a mutable copy of this object."
