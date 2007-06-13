@@ -1224,7 +1224,7 @@ Form validation happens when the data is cleaned. If you want to customise
 this process, there are various places you can change, each one serving a
 different purpose. Thee types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
-method on a form. There are other things that can kick of cleaning and
+method on a form. There are other things that can trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
@@ -1234,7 +1234,7 @@ the ``ValidationError`` constructor. If no ``ValidationError`` is raised, the
 method should return the cleaned (normalised) data as a Python object.
 
 If you detect multiple errors during a cleaning method and wish to signal all
-of them to the form submittor, it is possible to pass a list of errors to the
+of them to the form submitter, it is possible to pass a list of errors to the
 ``ValidationError`` constructor.
 
 The three types of cleaning methods are:
