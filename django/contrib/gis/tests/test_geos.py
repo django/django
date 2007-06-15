@@ -115,8 +115,9 @@ class GeosTest2(unittest.TestCase):
             self.assertEqual(mp.valid, mpoly.valid)
 
             if mp.valid:
-                self.assertEqual(mp.n_p, mpoly.num_geom)
-                self.assertEqual(mp.n_p, len(mpoly))
+                self.assertEqual(mp.num_geom, mpoly.num_geom)
+                self.assertEqual(mp.n_p, mpoly.num_coords)
+                self.assertEqual(mp.num_geom, len(mpoly))
                 for p in mpoly:
                     self.assertEqual(p.geom_type, 'Polygon')
                     self.assertEqual(p.geom_typeid, 3)

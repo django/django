@@ -11,6 +11,36 @@ from django.contrib.gis.gdal.libgdal import lgdal
 # Getting the error checking routine and exceptions
 from django.contrib.gis.gdal.OGRError import check_err, OGRException, SRSException
 
+"""
+  The Spatial Reference class, represensents OGR Spatial Reference objects.
+
+  Example:
+  >>> from django.contrib.gis.gdal import SpatialReference
+  >>> srs = SpatialReference('WGS84')
+  >>> print srs
+  GEOGCS["WGS 84",
+      DATUM["WGS_1984",
+          SPHEROID["WGS 84",6378137,298.257223563,
+              AUTHORITY["EPSG","7030"]],
+          TOWGS84[0,0,0,0,0,0,0],
+          AUTHORITY["EPSG","6326"]],
+      PRIMEM["Greenwich",0,
+          AUTHORITY["EPSG","8901"]],
+      UNIT["degree",0.01745329251994328,
+          AUTHORITY["EPSG","9122"]],
+      AUTHORITY["EPSG","4326"]]
+  >>> print srs.proj
+  +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
+  >>> print srs.ellipsoid
+  (6378137.0, 6356752.3142451793, 298.25722356300003)
+  >>> print srs.projected, srs.geographic
+  False True
+  >>> srs.import_epsg(32140)
+  >>> print srs.name
+  NAD83 / Texas South Central
+"""
+
+
 #### ctypes function prototypes ####
 def ellipsis_func(f):
     """Creates a ctypes function prototype for OSR ellipsis property functions,
@@ -183,7 +213,13 @@ class SpatialReference(object):
         self._cache_angular()
         return self._angular_units
 
-    #### Spheroid/Ellipsis Properties ####
+    #### Spheroid/Ellipsoid Properties ####
+    @property
+    def ellipsoid(self):
+        """Returns a tuple of the ellipsoid parameters:
+        (semimajor axis, semiminor axis, and inverse flattening)."""
+        return (self.semi_major, self.semi_minor, self.inverse_flattening)
+
     @property
     def semi_major(self):
         "Gets the Semi Major Axis for this Spatial Reference."
@@ -266,6 +302,10 @@ class SpatialReference(object):
         w = c_char_p()
         check_err(lgdal.OSRExportToProj4(self._srs, byref(w)))
         return string_at(w)
+
+    def proj4(self):
+        "Alias for proj()."
+        return self.proj
 
     @property
     def xml(self, dialect=''):

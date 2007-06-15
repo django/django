@@ -1,3 +1,4 @@
+from Driver import Driver
 from DataSource import DataSource
 from SpatialReference import SpatialReference, CoordTransform
 from OGRGeometry import OGRGeometry, OGRGeomType

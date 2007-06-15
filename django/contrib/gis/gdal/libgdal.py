@@ -1,8 +1,9 @@
 import os, sys
 from ctypes import CDLL
+from django.contrib.gis.gdal.OGRError import OGRException
 
 if os.name == 'nt':
-    # Windows NT library
+    # Windows NT shared library
     lib_name = 'libgdal-1.dll'
 elif os.name == 'posix':
     platform = os.uname()[0]
@@ -10,13 +11,13 @@ elif os.name == 'posix':
         # Linux shared library
         lib_name = 'libgdal.so'
     elif platform == 'Darwin':
-        # Mac OSX Shared Library
+        # Mac OSX shared library
         lib_name = 'libgdal.dylib'
     else:
-        raise GDALException, 'Unknown POSIX platform "%s"' % platform
+        raise OGRException, 'Unknown POSIX platform "%s"' % platform
 else:
-    raise GDALException, 'Unsupported OS "%s"' % os.name
+    raise OGRException, 'Unsupported OS "%s"' % os.name
 
-# The GDAL C library
+# This loads the GDAL/OGR C library
 lgdal = CDLL(lib_name)
                                                                             

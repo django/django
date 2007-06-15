@@ -1,5 +1,5 @@
 # types and ctypes
-import types
+from types import StringType
 from ctypes import c_char_p, c_int, string_at
 
 # The GDAL C library, OGR exception, and the Field object
@@ -31,7 +31,7 @@ class Feature(object):
 
     def __getitem__(self, index):
         "Gets the Field at the specified index."
-        if isinstance(index, types.StringType):
+        if isinstance(index, StringType):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:

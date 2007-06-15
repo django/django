@@ -8,7 +8,7 @@ from django.contrib.gis.gdal.OGRError import OGRException
 #
 # The OGR_Fld_* routines are relevant here.
 class Field(object):
-    "A class that wraps an OGR Field."
+    "A class that wraps an OGR Field, needs to be instantiated from a Feature object."
 
     _fld = 0 # Initially NULL
 

@@ -40,7 +40,7 @@ class DataSourceTest(unittest.TestCase):
             self.assertEqual(source.ds, ds.name)
 
             # Making sure the driver name matches up
-            self.assertEqual('ESRI Shapefile', ds.driver)
+            self.assertEqual('ESRI Shapefile', str(ds.driver))
 
             # Making sure indexing works
             try:
