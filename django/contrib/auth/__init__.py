@@ -53,6 +53,8 @@ def login(request, user):
     user.save()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
+    if hasattr(request, 'user'):
+        request.user = user
 
 def logout(request):
     """
@@ -66,6 +68,9 @@ def logout(request):
         del request.session[BACKEND_SESSION_KEY]
     except KeyError:
         pass
+    if hasattr(request, 'user'):
+        from django.contrib.auth.models import AnonymousUser
+        request.user = AnonymousUser()
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser
