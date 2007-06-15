@@ -285,11 +285,11 @@ def fieldsTest(format, self):
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
     obj.save()
-    
+
     # Serialize then deserialize the test database
     serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1','field3'))
     result = serializers.deserialize(format, serialized_data).next()
-    
+
     # Check that the deserialized object contains data in only the serialized fields.
     self.assertEqual(result.object.field1, 'first')
     self.assertEqual(result.object.field2, '')
@@ -301,19 +301,20 @@ def streamTest(format, self):
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
     obj.save()
-    
+
     # Serialize the test database to a stream
-    stream = StringIO()    
+    stream = StringIO()
     serializers.serialize(format, [obj], indent=2, stream=stream)
-    
+
     # Serialize normally for a comparison
     string_data = serializers.serialize(format, [obj], indent=2)
 
     # Check that the two are the same
-    self.assertEqual(string_data, stream.buffer())
+    self.assertEqual(string_data, stream.getvalue())
     stream.close()
-    
+
 for format in serializers.get_serializer_formats():
     setattr(SerializerTests, 'test_'+format+'_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_'+format+'_serializer_fields', curry(fieldsTest, format))
-    setattr(SerializerTests, 'test_'+format+'_serializer_stream', curry(fieldsTest, format))
+    if format != 'python':
+        setattr(SerializerTests, 'test_'+format+'_serializer_stream', curry(streamTest, format))

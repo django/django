@@ -2202,10 +2202,11 @@ msgstr[0] "dag"
 msgstr[1] "dagen"
 
 #: utils/timesince.py:16
+# In the timesince context it is stilistically wrong to use the plural for hour in Dutch.
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "uur"
-msgstr[1] "uren"
+msgstr[1] "uur"
 
 #: utils/timesince.py:17
 msgid "minute"
