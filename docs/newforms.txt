@@ -1293,7 +1293,7 @@ dictionary.
 The previous paragraph means that if you are overriding ``Form.clean()``, you
 should iterate through ``self.cleaned_data.items()``, possibly considering the
 ``_errors`` dictionary attribute on the form as well. In this way, you will
-already know which fields have passed thei individual validation requirements.
+already know which fields have passed their individual validation requirements.
 
 A simple example
 ~~~~~~~~~~~~~~~~
