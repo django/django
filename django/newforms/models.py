@@ -279,16 +279,16 @@ def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formf
 class InlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
     def __init__(self, instance=None, data=None):
+        from django.db.models.fields.related import RelatedObject
         self.instance = instance
-        super(InlineFormset, self).__init__(data, instances=self.get_inline_objects())
+        # is there a better way to get the object descriptor?
+        self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
+        super(InlineFormset, self).__init__(data, instances=self.get_inline_objects(), prefix=self.rel_name)
 
     def get_inline_objects(self):
         if self.instance is None:
             return []
-        from django.db.models.fields.related import RelatedObject
-        # is there a better way to get the object descriptor?
-        rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        return getattr(self.instance, rel_name).all()
+        return getattr(self.instance, self.rel_name).all()
 
     def save_new(self, form, commit=True):
         kwargs = {self.fk.get_attname(): self.instance._get_pk_val()}
