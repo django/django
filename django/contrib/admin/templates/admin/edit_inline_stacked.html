@@ -1,3 +1,32 @@
+{{ bound_inline.formset.management_form }}
+{% for bound_inline_object in bound_inline %}
+<fieldset class="module aligned {{ bfset.fieldset.classes }}">
+  <h2>{{ bound_inline.verbose_name|title }}&nbsp;#{{ forloop.counter }}</h2>
+  {% for bfset in bound_inline_object.form %}
+      <fieldset class="module aligned {{ bfset.fieldset.classes }}">
+      {% if bfset.fieldset.name %}<h2>{{ bfset.fieldset.name }}</h2>{% endif %}
+      {% if bfset.fieldset.description %}<div class="description">{{ bfset.fieldset.description }}</div>{% endif %}
+      {% for line in bfset %}
+          <div class="form-row{% if line.errors %} errors{% endif %}">
+          {{ line.errors }}
+          {% for field in line %}
+              {% if field.is_checkbox %}
+                  {{ field.field }}{{ field.label_tag }}
+              {% else %}
+                  {{ field.label_tag }}{{ field.field }}
+              {% endif %}
+              {% if field.field.field.help_text %}<p class="help">{{ field.field.field.help_text }}</p>{% endif %}
+          {% endfor %}
+          </div>
+      {% endfor %}
+      </fieldset>
+  {% endfor %}
+</fieldset>
+{% endfor %}
+
+{% comment %}
+<!-- Old forms. Here for reference until new forms match features -->
+
 {% load admin_modify %}
 <fieldset class="module aligned">
    {% for fcw in bound_related_object.form_field_collection_wrappers %}
@@ -14,3 +43,4 @@
       {% endfor %}
     {% endfor %}
 </fieldset>
+{% endcomment %}

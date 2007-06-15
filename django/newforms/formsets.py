@@ -1,18 +1,20 @@
-from django import newforms as forms
+from forms import Form, ValidationError
+from fields import IntegerField, BooleanField
+from widgets import HiddenInput
 
 # special field names
 FORM_COUNT_FIELD_NAME = 'COUNT'
 ORDERING_FIELD_NAME = 'ORDER'
 DELETION_FIELD_NAME = 'DELETE'
 
-class ManagementForm(forms.Form):
+class ManagementForm(Form):
     """
     ``ManagementForm`` is used to keep track of how many form instances
     are displayed on the page. If adding new forms via javascript, you should
     increment the count field of this form as well.
     """
     def __init__(self, *args, **kwargs):
-        self.base_fields[FORM_COUNT_FIELD_NAME] = forms.IntegerField(widget=forms.HiddenInput)
+        self.base_fields[FORM_COUNT_FIELD_NAME] = IntegerField(widget=HiddenInput)
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 class BaseFormSet(object):
@@ -33,7 +35,7 @@ class BaseFormSet(object):
                 self.change_form_count = self.total_forms - self.num_extra
             else:
                 # not sure that ValidationError is the best thing to raise here
-                raise forms.ValidationError('ManagementForm data is missing or has been tampered with')
+                raise ValidationError('ManagementForm data is missing or has been tampered with')
         elif initial:
             self.change_form_count = len(initial)
             self.required_forms = len(initial)
@@ -136,9 +138,9 @@ class BaseFormSet(object):
     def add_fields(self, form, index):
         """A hook for adding extra fields on to each form instance."""
         if self.orderable:
-            form.fields[ORDERING_FIELD_NAME] = forms.IntegerField(label='Order', initial=index+1)
+            form.fields[ORDERING_FIELD_NAME] = IntegerField(label='Order', initial=index+1)
         if self.deletable:
-            form.fields[DELETION_FIELD_NAME] = forms.BooleanField(label='Delete', required=False)
+            form.fields[DELETION_FIELD_NAME] = BooleanField(label='Delete', required=False)
 
     def add_prefix(self, index):
         return '%s-%s' % (self.prefix, index)
@@ -151,3 +153,10 @@ def formset_for_form(form, formset=BaseFormSet, num_extra=1, orderable=False, de
     """Return a FormSet for the given form class."""
     attrs = {'form_class': form, 'num_extra': num_extra, 'orderable': orderable, 'deletable': deletable}
     return type(form.__name__ + 'FormSet', (formset,), attrs)
+
+def all_valid(formsets):
+    """Returns true if every formset in formsets is valid."""
+    for formset in formsets:
+        if not formset.is_valid():
+            return False
+    return True

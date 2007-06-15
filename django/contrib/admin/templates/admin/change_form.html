@@ -63,6 +63,10 @@
 
 {% block after_field_sets %}{% endblock %}
 
+{% for bound_inline in bound_inlines %}
+    {% render_inline bound_inline %}
+{% endfor %}
+
 {% block after_related_objects %}{% endblock %}
 
 {% submit_row %}

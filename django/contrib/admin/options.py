@@ -1,5 +1,7 @@
 from django import oldforms, template
 from django import newforms as forms
+from django.newforms.formsets import all_valid
+from django.newforms.models import inline_formset
 from django.contrib.admin import widgets
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models
@@ -93,6 +95,77 @@ class BoundField(object):
             classes.append('inline')
         attrs = classes and {'class': ' '.join(classes)} or {}
         return self.field.label_tag(contents=contents, attrs=attrs)
+
+class InlineOptions(object):
+    """
+    Options for inline editing of ``model`` instances.
+    
+    Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
+    ``model`` to its parent. This is required if ``model`` has more than one
+    ``ForeignKey`` to its parent.
+    """
+    def __init__(self, model, name=None, extra=3, fields=None, template=None, formfield_callback=lambda f: f.formfield()):
+        self.model = model
+        self.name = name
+        self.extra = extra
+        self.fields = fields
+        self.template = template or self.default_template
+        self.verbose_name = model._meta.verbose_name
+        self.verbose_name_plural = model._meta.verbose_name_plural
+        self.prepopulated_fields = {}
+        self.formfield_callback = formfield_callback
+
+class StackedInline(InlineOptions):
+    default_template = 'admin/edit_inline_stacked.html'
+
+class TabularInline(InlineOptions):
+    default_template = 'admin/edit_inline_tabular.html'
+
+class BoundInline(object):
+    def __init__(self, opts, formset):
+        self.opts = opts
+        self.formset = formset
+
+    def __iter__(self):
+        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
+            yield BoundInlineObject(form, original, self.opts)
+        for form in self.formset.add_forms:
+            yield BoundInlineObject(form, None, self.opts)
+
+    def fields(self):
+        # HACK: each form instance has some extra fields. Getting those fields
+        # from the form class will take some rearranging. Get them from the 
+        # first form instance for now.
+        return list(self.formset.forms[0])
+
+    def verbose_name(self):
+        return self.opts.verbose_name
+
+    def verbose_name_plural(self):
+        return self.opts.verbose_name_plural
+
+class BoundInlineObject(object):
+    def __init__(self, form, original, opts):
+        self.opts = opts
+        self.base_form = form
+        self.form = AdminForm(form, self.fieldsets(), opts.prepopulated_fields)
+        self.original = original
+
+    def fieldsets(self):
+        """
+        Generator that yields Fieldset objects for use on add and change admin
+        form pages.
+
+        This default implementation looks at self.fields, but subclasses can
+        override this implementation and do something special based on the
+        given HttpRequest object.
+        """
+        if self.opts.fields is None:
+            default_fields = [f for f in self.base_form.fields]
+            yield Fieldset(fields=default_fields)
+        else:
+            for name, options in self.opts.fields:
+                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
 
 class ModelAdmin(object):
     "Encapsulates all admin options and functionality for a given model."
@@ -292,7 +365,7 @@ class ModelAdmin(object):
         """
         return self.queryset(request)
 
-    def save_add(self, request, model, form, post_url_continue):
+    def save_add(self, request, model, form, formsets, post_url_continue):
         """
         Saves the object in the "add" stage and returns an HttpResponseRedirect.
 
@@ -302,6 +375,14 @@ class ModelAdmin(object):
         from django.contrib.contenttypes.models import ContentType
         opts = model._meta
         new_object = form.save(commit=True)
+
+        if formsets:
+            for formset in formsets:
+                # HACK: it seems like the parent obejct should be passed into
+                # a method of something, not just set as an attribute
+                formset.instance = new_object
+                formset.save()
+
         pk_value = new_object._get_pk_val()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
         msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
@@ -331,17 +412,23 @@ class ModelAdmin(object):
                 post_url = '../../../'
             return HttpResponseRedirect(post_url)
 
-    def save_change(self, request, model, form):
+    def save_change(self, request, model, form, formsets=None):
         """
         Saves the object in the "change" stage and returns an HttpResponseRedirect.
 
         `form` is a bound Form instance that's verified to be valid.
+        
+        `formsets` is a sequence of InlineFormSet instances that are verified to be valid.
         """
         from django.contrib.admin.models import LogEntry, CHANGE
         from django.contrib.contenttypes.models import ContentType
         opts = model._meta
         new_object = form.save(commit=True)
         pk_value = new_object._get_pk_val()
+
+        if formsets:
+            for formset in formsets:
+                formset.save()
 
         # Construct the change message. TODO: Temporarily commented-out,
         # as manipulator object doesn't exist anymore, and we don't yet
@@ -394,15 +481,22 @@ class ModelAdmin(object):
 
         ModelForm = forms.form_for_model(model, formfield_callback=self.formfield_for_dbfield)
 
+        inline_formsets = []
         if request.POST:
             new_data = request.POST.copy()
             if opts.has_field_type(models.FileField):
                 new_data.update(request.FILES)
             form = ModelForm(new_data)
-            if form.is_valid():
-                return self.save_add(request, model, form, '../%s/')
+            for FormSet in self.get_inline_formsets():
+                inline_formset = FormSet(data=new_data)
+                inline_formsets.append(inline_formset)
+            if form.is_valid() and all_valid(inline_formsets):
+                return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
+            for FormSet in self.get_inline_formsets():
+                inline_formset = FormSet()
+                inline_formsets.append(inline_formset)
 
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
@@ -410,6 +504,7 @@ class ModelAdmin(object):
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
             'javascript_imports': self.javascript_add(request),
+            'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
         })
         return render_change_form(self, model, model.AddManipulator(), c, add=True)
 
@@ -439,16 +534,23 @@ class ModelAdmin(object):
 
         ModelForm = forms.form_for_instance(obj, formfield_callback=self.formfield_for_dbfield)
 
+        inline_formsets = []
         if request.POST:
             new_data = request.POST.copy()
             if opts.has_field_type(models.FileField):
                 new_data.update(request.FILES)
             form = ModelForm(new_data)
+            for FormSet in self.get_inline_formsets():
+                inline_formset = FormSet(obj, new_data)
+                inline_formsets.append(inline_formset)
 
-            if form.is_valid():
-                return self.save_change(request, model, form)
+            if form.is_valid() and all_valid(inline_formsets):
+                return self.save_change(request, model, form, inline_formsets)
         else:
             form = ModelForm()
+            for FormSet in self.get_inline_formsets():
+                inline_formset = FormSet(obj)
+                inline_formsets.append(inline_formset)
 
         ## Populate the FormWrapper.
         #oldform = oldforms.FormWrapper(manipulator, new_data, errors)
@@ -463,7 +565,6 @@ class ModelAdmin(object):
                         #related.get_accessor_name())
                 #orig_list = func()
                 #oldform.order_objects.extend(orig_list)
-
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
             'adminform': AdminForm(form, self.fieldsets_change(request, obj), self.prepopulated_fields),
@@ -471,6 +572,7 @@ class ModelAdmin(object):
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
             'javascript_imports': self.javascript_change(request, obj),
+            'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
         })
         return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
 
@@ -572,3 +674,10 @@ class ModelAdmin(object):
             "admin/object_history.html"
         ]
         return render_to_response(template_list, extra_context, context_instance=template.RequestContext(request))
+
+    def get_inline_formsets(self):
+        inline_formset_classes = []
+        for opts in self.inlines:
+            inline = inline_formset(self.model, opts.model, formfield_callback=self.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
+            inline_formset_classes.append(inline)
+        return inline_formset_classes

@@ -7,8 +7,9 @@ from django.utils.translation import gettext
 
 from util import ValidationError
 from forms import BaseForm, SortedDictFromList
-from fields import Field, ChoiceField
-from widgets import Select, SelectMultiple, MultipleHiddenInput
+from fields import Field, ChoiceField, IntegerField
+from formsets import BaseFormSet, formset_for_form, DELETION_FIELD_NAME
+from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 
 __all__ = (
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
@@ -197,3 +198,132 @@ class ModelMultipleChoiceField(ModelChoiceField):
             else:
                 final_values.append(obj)
         return final_values
+
+# Model-FormSet integration ###################################################
+
+def initial_data(instance, fields=None):
+    """
+    Return a dictionary from data in ``instance`` that is suitable for 
+    use as a ``Form`` constructor's ``initial`` argument.
+    
+    Provide ``fields`` to specify the names of specific fields to return.
+    All field values in the instance will be returned if ``fields`` is not
+    provided.
+    """
+    model = instance.__class__
+    opts = model._meta
+    initial = {}
+    for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
+        if fields and not f.name in fields:
+            continue
+        initial[f.name] = f.value_from_object(instance)
+    return initial
+
+class BaseModelFormSet(BaseFormSet):
+    """
+    A ``FormSet`` attatched to a particular model or sequence of model instances.
+    """
+    model = None
+    
+    def __init__(self, data=None, auto_id='id_%s', prefix=None, instances=None):
+        self.instances = instances
+        kwargs = {'data': data, 'auto_id': auto_id, 'prefix': prefix}
+        if instances:
+            kwargs['initial'] = [initial_data(instance) for instance in instances]
+        super(BaseModelFormSet, self).__init__(**kwargs)
+
+    def save_new(self, form, commit=True):
+        """Saves and retrutns a new model instance for the given form."""
+        return save_instance(form, self.model(), commit=commit)
+
+    def save_instance(self, form, instance, commit=True):
+        """Saves and retrutns an existing model instance for the given form."""
+        return save_instance(form, instance, commit=commit)
+
+    def save(self, commit=True):
+        """Saves model instances for every form, adding and changing instances
+        as necessary, and returns the list of instances.
+        """
+        saved_instances = []
+        # put self.instances into a dict so they are easy to lookup by pk
+        instances = {}
+        for instance in self.instances:
+            instances[instance._get_pk_val()] = instance
+        if self.instances:
+            # update/save existing instances
+            for form in self.change_forms:
+                instance = instances[form.cleaned_data[self.model._meta.pk.attname]]
+                if form.cleaned_data[DELETION_FIELD_NAME]:
+                    instance.delete()
+                else:
+                    saved_instances.append(self.save_instance(form, instance, commit=commit))
+        # create/save new instances
+        for form in self.add_forms:
+            if form.is_empty():
+                continue
+            saved_instances.append(self.save_new(form, commit=commit))
+        return saved_instances
+
+    def add_fields(self, form, index):
+        """Add a hidden field for the object's primary key."""
+        form.fields[self.model._meta.pk.attname] = IntegerField(required=False, widget=HiddenInput)
+        super(BaseModelFormSet, self).add_fields(form, index)
+
+def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield(), formset=BaseModelFormSet, extra=1, orderable=False, deletable=False, fields=None):
+    form = form_for_model(model, form=form, fields=fields, formfield_callback=formfield_callback)
+    FormSet = formset_for_form(form, formset, extra, orderable, deletable)
+    FormSet.model = model
+    return FormSet
+
+class InlineFormset(BaseModelFormSet):
+    """A formset for child objects related to a parent."""
+    def __init__(self, instance=None, data=None):
+        self.instance = instance
+        super(InlineFormset, self).__init__(data, instances=self.get_inline_objects())
+
+    def get_inline_objects(self):
+        if self.instance is None:
+            return []
+        from django.db.models.fields.related import RelatedObject
+        # is there a better way to get the object descriptor?
+        rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
+        return getattr(self.instance, rel_name).all()
+
+    def save_new(self, form, commit=True):
+        kwargs = {self.fk.get_attname(): self.instance._get_pk_val()}
+        new_obj = self.model(**kwargs)
+        return save_instance(form, new_obj, commit=commit)
+
+def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, formfield_callback=lambda f: f.formfield()):
+    """
+    Returns an ``InlineFormset`` for the given kwargs.
+    
+    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
+    to ``parent_model``.
+    """
+    from django.db.models import ForeignKey
+    opts = model._meta
+    # figure out what the ForeignKey from model to parent_model is
+    if fk_name is None:
+        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
+        if len(fks_to_parent) == 1:
+            fk = fks_to_parent[0]
+        elif len(fks_to_parent) == 0:
+            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
+        else:
+            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+    # let the formset handle object deletion by default
+    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields, formfield_callback=formfield_callback, extra=extra, deletable=True)
+    # HACK: remove the ForeignKey to the parent from every form
+    # This should be done a line above before we pass 'fields' to formset_for_model
+    # an 'omit' argument would be very handy here
+    try:
+        del FormSet.form_class.base_fields[fk.name]
+    except KeyError:
+        pass
+    FormSet.parent_model = parent_model
+    FormSet.fk_name = fk.name
+    FormSet.fk = fk
+    return FormSet

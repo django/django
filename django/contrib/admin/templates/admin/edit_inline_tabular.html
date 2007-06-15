@@ -1,3 +1,53 @@
+{{ bound_inline.formset.management_form }}
+<fieldset class="module">
+   <h2>{{ bound_inline.verbose_name_plural|capfirst|escape }}</h2>
+   <table>
+     <thead><tr>
+     {% for field in bound_inline.fields %}
+       {% if not field.is_hidden %}
+         <th>{{ field.label|capfirst|escape }}</th>
+        {% endif %}
+     {% endfor %}
+     </tr></thead>
+   
+     {% for bound_inline_object in bound_inline %}
+   
+        <!-- still need optional original object -->
+        
+        {% if bound_inline_object.form.form.errors %}
+           <tr class="errorlist"><td colspan="{{ bound_inline.fields|length }}">
+              {{ bound_inline_object.form.form.errors }}
+           </tr>
+        {% endif %}
+        
+        <tr class="{% cycle row1,row2 %}">
+        {% for bfset in bound_inline_object.form %}
+          {% for line in bfset %}
+            {% for field in line %}
+              
+              {% if not field.field.is_hidden %}
+                <td>{{ field.field }}</td>
+              {% else %}
+                {{ field.field }}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+        
+        <!-- still need optional view on site link -->
+        </tr>
+
+     {% endfor %}
+   
+   </table>
+
+   <!-- still need  for fcw in bound_related_object.form_field_collection_wrappers -->
+   
+</fieldset>
+
+{% comment %}
+<!-- Old forms. Here for reference until new forms match features -->
+
 {% load admin_modify %}
 <fieldset class="module">
    <h2>{{ bound_related_object.relation.opts.verbose_name_plural|capfirst|escape }}</h2><table>
@@ -42,3 +92,4 @@
       {% endfor %}
    {% endfor %}
 </fieldset>
+{% endcomment %}
