@@ -186,6 +186,7 @@ class ModelAdmin(object):
     prepopulated_fields = {}
     filter_vertical = ()
     filter_horizontal = ()
+    inlines = []
 
     def __init__(self, model):
         self.model = model
