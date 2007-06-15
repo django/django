@@ -83,6 +83,12 @@ class GeosTest2(unittest.TestCase):
             self.assertEqual(poly.ring, False)
             self.assertEqual(p.n_i, poly.num_interior_rings)
             self.assertEqual(p.n_i + 1, len(poly)) # Testing __len__
+            self.assertEqual(p.n_p, poly.num_points)
+
+            # Area & Centroid
+            self.assertAlmostEqual(p.area, poly.area, 9)
+            self.assertAlmostEqual(p.centroid[0], poly.centroid.tuple[0], 9)
+            self.assertAlmostEqual(p.centroid[1], poly.centroid.tuple[1], 9)
 
             # Testing the geometry equivalence
             self.assertEqual(True, poly == GEOSGeometry(p.wkt))
@@ -144,7 +150,6 @@ class GeosTest2(unittest.TestCase):
 
             self.assertAlmostEqual(l.centroid[0], ml.centroid.x, 9)
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
-
 
             self.assertEqual(True, ml == GEOSGeometry(l.wkt))
             self.assertEqual(False, ml == prev)

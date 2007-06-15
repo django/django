@@ -3,7 +3,7 @@ from django.contrib.gis.geos import GEOSGeometry, hex_to_wkt, wkt_to_hex, centro
 from geos import geomToWKT, geomToHEX, geomFromWKT, geomFromHEX
 from geometries import swig_geoms as geos_geoms
 
-class GeosTest(unittest.TestCase):
+class GeosTestWithSwig(unittest.TestCase):
 
     def test001_hex_to_wkt(self):
         "Testing HEX to WKT conversion."
@@ -20,7 +20,7 @@ class GeosTest(unittest.TestCase):
     def test003_centroid(self):
         "Testing the centroid property."
         for g in geos_geoms:
-            wkt1 = (centroid(g.wkt, geom_type='wkt')).wkt
+            wkt1 = centroid(g.wkt, geom_type='wkt')
             wkt2 = geomToWKT((geomFromWKT(g.wkt)).getCentroid())
             self.assertEqual(wkt1, wkt2)
 
@@ -60,7 +60,7 @@ class GeosTest(unittest.TestCase):
 
 def suite():
     s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(GeosTest))
+    s.addTest(unittest.makeSuite(GeosTestWithSwig))
     return s
 
 def run(verbosity=2):

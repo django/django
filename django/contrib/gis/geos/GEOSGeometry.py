@@ -32,6 +32,7 @@ from ctypes import \
      CDLL, CFUNCTYPE, byref, string_at, create_string_buffer, \
      c_char_p, c_double, c_float, c_int, c_uint, c_size_t
 import os, sys
+from types import StringType, IntType, FloatType
 
 """
   The goal of this module is to be a ctypes wrapper around the GEOS library
@@ -120,32 +121,35 @@ class GEOSGeometry(object):
     _g = 0  # Initially NULL
 
     #### Python 'magic' routines ####
-    def __init__(self, input, geom_type='wkt'):
+    def __init__(self, input, input_type='wkt'):
         "Takes an input and the type of the input for initialization."
 
-        if geom_type == 'wkt':
-            # If the geometry is in WKT form
-            g = lgeos.GEOSGeomFromWKT(c_char_p(input))
-        elif geom_type == 'hex':
-            # If the geometry is in HEX form.
-            sz = c_size_t(len(input))
-            buf = create_string_buffer(input)
-            g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
-        elif geom_type == 'geos':
+        if isinstance(input, StringType):
+            if input_type == 'wkt':
+                # If the geometry is in WKT form
+                g = lgeos.GEOSGeomFromWKT(c_char_p(input))
+            elif input_type == 'hex':
+                # If the geometry is in HEX form.
+                sz = c_size_t(len(input))
+                buf = create_string_buffer(input)
+                g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
+            else:
+                raise GEOSException, 'GEOS input geometry type "%s" not supported!' % input_type
+        elif isinstance(input, IntType):
             # When the input is a C pointer (Python integer)
             g = input
         else:
             # Invalid geometry type.
-            raise GEOSException, 'Improper geometry input type!'
+            raise GEOSException, 'Improper geometry input type: %s' % str(type(input))
 
-        # If the geometry pointer is NULL (0), then raise an exception.
+        # If the geometry pointer is NULL (0), raise an exception.
         if not g:
-            raise GEOSException, 'Invalid %s given!' % geom_type.upper()
+            raise GEOSException, 'Invalid %s given!' % input_type.upper()
         else:
             self._g = g
 
         # Setting the class type (e.g. 'Point', 'Polygon', etc.)
-        self.__class__ = GEO_CLASSES[self.geom_type]
+        self.__class__ = GEOS_CLASSES[self.geom_type]
 
     def __del__(self):
         "This cleans up the memory allocated for the geometry."
@@ -183,6 +187,11 @@ class GEOSGeometry(object):
         n = lgeos.GEOSGetNumCoordinates(self._g)
         if n == -1: raise GEOSException, 'Error getting number of coordinates!'
         else: return n
+
+    @property
+    def num_points(self):
+        "Returns the number points, or coordinates, in the geometry."
+        return self.num_coords
 
     @property
     def dims(self):
@@ -327,44 +336,39 @@ class GEOSGeometry(object):
         the number of segment used to approximate a quarter circle (defaults to 8).
         (Text from PostGIS documentation at ch. 6.1.3)
         """
-        if type(width) != type(0.0):
+        if not isinstance(width, FloatType):
             raise TypeError, 'width parameter must be a float'
-        if type(quadsegs) != type(0):
+        if not isinstance(quadsegs, IntType):
             raise TypeError, 'quadsegs parameter must be an integer'
         b = lgeos.GEOSBuffer(self._g, c_double(width), c_int(quadsegs))
-        return GEOSGeometry(b, 'geos')
+        return GEOSGeometry(b)
 
     @property
     def envelope(self):
         "Return the geometries bounding box."
-        e = lgeos.GEOSEnvelope(self._g)
-        return GEOSGeometry(e, 'geos')
+        return GEOSGeometry(lgeos.GEOSEnvelope(self._g))
 
     @property
     def centroid(self):
         """The centroid is equal to the centroid of the set of component Geometrys
         of highest dimension (since the lower-dimension geometries contribute zero
         "weight" to the centroid)."""
-        g = lgeos.GEOSGetCentroid(self._g)
-        return GEOSGeometry(g, 'geos')
+        return GEOSGeometry(lgeos.GEOSGetCentroid(self._g))
 
     @property
     def boundary(self):
         "Returns the boundary as a newly allocated Geometry object."
-        g = lgeos.GEOSBoundary(self._g)
-        return GEOSGeometry(g, 'geos')
+        return GEOSGeometry(lgeos.GEOSBoundary(self._g))
 
     @property
     def convex_hull(self):
         "Returns the smallest convex Polygon that contains all the points in the Geometry."
-        g = lgeos.GEOSConvexHull(self._g)
-        return GEOSGeometry(g, 'geos')
+        return GEOSGeometry(lgeos.GEOSConvexHull(self._g))
 
     @property
     def point_on_surface(self):
         "Computes an interior point of this Geometry."
-        g = lgeos.GEOSPointOnSurface(self._g)
-        return GEOSGeometry(g, 'geos')
+        return GEOSGeometry(lgeos.GEOSPointOnSurface(self._g))
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this geometry and the other."
@@ -373,24 +377,20 @@ class GEOSGeometry(object):
     def difference(self, other):
         """Returns a Geometry representing the points making up this Geometry
         that do not make up other."""
-        d = lgeos.GEOSDifference(self._g, other._g)
-        return GEOSGeometry(d, 'geos')
+        return GEOSGeometry(lgeos.GEOSDifference(self._g, other._g))
 
     def sym_difference(self, other):
         """Returns a set combining the points in this Geometry not in other,
         and the points in other not in this Geometry."""
-        d = lgeos.GEOSSymDifference(self._g, other._g)
-        return GEOSGeometry(d, 'geos')
+        return GEOSGeometry(lgeos.GEOSSymDifference(self._g, other._g))
 
     def intersection(self, other):
         "Returns a Geometry representing the points shared by this Geometry and other."
-        i = lgeos.GEOSIntersection(self._g, other._g)
-        return GEOSGeometry(i, 'geos')
+        return GEOSGeometry(lgeos.GEOSIntersection(self._g, other._g))
 
     def union(self, other):
         "Returns a Geometry representing all the points in this Geometry and other."
-        u = lgeos.GEOSUnion(self._g, other._g)
-        return GEOSGeometry(u, 'geos')
+        return GEOSGeometry(lgeos.GEOSUnion(self._g, other._g))
 
     #### Other Routines ####
     @property
@@ -640,7 +640,6 @@ class Polygon(GEOSGeometry):
     def __len__(self):
         "Returns the number of rings in this Polygon."
         return self.num_interior_rings + 1
-                        
 
     def get_interior_ring(self, ring_i):
         "Gets the interior ring at the specified index."
@@ -698,8 +697,8 @@ class GeometryCollection(GEOSGeometry):
     def __getitem__(self, index):
         "For indexing on the multiple geometries."
         self._checkindex(index)
-        item = lgeos.GEOSGeom_clone(lgeos.GEOSGetGeometryN(self._g, c_int(index)))
-        return GEOSGeometry(item, 'geos')
+        # Cloning the GEOS Geometry first, before returning it.
+        return GEOSGeometry(lgeos.GEOSGeom_clone(lgeos.GEOSGetGeometryN(self._g, c_int(index))))
 
     def __len__(self):
         "Returns the number of geometries in this collection."
@@ -711,12 +710,12 @@ class MultiLineString(GeometryCollection): pass
 class MultiPolygon(GeometryCollection): pass
 
 # Class mapping dictionary
-GEO_CLASSES = {'Point' : Point,
-               'Polygon' : Polygon,
-               'LineString' : LineString,
-               'LinearRing' : LinearRing,
-               'GeometryCollection' : GeometryCollection,
-               'MultiPoint' : MultiPoint,
-               'MultiLineString' : MultiLineString,
-               'MultiPolygon' : MultiPolygon,
-               }
+GEOS_CLASSES = {'Point' : Point,
+                'Polygon' : Polygon,
+                'LineString' : LineString,
+                'LinearRing' : LinearRing,
+                'GeometryCollection' : GeometryCollection,
+                'MultiPoint' : MultiPoint,
+                'MultiLineString' : MultiLineString,
+                'MultiPolygon' : MultiPolygon,
+                }
