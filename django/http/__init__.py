@@ -271,9 +271,7 @@ class HttpResponse(object):
         self.cookies[key]['max-age'] = 0
 
     def _get_content(self):
-        content = ''.join(self._container)
-        if isinstance(content, unicode):
-            content = content.encode(self._charset)
+        content = smart_str(''.join(self._container), self._charset)
         return content
 
     def _set_content(self, value):

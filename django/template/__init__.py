@@ -60,7 +60,7 @@ from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.functional import curry, Promise
 from django.utils.text import smart_split
-from django.utils.encoding import smart_unicode, smart_str, force_unicode
+from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext as _
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
@@ -176,9 +176,9 @@ class Template(object):
             for subnode in node:
                 yield subnode
 
-    def render(self, context, encoding=None):
+    def render(self, context):
         "Display stage -- can be called many times"
-        return self.nodelist.render(context, encoding)
+        return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
@@ -732,21 +732,14 @@ class Node(object):
         return nodes
 
 class NodeList(list):
-    # How invalid encoding sequences are handled. The default 'strict' is not
-    # appropriate, because the framework is not in control of all the string
-    # data.
-    codec_errors = 'replace'
-
-    def render(self, context, encoding=None):
-        if encoding is None:
-            encoding = settings.DEFAULT_CHARSET
+    def render(self, context):
         bits = []
         for node in self:
             if isinstance(node, Node):
                 bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
-        return ''.join([smart_str(b, encoding, errors=self.codec_errors) for b in bits])
+        return ''.join([force_unicode(b) for b in bits])
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"

@@ -24,10 +24,10 @@ Contexts can be constructed from unicode or UTF-8 bytestrings.
 >>> c4 = Context({u'var': '\xc4\x90\xc4\x91'})
 
 Since both templates and all four contexts represent the same thing, they all
-render the same (and are returned as bytestrings).
+render the same (and are returned as unicode objects).
 
 >>> t1.render(c3) == t2.render(c3)
 True
 >>> type(t1.render(c3))
-<type 'str'>
+<type 'unicode'>
 """

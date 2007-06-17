@@ -10,7 +10,7 @@ from django.template import Template
 # the test database.
 TEST_DATABASE_PREFIX = 'test_'
 
-def instrumented_test_render(self, context, unused=None):
+def instrumented_test_render(self, context):
     """
     An instrumented Template render method, providing a signal
     that can be intercepted by the test system Client
