@@ -15,14 +15,14 @@ class BlockNode(Node):
     def __repr__(self):
         return "<Block Node: %s. Contents: %r>" % (self.name, self.nodelist)
 
-    def render(self, context):
+    def iter_render(self, context):
         context.push()
         # Save context in case of block.super().
         self.context = context
         context['block'] = self
-        result = self.nodelist.render(context)
+        for chunk in self.nodelist.iter_render(context):
+            yield chunk
         context.pop()
-        return result
 
     def super(self):
         if self.parent:
@@ -59,7 +59,7 @@ class ExtendsNode(Node):
         else:
             return get_template_from_string(source, origin, parent)
 
-    def render(self, context):
+    def iter_render(self, context):
         compiled_parent = self.get_parent(context)
         parent_is_child = isinstance(compiled_parent.nodelist[0], ExtendsNode)
         parent_blocks = dict([(n.name, n) for n in compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
@@ -79,7 +79,7 @@ class ExtendsNode(Node):
                 parent_block.parent = block_node.parent
                 parent_block.add_parent(parent_block.nodelist)
                 parent_block.nodelist = block_node.nodelist
-        return compiled_parent.render(context)
+        return compiled_parent.iter_render(context)
 
 class ConstantIncludeNode(Node):
     def __init__(self, template_path):
@@ -91,27 +91,26 @@ class ConstantIncludeNode(Node):
                 raise
             self.template = None
 
-    def render(self, context):
+    def iter_render(self, context):
         if self.template:
-            return self.template.render(context)
-        else:
-            return ''
+            return self.template.iter_render(context)
+        return ()
 
 class IncludeNode(Node):
     def __init__(self, template_name):
         self.template_name = template_name
 
-    def render(self, context):
+    def iter_render(self, context):
         try:
             template_name = resolve_variable(self.template_name, context)
             t = get_template(template_name)
-            return t.render(context)
+            return t.iter_render(context)
         except TemplateSyntaxError, e:
             if settings.TEMPLATE_DEBUG:
                 raise
-            return ''
+            return ()
         except:
-            return '' # Fail silently for invalid included templates.
+            return () # Fail silently for invalid included templates.
 
 def do_block(parser, token):
     """

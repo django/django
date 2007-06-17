@@ -222,6 +222,12 @@ class HttpResponse(object):
         content = ''.join(self._container)
         if isinstance(content, unicode):
             content = content.encode(self._charset)
+
+        # If self._container was an iterator, we have just exhausted it, so we
+        # need to save the results for anything else that needs access
+        if not self._is_string:
+            self._container = [content]
+            self._is_string = True
         return content
 
     def _set_content(self, value):
@@ -231,14 +237,10 @@ class HttpResponse(object):
     content = property(_get_content, _set_content)
 
     def __iter__(self):
-        self._iterator = self._container.__iter__()
-        return self
-
-    def next(self):
-        chunk = self._iterator.next()
-        if isinstance(chunk, unicode):
-            chunk = chunk.encode(self._charset)
-        return chunk
+        for chunk in self._container:
+            if isinstance(chunk, unicode):
+                chunk = chunk.encode(self._charset)
+            yield chunk
 
     def close(self):
         if hasattr(self._container, 'close'):
