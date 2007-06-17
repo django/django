@@ -1,4 +1,4 @@
-from django import forms
+from django import oldforms as forms
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.models import User, Group, Permission, RowLevelPermission

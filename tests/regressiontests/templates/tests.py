@@ -127,61 +127,97 @@ class Templates(unittest.TestCase):
             # Fail silently when accessing a non-simple method
             'basic-syntax20': ("{{ var.method2 }}", {"var": SomeClass()}, ("","INVALID")),
 
+            # Don't get confused when parsing something that is almost, but not
+            # quite, a template tag.
+            'basic-syntax21': ("a {{ moo %} b", {}, "a {{ moo %} b"),
+            'basic-syntax22': ("{{ moo #}", {}, "{{ moo #}"),
+
+            # Will try to treat "moo #} {{ cow" as the variable. Not ideal, but
+            # costly to work around, so this triggers an error.
+            'basic-syntax23': ("{{ moo #} {{ cow }}", {"cow": "cow"}, template.TemplateSyntaxError),
+
+            # Embedded newlines make it not-a-tag.
+            'basic-syntax24': ("{{ moo\n }}", {}, "{{ moo\n }}"),
+
+            # List-index syntax allows a template to access a certain item of a subscriptable object.
+            'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
+
+            # Fail silently when the list index is out of range.
+            'list-index02': ("{{ var.5 }}", {"var": ["first item", "second item"]}, ("", "INVALID")),
+
+            # Fail silently when the variable is not a subscriptable object.
+            'list-index03': ("{{ var.1 }}", {"var": None}, ("", "INVALID")),
+
+            # Fail silently when variable is a dict without the specified key.
+            'list-index04': ("{{ var.1 }}", {"var": {}}, ("", "INVALID")),
+
+            # Dictionary lookup wins out when dict's key is a string.
+            'list-index05': ("{{ var.1 }}", {"var": {'1': "hello"}}, "hello"),
+
+            # But list-index lookup wins out when dict's key is an int, which
+            # behind the scenes is really a dictionary lookup (for a dict)
+            # after converting the key to an int.
+            'list-index06': ("{{ var.1 }}", {"var": {1: "hello"}}, "hello"),
+
+            # Dictionary lookup wins out when there is a string and int version of the key.
+            'list-index07': ("{{ var.1 }}", {"var": {'1': "hello", 1: "world"}}, "hello"),
+
             # Basic filter usage
-            'basic-syntax21': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
+            'filter-syntax01': ("{{ var|upper }}", {"var": "Django is the greatest!"}, "DJANGO IS THE GREATEST!"),
 
             # Chained filters
-            'basic-syntax22': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
+            'filter-syntax02': ("{{ var|upper|lower }}", {"var": "Django is the greatest!"}, "django is the greatest!"),
 
             # Raise TemplateSyntaxError for space between a variable and filter pipe
-            'basic-syntax23': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax03': ("{{ var |upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for space after a filter pipe
-            'basic-syntax24': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
+            'filter-syntax04': ("{{ var| upper }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for a nonexistent filter
-            'basic-syntax25': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
+            'filter-syntax05': ("{{ var|does_not_exist }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError when trying to access a filter containing an illegal character
-            'basic-syntax26': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
+            'filter-syntax06': ("{{ var|fil(ter) }}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for invalid block tags
-            'basic-syntax27': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
+            'filter-syntax07': ("{% nothing_to_see_here %}", {}, template.TemplateSyntaxError),
 
             # Raise TemplateSyntaxError for empty block tags
-            'basic-syntax28': ("{% %}", {}, template.TemplateSyntaxError),
+            'filter-syntax08': ("{% %}", {}, template.TemplateSyntaxError),
 
             # Chained filters, with an argument to the first one
-            'basic-syntax29': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
+            'filter-syntax09': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
             # Escaped string as argument
-            'basic-syntax30': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
+            'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
 
             # Variable as argument
-            'basic-syntax31': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
+            'filter-syntax11': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
 
             # Default argument testing
-            'basic-syntax32': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
+            'filter-syntax12': (r'{{ var|yesno:"yup,nup,mup" }} {{ var|yesno }}', {"var": True}, 'yup yes'),
 
-            # Fail silently for methods that raise an exception with a "silent_variable_failure" attribute
-            'basic-syntax33': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
+            # Fail silently for methods that raise an exception with a
+            # "silent_variable_failure" attribute
+            'filter-syntax13': (r'1{{ var.method3 }}2', {"var": SomeClass()}, ("12", "1INVALID2")),
 
-            # In methods that raise an exception without a "silent_variable_attribute" set to True,
-            # the exception propogates
-            'basic-syntax34': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
+            # In methods that raise an exception without a
+            # "silent_variable_attribute" set to True, the exception propagates
+            'filter-syntax14': (r'1{{ var.method4 }}2', {"var": SomeClass()}, SomeOtherException),
 
             # Escaped backslash in argument
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
+            'filter-syntax15': (r'{{ var|default_if_none:"foo\bar" }}', {"var": None}, r'foo\bar'),
 
             # Escaped backslash using known escape char
-            'basic-syntax35': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
+            'filter-syntax16': (r'{{ var|default_if_none:"foo\now" }}', {"var": None}, r'foo\now'),
 
             # Empty strings can be passed as arguments to filters
-            'basic-syntax36': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
+            'filter-syntax17': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the value
-            # will be converted to a bytestring.
-            'basic-syntax37': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            # If a variable has a __str__() that returns a Unicode object, the
+            # value will be converted to a bytestring.
+            'filter-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
 
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
@@ -236,6 +272,7 @@ class Templates(unittest.TestCase):
             'filter01': ('{% filter upper %}{% endfilter %}', {}, ''),
             'filter02': ('{% filter upper %}django{% endfilter %}', {}, 'DJANGO'),
             'filter03': ('{% filter upper|lower %}django{% endfilter %}', {}, 'django'),
+            'filter04': ('{% filter cut:remove %}djangospam{% endfilter %}', {'remove': 'spam'}, 'django'),
 
             ### FIRSTOF TAG ###########################################################
             'firstof01': ('{% firstof a b c %}', {'a':0,'b':0,'c':0}, ''),
@@ -252,6 +289,20 @@ class Templates(unittest.TestCase):
             'for-tag-vars02': ("{% for val in values %}{{ forloop.counter0 }}{% endfor %}", {"values": [6, 6, 6]}, "012"),
             'for-tag-vars03': ("{% for val in values %}{{ forloop.revcounter }}{% endfor %}", {"values": [6, 6, 6]}, "321"),
             'for-tag-vars04': ("{% for val in values %}{{ forloop.revcounter0 }}{% endfor %}", {"values": [6, 6, 6]}, "210"),
+            'for-tag-unpack01': ("{% for key,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
+            'for-tag-unpack03': ("{% for key, value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
+            'for-tag-unpack04': ("{% for key , value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
+            'for-tag-unpack05': ("{% for key ,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
+            'for-tag-unpack06': ("{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, template.TemplateSyntaxError),
+            'for-tag-unpack07': ("{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, template.TemplateSyntaxError),
+            'for-tag-unpack08': ("{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, template.TemplateSyntaxError),
+            # Ensure that a single loopvar doesn't truncate the list in val.
+            'for-tag-unpack09': ("{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, "one:1/two:2/"),
+            # Otherwise, silently truncate if the length of loopvars differs to the length of each set of items.
+            'for-tag-unpack10': ("{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'orange'))}, "one:1/two:2/"),
+            'for-tag-unpack11': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1), ('two', 2))}, ("one:1,/two:2,/", "one:1,INVALID/two:2,INVALID/")),
+            'for-tag-unpack12': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2))}, ("one:1,carrot/two:2,/", "one:1,carrot/two:2,INVALID/")),
+            'for-tag-unpack13': ("{% for x,y,z in items %}{{ x }}:{{ y }},{{ z }}/{% endfor %}", {"items": (('one', 1, 'carrot'), ('two', 2, 'cheese'))}, ("one:1,carrot/two:2,cheese/", "one:1,carrot/two:2,cheese/")),
 
             ### IF TAG ################################################################
             'if-tag01': ("{% if foo %}yes{% else %}no{% endif %}", {"foo": True}, "yes"),
@@ -378,6 +429,20 @@ class Templates(unittest.TestCase):
             'ifequal-split09': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slash\man"}, "yes"),
             'ifequal-split10': (r"{% ifequal a 'slash\man' %}yes{% else %}no{% endifequal %}", {'a': r"slashman"}, "no"),
 
+            # NUMERIC RESOLUTION
+            'ifequal-numeric01': ('{% ifequal x 5 %}yes{% endifequal %}', {'x': '5'}, ''),
+            'ifequal-numeric02': ('{% ifequal x 5 %}yes{% endifequal %}', {'x': 5}, 'yes'),
+            'ifequal-numeric03': ('{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5}, ''),
+            'ifequal-numeric04': ('{% ifequal x 5.2 %}yes{% endifequal %}', {'x': 5.2}, 'yes'),
+            'ifequal-numeric05': ('{% ifequal x 0.2 %}yes{% endifequal %}', {'x': .2}, 'yes'),
+            'ifequal-numeric06': ('{% ifequal x .2 %}yes{% endifequal %}', {'x': .2}, 'yes'),
+            'ifequal-numeric07': ('{% ifequal x 2. %}yes{% endifequal %}', {'x': 2}, ''),
+            'ifequal-numeric08': ('{% ifequal x "5" %}yes{% endifequal %}', {'x': 5}, ''),
+            'ifequal-numeric09': ('{% ifequal x "5" %}yes{% endifequal %}', {'x': '5'}, 'yes'),
+            'ifequal-numeric10': ('{% ifequal x -5 %}yes{% endifequal %}', {'x': -5}, 'yes'),
+            'ifequal-numeric11': ('{% ifequal x -5.2 %}yes{% endifequal %}', {'x': -5.2}, 'yes'),
+            'ifequal-numeric12': ('{% ifequal x +5 %}yes{% endifequal %}', {'x': 5}, 'yes'),
+
             ### IFNOTEQUAL TAG ########################################################
             'ifnotequal01': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 2}, "yes"),
             'ifnotequal02': ("{% ifnotequal a b %}yes{% endifnotequal %}", {"a": 1, "b": 1}, ""),
@@ -389,6 +454,21 @@ class Templates(unittest.TestCase):
             'include02': ('{% include "basic-syntax02" %}', {'headline': 'Included'}, "Included"),
             'include03': ('{% include template_name %}', {'template_name': 'basic-syntax02', 'headline': 'Included'}, "Included"),
             'include04': ('a{% include "nonexistent" %}b', {}, "ab"),
+
+            ### NAMED ENDBLOCKS #######################################################
+
+            # Basic test
+            'namedendblocks01': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock first %}3", {}, '1_2_3'),
+
+            # Unbalanced blocks
+            'namedendblocks02': ("1{% block first %}_{% block second %}2{% endblock first %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks03': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock second %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks04': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock third %}3", {}, template.TemplateSyntaxError),
+            'namedendblocks05': ("1{% block first %}_{% block second %}2{% endblock first %}", {}, template.TemplateSyntaxError),
+
+            # Mixed named and unnamed endblocks
+            'namedendblocks06': ("1{% block first %}_{% block second %}2{% endblock %}_{% endblock first %}3", {}, '1_2_3'),
+            'namedendblocks07': ("1{% block first %}_{% block second %}2{% endblock second %}_{% endblock %}3", {}, '1_2_3'),
 
             ### INHERITANCE ###########################################################
 
@@ -470,8 +550,8 @@ class Templates(unittest.TestCase):
             ### I18N ##################################################################
 
             # {% spaceless %} tag
-            'spaceless01': ("{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b> <i> text </i> </b>"),
-            'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b> <i> text </i> </b>"),
+            'spaceless01': ("{% spaceless %} <b>    <i> text </i>    </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
+            'spaceless02': ("{% spaceless %} <b> \n <i> text </i> \n </b> {% endspaceless %}", {}, "<b><i> text </i></b>"),
             'spaceless03': ("{% spaceless %}<b><i>text</i></b>{% endspaceless %}", {}, "<b><i>text</i></b>"),
 
             # simple translation of a string delimited by '
@@ -520,6 +600,8 @@ class Templates(unittest.TestCase):
             'invalidstr03': ('{% for v in var %}({{ v }}){% endfor %}', {}, ''),
             'invalidstr04': ('{% if var %}Yes{% else %}No{% endif %}', {}, 'No'),
             'invalidstr04': ('{% if var|default:"Foo" %}Yes{% else %}No{% endif %}', {}, 'Yes'),
+            'invalidstr05': ('{{ var }}', {}, ('', 'INVALID %s', 'var')),
+            'invalidstr06': ('{{ var.prop }}', {'var': {}}, ('', 'INVALID %s', 'var.prop')),
 
             ### MULTILINE #############################################################
 
@@ -598,6 +680,13 @@ class Templates(unittest.TestCase):
             'widthratio09': ('{% widthratio a b %}', {'a':50,'b':100}, template.TemplateSyntaxError),
             'widthratio10': ('{% widthratio a b 100.0 %}', {'a':50,'b':100}, template.TemplateSyntaxError),
 
+            ### WITH TAG ########################################################
+            'with01': ('{% with dict.key as key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, '50'),
+            'with02': ('{{ key }}{% with dict.key as key %}{{ key }}-{{ dict.key }}-{{ key }}{% endwith %}{{ key }}', {'dict': {'key':50}}, ('50-50-50', 'INVALID50-50-50INVALID')),
+
+            'with-error01': ('{% with dict.key xx key %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+            'with-error02': ('{% with dict.key as %}{{ key }}{% endwith %}', {'dict': {'key':50}}, template.TemplateSyntaxError),
+
             ### NOW TAG ########################################################
             # Simple case
             'now01' : ('{% now "j n Y"%}', {}, str(datetime.now().day) + ' ' + str(datetime.now().month) + ' ' + str(datetime.now().year)),
@@ -630,6 +719,18 @@ class Templates(unittest.TestCase):
             # Compare to a given parameter
             'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
             'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
+
+            ### URL TAG ########################################################
+            # Successes
+            'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
+            'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
+            'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
+            'url04' : ('{% url named-client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
+
+            # Failures
+            'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),
+            'url-fail02' : ('{% url no_such_view %}', {}, ''),
+            'url-fail03' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
         }
 
         # Register our custom template loader.
@@ -652,6 +753,7 @@ class Templates(unittest.TestCase):
 
         # Set TEMPLATE_STRING_IF_INVALID to a known string
         old_invalid = settings.TEMPLATE_STRING_IF_INVALID
+        expected_invalid_str = 'INVALID'
 
         for name, vals in tests:
             install()
@@ -659,6 +761,10 @@ class Templates(unittest.TestCase):
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
                 invalid_string_result = vals[2][1]
+                if '%s' in invalid_string_result:
+                    expected_invalid_str = 'INVALID %s'
+                    invalid_string_result = invalid_string_result % vals[2][2]
+                    template.invalid_var_format_string = True
             else:
                 normal_string_result = vals[2]
                 invalid_string_result = vals[2]
@@ -669,7 +775,7 @@ class Templates(unittest.TestCase):
                 activate('en-us')
 
             for invalid_str, result in [('', normal_string_result),
-                                        ('INVALID', invalid_string_result)]:
+                                        (expected_invalid_str, invalid_string_result)]:
                 settings.TEMPLATE_STRING_IF_INVALID = invalid_str
                 try:
                     output = loader.get_template(name).render(template.Context(vals[1]))
@@ -682,6 +788,10 @@ class Templates(unittest.TestCase):
 
             if 'LANGUAGE_CODE' in vals[1]:
                 deactivate()
+
+            if template.invalid_var_format_string:
+                expected_invalid_str = 'INVALID'
+                template.invalid_var_format_string = False
 
         loader.template_source_loaders = old_template_loaders
         deactivate()

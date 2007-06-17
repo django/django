@@ -2,9 +2,10 @@
 Extra HTML Widget classes
 """
 
+import datetime
+
 from django.newforms.widgets import Widget, Select
 from django.utils.dates import MONTHS
-import datetime
 
 __all__ = ('SelectDateWidget',)
 

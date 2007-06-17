@@ -1,5 +1,5 @@
 """
-26. Default manipulators
+27. Default manipulators
 
 Each model gets an AddManipulator and ChangeManipulator by default.
 """

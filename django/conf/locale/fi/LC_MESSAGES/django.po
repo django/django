@@ -93,7 +93,7 @@ msgstr "tšekki"
 
 #: conf/global_settings.py:42
 msgid "Welsh"
-msgstr ""
+msgstr "wales"
 
 #: conf/global_settings.py:43
 msgid "Danish"
@@ -169,15 +169,15 @@ msgstr "venäjä"
 
 #: conf/global_settings.py:61
 msgid "Slovak"
-msgstr ""
+msgstr "slovakia"
 
 #: conf/global_settings.py:62
 msgid "Slovenian"
-msgstr ""
+msgstr "slovenia"
 
 #: conf/global_settings.py:63
 msgid "Serbian"
-msgstr ""
+msgstr "serbia"
 
 #: conf/global_settings.py:64
 msgid "Swedish"
@@ -189,15 +189,15 @@ msgstr ""
 
 #: conf/global_settings.py:66
 msgid "Ukrainian"
-msgstr ""
+msgstr "ukraina"
 
 #: conf/global_settings.py:67
 msgid "Simplified Chinese"
-msgstr ""
+msgstr "kiina (yksinkertaistettu)"
 
 #: conf/global_settings.py:68
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "kiina (perinteinen)"
 
 #: core/validators.py:63
 msgid "This value must contain only letters, numbers and underscores."
@@ -211,7 +211,7 @@ msgstr "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä a
 
 #: core/validators.py:75
 msgid "Uppercase letters are not allowed here."
-msgstr "Versaalit (ABC) eivät kelpaa tässä."
+msgstr "Isot kirjaimet (ABC) eivät kelpaa tässä."
 
 #: core/validators.py:79
 msgid "Lowercase letters are not allowed here."
@@ -270,7 +270,7 @@ msgstr "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vio
 #: core/validators.py:162
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "Osoittessa %s ei ole kelpaavaa kuvaa."
+msgstr "Osoittessa %s ei ole kuvaa tai se on vioittunut."
 
 #: core/validators.py:166
 #, python-format
@@ -280,7 +280,7 @@ msgstr "Puhelinnumeron tulee olla muodossa XXX-XXX-XXXX. \"%s\" ei kelpaa."
 #: core/validators.py:174
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "Osoitteessa %s ei ole kelpaavaa QuickTime-videota."
+msgstr "Osoitteessa %s ei ole QuickTime-videota tai se on vioittunut."
 
 #: core/validators.py:178
 msgid "A valid URL is required."
@@ -308,7 +308,7 @@ msgstr "URL-osoite %s ei kelpaa."
 #: core/validators.py:213 core/validators.py:215
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "Osoite %s on katkennut linkki."
+msgstr "Osoite %s on rikkoutunut tai väärä linkki."
 
 #: core/validators.py:221
 msgid "Enter a valid U.S. state abbreviation."
@@ -324,7 +324,7 @@ msgstr[1] "Sanoja \"%s\" ei saa käyttää tässä."
 #: core/validators.py:243
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr ""
+msgstr "Arvon täytyy olla sama kuin kentässä '%s'."
 
 #: core/validators.py:262
 msgid "Please enter something for at least one field."
@@ -403,7 +403,7 @@ msgstr "Tämä arvo ei kelpaa."
 #: core/validators.py:441
 #, python-format
 msgid "Could not retrieve anything from %s."
-msgstr ""
+msgstr "Tietoja ei voida noutaa kohteesta: %s."
 
 #: core/validators.py:444
 #, python-format
@@ -1029,19 +1029,19 @@ msgstr " %(filter_title)s:"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr "Talleta uutena"
+msgstr "Tallenna uutena"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr "Talleta ja lisää seuraava"
+msgstr "Tallenna ja lisää seuraava"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr "Talleta välillä ja jatka muokkaamista"
+msgstr "Tallenna välillä ja jatka muokkaamista"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
-msgstr "Talleta ja poistu"
+msgstr "Tallenna ja poistu"
 
 #: contrib/admin/templates/admin/change_list.html:11
 #, python-format
@@ -1676,7 +1676,13 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
+"Kommentin kirjoittanut käyttäjä on kirjoittanut vain yhden kommentin:\n"
+"\n"
+"%(text)s"
 msgstr[1] ""
+"Kommentin kirjoittanut käyttäjä on kirjoittanut alle %(count)s kommenttia:\n"
+"\n"
+"%(text)s"
 
 # Mitä "sketchy user" tarkoittaa?
 #: contrib/comments/views/comments.py:116
@@ -1972,38 +1978,38 @@ msgstr "joulu"
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "vuosi"
+msgstr[1] "vuotta"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "kuukausi"
+msgstr[1] "kuukautta"
 
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "viikko"
+msgstr[1] "viikkoa"
 
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "päivä"
+msgstr[1] "päivää"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "tunti"
+msgstr[1] "tuntia"
 
 #: utils/timesince.py:17
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minuutti"
+msgstr[1] "minuuttia"
 
 #: utils/translation/trans_real.py:362
 msgid "DATE_FORMAT"
@@ -2019,10 +2025,9 @@ msgstr "G:i"
 
 #: utils/translation/trans_real.py:380
 msgid "YEAR_MONTH_FORMAT"
-msgstr "N j, Y"
+msgstr "N Y"
 
 #: utils/translation/trans_real.py:381
-#, fuzzy
 msgid "MONTH_DAY_FORMAT"
 msgstr "N j, Y"
 

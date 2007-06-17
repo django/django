@@ -7,6 +7,7 @@ a list of all possible variables.
 """
 
 import os
+import time     # Needed for Windows
 from django.conf import global_settings
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -105,8 +106,10 @@ class Settings(object):
                 new_installed_apps.append(app)
         self.INSTALLED_APPS = new_installed_apps
 
-        # move the time zone info into os.environ
-        os.environ['TZ'] = self.TIME_ZONE
+        if hasattr(time, 'tzset'):
+            # Move the time zone info into os.environ. See ticket #2315 for why
+            # we don't do this unconditionally (breaks Windows).
+            os.environ['TZ'] = self.TIME_ZONE
 
     def get_all_members(self):
         return dir(self)

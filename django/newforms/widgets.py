@@ -2,31 +2,35 @@
 HTML Widget classes
 """
 
-__all__ = (
-    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'FileInput',
-    'Textarea', 'CheckboxInput',
-    'Select', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
-)
-
-from util import StrAndUnicode, smart_unicode
-from django.utils.datastructures import MultiValueDict
-from django.utils.html import escape
-from itertools import chain
-
 try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
+from itertools import chain
 
-# Converts a dictionary to a single string with key="value", XML-style with
-# a leading space. Assumes keys do not need to be XML-escaped.
-flatatt = lambda attrs: u''.join([u' %s="%s"' % (k, escape(v)) for k, v in attrs.items()])
+from django.utils.datastructures import MultiValueDict
+from django.utils.html import escape
+from django.utils.translation import gettext
+from django.utils.encoding import StrAndUnicode, smart_unicode
+
+from util import flatatt
+
+__all__ = (
+    'Widget', 'TextInput', 'PasswordInput',
+    'HiddenInput', 'MultipleHiddenInput',
+    'FileInput', 'Textarea', 'CheckboxInput',
+    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
+    'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
+)
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
-        self.attrs = attrs or {}
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
 
     def render(self, name, value, attrs=None):
         """
@@ -83,14 +87,48 @@ class TextInput(Input):
 class PasswordInput(Input):
     input_type = 'password'
 
+    def __init__(self, attrs=None, render_value=True):
+        self.attrs = attrs or {}
+        self.render_value = render_value
+
+    def render(self, name, value, attrs=None):
+        if not self.render_value: value=None
+        return super(PasswordInput, self).render(name, value, attrs)
+
 class HiddenInput(Input):
     input_type = 'hidden'
     is_hidden = True
+
+class MultipleHiddenInput(HiddenInput):
+    """
+    A widget that handles <input type="hidden"> for fields that have a list
+    of values.
+    """
+    def __init__(self, attrs=None, choices=()):
+        # choices can be any iterable
+        self.attrs = attrs or {}
+        self.choices = choices
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None: value = []
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=smart_unicode(v), **final_attrs))) for v in value])
+
+    def value_from_datadict(self, data, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name, None)
 
 class FileInput(Input):
     input_type = 'file'
 
 class Textarea(Widget):
+    def __init__(self, attrs=None):
+        # The 'rows' and 'cols' attributes are required for HTML correctness.
+        self.attrs = {'cols': '40', 'rows': '10'}
+        if attrs:
+            self.attrs.update(attrs)
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         value = smart_unicode(value)
@@ -118,9 +156,11 @@ class CheckboxInput(Widget):
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
-        # choices can be any iterable
         self.attrs = attrs or {}
-        self.choices = choices
+        # choices can be any iterable, but we may need to render this widget
+        # multiple times. Thus, collapse it into a list so it can be consumed
+        # more than once.
+        self.choices = list(choices)
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = ''
@@ -133,6 +173,25 @@ class Select(Widget):
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
+
+class NullBooleanSelect(Select):
+    """
+    A Select Widget intended to be used with NullBooleanField.
+    """
+    def __init__(self, attrs=None):
+        choices = ((u'1', gettext('Unknown')), (u'2', gettext('Yes')), (u'3', gettext('No')))
+        super(NullBooleanSelect, self).__init__(attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        try:
+            value = {True: u'2', False: u'3', u'2': u'2', u'3': u'3'}[value]
+        except KeyError:
+            value = u'1'
+        return super(NullBooleanSelect, self).render(name, value, attrs, choices)
+
+    def value_from_datadict(self, data, name):
+        value = data.get(name, None)
+        return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -162,17 +221,18 @@ class RadioInput(StrAndUnicode):
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
-        self.choice_value, self.choice_label = choice
+        self.choice_value = smart_unicode(choice[0])
+        self.choice_label = smart_unicode(choice[1])
         self.index = index
 
     def __unicode__(self):
         return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
 
     def is_checked(self):
-        return self.value == smart_unicode(self.choice_value)
+        return self.value == self.choice_value
 
     def tag(self):
-        if self.attrs.has_key('id'):
+        if 'id' in self.attrs:
             self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
@@ -202,8 +262,8 @@ class RadioSelect(Select):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
         str_value = smart_unicode(value) # Normalize to string.
-        attrs = attrs or {}
-        return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
+        final_attrs = self.build_attrs(attrs)
+        return RadioFieldRenderer(name, str_value, final_attrs, list(chain(self.choices, choices)))
 
     def id_for_label(self, id_):
         # RadioSelect is represented by multiple <input type="radio"> fields,
@@ -218,11 +278,16 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
+        has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
-        cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-        for option_value, option_label in chain(self.choices, choices):
+        for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            # If an ID attribute was given, add a numeric index as a suffix,
+            # so that the checkboxes don't all have the same ID attribute.
+            if has_id:
+                final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+            cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = smart_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
@@ -235,3 +300,77 @@ class CheckboxSelectMultiple(SelectMultiple):
             id_ += '_0'
         return id_
     id_for_label = classmethod(id_for_label)
+
+class MultiWidget(Widget):
+    """
+    A widget that is composed of multiple widgets.
+
+    Its render() method takes a "decompressed" list of values, not a single
+    value. Each value in this list is rendered in the corresponding widget --
+    the first value is rendered in the first widget, the second value is
+    rendered in the second widget, etc.
+
+    Subclasses should implement decompress(), which specifies how a single
+    value should be converted to a list of values. Subclasses should not
+    have to implement clean().
+
+    Subclasses may implement format_output(), which takes the list of rendered
+    widgets and returns HTML that formats them any way you'd like.
+
+    You'll probably want to use this with MultiValueField.
+    """
+    def __init__(self, widgets, attrs=None):
+        self.widgets = [isinstance(w, type) and w() or w for w in widgets]
+        super(MultiWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        # value is a list of values, each corresponding to a widget
+        # in self.widgets.
+        if not isinstance(value, list):
+            value = self.decompress(value)
+        output = []
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
+        for i, widget in enumerate(self.widgets):
+            try:
+                widget_value = value[i]
+            except IndexError:
+                widget_value = None
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
+        return self.format_output(output)
+
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
+
+    def value_from_datadict(self, data, name):
+        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+
+    def format_output(self, rendered_widgets):
+        return u''.join(rendered_widgets)
+
+    def decompress(self, value):
+        """
+        Returns a list of decompressed values for the given compressed value.
+        The given value can be assumed to be valid, but not necessarily
+        non-empty.
+        """
+        raise NotImplementedError('Subclasses must implement this method.')
+
+class SplitDateTimeWidget(MultiWidget):
+    """
+    A Widget that splits datetime input into two <input type="text"> boxes.
+    """
+    def __init__(self, attrs=None):
+        widgets = (TextInput(attrs=attrs), TextInput(attrs=attrs))
+        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.date(), value.time()]
+        return [None, None]

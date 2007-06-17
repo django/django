@@ -1,5 +1,5 @@
 """
-29. Object pagination
+30. Object pagination
 
 Django provides a framework for paginating a list of objects in a few lines
 of code. This is often useful for dividing search results or long lists of

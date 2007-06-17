@@ -85,6 +85,7 @@ class Options(object):
             self.fields.insert(bisect(self.fields, field), field)
             if not self.pk and field.primary_key:
                 self.pk = field
+                field.serialize = False
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
@@ -140,7 +141,7 @@ class Options(object):
     def get_follow(self, override=None):
         follow = {}
         for f in self.fields + self.many_to_many + self.get_all_related_objects():
-            if override and override.has_key(f.name):
+            if override and f.name in override:
                 child_override = override[f.name]
             else:
                 child_override = None
@@ -182,7 +183,7 @@ class Options(object):
         # TODO: follow
         if not hasattr(self, '_field_types'):
             self._field_types = {}
-        if not self._field_types.has_key(field_type):
+        if field_type not in self._field_types:
             try:
                 # First check self.fields.
                 for f in self.fields:

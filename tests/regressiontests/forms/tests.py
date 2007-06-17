@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-r"""
+from localflavor import localflavor_tests
+from regressions import regression_tests
+
+form_tests = r"""
 >>> from django.newforms import *
 >>> import datetime
+>>> import time
 >>> import re
+>>> try:
+...     from decimal import Decimal
+... except ImportError:
+...     from django.utils._decimal import Decimal
 
 ###########
 # Widgets #
@@ -72,6 +80,22 @@ u'<input type="password" class="special" name="email" />'
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
 u'<input type="password" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
 
+The render_value argument lets you specify whether the widget should render
+its value. You may want to do this for security reasons.
+>>> w = PasswordInput(render_value=True)
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" value="secret" />'
+>>> w = PasswordInput(render_value=False)
+>>> w.render('email', '')
+u'<input type="password" name="email" />'
+>>> w.render('email', None)
+u'<input type="password" name="email" />'
+>>> w.render('email', 'secret')
+u'<input type="password" name="email" />'
+>>> w = PasswordInput(attrs={'class': 'fun'}, render_value=False)
+>>> w.render('email', 'secret')
+u'<input type="password" class="fun" name="email" />'
+
 # HiddenInput Widget ############################################################
 
 >>> w = HiddenInput()
@@ -106,6 +130,46 @@ u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="hidden" class="special" name="email" />'
 
+# MultipleHiddenInput Widget ##################################################
+
+>>> w = MultipleHiddenInput()
+>>> w.render('email', [])
+u''
+>>> w.render('email', None)
+u''
+>>> w.render('email', ['test@example.com'])
+u'<input type="hidden" name="email" value="test@example.com" />'
+>>> w.render('email', ['some "quoted" & ampersanded value'])
+u'<input type="hidden" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+>>> w.render('email', ['test@example.com', 'foo@example.com'])
+u'<input type="hidden" name="email" value="test@example.com" />\n<input type="hidden" name="email" value="foo@example.com" />'
+>>> w.render('email', ['test@example.com'], attrs={'class': 'fun'})
+u'<input type="hidden" name="email" value="test@example.com" class="fun" />'
+>>> w.render('email', ['test@example.com', 'foo@example.com'], attrs={'class': 'fun'})
+u'<input type="hidden" name="email" value="test@example.com" class="fun" />\n<input type="hidden" name="email" value="foo@example.com" class="fun" />'
+
+You can also pass 'attrs' to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'fun'})
+>>> w.render('email', [])
+u''
+>>> w.render('email', ['foo@example.com'])
+u'<input type="hidden" class="fun" value="foo@example.com" name="email" />'
+>>> w.render('email', ['foo@example.com', 'test@example.com'])
+u'<input type="hidden" class="fun" value="foo@example.com" name="email" />\n<input type="hidden" class="fun" value="test@example.com" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', ['foo@example.com'], attrs={'class': 'special'})
+u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
+
+>>> w.render('email', ['ŠĐĆŽćžšđ'], attrs={'class': 'fun'})
+u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+
+'attrs' passed to render() get precedence over those passed to the constructor:
+>>> w = MultipleHiddenInput(attrs={'class': 'pretty'})
+>>> w.render('email', ['foo@example.com'], attrs={'class': 'special'})
+u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
+
 # FileInput Widget ############################################################
 
 >>> w = FileInput()
@@ -134,30 +198,30 @@ u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u01
 
 >>> w = Textarea()
 >>> w.render('msg', '')
-u'<textarea name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg"></textarea>'
 >>> w.render('msg', None)
-u'<textarea name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg"></textarea>'
 >>> w.render('msg', 'value')
-u'<textarea name="msg">value</textarea>'
+u'<textarea rows="10" cols="40" name="msg">value</textarea>'
 >>> w.render('msg', 'some "quoted" & ampersanded value')
-u'<textarea name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
->>> w.render('msg', 'value', attrs={'class': 'pretty'})
-u'<textarea name="msg" class="pretty">value</textarea>'
+u'<textarea rows="10" cols="40" name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
+>>> w.render('msg', 'value', attrs={'class': 'pretty', 'rows': 20})
+u'<textarea class="pretty" rows="20" cols="40" name="msg">value</textarea>'
 
 You can also pass 'attrs' to the constructor:
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '')
-u'<textarea class="pretty" name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="pretty"></textarea>'
 >>> w.render('msg', 'example')
-u'<textarea class="pretty" name="msg">example</textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="pretty">example</textarea>'
 
 'attrs' passed to render() get precedence over those passed to the constructor:
 >>> w = Textarea(attrs={'class': 'pretty'})
 >>> w.render('msg', '', attrs={'class': 'special'})
-u'<textarea class="special" name="msg"></textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="special"></textarea>'
 
 >>> w.render('msg', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
-u'<textarea class="fun" name="msg">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
+u'<textarea rows="10" cols="40" name="msg" class="fun">\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</textarea>'
 
 # CheckboxInput Widget ########################################################
 
@@ -262,6 +326,7 @@ The value is compared to its str():
 </select>
 
 The 'choices' argument can be any iterable:
+>>> from itertools import chain
 >>> def get_choices():
 ...     for i in range(5):
 ...         yield (i, i)
@@ -273,6 +338,17 @@ The 'choices' argument can be any iterable:
 <option value="3">3</option>
 <option value="4">4</option>
 </select>
+>>> things = ({'id': 1, 'name': 'And Boom'}, {'id': 2, 'name': 'One More Thing!'})
+>>> class SomeForm(Form):
+...     somechoice = ChoiceField(choices=chain((('', '-'*9),), [(thing['id'], thing['name']) for thing in things]))
+>>> f = SomeForm()
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="" selected="selected">---------</option>\n<option value="1">And Boom</option>\n<option value="2">One More Thing!</option>\n</select></td></tr>'
+>>> f = SomeForm({'somechoice': 2})
+>>> f.as_table()
+u'<tr><th><label for="id_somechoice">Somechoice:</label></th><td><select name="somechoice" id="id_somechoice">\n<option value="">---------</option>\n<option value="1">And Boom</option>\n<option value="2" selected="selected">One More Thing!</option>\n</select></td></tr>'
 
 You can also pass 'choices' to the constructor:
 >>> w = Select(choices=[(1, 1), (2, 2), (3, 3)])
@@ -295,6 +371,60 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 
 >>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
+
+If choices is passed to the constructor and is a generator, it can be iterated
+over multiple times without getting consumed:
+>>> w = Select(choices=get_choices())
+>>> print w.render('num', 2)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2" selected="selected">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+</select>
+>>> print w.render('num', 3)
+<select name="num">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3" selected="selected">3</option>
+<option value="4">4</option>
+</select>
+
+# NullBooleanSelect Widget ####################################################
+
+>>> w = NullBooleanSelect()
+>>> print w.render('is_cool', True)
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', False)
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
+>>> print w.render('is_cool', None)
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', '2')
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> print w.render('is_cool', '3')
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
 
 # SelectMultiple Widget #######################################################
 
@@ -527,11 +657,36 @@ True
 >>> r[1].is_checked()
 False
 >>> r[1].name, r[1].value, r[1].choice_value, r[1].choice_label
-('beatle', u'J', 'P', 'Paul')
+('beatle', u'J', u'P', u'Paul')
 >>> r[10]
 Traceback (most recent call last):
 ...
 IndexError: list index out of range
+
+# Unicode choices are correctly rendered as HTML
+>>> w = RadioSelect()
+>>> unicode(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]))
+u'<ul>\n<li><label><input checked="checked" type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
+
+# Attributes provided at instantiation are passed to the constituent inputs
+>>> w = RadioSelect(attrs={'id':'foo'})
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<ul>
+<li><label><input checked="checked" type="radio" id="foo_0" value="J" name="beatle" /> John</label></li>
+<li><label><input type="radio" id="foo_1" value="P" name="beatle" /> Paul</label></li>
+<li><label><input type="radio" id="foo_2" value="G" name="beatle" /> George</label></li>
+<li><label><input type="radio" id="foo_3" value="R" name="beatle" /> Ringo</label></li>
+</ul>
+
+# Attributes provided at render-time are passed to the constituent inputs
+>>> w = RadioSelect()
+>>> print w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')), attrs={'id':'bar'})
+<ul>
+<li><label><input checked="checked" type="radio" id="bar_0" value="J" name="beatle" /> John</label></li>
+<li><label><input type="radio" id="bar_1" value="P" name="beatle" /> Paul</label></li>
+<li><label><input type="radio" id="bar_2" value="G" name="beatle" /> George</label></li>
+<li><label><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
+</ul>
 
 # CheckboxSelectMultiple Widget ###############################################
 
@@ -640,6 +795,44 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
 
+# MultiWidget #################################################################
+
+>>> class MyMultiWidget(MultiWidget):
+...     def decompress(self, value):
+...         if value:
+...             return value.split('__')
+...         return ['', '']
+...     def format_output(self, rendered_widgets):
+...         return u'<br />'.join(rendered_widgets)
+>>> w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})))
+>>> w.render('name', ['john', 'lennon'])
+u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
+>>> w.render('name', 'john__lennon')
+u'<input type="text" class="big" value="john" name="name_0" /><br /><input type="text" class="small" value="lennon" name="name_1" />'
+>>> w.render('name', 'john__lennon', attrs={'id':'foo'})
+u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><input id="foo_1" type="text" class="small" value="lennon" name="name_1" />'
+>>> w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
+>>> w.render('name', ['john', 'lennon'])
+u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
+
+# SplitDateTimeWidget #########################################################
+
+>>> w = SplitDateTimeWidget()
+>>> w.render('date', '')
+u'<input type="text" name="date_0" /><input type="text" name="date_1" />'
+>>> w.render('date', None)
+u'<input type="text" name="date_0" /><input type="text" name="date_1" />'
+>>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
+u'<input type="text" name="date_0" value="2006-01-10" /><input type="text" name="date_1" value="07:30:00" />'
+>>> w.render('date', [datetime.date(2006, 1, 10), datetime.time(7, 30)])
+u'<input type="text" name="date_0" value="2006-01-10" /><input type="text" name="date_1" value="07:30:00" />'
+
+You can also pass 'attrs' to the constructor. In this case, the attrs will be
+included on both widgets.
+>>> w = SplitDateTimeWidget(attrs={'class': 'pretty'})
+>>> w.render('date', datetime.datetime(2006, 1, 10, 7, 30))
+u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input type="text" class="pretty" value="07:30:00" name="date_1" />'
+
 ##########
 # Fields #
 ##########
@@ -658,6 +851,8 @@ Each Field's __init__() takes at least these parameters:
     label -- A verbose name for this field, for use in displaying this field in
              a form. By default, Django will use a "pretty" version of the form
              field name, if the Field is part of a Form.
+    initial -- A value to use in this Field's initial display. This value is
+               *not* used as a fallback if data isn't given.
 
 Other than that, the Field subclasses have class-specific options for
 __init__(). For example, CharField has a max_length option.
@@ -764,9 +959,11 @@ ValidationError: [u'Enter a whole number.']
 
 >>> f = IntegerField(required=False)
 >>> f.clean('')
-u''
+>>> repr(f.clean(''))
+'None'
 >>> f.clean(None)
-u''
+>>> repr(f.clean(None))
+'None'
 >>> f.clean('1')
 1
 >>> isinstance(f.clean('1'), int)
@@ -852,6 +1049,133 @@ ValidationError: [u'Ensure this value is greater than or equal to 10.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value is less than or equal to 20.']
+
+# FloatField ##################################################################
+
+>>> f = FloatField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('1')
+1.0
+>>> isinstance(f.clean('1'), float)
+True
+>>> f.clean('23')
+23.0
+>>> f.clean('3.14')
+3.1400000000000001
+>>> f.clean('a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('1.0 ')
+1.0
+>>> f.clean(' 1.0')
+1.0
+>>> f.clean(' 1.0 ')
+1.0
+>>> f.clean('1.0a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+
+>>> f = FloatField(required=False)
+>>> f.clean('')
+
+>>> f.clean(None)
+
+>>> f.clean('1')
+1.0
+
+FloatField accepts min_value and max_value just like IntegerField:
+>>> f = FloatField(max_value=1.5, min_value=0.5)
+
+>>> f.clean('1.6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 1.5.']
+>>> f.clean('0.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
+>>> f.clean('1.5')
+1.5
+>>> f.clean('0.5')
+0.5
+
+# DecimalField ################################################################
+
+>>> f = DecimalField(max_digits=4, decimal_places=2)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('1')
+Decimal("1")
+>>> isinstance(f.clean('1'), Decimal)
+True
+>>> f.clean('23')
+Decimal("23")
+>>> f.clean('3.14')
+Decimal("3.14")
+>>> f.clean('a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('1.0 ')
+Decimal("1.0")
+>>> f.clean(' 1.0')
+Decimal("1.0")
+>>> f.clean(' 1.0 ')
+Decimal("1.0")
+>>> f.clean('1.0a')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+>>> f.clean('123.45')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 4 digits in total.']
+>>> f.clean('1.234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 decimal places.']
+>>> f.clean('123.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 digits before the decimal point.']
+>>> f = DecimalField(max_digits=4, decimal_places=2, required=False)
+>>> f.clean('')
+
+>>> f.clean(None)
+
+>>> f.clean('1')
+Decimal("1")
+
+DecimalField accepts min_value and max_value just like IntegerField:
+>>> f = DecimalField(max_digits=4, decimal_places=2, max_value=Decimal('1.5'), min_value=Decimal('0.5'))
+
+>>> f.clean('1.6')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is less than or equal to 1.5.']
+>>> f.clean('0.4')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
+>>> f.clean('1.5')
+Decimal("1.5")
+>>> f.clean('0.5')
+Decimal("0.5")
 
 # DateField ###################################################################
 
@@ -1283,8 +1607,13 @@ ValidationError: [u'This URL appears to be a broken link.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This URL appears to be a broken link.']
+>>> f = URLField(verify_exists=True, required=False)
+>>> f.clean('')
+u''
+>>> f.clean('http://www.google.com') # This will fail if there's no Internet connection
+u'http://www.google.com'
 
-EmailField also access min_length and max_length parameters, for convenience.
+URLField also access min_length and max_length parameters, for convenience.
 >>> f = URLField(min_length=15, max_length=20)
 >>> f.clean('http://f.com')
 Traceback (most recent call last):
@@ -1353,7 +1682,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('1', '1'), ('2', '2')], required=False)
 >>> f.clean('')
@@ -1367,7 +1696,7 @@ u'1'
 >>> f.clean('3')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. 3 is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
 >>> f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')])
 >>> f.clean('J')
@@ -1375,7 +1704,21 @@ u'J'
 >>> f.clean('John')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Select a valid choice. John is not one of the available choices.']
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+
+# NullBooleanField ############################################################
+
+>>> f = NullBooleanField()
+>>> f.clean('')
+>>> f.clean(True)
+True
+>>> f.clean(False)
+False
+>>> f.clean(None)
+>>> f.clean('1')
+>>> f.clean('2')
+>>> f.clean('3')
+>>> f.clean('hello')
 
 # MultipleChoiceField #########################################################
 
@@ -1483,6 +1826,58 @@ u''
 >>> f.clean(None)
 u''
 
+# SplitDateTimeField ##########################################################
+
+>>> f = SplitDateTimeField()
+>>> f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)])
+datetime.datetime(2006, 1, 10, 7, 30)
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.clean(['hello', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.', u'Enter a valid time.']
+>>> f.clean(['2006-01-10', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+>>> f.clean(['hello', '07:30'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+
+>>> f = SplitDateTimeField(required=False)
+>>> f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)])
+datetime.datetime(2006, 1, 10, 7, 30)
+>>> f.clean(None)
+>>> f.clean('')
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a list of values.']
+>>> f.clean(['hello', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.', u'Enter a valid time.']
+>>> f.clean(['2006-01-10', 'there'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid time.']
+>>> f.clean(['hello', '07:30'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+
 #########
 # Forms #
 #########
@@ -1500,6 +1895,8 @@ You can pass it data in __init__(), as a dictionary.
 
 Pass a dictionary to a Form's __init__().
 >>> p = Person({'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9'})
+>>> p.is_bound
+True
 >>> p.errors
 {}
 >>> p.is_valid()
@@ -1508,7 +1905,7 @@ True
 u''
 >>> p.errors.as_text()
 u''
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> print p['first_name']
 <input type="text" name="first_name" value="John" id="id_first_name" />
@@ -1538,10 +1935,16 @@ Birthday 1940-10-9
 
 Empty dictionaries are valid, too.
 >>> p = Person({})
+>>> p.is_bound
+True
 >>> p.errors
 {'first_name': [u'This field is required.'], 'last_name': [u'This field is required.'], 'birthday': [u'This field is required.']}
 >>> p.is_valid()
 False
+>>> p.cleaned_data
+Traceback (most recent call last):
+...
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1563,13 +1966,19 @@ False
 <p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>
 
 If you don't pass any values to the Form's __init__(), or if you pass None,
-the Form won't do any validation. Form.errors will be an empty dictionary *but*
-Form.is_valid() will return False.
+the Form will be considered unbound and won't do any validation. Form.errors
+will be an empty dictionary *but* Form.is_valid() will return False.
 >>> p = Person()
+>>> p.is_bound
+False
 >>> p.errors
 {}
 >>> p.is_valid()
 False
+>>> p.cleaned_data
+Traceback (most recent call last):
+...
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> print p
 <tr><th><label for="id_first_name">First name:</label></th><td><input type="text" name="first_name" id="id_first_name" /></td></tr>
 <tr><th><label for="id_last_name">Last name:</label></th><td><input type="text" name="last_name" id="id_last_name" /></td></tr>
@@ -1608,9 +2017,10 @@ u'<ul class="errorlist"><li>first_name<ul class="errorlist"><li>This field is re
   * This field is required.
 * birthday
   * This field is required.
->>> p.clean_data
->>> repr(p.clean_data)
-'None'
+>>> p.cleaned_data
+Traceback (most recent call last):
+...
+AttributeError: 'Person' object has no attribute 'cleaned_data'
 >>> p['first_name'].errors
 [u'This field is required.']
 >>> p['first_name'].errors.as_ul()
@@ -1625,6 +2035,45 @@ u'* This field is required.'
 <input type="text" name="last_name" id="id_last_name" />
 >>> print p['birthday']
 <input type="text" name="birthday" id="id_birthday" />
+
+cleaned_data will always *only* contain a key for fields defined in the
+Form, even if you pass extra data when you define the Form. In this
+example, we pass a bunch of extra fields to the form constructor,
+but cleaned_data contains only the form's fields.
+>>> data = {'first_name': u'John', 'last_name': u'Lennon', 'birthday': u'1940-10-9', 'extra1': 'hello', 'extra2': 'hello'}
+>>> p = Person(data)
+>>> p.is_valid()
+True
+>>> p.cleaned_data
+{'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
+cleaned_data will include a key and value for *all* fields defined in the Form,
+even if the Form's data didn't include a value for fields that are not
+required. In this example, the data dictionary doesn't include a value for the
+"nick_name" field, but cleaned_data includes it. For CharFields, it's set to the
+empty string.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     nick_name = CharField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'nick_name': u'', 'first_name': u'John', 'last_name': u'Lennon'}
+
+For DateFields, it's set to None.
+>>> class OptionalPersonForm(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birth_date = DateField(required=False)
+>>> data = {'first_name': u'John', 'last_name': u'Lennon'}
+>>> f = OptionalPersonForm(data)
+>>> f.is_valid()
+True
+>>> f.cleaned_data
+{'birth_date': None, 'first_name': u'John', 'last_name': u'Lennon'}
 
 "auto_id" tells the Form to add an "id" attribute to each form element.
 If it's a string that contains '%s', Django will use that as a format string
@@ -1703,12 +2152,12 @@ Any Field can have a Widget class passed to its constructor:
 >>> print f['subject']
 <input type="text" name="subject" />
 >>> print f['message']
-<textarea name="message"></textarea>
+<textarea rows="10" cols="40" name="message"></textarea>
 
 as_textarea(), as_text() and as_hidden() are shortcuts for changing the output
 widget type:
 >>> f['subject'].as_textarea()
-u'<textarea name="subject"></textarea>'
+u'<textarea rows="10" cols="40" name="subject"></textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" />'
 >>> f['message'].as_hidden()
@@ -1728,7 +2177,7 @@ as_hidden():
 u'<input type="text" name="message" />'
 >>> f = ContactForm({'subject': 'Hello', 'message': 'I love you.'}, auto_id=False)
 >>> f['subject'].as_textarea()
-u'<textarea name="subject">Hello</textarea>'
+u'<textarea rows="10" cols="40" name="subject">Hello</textarea>'
 >>> f['message'].as_text()
 u'<input type="text" name="message" value="I love you." />'
 >>> f['message'].as_hidden()
@@ -1748,6 +2197,70 @@ For a form with a <select>, use ChoiceField:
 >>> print f['language']
 <select name="language">
 <option value="P" selected="selected">Python</option>
+<option value="J">Java</option>
+</select>
+
+A subtlety: If one of the choices' value is the empty string and the form is
+unbound, then the <option> for the empty-string choice will get selected="selected".
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('', '------'), ('P', 'Python'), ('J', 'Java')])
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select name="language">
+<option value="" selected="selected">------</option>
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+
+You can specify widget attributes in the Widget constructor.
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(attrs={'class': 'foo'}))
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select class="foo" name="language">
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+>>> f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
+>>> print f['language']
+<select class="foo" name="language">
+<option value="P" selected="selected">Python</option>
+<option value="J">Java</option>
+</select>
+
+When passing a custom widget instance to ChoiceField, note that setting
+'choices' on the widget is meaningless. The widget will use the choices
+defined on the Field, not the ones defined on the Widget.
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField(choices=[('P', 'Python'), ('J', 'Java')], widget=Select(choices=[('R', 'Ruby'), ('P', 'Perl')], attrs={'class': 'foo'}))
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select class="foo" name="language">
+<option value="P">Python</option>
+<option value="J">Java</option>
+</select>
+>>> f = FrameworkForm({'name': 'Django', 'language': 'P'}, auto_id=False)
+>>> print f['language']
+<select class="foo" name="language">
+<option value="P" selected="selected">Python</option>
+<option value="J">Java</option>
+</select>
+
+You can set a ChoiceField's choices after the fact.
+>>> class FrameworkForm(Form):
+...     name = CharField()
+...     language = ChoiceField()
+>>> f = FrameworkForm(auto_id=False)
+>>> print f['language']
+<select name="language">
+</select>
+>>> f.fields['language'].choices = [('P', 'Python'), ('J', 'Java')]
+>>> print f['language']
+<select name="language">
+<option value="P">Python</option>
 <option value="J">Java</option>
 </select>
 
@@ -1832,6 +2345,17 @@ MultipleChoiceField is a special case, as its data is required to be a list:
 <option value="P" selected="selected">Paul McCartney</option>
 </select>
 
+MultipleChoiceField rendered as_hidden() is a special case. Because it can
+have multiple values, its as_hidden() renders multiple <input type="hidden">
+tags.
+>>> f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
+>>> print f['composers'].as_hidden()
+<input type="hidden" name="composers" value="P" />
+>>> f = SongForm({'name': 'From Me To You', 'composers': ['P', 'J']}, auto_id=False)
+>>> print f['composers'].as_hidden()
+<input type="hidden" name="composers" value="P" />
+<input type="hidden" name="composers" value="J" />
+
 MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 >>> class SongForm(Form):
 ...     name = CharField()
@@ -1855,6 +2379,16 @@ MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>
 
+Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
+gets a distinct ID, formed by appending an underscore plus the checkbox's
+zero-based index.
+>>> f = SongForm(auto_id='%s_id')
+>>> print f['composers']
+<ul>
+<li><label><input type="checkbox" name="composers" value="J" id="composers_id_0" /> John Lennon</label></li>
+<li><label><input type="checkbox" name="composers" value="P" id="composers_id_1" /> Paul McCartney</label></li>
+</ul>
+
 Data for a MultipleChoiceField should be a list. QueryDict and MultiValueDict
 conveniently work with this.
 >>> data = {'name': 'Yesterday', 'composers': ['J', 'P']}
@@ -1867,10 +2401,19 @@ conveniently work with this.
 >>> f.errors
 {}
 >>> from django.utils.datastructures import MultiValueDict
->>> data = MultiValueDict(dict(name='Yesterday', composers=['J', 'P']))
+>>> data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
 >>> f = SongForm(data)
 >>> f.errors
 {}
+
+The MultipleHiddenInput widget renders multiple values as hidden fields.
+>>> class SongFormHidden(Form):
+...     name = CharField()
+...     composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=MultipleHiddenInput)
+>>> f = SongFormHidden(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])), auto_id=False)
+>>> print f.as_ul()
+<li>Name: <input type="text" name="name" value="Yesterday" /><input type="hidden" name="composers" value="J" />
+<input type="hidden" name="composers" value="P" /></li>
 
 When using CheckboxSelectMultiple, the framework expects a list of input and
 returns a list of input.
@@ -1880,19 +2423,34 @@ returns a list of input.
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J']}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'composers': [u'J'], 'name': u'Yesterday'}
 >>> f = SongForm({'name': 'Yesterday', 'composers': ['J', 'P']}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'composers': [u'J', u'P'], 'name': u'Yesterday'}
+
+Validation errors are HTML-escaped when output as HTML.
+>>> class EscapingForm(Form):
+...     special_name = CharField()
+...     def clean_special_name(self):
+...         raise ValidationError("Something's wrong with '%s'" % self.cleaned_data['special_name'])
+
+>>> f = EscapingForm({'special_name': "Nothing to escape"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul><input type="text" name="special_name" value="Nothing to escape" /></td></tr>
+>>> f = EscapingForm({'special_name': "Should escape < & > and <script>alert('xss')</script>"}, auto_id=False)
+>>> print f
+<tr><th>Special name:</th><td><ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul><input type="text" name="special_name" value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" /></td></tr>
+
+# Validating multiple fields in relation to another ###########################
 
 There are a couple of ways to do multiple-field validation. If you want the
 validation message to be associated with a particular field, implement the
 clean_XXX() method on the Form, where XXX is the field name. As in
 Field.clean(), the clean_XXX() method should return the cleaned value. In the
-clean_XXX() method, you have access to self.clean_data, which is a dictionary
+clean_XXX() method, you have access to self.cleaned_data, which is a dictionary
 of all the data that has been cleaned *so far*, in order by the fields,
 including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> class UserRegistration(Form):
@@ -1900,9 +2458,9 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean_password2(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data['password2']
+...        return self.cleaned_data['password2']
 >>> f = UserRegistration(auto_id=False)
 >>> f.errors
 {}
@@ -1915,14 +2473,14 @@ including the current field (e.g., the field XXX if you're in clean_XXX()).
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
 
 Another way of doing multiple-field validation is by implementing the
 Form's clean() method. If you do this, any ValidationError raised by that
 method will not be associated with a particular field; it will have a
 special-case association with the field named '__all__'.
-Note that in Form.clean(), you have access to self.clean_data, a dictionary of
+Note that in Form.clean(), you have access to self.cleaned_data, a dictionary of
 all the fields/values that have *not* raised a ValidationError. Also note
 Form.clean() is required to return a dictionary of all clean data.
 >>> class UserRegistration(Form):
@@ -1930,9 +2488,9 @@ Form.clean() is required to return a dictionary of all clean data.
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 >>> f = UserRegistration(auto_id=False)
 >>> f.errors
 {}
@@ -1959,8 +2517,10 @@ Form.clean() is required to return a dictionary of all clean data.
 >>> f = UserRegistration({'username': 'adrian', 'password1': 'foo', 'password2': 'foo'}, auto_id=False)
 >>> f.errors
 {}
->>> f.clean_data
+>>> f.cleaned_data
 {'username': u'adrian', 'password1': u'foo', 'password2': u'foo'}
+
+# Dynamic construction ########################################################
 
 It's possible to construct a Form dynamically by adding to the self.fields
 dictionary in __init__(). Don't forget to call Form.__init__() within the
@@ -1976,6 +2536,83 @@ subclass' __init__().
 <tr><th>First name:</th><td><input type="text" name="first_name" /></td></tr>
 <tr><th>Last name:</th><td><input type="text" name="last_name" /></td></tr>
 <tr><th>Birthday:</th><td><input type="text" name="birthday" /></td></tr>
+
+Instances of a dynamic Form do not persist fields from one Form instance to
+the next.
+>>> class MyForm(Form):
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
+
+>>> class MyForm(Form):
+...     default_field_1 = CharField()
+...     default_field_2 = CharField()
+...     def __init__(self, data=None, auto_id=False, field_list=[]):
+...         Form.__init__(self, data, auto_id)
+...         for field in field_list:
+...             self.fields[field[0]] = field[1]
+>>> field_list = [('field1', CharField()), ('field2', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field1:</th><td><input type="text" name="field1" /></td></tr>
+<tr><th>Field2:</th><td><input type="text" name="field2" /></td></tr>
+>>> field_list = [('field3', CharField()), ('field4', CharField())]
+>>> my_form = MyForm(field_list=field_list)
+>>> print my_form
+<tr><th>Default field 1:</th><td><input type="text" name="default_field_1" /></td></tr>
+<tr><th>Default field 2:</th><td><input type="text" name="default_field_2" /></td></tr>
+<tr><th>Field3:</th><td><input type="text" name="field3" /></td></tr>
+<tr><th>Field4:</th><td><input type="text" name="field4" /></td></tr>
+
+Similarly, changes to field attributes do not persist from one Form instance
+to the next.
+>>> class Person(Form):
+...     first_name = CharField(required=False)
+...     last_name = CharField(required=False)
+...     def __init__(self, names_required=False, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if names_required:
+...             self.fields['first_name'].required = True
+...             self.fields['last_name'].required = True
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> f = Person(names_required=True)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(True, True)
+>>> f = Person(names_required=False)
+>>> f['first_name'].field.required, f['last_name'].field.required
+(False, False)
+>>> class Person(Form):
+...     first_name = CharField(max_length=30)
+...     last_name = CharField(max_length=30)
+...     def __init__(self, name_max_length=None, *args, **kwargs):
+...         super(Person, self).__init__(*args, **kwargs)
+...         if name_max_length:
+...             self.fields['first_name'].max_length = name_max_length
+...             self.fields['last_name'].max_length = name_max_length
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
+>>> f = Person(name_max_length=20)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(20, 20)
+>>> f = Person(name_max_length=None)
+>>> f['first_name'].field.max_length, f['last_name'].field.max_length
+(30, 30)
 
 HiddenInput widgets are displayed differently in the as_table(), as_ul()
 and as_p() output of a Form -- their verbose names are not displayed, and a
@@ -2108,6 +2745,8 @@ in "attrs".
 <li>Username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password: <input type="password" name="password" maxlength="10" /></li>
 
+# Specifying labels ###########################################################
+
 You can specify the label for a field by using the 'label' argument to a Field
 class. If you don't specify 'label', Django will use the field name with
 underscores converted to spaces, and the initial letter capitalized.
@@ -2120,6 +2759,27 @@ underscores converted to spaces, and the initial letter capitalized.
 <li>Your username: <input type="text" name="username" maxlength="10" /></li>
 <li>Password1: <input type="password" name="password1" /></li>
 <li>Password (again): <input type="password" name="password2" /></li>
+
+Labels for as_* methods will only end in a colon if they don't end in other
+punctuation already.
+>>> class Questions(Form):
+...    q1 = CharField(label='The first question')
+...    q2 = CharField(label='What is your name?')
+...    q3 = CharField(label='The answer to life is:')
+...    q4 = CharField(label='Answer this question!')
+...    q5 = CharField(label='The last question. Period.')
+>>> print Questions(auto_id=False).as_p()
+<p>The first question: <input type="text" name="q1" /></p>
+<p>What is your name? <input type="text" name="q2" /></p>
+<p>The answer to life is: <input type="text" name="q3" /></p>
+<p>Answer this question! <input type="text" name="q4" /></p>
+<p>The last question. Period. <input type="text" name="q5" /></p>
+>>> print Questions().as_p()
+<p><label for="id_q1">The first question:</label> <input type="text" name="q1" id="id_q1" /></p>
+<p><label for="id_q2">What is your name?</label> <input type="text" name="q2" id="id_q2" /></p>
+<p><label for="id_q3">The answer to life is:</label> <input type="text" name="q3" id="id_q3" /></p>
+<p><label for="id_q4">Answer this question!</label> <input type="text" name="q4" id="id_q4" /></p>
+<p><label for="id_q5">The last question. Period.</label> <input type="text" name="q5" id="id_q5" /></p>
 
 A label can be a Unicode object or a bytestring with special characters.
 >>> class UserRegistration(Form):
@@ -2156,6 +2816,242 @@ is default behavior.
 <li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
 <li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
 
+# Initial data ################################################################
+
+You can specify initial data for a field by using the 'initial' argument to a
+Field class. This initial data is displayed when a Form is rendered with *no*
+data. It is not displayed when a Form is rendered with any data (including an
+empty dictionary). Also, the initial value is *not* used if data for a
+particular required field isn't provided.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial='django')
+...    password = CharField(widget=PasswordInput)
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+Here, we're submitting data, so the initial value will *not* be displayed.
+>>> p = UserRegistration({}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+An 'initial' value is *not* used as a fallback if data is not provided. In this
+example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+# Dynamic initial data ########################################################
+
+The previous technique dealt with "hard-coded" initial data, but it's also
+possible to specify initial data after you've already created the Form class
+(i.e., at runtime). Use the 'initial' parameter to the Form constructor. This
+should be a dictionary containing initial values for one or more fields in the
+form, keyed by field name.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': 'stephane'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': 'django'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A dynamic 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': 'django'})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial='django')
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(initial={'username': 'babik'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="babik" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+# Callable initial data ########################################################
+
+The previous technique dealt with raw values as initial data, but it's also
+possible to specify callable data.
+
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10)
+...    password = CharField(widget=PasswordInput)
+
+We need to define functions that get called later.
+>>> def initial_django():
+...     return 'django'
+>>> def initial_stephane():
+...     return 'stephane'
+
+Here, we're not submitting any data, so the initial value will be displayed.
+>>> p = UserRegistration(initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+The 'initial' parameter is meaningless if you pass data.
+>>> p = UserRegistration({}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u''}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li><ul class="errorlist"><li>This field is required.</li></ul>Username: <input type="text" name="username" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration({'username': u'foo'}, initial={'username': initial_django}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /></li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /></li>
+
+A callable 'initial' value is *not* used as a fallback if data is not provided.
+In this example, we don't provide a value for 'username', and the form raises a
+validation error rather than using the initial value for 'username'.
+>>> p = UserRegistration({'password': 'secret'}, initial={'username': initial_django})
+>>> p.errors
+{'username': [u'This field is required.']}
+>>> p.is_valid()
+False
+
+If a Form defines 'initial' *and* 'initial' is passed as a parameter to Form(),
+then the latter will get precedence.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, initial=initial_django)
+...    password = CharField(widget=PasswordInput)
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="django" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+>>> p = UserRegistration(initial={'username': initial_stephane}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="stephane" maxlength="10" /></li>
+<li>Password: <input type="password" name="password" /></li>
+
+# Help text ###################################################################
+
+You can specify descriptive text for a field by using the 'help_text' argument
+to a Field class. This help text is displayed when a Form is rendered.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput, help_text='Choose wisely.')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /> Choose wisely.</li>
+>>> print p.as_p()
+<p>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</p>
+<p>Password: <input type="password" name="password" /> Choose wisely.</p>
+>>> print p.as_table()
+<tr><th>Username:</th><td><input type="text" name="username" maxlength="10" /><br />e.g., user@example.com</td></tr>
+<tr><th>Password:</th><td><input type="password" name="password" /><br />Choose wisely.</td></tr>
+
+The help text is displayed whether or not data is provided for the form.
+>>> p = UserRegistration({'username': u'foo'}, auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" value="foo" maxlength="10" /> e.g., user@example.com</li>
+<li><ul class="errorlist"><li>This field is required.</li></ul>Password: <input type="password" name="password" /> Choose wisely.</li>
+
+help_text is not displayed for hidden fields. It can be used for documentation
+purposes, though.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='e.g., user@example.com')
+...    password = CharField(widget=PasswordInput)
+...    next = CharField(widget=HiddenInput, initial='/', help_text='Redirect destination')
+>>> p = UserRegistration(auto_id=False)
+>>> print p.as_ul()
+<li>Username: <input type="text" name="username" maxlength="10" /> e.g., user@example.com</li>
+<li>Password: <input type="password" name="password" /><input type="hidden" name="next" value="/" /></li>
+
+Help text can include arbitrary Unicode characters.
+>>> class UserRegistration(Form):
+...    username = CharField(max_length=10, help_text='ŠĐĆŽćžšđ')
+>>> p = UserRegistration(auto_id=False)
+>>> p.as_ul()
+u'<li>Username: <input type="text" name="username" maxlength="10" /> \u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111</li>'
+
+# Subclassing forms ###########################################################
+
+You can subclass a Form to add fields. The resulting form subclass will have
+all of the fields of the parent Form, plus whichever fields you define in the
+subclass.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Musician(Person):
+...     instrument = CharField()
+>>> p = Person(auto_id=False)
+>>> print p.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+>>> m = Musician(auto_id=False)
+>>> print m.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+
+Yes, you can subclass multiple forms. The fields are added in the order in
+which the parent classes are listed.
+>>> class Person(Form):
+...     first_name = CharField()
+...     last_name = CharField()
+...     birthday = DateField()
+>>> class Instrument(Form):
+...     instrument = CharField()
+>>> class Beatle(Person, Instrument):
+...     haircut_type = CharField()
+>>> b = Beatle(auto_id=False)
+>>> print b.as_ul()
+<li>First name: <input type="text" name="first_name" /></li>
+<li>Last name: <input type="text" name="last_name" /></li>
+<li>Birthday: <input type="text" name="birthday" /></li>
+<li>Instrument: <input type="text" name="instrument" /></li>
+<li>Haircut type: <input type="text" name="haircut_type" /></li>
+
 # Forms with prefixes #########################################################
 
 Sometimes it's necessary to have multiple forms display on the same HTML page,
@@ -2189,7 +3085,7 @@ actual field name.
 {}
 >>> p.is_valid()
 True
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 
 Let's try submitting some bad data to make sure form.errors and field.errors
@@ -2233,12 +3129,12 @@ of the same form.
 >>> p1 = Person(data, prefix='person1')
 >>> p1.is_valid()
 True
->>> p1.clean_data
+>>> p1.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
 >>> p2 = Person(data, prefix='person2')
 >>> p2.is_valid()
 True
->>> p2.clean_data
+>>> p2.cleaned_data
 {'first_name': u'Jim', 'last_name': u'Morrison', 'birthday': datetime.date(1943, 12, 8)}
 
 By default, forms append a hyphen between the prefix and the field name, but a
@@ -2264,8 +3160,59 @@ self.prefix.
 >>> p = Person(data, prefix='foo')
 >>> p.is_valid()
 True
->>> p.clean_data
+>>> p.cleaned_data
 {'first_name': u'John', 'last_name': u'Lennon', 'birthday': datetime.date(1940, 10, 9)}
+
+# Forms with NullBooleanFields ################################################
+
+NullBooleanField is a bit of a special case because its presentation (widget)
+is different than its data. This is handled transparently, though.
+
+>>> class Person(Form):
+...     name = CharField()
+...     is_cool = NullBooleanField()
+>>> p = Person({'name': u'Joe'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'1'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1" selected="selected">Unknown</option>
+<option value="2">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'2'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': u'3'}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': True}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2" selected="selected">Yes</option>
+<option value="3">No</option>
+</select>
+>>> p = Person({'name': u'Joe', 'is_cool': False}, auto_id=False)
+>>> print p['is_cool']
+<select name="is_cool">
+<option value="1">Unknown</option>
+<option value="2">Yes</option>
+<option value="3" selected="selected">No</option>
+</select>
 
 # Basic form processing in a view #############################################
 
@@ -2275,16 +3222,16 @@ True
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 >>> def my_function(method, post_data):
 ...     if method == 'POST':
 ...         form = UserRegistration(post_data, auto_id=False)
 ...     else:
 ...         form = UserRegistration(auto_id=False)
 ...     if form.is_valid():
-...         return 'VALID: %r' % form.clean_data
+...         return 'VALID: %r' % form.cleaned_data
 ...     t = Template('<form action="" method="post">\n<table>\n{{ form }}\n</table>\n<input type="submit" />\n</form>')
 ...     return t.render(Context({'form': form}))
 
@@ -2318,13 +3265,13 @@ VALID: {'username': u'adrian', 'password1': u'secret', 'password2': u'secret'}
 # Some ideas for using templates with forms ###################################
 
 >>> class UserRegistration(Form):
-...    username = CharField(max_length=10)
+...    username = CharField(max_length=10, help_text="Good luck picking a username that doesn't already exist.")
 ...    password1 = CharField(widget=PasswordInput)
 ...    password2 = CharField(widget=PasswordInput)
 ...    def clean(self):
-...        if self.clean_data.get('password1') and self.clean_data.get('password2') and self.clean_data['password1'] != self.clean_data['password2']:
+...        if self.cleaned_data.get('password1') and self.cleaned_data.get('password2') and self.cleaned_data['password1'] != self.cleaned_data['password2']:
 ...            raise ValidationError(u'Please make sure your passwords match.')
-...        return self.clean_data
+...        return self.cleaned_data
 
 You have full flexibility in displaying form fields in a template. Just pass a
 Form instance to the template, and use "dot" access to refer to individual
@@ -2395,6 +3342,33 @@ field an "id" attribute.
 <input type="submit" />
 </form>
 
+User form.[field].help_text to output a field's help text. If the given field
+does not have help text, nothing will be output.
+>>> t = Template('''<form action="">
+... <p>{{ form.username.label_tag }}: {{ form.username }}<br />{{ form.username.help_text }}</p>
+... <p>{{ form.password1.label_tag }}: {{ form.password1 }}</p>
+... <p>{{ form.password2.label_tag }}: {{ form.password2 }}</p>
+... <input type="submit" />
+... </form>''')
+>>> print t.render(Context({'form': UserRegistration(auto_id=False)}))
+<form action="">
+<p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn't already exist.</p>
+<p>Password1: <input type="password" name="password1" /></p>
+<p>Password2: <input type="password" name="password2" /></p>
+<input type="submit" />
+</form>
+>>> Template('{{ form.password1.help_text }}').render(Context({'form': UserRegistration(auto_id=False)}))
+''
+
+The label_tag() method takes an optional attrs argument: a dictionary of HTML
+attributes to add to the <label> tag.
+>>> f = UserRegistration(auto_id='id_%s')
+>>> for bf in f:
+...     print bf.label_tag(attrs={'class': 'pretty'})
+<label for="id_username" class="pretty">Username</label>
+<label for="id_password1" class="pretty">Password1</label>
+<label for="id_password2" class="pretty">Password2</label>
+
 To display the errors that aren't associated with a particular field -- e.g.,
 the errors caused by Form.clean() -- use {{ form.non_field_errors }} in the
 template. If used on its own, it is displayed as a <ul> (or an empty string, if
@@ -2428,17 +3402,17 @@ the list of errors is empty). You can also use it in {% if %} statements.
 <input type="submit" />
 </form>
 
-#################
-# Extra widgets #
-#################
+###############
+# Extra stuff #
+###############
 
-The newforms library comes with some extra, higher-level Widget classes that
-demonstrate some of the library's abilities.
+The newforms library comes with some extra, higher-level Field and Widget
+classes that demonstrate some of the library's abilities.
 
 # SelectDateWidget ############################################################
 
 >>> from django.newforms.extras import SelectDateWidget
->>> w = SelectDateWidget()
+>>> w = SelectDateWidget(years=('2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'))
 >>> print w.render('mydate', '')
 <select name="mydate_month">
 <option value="1">January</option>
@@ -2488,7 +3462,6 @@ demonstrate some of the library's abilities.
 <option value="31">31</option>
 </select>
 <select name="mydate_year">
-<option value="2006">2006</option>
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
@@ -2498,6 +3471,7 @@ demonstrate some of the library's abilities.
 <option value="2013">2013</option>
 <option value="2014">2014</option>
 <option value="2015">2015</option>
+<option value="2016">2016</option>
 </select>
 >>> w.render('mydate', None) == w.render('mydate', '')
 True
@@ -2550,7 +3524,6 @@ True
 <option value="31">31</option>
 </select>
 <select name="mydate_year">
-<option value="2006">2006</option>
 <option value="2007">2007</option>
 <option value="2008">2008</option>
 <option value="2009">2009</option>
@@ -2560,9 +3533,154 @@ True
 <option value="2013">2013</option>
 <option value="2014">2014</option>
 <option value="2015">2015</option>
+<option value="2016">2016</option>
 </select>
 
+# MultiWidget and MultiValueField #############################################
+# MultiWidgets are widgets composed of other widgets. They are usually
+# combined with MultiValueFields - a field that is composed of other fields.
+# MulitWidgets can themselved be composed of other MultiWidgets.
+# SplitDateTimeWidget is one example of a MultiWidget.
+
+>>> class ComplexMultiWidget(MultiWidget):
+...     def __init__(self, attrs=None):
+...         widgets = (
+...             TextInput(),
+...             SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+...             SplitDateTimeWidget(),
+...         )
+...         super(ComplexMultiWidget, self).__init__(widgets, attrs)
+...
+...     def decompress(self, value):
+...         if value:
+...             data = value.split(',')
+...             return [data[0], data[1], datetime.datetime(*time.strptime(data[2], "%Y-%m-%d %H:%M:%S")[0:6])]
+...         return [None, None, None]
+...     def format_output(self, rendered_widgets):
+...         return u'\n'.join(rendered_widgets)
+>>> w = ComplexMultiWidget()
+>>> print w.render('name', 'some text,JP,2007-04-25 06:24:00')
+<input type="text" name="name_0" value="some text" />
+<select multiple="multiple" name="name_1">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="name_2_0" value="2007-04-25" /><input type="text" name="name_2_1" value="06:24:00" />
+
+>>> class ComplexField(MultiValueField):
+...     def __init__(self, required=True, widget=None, label=None, initial=None):
+...         fields = (
+...             CharField(),
+...             MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+...             SplitDateTimeField()
+...         )
+...         super(ComplexField, self).__init__(fields, required, widget, label, initial)
+...
+...     def compress(self, data_list):
+...         if data_list:
+...             return '%s,%s,%s' % (data_list[0],''.join(data_list[1]),data_list[2])
+...         return None
+
+>>> f = ComplexField(widget=w)
+>>> f.clean(['some text', ['J','P'], ['2007-04-25','6:24:00']])
+u'some text,JP,2007-04-25 06:24:00'
+>>> f.clean(['some text',['X'], ['2007-04-25','6:24:00']])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. X is not one of the available choices.']
+
+# If insufficient data is provided, None is substituted
+>>> f.clean(['some text',['JP']])
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> class ComplexFieldForm(Form):
+...     field1 = ComplexField(widget=w)
+>>> f = ComplexFieldForm()
+>>> print f
+<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" id="id_field1_0" />
+<select multiple="multiple" name="field1_1" id="id_field1_1">
+<option value="J">John</option>
+<option value="P">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="field1_2_0" id="id_field1_2_0" /><input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>
+
+>>> f = ComplexFieldForm({'field1_0':'some text','field1_1':['J','P'], 'field1_2_0':'2007-04-25', 'field1_2_1':'06:24:00'})
+>>> print f
+<tr><th><label for="id_field1_0">Field1:</label></th><td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+<select multiple="multiple" name="field1_1" id="id_field1_1">
+<option value="J" selected="selected">John</option>
+<option value="P" selected="selected">Paul</option>
+<option value="G">George</option>
+<option value="R">Ringo</option>
+</select>
+<input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" /><input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
+
+>>> f.cleaned_data
+{'field1': u'some text,JP,2007-04-25 06:24:00'}
+
+#################################
+# Tests of underlying functions #
+#################################
+
+# smart_unicode tests
+>>> from django.utils.encoding import smart_unicode
+>>> class Test:
+...     def __str__(self):
+...        return 'ŠĐĆŽćžšđ'
+>>> class TestU:
+...     def __str__(self):
+...        return 'Foo'
+...     def __unicode__(self):
+...        return u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(Test())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(TestU())
+u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'
+>>> smart_unicode(1)
+u'1'
+>>> smart_unicode('foo')
+u'foo'
+
+# flatatt tests
+>>> from django.newforms.util import flatatt
+>>> flatatt({'id': "header"})
+u' id="header"'
+>>> flatatt({'class': "news", 'title': "Read this"})
+u' class="news" title="Read this"'
+>>> flatatt({})
+u''
+
+####################################
+# Test accessing errors in clean() #
+####################################
+
+>>> class UserForm(Form):
+...     username = CharField(max_length=10)
+...     password = CharField(widget=PasswordInput)
+...     def clean(self):
+...         data = self.cleaned_data
+...         if not self.errors:
+...             data['username'] = data['username'].lower()
+...         return data
+
+>>> f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+>>> f.is_valid()
+True
+>>> f.cleaned_data['username']
+u'sirrobin'
 """
+
+__test__ = {
+    'form_tests': form_tests,
+    'localflavor': localflavor_tests,
+    'regressions': regression_tests,
+}
 
 if __name__ == "__main__":
     import doctest

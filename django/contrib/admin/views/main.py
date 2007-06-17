@@ -46,8 +46,8 @@ def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
     any '/', '_' and ':' characters. Similar to urllib.quote, except that the
-    quoting is slightly different so that it doesn't get autoamtically
-    unquoted by the web browser.
+    quoting is slightly different so that it doesn't get automatically
+    unquoted by the Web browser.
     """
     if type(s) != type(''):
         return s
@@ -273,17 +273,17 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
                                                                               delete=admin_opts.grant_delete_row_level_perm)
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
-            if request.POST.has_key("_continue"):
+            if "_continue" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                if request.POST.has_key("_popup"):
+                if "_popup" in request.POST:
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
-            if request.POST.has_key("_popup"):
+            if "_popup" in request.POST:
                 if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
                     pk_value = '"%s"' % pk_value.replace('"', '\\"')
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
                     (pk_value, str(new_object).replace('"', '\\"')))
-            elif request.POST.has_key("_addanother"):
+            elif "_addanother" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect(request.path)
             else:
@@ -304,7 +304,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
     c = template.RequestContext(request, {
         'title': _('Add %s') % opts.verbose_name,
         'form': form,
-        'is_popup': request.REQUEST.has_key('_popup'),
+        'is_popup': '_popup' in request.REQUEST,
         'show_delete': show_delete,
     })
 
@@ -329,7 +329,7 @@ def change_stage(request, app_label, model_name, object_id):
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission(), object=manipulator.original_object):
         raise PermissionDenied
 
-    if request.POST and request.POST.has_key("_saveasnew"):
+    if request.POST and "_saveasnew" in request.POST:
         return add_stage(request, app_label, model_name, form_url='../../add/')
 
     if request.POST:
@@ -367,16 +367,16 @@ def change_stage(request, app_label, model_name, object_id):
                                                                               delete=admin_opts.grant_delete_row_level_perm)
 
             msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-            if request.POST.has_key("_continue"):
+            if "_continue" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                if request.REQUEST.has_key('_popup'):
+                if '_popup' in request.REQUEST:
                     return HttpResponseRedirect(request.path + "?_popup=1")
                 else:
                     return HttpResponseRedirect(request.path)
-            elif request.POST.has_key("_saveasnew"):
+            elif "_saveasnew" in request.POST:
                 request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
                 return HttpResponseRedirect("../%s/" % pk_value)
-            elif request.POST.has_key("_addanother"):
+            elif "_addanother" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
                 return HttpResponseRedirect("../add/")
             else:
@@ -416,7 +416,7 @@ def change_stage(request, app_label, model_name, object_id):
         'form': form,
         'object_id': object_id,
         'original': manipulator.original_object,
-        'is_popup': request.REQUEST.has_key('_popup'),
+        'is_popup': '_popup' in request.REQUEST,
         'object_has_row_level_permissions':opts.row_level_permissions,
         'has_row_level_permissions':request.user.has_perm("auth.change_rowlevelpermission") and request.user.has_perm(opts.app_label+"."+opts.get_change_permission(), object=manipulator.original_object),
     })
@@ -488,9 +488,12 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        rel_objs = getattr(obj, rel_opts_name, None)
-        if rel_objs:
-            has_related_objs = True
+       
+        # related.get_accessor_name() could return None for symmetrical relationships
+        if rel_opts_name:
+            rel_objs = getattr(obj, rel_opts_name, None)
+            if rel_objs:
+                has_related_objs = True
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
@@ -585,12 +588,12 @@ class ChangeList(object):
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
             self.page_num = 0
-        self.show_all = request.GET.has_key(ALL_VAR)
-        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
+        self.show_all = ALL_VAR in request.GET
+        self.is_popup = IS_POPUP_VAR in request.GET
         self.params = dict(request.GET.items())
-        if self.params.has_key(PAGE_VAR):
+        if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
-        if self.params.has_key(ERROR_FLAG):
+        if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
         self.order_field, self.order_type = self.get_ordering()
@@ -621,7 +624,7 @@ class ChangeList(object):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():
-            if p.has_key(k) and v is None:
+            if k in p and v is None:
                 del p[k]
             elif v is not None:
                 p[k] = v
@@ -687,18 +690,25 @@ class ChangeList(object):
             order_field, order_type = ordering[0][1:], 'desc'
         else:
             order_field, order_type = ordering[0], 'asc'
-        if params.has_key(ORDER_VAR):
+        if ORDER_VAR in params:
             try:
+                field_name = lookup_opts.admin.list_display[int(params[ORDER_VAR])]
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
-                    pass
+                    # see if field_name is a name of a non-field
+                    # that allows sorting
+                    try:
+                        attr = getattr(lookup_opts.admin.manager.model, field_name)
+                        order_field = attr.admin_order_field
+                    except IndexError:
+                        pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
-        if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
+        if ORDER_TYPE_VAR in params and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
             order_type = params[ORDER_TYPE_VAR]
         return order_field, order_type
 
@@ -715,7 +725,7 @@ class ChangeList(object):
             qs = self.manager.get_query_set()
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
-            if lookup_params.has_key(i):
+            if i in lookup_params:
                 del lookup_params[i]
 
         # Apply lookup parameters from the query string.

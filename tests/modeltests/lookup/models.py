@@ -58,6 +58,17 @@ Article 4
 >>> Article.objects.filter(headline__startswith='Blah blah').count()
 0L
 
+# count() should respect sliced query sets.
+>>> articles = Article.objects.all()
+>>> articles.count()
+7L
+>>> articles[:4].count()
+4
+>>> articles[1:100].count()
+6L
+>>> articles[10:100].count()
+0
+
 # Date and date/time lookups can also be done with strings.
 >>> Article.objects.filter(pub_date__exact='2005-07-27 00:00:00').count()
 3L
@@ -119,6 +130,27 @@ True
 [('headline', 'Article 3'), ('id', 3)]
 [('headline', 'Article 7'), ('id', 7)]
 [('headline', 'Article 1'), ('id', 1)]
+
+
+# you can use values() even on extra fields
+>>> for d in Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_one'):
+...     i = d.items()
+...     i.sort()
+...     i
+[('id', 5), ('id_plus_one', 6)]
+[('id', 6), ('id_plus_one', 7)]
+[('id', 4), ('id_plus_one', 5)]
+[('id', 2), ('id_plus_one', 3)]
+[('id', 3), ('id_plus_one', 4)]
+[('id', 7), ('id_plus_one', 8)]
+[('id', 1), ('id_plus_one', 2)]
+
+# however, an exception FieldDoesNotExist will still be thrown 
+# if you try to access non-existent field (field that is neither on the model nor extra)
+>>> Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_two')
+Traceback (most recent call last):
+    ...
+FieldDoesNotExist: Article has no field named 'id_plus_two'
 
 # if you don't specify which fields, all are returned
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
@@ -190,5 +222,33 @@ DoesNotExist: Article matching query does not exist.
 >>> a10.save()
 >>> Article.objects.filter(headline__contains='\\')
 [<Article: Article with \ backslash>]
+
+# none() returns an EmptyQuerySet that behaves like any other QuerySet object
+>>> Article.objects.none()
+[]
+>>> Article.objects.none().filter(headline__startswith='Article')
+[]
+>>> Article.objects.none().count()
+0
+>>> [article for article in Article.objects.none().iterator()]
+[]
+
+# using __in with an empty list should return an empty query set
+>>> Article.objects.filter(id__in=[])
+[]
+
+>>> Article.objects.exclude(id__in=[])
+[<Article: Article with \ backslash>, <Article: Article% with percent sign>, <Article: Article_ with underscore>, <Article: Article 5>, <Article: Article 6>, <Article: Article 4>, <Article: Article 2>, <Article: Article 3>, <Article: Article 7>, <Article: Article 1>]
+
+# Programming errors are pointed out with nice error messages
+>>> Article.objects.filter(pub_date_year='2005').count()
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: id, headline, pub_date
+
+>>> Article.objects.filter(headline__starts='Article')
+Traceback (most recent call last):
+    ...
+TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id, headline, pub_date
 
 """}

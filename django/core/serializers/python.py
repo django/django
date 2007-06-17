@@ -37,7 +37,12 @@ class Serializer(base.Serializer):
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
         if related is not None:
-            related = related._get_pk_val()
+            if field.rel.field_name == related._meta.pk.name:
+                # Related to remote object via primary key
+                related = related._get_pk_val()
+            else:
+                # Related to remote object via other field
+                related = getattr(related, field.rel.field_name)
         self._current[field.name] = related
     
     def handle_m2m_field(self, obj, field):
@@ -57,7 +62,7 @@ def Deserializer(object_list, **options):
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
         Model = _get_model(d["model"])
-        data = {Model._meta.pk.name : d["pk"]}
+        data = {Model._meta.pk.attname : Model._meta.pk.to_python(d["pk"])}
         m2m_data = {}
         
         # Handle each field
@@ -67,20 +72,23 @@ def Deserializer(object_list, **options):
                 
             field = Model._meta.get_field(field_name)
             
-            # Handle M2M relations (with in_bulk() for performance)
+            # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
                 pks = []
+                m2m_convert = field.rel.to._meta.pk.to_python
                 for pk in field_value:
                     if isinstance(pk, unicode):
-                        pk = pk.encode(options.get("encoding", settings.DEFAULT_CHARSET))
-                m2m_data[field.name] = field.rel.to._default_manager.in_bulk(field_value).values()
+                        pks.append(m2m_convert(pk.encode(options.get("encoding", settings.DEFAULT_CHARSET))))
+                    else:
+                        pks.append(m2m_convert(pk))
+                m2m_data[field.name] = pks
                 
             # Handle FK fields
-            elif field.rel and isinstance(field.rel, models.ManyToOneRel) and field_value is not None:
-                try:
-                    data[field.name] = field.rel.to._default_manager.get(pk=field_value)
-                except field.rel.to.DoesNotExist:
-                    data[field.name] = None
+            elif field.rel and isinstance(field.rel, models.ManyToOneRel):
+                if field_value:
+                    data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
+                else:
+                    data[field.attname] = None
                     
             # Handle all other fields
             else:

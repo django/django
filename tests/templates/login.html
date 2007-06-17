@@ -1,7 +1,6 @@
-<html>
-<head></head>
-<body>
-<h1>Django Internal Tests: Login</h1>
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
 {% if form.has_errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
@@ -15,5 +14,4 @@
 <input type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
-</body>
-</html>
+{% endblock %}

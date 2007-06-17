@@ -8,25 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: djangojs 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-30 13:28+0200\n"
-"PO-Revision-Date: 2006-03-30 13:35+0200\n"
+"POT-Creation-Date: 2007-05-06 13:08+0300\n"
+"PO-Revision-Date: 2007-05-06 13:08+0300\n"
 "Last-Translator: Meir Kriheli <meir@mksoft.co.il>\n"
 "Language-Team: Hebrew\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
-
-#: contrib/admin/media/js/dateparse.js:32
-#: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"ינואר פברואר מרץ אפריל מאי יוני יולי אוגוסט ספטמבר אוקטובר נובמבר דצמבר"
-
-#: contrib/admin/media/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "ראשון שני שלישי רביעי חמישי שישי שבת"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -58,54 +46,75 @@ msgstr "יש לסמן את ההרשאות המבוקשות וללחוץ על "
 msgid "Clear all"
 msgstr "איפוס הכל"
 
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"ינואר פברואר מרץ אפריל מאי יוני יולי אוגוסט ספטמבר אוקטובר נובמבר דצמבר"
+
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
 msgstr "ר ש ש ר ח ש ש"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "ראשון שני שלישי רביעי חמישי שישי שבת"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "הצג"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "הסתר"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
 msgstr "כעת"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
 msgstr "שעון"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
 msgstr "בחירת שעה"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
 msgstr "חצות"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
 msgstr "6 בבוקר"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
 msgstr "צהריים"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
 msgstr "ביטול"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
 msgstr "היום"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
 msgstr "לוח שנה"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
 msgstr "אתמול"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "מחר"
 

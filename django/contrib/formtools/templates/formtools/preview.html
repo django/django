@@ -7,7 +7,7 @@
 <table>
 {% for field in form %}
 <tr>
-<th>{{ field.verbose_name }}:</th>
+<th>{{ field.label }}:</th>
 <td>{{ field.data|escape }}</td>
 </tr>
 {% endfor %}
@@ -30,7 +30,7 @@
 {{ form }}
 </table>
 <input type="hidden" name="{{ stage_field }}" value="1" />
-<p><input type="submit" value="Submit changes" /></p>
+<p><input type="submit" value="Preview" /></p>
 </form>
 
 {% endblock %}

@@ -17,7 +17,13 @@ except ImportError, e:
         module = 'sqlite3'
     raise ImproperlyConfigured, "Error loading %s module: %s" % (module, e)
 
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal # for Python 2.3
+
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 Database.register_converter("bool", lambda s: str(s) == '1')
 Database.register_converter("time", util.typecast_time)
@@ -25,6 +31,8 @@ Database.register_converter("date", util.typecast_date)
 Database.register_converter("datetime", util.typecast_timestamp)
 Database.register_converter("timestamp", util.typecast_timestamp)
 Database.register_converter("TIMESTAMP", util.typecast_timestamp)
+Database.register_converter("decimal", util.typecast_decimal)
+Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
 def utf8rowFactory(cursor, row):
     def utf8(s):
@@ -67,10 +75,11 @@ class DatabaseWrapper(local):
             return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             self.connection.rollback()
 
     def close(self):
@@ -139,6 +148,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RANDOM()"
 
+def get_deferrable_sql():
+    return ""
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -148,6 +160,29 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "NULL"
 
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    
+    """
+    # NB: The generated SQL below is specific to SQLite
+    # Note: The DELETE FROM... SQL generated below works for SQLite databases
+    # because constraints don't exist
+    sql = ['%s %s %s;' % \
+            (style.SQL_KEYWORD('DELETE'),
+             style.SQL_KEYWORD('FROM'),
+             style.SQL_FIELD(quote_name(table))
+             ) for table in tables]
+    # Note: No requirement for reset of auto-incremented indices (cf. other
+    # get_sql_flush() implementations). Just return SQL at this point
+    return sql
+
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
+    
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)

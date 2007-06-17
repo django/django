@@ -75,8 +75,8 @@ def page_not_found(request, template_name='404.html'):
         request_path
             The path of the requested URL (e.g., '/app/pages/bad_page/')
     """
-    t = loader.get_template(template_name)
-    return http.HttpResponseNotFound(t.render(RequestContext(request, {'request_path': request.path})))
+    t = loader.get_template(template_name) # You need to create a 404.html template.
+    return http.HttpResponseNotFound(t.iter_render(RequestContext(request, {'request_path': request.path})))
 
 def server_error(request, template_name='500.html'):
     """
@@ -85,5 +85,5 @@ def server_error(request, template_name='500.html'):
     Templates: `500.html`
     Context: None
     """
-    t = loader.get_template(template_name)
-    return http.HttpResponseServerError(t.render(Context({})))
+    t = loader.get_template(template_name) # You need to create a 500.html template.
+    return http.HttpResponseServerError(t.iter_render(Context({})))

@@ -1,5 +1,6 @@
 from django.contrib.admin import utils
-from django import forms, template
+from django import oldforms as forms
+from django import template
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.contrib.contenttypes.models import ContentType

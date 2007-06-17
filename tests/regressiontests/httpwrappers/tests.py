@@ -34,6 +34,9 @@ AttributeError: This QueryDict instance is immutable
 >>> q.has_key('foo')
 False
 
+>>> 'foo' in q
+False
+
 >>> q.items()
 []
 
@@ -93,6 +96,12 @@ MultiValueDictKeyError: "Key 'foo' not found in <MultiValueDict: {}>"
 >>> q['name']
 'john'
 
+>>> del q['name']
+>>> 'name' in q
+False
+
+>>> q['name'] = 'john'
+
 >>> q.get('foo', 'default')
 'default'
 
@@ -124,6 +133,9 @@ MultiValueDictKeyError: "Key 'foo' not found in <MultiValueDict: {}>"
 >>> q.has_key('foo')
 True
 
+>>> 'foo' in q
+True
+
 >>> q.items()
 [('foo', 'another'), ('name', 'john')]
 
@@ -153,6 +165,9 @@ True
 
 >>> q.pop('foo')
 ['bar', 'baz', 'another', 'hello']
+
+>>> q.pop('foo', 'not there')
+'not there'
 
 >>> q.get('foo', 'not there')
 'not there'
@@ -218,7 +233,13 @@ AttributeError: This QueryDict instance is immutable
 >>> q.has_key('foo')
 True
 
+>>> 'foo' in q
+True
+
 >>> q.has_key('bar')
+False
+
+>>> 'bar' in q
 False
 
 >>> q.items()
@@ -303,7 +324,13 @@ AttributeError: This QueryDict instance is immutable
 >>> q.has_key('vote')
 True
 
+>>> 'vote' in q
+True
+
 >>> q.has_key('foo')
+False
+
+>>> 'foo' in q
 False
 
 >>> q.items()
@@ -348,6 +375,11 @@ AttributeError: This QueryDict instance is immutable
 
 >>> q.urlencode()
 'vote=yes&vote=no'
+
+>>> del q['vote']
+Traceback (most recent call last):
+...
+AttributeError: This QueryDict instance is immutable
 
 """
 

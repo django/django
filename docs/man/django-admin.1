@@ -1,0 +1,162 @@
+.TH "django-admin.py" "1" "June 2007" "Django Project" ""
+.SH "NAME"
+django\-admin.py \- Utility script for the Django web framework
+.SH "SYNOPSIS"
+.B django\-admin.py
+.I <action>
+.B [options]
+.sp
+.SH "DESCRIPTION"
+This utility script provides commands for creation and maintenance of Django
+projects and apps.
+.sp
+With the exception of
+.BI startproject,
+all commands listed below can also be performed with the
+.BI manage.py
+script found at the top level of each Django project directory.
+.sp
+.SH "ACTIONS"
+.TP
+.BI "adminindex [" "appname ..." "]"
+Prints the admin\-index template snippet for the given app name(s).
+.TP
+.BI "createcachetable [" "tablename" "]"
+Creates the table needed to use the SQL cache backend
+.TP
+.B dbshell
+Runs the command\-line client for the current
+.BI DATABASE_ENGINE.
+.TP
+.B diffsettings
+Displays differences between the current
+.B settings.py
+and Django's default settings. Settings that don't appear in the defaults are
+followed by "###".
+.TP
+.B inspectdb
+Introspects the database tables in the database specified in settings.py and outputs a Django
+model module.
+.TP
+.BI "install [" "appname ..." "]"
+Executes
+.B sqlall
+for the given app(s) in the current database.
+.TP
+.BI "reset [" "appname ..." "]"
+Executes
+.B sqlreset
+for the given app(s) in the current database.
+.TP
+.BI "runfcgi [" "KEY=val" "] [" "KEY=val" "] " "..."
+Runs this project as a FastCGI application. Requires flup. Use
+.B runfcgi help
+for help on the KEY=val pairs.
+.TP
+.BI "runserver [" "\-\-noreload" "] [" "\-\-adminmedia=ADMIN_MEDIA_PATH" "] [" "port|ipaddr:port" "]"
+Starts a lightweight Web server for development.
+.TP
+.BI "shell [" "\-\-plain" "]"
+Runs a Python interactive interpreter. Tries to use IPython, if it's available.
+The
+.BI \-\-plain
+option forces the use of the standard Python interpreter even when IPython is
+installed.
+.TP
+.BI "sql [" "appname ..." "]"
+Prints the CREATE TABLE SQL statements for the given app name(s).
+.TP
+.BI "sqlall [" "appname ..." "]"
+Prints the CREATE TABLE, initial\-data and CREATE INDEX SQL statements for the
+given model module name(s).
+.TP
+.BI "sqlclear [" "appname ..." "]"
+Prints the DROP TABLE SQL statements for the given app name(s).
+.TP
+.BI "sqlindexes [" "appname ..." "]"
+Prints the CREATE INDEX SQL statements for the given model module name(s).
+.TP
+.BI "sqlinitialdata [" "appname ..." "]"
+Prints the initial INSERT SQL statements for the given app name(s).
+.TP
+.BI "sqlreset [" "appname ..." "]"
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app
+name(s).
+.TP
+.BI "sqlsequencereset [" "appname ..." "]"
+Prints the SQL statements for resetting PostgreSQL sequences for the
+given app name(s).
+.TP
+.BI "startapp [" "appname" "]"
+Creates a Django app directory structure for the given app name in
+the current directory.
+.TP
+.BI "startproject [" "projectname" "]"
+Creates a Django project directory structure for the given project name
+in the current directory.
+.TP
+.BI syncdb
+Creates the database tables for all apps in INSTALLED_APPS whose tables
+haven't already been created.
+.TP
+.BI "test [" "\-\-verbosity" "] [" "appname ..." "]"
+Runs the test suite for the specified applications, or the entire project if
+no apps are specified
+.TP
+.BI validate
+Validates all installed models.
+.SH "OPTIONS"
+.TP
+.I \-\-version
+Show program's version number and exit.
+.TP
+.I \-h, \-\-help
+Show this help message and exit.
+.TP
+.I \-\-settings=SETTINGS
+Python path to settings module, e.g. "myproject.settings.main". If
+this isn't provided, the DJANGO_SETTINGS_MODULE environment variable
+will be used.
+.TP
+.I \-\-pythonpath=PYTHONPATH
+Lets you manually add a directory the Python path,
+e.g. "/home/djangoprojects/myproject".
+.TP
+.I \-\-plain
+Use plain Python, not IPython, for the "shell" command.
+.TP
+.I \-\-noinput
+Do not prompt the user for input.
+.TP
+.I \-\-noreload
+Disable the development server's auto\-reloader.
+.TP
+.I \-\-verbosity=VERBOSITY
+Verbosity level: 0=minimal output, 1=normal output, 2=all output.
+.TP
+.I \-\-adminmedia=ADMIN_MEDIA_PATH
+Specifies the directory from which to serve admin media when using the development server.
+
+.SH "ENVIRONMENT"
+.TP
+.I DJANGO_SETTINGS_MODULE
+In the absence of the
+.BI \-\-settings
+option, this environment variable defines the settings module to be read.
+It should be in Python-import form, e.g. "myproject.settings".
+
+.SH "SEE ALSO"
+Full descriptions of all these options, with examples, as well as documentation
+for the rest of the Django framework, can be found on the Django site:
+.sp
+.I http://www.djangoproject.com/documentation/
+.sp
+or in the distributed documentation.
+.SH "AUTHORS/CREDITS"
+Originally developed at World Online in Lawrence, Kansas, USA. Refer to the
+AUTHORS file in the Django distribution for contributors.
+.sp
+.SH "LICENSE"
+New BSD license. For the full license text refer to the LICENSE file in the
+Django distribution.
+

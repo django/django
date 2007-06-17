@@ -52,7 +52,7 @@ class CacheClass(BaseCache):
             pass
 
     def has_key(self, key):
-        return self._cache.has_key(key)
+        return key in self._cache
 
     def _cull(self):
         if self._cull_frequency == 0:

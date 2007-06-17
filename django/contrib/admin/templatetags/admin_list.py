@@ -72,6 +72,7 @@ def result_headers(cl):
     for i, field_name in enumerate(lookup_opts.admin.list_display):
         try:
             f = lookup_opts.get_field(field_name)
+            admin_order_field = None
         except models.FieldDoesNotExist:
             # For non-field list_display values, check for the function
             # attribute "short_description". If that doesn't exist, fall
@@ -84,22 +85,36 @@ def result_headers(cl):
                     header = attr.short_description
                 except AttributeError:
                     header = field_name.replace('_', ' ')
-            # Non-field list_display values don't get ordering capability.
-            yield {"text": header}
+
+            # It is a non-field, but perhaps one that is sortable
+            admin_order_field = getattr(getattr(cl.model, field_name), "admin_order_field", None)
+            if not admin_order_field:
+                yield {"text": header}
+                continue
+
+            # So this _is_ a sortable non-field.  Go to the yield
+            # after the else clause.
         else:
             if isinstance(f.rel, models.ManyToOneRel) and f.null:
                 yield {"text": f.verbose_name}
+                continue
             else:
-                th_classes = []
-                new_order_type = 'asc'
-                if field_name == cl.order_field:
-                    th_classes.append('sorted %sending' % cl.order_type.lower())
-                    new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
+                header = f.verbose_name
 
-                yield {"text": f.verbose_name,
-                       "sortable": True,
-                       "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-                       "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
+        th_classes = []
+        new_order_type = 'asc'
+        if field_name == cl.order_field or admin_order_field == cl.order_field:
+            th_classes.append('sorted %sending' % cl.order_type.lower())
+            new_order_type = {'asc': 'desc', 'desc': 'asc'}[cl.order_type.lower()]
+
+        yield {"text": header,
+               "sortable": True,
+               "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
+               "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
+
+def _boolean_icon(field_val):
+    BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
+    return '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
 
 def items_for_result(cl, result):
     first = True
@@ -116,9 +131,14 @@ def items_for_result(cl, result):
             try:
                 attr = getattr(result, field_name)
                 allow_tags = getattr(attr, 'allow_tags', False)
+                boolean = getattr(attr, 'boolean', False)
                 if callable(attr):
                     attr = attr()
-                result_repr = str(attr)
+                if boolean:
+                    allow_tags = True
+                    result_repr = _boolean_icon(attr)
+                else:
+                    result_repr = str(attr)
             except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
@@ -149,10 +169,9 @@ def items_for_result(cl, result):
                 row_class = ' class="nowrap"'
             # Booleans are special: We use images.
             elif isinstance(f, models.BooleanField) or isinstance(f, models.NullBooleanField):
-                BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-                result_repr = '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
-            # FloatFields are special: Zero-pad the decimals.
-            elif isinstance(f, models.FloatField):
+                result_repr = _boolean_icon(field_val)
+            # DecimalFields are special: Zero-pad the decimals.
+            elif isinstance(f, models.DecimalField):
                 if field_val is not None:
                     result_repr = ('%%.%sf' % f.decimal_places) % field_val
                 else:

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core import signals
 from django.dispatch import dispatcher
 
-__all__ = ('backend', 'connection', 'DatabaseError')
+__all__ = ('backend', 'connection', 'DatabaseError', 'IntegrityError')
 
 if not settings.DATABASE_ENGINE:
     settings.DATABASE_ENGINE = 'dummy'
@@ -29,6 +29,7 @@ runshell = lambda: __import__('django.db.backends.%s.client' % settings.DATABASE
 
 connection = backend.DatabaseWrapper(**settings.DATABASE_OPTIONS)
 DatabaseError = backend.DatabaseError
+IntegrityError = backend.IntegrityError
 
 # Register an event that closes the database connection
 # when a Django request is finished.

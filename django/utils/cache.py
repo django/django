@@ -86,7 +86,7 @@ def patch_response_headers(response, cache_timeout=None):
 
 def add_never_cache_headers(response):
     """
-    Add headers to a response to indicate that 
+    Add headers to a response to indicate that
     a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)

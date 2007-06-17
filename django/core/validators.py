@@ -25,6 +25,7 @@ email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
+decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
 integer_re = re.compile(r'^-?\d+$')
 ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
@@ -140,7 +141,8 @@ def _isValidDate(date_string):
     try:
         date(year, month, day)
     except ValueError, e:
-        raise ValidationError, gettext('Invalid date: %s.' % e)    
+        msg = gettext('Invalid date: %s') % gettext(str(e))
+        raise ValidationError, msg    
 
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
@@ -283,7 +285,7 @@ class ValidateIfOtherFieldEquals(object):
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value:
+        if self.other_field in all_data and all_data[self.other_field] == self.other_value:
             for v in self.validator_list:
                 v(field_data, all_data)
 
@@ -312,27 +314,29 @@ class RequiredIfOtherFieldGiven(RequiredIfOtherFieldsGiven):
         RequiredIfOtherFieldsGiven.__init__(self, [other_field_name], error_message)
 
 class RequiredIfOtherFieldEquals(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, error_message=None, other_label=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] == self.other_value and not field_data:
+        if self.other_field in all_data and all_data[self.other_field] == self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
 class RequiredIfOtherFieldDoesNotEqual(object):
-    def __init__(self, other_field, other_value, error_message=None):
+    def __init__(self, other_field, other_value, other_label=None, error_message=None):
         self.other_field = other_field
         self.other_value = other_value
+        other_label = other_label or other_value
         self.error_message = error_message or lazy_inter(gettext_lazy("This field must be given if %(field)s is not %(value)s"), {
-            'field': other_field, 'value': other_value})
+            'field': other_field, 'value': other_label})
         self.always_test = True
 
     def __call__(self, field_data, all_data):
-        if all_data.has_key(self.other_field) and all_data[self.other_field] != self.other_value and not field_data:
+        if self.other_field in all_data and all_data[self.other_field] != self.other_value and not field_data:
             raise ValidationError(self.error_message)
 
 class IsLessThanOtherField(object):
@@ -361,7 +365,7 @@ class NumberIsInRange(object):
         self.lower, self.upper = lower, upper
         if not error_message:
             if lower and upper:
-                self.error_message = gettext("This value must be between %s and %s.") % (lower, upper)
+                 self.error_message = gettext("This value must be between %(lower)s and %(upper)s.") % {'lower': lower, 'upper': upper}
             elif lower:
                 self.error_message = gettext("This value must be at least %s.") % lower
             elif upper:
@@ -403,27 +407,34 @@ class IsAPowerOf(object):
         if val != int(val):
             raise ValidationError, gettext("This value must be a power of %s.") % self.power_of
 
-class IsValidFloat(object):
+class IsValidDecimal(object):
     def __init__(self, max_digits, decimal_places):
         self.max_digits, self.decimal_places = max_digits, decimal_places
 
     def __call__(self, field_data, all_data):
-        data = str(field_data)
-        try:
-            float(data)
-        except ValueError:
+        match = decimal_re.search(str(field_data))
+        if not match:
             raise ValidationError, gettext("Please enter a valid decimal number.")
-        # Negative floats require more space to input.
-        max_allowed_length = data.startswith('-') and (self.max_digits + 2) or (self.max_digits + 1)
-        if len(data) > max_allowed_length:
+        
+        digits = len(match.group('digits') or '')
+        decimals = len(match.group('decimals') or '')
+        
+        if digits + decimals > self.max_digits:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
-        if (not '.' in data and len(data) > (max_allowed_length - self.decimal_places - 1)) or ('.' in data and len(data) > (max_allowed_length - (self.decimal_places - len(data.split('.')[1])))):
+        if digits > (self.max_digits - self.decimal_places):
             raise ValidationError, ngettext( "Please enter a valid decimal number with a whole part of at most %s digit.",
                 "Please enter a valid decimal number with a whole part of at most %s digits.", str(self.max_digits-self.decimal_places)) % str(self.max_digits-self.decimal_places)
-        if '.' in data and len(data.split('.')[1]) > self.decimal_places:
+        if decimals > self.decimal_places:
             raise ValidationError, ngettext("Please enter a valid decimal number with at most %s decimal place.",
                 "Please enter a valid decimal number with at most %s decimal places.", self.decimal_places) % self.decimal_places
+
+def isValidFloat(field_data, all_data):
+    data = str(field_data)
+    try:
+        float(data)
+    except ValueError:
+        raise ValidationError, gettext("Please enter a valid floating point number.")
 
 class HasAllowableSize(object):
     """

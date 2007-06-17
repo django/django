@@ -12,13 +12,19 @@ from django.core.exceptions import ImproperlyConfigured
 def complain(*args, **kwargs):
     raise ImproperlyConfigured, "You haven't set the DATABASE_ENGINE setting yet."
 
+def ignore(*args, **kwargs):
+    pass
+
 class DatabaseError(Exception):
+    pass
+
+class IntegrityError(DatabaseError):
     pass
 
 class DatabaseWrapper:
     cursor = complain
     _commit = complain
-    _rollback = complain
+    _rollback = ignore
 
     def __init__(self, **kwargs):
         pass
@@ -36,6 +42,10 @@ get_date_extract_sql = complain
 get_date_trunc_sql = complain
 get_limit_offset_sql = complain
 get_random_function_sql = complain
+get_deferrable_sql = complain
 get_fulltext_search_sql = complain
 get_drop_foreignkey_sql = complain
+get_sql_flush = complain
+get_sql_sequence_reset = complain
+
 OPERATOR_MAPPING = {}

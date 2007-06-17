@@ -1,6 +1,7 @@
 import sys, time
 from django.conf import settings
 from django.db import connection, transaction, backend
+from django.core import management, mail
 from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
@@ -10,30 +11,72 @@ from django.template import Template
 TEST_DATABASE_PREFIX = 'test_'
 
 def instrumented_test_render(self, context):
-    """An instrumented Template render method, providing a signal 
-    that can be intercepted by the test system Client
-    
+    """
+    An instrumented Template render method, providing a signal that can be
+    intercepted by the test system Client.
     """
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)
+
+def instrumented_test_iter_render(self, context):
+    """
+    An instrumented Template iter_render method, providing a signal that can be
+    intercepted by the test system Client.
+    """
+    for chunk in self.nodelist.iter_render(context):
+        yield chunk
+    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     
+class TestSMTPConnection(object):
+    """A substitute SMTP connection for use during test sessions.
+    The test connection stores email messages in a dummy outbox,
+    rather than sending them out on the wire.
+    
+    """
+    def __init__(*args, **kwargs):
+        pass
+    def open(self):
+        "Mock the SMTPConnection open() interface"
+        pass
+    def close(self):
+        "Mock the SMTPConnection close() interface"
+        pass
+    def send_messages(self, messages):
+        "Redirect messages to the dummy outbox"
+        mail.outbox.extend(messages)
+
 def setup_test_environment():
     """Perform any global pre-test setup. This involves:
         
         - Installing the instrumented test renderer
+        - Diverting the email sending functions to a test buffer
         
     """
     Template.original_render = Template.render
+    Template.original_iter_render = Template.iter_render
     Template.render = instrumented_test_render
+    Template.iter_render = instrumented_test_render
+    
+    mail.original_SMTPConnection = mail.SMTPConnection
+    mail.SMTPConnection = TestSMTPConnection
+
+    mail.outbox = []
     
 def teardown_test_environment():
     """Perform any global post-test teardown. This involves:
 
         - Restoring the original test renderer
+        - Restoring the email sending functions
         
     """
     Template.render = Template.original_render
-    del Template.original_render
+    Template.iter_render = Template.original_iter_render
+    del Template.original_render, Template.original_iter_render
+    
+    mail.SMTPConnection = mail.original_SMTPConnection
+    del mail.original_SMTPConnection
+    
+    del mail.outbox
     
 def _set_autocommit(connection):
     "Make sure a connection is in autocommit mode."
@@ -41,6 +84,20 @@ def _set_autocommit(connection):
         connection.connection.autocommit(True)
     elif hasattr(connection.connection, "set_isolation_level"):
         connection.connection.set_isolation_level(0)
+
+def get_mysql_create_suffix():
+    suffix = []
+    if settings.TEST_DATABASE_CHARSET:
+        suffix.append('CHARACTER SET %s' % settings.TEST_DATABASE_CHARSET)
+    if settings.TEST_DATABASE_COLLATION:
+        suffix.append('COLLATE %s' % settings.TEST_DATABASE_COLLATION)
+    return ' '.join(suffix)
+
+def get_postgresql_create_suffix():
+    assert settings.TEST_DATABASE_COLLATION is None, "PostgreSQL does not support collation setting at database creation time."
+    if settings.TEST_DATABASE_CHARSET:
+        return "WITH ENCODING '%s'" % settings.TEST_DATABASE_CHARSET
+    return ''
 
 def create_test_db(verbosity=1, autoclobber=False):
     if verbosity >= 1:
@@ -50,6 +107,12 @@ def create_test_db(verbosity=1, autoclobber=False):
     if settings.DATABASE_ENGINE == "sqlite3":
         TEST_DATABASE_NAME = ":memory:"
     else:
+        suffix = {
+            'postgresql': get_postgresql_create_suffix,
+            'postgresql_psycopg2': get_postgresql_create_suffix,
+            'mysql': get_mysql_create_suffix,
+            'mysql_old': get_mysql_create_suffix,
+        }.get(settings.DATABASE_ENGINE, lambda: '')()
         if settings.TEST_DATABASE_NAME:
             TEST_DATABASE_NAME = settings.TEST_DATABASE_NAME
         else:
@@ -61,7 +124,7 @@ def create_test_db(verbosity=1, autoclobber=False):
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+            cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
         except Exception, e:            
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -73,7 +136,7 @@ def create_test_db(verbosity=1, autoclobber=False):
                     cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+                    cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
@@ -83,6 +146,8 @@ def create_test_db(verbosity=1, autoclobber=False):
                
     connection.close()
     settings.DATABASE_NAME = TEST_DATABASE_NAME
+
+    management.syncdb(verbosity, interactive=False)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.

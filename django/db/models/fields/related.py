@@ -2,10 +2,12 @@ from django.db import backend, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
+from django.utils.text import capfirst
 from django.utils.translation import gettext_lazy, string_concat, ngettext
 from django.utils.functional import curry
 from django.core import validators
 from django import oldforms
+from django import newforms as forms
 from django.dispatch import dispatcher
 
 # For Python 2.3
@@ -314,18 +316,20 @@ def create_many_related_manager(superclass):
             # join_table: name of the m2m link table
             # source_col_name: the PK colname in join_table for the source object
             # target_col_name: the PK colname in join_table for the target object
-            # *objs - objects to add
+            # *objs - objects to add. Either object instances, or primary keys of object instances.
             from django.db import connection
 
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                new_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to add() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        new_ids.add(obj._get_pk_val())
+                    else:
+                        new_ids.add(obj)
                 # Add the newly created or already existing objects to the join table.
                 # First find out which items are already added, to avoid adding them twice
-                new_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("SELECT %s FROM %s WHERE %s = %%s AND %s IN (%s)" % \
                     (target_col_name, self.join_table, source_col_name,
@@ -352,14 +356,16 @@ def create_many_related_manager(superclass):
             # If there aren't any objects, there is nothing to do.
             if objs:
                 # Check that all the objects are of the right type
+                old_ids = set()
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise ValueError, "objects to remove() must be %s instances" % self.model._meta.object_name
+                    if isinstance(obj, self.model):
+                        old_ids.add(obj._get_pk_val())
+                    else:
+                        old_ids.add(obj)
                 # Remove the specified objects from the join table
-                old_ids = set([obj._get_pk_val() for obj in objs])
                 cursor = connection.cursor()
                 cursor.execute("DELETE FROM %s WHERE %s = %%s AND %s IN (%s)" % \
-                    (self.join_table, source_col_name, 
+                    (self.join_table, source_col_name,
                     target_col_name, ",".join(['%s'] * len(old_ids))),
                     [self._pk_val] + list(old_ids))
                 transaction.commit_unless_managed()
@@ -468,7 +474,7 @@ class ForeignKey(RelatedField, Field):
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
-        if kwargs.has_key('edit_inline_type'):
+        if 'edit_inline_type' in kwargs:
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
@@ -546,6 +552,11 @@ class ForeignKey(RelatedField, Field):
     def contribute_to_related_class(self, cls, related):
         setattr(cls, related.get_accessor_name(), ForeignRelatedObjectsDescriptor(related))
 
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.ModelChoiceField, 'queryset': self.rel.to._default_manager.all()}
+        defaults.update(kwargs)
+        return super(ForeignKey, self).formfield(**defaults)
+
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
         try:
@@ -556,7 +567,7 @@ class OneToOneField(RelatedField, IntegerField):
             to_field = to_field or to._meta.pk.name
         kwargs['verbose_name'] = kwargs.get('verbose_name', '')
 
-        if kwargs.has_key('edit_inline_type'):
+        if 'edit_inline_type' in kwargs:
             import warnings
             warnings.warn("edit_inline_type is deprecated. Use edit_inline instead.")
             kwargs['edit_inline'] = kwargs.pop('edit_inline_type')
@@ -607,6 +618,11 @@ class OneToOneField(RelatedField, IntegerField):
         if not cls._meta.one_to_one_field:
             cls._meta.one_to_one_field = self
 
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.ModelChoiceField, 'queryset': self.rel.to._default_manager.all()}
+        defaults.update(kwargs)
+        return super(OneToOneField, self).formfield(**defaults)
+
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
         kwargs['verbose_name'] = kwargs.get('verbose_name', None)
@@ -617,6 +633,7 @@ class ManyToManyField(RelatedField, Field):
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             raw_id_admin=kwargs.pop('raw_id_admin', False),
             symmetrical=kwargs.pop('symmetrical', True))
+        self.db_table = kwargs.pop('db_table', None)
         if kwargs["rel"].raw_id_admin:
             kwargs.setdefault("validator_list", []).append(self.isValidIDList)
         Field.__init__(self, **kwargs)
@@ -639,7 +656,10 @@ class ManyToManyField(RelatedField, Field):
 
     def _get_m2m_db_table(self, opts):
         "Function that can be curried to provide the m2m table name for this relation"
-        return '%s_%s' % (opts.db_table, self.name)
+        if self.db_table:
+            return self.db_table
+        else:
+            return '%s_%s' % (opts.db_table, self.name)
 
     def _get_m2m_column_name(self, related):
         "Function that can be curried to provide the source column name for the m2m table"
@@ -712,6 +732,19 @@ class ManyToManyField(RelatedField, Field):
 
     def set_attributes_from_rel(self):
         pass
+
+    def value_from_object(self, obj):
+        "Returns the value of this field in the given model instance."
+        return getattr(obj, self.attname).all()
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.ModelMultipleChoiceField, 'queryset': self.rel.to._default_manager.all()}
+        defaults.update(kwargs)
+        # If initial is passed in, it's a list of related objects, but the
+        # MultipleChoiceField takes a list of IDs.
+        if defaults.get('initial') is not None:
+            defaults['initial'] = [i._get_pk_val() for i in defaults['initial']]
+        return super(ManyToManyField, self).formfield(**defaults)
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,

@@ -96,14 +96,16 @@ class AutomaticManipulator(oldforms.Manipulator):
         if self.change:
             params[self.opts.pk.attname] = self.obj_key
 
-        # First, save the basic object itself.
+        # First, create the basic object itself.
         new_object = self.model(**params)
-        new_object.save()
 
-        # Now that the object's been saved, save any uploaded files.
+        # Now that the object's been created, save any uploaded files.
         for f in self.opts.fields:
             if isinstance(f, FileField):
-                f.save_file(new_data, new_object, self.change and self.original_object or None, self.change, rel=False)
+                f.save_file(new_data, new_object, self.change and self.original_object or None, self.change, rel=False, save=False)
+
+        # Now save the object
+        new_object.save()
 
         # Calculate which primary fields have changed.
         if self.change:

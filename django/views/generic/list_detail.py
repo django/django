@@ -33,6 +33,12 @@ def object_list(request, queryset, paginate_by=None, page=None,
             number of pages, total
         hits
             number of objects, total
+        last_on_page
+            the result number of the last of object in the
+            object_list (1-indexed)
+        first_on_page
+            the result number of the first object in the
+            object_list (1-indexed)
     """
     if extra_context is None: extra_context = {}
     queryset = queryset._clone()
@@ -57,6 +63,8 @@ def object_list(request, queryset, paginate_by=None, page=None,
             'page': page,
             'next': page + 1,
             'previous': page - 1,
+            'last_on_page': paginator.last_on_page(page - 1),
+            'first_on_page': paginator.first_on_page(page - 1),
             'pages': paginator.pages,
             'hits' : paginator.hits,
         }, context_processors)
@@ -76,7 +84,7 @@ def object_list(request, queryset, paginate_by=None, page=None,
         model = queryset.model
         template_name = "%s/%s_list.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
-    return HttpResponse(t.render(c), mimetype=mimetype)
+    return HttpResponse(t.iter_render(c), mimetype=mimetype)
 
 def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
@@ -118,6 +126,6 @@ def object_detail(request, queryset, object_id=None, slug=None,
             c[key] = value()
         else:
             c[key] = value
-    response = HttpResponse(t.render(c), mimetype=mimetype)
+    response = HttpResponse(t.iter_render(c), mimetype=mimetype)
     populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.name))
     return response

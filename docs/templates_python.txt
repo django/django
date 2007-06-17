@@ -11,7 +11,7 @@ If you're looking to use the Django template system as part of another
 application -- i.e., without the rest of the framework -- make sure to read
 the `configuration`_ section later in this document.
 
-.. _`The Django template language: For template authors`: http://www.djangoproject.com/documentation/templates/
+.. _`The Django template language: For template authors`: ../templates/
 
 Basics
 ======
@@ -212,21 +212,24 @@ template tags. If an invalid variable is provided to one of these template
 tags, the variable will be interpreted as ``None``. Filters are always
 applied to invalid variables within these template tags.
 
+If ``TEMPLATE_STRING_IF_INVALID`` contains a ``'%s'``, the format marker will
+be replaced with the name of the invalid variable.
+
 .. admonition:: For debug purposes only!
 
-    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool, 
-    it is a bad idea to turn it on as a 'development default'. 
-    
-    Many templates, including those in the Admin site, rely upon the 
-    silence of the template system when a non-existent variable is 
+    While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool,
+    it is a bad idea to turn it on as a 'development default'.
+
+    Many templates, including those in the Admin site, rely upon the
+    silence of the template system when a non-existent variable is
     encountered. If you assign a value other than ``''`` to
-    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering 
+    ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering
     problems with these templates and sites.
-    
-    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled 
-    in order to debug a specific template problem, then cleared 
+
+    Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled
+    in order to debug a specific template problem, then cleared
     once debugging is complete.
-        
+
 Playing with Context objects
 ----------------------------
 
@@ -291,7 +294,8 @@ return a dictionary of items to be merged into the context. By default,
 
     ("django.core.context_processors.auth",
     "django.core.context_processors.debug",
-    "django.core.context_processors.i18n")
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media")
 
 Each processor is applied in order. That means, if one processor adds a
 variable to the context and a second processor adds a variable with the same
@@ -327,8 +331,8 @@ Note::
 
 Here's what each of the default processors does:
 
-.. _HttpRequest object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
-.. _TEMPLATE_CONTEXT_PROCESSORS setting: http://www.djangoproject.com/documentation/settings/#template-context-processors
+.. _HttpRequest object: ../request_response/#httprequest-objects
+.. _TEMPLATE_CONTEXT_PROCESSORS setting: ../settings/#template-context-processors
 
 django.core.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -345,7 +349,7 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
       ``request.user.get_and_delete_messages()`` for every request. That method
       collects the user's messages and deletes them from the database.
 
-      Note that messages are set with ``user.add_message()``. See the
+      Note that messages are set with ``user.message_set.create``. See the
       `message docs`_ for more.
 
     * ``perms`` -- An instance of
@@ -353,9 +357,9 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
       permissions that the currently logged-in user has. See the `permissions
       docs`_.
 
-.. _user authentication docs: http://www.djangoproject.com/documentation/authentication/#users
-.. _message docs: http://www.djangoproject.com/documentation/authentication/#messages
-.. _permissions docs: http://www.djangoproject.com/documentation/authentication/#permissions
+.. _user authentication docs: ../authentication/#users
+.. _message docs: ../authentication/#messages
+.. _permissions docs: ../authentication/#permissions
 
 django.core.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -383,9 +387,18 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 
 See the `internationalization docs`_ for more.
 
-.. _LANGUAGES setting: http://www.djangoproject.com/documentation/settings/#languages
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
-.. _internationalization docs: http://www.djangoproject.com/documentation/i18n/
+.. _LANGUAGES setting: ../settings/#languages
+.. _LANGUAGE_CODE setting: ../settings/#language-code
+.. _internationalization docs: ../i18n/
+
+django.core.context_processors.media
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
+``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
+value of the `MEDIA_URL setting`_.
+
+.. _MEDIA_URL setting: ../settings/#media-url
 
 django.core.context_processors.request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -654,6 +667,18 @@ decorator instead::
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
 
+Template filters which expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If you are writing a template filter which only expects a string as the first
+argument, you should use the included decorator ``stringfilter`` which will convert
+an object to it's string value before being passed to your function::
+
+    from django import template
+
+    @template.stringfilter
+    def lower(value):
+    	return value.lower()
+
 Writing custom template tags
 ----------------------------
 
@@ -668,14 +693,15 @@ how the compilation works and how the rendering works.
 
 When Django compiles a template, it splits the raw template text into
 ''nodes''. Each node is an instance of ``django.template.Node`` and has
-a ``render()`` method. A compiled template is, simply, a list of ``Node``
-objects. When you call ``render()`` on a compiled template object, the template
-calls ``render()`` on each ``Node`` in its node list, with the given context.
-The results are all concatenated together to form the output of the template.
+either a ``render()`` or ``iter_render()`` method. A compiled template is,
+simply, a list of ``Node`` objects. When you call ``render()`` on a compiled
+template object, the template calls ``render()`` on each ``Node`` in its node
+list, with the given context. The results are all concatenated together to
+form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
 converted into a ``Node`` (the compilation function), and what the node's
-``render()`` method does.
+``render()`` or ``iter_render()`` method does.
 
 Writing the compilation function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -702,7 +728,7 @@ object::
             # split_contents() knows not to split quoted strings.
             tag_name, format_string = token.split_contents()
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
         if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
             raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
         return CurrentTimeNode(format_string[1:-1])
@@ -745,7 +771,8 @@ Writing the renderer
 ~~~~~~~~~~~~~~~~~~~~
 
 The second step in writing custom tags is to define a ``Node`` subclass that
-has a ``render()`` method.
+has a ``render()`` method (we will discuss the ``iter_render()`` alternative
+in `Improving rendering speed`_, below).
 
 Continuing the above example, we need to define ``CurrentTimeNode``::
 
@@ -800,6 +827,70 @@ Python 2.4 and above::
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the tag name.
+
+Passing template variables to the tag
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although you can pass any number of arguments to a template tag using
+``token.split_contents()``, the arguments are all unpacked as
+string literals. A little more work is required in order to dynamic content (a
+template variable) to a template tag as an argument.
+
+While the previous examples have formatted the current time into a string and
+returned the string, suppose you wanted to pass in a ``DateTimeField`` from an
+object and have the template tag format that date-time::
+
+    <p>This post was last updated at {% format_time blog_entry.date_updated "%Y-%m-%d %I:%M %p" %}.</p>
+
+Initially, ``token.split_contents()`` will return three values:
+
+    1. The tag name ``format_time``.
+    2. The string "blog_entry.date_updated" (without the surrounding quotes).
+    3. The formatting string "%Y-%m-%d %I:%M %p". The return value from
+       ``split_contents()`` will include the leading and trailing quotes for
+       string literals like this.
+
+Now your tag should begin to look like this::
+
+    from django import template
+    def do_format_time(parser, token):
+        try:
+            # split_contents() knows not to split quoted strings.
+            tag_name, date_to_be_formatted, format_string = token.split_contents()
+        except ValueError:
+            raise template.TemplateSyntaxError, "%r tag requires exactly two arguments" % token.contents.split()[0]
+        if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+            raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
+        return FormatTimeNode(date_to_be_formatted, format_string[1:-1])
+
+You also have to change the renderer to retrieve the actual contents of the
+``date_updated`` property of the ``blog_entry`` object.  This can be
+accomplished by using the ``resolve_variable()`` function in
+``django.template``. You pass ``resolve_variable()`` the variable name and the
+current context, available in the ``render`` method::
+
+    from django import template
+    from django.template import resolve_variable
+    import datetime
+    class FormatTimeNode(template.Node):
+        def __init__(self, date_to_be_formatted, format_string):
+            self.date_to_be_formatted = date_to_be_formatted
+            self.format_string = format_string
+
+        def render(self, context):
+            try:
+                actual_date = resolve_variable(self.date_to_be_formatted, context)
+                return actual_date.strftime(self.format_string)
+            except template.VariableDoesNotExist:
+                return ''
+
+``resolve_variable`` will try to resolve ``blog_entry.date_updated`` and then
+format it accordingly.
+
+.. note::
+    The ``resolve_variable()`` function will throw a ``VariableDoesNotExist``
+    exception if it cannot resolve the string passed to it in the current
+    context of the page.
 
 Shortcut for simple tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -944,7 +1035,7 @@ The ``takes_context`` parameter defaults to ``False``. When it's set to *True*,
 the tag is passed the context object, as in this example. That's the only
 difference between this case and the previous ``inclusion_tag`` example.
 
-.. _tutorials: http://www.djangoproject.com/documentation/tutorial1/#creating-models
+.. _tutorials: ../tutorial01/#creating-models
 
 Setting a variable in the context
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1001,7 +1092,7 @@ class, like so::
             # Splitting by None == splitting by spaces.
             tag_name, arg = token.contents.split(None, 1)
         except ValueError:
-            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents[0]
+            raise template.TemplateSyntaxError, "%r tag requires arguments" % token.contents.split()[0]
         m = re.search(r'(.*?) as (\w+)', arg)
         if not m:
             raise template.TemplateSyntaxError, "%r tag had invalid arguments" % tag_name
@@ -1086,6 +1177,48 @@ For more examples of complex rendering, see the source code for ``{% if %}``,
 
 .. _configuration:
 
+Improving rendering speed
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For most practical purposes, the ``render()`` method on a ``Node`` will be
+sufficient and the simplest way to implement a new tag. However, if your
+template tag is expected to produce large strings via ``render()``, you can
+speed up the rendering process (and reduce memory usage) using iterative
+rendering via the ``iter_render()`` method.
+
+The ``iter_render()`` method should either be an iterator that yields string
+chunks, one at a time, or a method that returns a sequence of string chunks.
+The template renderer will join the successive chunks together when creating
+the final output. The improvement over the ``render()`` method here is that
+you do not need to create one large string containing all the output of the
+``Node``, instead you can produce the output in smaller chunks.
+
+By way of example, here's a trivial ``Node`` subclass that simply returns the
+contents of a file it is given::
+
+    class FileNode(Node):
+        def __init__(self, filename):
+            self.filename = filename
+
+        def iter_render(self):
+            for line in file(self.filename):
+                yield line
+
+For very large files, the full file contents will never be read entirely into
+memory when this tag is used, which is a useful optimisation.
+
+If you define an ``iter_render()`` method on your ``Node`` subclass, you do
+not need to define a ``render()`` method. The reverse is true as well: the
+default ``Node.iter_render()`` method will call your ``render()`` method if
+necessary. A useful side-effect of this is that you can develop a new tag
+using ``render()`` and producing all the output at once, which is easy to
+debug. Then you can rewrite the method as an iterator, rename it to
+``iter_render()`` and everything will still work.
+
+It is compulsory, however, to define *either* ``render()`` or ``iter_render()``
+in your subclass. If you omit them both, a ``TypeError`` will be raised when
+the code is imported.
+
 Configuring the template system in standalone mode
 ==================================================
 
@@ -1115,5 +1248,6 @@ settings you wish to specify. You might want to consider setting at least
 `settings documentation`_, and any setting starting with *TEMPLATE_*
 is of obvious interest.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/#using-settings-without-the-django-settings-module-environment-variable
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/
+.. _settings file: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/
+

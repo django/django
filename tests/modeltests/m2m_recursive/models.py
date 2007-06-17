@@ -1,5 +1,5 @@
 """
-27. Many-to-many relationships between the same two tables
+28. Many-to-many relationships between the same two tables
 
 In this example, A Person can have many friends, who are also people. Friendship is a
 symmetrical relationship - if I am your friend, you are my friend.

@@ -29,12 +29,12 @@ class HttpRequest(object):
 
     def __getitem__(self, key):
         for d in (self.POST, self.GET):
-            if d.has_key(key):
+            if key in d:
                 return d[key]
         raise KeyError, "%s not found in either POST or GET" % key
 
     def has_key(self, key):
-        return self.GET.has_key(key) or self.POST.has_key(key)
+        return key in self.GET or key in self.POST
 
     def get_full_path(self):
         return ''
@@ -52,12 +52,12 @@ def parse_file_upload(header_dict, post_data):
     POST = MultiValueDict()
     FILES = MultiValueDict()
     for submessage in msg.get_payload():
-        if isinstance(submessage, email.Message.Message):
+        if submessage and isinstance(submessage, email.Message.Message):
             name_dict = parse_header(submessage['Content-Disposition'])[1]
             # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
             # or {'name': 'blah'} for POST fields
             # We assume all uploaded files have a 'filename' set.
-            if name_dict.has_key('filename'):
+            if 'filename' in name_dict:
                 assert type([]) != type(submessage.get_payload()), "Nested MIME messages are not supported"
                 if not name_dict['filename'].strip():
                     continue
@@ -66,7 +66,7 @@ def parse_file_upload(header_dict, post_data):
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
                 FILES.appendlist(name_dict['name'], {
                     'filename': filename,
-                    'content-type': (submessage.has_key('Content-Type') and submessage['Content-Type'] or None),
+                    'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
                     'content': submessage.get_payload(),
                 })
             else:
@@ -90,6 +90,10 @@ class QueryDict(MultiValueDict):
     def __setitem__(self, key, value):
         self._assert_mutable()
         MultiValueDict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        self._assert_mutable()
+        super(QueryDict, self).__delitem__(key)
 
     def __copy__(self):
         result = self.__class__('', mutable=True)
@@ -117,9 +121,9 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.update(self, other_dict)
 
-    def pop(self, key):
+    def pop(self, key, *args):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key)
+        return MultiValueDict.pop(self, key, *args)
 
     def popitem(self):
         self._assert_mutable()
@@ -155,12 +159,15 @@ def parse_cookie(cookie):
 
 class HttpResponse(object):
     "A basic HTTP response, with content and dictionary-accessed headers"
+
+    status_code = 200
+
     def __init__(self, content='', mimetype=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
-        if hasattr(content, '__iter__'):
+        if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:
@@ -168,7 +175,6 @@ class HttpResponse(object):
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
-        self.status_code = 200
 
     def __str__(self):
         "Full HTTP message, including headers"
@@ -216,6 +222,12 @@ class HttpResponse(object):
         content = ''.join(self._container)
         if isinstance(content, unicode):
             content = content.encode(self._charset)
+
+        # If self._container was an iterator, we have just exhausted it, so we
+        # need to save the results for anything else that needs access
+        if not self._is_string:
+            self._container = [content]
+            self._is_string = True
         return content
 
     def _set_content(self, value):
@@ -225,14 +237,10 @@ class HttpResponse(object):
     content = property(_get_content, _set_content)
 
     def __iter__(self):
-        self._iterator = self._container.__iter__()
-        return self
-
-    def next(self):
-        chunk = self._iterator.next()
-        if isinstance(chunk, unicode):
-            chunk = chunk.encode(self._charset)
-        return chunk
+        for chunk in self._container:
+            if isinstance(chunk, unicode):
+                chunk = chunk.encode(self._charset)
+            yield chunk
 
     def close(self):
         if hasattr(self._container, 'close'):
@@ -254,47 +262,49 @@ class HttpResponse(object):
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseRedirect(HttpResponse):
+    status_code = 302
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 302
 
 class HttpResponsePermanentRedirect(HttpResponse):
+    status_code = 301
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
         self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 301
 
 class HttpResponseNotModified(HttpResponse):
-    def __init__(self):
-        HttpResponse.__init__(self)
-        self.status_code = 304
+    status_code = 304
+
+class HttpResponseBadRequest(HttpResponse):
+    status_code = 400
 
 class HttpResponseNotFound(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 404
+    status_code = 404
 
 class HttpResponseForbidden(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 403
+    status_code = 403
 
 class HttpResponseNotAllowed(HttpResponse):
+    status_code = 405
+
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
-        self.status_code = 405
 
 class HttpResponseGone(HttpResponse):
+    status_code = 410
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 410
 
 class HttpResponseServerError(HttpResponse):
+    status_code = 500
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 500
 
 def get_host(request):
     "Gets the HTTP host from the environment or request headers."

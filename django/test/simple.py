@@ -1,6 +1,6 @@
-import unittest, doctest
+import unittest
 from django.conf import settings
-from django.core import management
+from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.utils import create_test_db, destroy_test_db
 from django.test.testcases import OutputChecker, DocTestRunner
@@ -50,9 +50,12 @@ def build_suite(app_module):
             pass
         else:
             # The module exists, so there must be an import error in the 
-            # test module itself. We don't need the module; close the file
-            # handle returned by find_module.
-            mod[0].close()
+            # test module itself. We don't need the module; so if the
+            # module was a single file module (i.e., tests.py), close the file
+            # handle returned by find_module. Otherwise, the test module
+            # is a directory, and there is nothing to close.
+            if mod[0]:
+                mod[0].close()
             raise
             
     return suite
@@ -64,6 +67,8 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
     looking for doctests and unittests in models.py or tests.py within
     the module. A list of 'extra' tests may also be provided; these tests
     will be added to the test suite.
+    
+    Returns the number of tests that failed.
     """
     setup_test_environment()
     
@@ -78,8 +83,10 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
 
     old_name = settings.DATABASE_NAME
     create_test_db(verbosity)
-    management.syncdb(verbosity, interactive=False)
-    unittest.TextTestRunner(verbosity=verbosity).run(suite)
+    result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
     destroy_test_db(old_name, verbosity)
     
     teardown_test_environment()
+    
+    return len(result.failures) + len(result.errors)
+    

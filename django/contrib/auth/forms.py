@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
 from django import oldforms
+from django.utils.translation import gettext as _
 
 class UserCreationForm(oldforms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
@@ -125,4 +126,19 @@ class PasswordChangeForm(oldforms.Manipulator):
     def save(self, new_data):
         "Saves the new password."
         self.user.set_password(new_data['new_password1'])
+        self.user.save()
+
+class AdminPasswordChangeForm(oldforms.Manipulator):
+    "A form used to change the password of a user in the admin interface."
+    def __init__(self, user):
+        self.user = user
+        self.fields = (
+            oldforms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
+            oldforms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
+                validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
+        )
+
+    def save(self, new_data):
+        "Saves the new password."
+        self.user.set_password(new_data['password1'])
         self.user.save()

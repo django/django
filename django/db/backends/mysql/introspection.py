@@ -76,7 +76,7 @@ def get_indexes(cursor, table_name):
 DATA_TYPES_REVERSE = {
     FIELD_TYPE.BLOB: 'TextField',
     FIELD_TYPE.CHAR: 'CharField',
-    FIELD_TYPE.DECIMAL: 'FloatField',
+    FIELD_TYPE.DECIMAL: 'DecimalField',
     FIELD_TYPE.DATE: 'DateField',
     FIELD_TYPE.DATETIME: 'DateTimeField',
     FIELD_TYPE.DOUBLE: 'FloatField',
@@ -85,7 +85,7 @@ DATA_TYPES_REVERSE = {
     FIELD_TYPE.LONG: 'IntegerField',
     FIELD_TYPE.LONGLONG: 'IntegerField',
     FIELD_TYPE.SHORT: 'IntegerField',
-    FIELD_TYPE.STRING: 'TextField',
+    FIELD_TYPE.STRING: 'CharField',
     FIELD_TYPE.TIMESTAMP: 'DateTimeField',
     FIELD_TYPE.TINY: 'IntegerField',
     FIELD_TYPE.TINY_BLOB: 'TextField',

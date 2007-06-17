@@ -26,7 +26,7 @@ to determine which feed to output.
 
 To create a feed, just write a ``Feed`` class and point to it in your URLconf_.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
+.. _URLconf: ../url_dispatch/
 
 Initialization
 --------------
@@ -72,8 +72,8 @@ The above example registers two feeds:
 
 Once that's set up, you just need to define the ``Feed`` classes themselves.
 
-.. _URLconf: http://www.djangoproject.com/documentation/url_dispatch/
-.. _settings file: http://www.djangoproject.com/documentation/settings/
+.. _URLconf: ../url_dispatch/
+.. _settings file: ../settings/
 
 Feed classes
 ------------
@@ -114,6 +114,9 @@ Note:
       `object-relational mapper`_, ``items()`` doesn't have to return model
       instances. Although you get a few bits of functionality "for free" by
       using Django models, ``items()`` can return any type of object you want.
+    * If you're creating an Atom feed, rather than an RSS feed, set the
+      ``subtitle`` attribute instead of the ``description`` attribute. See
+      `Publishing Atom and RSS feeds in tandem`_, later, for an example.
 
 One thing's left to do. In an RSS feed, each ``<item>`` has a ``<title>``,
 ``<link>`` and ``<description>``. We need to tell the framework what data to
@@ -127,7 +130,7 @@ put into those elements.
       it two template context variables:
 
           * ``{{ obj }}`` -- The current object (one of whichever objects you
-            returned in ``items()``). 
+            returned in ``items()``).
           * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
             representing the current site. This is useful for
             ``{{ site.domain }}`` or ``{{ site.name }}``.
@@ -143,7 +146,10 @@ put into those elements.
       exist, it tries calling a method ``item_link()`` in the ``Feed`` class,
       passing it a single parameter, ``item``, which is the object itself.
       Both ``get_absolute_url()`` and ``item_link()`` should return the item's
-      URL as a normal Python string.
+      URL as a normal Python string. As with ``get_absolute_url()``, the
+      result of ``item_link()`` will be included directly in the URL, so you
+      are responsible for doing all necessary URL quoting and conversion to
+      ASCII inside the method itself.
 
     * For the LatestEntries example above, we could have very simple feed templates:
 
@@ -156,8 +162,8 @@ put into those elements.
              {{ obj.description }}
 
 .. _chicagocrime.org: http://www.chicagocrime.org/
-.. _object-relational mapper: http://www.djangoproject.com/documentation/db_api/
-.. _Django templates: http://www.djangoproject.com/documentation/templates/
+.. _object-relational mapper: ../db-api/
+.. _Django templates: ../templates/
 
 A complex example
 -----------------
@@ -277,7 +283,7 @@ Feeds created by the syndication framework automatically include the
 appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). This
 comes directly from your `LANGUAGE_CODE setting`_.
 
-.. _LANGUAGE_CODE setting: http://www.djangoproject.com/documentation/settings/#language-code
+.. _LANGUAGE_CODE setting: ../settings/#language-code
 
 URLs
 ----
@@ -292,13 +298,13 @@ Atom feeds require a ``<link rel="self">`` that defines the feed's current
 location. The syndication framework populates this automatically, using the
 domain of the current site according to the SITE_ID setting.
 
-.. _SITE_ID setting: http://www.djangoproject.com/documentation/settings/#site-id
+.. _SITE_ID setting: ../settings/#site-id
 
 Publishing Atom and RSS feeds in tandem
 ---------------------------------------
 
 Some developers like to make available both Atom *and* RSS versions of their
-feeds. That's easy to do with Django: Just create a subclass of your ``feed``
+feeds. That's easy to do with Django: Just create a subclass of your ``Feed``
 class and set the ``feed_type`` to something different. Then update your
 URLconf to add the extra versions.
 
@@ -318,6 +324,20 @@ Here's a full example::
 
     class AtomSiteNewsFeed(RssSiteNewsFeed):
         feed_type = Atom1Feed
+        subtitle = RssSiteNewsFeed.description
+
+.. Note::
+    In this example, the RSS feed uses a ``description`` while the Atom feed
+    uses a ``subtitle``. That's because Atom feeds don't provide for a
+    feed-level "description," but they *do* provide for a "subtitle."
+
+    If you provide a ``description`` in your ``Feed`` class, Django will *not*
+    automatically put that into the ``subtitle`` element, because a subtitle
+    and description are not necessarily the same thing. Instead, you should
+    define a ``subtitle`` attribute.
+
+    In the above example, we simply set the Atom feed's ``subtitle`` to the
+    RSS feed's ``description``, because it's quite short already.
 
 And the accompanying URLconf::
 
@@ -478,6 +498,22 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         categories = ("python", "django") # Hard-coded list of categories.
 
+        # COPYRIGHT NOTICE -- One of the following three is optional. The
+        # framework looks for them in this order.
+
+        def copyright(self, obj):
+            """
+            Takes the object returned by get_object() and returns the feed's
+            copyright notice as a normal Python string.
+            """
+
+        def copyright(self):
+            """
+            Returns the feed's copyright notice as a normal Python string.
+            """
+
+        copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
+
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
 
@@ -613,15 +649,15 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         def item_enclosure_mime_type(self, item):
             """
             Takes an item, as returned by items(), and returns the item's
-            enclosure mime type.
+            enclosure MIME type.
             """
 
         def item_enclosure_mime_type(self):
             """
-            Returns the enclosure length, in bytes, for every item in the feed.
+            Returns the enclosure MIME type for every item in the feed.
             """
 
-        item_enclosure_mime_type = "audio/mpeg" # Hard-coded enclosure mime-type.
+        item_enclosure_mime_type = "audio/mpeg" # Hard-coded enclosure MIME type.
 
         # ITEM PUBDATE -- It's optional to use one of these three. This is a
         # hook that specifies how to get the pubdate for a given item.
@@ -658,6 +694,23 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             """
 
         item_categories = ("python", "django") # Hard-coded categories.
+
+        # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
+        # following three is optional. The framework looks for them in this
+        # order.
+
+        def item_copyright(self, obj):
+            """
+            Takes an item, as returned by items(), and returns the item's
+            copyright notice as a normal Python string.
+            """
+
+        def item_copyright(self):
+            """
+            Returns the copyright notice for every item in the feed.
+            """
+
+        item_copyright = 'Copyright (c) 2007, Sally Smith' # Hard-coded copyright notice.
 
 
 The low-level framework

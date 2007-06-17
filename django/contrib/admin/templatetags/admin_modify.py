@@ -11,6 +11,7 @@ import re
 register = template.Library()
 
 word_re = re.compile('[A-Z][a-z]+')
+absolute_url_re = re.compile(r'^(?:http(?:s)?:/)?/', re.IGNORECASE)
 
 def class_name_to_underscored(name):
     return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
@@ -18,18 +19,19 @@ def class_name_to_underscored(name):
 def include_admin_script(script_path):
     """
     Returns an HTML script element for including a script from the admin
-    media url.
+    media url (or other location if an absolute url is given).
 
     Example usage::
 
-        {% include_admin_script js/calendar.js %}
+        {% include_admin_script "js/calendar.js" %}
 
     could return::
 
         <script type="text/javascript" src="/media/admin/js/calendar.js">
     """
-
-    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    if not absolute_url_re.match(script_path):
+        script_path = '%s%s' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    return '<script type="text/javascript" src="%s"></script>' % script_path
 include_admin_script = register.simple_tag(include_admin_script)
 
 def submit_row(context):
@@ -72,7 +74,7 @@ class FieldWidgetNode(template.Node):
         self.bound_field_var = bound_field_var
 
     def get_nodelist(cls, klass):
-        if not cls.nodelists.has_key(klass):
+        if klass not in cls.nodelists:
             try:
                 field_class_name = klass.__name__
                 template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
@@ -92,15 +94,15 @@ class FieldWidgetNode(template.Node):
             return cls.nodelists[klass]
     get_nodelist = classmethod(get_nodelist)
 
-    def render(self, context):
+    def iter_render(self, context):
         bound_field = template.resolve_variable(self.bound_field_var, context)
 
         context.push()
         context['bound_field'] = bound_field
 
-        output = self.get_nodelist(bound_field.field.__class__).render(context)
+        for chunk in self.get_nodelist(bound_field.field.__class__).iter_render(context):
+            yield chunk
         context.pop()
-        return output
 
 class FieldWrapper(object):
     def __init__(self, field ):
@@ -165,7 +167,7 @@ class EditInlineNode(template.Node):
     def __init__(self, rel_var):
         self.rel_var = rel_var
 
-    def render(self, context):
+    def iter_render(self, context):
         relation = template.resolve_variable(self.rel_var, context)
         context.push()
         if relation.field.rel.edit_inline == models.TABULAR:
@@ -177,10 +179,9 @@ class EditInlineNode(template.Node):
         original = context.get('original', None)
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
-        t = loader.get_template(bound_related_object.template_name())
-        output = t.render(context)
+        for chunk in loader.get_template(bound_related_object.template_name()).iter_render(context):
+            yield chunk
         context.pop()
-        return output
 
 def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])

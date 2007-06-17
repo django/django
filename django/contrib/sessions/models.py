@@ -1,4 +1,4 @@
-import base64, md5, random, sys
+import base64, md5, random, sys, datetime, os, time
 import cPickle as pickle
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -14,14 +14,31 @@ class SessionManager(models.Manager):
     def get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
-        # Use person_id and SECRET_KEY as added salt.
+        # Use SECRET_KEY as added salt.
         while 1:
-            session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + str(random.randint(0, sys.maxint - 1)) + settings.SECRET_KEY).hexdigest()
+            session_key = md5.new("%s%s%s%s" % (random.randint(0, sys.maxint - 1), os.getpid(), time.time(), settings.SECRET_KEY)).hexdigest()
             try:
                 self.get(session_key=session_key)
             except self.model.DoesNotExist:
                 break
         return session_key
+
+    def get_new_session_object(self):
+        """
+        Returns a new session object.
+        """
+        # FIXME: There is a *small* chance of collision here, meaning we will
+        # return an existing object. That can be fixed when we add a way to
+        # validate (and guarantee) that non-auto primary keys are unique. For
+        # now, we save immediately in order to reduce the "window of
+        # misfortune" as much as possible.
+        created = False
+        while not created:
+            obj, created = self.get_or_create(session_key=self.get_new_session_key(),
+                    expire_date = datetime.datetime.now())
+            # Collision in key generation, so re-seed the generator
+            random.seed()
+        return obj
 
     def save(self, session_key, session_dict, expire_date):
         s = self.model(session_key, self.encode(session_dict), expire_date)

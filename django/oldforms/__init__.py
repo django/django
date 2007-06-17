@@ -130,7 +130,9 @@ class FormWrapper(object):
         if self.edit_inline:
             self.fill_inline_collections()
             for inline_collection in self._inline_collections:
-                if inline_collection.name == key:
+                # The 'orig_name' comparison is for backwards compatibility
+                # with hand-crafted forms.
+                if inline_collection.name == key or (':' not in key and inline_collection.orig_name == key):
                     return inline_collection
         raise KeyError, "Could not find Formfield or InlineObjectCollection named %r" % key
 
@@ -226,6 +228,9 @@ class InlineObjectCollection(object):
         self.errors = errors
         self._collections = None
         self.name = rel_obj.name
+        # This is the name used prior to fixing #1839. Needs for backwards
+        # compatibility.
+        self.orig_name = rel_obj.opts.module_name
 
     def __len__(self):
         self.fill()
@@ -304,6 +309,10 @@ class FormField(object):
         return data
     html2python = staticmethod(html2python)
 
+    def iter_render(self, data):
+        # this even needed?
+        return (self.render(data),)
+
     def render(self, data):
         raise NotImplementedError
 
@@ -324,7 +333,7 @@ class FormField(object):
 
     def convert_post_data(self, new_data):
         name = self.get_member_name()
-        if new_data.has_key(self.field_name):
+        if self.field_name in new_data:
             d = new_data.getlist(self.field_name)
             try:
                 converted_data = [self.__class__.html2python(data) for data in d]
@@ -569,7 +578,7 @@ class NullBooleanField(SelectField):
     "This SelectField provides 'Yes', 'No' and 'Unknown', mapping results to True, False or None"
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
-        SelectField.__init__(self, field_name, choices=[('1', 'Unknown'), ('2', 'Yes'), ('3', 'No')],
+        SelectField.__init__(self, field_name, choices=[('1', _('Unknown')), ('2', _('Yes')), ('3', _('No'))],
             is_required=is_required, validator_list=validator_list)
 
     def render(self, data):
@@ -745,14 +754,27 @@ class PositiveSmallIntegerField(IntegerField):
             raise validators.CriticalValidationError, gettext("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
+    def __init__(self, field_name, is_required=False, validator_list=None): 
+        if validator_list is None: validator_list = [] 
+        validator_list = [validators.isValidFloat] + validator_list 
+        TextField.__init__(self, field_name, is_required=is_required, validator_list=validator_list) 
+ 
+    def html2python(data): 
+        if data == '' or data is None: 
+            return None 
+        return float(data) 
+    html2python = staticmethod(html2python) 
+ 
+class DecimalField(TextField): 
     def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        validator_list = [self.isValidFloat] + validator_list
-        TextField.__init__(self, field_name, max_digits+2, max_digits+2, is_required, validator_list)
+        validator_list = [self.isValidDecimal] + validator_list 
+        # Initialise the TextField, making sure it's large enough to fit the number with a - sign and a decimal point. 
+        super(DecimalField, self).__init__(field_name, max_digits+2, max_digits+2, is_required, validator_list) 
 
-    def isValidFloat(self, field_data, all_data):
-        v = validators.IsValidFloat(self.max_digits, self.decimal_places)
+    def isValidDecimal(self, field_data, all_data): 
+        v = validators.IsValidDecimal(self.max_digits, self.decimal_places) 
         try:
             v(field_data, all_data)
         except validators.ValidationError, e:
@@ -761,7 +783,14 @@ class FloatField(TextField):
     def html2python(data):
         if data == '' or data is None:
             return None
-        return float(data)
+        try: 
+            import decimal 
+        except ImportError:
+            from django.utils import _decimal as decimal
+        try: 
+            return decimal.Decimal(data) 
+        except decimal.InvalidOperation, e: 
+            raise ValueError, e 
     html2python = staticmethod(html2python)
 
 ####################
@@ -918,7 +947,8 @@ class FilePathField(SelectField):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     if match is None or match_re.search(f):
-                        choices.append((os.path.join(root, f), f))
+                        f = os.path.join(root, f)
+                        choices.append((f, f.replace(path, "", 1)))
         else:
             try:
                 for f in os.listdir(path):
@@ -958,7 +988,9 @@ class USStateField(TextField):
             raise validators.CriticalValidationError, e.messages
 
     def html2python(data):
-        return data.upper() # Should always be stored in upper case
+        if data:
+            return data.upper() # Should always be stored in upper case
+        return data
     html2python = staticmethod(html2python)
 
 class CommaSeparatedIntegerField(TextField):

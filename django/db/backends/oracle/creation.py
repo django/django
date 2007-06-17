@@ -5,9 +5,10 @@ DATA_TYPES = {
     'CommaSeparatedIntegerField': 'varchar2(%(maxlength)s)',
     'DateField':         'date',
     'DateTimeField':     'date',
+    'DecimalField':      'number(%(max_digits)s, %(decimal_places)s)',
     'FileField':         'varchar2(100)',
     'FilePathField':     'varchar2(100)',
-    'FloatField':        'number(%(max_digits)s, %(decimal_places)s)',
+    'FloatField':        'double precision',
     'ImageField':        'varchar2(100)',
     'IntegerField':      'integer',
     'IPAddressField':    'char(15)',
@@ -21,6 +22,5 @@ DATA_TYPES = {
     'SmallIntegerField': 'smallint',
     'TextField':         'long',
     'TimeField':         'timestamp',
-    'URLField':          'varchar(200)',
     'USStateField':      'varchar(2)',
 }

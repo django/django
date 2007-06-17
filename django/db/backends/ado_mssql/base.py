@@ -17,6 +17,7 @@ except ImportError:
     mx = None
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 # We need to use a special Cursor class because adodbapi expects question-mark
 # param style, but Django expects "%s". This cursor converts question marks to
@@ -76,10 +77,11 @@ class DatabaseWrapper(local):
         return cursor
 
     def _commit(self):
-        return self.connection.commit()
+        if self.connection is not None:
+            return self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             return self.connection.rollback()
 
     def close(self):
@@ -125,6 +127,9 @@ def get_limit_offset_sql(limit, offset=None):
 def get_random_function_sql():
     return "RAND()"
 
+def get_deferrable_sql():
+    return " DEFERRABLE INITIALLY DEFERRED"
+
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
@@ -133,6 +138,24 @@ def get_drop_foreignkey_sql():
 
 def get_pk_default_value():
     return "DEFAULT"
+
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+    """
+    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # TODO - SQL not actually tested against ADO MSSQL yet!
+    # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
+    sql_list = ['%s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'),
+                 style.SQL_FIELD(quote_name(table))
+                 )  for table in tables]
+
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

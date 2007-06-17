@@ -11,8 +11,8 @@ Being a Python Web framework, Django requires Python.
 
 It works with any Python version 2.3 and higher.
 
-Get Python at www.python.org. If you're running Linux or Mac OS X, you probably
-already have it installed.
+Get Python at http://www.python.org. If you're running Linux or Mac OS X, you
+probably already have it installed.
 
 Install Apache and mod_python
 =============================
@@ -38,33 +38,68 @@ each platform.
 .. _Apache: http://httpd.apache.org/
 .. _mod_python: http://www.modpython.org/
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with mod_python: http://www.djangoproject.com/documentation/modpython/
+.. _How to use Django with mod_python: ../modpython/
 .. _server-arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 Get your database running
 =========================
 
 If you plan to use Django's database API functionality, you'll need to
-make sure a database server is running. Django works with PostgreSQL_
-(recommended), MySQL_ and SQLite_.
+make sure a database server is running. Django works with PostgreSQL_,
+MySQL_ and SQLite_.
 
 Additionally, you'll need to make sure your Python database bindings are
 installed.
 
-* If you're using PostgreSQL, you'll need the psycopg_ package (version 1.1 --
-  not version 1.0 or version 2, which is still in beta). If you're on Windows,
-  check out the unofficial `compiled Windows version`_.
-* If you're using MySQL, you'll need MySQLdb_.
+* If you're using PostgreSQL, you'll need the psycopg_ package. Django supports
+  both version 1 and 2. (When you configure Django's database layer, specify
+  either ``postgresql`` [for version 1] or ``postgresql_psycopg2`` [for version 2].)
+
+  If you're on Windows, check out the unofficial `compiled Windows version`_.
+
+* If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
+  You will also want to read the database-specific notes for the `MySQL backend`_.
+
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
-.. _psycopg: http://initd.org/projects/psycopg1
+.. _psycopg: http://initd.org/tracker/psycopg
 .. _compiled Windows version: http://stickpeople.com/projects/python/win-psycopg/
 .. _MySQLdb: http://sourceforge.net/projects/mysql-python
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
+.. _MySQL backend: ../databases/
+
+Remove any old versions of Django
+=================================
+
+If you are upgrading your installation of Django from a previous version,
+you will need to uninstall the old Django version before installing the
+new version.
+
+If you installed Django using ``setup.py install``, uninstalling
+is as simple as deleting the ``django`` directory from your Python
+``site-packages``.
+
+If you installed Django from a Python Egg, remove the Django ``.egg`` file,
+and remove the reference to the egg in the file named ``easy-install.pth``.
+This file should also be located in your ``site-packages`` directory.
+
+.. admonition:: Where are my ``site-packages`` stored?
+
+    The location of the ``site-packages`` directory depends on the operating
+    system, and the location in which Python was installed. However, the
+    following locations are common:
+
+    * If you're using Linux: ``/usr/lib/python2.X/site-packages``
+
+    * If you're using Windows: ``C:\Python2.X\lib\site-packages``
+
+    * If you're using MacOSX: ``/Library/Python2.X/site-packages`` or
+      ``/Library/Frameworks/Python.framework/Versions/2.X/lib/python2.X/site-packages/``
+      (in later releases).
 
 Install the Django code
 =======================
@@ -77,22 +112,23 @@ It's easy either way.
 Installing the official version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Django-0.95.tar.gz from our `download page`_.
-2. ``tar xzvf Django-0.95.tar.gz``
-3. ``cd Django-0.95``
-4. ``sudo python setup.py install``
+    1. Check the `distribution specific notes`_ to see if your
+       platform/distribution provides official Django packages/installers.
+       Distribution-provided packages will typically allow for automatic
+       installation of dependancies and easy upgrade paths.
 
-Note that the last command will automatically download and install setuptools_
-if you don't already have it installed. This requires a working Internet
-connection and may cause problems on Python 2.5. If you run into problems,
-try using our development version by following the instructions below. The
-development version no longer uses setuptools nor requires an Internet
-connection.
+    2. Download the latest release from our `download page`_.
+
+    3. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``).
+
+    4. Change into the downloaded directory (e.g. ``cd Django-NNN``).
+
+    5. Run ``sudo python setup.py install``.
 
 The command will install Django in your Python installation's ``site-packages``
 directory.
 
-.. _setuptools: http://peak.telecommunity.com/DevCenter/setuptools
+.. _distribution specific notes: ../distributions/
 
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,14 +149,14 @@ latest bug fixes and improvements, follow these instructions:
 
        svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
 
-4. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
+3. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
    system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
    (Windows). This step simply lets you type ``django-admin.py`` from within
    any directory, rather than having to qualify the command with the full path
    to the file.
 
 You *don't* have to run ``python setup.py install``, because that command
-takes care of steps 3 and 4 for you.
+takes care of steps 2 and 3 for you.
 
 When you want to update your copy of the Django source code, just run the
 command ``svn update`` from within the ``django`` directory. When you do this,

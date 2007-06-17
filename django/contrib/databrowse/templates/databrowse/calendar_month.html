@@ -1,0 +1,17 @@
+{% extends "databrowse/base.html" %}
+
+{% block title %}{{ model.verbose_name_plural|capfirst }} with {{ field.verbose_name }} in {{ month|date:"F Y" }}{% endblock %}
+
+{% block content %}
+
+<div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / <a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a> / <a href="../../../">Calendars</a> / <a href="../../">By {{ field.verbose_name }}</a> / <a href="../">{{ month.year }}</a> / {{ month|date:"F" }}</div>
+
+<h1>{{ model.verbose_name_plural|capfirst }} with {{ field.verbose_name }} in {{ month|date:"F Y" }}</h1>
+
+<ul class="objectlist">
+{% for object in object_list %}
+<li class="{% cycle odd,even %}"><a href="{{ object.url }}">{{ object }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}
