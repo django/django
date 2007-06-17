@@ -492,9 +492,6 @@ class TokenParser(object):
             self.pointer = i
             return s
 
-
-
-
 filter_raw_string = r"""
 ^%(i18n_open)s"(?P<i18n_constant>%(str)s)"%(i18n_close)s|
 ^"(?P<constant>%(str)s)"|
@@ -750,7 +747,6 @@ class NodeList(list):
         for node in self:
             nodes.extend(node.get_nodes_by_type(nodetype))
         return nodes
-
 
 class DebugNodeList(NodeList):
     def iter_render(self, context):
