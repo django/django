@@ -19,9 +19,8 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
     """
     Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
 
-    Assumes ``form`` has a field for every non-AutoField database field in
-    ``instance``. If commit=True, then the changes to ``instance`` will be
-    saved to the database. Returns ``instance``.
+    If commit=True, then the changes to ``instance`` will be saved to the
+    database. Returns ``instance``.
     """
     from django.db import models
     opts = instance.__class__._meta

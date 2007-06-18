@@ -24,7 +24,7 @@ class CommentFormNode(template.Node):
         self.photo_options, self.rating_options = photo_options, rating_options
         self.is_public = is_public
 
-    def render(self, context):
+    def iter_render(self, context):
         from django.conf import settings
         from django.utils.text import normalize_newlines
         import base64
@@ -33,7 +33,7 @@ class CommentFormNode(template.Node):
             try:
                 self.obj_id = template.resolve_variable(self.obj_id_lookup_var, context)
             except template.VariableDoesNotExist:
-                return ''
+                return
             # Validate that this object ID is valid for this content-type.
             # We only have to do this validation if obj_id_lookup_var is provided,
             # because do_comment_form() validates hard-coded object IDs.
@@ -67,9 +67,9 @@ class CommentFormNode(template.Node):
             context['hash'] = Comment.objects.get_security_hash(context['options'], context['photo_options'], context['rating_options'], context['target'])
             context['logout_url'] = settings.LOGOUT_URL
             default_form = loader.get_template(COMMENT_FORM)
-        output = default_form.render(context)
+        for chunk in default_form.iter_render(context):
+            yield chunk
         context.pop()
-        return output
 
 class CommentCountNode(template.Node):
     def __init__(self, package, module, context_var_name, obj_id, var_name, free):
@@ -77,7 +77,7 @@ class CommentCountNode(template.Node):
         self.context_var_name, self.obj_id = context_var_name, obj_id
         self.var_name, self.free = var_name, free
 
-    def render(self, context):
+    def iter_render(self, context):
         from django.conf import settings
         manager = self.free and FreeComment.objects or Comment.objects
         if self.context_var_name is not None:
@@ -86,7 +86,7 @@ class CommentCountNode(template.Node):
             content_type__app_label__exact=self.package,
             content_type__model__exact=self.module, site__id__exact=settings.SITE_ID).count()
         context[self.var_name] = comment_count
-        return ''
+        return ()
 
 class CommentListNode(template.Node):
     def __init__(self, package, module, context_var_name, obj_id, var_name, free, ordering, extra_kwargs=None):
@@ -96,14 +96,14 @@ class CommentListNode(template.Node):
         self.ordering = ordering
         self.extra_kwargs = extra_kwargs or {}
 
-    def render(self, context):
+    def iter_render(self, context):
         from django.conf import settings
         get_list_function = self.free and FreeComment.objects.filter or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
                 self.obj_id = template.resolve_variable(self.context_var_name, context)
             except template.VariableDoesNotExist:
-                return ''
+                return ()
         kwargs = {
             'object_id__exact': self.obj_id,
             'content_type__app_label__exact': self.package,
@@ -127,7 +127,7 @@ class CommentListNode(template.Node):
                 comment_list = [c for c in comment_list if not c.is_hidden or (user_id == c.user_id)]
 
         context[self.var_name] = comment_list
-        return ''
+        return ()
 
 class DoCommentForm:
     """

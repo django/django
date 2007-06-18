@@ -7,7 +7,8 @@ these implementations if necessary.
 import itertools
 
 def compat_tee(iterable):
-    """Return two independent iterators from a single iterable.
+    """
+    Return two independent iterators from a single iterable.
 
     Based on http://www.python.org/doc/2.3.5/lib/itertools-example.html
     """
@@ -25,7 +26,28 @@ def compat_tee(iterable):
     next = iter(iterable).next
     return gen(next), gen(next)
 
+def groupby(iterable, keyfunc=None):
+    """
+    Taken from http://docs.python.org/lib/itertools-functions.html
+    """
+    if keyfunc is None:
+        keyfunc = lambda x:x
+    iterable = iter(iterable)
+    l = [iterable.next()]
+    lastkey = keyfunc(l)
+    for item in iterable:
+        key = keyfunc(item)
+        if key != lastkey:
+            yield lastkey, l
+            lastkey = key
+            l = [item]
+        else:
+            l.append(item)
+    yield lastkey, l
+
 if hasattr(itertools, 'tee'):
     tee = itertools.tee
 else:
     tee = compat_tee
+if hasattr(itertools, 'groupby'):
+    groupby = itertools.groupby
