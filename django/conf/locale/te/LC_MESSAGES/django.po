@@ -2,19 +2,19 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 #
-# pavithran <pavithran.s@gmail.com>, 2007.
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-09-25 15:43+0200\n"
-"PO-Revision-Date: 2007-02-28 18:35+0530\n"
+"PO-Revision-Date: 2007-05-19 12:44+0530\n"
 "Last-Translator: pavithran <pavithran.s@gmail.com>\n"
 "Language-Team: Telugu <indlinux-telugu@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
+"Plural-Forms: nplurals=2; nplurals=n>1;"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"
@@ -144,7 +144,7 @@ msgstr "కర్మ  స్కొరులు"
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "%(user) రేటింగ్"
+msgstr "%(score)d కి     %(user)s  రేటింగ్"
 
 #: contrib/comments/models.py:258
 #, python-format
@@ -153,9 +153,9 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"%(user)s చేత చేయబడ్డ  వ్యాఖ్యానములు"
+"%(user)s చేత చేయబడ్డ  వ్యాఖ్యానములు:\n"
 "\n"
-"%(text)లు"
+"%(text)s"
 
 #: contrib/comments/models.py:265
 msgid "flag date"
@@ -163,11 +163,11 @@ msgstr "ఫ్లాగ్ తేది "
 
 #: contrib/comments/models.py:268
 msgid "user flag"
-msgstr "యూఙర్ ఫ్లాగ్"
+msgstr "యూజర్ ఫ్లాగ్"
 
 #: contrib/comments/models.py:269
 msgid "user flags"
-msgstr "యూఙర్ ఫ్లాగులు"
+msgstr "యూజర్ ఫ్లాగులు"
 
 #: contrib/comments/models.py:273
 #, python-format
@@ -193,7 +193,7 @@ msgstr "మొదరేటర్ తీసివేసిన %r"
 
 #: contrib/comments/views/karma.py:19
 msgid "Anonymous users cannot vote"
-msgstr "అపరిచిత  యూఙరులు వోటు వేయలేరు"
+msgstr "అపరిచిత  యూజర్లు వోటు వేయలేరు"
 
 #: contrib/comments/views/karma.py:23
 msgid "Invalid comment ID"
@@ -220,12 +220,12 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"ఈ  వ్యాఖ్యానము చేసిన యూఙర్  %(count)లు కన్న తక్కువ  సమర్పించాడు  "
+"ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడు  "
 "వ్యాఖ్యానము:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"ఈ  వ్యాఖ్యానము చేసిన యూఙర్  %(count)లు కన్న తక్కువ  సమర్పించాడు"
+"ఈ  వ్యాఖ్యానము చేసిన యూజర్  %(count)s లు కన్న తక్కువ  సమర్పించాడు"
 "వ్యాఖ్యానములు:\n"
 "\n"
 "%(text)s"
@@ -237,7 +237,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"ఈ  వ్యాఖ్యానము స్కెచి  యూఙర్ చేసాడు  :\n"
+"ఈ  వ్యాఖ్యానము స్కెచి  యూజర్ చేసాడు  :\n"
 "\n"
 "%(text)s"
 
@@ -274,7 +274,7 @@ msgstr "వ్యాఖ్యానము ఫార్మ్ లో 'ప్ర�
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/login.html:17
 msgid "Username:"
-msgstr "యూఙర్ పేరు"
+msgstr "యూజర్ పేరు"
 
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/admin/templates/admin/object_history.html:3
@@ -343,7 +343,8 @@ msgstr "మీ పేరు"
 msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
-msgstr "<h3> %s తో:</h3>\n"
+msgstr ""
+"<h3> %s తో:</h3>\n"
 "<ul>\n"
 
 #: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
@@ -353,15 +354,15 @@ msgstr "అన్నీ"
 
 #: contrib/admin/filterspecs.py:109
 msgid "Any date"
-msgstr "ఏ రోఙైన"
+msgstr "ఏ రోజైన"
 
 #: contrib/admin/filterspecs.py:110
 msgid "Today"
-msgstr "ఈ రోఙు"
+msgstr "ఈ రోజు"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
-msgstr "గత  7 రోఙుల గా"
+msgstr "గత  7 రోజుల గా"
 
 #: contrib/admin/filterspecs.py:115
 msgid "This month"
@@ -413,13 +414,13 @@ msgstr "లాగ్ ఎంట్రీలు"
 
 #: contrib/admin/templatetags/admin_list.py:230
 msgid "All dates"
-msgstr "అన్నీ  రోఙులు"
+msgstr "అన్నీ  రోజులు"
 
 #: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:59
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
-msgstr "దయచేసి సరైన  యూఙర్ పేరు పాస్ వర్డ్ ఇవ్వండి"
+msgstr "దయచేసి సరైన  యూజర్ పేరు పాస్ వర్డ్ ఇవ్వండి"
 
 #: contrib/admin/views/decorators.py:24
 #: contrib/admin/templates/admin/login.html:25
@@ -430,22 +431,22 @@ msgstr "లాగ్ ఇన్"
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
-msgstr "దయచేసి మళీ  లాగ్ ఇన్ అవ్వండి ఎందుకంటే మీ సేస్సన్  ముగిసింది . బాధపడకండి మీ సమర్పన దాచిపెట్టాము"
+msgstr "దయచేసి మళ్ళీ  లాగ్ ఇన్ అవ్వండి ఎందుకంటే మీ సేస్సన్  ముగిసింది . బాధపడకండి మీ సమర్పన దాచిపెట్టాము"
 
 #: contrib/admin/views/decorators.py:69
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
-msgstr "మీ  బ్రౌఙర్ పై కుకీస్ అంగీకరించబడేటట్లు చేయలేదు . దయ చేసి  కుకీస్ ఎనేబల్ చేసి ,మళ్ళీ ట్రై చేయండి"
+msgstr "మీ  బ్రౌజర్ పై కుకీస్ అంగీకరించేటట్లు చేయలేదు . దయ చేసి  కుకీస్ ఎనేబల్ చేసి ,మళ్ళీ ట్రై చేయండి"
 
 #: contrib/admin/views/decorators.py:83
 msgid "Usernames cannot contain the '@' character."
-msgstr "యూఙర్ పేరు లో  '@' అక్షరము ఉందకూడడు"
+msgstr "యూజర్ పేరు లో  '@' అక్షరము ఉందకూడడు"
 
 #: contrib/admin/views/decorators.py:85
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "మీ ఈ మెయిల్ అడ్రస్   మీ యూఙర్ పేరు కాదు . '%s' ఇచ్చి చూడండి "
+msgstr "మీ ఈ మెయిల్ అడ్రస్   మీ యూజర్ పేరు కాదు . '%s' ఇచ్చి చూడండి "
 
 #: contrib/admin/views/main.py:223
 msgid "Site administration"
@@ -454,7 +455,7 @@ msgstr "సైట్ నిర్వాహన"
 #: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:17
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\"ఙయప్రదంగా కలపబడ్డడి"
+msgstr "%(name)s \"%(obj)s\"జయప్రదంగా కలపబడ్డడి"
 
 #: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
 #: contrib/admin/views/auth.py:22
@@ -464,12 +465,12 @@ msgstr "మీరు  మళ్ళీ దీనినీ  క్రింద మ
 #: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
 #, python-format
 msgid "You may add another %s below."
-msgstr "మీరు ఇంకొక   %s ని  క్రింద ఙత చేయొచ్చు"
+msgstr "మీరు ఇంకొక   %s ని  క్రింద జత చేయొచ్చు"
 
 #: contrib/admin/views/main.py:289
 #, python-format
 msgid "Add %s"
-msgstr "%s ని ఙత చేయండి "
+msgstr "%s ని జత చేయండి "
 
 #: contrib/admin/views/main.py:335
 #, python-format
@@ -493,17 +494,17 @@ msgstr "%s తీసివేయబడ్డడి"
 
 #: contrib/admin/views/main.py:342
 msgid "No fields changed."
-msgstr "మార్చబడలేదు"
+msgstr "ఫీల్డ్స్  ఏమి మార్చబడలేదు"
 
 #: contrib/admin/views/main.py:345
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ఙయప్రదంగా మార్చబడిండి"
+msgstr "%(name)s \"%(obj)s\" జయప్రదంగా మార్చబడిండి"
 
 #: contrib/admin/views/main.py:353
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" ఙయప్రదంగా కలపబడ్డడి  .మీరు  మళ్ళీ దీనినీ  క్రింద మార్చవచ్చు"
+msgstr "%(name)s \"%(obj)s\" జయప్రదంగా కలపబడ్డడి  .మీరు  మళ్ళీ దీనినీ  క్రింద మార్చవచ్చు"
 
 #: contrib/admin/views/main.py:391
 #, python-format
@@ -513,17 +514,17 @@ msgstr "%s ని మార్చంది"
 #: contrib/admin/views/main.py:473
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ  %(name)లు లో  %(fieldname)లు : %(obj)లు "
+msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ  %(name)s లో  %(fieldname)s  : %(obj)s "
 
 #: contrib/admin/views/main.py:478
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ   %(name)లు లో  %(fieldname)లు"
+msgstr "ఒకటి కాని ,అంత కన్నఎక్కువ   %(name)s లో  %(fieldname)s"
 
 #: contrib/admin/views/main.py:511
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)లు \"%(obj)s\"ఙయప్రదంగా తీసివేయబడ్డడి"
+msgstr "%(name)s \"%(obj)s\"జయప్రదంగా తీసివేయబడ్డడి"
 
 #: contrib/admin/views/main.py:514
 msgid "Are you sure?"
@@ -532,7 +533,7 @@ msgstr "మీరు కచ్చితంగా ఉన్నారా?"
 #: contrib/admin/views/main.py:536
 #, python-format
 msgid "Change history: %s"
-msgstr "మార్చబడిన పురాణము"
+msgstr "మార్చబడిన పురాణము: %s"
 
 #: contrib/admin/views/main.py:570
 #, python-format
@@ -601,7 +602,7 @@ msgstr ""
 #: contrib/admin/views/doc.py:229
 #, python-format
 msgid "Fields on %s objects"
-msgstr "వస్తువు"
+msgstr "%s వస్తువులలో ఫీల్డ్స్   "
 
 #: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
 #: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
@@ -682,7 +683,7 @@ msgstr ""
 
 #: contrib/admin/views/auth.py:28
 msgid "Add user"
-msgstr "యూఙర్"
+msgstr "యూజర్ ని జత చేయండి"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
@@ -742,7 +743,7 @@ msgstr "తేది/వేళ"
 
 #: contrib/admin/templates/admin/object_history.html:19
 msgid "User"
-msgstr "యూఙర్"
+msgstr "యూజర్"
 
 #: contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
@@ -760,11 +761,11 @@ msgstr ""
 
 #: contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
-msgstr "డ్ఙాంగొ యొక్క నిర్వాహనదారులు"
+msgstr "డ్జాంగొ యొక్క నిర్వాహనదారులు"
 
 #: contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
-msgstr "డ్ఙాంగొ నిర్వాహన"
+msgstr "డ్జాంగొ నిర్వాహన"
 
 #: contrib/admin/templates/admin/500.html:4
 msgid "Server error"
@@ -782,31 +783,31 @@ msgstr "సర్వర్ తప్పు <em>(500)</em>"
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
-msgstr "తప్పు  ఙరిగిండి .  దానిని  నిర్వాహనాధికారులు కి ఈ మెయిల్  చేయబడ్డడి,మీ ఓపిక కి ధన్యవాదములు"
+msgstr "తప్పు  జరిగిండి .  దానిని  నిర్వాహనాధికారులు కి ఈ మెయిల్  చేయబడ్డడి,మీ ఓపిక కి ధన్యవాదములు"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
-msgstr "పేఙి  దొరకలేదు"
+msgstr "పేజి  దొరకలేదు"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "క్షమించండి మీరు కోరిన పేఙి దొరకలేడు"
+msgstr "క్షమించండి మీరు కోరిన పేజి దొరకలేడు"
 
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
 msgid "Models available in the %(name)s application."
-msgstr "మొడల్ లు %(name)లో  దొరికే అప్ప్లికేషన్"
+msgstr "మొడల్ లు %(name)s లో  దొరికే అప్ప్లికేషన్"
 
 #: contrib/admin/templates/admin/index.html:18
 #, python-format
 msgid "%(name)s"
-msgstr ""
+msgstr "%(name)s"
 
 #: contrib/admin/templates/admin/index.html:28
 #: contrib/admin/templates/admin/change_form.html:15
 msgid "Add"
-msgstr "ఙత చేయి"
+msgstr "జత చేయి"
 
 #: contrib/admin/templates/admin/index.html:34
 msgid "Change"
@@ -831,7 +832,7 @@ msgstr "ఏమి  దొరకలేదు"
 #: contrib/admin/templates/admin/change_list.html:11
 #, python-format
 msgid "Add %(name)s"
-msgstr "%(name)లు ఙత చేయు"
+msgstr "%(name)s జత చేయు"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
@@ -943,7 +944,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
-msgstr "యూఙర్ పేరు"
+msgstr "యూజర్ పేరు"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:18
 msgid "Password"
@@ -967,7 +968,7 @@ msgstr "పాస్ వర్డ్ మార్పు"
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
-msgstr "పాస్ వర్డ్ మార్పు ఙయప్రదమైండి "
+msgstr "పాస్ వర్డ్ మార్పు జయప్రదమైండి "
 
 #: contrib/admin/templates/registration/password_change_done.html:12
 msgid "Your password was changed."
@@ -1005,7 +1006,7 @@ msgstr "మళ్ళీ లాగ్ ఇన్ అవ్వండి"
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
 msgid "Password reset successful"
-msgstr "పాస్ వర్డ్ రీసెట్  ఙయప్రదమైండి"
+msgstr "పాస్ వర్డ్ రీసెట్  జయప్రదమైండి"
 
 #: contrib/admin/templates/registration/password_reset_done.html:12
 msgid ""
@@ -1051,11 +1052,11 @@ msgstr "మీ  కొత్త పాస్ వర్డ్ : %(new_password)s 
 
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
-msgstr "నిస్సందేహము గా ఈ పేఙి క్ కి వెళ్ళి పాస్ వర్డ్  మార్చుకోండి "
+msgstr "నిస్సందేహము గా ఈ పేజి క్ కి వెళ్ళి పాస్ వర్డ్  మార్చుకోండి "
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
-msgstr "మీ యూఙర్ పేరు, ఒక వేళ మర్చిపోయి ఉంటే "
+msgstr "మీ యూజర్ పేరు, ఒక వేళ మర్చిపోయి ఉంటే "
 
 #: contrib/admin/templates/registration/password_reset_email.html:13
 msgid "Thanks for using our site!"
@@ -1103,19 +1104,19 @@ msgstr "వస్తువు ఇడి చూడండి"
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
-msgstr "వస్తువు"
+msgstr ""
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
-msgstr "వస్తువు"
+msgstr "వస్తువు ని మార్చండి (ప్రస్తుత విండొ)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "వస్తువు"
+msgstr ""
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
-msgstr "వస్తువు"
+msgstr "వస్తువు ని మార్చండి(కొత్త విండొ) "
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:29
 msgid "As above, but opens the admin page in a new window."
@@ -1197,7 +1198,7 @@ msgstr "నమొదు చేయటము అవసరం"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "ఇది చెక్ చేసి ఉంటే కేవలం లాగ్గడ్ ఇన్ యూఙర్లు పేఙి చూడలేస్తారు"
+msgstr "ఇది చెక్ చేసి ఉంటే కేవలం లాగ్గడ్ ఇన్ యూజర్లు పేజి చూడలేస్తారు"
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -1237,7 +1238,7 @@ msgstr "గుంపులు"
 
 #: contrib/auth/models.py:90
 msgid "username"
-msgstr "యూఙర్ పేరు"
+msgstr "యూజర్ పేరు"
 
 #: contrib/auth/models.py:90
 msgid ""
@@ -1309,15 +1310,15 @@ msgstr ""
 
 #: contrib/auth/models.py:102
 msgid "user permissions"
-msgstr "యూఙర్  అనుమతులు"
+msgstr "యూజర్  అనుమతులు"
 
 #: contrib/auth/models.py:105
 msgid "user"
-msgstr "యూఙర్"
+msgstr "యూజర్"
 
 #: contrib/auth/models.py:106
 msgid "users"
-msgstr "యూఙర్లు"
+msgstr "యూజర్లు"
 
 #: contrib/auth/models.py:111
 msgid "Personal info"
@@ -1427,7 +1428,7 @@ msgstr "ఆదివారము"
 
 #: utils/dates.py:14
 msgid "January"
-msgstr "ఙాన్వరి "
+msgstr "జాన్వరి "
 
 #: utils/dates.py:14
 msgid "February"
@@ -1447,11 +1448,11 @@ msgstr "మే"
 
 #: utils/dates.py:14 utils/dates.py:27
 msgid "June"
-msgstr "ఙూను"
+msgstr "జూను"
 
 #: utils/dates.py:15 utils/dates.py:27
 msgid "July"
-msgstr "ఙులై"
+msgstr "జులై"
 
 #: utils/dates.py:15
 msgid "August"
@@ -1475,7 +1476,7 @@ msgstr "డిసెంబర్"
 
 #: utils/dates.py:19
 msgid "jan"
-msgstr "ఙాన్"
+msgstr "జాన్"
 
 #: utils/dates.py:19
 msgid "feb"
@@ -1495,11 +1496,11 @@ msgstr "మే"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr "ఙూన్"
+msgstr "జూన్"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr "ఙుల్"
+msgstr "జుల్"
 
 #: utils/dates.py:20
 msgid "aug"
@@ -1523,7 +1524,7 @@ msgstr "డిస్"
 
 #: utils/dates.py:27
 msgid "Jan."
-msgstr "ఙాన్"
+msgstr "జాన్"
 
 #: utils/dates.py:27
 msgid "Feb."
@@ -1570,8 +1571,8 @@ msgstr[1] "వారాలు"
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
-msgstr[0] "రోఙు"
-msgstr[1] "రోఙులు"
+msgstr[0] "రోజు"
+msgstr[1] "రోజులు"
 
 #: utils/timesince.py:16
 msgid "hour"
@@ -1615,7 +1616,7 @@ msgstr "బెంగాలి"
 
 #: conf/global_settings.py:41
 msgid "Czech"
-msgstr "క్ఙెఖ్"
+msgstr "క్జెఖ్"
 
 #: conf/global_settings.py:42
 msgid "Welsh"
@@ -1627,7 +1628,7 @@ msgstr "డానిశ్"
 
 #: conf/global_settings.py:44
 msgid "German"
-msgstr "ఙెర్మన్"
+msgstr "జెర్మన్"
 
 #: conf/global_settings.py:45
 msgid "Greek"
@@ -1643,7 +1644,7 @@ msgstr "స్పానిష్"
 
 #: conf/global_settings.py:48
 msgid "Argentinean Spanish"
-msgstr "అర్ఙంటీనా స్పానిష్"
+msgstr "అర్జంటీనా స్పానిష్"
 
 #: conf/global_settings.py:49
 msgid "Finnish"
@@ -1675,7 +1676,7 @@ msgstr "ఇటాలియవ్"
 
 #: conf/global_settings.py:56
 msgid "Japanese"
-msgstr "ఙపనీస్"
+msgstr "జపనీస్"
 
 #: conf/global_settings.py:57
 msgid "Dutch"
@@ -1683,11 +1684,11 @@ msgstr "డట్చ్"
 
 #: conf/global_settings.py:58
 msgid "Norwegian"
-msgstr "నార్వీఙియన్"
+msgstr "నార్వీజియన్"
 
 #: conf/global_settings.py:59
 msgid "Brazilian"
-msgstr "బ్రఙీలియన్"
+msgstr "బ్రజీలియన్"
 
 #: conf/global_settings.py:60
 msgid "Romanian"
@@ -1794,7 +1795,7 @@ msgstr "సంవత్సరము 1900 లేక దాని తరువా�
 #: core/validators.py:142
 #, python-format
 msgid "Invalid date: %s."
-msgstr "సరికాని తారీఖు"
+msgstr "సరికాని తారీఖు : %s."
 
 #: core/validators.py:146 db/models/fields/__init__.py:415
 msgid "Enter a valid date in YYYY-MM-DD format."
@@ -1846,8 +1847,10 @@ msgstr "సరైన  URL కావాలి"
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
 "%s"
-msgstr "సరైన  HTML ఇవ్వండి .ప్రత్యేకమైన తప్పులు :\n"
+msgstr ""
+"సరైన  HTML ఇవ్వండి .ప్రత్యేకమైన తప్పులు :\n"
 "%s"
+
 #: core/validators.py:220
 #, python-format
 msgid "Badly formed XML: %s"
@@ -1856,7 +1859,7 @@ msgstr ""
 #: core/validators.py:230
 #, python-format
 msgid "Invalid URL: %s"
-msgstr ""
+msgstr "సరికాని  URL: %s"
 
 #: core/validators.py:234 core/validators.py:236
 #, python-format
@@ -1865,7 +1868,7 @@ msgstr ""
 
 #: core/validators.py:242
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "దయచేసి  సరైన అగ్ర రాఙ్య  సంక్షేపము చేసిన  రాష్ట్రము పేరు ఇవ్వండి"
+msgstr "దయచేసి  సరైన అగ్ర రాజ్య  సంక్షేపము చేసిన  రాష్ట్రము పేరు ఇవ్వండి"
 
 #: core/validators.py:256
 #, python-format
@@ -2004,27 +2007,27 @@ msgstr ""
 #: views/generic/create_update.py:43
 #, python-format
 msgid "The %(verbose_name)s was created successfully."
-msgstr "%(verbose_name)లు ఙయప్రదంగా తయారయింది"
+msgstr "%(verbose_name)s జయప్రదంగా తయారయింది"
 
 #: views/generic/create_update.py:117
 #, python-format
 msgid "The %(verbose_name)s was updated successfully."
-msgstr "%(verbose_name)లు ఙయప్రదంగా  @@"
+msgstr "%(verbose_name)s జయప్రదంగా  @@"
 
 #: views/generic/create_update.py:184
 #, python-format
 msgid "The %(verbose_name)s was deleted."
-msgstr "%(verbose_name)లు తీసివేయబడినది"
+msgstr "%(verbose_name)s తీసివేయబడినది"
 
 #: db/models/manipulators.py:302
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(field)ల లో %(object)తో  %(type)  ఉన్నాయి"
+msgstr "%(field)s లో %(object)s తో  %(type)s  ఉన్నాయి"
 
 #: db/models/fields/__init__.py:40
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)లు తో %(fieldname) ముందే ఉన్నాయి ."
+msgstr "%(optname)s తో %(fieldname)s ముందే ఉన్నాయి ."
 
 #: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
 #: db/models/fields/__init__.py:551 db/models/fields/__init__.py:562
@@ -2082,7 +2085,7 @@ msgstr "లైన్  బ్రేక్స్  కి ఇక్కడ  ఆన�
 #: forms/__init__.py:487 forms/__init__.py:560 forms/__init__.py:599
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "సరైనది ఎంచుకోండి;  %(choices) ల లో  '%(data)s' లేవు  "
+msgstr "సరైనది ఎంచుకోండి;  %(choices)s లో  '%(data)s' లేవు  "
 
 #: forms/__init__.py:663
 msgid "The submitted file is empty."

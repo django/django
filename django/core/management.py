@@ -3,13 +3,16 @@
 
 import django
 from django.core.exceptions import ImproperlyConfigured
-import os, re, shutil, sys, textwrap
 from optparse import OptionParser
 from django.utils import termcolors
+import os, re, shutil, sys, textwrap
 
 # For Python 2.3
 if not hasattr(__builtins__, 'set'):
     from sets import Set as set
+
+# For backwards compatibility: get_version() used to be in this module.
+get_version = django.get_version
 
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
     <tr>
@@ -93,14 +96,6 @@ def _get_sequence_list():
 # field as the field to which it points.
 get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
 
-def get_version():
-    "Returns the version as a human-format string."
-    from django import VERSION
-    v = '.'.join([str(i) for i in VERSION[:-1]])
-    if VERSION[-1]:
-        v += '-' + VERSION[-1]
-    return v
-
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
     from django.db import get_creation_module, models
@@ -168,6 +163,8 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         if isinstance(f, (models.ForeignKey, models.OneToOneField)):
             rel_field = f.rel.get_related_field()
+            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
+                rel_field = rel_field.rel.get_related_field()
             data_type = get_rel_data_type(rel_field)
         else:
             rel_field = f
@@ -186,7 +183,7 @@ def _get_sql_model_create(model, known_models=set()):
                 if f.rel.to in known_models:
                     field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                         style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' + 
+                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
                         backend.get_deferrable_sql()
                     )
                 else:
@@ -232,21 +229,21 @@ def _get_sql_for_pending_references(model, pending_references):
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
                     (backend.quote_name(r_table), r_name,
-                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col), 
+                    backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col),
                     backend.get_deferrable_sql()))
             del pending_references[model]
     return final_output
 
 def _get_many_to_many_sql_for_model(model):
     from django.db import backend, get_creation_module
-    from django.db.models import GenericRel
+    from django.contrib.contenttypes import generic
 
     data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
     for f in opts.many_to_many:
-        if not isinstance(f.rel, GenericRel):
+        if not isinstance(f.rel, generic.GenericRel):
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s,' % \
@@ -314,7 +311,7 @@ def get_sql_delete(app):
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-            if backend.supports_constraints and references_to_delete.has_key(model):
+            if backend.supports_constraints and model in references_to_delete:
                 for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
@@ -414,30 +411,10 @@ get_sql_initial_data.help_doc = "RENAMED: see 'sqlcustom'"
 get_sql_initial_data.args = ''
 
 def get_sql_sequence_reset(app):
-    "Returns a list of the SQL statements to reset PostgreSQL sequences for the given app."
+    "Returns a list of the SQL statements to reset sequences for the given app."
     from django.db import backend, models
-    output = []
-    for model in models.get_models(app):
-        for f in model._meta.fields:
-            if isinstance(f, models.AutoField):
-                output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                    (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD('%s_%s_seq' % (model._meta.db_table, f.column)),
-                    style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD(backend.quote_name(f.column)),
-                    style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(backend.quote_name(model._meta.db_table))))
-                break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in model._meta.many_to_many:
-            output.append("%s setval('%s', (%s max(%s) %s %s));" % \
-                (style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD('%s_id_seq' % f.m2m_db_table()),
-                style.SQL_KEYWORD('SELECT'),
-                style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_KEYWORD('FROM'),
-                style.SQL_TABLE(f.m2m_db_table())))
-    return output
-get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting PostgreSQL sequences for the given app name(s)."
+    return backend.get_sql_sequence_reset(style, models.get_models(app))
+get_sql_sequence_reset.help_doc = "Prints the SQL statements for resetting sequences for the given app name(s)."
 get_sql_sequence_reset.args = APP_ARGS
 
 def get_sql_indexes(app):
@@ -460,7 +437,7 @@ def get_sql_indexes_for_model(model):
             unique = f.unique and 'UNIQUE ' or ''
             output.append(
                 style.SQL_KEYWORD('CREATE %sINDEX' % unique) + ' ' + \
-                style.SQL_TABLE('%s_%s' % (model._meta.db_table, f.column)) + ' ' + \
+                style.SQL_TABLE(backend.quote_name('%s_%s' % (model._meta.db_table, f.column))) + ' ' + \
                 style.SQL_KEYWORD('ON') + ' ' + \
                 style.SQL_TABLE(backend.quote_name(model._meta.db_table)) + ' ' + \
                 "(%s);" % style.SQL_FIELD(backend.quote_name(f.column))
@@ -558,9 +535,10 @@ def syncdb(verbosity=1, interactive=True):
     # to do at this point.
     _emit_post_sync_signal(created_models, verbosity, interactive)
 
-    # Install custom SQL for the app (but only if this 
+    # Install custom SQL for the app (but only if this
     # is a model we've just created)
     for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
         for model in models.get_models(app):
             if model in created_models:
                 custom_sql = get_custom_sql_for_model(model)
@@ -599,7 +577,7 @@ def syncdb(verbosity=1, interactive=True):
     # Install the 'initialdata' fixture, using format discovery
     load_data(['initial_data'], verbosity=verbosity)
 syncdb.help_doc = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-syncdb.args = '[--verbosity] [--interactive]'
+syncdb.args = '[--verbosity] [--noinput]'
 
 def get_admin_index(app):
     "Returns admin-index template snippet (in list form) for the given app."
@@ -693,14 +671,14 @@ The full error: """ % (app_name, app_name)) + style.ERROR_OUTPUT(str(e)) + '\n')
     else:
         print "Reset cancelled."
 reset.help_doc = "Executes ``sqlreset`` for the given app(s) in the current database."
-reset.args = '[--interactive]' + APP_ARGS
+reset.args = '[--noinput]' + APP_ARGS
 
 def flush(verbosity=1, interactive=True):
     "Returns all tables in the database to the same state they were in immediately after syncdb."
     from django.conf import settings
     from django.db import connection, transaction, models
     from django.dispatch import dispatcher
-    
+
     disable_termcolors()
 
     # First, try validating the models.
@@ -713,7 +691,7 @@ def flush(verbosity=1, interactive=True):
             __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
-    
+
     sql_list = get_sql_flush()
 
     if interactive:
@@ -747,14 +725,14 @@ The full error: """ % settings.DATABASE_NAME + style.ERROR_OUTPUT(str(e)) + '\n'
         # applications to respond as if the database had been
         # sync'd from scratch.
         _emit_post_sync_signal(models.get_models(), verbosity, interactive)
-        
+
         # Reinstall the initial_data fixture
         load_data(['initial_data'], verbosity=verbosity)
-        
+
     else:
         print "Flush cancelled."
 flush.help_doc = "Executes ``sqlflush`` on the current database."
-flush.args = '[--verbosity] [--interactive]'
+flush.args = '[--verbosity] [--noinput]'
 
 def _start_helper(app_or_project, name, directory, other_name=''):
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -813,11 +791,12 @@ def startapp(app_name, directory):
     # Determine the project_name a bit naively -- by looking at the name of
     # the parent directory.
     project_dir = os.path.normpath(os.path.join(directory, '..'))
-    project_name = os.path.basename(project_dir)
-    if app_name == os.path.basename(directory):
+    parent_dir = os.path.basename(project_dir)
+    project_name = os.path.basename(directory)
+    if app_name == project_name:
         sys.stderr.write(style.ERROR("Error: You cannot create an app with the same name (%r) as your project.\n" % app_name))
         sys.exit(1)
-    _start_helper('app', app_name, directory, project_name)
+    _start_helper('app', app_name, directory, parent_dir)
 startapp.help_doc = "Creates a Django app directory structure for the given app name in the current directory."
 startapp.args = "[appname]"
 
@@ -866,7 +845,7 @@ def inspectdb():
                 att_name += '_field'
                 comment_notes.append('Field renamed because it was a Python reserved word.')
 
-            if relations.has_key(i):
+            if i in relations:
                 rel_to = relations[i][1] == table_name and "'self'" or table2model(relations[i][1])
                 field_type = 'ForeignKey(%s' % rel_to
                 if att_name.endswith('_id'):
@@ -890,7 +869,7 @@ def inspectdb():
                 if field_type == 'CharField' and row[3]:
                     extra_params['maxlength'] = row[3]
 
-                if field_type == 'FloatField':
+                if field_type == 'DecimalField':
                     extra_params['max_digits'] = row[4]
                     extra_params['decimal_places'] = row[5]
 
@@ -965,11 +944,11 @@ def get_validation_errors(outfile, app=None):
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
             if isinstance(f, models.CharField) and f.maxlength in (None, 0):
                 e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
-            if isinstance(f, models.FloatField):
+            if isinstance(f, models.DecimalField):
                 if f.decimal_places is None:
-                    e.add(opts, '"%s": FloatFields require a "decimal_places" attribute.' % f.name)
+                    e.add(opts, '"%s": DecimalFields require a "decimal_places" attribute.' % f.name)
                 if f.max_digits is None:
-                    e.add(opts, '"%s": FloatFields require a "max_digits" attribute.' % f.name)
+                    e.add(opts, '"%s": DecimalFields require a "max_digits" attribute.' % f.name)
             if isinstance(f, models.FileField) and not f.upload_to:
                 e.add(opts, '"%s": FileFields require an "upload_to" attribute.' % f.name)
             if isinstance(f, models.ImageField):
@@ -1158,7 +1137,7 @@ def validate(outfile=sys.stdout, silent_success=False):
             return
         outfile.write('%s error%s found.\n' % (num_errors, num_errors != 1 and 's' or ''))
     except ImproperlyConfigured:
-        outfile.write("Skipping validation because things aren't configured properly.")
+        outfile.write("Skipping validation because things aren't configured properly.\n")
 validate.args = ''
 
 def _check_for_validation_errors(app=None):
@@ -1329,7 +1308,7 @@ def test(app_labels, verbosity=1):
     failures = test_runner(app_list, verbosity)
     if failures:
         sys.exit(failures)
-        
+
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
 test.args = '[--verbosity] ' + APP_ARGS
 
@@ -1337,40 +1316,51 @@ def load_data(fixture_labels, verbosity=1):
     "Installs the provided fixture file(s) as data in the database."
     from django.db.models import get_apps
     from django.core import serializers
-    from django.db import connection, transaction
+    from django.db import connection, transaction, backend
     from django.conf import settings
     import sys
-     
+
+    disable_termcolors()
+
     # Keep a count of the installed objects and fixtures
     count = [0,0]
+    models = set()
     
     humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
 
     # Get a cursor (even though we don't need one yet). This has
-    # the side effect of initializing the test database (if 
+    # the side effect of initializing the test database (if
     # it isn't already initialized).
     cursor = connection.cursor()
-    
-    # Start transaction management. All fixtures are installed in a 
+
+    # Start transaction management. All fixtures are installed in a
     # single transaction to ensure that all references are resolved.
     transaction.commit_unless_managed()
     transaction.enter_transaction_management()
     transaction.managed(True)
-    
+
     app_fixtures = [os.path.join(os.path.dirname(app.__file__),'fixtures') for app in get_apps()]
     for fixture_label in fixture_labels:
+        parts = fixture_label.split('.')
+        if len(parts) == 1:
+            fixture_name = fixture_label
+            formats = serializers.get_serializer_formats()
+        else:
+            fixture_name, format = '.'.join(parts[:-1]), parts[-1]
+            if format in serializers.get_serializer_formats():
+                formats = [format]
+            else:
+                formats = []
+
         if verbosity > 0:
-            print "Loading '%s' fixtures..." % fixture_label
+            if formats:
+                print "Loading '%s' fixtures..." % fixture_name
+            else:
+                print "Skipping fixture '%s': %s is not a known serialization format" % (fixture_name, format)
+
         for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
             if verbosity > 1:
                 print "Checking %s for fixtures..." % humanize(fixture_dir)
-            parts = fixture_label.split('.')
-            if len(parts) == 1:
-                fixture_name = fixture_label
-                formats = serializers.get_serializer_formats()
-            else:
-                fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                formats = [format]
 
             label_found = False
             for format in formats:
@@ -1383,7 +1373,7 @@ def load_data(fixture_labels, verbosity=1):
                     fixture = open(full_path, 'r')
                     if label_found:
                         fixture.close()
-                        print style.ERROR("Multiple fixtures named '%s' in %s. Aborting." % 
+                        print style.ERROR("Multiple fixtures named '%s' in %s. Aborting." %
                             (fixture_name, humanize(fixture_dir)))
                         transaction.rollback()
                         transaction.leave_transaction_management()
@@ -1397,12 +1387,13 @@ def load_data(fixture_labels, verbosity=1):
                             objects =  serializers.deserialize(format, fixture)
                             for obj in objects:
                                 count[0] += 1
+                                models.add(obj.object.__class__)
                                 obj.save()
                             label_found = True
                         except Exception, e:
                             fixture.close()
                             sys.stderr.write(
-                                style.ERROR("Problem installing fixture '%s': %s\n" % 
+                                style.ERROR("Problem installing fixture '%s': %s\n" %
                                      (full_path, str(e))))
                             transaction.rollback()
                             transaction.leave_transaction_management()
@@ -1412,35 +1403,45 @@ def load_data(fixture_labels, verbosity=1):
                     if verbosity > 1:
                         print "No %s fixture '%s' in %s." % \
                             (format, fixture_name, humanize(fixture_dir))
+                            
+    if count[0] > 0:
+        sequence_sql = backend.get_sql_sequence_reset(style, models)
+        if sequence_sql:
+            if verbosity > 1:
+                print "Resetting sequences"
+            for line in sequence_sql:
+                cursor.execute(line)
+            
+    transaction.commit()
+    transaction.leave_transaction_management()
+    
     if count[0] == 0:
         if verbosity > 0:
             print "No fixtures found."
     else:
         if verbosity > 0:
             print "Installed %d object(s) from %d fixture(s)" % tuple(count)
-    transaction.commit()
-    transaction.leave_transaction_management()
-        
+
 load_data.help_doc = 'Installs the named fixture(s) in the database'
 load_data.args = "[--verbosity] fixture, fixture, ..."
- 
+
 def dump_data(app_labels, format='json', indent=None):
     "Output the current contents of the database as a fixture of the given format"
     from django.db.models import get_app, get_apps, get_models
     from django.core import serializers
- 
+
     if len(app_labels) == 0:
         app_list = get_apps()
     else:
         app_list = [get_app(app_label) for app_label in app_labels]
- 
+
     # Check that the serialization format exists; this is a shortcut to
     # avoid collating all the objects and _then_ failing.
     try:
         serializers.get_serializer(format)
     except KeyError:
-        sys.stderr.write(style.ERROR("Unknown serialization format: %s\n" % format))        
-    
+        sys.stderr.write(style.ERROR("Unknown serialization format: %s\n" % format))
+
     objects = []
     for app in app_list:
         for model in get_models(app):
@@ -1450,7 +1451,7 @@ def dump_data(app_labels, format='json', indent=None):
     except Exception, e:
         sys.stderr.write(style.ERROR("Unable to serialize database: %s\n" % e))
 dump_data.help_doc = 'Output the contents of the database as a fixture of the given format'
-dump_data.args = '[--format]' + APP_ARGS
+dump_data.args = '[--format] [--indent]' + APP_ARGS
 
 # Utilities for command-line script
 
@@ -1535,7 +1536,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
     parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
         help='Tells Django to NOT use the auto-reloader when running the development server.')
     parser.add_option('--format', default='json', dest='format',
-        help='Specifies the output serialization format for fixtures')    
+        help='Specifies the output serialization format for fixtures')
     parser.add_option('--indent', default=None, dest='indent',
         type='int', help='Specifies the indent level to use when pretty-printing output')
     parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
@@ -1557,7 +1558,7 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
         action = args[0]
     except IndexError:
         parser.print_usage_and_exit()
-    if not action_mapping.has_key(action):
+    if action not in action_mapping:
         print_error("Your action, %r, was invalid." % action, argv[0])
 
     # Switch to English, because django-admin.py creates database content

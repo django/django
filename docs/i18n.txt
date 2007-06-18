@@ -175,7 +175,7 @@ class, though::
             verbose_name = _('my thing')
             verbose_name_plural = _('mythings')
 
-.. _Django models: ../model_api/
+.. _Django models: ../model-api/
 
 Pluralization
 ~~~~~~~~~~~~~
@@ -236,7 +236,7 @@ To pluralize, specify both the singular and plural forms with the
 ``{% plural %}`` tag, which appears within ``{% blocktrans %}`` and
 ``{% endblocktrans %}``. Example::
 
-    {% blocktrans count list|count as counter %}
+    {% blocktrans count list|length as counter %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
@@ -310,7 +310,7 @@ To create or update a message file, run this command::
 
 ...where ``de`` is the language code for the message file you want to create.
 The language code, in this case, is in locale format. For example, it's
-``pt_BR`` for Brazilian and ``de_AT`` for Austrian German.
+``pt_BR`` for Brazilian Portugese and ``de_AT`` for Austrian German.
 
 The script should be run from one of three places:
 
@@ -463,8 +463,8 @@ following this algorithm:
 Notes:
 
     * In each of these places, the language preference is expected to be in the
-      standard language format, as a string. For example, Brazilian is
-      ``pt-br``.
+      standard language format, as a string. For example, Brazilian Portugese
+      is ``pt-br``.
     * If a base language is available but the sublanguage specified is not,
       Django uses the base language. For example, if a user specifies ``de-at``
       (Austrian German) but Django only has ``de`` available, Django uses

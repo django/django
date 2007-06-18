@@ -43,7 +43,7 @@ def intword(value):
     if value < 1000000:
         return value
     if value < 1000000000:
-    	new_value = value / 1000000.0
+        new_value = value / 1000000.0
         return ngettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
     if value < 1000000000000:
         new_value = value / 1000000000.0

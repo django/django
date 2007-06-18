@@ -82,7 +82,13 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related = getattr(obj, field.name)
         if related is not None:
-            self.xml.characters(str(related._get_pk_val()))
+            if field.rel.field_name == related._meta.pk.name:
+                # Related to remote object via primary key
+                related = related._get_pk_val()
+            else:
+                # Related to remote object via other field
+                related = getattr(related, field.rel.field_name)
+            self.xml.characters(str(related))
         else:
             self.xml.addQuickElement("None")
         self.xml.endElement("field")
@@ -181,7 +187,7 @@ class Deserializer(base.Deserializer):
         if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
             return None
         else:
-            return field.rel.to._meta.pk.to_python(
+            return field.rel.to._meta.get_field(field.rel.field_name).to_python(
                        getInnerText(node).strip().encode(self.encoding))
         
     def _handle_m2m_field_node(self, node, field):

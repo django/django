@@ -2,12 +2,15 @@
 Field classes
 """
 
-from django.utils.translation import gettext
-from util import ErrorList, ValidationError, smart_unicode
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 import datetime
 import re
 import time
+
+from django.utils.translation import gettext
+from django.utils.encoding import smart_unicode
+
+from util import ErrorList, ValidationError
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
@@ -16,7 +19,7 @@ __all__ = (
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
     'RegexField', 'EmailField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
-    'ComboField', 'MultiValueField',
+    'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField',
 )
 
@@ -28,6 +31,11 @@ try:
 except NameError:
     from sets import Set as set # Python 2.3 fallback
 
+try:
+    from decimal import Decimal
+except ImportError:
+    from django.utils._decimal import Decimal   # Python 2.3 fallback
+
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
@@ -38,15 +46,16 @@ class Field(object):
     def __init__(self, required=True, widget=None, label=None, initial=None, help_text=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
-        # widget -- A Widget class, or instance of a Widget class, that should be
-        #         used for this Field when displaying it. Each Field has a default
-        #         Widget that it'll use if you don't specify this. In most cases,
-        #         the default widget is TextInput.
-        # label -- A verbose name for this field, for use in displaying this field in
-        #         a form. By default, Django will use a "pretty" version of the form
-        #         field name, if the Field is part of a Form.
-        # initial -- A value to use in this Field's initial display. This value is
-        #            *not* used as a fallback if data isn't given.
+        # widget -- A Widget class, or instance of a Widget class, that should
+        #           be used for this Field when displaying it. Each Field has a
+        #           default Widget that it'll use if you don't specify this. In
+        #           most cases, the default widget is TextInput.
+        # label -- A verbose name for this field, for use in displaying this
+        #          field in a form. By default, Django will use a "pretty"
+        #          version of the form field name, if the Field is part of a
+        #          Form.
+        # initial -- A value to use in this Field's initial display. This value
+        #            is *not* used as a fallback if data isn't given.
         # help_text -- An optional string to use as "help text" for this Field.
         if label is not None:
             label = smart_unicode(label)
@@ -128,6 +137,67 @@ class IntegerField(Field):
             raise ValidationError(gettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
         if self.min_value is not None and value < self.min_value:
             raise ValidationError(gettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
+        return value
+
+class FloatField(Field):
+    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
+        Field.__init__(self, *args, **kwargs)
+
+    def clean(self, value):
+        """
+        Validates that float() can be called on the input. Returns a float.
+        Returns None for empty values.
+        """
+        super(FloatField, self).clean(value)
+        if not self.required and value in EMPTY_VALUES:
+            return None
+        try:
+            value = float(value)
+        except (ValueError, TypeError):
+            raise ValidationError(gettext('Enter a number.'))
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(gettext('Ensure this value is less than or equal to %s.') % self.max_value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(gettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+        return value
+
+decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
+
+class DecimalField(Field):
+    def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
+        self.max_digits, self.decimal_places = max_digits, decimal_places
+        Field.__init__(self, *args, **kwargs)
+
+    def clean(self, value):
+        """
+        Validates that the input is a decimal number. Returns a Decimal
+        instance. Returns None for empty values. Ensures that there are no more
+        than max_digits in the number, and no more than decimal_places digits
+        after the decimal point.
+        """
+        super(DecimalField, self).clean(value)
+        if not self.required and value in EMPTY_VALUES:
+            return None
+        value = value.strip()
+        match = decimal_re.search(value)
+        if not match:
+            raise ValidationError(gettext('Enter a number.'))
+        else:
+            value = Decimal(value)
+        digits = len(match.group('digits') or '')
+        decimals = len(match.group('decimals') or '')
+        if self.max_value is not None and value > self.max_value:
+            raise ValidationError(gettext('Ensure this value is less than or equal to %s.') % self.max_value)
+        if self.min_value is not None and value < self.min_value:
+            raise ValidationError(gettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+        if self.max_digits is not None and (digits + decimals) > self.max_digits:
+            raise ValidationError(gettext('Ensure that there are no more than %s digits in total.') % self.max_digits)
+        if self.decimal_places is not None and decimals > self.decimal_places:
+            raise ValidationError(gettext('Ensure that there are no more than %s decimal places.') % self.decimal_places)
+        if self.max_digits is not None and self.decimal_places is not None and digits > (self.max_digits - self.decimal_places):
+            raise ValidationError(gettext('Ensure that there are no more than %s digits before the decimal point.') % (self.max_digits - self.decimal_places))
         return value
 
 DEFAULT_DATE_INPUT_FORMATS = (
@@ -330,7 +400,9 @@ class NullBooleanField(BooleanField):
         return {True: True, False: False}.get(value, None)
 
 class ChoiceField(Field):
-    def __init__(self, choices=(), required=True, widget=Select, label=None, initial=None, help_text=None):
+    widget = Select
+
+    def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None):
         super(ChoiceField, self).__init__(required, widget, label, initial, help_text)
         self.choices = choices
 
@@ -362,9 +434,7 @@ class ChoiceField(Field):
 
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
-
-    def __init__(self, choices=(), required=True, widget=SelectMultiple, label=None, initial=None, help_text=None):
-        super(MultipleChoiceField, self).__init__(choices, required, widget, label, initial, help_text)
+    widget = SelectMultiple
 
     def clean(self, value):
         """
@@ -455,7 +525,7 @@ class MultiValueField(Field):
         for i, field in enumerate(self.fields):
             try:
                 field_value = value[i]
-            except KeyError:
+            except IndexError:
                 field_value = None
             if self.required and field_value in EMPTY_VALUES:
                 raise ValidationError(gettext(u'This field is required.'))

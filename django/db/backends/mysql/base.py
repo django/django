@@ -15,7 +15,7 @@ except ImportError, e:
 # lexicographic ordering in this check because then (1, 2, 1, 'gamma')
 # inadvertently passes the version test.
 version = Database.version_info
-if (version < (1,2,1) or (version[:3] == (1, 2, 1) and 
+if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
         (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
     raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__
 
@@ -25,6 +25,7 @@ import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 # MySQLdb-1.2.1 supports the Python boolean type, and only uses datetime
 # module for time-related columns; older versions could have used mx.DateTime
@@ -35,6 +36,8 @@ DatabaseError = Database.DatabaseError
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: util.typecast_time,
+    FIELD_TYPE.DECIMAL: util.typecast_decimal,
+    FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -214,6 +217,11 @@ def get_sql_flush(style, tables, sequences):
         return sql
     else:
         return []
+
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

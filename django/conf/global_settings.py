@@ -38,6 +38,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
     ('ar', gettext_noop('Arabic')),
     ('bn', gettext_noop('Bengali')),
+    ('bg', gettext_noop('Bulgarian')),
     ('ca', gettext_noop('Catalan')),
     ('cs', gettext_noop('Czech')),
     ('cy', gettext_noop('Welsh')),
@@ -55,6 +56,7 @@ LANGUAGES = (
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
+    ('ko', gettext_noop('Korean')),
     ('kn', gettext_noop('Kannada')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
@@ -118,6 +120,7 @@ EMAIL_PORT = 25
 # Optional SMTP authentication information for EMAIL_HOST.
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
 
 # List of strings representing installed apps.
 INSTALLED_APPS = ()
@@ -141,6 +144,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.auth',
     'django.core.context_processors.debug',
     'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
 #    'django.core.context_processors.request',
 )
 
@@ -237,7 +241,8 @@ TRANSACTIONS_MANAGED = False
 
 # The User-Agent string to use when checking for URL validity through the
 # isExistingURL validator.
-URL_VALIDATOR_USER_AGENT = "Django/0.96pre (http://www.djangoproject.com)"
+from django import get_version
+URL_VALIDATOR_USER_AGENT = "Django/%s (http://www.djangoproject.com)" % get_version()
 
 ##############
 # MIDDLEWARE #
@@ -311,6 +316,12 @@ BANNED_IPS = ()
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
+LOGIN_URL = '/accounts/login/'
+
+LOGOUT_URL = '/accounts/logout/'
+
+LOGIN_REDIRECT_URL = '/accounts/profile/'
+
 ###########
 # TESTING #
 ###########
@@ -321,6 +332,13 @@ TEST_RUNNER = 'django.test.simple.run_tests'
 # The name of the database to use for testing purposes.
 # If None, a name of 'test_' + DATABASE_NAME will be assumed
 TEST_DATABASE_NAME = None
+
+# Strings used to set the character set and collation order for the test
+# database. These values are passed literally to the server, so they are
+# backend-dependent. If None, no special settings are sent (system defaults are
+# used).
+TEST_DATABASE_CHARSET = None
+TEST_DATABASE_COLLATION = None
 
 ############
 # FIXTURES #

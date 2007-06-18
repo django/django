@@ -3,9 +3,12 @@
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
 
 try:
-    import memcache
+    import cmemcache as memcache
 except ImportError:
-    raise InvalidCacheBackendError, "Memcached cache backend requires the 'memcache' library"
+    try:
+        import memcache
+    except:
+        raise InvalidCacheBackendError("Memcached cache backend requires either the 'memcache' or 'cmemcache' library")
 
 class CacheClass(BaseCache):
     def __init__(self, server, params):

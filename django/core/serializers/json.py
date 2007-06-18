@@ -4,22 +4,30 @@ Serialize data to/from JSON
 
 import datetime
 from django.utils import simplejson
+from django.utils.simplejson import decoder
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # Python 2.3 fallback
 
 class Serializer(PythonSerializer):
     """
     Convert a queryset to JSON.
     """
     def end_serialization(self):
-        simplejson.dump(self.objects, self.stream, cls=DateTimeAwareJSONEncoder, **self.options)
-        
+        self.options.pop('stream', None)
+        self.options.pop('fields', None)
+        simplejson.dump(self.objects, self.stream, cls=DjangoJSONEncoder, **self.options)
+
     def getvalue(self):
-        return self.stream.getvalue()
+        if callable(getattr(self.stream, 'getvalue', None)):
+            return self.stream.getvalue()
 
 def Deserializer(stream_or_string, **options):
     """
@@ -31,15 +39,15 @@ def Deserializer(stream_or_string, **options):
         stream = stream_or_string
     for obj in PythonDeserializer(simplejson.load(stream)):
         yield obj
-        
-class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
+
+class DjangoJSONEncoder(simplejson.JSONEncoder):
     """
-    JSONEncoder subclass that knows how to encode date/time types
+    JSONEncoder subclass that knows how to encode date/time and decimal types.
     """
-    
-    DATE_FORMAT = "%Y-%m-%d" 
+
+    DATE_FORMAT = "%Y-%m-%d"
     TIME_FORMAT = "%H:%M:%S"
-    
+
     def default(self, o):
         if isinstance(o, datetime.datetime):
             return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
@@ -47,5 +55,11 @@ class DateTimeAwareJSONEncoder(simplejson.JSONEncoder):
             return o.strftime(self.DATE_FORMAT)
         elif isinstance(o, datetime.time):
             return o.strftime(self.TIME_FORMAT)
+        elif isinstance(o, decimal.Decimal):
+            return str(o)
         else:
-            return super(DateTimeAwareJSONEncoder, self).default(o)
+            return super(DjangoJSONEncoder, self).default(o)
+
+# Older, deprecated class name (for backwards compatibility purposes).
+DateTimeAwareJSONEncoder = DjangoJSONEncoder
+

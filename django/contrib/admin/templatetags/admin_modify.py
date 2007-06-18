@@ -74,7 +74,7 @@ class FieldWidgetNode(template.Node):
         self.bound_field_var = bound_field_var
 
     def get_nodelist(cls, klass):
-        if not cls.nodelists.has_key(klass):
+        if klass not in cls.nodelists:
             try:
                 field_class_name = klass.__name__
                 template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
@@ -94,15 +94,15 @@ class FieldWidgetNode(template.Node):
             return cls.nodelists[klass]
     get_nodelist = classmethod(get_nodelist)
 
-    def render(self, context):
+    def iter_render(self, context):
         bound_field = template.resolve_variable(self.bound_field_var, context)
 
         context.push()
         context['bound_field'] = bound_field
 
-        output = self.get_nodelist(bound_field.field.__class__).render(context)
+        for chunk in self.get_nodelist(bound_field.field.__class__).iter_render(context):
+            yield chunk
         context.pop()
-        return output
 
 class FieldWrapper(object):
     def __init__(self, field ):
@@ -157,7 +157,7 @@ class EditInlineNode(template.Node):
     def __init__(self, rel_var):
         self.rel_var = rel_var
 
-    def render(self, context):
+    def iter_render(self, context):
         relation = template.resolve_variable(self.rel_var, context)
         context.push()
         if relation.field.rel.edit_inline == models.TABULAR:
@@ -169,10 +169,9 @@ class EditInlineNode(template.Node):
         original = context.get('original', None)
         bound_related_object = relation.bind(context['form'], original, bound_related_object_class)
         context['bound_related_object'] = bound_related_object
-        t = loader.get_template(bound_related_object.template_name())
-        output = t.render(context)
+        for chunk in loader.get_template(bound_related_object.template_name()).iter_render(context):
+            yield chunk
         context.pop()
-        return output
 
 def output_all(form_fields):
     return ''.join([str(f) for f in form_fields])

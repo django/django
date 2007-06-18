@@ -16,6 +16,7 @@ import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 django_conversions = conversions.copy()
 django_conversions.update({
@@ -23,6 +24,7 @@ django_conversions.update({
     FIELD_TYPE.DATETIME: util.typecast_timestamp,
     FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
+    FIELD_TYPE.DECIMAL: util.typecast_decimal,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -52,7 +54,7 @@ class MysqlDebugWrapper:
             raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
 
     def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
+        if attr in self.__dict__:
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)
@@ -216,6 +218,11 @@ def get_sql_flush(style, tables, sequences):
         return sql
     else:
         return []
+
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

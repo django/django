@@ -31,9 +31,9 @@ def compile_messages(locale=None):
                 os.environ['djangocompilemo'] = pf + '.mo'
                 os.environ['djangocompilepo'] = pf + '.po'
                 if sys.platform == 'win32': # Different shell-variable syntax
-                    cmd = 'msgfmt -o "%djangocompilemo%" "%djangocompilepo%"'
+                    cmd = 'msgfmt --check-format -o "%djangocompilemo%" "%djangocompilepo%"'
                 else:
-                    cmd = 'msgfmt -o "$djangocompilemo" "$djangocompilepo"'
+                    cmd = 'msgfmt --check-format -o "$djangocompilemo" "$djangocompilepo"'
                 os.system(cmd)
 
 def main():

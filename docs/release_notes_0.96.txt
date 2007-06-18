@@ -62,7 +62,7 @@ Database constraint names changed
 The format of the constraint names Django generates for foreign key
 references have changed slightly. These names are generally only used
 when it is not possible to put the reference directly on the affected
-column, so they is not always visible.
+column, so they are not always visible.
 
 The effect of this change is that running ``manage.py reset`` and
 similar commands against an existing database may generate SQL with

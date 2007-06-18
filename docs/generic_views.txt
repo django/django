@@ -44,7 +44,7 @@ simple weblog app that drives the blog on djangoproject.com::
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',               'archive_day',   info_dict),
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',                                'archive_month', info_dict),
        (r'^(?P<year>\d{4})/$',                                                    'archive_year',  info_dict),
-       (r'^/?$',                                                                  'archive_index', info_dict),
+       (r'^$',                                                                    'archive_index', info_dict),
     )
 
 As you can see, this URLconf defines a few options in ``info_dict``.
@@ -71,7 +71,7 @@ are first evaluated, so if you want to pass in a QuerySet via
 ``extra_context`` that is always fresh you need to wrap it in a function or
 lambda that returns the QuerySet.
 
-.. _database API docs: ../db_api/
+.. _database API docs: ../db-api/
 
 "Simple" generic views
 ======================
@@ -98,6 +98,9 @@ which is a dictionary of the parameters captured in the URL.
       context. By default, this is an empty dictionary. If a value in the
       dictionary is callable, the generic view will call it
       just before rendering the template.
+
+    * ``mimetype``: The MIME type to use for the resulting document. Defaults
+      to the value of the ``DEFAULT_CONTENT_TYPE`` setting.
 
 **Example:**
 
@@ -222,7 +225,7 @@ In addition to ``extra_context``, the template's context will be:
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
       ``latest`` will be a list of the latest 10 objects in ``queryset``.
 
-.. _RequestContext docs: ../templates_python/#subclassing-context-djangocontext
+.. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
 ``django.views.generic.date_based.archive_year``
 ------------------------------------------------

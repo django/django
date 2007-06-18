@@ -11,7 +11,8 @@ class CommonMiddleware(object):
         - Forbids access to User-Agents in settings.DISALLOWED_USER_AGENTS
 
         - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
-          this middleware appends missing slashes and/or prepends missing "www."s.
+          this middleware appends missing slashes and/or prepends missing
+          "www."s.
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
@@ -25,7 +26,7 @@ class CommonMiddleware(object):
         """
 
         # Check for denied User-Agents
-        if request.META.has_key('HTTP_USER_AGENT'):
+        if 'HTTP_USER_AGENT' in request.META:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
@@ -66,14 +67,19 @@ class CommonMiddleware(object):
                 path = request.get_full_path()
                 if referer and not _is_ignorable_404(path) and (is_internal or '?' not in referer):
                     ua = request.META.get('HTTP_USER_AGENT', '<none>')
+                    ip = request.META.get('REMOTE_ADDR', '<none>')
                     mail_managers("Broken %slink on %s" % ((is_internal and 'INTERNAL ' or ''), domain),
-                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\n" % (referer, request.get_full_path(), ua))
+                        "Referrer: %s\nRequested URL: %s\nUser agent: %s\nIP address: %s\n" \
+                                  % (referer, request.get_full_path(), ua, ip))
                 return response
 
         # Use ETags, if requested.
         if settings.USE_ETAGS:
-            etag = md5.new(response.content).hexdigest()
-            if request.META.get('HTTP_IF_NONE_MATCH') == etag:
+            if response.has_header('ETag'):
+                etag = response['ETag']
+            else:
+                etag = md5.new(response.content).hexdigest()
+            if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 response = http.HttpResponseNotModified()
             else:
                 response['ETag'] = etag

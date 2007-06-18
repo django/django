@@ -1,0 +1,107 @@
+# Copyright (C) 2007
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: DJANGO-JS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2005-12-09 11:51+0100\n"
+"PO-Revision-Date: 2007-03-31 21:29+0100\n"
+"Last-Translator: Gasper Koren <skrat@owca.info>\n"
+"Language-Team: SLOVENIAN <lugos-slo@lugos.si>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Slovenian\n"
+"X-Poedit-Country: SLOVENIA\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "Možne %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "Izberi vse"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "Dodaj"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "Odstrani"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "Izberite %s"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "Izberite in kliknite"
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "Izbriši vse"
+
+#: contrib/admin/media/js/dateparse.js:26
+#: contrib/admin/media/js/calendar.js:24
+msgid "January February March April May June July August September October November December"
+msgstr "Januar Februar Marec April Maj Junij Julij Avgust September Oktober November December"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Nedelja Ponedeljek Torek Sreda Četrtek Petek Sobota"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "N P T S Č P S"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Now"
+msgstr "Sedaj"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+msgid "Clock"
+msgstr "URA"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+msgid "Choose a time"
+msgstr "Izberite čas"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Midnight"
+msgstr "Polnoč"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "6 a.m."
+msgstr "Ob 6h"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Noon"
+msgstr "Opoldne"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+msgid "Cancel"
+msgstr "Prekliči"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+msgid "Today"
+msgstr "Danes"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+msgid "Calendar"
+msgstr "Koledar"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+msgid "Yesterday"
+msgstr "Včeraj"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+msgid "Tomorrow"
+msgstr "Jutri"
+

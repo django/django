@@ -132,6 +132,7 @@ class RssFeed(SyndicationFeed):
             handler.addQuickElement(u"category", cat)
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement(u"copyright", self.feed['feed_copyright'])
+        handler.addQuickElement(u"lastBuildDate", rfc2822_date(self.latest_post_date()).decode('ascii'))
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
@@ -167,6 +168,8 @@ class Rss201rev2Feed(RssFeed):
                     (item['author_email'], item['author_name']))
             elif item["author_email"]:
                 handler.addQuickElement(u"author", item["author_email"])
+            elif item["author_name"]:
+                handler.addQuickElement(u"dc:creator", item["author_name"], {"xmlns:dc": u"http://purl.org/dc/elements/1.1/"})
 
             if item['pubdate'] is not None:
                 handler.addQuickElement(u"pubDate", rfc2822_date(item['pubdate']).decode('ascii'))

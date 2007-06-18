@@ -1,4 +1,4 @@
-import base64, md5, random, sys, datetime
+import base64, md5, random, sys, datetime, os, time
 import cPickle as pickle
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -14,9 +14,9 @@ class SessionManager(models.Manager):
     def get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
-        # Use person_id and SECRET_KEY as added salt.
+        # Use SECRET_KEY as added salt.
         while 1:
-            session_key = md5.new(str(random.randint(0, sys.maxint - 1)) + str(random.randint(0, sys.maxint - 1)) + settings.SECRET_KEY).hexdigest()
+            session_key = md5.new("%s%s%s%s" % (random.randint(0, sys.maxint - 1), os.getpid(), time.time(), settings.SECRET_KEY)).hexdigest()
             try:
                 self.get(session_key=session_key)
             except self.model.DoesNotExist:

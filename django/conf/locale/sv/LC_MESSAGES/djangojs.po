@@ -2,9 +2,6 @@
 # Copyright (C) 2005
 # This file is distributed under the same license as the Django package.
 #
-#
-# Robin Sonefors <ozamosi@blinkenlights.se>, 2005.
-# Mikko Hellsing <mikko@sorl.net>, 2007.
 msgid ""
 msgstr ""
 "Project-Id-Version: djangojs\n"

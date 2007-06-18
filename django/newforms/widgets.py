@@ -2,29 +2,35 @@
 HTML Widget classes
 """
 
-__all__ = (
-    'Widget', 'TextInput', 'PasswordInput', 'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'Textarea', 'CheckboxInput',
-    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect', 'CheckboxSelectMultiple',
-    'MultiWidget', 'SplitDateTimeWidget',
-)
-
-from util import flatatt, StrAndUnicode, smart_unicode
-from django.utils.datastructures import MultiValueDict
-from django.utils.html import escape
-from django.utils.translation import gettext
-from itertools import chain
-
 try:
     set # Only available in Python 2.4+
 except NameError:
     from sets import Set as set # Python 2.3 fallback
+from itertools import chain
+
+from django.utils.datastructures import MultiValueDict
+from django.utils.html import escape
+from django.utils.translation import gettext
+from django.utils.encoding import StrAndUnicode, smart_unicode
+
+from util import flatatt
+
+__all__ = (
+    'Widget', 'TextInput', 'PasswordInput',
+    'HiddenInput', 'MultipleHiddenInput',
+    'FileInput', 'Textarea', 'CheckboxInput',
+    'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
+    'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
+)
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
-        self.attrs = attrs or {}
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
 
     def render(self, name, value, attrs=None):
         """
@@ -117,6 +123,12 @@ class FileInput(Input):
     input_type = 'file'
 
 class Textarea(Widget):
+    def __init__(self, attrs=None):
+        # The 'rows' and 'cols' attributes are required for HTML correctness.
+        self.attrs = {'cols': '40', 'rows': '10'}
+        if attrs:
+            self.attrs.update(attrs)
+
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         value = smart_unicode(value)
@@ -220,7 +232,7 @@ class RadioInput(StrAndUnicode):
         return self.value == self.choice_value
 
     def tag(self):
-        if self.attrs.has_key('id'):
+        if 'id' in self.attrs:
             self.attrs['id'] = '%s_%s' % (self.attrs['id'], self.index)
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
@@ -250,8 +262,8 @@ class RadioSelect(Select):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
         str_value = smart_unicode(value) # Normalize to string.
-        attrs = attrs or {}
-        return RadioFieldRenderer(name, str_value, attrs, list(chain(self.choices, choices)))
+        final_attrs = self.build_attrs(attrs)
+        return RadioFieldRenderer(name, str_value, final_attrs, list(chain(self.choices, choices)))
 
     def id_for_label(self, id_):
         # RadioSelect is represented by multiple <input type="radio"> fields,
@@ -266,7 +278,7 @@ class RadioSelect(Select):
 class CheckboxSelectMultiple(SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
-        has_id = attrs and attrs.has_key('id')
+        has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
         str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
@@ -317,16 +329,27 @@ class MultiWidget(Widget):
         if not isinstance(value, list):
             value = self.decompress(value)
         output = []
+        final_attrs = self.build_attrs(attrs)
+        id_ = final_attrs.get('id', None)
         for i, widget in enumerate(self.widgets):
             try:
                 widget_value = value[i]
-            except KeyError:
+            except IndexError:
                 widget_value = None
-            output.append(widget.render(name + '_%s' % i, widget_value, attrs))
+            if id_:
+                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
+            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         return self.format_output(output)
 
+    def id_for_label(self, id_):
+        # See the comment for RadioSelect.id_for_label()
+        if id_:
+            id_ += '_0'
+        return id_
+    id_for_label = classmethod(id_for_label)
+
     def value_from_datadict(self, data, name):
-        return [data.get(name + '_%s' % i) for i in range(len(self.widgets))]
+        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets):
         return u''.join(rendered_widgets)

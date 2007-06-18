@@ -12,6 +12,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading psycopg module: %s" % e
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+
@@ -47,7 +48,7 @@ class UnicodeCursorWrapper(object):
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
+        if attr in self.__dict__:
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)
@@ -192,7 +193,7 @@ def get_sql_flush(style, tables, sequences):
                 sql.append("%s %s %s %s %s %s;" % \
                     (style.SQL_KEYWORD('ALTER'),
                     style.SQL_KEYWORD('SEQUENCE'),
-                    style.SQL_FIELD('%s_%s_seq' % (table_name, column_name)),
+                    style.SQL_FIELD(quote_name('%s_%s_seq' % (table_name, column_name))),
                     style.SQL_KEYWORD('RESTART'),
                     style.SQL_KEYWORD('WITH'),
                     style.SQL_FIELD('1')
@@ -203,7 +204,7 @@ def get_sql_flush(style, tables, sequences):
                 sql.append("%s %s %s %s %s %s;" % \
                     (style.SQL_KEYWORD('ALTER'),
                      style.SQL_KEYWORD('SEQUENCE'),
-                     style.SQL_FIELD('%s_id_seq' % table_name),
+                     style.SQL_FIELD(quote_name('%s_id_seq' % table_name)),
                      style.SQL_KEYWORD('RESTART'),
                      style.SQL_KEYWORD('WITH'),
                      style.SQL_FIELD('1')
@@ -213,6 +214,35 @@ def get_sql_flush(style, tables, sequences):
     else:
         return []
 
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    from django.db import models
+    output = []
+    for model in model_list:
+        # Use `coalesce` to set the sequence for each model to the max pk value if there are records,
+        # or 1 if there are none. Set the `is_called` property (the third argument to `setval`) to true
+        # if there are records (as the max pk value is already in use), otherwise set it to false.
+        for f in model._meta.fields:
+            if isinstance(f, models.AutoField):
+                output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(quote_name('%s_%s_seq' % (model._meta.db_table, f.column))),
+                    style.SQL_FIELD(quote_name(f.column)),
+                    style.SQL_FIELD(quote_name(f.column)),
+                    style.SQL_KEYWORD('IS NOT'),
+                    style.SQL_KEYWORD('FROM'),
+                    style.SQL_TABLE(quote_name(model._meta.db_table))))
+                break # Only one AutoField is allowed per model, so don't bother continuing.
+        for f in model._meta.many_to_many:
+            output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
+                (style.SQL_KEYWORD('SELECT'),
+                style.SQL_FIELD(quote_name('%s_id_seq' % f.m2m_db_table())),
+                style.SQL_FIELD(quote_name('id')),
+                style.SQL_FIELD(quote_name('id')),
+                style.SQL_KEYWORD('IS NOT'),
+                style.SQL_KEYWORD('FROM'),
+                style.SQL_TABLE(f.m2m_db_table())))
+    return output
         
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
@@ -224,6 +254,7 @@ except AttributeError:
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
+Database.register_type(Database.new_type((1700,), "NUMERIC", util.typecast_decimal))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

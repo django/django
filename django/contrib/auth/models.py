@@ -17,6 +17,12 @@ def check_password(raw_password, enc_password):
     elif algo == 'sha1':
         import sha
         return hsh == sha.new(salt+raw_password).hexdigest()
+    elif algo == 'crypt':
+        try:
+            import crypt
+        except ImportError:
+            raise ValueError, "Crypt password algorithm not supported in this environment."
+        return hsh == crypt.crypt(raw_password, salt)
     raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
@@ -38,6 +44,7 @@ class Permission(models.Model):
     name = models.CharField(_('name'), maxlength=50)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), maxlength=100)
+
     class Meta:
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
@@ -45,7 +52,7 @@ class Permission(models.Model):
         ordering = ('content_type', 'codename')
 
     def __str__(self):
-        return "%s | %s" % (self.content_type, self.name)
+        return "%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -56,10 +63,12 @@ class Group(models.Model):
     """
     name = models.CharField(_('name'), maxlength=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True, filter_interface=models.HORIZONTAL)
+
     class Meta:
         verbose_name = _('group')
         verbose_name_plural = _('groups')
         ordering = ('name',)
+
     class Admin:
         search_fields = ('name',)
 
@@ -95,16 +104,18 @@ class User(models.Model):
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_("Designates whether the user can log into this admin site."))
     is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."))
     is_superuser = models.BooleanField(_('superuser status'), default=False, help_text=_("Designates that this user has all permissions without explicitly assigning them."))
-    last_login = models.DateTimeField(_('last login'), default=models.LazyDate())
-    date_joined = models.DateTimeField(_('date joined'), default=models.LazyDate())
+    last_login = models.DateTimeField(_('last login'), default=datetime.datetime.now)
+    date_joined = models.DateTimeField(_('date joined'), default=datetime.datetime.now)
     groups = models.ManyToManyField(Group, verbose_name=_('groups'), blank=True,
         help_text=_("In addition to the permissions manually assigned, this user will also get all permissions granted to each group he/she is in."))
     user_permissions = models.ManyToManyField(Permission, verbose_name=_('user permissions'), blank=True, filter_interface=models.HORIZONTAL)
     objects = UserManager()
+
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
         ordering = ('username',)
+
     class Admin:
         fields = (
             (None, {'fields': ('username', 'password')}),
@@ -268,7 +279,7 @@ class AnonymousUser(object):
         pass
 
     def __str__(self):
-        return 'AnonymousUser'
+        return _('AnonymousUser')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

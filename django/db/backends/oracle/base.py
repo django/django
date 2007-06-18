@@ -12,6 +12,7 @@ except ImportError, e:
     raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
 
 DatabaseError = Database.Error
+IntegrityError = Database.IntegrityError
 
 try:
     # Only exists in Python 2.4+
@@ -134,6 +135,10 @@ def get_sql_flush(style, tables, sequences):
              style.SQL_FIELD(quote_name(table))
              )  for table in tables]
 
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

@@ -7,7 +7,7 @@ from django.http import HttpResponse, Http404
 from django.db.models.manager import Manager
 
 def render_to_response(*args, **kwargs):
-    return HttpResponse(loader.render_to_string(*args, **kwargs))
+    return HttpResponse(loader.render_to_iter(*args, **kwargs))
 load_and_render = render_to_response # For backwards compatibility.
 
 def get_object_or_404(klass, *args, **kwargs):

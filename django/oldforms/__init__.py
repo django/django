@@ -309,6 +309,10 @@ class FormField(object):
         return data
     html2python = staticmethod(html2python)
 
+    def iter_render(self, data):
+        # this even needed?
+        return (self.render(data),)
+
     def render(self, data):
         raise NotImplementedError
 
@@ -329,7 +333,7 @@ class FormField(object):
 
     def convert_post_data(self, new_data):
         name = self.get_member_name()
-        if new_data.has_key(self.field_name):
+        if self.field_name in new_data:
             d = new_data.getlist(self.field_name)
             try:
                 converted_data = [self.__class__.html2python(data) for data in d]
@@ -750,14 +754,27 @@ class PositiveSmallIntegerField(IntegerField):
             raise validators.CriticalValidationError, gettext("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
+    def __init__(self, field_name, is_required=False, validator_list=None): 
+        if validator_list is None: validator_list = [] 
+        validator_list = [validators.isValidFloat] + validator_list 
+        TextField.__init__(self, field_name, is_required=is_required, validator_list=validator_list) 
+ 
+    def html2python(data): 
+        if data == '' or data is None: 
+            return None 
+        return float(data) 
+    html2python = staticmethod(html2python) 
+ 
+class DecimalField(TextField): 
     def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        validator_list = [self.isValidFloat] + validator_list
-        TextField.__init__(self, field_name, max_digits+2, max_digits+2, is_required, validator_list)
+        validator_list = [self.isValidDecimal] + validator_list 
+        # Initialise the TextField, making sure it's large enough to fit the number with a - sign and a decimal point. 
+        super(DecimalField, self).__init__(field_name, max_digits+2, max_digits+2, is_required, validator_list) 
 
-    def isValidFloat(self, field_data, all_data):
-        v = validators.IsValidFloat(self.max_digits, self.decimal_places)
+    def isValidDecimal(self, field_data, all_data): 
+        v = validators.IsValidDecimal(self.max_digits, self.decimal_places) 
         try:
             v(field_data, all_data)
         except validators.ValidationError, e:
@@ -766,7 +783,14 @@ class FloatField(TextField):
     def html2python(data):
         if data == '' or data is None:
             return None
-        return float(data)
+        try: 
+            import decimal 
+        except ImportError:
+            from django.utils import _decimal as decimal
+        try: 
+            return decimal.Decimal(data) 
+        except decimal.InvalidOperation, e: 
+            raise ValueError, e 
     html2python = staticmethod(html2python)
 
 ####################
@@ -923,7 +947,8 @@ class FilePathField(SelectField):
             for root, dirs, files in os.walk(path):
                 for f in files:
                     if match is None or match_re.search(f):
-                        choices.append((os.path.join(root, f), f))
+                        f = os.path.join(root, f)
+                        choices.append((f, f.replace(path, "", 1)))
         else:
             try:
                 for f in os.listdir(path):

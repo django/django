@@ -1,19 +1,20 @@
 """
 A test spanning all the capabilities of all the serializers.
 
-This class sets up a model for each model field type 
+This class sets up a model for each model field type
 (except for image types, because of the PIL dependency).
 """
 
 from django.db import models
+from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-# The following classes are for testing basic data 
+# The following classes are for testing basic data
 # marshalling, including NULL values.
 
 class BooleanData(models.Model):
     data = models.BooleanField(null=True)
-    
+
 class CharData(models.Model):
     data = models.CharField(maxlength=30, null=True)
 
@@ -22,6 +23,9 @@ class DateData(models.Model):
 
 class DateTimeData(models.Model):
     data = models.DateTimeField(null=True)
+
+class DecimalData(models.Model):
+    data = models.DecimalField(null=True, decimal_places=3, max_digits=5)
 
 class EmailData(models.Model):
     data = models.EmailField(null=True)
@@ -33,7 +37,7 @@ class FilePathData(models.Model):
     data = models.FilePathField(null=True)
 
 class FloatData(models.Model):
-    data = models.FloatField(null=True, decimal_places=3, max_digits=5)
+    data = models.FloatField(null=True)
 
 class IntegerData(models.Model):
     data = models.IntegerField(null=True)
@@ -80,7 +84,7 @@ class Tag(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
 
-    content_object = models.GenericForeignKey()
+    content_object = generic.GenericForeignKey()
 
     class Meta:
         ordering = ["data"]
@@ -88,7 +92,7 @@ class Tag(models.Model):
 class GenericData(models.Model):
     data = models.CharField(maxlength=30)
 
-    tags = models.GenericRelation(Tag)
+    tags = generic.GenericRelation(Tag)
     
 # The following test classes are all for validation
 # of related objects; in particular, forward, backward,
@@ -99,6 +103,12 @@ class Anchor(models.Model):
     something for other models to point at"""
     
     data = models.CharField(maxlength=30)
+
+class UniqueAnchor(models.Model):
+    """This is a model that can be used as 
+    something for other models to point at"""
+
+    data = models.CharField(unique=True, maxlength=30)
     
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
@@ -114,6 +124,13 @@ class FKSelfData(models.Model):
     
 class M2MSelfData(models.Model):
     data = models.ManyToManyField('self', null=True, symmetrical=False)
+
+
+class FKDataToField(models.Model):
+    data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
+
+class FKDataToO2O(models.Model):
+    data = models.ForeignKey(O2OData, null=True)
 
 # The following test classes are for validating the
 # deserialization of objects that use a user-defined
@@ -134,6 +151,9 @@ class CharPKData(models.Model):
 # class DateTimePKData(models.Model):
 #    data = models.DateTimeField(primary_key=True)
 
+class DecimalPKData(models.Model):
+    data = models.DecimalField(primary_key=True, decimal_places=3, max_digits=5)
+
 class EmailPKData(models.Model):
     data = models.EmailField(primary_key=True)
 
@@ -144,7 +164,7 @@ class FilePathPKData(models.Model):
     data = models.FilePathField(primary_key=True)
 
 class FloatPKData(models.Model):
-    data = models.FloatField(primary_key=True, decimal_places=3, max_digits=5)
+    data = models.FloatField(primary_key=True)
 
 class IntegerPKData(models.Model):
     data = models.IntegerField(primary_key=True)
@@ -185,3 +205,7 @@ class USStatePKData(models.Model):
 # class XMLPKData(models.Model):
 #     data = models.XMLField(primary_key=True)
 
+class ComplexModel(models.Model):
+    field1 = models.CharField(maxlength=10)
+    field2 = models.CharField(maxlength=10)
+    field3 = models.CharField(maxlength=10)

@@ -1,5 +1,6 @@
-import unittest, doctest
+import unittest
 from django.conf import settings
+from django.test import _doctest as doctest
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.test.utils import create_test_db, destroy_test_db
 from django.test.testcases import OutputChecker, DocTestRunner
@@ -49,9 +50,12 @@ def build_suite(app_module):
             pass
         else:
             # The module exists, so there must be an import error in the 
-            # test module itself. We don't need the module; close the file
-            # handle returned by find_module.
-            mod[0].close()
+            # test module itself. We don't need the module; so if the
+            # module was a single file module (i.e., tests.py), close the file
+            # handle returned by find_module. Otherwise, the test module
+            # is a directory, and there is nothing to close.
+            if mod[0]:
+                mod[0].close()
             raise
             
     return suite
@@ -84,5 +88,5 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
     
     teardown_test_environment()
     
-    return len(result.failures)
+    return len(result.failures) + len(result.errors)
     

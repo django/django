@@ -10,6 +10,10 @@ from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy
 import datetime, os, time
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
 
 class NOT_PROVIDED:
     pass
@@ -341,11 +345,13 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
-    def formfield(self, **kwargs):
+    def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        if self.choices:
+            defaults['widget'] = forms.Select(choices=self.get_choices())
         defaults.update(kwargs)
-        return forms.CharField(**defaults)
+        return form_class(**defaults)
 
     def value_from_object(self, obj):
         "Returns the value of this field in the given model instance."
@@ -405,9 +411,9 @@ class BooleanField(Field):
         return [oldforms.CheckboxField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.BooleanField}
         defaults.update(kwargs)
-        return forms.BooleanField(**defaults)
+        return super(BooleanField, self).formfield(**defaults)
 
 class CharField(Field):
     def get_manipulator_field_objs(self):
@@ -424,9 +430,9 @@ class CharField(Field):
         return str(value)
 
     def formfield(self, **kwargs):
-        defaults = {'max_length': self.maxlength, 'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'max_length': self.maxlength}
         defaults.update(kwargs)
-        return forms.CharField(**defaults)
+        return super(CharField, self).formfield(**defaults)
 
 # TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
@@ -502,9 +508,9 @@ class DateField(Field):
         return {self.attname: (val is not None and val.strftime("%Y-%m-%d") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.DateField}
         defaults.update(kwargs)
-        return forms.DateField(**defaults)
+        return super(DateField, self).formfield(**defaults)
 
 class DateTimeField(DateField):
     def to_python(self, value):
@@ -567,9 +573,68 @@ class DateTimeField(DateField):
                 time_field: (val is not None and val.strftime("%H:%M:%S") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.DateTimeField}
         defaults.update(kwargs)
-        return forms.DateTimeField(**defaults)
+        return super(DateTimeField, self).formfield(**defaults)
+
+class DecimalField(Field):
+    empty_strings_allowed = False
+    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
+        self.max_digits, self.decimal_places = max_digits, decimal_places
+        Field.__init__(self, verbose_name, name, **kwargs)
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return decimal.Decimal(value)
+        except decimal.InvalidOperation:
+            raise validators.ValidationError, gettext("This value must be a decimal number.")
+
+    def _format(self, value):
+        if isinstance(value, basestring):
+            return value
+        else:
+            return self.format_number(value)
+
+    def format_number(self, value):
+        """
+        Formats a number into a string with the requisite number of digits and
+        decimal places.
+        """
+        num_chars = self.max_digits
+        # Allow for a decimal point
+        if self.decimal_places > 0:
+            num_chars += 1
+        # Allow for a minus sign
+        if value < 0:
+            num_chars += 1
+
+        return "%.*f" % (self.decimal_places, value)
+
+    def get_db_prep_save(self, value):
+        if value is not None:
+            value = self._format(value)
+        return super(DecimalField, self).get_db_prep_save(value)
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        if lookup_type == 'range':
+            value = [self._format(v) for v in value]
+        else:
+            value = self._format(value)
+        return super(DecimalField, self).get_db_prep_lookup(lookup_type, value)
+
+    def get_manipulator_field_objs(self):
+        return [curry(oldforms.DecimalField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'max_digits': self.max_digits,
+            'decimal_places': self.decimal_places,
+            'form_class': forms.DecimalField,
+        }
+        defaults.update(kwargs)
+        return super(DecimalField, self).formfield(**defaults)
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
@@ -586,9 +651,9 @@ class EmailField(CharField):
         validators.isValidEmail(field_data, all_data)
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.EmailField}
         defaults.update(kwargs)
-        return forms.EmailField(**defaults)
+        return super(EmailField, self).formfield(**defaults)
 
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
@@ -681,12 +746,14 @@ class FilePathField(Field):
 
 class FloatField(Field):
     empty_strings_allowed = False
-    def __init__(self, verbose_name=None, name=None, max_digits=None, decimal_places=None, **kwargs):
-        self.max_digits, self.decimal_places = max_digits, decimal_places
-        Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
-        return [curry(oldforms.FloatField, max_digits=self.max_digits, decimal_places=self.decimal_places)]
+        return [oldforms.FloatField]
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.FloatField}
+        defaults.update(kwargs)
+        return super(FloatField, self).formfield(**defaults)
 
 class ImageField(FileField):
     def __init__(self, verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
@@ -723,9 +790,9 @@ class IntegerField(Field):
         return [oldforms.IntegerField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.IntegerField}
         defaults.update(kwargs)
-        return forms.IntegerField(**defaults)
+        return super(IntegerField, self).formfield(**defaults)
 
 class IPAddressField(Field):
     def __init__(self, *args, **kwargs):
@@ -761,10 +828,10 @@ class PhoneNumberField(IntegerField):
         validators.isValidPhone(field_data, all_data)
 
     def formfield(self, **kwargs):
-        from django.contrib.localflavor.usa.forms import USPhoneNumberField
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        from django.contrib.localflavor.us.forms import USPhoneNumberField
+        defaults = {'form_class': USPhoneNumberField}
         defaults.update(kwargs)
-        return USPhoneNumberField(**defaults)
+        return super(PhoneNumberField, self).formfield(**defaults)
 
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
@@ -779,7 +846,7 @@ class SlugField(Field):
         kwargs['maxlength'] = kwargs.get('maxlength', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
-        if not kwargs.has_key('db_index'):
+        if 'db_index' not in kwargs:
             kwargs['db_index'] = True
         Field.__init__(self, *args, **kwargs)
 
@@ -795,9 +862,9 @@ class TextField(Field):
         return [oldforms.LargeTextField]
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'widget': forms.Textarea, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'widget': forms.Textarea}
         defaults.update(kwargs)
-        return forms.CharField(**defaults)
+        return super(TextField, self).formfield(**defaults)
 
 class TimeField(Field):
     empty_strings_allowed = False
@@ -840,9 +907,9 @@ class TimeField(Field):
         return {self.attname: (val is not None and val.strftime("%H:%M:%S") or '')}
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.TimeField}
         defaults.update(kwargs)
-        return forms.TimeField(**defaults)
+        return super(TimeField, self).formfield(**defaults)
 
 class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
@@ -859,13 +926,19 @@ class URLField(CharField):
         return "CharField"
 
     def formfield(self, **kwargs):
-        defaults = {'required': not self.blank, 'verify_exists': self.verify_exists, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults = {'form_class': forms.URLField, 'verify_exists': self.verify_exists}
         defaults.update(kwargs)
-        return forms.URLField(**defaults)
+        return super(URLField, self).formfield(**defaults)
 
 class USStateField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.USStateField]
+
+    def formfield(self, **kwargs):
+        from django.contrib.localflavor.us.forms import USStateSelect
+        defaults = {'widget': USStateSelect}
+        defaults.update(kwargs)
+        return super(USStateField, self).formfield(**defaults)
 
 class XMLField(TextField):
     def __init__(self, verbose_name=None, name=None, schema_path=None, **kwargs):

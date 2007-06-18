@@ -20,23 +20,19 @@ rather than the HTML rendered to the end-user.
 
 """
 from django.test import Client, TestCase
+from django.core import mail
 
 class ClientTest(TestCase):
     fixtures = ['testdata.json']
     
-    def setUp(self):
-        "Set up test environment"
-        self.client = Client()
-        
     def test_get_view(self):
         "GET a view"
         response = self.client.get('/test_client/get_view/')
         
         # Check some response details
-        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This is a test')
         self.assertEqual(response.context['var'], 42)
         self.assertEqual(response.template.name, 'GET Template')
-        self.failUnless('This is a test.' in response.content)
 
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
@@ -45,6 +41,8 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty GET Template')
+        self.assertTemplateUsed(response, 'Empty GET Template')
+        self.assertTemplateNotUsed(response, 'Empty POST Template')
         
     def test_empty_post(self):
         "POST an empty dictionary to a view"
@@ -53,6 +51,8 @@ class ClientTest(TestCase):
         # Check some response details
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template.name, 'Empty POST Template')
+        self.assertTemplateNotUsed(response, 'Empty GET Template')
+        self.assertTemplateUsed(response, 'Empty POST Template')
         
     def test_post(self):
         "POST some data to a view"
@@ -68,6 +68,7 @@ class ClientTest(TestCase):
         self.failUnless('Data received' in response.content)
         
     def test_raw_post(self):
+        "POST raw data (with a content type) to a view"
         test_doc = """<?xml version="1.0" encoding="utf-8"?><library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>"""
         response = self.client.post("/test_client/raw_post_view/", test_doc,
                                     content_type="text/xml")
@@ -80,7 +81,29 @@ class ClientTest(TestCase):
         response = self.client.get('/test_client/redirect_view/')
         
         # Check that the response was a 302 (redirect)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/test_client/get_view/')
+
+    def test_permanent_redirect(self):
+        "GET a URL that redirects permanently elsewhere"
+        response = self.client.get('/test_client/permanent_redirect_view/')
+        
+        # Check that the response was a 301 (permanent redirect)
+        self.assertRedirects(response, '/test_client/get_view/', status_code=301)
+
+    def test_redirect_to_strange_location(self):
+        "GET a URL that redirects to a non-200 page"
+        response = self.client.get('/test_client/double_redirect_view/')
+        
+        # Check that the response was a 302, and that
+        # the attempt to get the redirection location returned 301 when retrieved
+        self.assertRedirects(response, '/test_client/permanent_redirect_view/', target_status_code=301)
+
+    def test_notfound_response(self):
+        "GET a URL that responds as '404:Not Found'"
+        response = self.client.get('/test_client/bad_view/')
+        
+        # Check that the response was a 404, and that the content contains MAGIC
+        self.assertContains(response, 'MAGIC', status_code=404)
 
     def test_valid_form(self):
         "POST valid data to a form"
@@ -93,7 +116,7 @@ class ClientTest(TestCase):
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Valid POST Template")
+        self.assertTemplateUsed(response, "Valid POST Template")
 
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
@@ -102,8 +125,13 @@ class ClientTest(TestCase):
             'value': 37            
         }
         response = self.client.post('/test_client/form_view/', post_data)
+        self.assertContains(response, 'This field is required.', 3)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Invalid POST Template")
+        self.assertTemplateUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+        self.assertFormError(response, 'form', 'single', 'This field is required.')
+        self.assertFormError(response, 'form', 'multi', 'This field is required.')
 
     def test_form_error(self):
         "POST erroneous data to a form"
@@ -116,7 +144,57 @@ class ClientTest(TestCase):
         }
         response = self.client.post('/test_client/form_view/', post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template.name, "Invalid POST Template")
+        self.assertTemplateUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
+
+    def test_valid_form_with_template(self):
+        "POST valid data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'foo@example.com',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data OK')
+        self.assertTemplateUsed(response, "form_view.html")
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Valid POST Template")
+
+    def test_incomplete_data_form_with_template(self):
+        "POST incomplete data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'value': 37            
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data has errors')
+        self.assertTemplateUsed(response, 'form_view.html')
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'This field is required.')
+        self.assertFormError(response, 'form', 'single', 'This field is required.')
+        self.assertFormError(response, 'form', 'multi', 'This field is required.')
+
+    def test_form_error_with_template(self):
+        "POST erroneous data to a form using multiple templates"
+        post_data = {
+            'text': 'Hello World',
+            'email': 'not an email address',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view_with_template/', post_data)
+        self.assertContains(response, 'POST data has errors')
+        self.assertTemplateUsed(response, "form_view.html")
+        self.assertTemplateUsed(response, 'base.html')
+        self.assertTemplateNotUsed(response, "Invalid POST Template")
+
+        self.assertFormError(response, 'form', 'email', 'Enter a valid e-mail address.')
         
     def test_unknown_page(self):
         "GET an invalid URL"
@@ -130,20 +208,21 @@ class ClientTest(TestCase):
         
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/accounts/login/')
         
+        # Log in
+        self.client.login(username='testclient', password='password')
+
         # Request a page that requires a login
-        response = self.client.login('/test_client/login_protected_view/', 'testclient', 'password')
-        self.failUnless(response)
+        response = self.client.get('/test_client/login_protected_view/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
-        self.assertEqual(response.template.name, 'Login Template')
 
     def test_view_with_bad_login(self):
         "Request a page that is protected with @login, but use bad credentials"
 
-        response = self.client.login('/test_client/login_protected_view/', 'otheruser', 'nopassword')
-        self.failIf(response)
+        login = self.client.login(username='otheruser', password='nopassword')
+        self.failIf(login)
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
@@ -170,3 +249,36 @@ class ClientTest(TestCase):
             self.fail('Should raise an error')
         except KeyError:
             pass
+    
+    def test_mail_sending(self):
+        "Test that mail is redirected to a dummy outbox during test setup"
+        
+        response = self.client.get('/test_client/mail_sending_view/')
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, 'Test message')
+        self.assertEqual(mail.outbox[0].body, 'This is a test email')
+        self.assertEqual(mail.outbox[0].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
+        self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
+
+    def test_mass_mail_sending(self):
+        "Test that mass mail is redirected to a dummy outbox during test setup"
+        
+        response = self.client.get('/test_client/mass_mail_sending_view/')
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(mail.outbox[0].subject, 'First Test message')
+        self.assertEqual(mail.outbox[0].body, 'This is the first test email')
+        self.assertEqual(mail.outbox[0].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
+        self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
+
+        self.assertEqual(mail.outbox[1].subject, 'Second Test message')
+        self.assertEqual(mail.outbox[1].body, 'This is the second test email')
+        self.assertEqual(mail.outbox[1].from_email, 'from@example.com') 
+        self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
+        self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
+        

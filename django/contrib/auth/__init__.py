@@ -1,8 +1,8 @@
+import datetime
 from django.core.exceptions import ImproperlyConfigured
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
-LOGIN_URL = '/accounts/login/'
 REDIRECT_FIELD_NAME = 'next'
 
 def load_backend(path):
@@ -49,8 +49,12 @@ def login(request, user):
     if user is None:
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
+    user.last_login = datetime.datetime.now()
+    user.save()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
+    if hasattr(request, 'user'):
+        request.user = user
 
 def logout(request):
     """
@@ -64,6 +68,9 @@ def logout(request):
         del request.session[BACKEND_SESSION_KEY]
     except KeyError:
         pass
+    if hasattr(request, 'user'):
+        from django.contrib.auth.models import AnonymousUser
+        request.user = AnonymousUser()
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser
