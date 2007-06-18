@@ -64,6 +64,18 @@ def lazy(func, *resultclasses):
             else:
                 return Promise.__str__(self)
 
+        def __cmp__(self, rhs):
+            if self._delegate_str:
+                s = str(self.__func(*self.__args, **self.__kw))
+            elif self._delegate_unicode:
+                s = unicode(self.__func(*self.__args, **self.__kw))
+            else:
+                s = self.__func(*self.__args, **self.__kw)
+            if isinstance(rhs, Promise):
+                return -cmp(rhs, s)
+            else:
+                return cmp(s, rhs)
+
         def __mod__(self, rhs):
             if self._delegate_str:
                 return str(self) % rhs
