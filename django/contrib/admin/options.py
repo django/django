@@ -623,7 +623,7 @@ class InlineModelAdmin(BaseModelAdmin):
     ``model`` to its parent. This is required if ``model`` has more than one
     ``ForeignKey`` to its parent.
     """
-    def __init__(self, model, name=None, extra=3, fields=None, template=None):
+    def __init__(self, model, name=None, extra=3, fields=None, template=None, raw_id_fields=None):
         self.model = model
         self.opts = model._meta
         self.name = name
@@ -633,6 +633,7 @@ class InlineModelAdmin(BaseModelAdmin):
         self.verbose_name = model._meta.verbose_name
         self.verbose_name_plural = model._meta.verbose_name_plural
         self.prepopulated_fields = {}
+        self.raw_id_fields = raw_id_fields or ()
 
 class StackedInline(InlineModelAdmin):
     default_template = 'admin/edit_inline_stacked.html'
