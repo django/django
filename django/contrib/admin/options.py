@@ -96,78 +96,55 @@ class BoundField(object):
         attrs = classes and {'class': ' '.join(classes)} or {}
         return self.field.label_tag(contents=contents, attrs=attrs)
 
-class InlineOptions(object):
-    """
-    Options for inline editing of ``model`` instances.
-    
-    Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
-    ``model`` to its parent. This is required if ``model`` has more than one
-    ``ForeignKey`` to its parent.
-    """
-    def __init__(self, model, name=None, extra=3, fields=None, template=None, formfield_callback=lambda f: f.formfield()):
-        self.model = model
-        self.name = name
-        self.extra = extra
-        self.fields = fields
-        self.template = template or self.default_template
-        self.verbose_name = model._meta.verbose_name
-        self.verbose_name_plural = model._meta.verbose_name_plural
-        self.prepopulated_fields = {}
-        self.formfield_callback = formfield_callback
+class BaseModelAdmin(object):
+    """Functionality common to both ModelAdmin and InlineAdmin."""
+    raw_id_fields = ()
+    fields = None
 
-class StackedInline(InlineOptions):
-    default_template = 'admin/edit_inline_stacked.html'
-
-class TabularInline(InlineOptions):
-    default_template = 'admin/edit_inline_tabular.html'
-
-class BoundInline(object):
-    def __init__(self, opts, formset):
-        self.opts = opts
-        self.formset = formset
-
-    def __iter__(self):
-        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
-            yield BoundInlineObject(form, original, self.opts)
-        for form in self.formset.add_forms:
-            yield BoundInlineObject(form, None, self.opts)
-
-    def fields(self):
-        # HACK: each form instance has some extra fields. Getting those fields
-        # from the form class will take some rearranging. Get them from the 
-        # first form instance for now.
-        return list(self.formset.forms[0])
-
-    def verbose_name(self):
-        return self.opts.verbose_name
-
-    def verbose_name_plural(self):
-        return self.opts.verbose_name_plural
-
-class BoundInlineObject(object):
-    def __init__(self, form, original, opts):
-        self.opts = opts
-        self.base_form = form
-        self.form = AdminForm(form, self.fieldsets(), opts.prepopulated_fields)
-        self.original = original
-
-    def fieldsets(self):
+    def formfield_for_dbfield(self, db_field, **kwargs):
         """
-        Generator that yields Fieldset objects for use on add and change admin
-        form pages.
+        Hook for specifying the form Field instance for a given database Field
+        instance.
 
-        This default implementation looks at self.fields, but subclasses can
-        override this implementation and do something special based on the
-        given HttpRequest object.
+        If kwargs are given, they're passed to the form Field's constructor.
         """
-        if self.opts.fields is None:
-            default_fields = [f for f in self.base_form.fields]
-            yield Fieldset(fields=default_fields)
-        else:
-            for name, options in self.opts.fields:
-                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
+        # For ManyToManyFields with a filter interface, use a special Widget.
+        if isinstance(db_field, models.ManyToManyField) and db_field.name in (self.filter_vertical + self.filter_horizontal):
+            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
+            return db_field.formfield(**kwargs)
 
-class ModelAdmin(object):
+        # For DateTimeFields, use a special field and widget.
+        if isinstance(db_field, models.DateTimeField):
+            return forms.SplitDateTimeField(required=not db_field.blank,
+                widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name),
+                help_text=db_field.help_text, **kwargs)
+
+        # For DateFields, add a custom CSS class.
+        if isinstance(db_field, models.DateField):
+            kwargs['widget'] = forms.TextInput(attrs={'class': 'vDateField', 'size': '10'})
+            return db_field.formfield(**kwargs)
+
+        # For TimeFields, add a custom CSS class.
+        if isinstance(db_field, models.TimeField):
+            kwargs['widget'] = forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'})
+            return db_field.formfield(**kwargs)
+
+        # For ForeignKey or ManyToManyFields, use a special widget.
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
+            if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
+                kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
+                return db_field.formfield(**kwargs)
+            else:
+                # Wrap the widget's render() method with a method that adds
+                # extra HTML to the end of the rendered output.
+                formfield = db_field.formfield(**kwargs)
+                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
+                return formfield
+
+        # For any other type of field, just call its formfield() method.
+        return db_field.formfield(**kwargs)
+
+class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
 
     list_display = ('__str__',)
@@ -181,8 +158,6 @@ class ModelAdmin(object):
     save_on_top = False
     ordering = None
     js = None
-    fields = None
-    raw_id_fields = ()
     prepopulated_fields = {}
     filter_vertical = ()
     filter_horizontal = ()
@@ -274,49 +249,6 @@ class ModelAdmin(object):
         "Hook for specifying Fieldsets for the change form."
         for fs in self.fieldsets(request):
             yield fs
-
-    def formfield_for_dbfield(self, db_field, **kwargs):
-        """
-        Hook for specifying the form Field instance for a given database Field
-        instance.
-
-        If kwargs are given, they're passed to the form Field's constructor.
-        """
-        # For ManyToManyFields with a filter interface, use a special Widget.
-        if isinstance(db_field, models.ManyToManyField) and db_field.name in (self.filter_vertical + self.filter_horizontal):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
-            return db_field.formfield(**kwargs)
-
-        # For DateTimeFields, use a special field and widget.
-        if isinstance(db_field, models.DateTimeField):
-            return forms.SplitDateTimeField(required=not db_field.blank,
-                widget=widgets.AdminSplitDateTime(), label=capfirst(db_field.verbose_name),
-                help_text=db_field.help_text, **kwargs)
-
-        # For DateFields, add a custom CSS class.
-        if isinstance(db_field, models.DateField):
-            kwargs['widget'] = forms.TextInput(attrs={'class': 'vDateField', 'size': '10'})
-            return db_field.formfield(**kwargs)
-
-        # For TimeFields, add a custom CSS class.
-        if isinstance(db_field, models.TimeField):
-            kwargs['widget'] = forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'})
-            return db_field.formfield(**kwargs)
-
-        # For ForeignKey or ManyToManyFields, use a special widget.
-        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
-            if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
-                kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
-                return db_field.formfield(**kwargs)
-            else:
-                # Wrap the widget's render() method with a method that adds
-                # extra HTML to the end of the rendered output.
-                formfield = db_field.formfield(**kwargs)
-                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
-                return formfield
-
-        # For any other type of field, just call its formfield() method.
-        return db_field.formfield(**kwargs)
 
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
@@ -679,6 +611,78 @@ class ModelAdmin(object):
     def get_inline_formsets(self):
         inline_formset_classes = []
         for opts in self.inlines:
-            inline = inline_formset(self.model, opts.model, formfield_callback=self.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
+            inline = inline_formset(self.model, opts.model, formfield_callback=opts.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
             inline_formset_classes.append(inline)
         return inline_formset_classes
+
+class InlineModelAdmin(BaseModelAdmin):
+    """
+    Options for inline editing of ``model`` instances.
+    
+    Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
+    ``model`` to its parent. This is required if ``model`` has more than one
+    ``ForeignKey`` to its parent.
+    """
+    def __init__(self, model, name=None, extra=3, fields=None, template=None):
+        self.model = model
+        self.opts = model._meta
+        self.name = name
+        self.extra = extra
+        self.fields = fields
+        self.template = template or self.default_template
+        self.verbose_name = model._meta.verbose_name
+        self.verbose_name_plural = model._meta.verbose_name_plural
+        self.prepopulated_fields = {}
+
+class StackedInline(InlineModelAdmin):
+    default_template = 'admin/edit_inline_stacked.html'
+
+class TabularInline(InlineModelAdmin):
+    default_template = 'admin/edit_inline_tabular.html'
+
+class BoundInline(object):
+    def __init__(self, inline_admin, formset):
+        self.inline_admin = inline_admin
+        self.formset = formset
+        self.template = inline_admin.template
+
+    def __iter__(self):
+        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
+            yield BoundInlineObject(form, original, self.inline_admin)
+        for form in self.formset.add_forms:
+            yield BoundInlineObject(form, None, self.inline_admin)
+
+    def fields(self):
+        # HACK: each form instance has some extra fields. Getting those fields
+        # from the form class will take some rearranging. Get them from the 
+        # first form instance for now.
+        return list(self.formset.forms[0])
+
+    def verbose_name(self):
+        return self.inline_admin.verbose_name
+
+    def verbose_name_plural(self):
+        return self.inline_admin.verbose_name_plural
+
+class BoundInlineObject(object):
+    def __init__(self, form, original, inline_admin):
+        self.inline_admin = inline_admin
+        self.base_form = form
+        self.form = AdminForm(form, self.fieldsets(), inline_admin.prepopulated_fields)
+        self.original = original
+
+    def fieldsets(self):
+        """
+        Generator that yields Fieldset objects for use on add and change admin
+        form pages.
+
+        This default implementation looks at self.fields, but subclasses can
+        override this implementation and do something special based on the
+        given HttpRequest object.
+        """
+        if self.inline_admin.fields is None:
+            default_fields = [f for f in self.base_form.fields]
+            yield Fieldset(fields=default_fields)
+        else:
+            for name, options in self.opts.fields:
+                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))

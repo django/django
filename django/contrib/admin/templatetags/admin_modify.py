@@ -111,7 +111,7 @@ class InlineNode(template.Node):
 
     def render(self, context):
         inline = context[self.inline_var]
-        t = loader.get_template(inline.opts.template)
+        t = loader.get_template(inline.template)
         output = t.render(context)
         return output
 
