@@ -1880,7 +1880,7 @@ use the ``where``, ``tables`` and ``params`` arguments to the standard lookup
 API. See `Other lookup options`_.
 
 .. _Python DB-API: http://www.python.org/peps/pep-0249.html
-.. _Other lookup options: ../db-api/#extra-params-select-where-tables
+.. _Other lookup options: ../db-api/#extra-select-none-where-none-params-none-tables-none
 .. _transaction handling: ../transactions/
 
 Overriding default model methods
