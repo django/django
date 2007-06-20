@@ -85,23 +85,20 @@ If you installed Django using ``setup.py install``, uninstalling
 is as simple as deleting the ``django`` directory from your Python
 ``site-packages``.
 
-If you installed Django from a Python Egg, remove the Django ``.egg`` file,
+If you installed Django from a Python egg, remove the Django ``.egg`` file,
 and remove the reference to the egg in the file named ``easy-install.pth``.
 This file should also be located in your ``site-packages`` directory.
 
 .. admonition:: Where are my ``site-packages`` stored?
 
     The location of the ``site-packages`` directory depends on the operating
-    system, and the location in which Python was installed. However, the
-    following locations are common:
+    system, and the location in which Python was installed. To find out your
+    system's ``site-packages`` location, execute the following::
 
-    * If you're using Linux: ``/usr/lib/python2.X/site-packages``
+        python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
 
-    * If you're using Windows: ``C:\Python2.X\lib\site-packages``
-
-    * If you're using MacOSX: ``/Library/Python2.X/site-packages`` or
-      ``/Library/Frameworks/Python.framework/Versions/2.X/lib/python2.X/site-packages/``
-      (in later releases).
+    (Note that this should be run from a shell prompt, not a Python interactive
+    prompt.)
 
 Install the Django code
 =======================
@@ -140,12 +137,15 @@ latest bug fixes and improvements, follow these instructions:
 
 1. Make sure you have Subversion_ installed.
 2. Check out the Django code into your Python ``site-packages`` directory.
+
    On Linux / Mac OSX / Unix, do this::
 
        svn co http://code.djangoproject.com/svn/django/trunk/ django_src
-       ln -s `pwd`/django_src/django /usr/lib/python2.3/site-packages/django
+       ln -s `pwd`/django_src/django SITE-PACKAGES-DIR/django
 
-   (In the above line, change ``python2.3`` to match your current Python version.)
+   (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
+   your system's ``site-packages`` directory, as explained in the
+   "Where are my ``site-packages`` stored?" section above.)
 
    On Windows, do this::
 
