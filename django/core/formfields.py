@@ -325,7 +325,8 @@ class FormField:
 
 class TextField(FormField):
     input_type = "text"
-    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=[], member_name=None):
+    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=None, member_name=None):
+        if validator_list is None: validator_list = []
         self.field_name = field_name
         self.length, self.maxlength = length, maxlength
         self.is_required = is_required
@@ -362,7 +363,8 @@ class PasswordField(TextField):
     input_type = "password"
 
 class LargeTextField(TextField):
-    def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=[], maxlength=None):
+    def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=None, maxlength=None):
+        if validator_list is None: validator_list = []
         self.field_name = field_name
         self.rows, self.cols, self.is_required = rows, cols, is_required
         self.validator_list = validator_list[:]
@@ -380,7 +382,8 @@ class LargeTextField(TextField):
             self.field_name, self.rows, self.cols, escape(data))
 
 class HiddenField(FormField):
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         self.field_name, self.is_required = field_name, is_required
         self.validator_list = validator_list[:]
 
@@ -410,7 +413,8 @@ class CheckboxField(FormField):
     html2python = staticmethod(html2python)
 
 class SelectField(FormField):
-    def __init__(self, field_name, choices=[], size=1, is_required=False, validator_list=[], member_name=None):
+    def __init__(self, field_name, choices=[], size=1, is_required=False, validator_list=None, member_name=None):
+        if validator_list is None: validator_list = []
         self.field_name = field_name
         # choices is a list of (value, human-readable key) tuples because order matters
         self.choices, self.size, self.is_required = choices, size, is_required
@@ -446,7 +450,8 @@ class NullSelectField(SelectField):
     html2python = staticmethod(html2python)
 
 class RadioSelectField(FormField):
-    def __init__(self, field_name, choices=[], ul_class='', is_required=False, validator_list=[], member_name=None):
+    def __init__(self, field_name, choices=[], ul_class='', is_required=False, validator_list=None, member_name=None):
+        if validator_list is None: validator_list = []
         self.field_name = field_name
         # choices is a list of (value, human-readable key) tuples because order matters
         self.choices, self.is_required = choices, is_required
@@ -510,7 +515,8 @@ class RadioSelectField(FormField):
 
 class NullBooleanField(SelectField):
     "This SelectField provides 'Yes', 'No' and 'Unknown', mapping results to True, False or None"
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         SelectField.__init__(self, field_name, choices=[('1', 'Unknown'), ('2', 'Yes'), ('3', 'No')],
             is_required=is_required, validator_list=validator_list)
 
@@ -563,7 +569,8 @@ class CheckboxSelectMultipleField(SelectMultipleField):
     back into the single list that validators, renderers and save() expect.
     """
     requires_data_list = True
-    def __init__(self, field_name, choices=[], validator_list=[]):
+    def __init__(self, field_name, choices=[], validator_list=None):
+        if validator_list is None: validator_list = []
         SelectMultipleField.__init__(self, field_name, choices, size=1, is_required=False, validator_list=validator_list)
 
     def prepare(self, new_data):
@@ -594,7 +601,8 @@ class CheckboxSelectMultipleField(SelectMultipleField):
 ####################
 
 class FileUploadField(FormField):
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         self.field_name, self.is_required = field_name, is_required
         self.validator_list = [self.isNonEmptyFile] + validator_list
 
@@ -629,7 +637,8 @@ class ImageUploadField(FileUploadField):
 ####################
 
 class IntegerField(TextField):
-    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=[], member_name=None):
+    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=None, member_name=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isInteger] + validator_list
         if member_name is not None:
             self.member_name = member_name
@@ -648,7 +657,8 @@ class IntegerField(TextField):
     html2python = staticmethod(html2python)
 
 class SmallIntegerField(IntegerField):
-    def __init__(self, field_name, length=5, maxlength=5, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=5, maxlength=5, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isSmallInteger] + validator_list
         IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
 
@@ -657,7 +667,8 @@ class SmallIntegerField(IntegerField):
             raise validators.CriticalValidationError, _("Enter a whole number between -32,768 and 32,767.")
 
 class PositiveIntegerField(IntegerField):
-    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isPositive] + validator_list
         IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
 
@@ -666,7 +677,8 @@ class PositiveIntegerField(IntegerField):
             raise validators.CriticalValidationError, _("Enter a positive number.")
 
 class PositiveSmallIntegerField(IntegerField):
-    def __init__(self, field_name, length=5, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=5, maxlength=None, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isPositiveSmall] + validator_list
         IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
 
@@ -675,7 +687,8 @@ class PositiveSmallIntegerField(IntegerField):
             raise validators.CriticalValidationError, _("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
-    def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=[]):
+    def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
         validator_list = [self.isValidFloat] + validator_list
         TextField.__init__(self, field_name, max_digits+1, max_digits+1, is_required, validator_list)
@@ -700,7 +713,8 @@ class FloatField(TextField):
 class DatetimeField(TextField):
     """A FormField that automatically converts its data to a datetime.datetime object.
     The data should be in the format YYYY-MM-DD HH:MM:SS."""
-    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         self.field_name = field_name
         self.length, self.maxlength = length, maxlength
         self.is_required = is_required
@@ -723,7 +737,8 @@ class DatetimeField(TextField):
 class DateField(TextField):
     """A FormField that automatically converts its data to a datetime.date object.
     The data should be in the format YYYY-MM-DD."""
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidDate] + validator_list
         TextField.__init__(self, field_name, length=10, maxlength=10,
             is_required=is_required, validator_list=validator_list)
@@ -747,7 +762,8 @@ class DateField(TextField):
 class TimeField(TextField):
     """A FormField that automatically converts its data to a datetime.time object.
     The data should be in the format HH:MM:SS or HH:MM:SS.mmmmmm."""
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidTime] + validator_list
         TextField.__init__(self, field_name, length=8, maxlength=8,
             is_required=is_required, validator_list=validator_list)
@@ -781,7 +797,8 @@ class TimeField(TextField):
 
 class EmailField(TextField):
     "A convenience FormField for validating e-mail addresses"
-    def __init__(self, field_name, length=50, maxlength=75, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=50, maxlength=75, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidEmail] + validator_list
         TextField.__init__(self, field_name, length, maxlength=maxlength,
             is_required=is_required, validator_list=validator_list)
@@ -794,7 +811,8 @@ class EmailField(TextField):
 
 class URLField(TextField):
     "A convenience FormField for validating URLs"
-    def __init__(self, field_name, length=50, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=50, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidURL] + validator_list
         TextField.__init__(self, field_name, length=length, maxlength=200,
             is_required=is_required, validator_list=validator_list)
@@ -806,7 +824,8 @@ class URLField(TextField):
             raise validators.CriticalValidationError, e.messages
 
 class IPAddressField(TextField):
-    def __init__(self, field_name, length=15, maxlength=15, is_required=False, validator_list=[]):
+    def __init__(self, field_name, length=15, maxlength=15, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidIPAddress] + validator_list
         TextField.__init__(self, field_name, length=length, maxlength=maxlength,
             is_required=is_required, validator_list=validator_list)
@@ -827,7 +846,8 @@ class IPAddressField(TextField):
 
 class FilePathField(SelectField):
     "A SelectField whose choices are the files in a given directory."
-    def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=[]):
+    def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         import os
         if match is not None:
             import re
@@ -850,7 +870,8 @@ class FilePathField(SelectField):
 
 class PhoneNumberField(TextField):
     "A convenience FormField for validating phone numbers (e.g. '630-555-1234')"
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidPhone] + validator_list
         TextField.__init__(self, field_name, length=12, maxlength=12,
             is_required=is_required, validator_list=validator_list)
@@ -863,7 +884,8 @@ class PhoneNumberField(TextField):
 
 class USStateField(TextField):
     "A convenience FormField for validating U.S. states (e.g. 'IL')"
-    def __init__(self, field_name, is_required=False, validator_list=[]):
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isValidUSState] + validator_list
         TextField.__init__(self, field_name, length=2, maxlength=2,
             is_required=is_required, validator_list=validator_list)
@@ -883,7 +905,8 @@ class USStateField(TextField):
 
 class CommaSeparatedIntegerField(TextField):
     "A convenience FormField for validating comma-separated integer fields"
-    def __init__(self, field_name, maxlength=None, is_required=False, validator_list=[]):
+    def __init__(self, field_name, maxlength=None, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
         validator_list = [self.isCommaSeparatedIntegerList] + validator_list
         TextField.__init__(self, field_name, length=20, maxlength=maxlength,
             is_required=is_required, validator_list=validator_list)
