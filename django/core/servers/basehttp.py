@@ -9,7 +9,7 @@ been reviewed for security issues. Don't use it for production use.
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from types import ListType, StringType
-import os, re, sys, time, urllib
+import os, re, sys, time, urllib, mimetypes
 
 __version__ = "0.1"
 __all__ = ['WSGIServer','WSGIRequestHandler','demo_app']
@@ -629,6 +629,9 @@ class AdminMediaHandler(object):
             else:
                 status = '200 OK'
                 headers = {}
+                mime_type = mimetypes.guess_type(file_path)[0]
+                if mime_type:
+                    headers['Content-Type'] = mime_type
                 output = [fp.read()]
                 fp.close()
         start_response(status, headers.items())
