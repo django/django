@@ -36,10 +36,19 @@ class UnicodeCursorWrapper(object):
         self.charset = charset
 
     def execute(self, sql, params=()):
-        return self.cursor.execute(sql, [smart_basestring(p, self.charset) for p in params])
+        try:
+            params = dict([(k, smart_basestring(v, self.charset)) for (k, v) in params.items()])
+        except AttributeError:
+            params = [smart_basestring(p, self.charset) for p in params]
+        return self.cursor.execute(sql, params)
 
     def executemany(self, sql, param_list):
-        new_param_list = [tuple([smart_basestring(p, self.charset) for p in params]) for params in param_list]
+        try:
+            new_param_list = [dict([(k, smart_basestring(v, self.charset)) for (k, v) in params.items()])
+                              for params in param_list]
+        except AttributeError:
+            new_param_list = [tuple([smart_basestring(p, self.charset) for p in params])
+                              for params in param_list]
         return self.cursor.executemany(sql, new_param_list)
 
     def __getattr__(self, attr):
