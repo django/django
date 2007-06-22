@@ -137,7 +137,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
     })
-    return HttpResponseServerError(t.iter_render(c), mimetype='text/html')
+    return HttpResponseServerError(t.render(c), mimetype='text/html')
 
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
@@ -160,7 +160,7 @@ def technical_404_response(request, exception):
         'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
     })
-    return HttpResponseNotFound(t.iter_render(c), mimetype='text/html')
+    return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
 def empty_urlconf(request):
     "Create an empty URLconf 404 error response."
@@ -168,7 +168,7 @@ def empty_urlconf(request):
     c = Context({
         'project_name': settings.SETTINGS_MODULE.split('.')[0]
     })
-    return HttpResponseNotFound(t.iter_render(c), mimetype='text/html')
+    return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
 def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
     """

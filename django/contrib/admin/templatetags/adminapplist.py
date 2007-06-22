@@ -7,7 +7,7 @@ class AdminApplistNode(template.Node):
     def __init__(self, varname):
         self.varname = varname
 
-    def iter_render(self, context):
+    def render(self, context):
         from django.db import models
         from django.utils.text import capfirst
         app_list = []
@@ -54,7 +54,7 @@ class AdminApplistNode(template.Node):
                         'models': model_list,
                     })
         context[self.varname] = app_list
-        return ()
+        return ''
 
 def get_admin_app_list(parser, token):
     """

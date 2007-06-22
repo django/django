@@ -15,11 +15,12 @@ if not hasattr(__builtins__, 'reversed'):
         for index in xrange(len(data)-1, -1, -1):
             yield data[index]
 
+
 register = Library()
 
 class CommentNode(Node):
-    def iter_render(self, context):
-        return ()
+    def render(self, context):
+        return ''
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
@@ -27,9 +28,6 @@ class CycleNode(Node):
         self.cyclevars_len = len(cyclevars)
         self.counter = -1
         self.variable_name = variable_name
-
-    def iter_render(self, context):
-        return (self.render(context),)
 
     def render(self, context):
         self.counter += 1
@@ -39,31 +37,28 @@ class CycleNode(Node):
         return value
 
 class DebugNode(Node):
-    def iter_render(self, context):
+    def render(self, context):
         from pprint import pformat
-        for val in context:
-            yield pformat(val)
-        yield "\n\n"
-        yield pformat(sys.modules)
+        output = [pformat(val) for val in context]
+        output.append('\n\n')
+        output.append(pformat(sys.modules))
+        return ''.join(output)
 
 class FilterNode(Node):
     def __init__(self, filter_expr, nodelist):
         self.filter_expr, self.nodelist = filter_expr, nodelist
 
-    def iter_render(self, context):
+    def render(self, context):
         output = self.nodelist.render(context)
         # apply filters
         context.update({'var': output})
         filtered = self.filter_expr.resolve(context)
         context.pop()
-        return (filtered,)
+        return filtered
 
 class FirstOfNode(Node):
     def __init__(self, vars):
         self.vars = vars
-
-    def iter_render(self, context):
-        return (self.render(context),)
 
     def render(self, context):
         for var in self.vars:
@@ -100,7 +95,8 @@ class ForNode(Node):
         nodes.extend(self.nodelist_loop.get_nodes_by_type(nodetype))
         return nodes
 
-    def iter_render(self, context):
+    def render(self, context):
+        nodelist = NodeList()
         if 'forloop' in context:
             parentloop = context['forloop']
         else:
@@ -108,12 +104,12 @@ class ForNode(Node):
         context.push()
         try:
             values = self.sequence.resolve(context, True)
-            if values is None:
-                values = ()
-            elif not hasattr(values, '__len__'):
-                values = list(values)
         except VariableDoesNotExist:
-            values = ()
+            values = []
+        if values is None:
+            values = []
+        if not hasattr(values, '__len__'):
+            values = list(values)
         len_values = len(values)
         if self.reversed:
             values = reversed(values)
@@ -132,17 +128,12 @@ class ForNode(Node):
                 'parentloop': parentloop,
             }
             if unpack:
-                # If there are multiple loop variables, unpack the item into
-                # them.
+                # If there are multiple loop variables, unpack the item into them.
                 context.update(dict(zip(self.loopvars, item)))
             else:
                 context[self.loopvars[0]] = item
-
-            # We inline this to avoid the overhead since ForNode is pretty
-            # common.
             for node in self.nodelist_loop:
-                for chunk in node.iter_render(context):
-                    yield chunk
+                nodelist.append(node.render(context))
             if unpack:
                 # The loop variables were pushed on to the context so pop them
                 # off again. This is necessary because the tag lets the length
@@ -151,6 +142,7 @@ class ForNode(Node):
                 # context.
                 context.pop()
         context.pop()
+        return nodelist.render(context)
 
 class IfChangedNode(Node):
     def __init__(self, nodelist, *varlist):
@@ -158,7 +150,7 @@ class IfChangedNode(Node):
         self._last_seen = None
         self._varlist = varlist
 
-    def iter_render(self, context):
+    def render(self, context):
         if 'forloop' in context and context['forloop']['first']:
             self._last_seen = None
         try:
@@ -176,9 +168,11 @@ class IfChangedNode(Node):
             self._last_seen = compare_to
             context.push()
             context['ifchanged'] = {'firstloop': firstloop}
-            for chunk in self.nodelist.iter_render(context):
-                yield chunk
+            content = self.nodelist.render(context)
             context.pop()
+            return content
+        else:
+            return ''
 
 class IfEqualNode(Node):
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
@@ -189,7 +183,7 @@ class IfEqualNode(Node):
     def __repr__(self):
         return "<IfEqualNode>"
 
-    def iter_render(self, context):
+    def render(self, context):
         try:
             val1 = resolve_variable(self.var1, context)
         except VariableDoesNotExist:
@@ -199,8 +193,8 @@ class IfEqualNode(Node):
         except VariableDoesNotExist:
             val2 = None
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.iter_render(context)
-        return self.nodelist_false.iter_render(context)
+            return self.nodelist_true.render(context)
+        return self.nodelist_false.render(context)
 
 class IfNode(Node):
     def __init__(self, bool_exprs, nodelist_true, nodelist_false, link_type):
@@ -225,7 +219,7 @@ class IfNode(Node):
         nodes.extend(self.nodelist_false.get_nodes_by_type(nodetype))
         return nodes
 
-    def iter_render(self, context):
+    def render(self, context):
         if self.link_type == IfNode.LinkTypes.or_:
             for ifnot, bool_expr in self.bool_exprs:
                 try:
@@ -233,8 +227,8 @@ class IfNode(Node):
                 except VariableDoesNotExist:
                     value = None
                 if (value and not ifnot) or (ifnot and not value):
-                    return self.nodelist_true.iter_render(context)
-            return self.nodelist_false.iter_render(context)
+                    return self.nodelist_true.render(context)
+            return self.nodelist_false.render(context)
         else:
             for ifnot, bool_expr in self.bool_exprs:
                 try:
@@ -242,8 +236,8 @@ class IfNode(Node):
                 except VariableDoesNotExist:
                     value = None
                 if not ((value and not ifnot) or (ifnot and not value)):
-                    return self.nodelist_false.iter_render(context)
-            return self.nodelist_true.iter_render(context)
+                    return self.nodelist_false.render(context)
+            return self.nodelist_true.render(context)
 
     class LinkTypes:
         and_ = 0,
@@ -254,16 +248,16 @@ class RegroupNode(Node):
         self.target, self.expression = target, expression
         self.var_name = var_name
 
-    def iter_render(self, context):
+    def render(self, context):
         obj_list = self.target.resolve(context, True)
         if obj_list == None: # target_var wasn't found in context; fail silently
             context[self.var_name] = []
-            return ()
+            return ''
         # List of dictionaries in the format
         # {'grouper': 'key', 'list': [list of contents]}.
         context[self.var_name] = [{'grouper':key, 'list':list(val)} for key, val in
             groupby(obj_list, lambda v, f=self.expression.resolve: f(v, True))]
-        return ()
+        return ''
 
 def include_is_allowed(filepath):
     for root in settings.ALLOWED_INCLUDE_ROOTS:
@@ -275,10 +269,10 @@ class SsiNode(Node):
     def __init__(self, filepath, parsed):
         self.filepath, self.parsed = filepath, parsed
 
-    def iter_render(self, context):
+    def render(self, context):
         if not include_is_allowed(self.filepath):
             if settings.DEBUG:
-                return ("[Didn't have permission to include file]",)
+                return "[Didn't have permission to include file]"
             else:
                 return '' # Fail silently for invalid includes.
         try:
@@ -289,24 +283,22 @@ class SsiNode(Node):
             output = ''
         if self.parsed:
             try:
-                return Template(output, name=self.filepath).iter_render(context)
+                t = Template(output, name=self.filepath)
+                return t.render(context)
             except TemplateSyntaxError, e:
                 if settings.DEBUG:
                     return "[Included template had syntax error: %s]" % e
                 else:
                     return '' # Fail silently for invalid included templates.
-        return (output,)
+        return output
 
 class LoadNode(Node):
-    def iter_render(self, context):
-        return ()
+    def render(self, context):
+        return ''
 
 class NowNode(Node):
     def __init__(self, format_string):
         self.format_string = format_string
-
-    def iter_render(self, context):
-        return (self.render(context),)
 
     def render(self, context):
         from datetime import datetime
@@ -336,9 +328,6 @@ class TemplateTagNode(Node):
     def __init__(self, tagtype):
         self.tagtype = tagtype
 
-    def iter_render(self, context):
-        return (self.render(context),)
-
     def render(self, context):
         return self.mapping.get(self.tagtype, '')
 
@@ -348,27 +337,24 @@ class URLNode(Node):
         self.args = args
         self.kwargs = kwargs
 
-    def iter_render(self, context):
+    def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = dict([(k, v.resolve(context)) for k, v in self.kwargs.items()])
         try:
-            return (reverse(self.view_name, args=args, kwargs=kwargs),)
+            return reverse(self.view_name, args=args, kwargs=kwargs)
         except NoReverseMatch:
             try:
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 return reverse(project_name + '.' + self.view_name, args=args, kwargs=kwargs)
             except NoReverseMatch:
-                return ()
+                return ''
 
 class WidthRatioNode(Node):
     def __init__(self, val_expr, max_expr, max_width):
         self.val_expr = val_expr
         self.max_expr = max_expr
         self.max_width = max_width
-
-    def iter_render(self, context):
-        return (self.render(context),)
 
     def render(self, context):
         try:
@@ -393,13 +379,13 @@ class WithNode(Node):
     def __repr__(self):
         return "<WithNode>"
 
-    def iter_render(self, context):
+    def render(self, context):
         val = self.var.resolve(context)
         context.push()
         context[self.name] = val
-        for chunk in self.nodelist.iter_render(context):
-            yield chunk
+        output = self.nodelist.render(context)
         context.pop()
+        return output
 
 #@register.tag
 def comment(parser, token):

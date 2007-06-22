@@ -11,21 +11,12 @@ from django.template import Template
 TEST_DATABASE_PREFIX = 'test_'
 
 def instrumented_test_render(self, context):
-    """
-    An instrumented Template render method, providing a signal that can be
-    intercepted by the test system Client.
+    """An instrumented Template render method, providing a signal 
+    that can be intercepted by the test system Client
+    
     """
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)
-
-def instrumented_test_iter_render(self, context):
-    """
-    An instrumented Template iter_render method, providing a signal that can be
-    intercepted by the test system Client.
-    """
-    for chunk in self.nodelist.iter_render(context):
-        yield chunk
-    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     
 class TestSMTPConnection(object):
     """A substitute SMTP connection for use during test sessions.
@@ -53,9 +44,7 @@ def setup_test_environment():
         
     """
     Template.original_render = Template.render
-    Template.original_iter_render = Template.iter_render
     Template.render = instrumented_test_render
-    Template.iter_render = instrumented_test_render
     
     mail.original_SMTPConnection = mail.SMTPConnection
     mail.SMTPConnection = TestSMTPConnection
@@ -70,8 +59,7 @@ def teardown_test_environment():
         
     """
     Template.render = Template.original_render
-    Template.iter_render = Template.original_iter_render
-    del Template.original_render, Template.original_iter_render
+    del Template.original_render
     
     mail.SMTPConnection = mail.original_SMTPConnection
     del mail.original_SMTPConnection

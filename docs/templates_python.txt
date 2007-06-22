@@ -219,13 +219,13 @@ be replaced with the name of the invalid variable.
 
     While ``TEMPLATE_STRING_IF_INVALID`` can be a useful debugging tool,
     it is a bad idea to turn it on as a 'development default'.
-
+    
     Many templates, including those in the Admin site, rely upon the
     silence of the template system when a non-existent variable is
     encountered. If you assign a value other than ``''`` to
     ``TEMPLATE_STRING_IF_INVALID``, you will experience rendering
     problems with these templates and sites.
-
+    
     Generally, ``TEMPLATE_STRING_IF_INVALID`` should only be enabled
     in order to debug a specific template problem, then cleared
     once debugging is complete.
@@ -693,15 +693,14 @@ how the compilation works and how the rendering works.
 
 When Django compiles a template, it splits the raw template text into
 ''nodes''. Each node is an instance of ``django.template.Node`` and has
-either a ``render()`` or ``iter_render()`` method. A compiled template is,
-simply, a list of ``Node`` objects. When you call ``render()`` on a compiled
-template object, the template calls ``render()`` on each ``Node`` in its node
-list, with the given context. The results are all concatenated together to
-form the output of the template.
+a ``render()`` method. A compiled template is, simply, a list of ``Node``
+objects. When you call ``render()`` on a compiled template object, the template
+calls ``render()`` on each ``Node`` in its node list, with the given context.
+The results are all concatenated together to form the output of the template.
 
 Thus, to define a custom template tag, you specify how the raw template tag is
 converted into a ``Node`` (the compilation function), and what the node's
-``render()`` or ``iter_render()`` method does.
+``render()`` method does.
 
 Writing the compilation function
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -771,8 +770,7 @@ Writing the renderer
 ~~~~~~~~~~~~~~~~~~~~
 
 The second step in writing custom tags is to define a ``Node`` subclass that
-has a ``render()`` method (we will discuss the ``iter_render()`` alternative
-in `Improving rendering speed`_, below).
+has a ``render()`` method.
 
 Continuing the above example, we need to define ``CurrentTimeNode``::
 
@@ -876,7 +874,7 @@ current context, available in the ``render`` method::
         def __init__(self, date_to_be_formatted, format_string):
             self.date_to_be_formatted = date_to_be_formatted
             self.format_string = format_string
-
+        
         def render(self, context):
             try:
                 actual_date = resolve_variable(self.date_to_be_formatted, context)
@@ -1177,48 +1175,6 @@ For more examples of complex rendering, see the source code for ``{% if %}``,
 
 .. _configuration:
 
-Improving rendering speed
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For most practical purposes, the ``render()`` method on a ``Node`` will be
-sufficient and the simplest way to implement a new tag. However, if your
-template tag is expected to produce large strings via ``render()``, you can
-speed up the rendering process (and reduce memory usage) using iterative
-rendering via the ``iter_render()`` method.
-
-The ``iter_render()`` method should either be an iterator that yields string
-chunks, one at a time, or a method that returns a sequence of string chunks.
-The template renderer will join the successive chunks together when creating
-the final output. The improvement over the ``render()`` method here is that
-you do not need to create one large string containing all the output of the
-``Node``, instead you can produce the output in smaller chunks.
-
-By way of example, here's a trivial ``Node`` subclass that simply returns the
-contents of a file it is given::
-
-    class FileNode(Node):
-        def __init__(self, filename):
-            self.filename = filename
-
-        def iter_render(self):
-            for line in file(self.filename):
-                yield line
-
-For very large files, the full file contents will never be read entirely into
-memory when this tag is used, which is a useful optimisation.
-
-If you define an ``iter_render()`` method on your ``Node`` subclass, you do
-not need to define a ``render()`` method. The reverse is true as well: the
-default ``Node.iter_render()`` method will call your ``render()`` method if
-necessary. A useful side-effect of this is that you can develop a new tag
-using ``render()`` and producing all the output at once, which is easy to
-debug. Then you can rewrite the method as an iterator, rename it to
-``iter_render()`` and everything will still work.
-
-It is compulsory, however, to define *either* ``render()`` or ``iter_render()``
-in your subclass. If you omit them both, a ``TypeError`` will be raised when
-the code is imported.
-
 Configuring the template system in standalone mode
 ==================================================
 
@@ -1250,4 +1206,3 @@ is of obvious interest.
 
 .. _settings file: ../settings/#using-settings-without-the-django-settings-module-environment-variable
 .. _settings documentation: ../settings/
-
