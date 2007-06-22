@@ -15,7 +15,7 @@ def direct_to_template(request, template, extra_context={}, mimetype=None, **kwa
             dictionary[key] = value
     c = RequestContext(request, dictionary)
     t = loader.get_template(template)
-    return HttpResponse(t.iter_render(c), mimetype=mimetype)
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def redirect_to(request, url, **kwargs):
     """

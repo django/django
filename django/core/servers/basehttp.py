@@ -309,7 +309,7 @@ class ServerHandler(object):
         """
         if not self.result_is_file() and not self.sendfile():
             for data in self.result:
-                self.write(data, False)
+                self.write(data)
             self.finish_content()
         self.close()
 
@@ -377,7 +377,7 @@ class ServerHandler(object):
         else:
             self._write('Status: %s\r\n' % self.status)
 
-    def write(self, data, flush=True):
+    def write(self, data):
         """'write()' callable as specified by PEP 333"""
 
         assert type(data) is StringType,"write() argument must be string"
@@ -394,8 +394,7 @@ class ServerHandler(object):
 
         # XXX check Content-Length and truncate if too many bytes written?
         self._write(data)
-        if flush:
-            self._flush()
+        self._flush()
 
     def sendfile(self):
         """Platform-specific file transmission
@@ -422,6 +421,8 @@ class ServerHandler(object):
         if not self.headers_sent:
             self.headers['Content-Length'] = "0"
             self.send_headers()
+        else:
+            pass # XXX check if content-length was too short?
 
     def close(self):
         try:

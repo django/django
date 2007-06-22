@@ -92,7 +92,7 @@ def directory_index(path, fullpath):
         'directory' : path + '/',
         'file_list' : files,
     })
-    return HttpResponse(t.iter_render(c))
+    return HttpResponse(t.render(c))
 
 def was_modified_since(header=None, mtime=0, size=0):
     """

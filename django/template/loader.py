@@ -87,12 +87,14 @@ def get_template_from_string(source, origin=None, name=None):
     """
     return Template(source, origin, name)
 
-def _render_setup(template_name, dictionary=None, context_instance=None):
+def render_to_string(template_name, dictionary=None, context_instance=None):
     """
-    Common setup code for render_to_string and render_to_iter.
+    Loads the given template_name and renders it with the given dictionary as
+    context. The template_name may be a string to load a single template using
+    get_template, or it may be a tuple to use select_template to find one of
+    the templates in the list. Returns a string.
     """
-    if dictionary is None:
-        dictionary = {}
+    dictionary = dictionary or {}
     if isinstance(template_name, (list, tuple)):
         t = select_template(template_name)
     else:
@@ -101,28 +103,7 @@ def _render_setup(template_name, dictionary=None, context_instance=None):
         context_instance.update(dictionary)
     else:
         context_instance = Context(dictionary)
-    return t, context_instance
-
-def render_to_string(template_name, dictionary=None, context_instance=None):
-    """
-    Loads the given template_name and renders it with the given dictionary as
-    context. The template_name may be a string to load a single template using
-    get_template, or it may be a tuple to use select_template to find one of
-    the templates in the list. Returns a string.
-    """
-    t, c = _render_setup(template_name, dictionary=dictionary, context_instance=context_instance)
-    return t.render(c)
-
-def render_to_iter(template_name, dictionary=None, context_instance=None):
-    """
-    Loads the given template_name and renders it with the given dictionary as
-    context. The template_name may be a string to load a single template using
-    get_template, or it may be a tuple to use select_template to find one of
-    the templates in the list. Returns a string.
-    """
-    t, c = _render_setup(template_name, dictionary=dictionary, context_instance=context_instance)
-    return t.iter_render(c)
-
+    return t.render(context_instance)
 
 def select_template(template_name_list):
     "Given a list of template names, returns the first that can be loaded."

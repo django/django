@@ -84,7 +84,7 @@ def object_list(request, queryset, paginate_by=None, page=None,
         model = queryset.model
         template_name = "%s/%s_list.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
-    return HttpResponse(t.iter_render(c), mimetype=mimetype)
+    return HttpResponse(t.render(c), mimetype=mimetype)
 
 def object_detail(request, queryset, object_id=None, slug=None,
         slug_field=None, template_name=None, template_name_field=None,
@@ -126,6 +126,6 @@ def object_detail(request, queryset, object_id=None, slug=None,
             c[key] = value()
         else:
             c[key] = value
-    response = HttpResponse(t.iter_render(c), mimetype=mimetype)
+    response = HttpResponse(t.render(c), mimetype=mimetype)
     populate_xheaders(request, response, model, getattr(obj, obj._meta.pk.name))
     return response
