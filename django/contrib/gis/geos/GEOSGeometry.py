@@ -72,8 +72,8 @@ if os.name == 'nt':
     lib_name = 'libgeos_c-1.dll'
 elif os.name == 'posix':
     platform = os.uname()[0] # Using os.uname()
-    if platform == 'Linux':
-        # Linux shared library
+    if platform in ('Linux', 'SunOS'):
+        # Linux or Solaris shared library
         lib_name = 'libgeos_c.so'
     elif platform == 'Darwin':
         # Mac OSX Shared Library (Thanks Matt!)

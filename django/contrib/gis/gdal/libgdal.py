@@ -7,8 +7,8 @@ if os.name == 'nt':
     lib_name = 'libgdal-1.dll'
 elif os.name == 'posix':
     platform = os.uname()[0]
-    if platform == 'Linux':
-        # Linux shared library
+    if platform in ('Linux', 'SunOS'):
+        # Linux or Solaris shared library
         lib_name = 'libgdal.so'
     elif platform == 'Darwin':
         # Mac OSX shared library
