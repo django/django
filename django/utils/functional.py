@@ -3,6 +3,21 @@ def curry(_curried_func, *args, **kwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
     return _curried
 
+def memoize(func, cache):
+    """
+    Wrap a function so that results for any argument tuple are stored in
+    'cache'. Note that the args to the function must be usable as dictionary
+    keys.
+    """
+    def wrapper(*args):
+        if args in cache:
+            return cache[args]
+
+        result = func(*args)
+        cache[args] = result
+        return result
+    return wrapper
+
 class Promise:
     """
     This is just a base class for the proxy class created in

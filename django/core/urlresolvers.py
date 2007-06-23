@@ -9,7 +9,11 @@ a string) and returns a tuple in this format:
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.utils.functional import memoize
 import re
+
+_resolver_cache = {} # Maps urlconf modules to RegexURLResolver instances.
+_callable_cache = {} # Maps view and url pattern names to their view functions.
 
 class Resolver404(Http404):
     pass
@@ -17,6 +21,21 @@ class Resolver404(Http404):
 class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
     silent_variable_failure = True
+
+def get_callable(lookup_view):
+    if not callable(lookup_view):
+        mod_name, func_name = get_mod_func(lookup_view)
+        if func_name != '':
+            lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+    return lookup_view
+get_callable = memoize(get_callable, _callable_cache)
+
+def get_resolver(urlconf):
+    if urlconf is None:
+        from django.conf import settings
+        urlconf = settings.ROOT_URLCONF
+    return RegexURLResolver(r'^/', urlconf)
+get_resolver = memoize(get_resolver, _resolver_cache)
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -129,9 +148,8 @@ class RegexURLPattern(object):
     def _get_callback(self):
         if self._callback is not None:
             return self._callback
-        mod_name, func_name = get_mod_func(self._callback_str)
         try:
-            self._callback = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+            self._callback = get_callable(self._callback_str)
         except ImportError, e:
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
         except AttributeError, e:
@@ -160,6 +178,15 @@ class RegexURLResolver(object):
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
+        self.reverse_dict = {}
+
+        for pattern in reversed(self.urlconf_module.urlpatterns):
+            if isinstance(pattern, RegexURLResolver):
+                for key, value in pattern.reverse_dict.iteritems():
+                    self.reverse_dict[key] = (pattern,) + value
+            else:
+                self.reverse_dict[pattern.callback] = (pattern,)
+                self.reverse_dict[pattern.name] = (pattern,)
 
     def resolve(self, path):
         tried = []
@@ -209,24 +236,12 @@ class RegexURLResolver(object):
         return self._resolve_special('500')
 
     def reverse(self, lookup_view, *args, **kwargs):
-        if not callable(lookup_view):
-            mod_name, func_name = get_mod_func(lookup_view)
-            try:
-                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-            except (ImportError, AttributeError):
-                if func_name != '':
-                    raise NoReverseMatch
-        for pattern in self.urlconf_module.urlpatterns:
-            if isinstance(pattern, RegexURLResolver):
-                try:
-                    return pattern.reverse_helper(lookup_view, *args, **kwargs)
-                except NoReverseMatch:
-                    continue
-            elif pattern.callback == lookup_view or pattern.name == lookup_view:
-                try:
-                    return pattern.reverse_helper(*args, **kwargs)
-                except NoReverseMatch:
-                    continue
+        try:
+            lookup_view = get_callable(lookup_view)
+        except (ImportError, AttributeError):
+            raise NoReverseMatch
+        if lookup_view in self.reverse_dict:
+            return ''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
         raise NoReverseMatch
 
     def reverse_helper(self, lookup_view, *args, **kwargs):
@@ -235,17 +250,10 @@ class RegexURLResolver(object):
         return result + sub_match
 
 def resolve(path, urlconf=None):
-    if urlconf is None:
-        from django.conf import settings
-        urlconf = settings.ROOT_URLCONF
-    resolver = RegexURLResolver(r'^/', urlconf)
-    return resolver.resolve(path)
+    return get_resolver(urlconf).resolve(path)
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None):
     args = args or []
     kwargs = kwargs or {}
-    if urlconf is None:
-        from django.conf import settings
-        urlconf = settings.ROOT_URLCONF
-    resolver = RegexURLResolver(r'^/', urlconf)
-    return '/' + resolver.reverse(viewname, *args, **kwargs)
+    return '/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs)
+
