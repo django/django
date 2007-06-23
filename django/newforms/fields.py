@@ -516,11 +516,13 @@ class MultiValueField(Field):
         """
         clean_data = []
         errors = ErrorList()
-        if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
-        elif not self.required and not value:
-            return self.compress([])
-        if not isinstance(value, (list, tuple)):
+        if not value or isinstance(value, (list, tuple)):
+            if not value or not [v for v in value if v not in EMPTY_VALUES]:
+                if self.required:
+                    raise ValidationError(gettext(u'This field is required.'))
+                else:
+                    return self.compress([])
+        else:
             raise ValidationError(gettext(u'Enter a list of values.'))
         for i, field in enumerate(self.fields):
             try:
@@ -558,5 +560,11 @@ class SplitDateTimeField(MultiValueField):
 
     def compress(self, data_list):
         if data_list:
+            # Raise a validation error if time or date is empty
+            # (possible if SplitDateTimeField has required=False).
+            if data_list[0] in EMPTY_VALUES:
+                raise ValidationError(gettext(u'Enter a valid date.'))
+            if data_list[1] in EMPTY_VALUES:
+                raise ValidationError(gettext(u'Enter a valid time.'))
             return datetime.datetime.combine(*data_list)
         return None
