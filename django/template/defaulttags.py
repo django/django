@@ -8,8 +8,10 @@ from django.utils.itercompat import groupby
 import sys
 import re
 
-if not hasattr(__builtins__, 'reversed'):
-    # For Python 2.3.
+try:
+    reversed
+except NameError:
+    # Python 2.3 fallback.
     # From http://www.python.org/doc/current/tut/node11.html
     def reversed(data):
         for index in xrange(len(data)-1, -1, -1):

@@ -7,9 +7,10 @@ from optparse import OptionParser
 from django.utils import termcolors
 import os, re, shutil, sys, textwrap
 
-# For Python 2.3
-if not hasattr(__builtins__, 'set'):
-    from sets import Set as set
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version

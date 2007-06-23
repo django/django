@@ -5,6 +5,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 import datetime
 
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
+
 def check_password(raw_password, enc_password):
     """
     Returns a boolean of whether the raw_password was correct. Handles
@@ -175,7 +180,6 @@ class User(models.Model):
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
         if not hasattr(self, '_group_perm_cache'):
-            import sets
             cursor = connection.cursor()
             # The SQL below works out to the following, after DB quoting:
             # cursor.execute("""
@@ -200,13 +204,13 @@ class User(models.Model):
                 backend.quote_name('id'), backend.quote_name('content_type_id'),
                 backend.quote_name('user_id'),)
             cursor.execute(sql, [self.id])
-            self._group_perm_cache = sets.Set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
+            self._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return self._group_perm_cache
 
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
             import sets
-            self._perm_cache = sets.Set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
+            self._perm_cache = set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 

@@ -7,9 +7,10 @@ from django.contrib.contenttypes import generic
 import operator
 import re
 
-# For Python 2.3
-if not hasattr(__builtins__, 'set'):
-    from sets import Set as set
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 # The string constant used to separate query parts
 LOOKUP_SEPARATOR = '__'

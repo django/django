@@ -3,9 +3,10 @@ HTML Widget classes
 """
 
 try:
-    set # Only available in Python 2.4+
+    set
 except NameError:
-    from sets import Set as set # Python 2.3 fallback
+    from sets import Set as set   # Python 2.3 fallback
+
 from itertools import chain
 
 from django.utils.datastructures import MultiValueDict

@@ -10,9 +10,10 @@ from django import oldforms
 from django import newforms as forms
 from django.dispatch import dispatcher
 
-# For Python 2.3
-if not hasattr(__builtins__, 'set'):
-    from sets import Set as set
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
