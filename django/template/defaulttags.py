@@ -11,12 +11,7 @@ import re
 try:
     reversed
 except NameError:
-    # Python 2.3 fallback.
-    # From http://www.python.org/doc/current/tut/node11.html
-    def reversed(data):
-        for index in xrange(len(data)-1, -1, -1):
-            yield data[index]
-
+    from django.utils.itercompat import reversed     # Python 2.3 fallback
 
 register = Library()
 

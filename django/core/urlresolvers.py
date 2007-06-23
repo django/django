@@ -12,6 +12,11 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.functional import memoize
 import re
 
+try:
+    reversed
+except NameError:
+    from django.utils.itercompat import reversed     # Python 2.3 fallback
+
 _resolver_cache = {} # Maps urlconf modules to RegexURLResolver instances.
 _callable_cache = {} # Maps view and url pattern names to their view functions.
 
