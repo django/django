@@ -1974,11 +1974,11 @@ AttributeError: 'Person' object has no attribute 'cleaned_data'
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></li>
 <li><ul class="errorlist"><li>This field is required.</li></ul><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></li>
 >>> print p.as_p()
-<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_first_name">First name:</label> <input type="text" name="first_name" id="id_first_name" /></p>
-<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_last_name">Last name:</label> <input type="text" name="last_name" id="id_last_name" /></p>
-<p><ul class="errorlist"><li>This field is required.</li></ul></p>
+<ul class="errorlist"><li>This field is required.</li></ul>
 <p><label for="id_birthday">Birthday:</label> <input type="text" name="birthday" id="id_birthday" /></p>
 
 If you don't pass any values to the Form's __init__(), or if you pass None,
@@ -2684,7 +2684,7 @@ its field's order in the form.
 <li>Last name: <input type="text" name="last_name" value="Lennon" /></li>
 <li>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></li>
 >>> print p.as_p()
-<p><ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul></p>
+<ul class="errorlist"><li>(Hidden field hidden_text) This field is required.</li></ul>
 <p>First name: <input type="text" name="first_name" value="John" /></p>
 <p>Last name: <input type="text" name="last_name" value="Lennon" /></p>
 <p>Birthday: <input type="text" name="birthday" value="1940-10-9" /><input type="hidden" name="hidden_text" /></p>
