@@ -8,12 +8,10 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 from itertools import chain
-
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import gettext
 from django.utils.encoding import StrAndUnicode, smart_unicode
-
 from util import flatatt
 
 __all__ = (

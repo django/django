@@ -55,7 +55,7 @@ class DatabaseWrapper(local):
         global postgres_version
         if not postgres_version:
             cursor.execute("SELECT version()")
-            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]        
+            postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         return cursor
@@ -73,7 +73,14 @@ class DatabaseWrapper(local):
             self.connection.close()
             self.connection = None
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+autoindexes_primary_keys = True
+needs_datetime_string_cast = False
+needs_upper_for_iops = False
 supports_constraints = True
+supports_tablespaces = False
+uses_case_insensitive_names = True
 
 def quote_name(name):
     if name.startswith('"') and name.endswith('"'):
@@ -98,6 +105,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
     return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:
@@ -119,6 +129,15 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_max_name_length():
+    return None
+
+def get_start_transaction_sql():
+    return "BEGIN;"
+
+def get_autoinc_sql(table):
+    return None
+
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
@@ -139,7 +158,7 @@ def get_sql_flush(style, tables, sequences):
                      style.SQL_KEYWORD('FROM'),
                      style.SQL_FIELD(quote_name(table))
                      ) for table in tables]
-                     
+
         # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
         # to reset sequence indices
         for sequence in sequences:
@@ -200,7 +219,7 @@ def get_sql_sequence_reset(style, model_list):
                 style.SQL_KEYWORD('FROM'),
                 style.SQL_TABLE(f.m2m_db_table())))
     return output
-        
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'ILIKE %s',

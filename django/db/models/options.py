@@ -13,7 +13,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label')
+                 'order_with_respect_to', 'app_label', 'db_tablespace')
 
 class Options(object):
     def __init__(self, meta):
@@ -27,6 +27,7 @@ class Options(object):
         self.object_name, self.app_label = None, None
         self.get_latest_by = None
         self.order_with_respect_to = None
+        self.db_tablespace = None
         self.admin = None
         self.meta = meta
         self.pk = None
@@ -59,6 +60,8 @@ class Options(object):
         del self.meta
 
     def _prepare(self, model):
+        from django.db import backend
+        from django.db.backends.util import truncate_name
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
@@ -73,6 +76,8 @@ class Options(object):
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            self.db_table = truncate_name(self.db_table,
+                                          backend.get_max_name_length())
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
@@ -88,10 +93,10 @@ class Options(object):
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-        
+
     def __str__(self):
         return "%s.%s" % (self.app_label, self.module_name)
-        
+
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields

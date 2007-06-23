@@ -4,6 +4,7 @@ from django.db.models import signals, loading
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.contrib.contenttypes import generic
+import datetime
 import operator
 import re
 
@@ -78,7 +79,7 @@ def quote_only_if_word(word):
     else:
         return backend.quote_name(word)
 
-class QuerySet(object):
+class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
     def __init__(self, model=None):
         self.model = model
@@ -182,13 +183,18 @@ class QuerySet(object):
 
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+
         fill_cache = self._select_related
-        index_end = len(self.model._meta.fields)
+        fields = self.model._meta.fields
+        index_end = len(fields)
+        has_resolve_columns = hasattr(self, 'resolve_columns')
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
             if not rows:
                 raise StopIteration
             for row in rows:
+                if has_resolve_columns:
+                    row = self.resolve_columns(row, fields)
                 if fill_cache:
                     obj, index_end = get_cached_row(klass=self.model, row=row,
                                                     index_start=0, max_depth=self._max_related_depth)
@@ -552,6 +558,12 @@ class QuerySet(object):
 
         return select, " ".join(sql), params
 
+# Use the backend's QuerySet class if it defines one, otherwise use _QuerySet.
+if hasattr(backend, 'get_query_set_class'):
+    QuerySet = backend.get_query_set_class(_QuerySet)
+else:
+    QuerySet = _QuerySet
+
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
         super(ValuesQuerySet, self).__init__(*args, **kwargs)
@@ -566,35 +578,38 @@ class ValuesQuerySet(QuerySet):
 
         # self._fields is a list of field names to fetch.
         if self._fields:
-            #columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
             if not self._select:
-                columns = [self.model._meta.get_field(f, many_to_many=False).column for f in self._fields]
+                fields = [self.model._meta.get_field(f, many_to_many=False) for f in self._fields]
             else:
-                columns = []
+                fields = []
                 for f in self._fields:
                     if f in [field.name for field in self.model._meta.fields]:
-                        columns.append( self.model._meta.get_field(f, many_to_many=False).column )
+                        fields.append(self.model._meta.get_field(f, many_to_many=False))
                     elif not self._select.has_key( f ):
                         raise FieldDoesNotExist, '%s has no field named %r' % ( self.model._meta.object_name, f )
 
             field_names = self._fields
         else: # Default to all fields.
-            columns = [f.column for f in self.model._meta.fields]
-            field_names = [f.attname for f in self.model._meta.fields]
+            fields = self.model._meta.fields
+            field_names = [f.attname for f in fields]
 
+        columns = [f.column for f in fields]
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
-
         # Add any additional SELECTs.
         if self._select:
             select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
 
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
+
+        has_resolve_columns = hasattr(self, 'resolve_columns')
         while 1:
             rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
             if not rows:
                 raise StopIteration
             for row in rows:
+                if has_resolve_columns:
+                    row = self.resolve_columns(row, fields)
                 yield dict(zip(field_names, row))
 
     def _clone(self, klass=None, **kwargs):
@@ -605,25 +620,49 @@ class ValuesQuerySet(QuerySet):
 class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
+        from django.db.models.fields import DateTimeField
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
                 (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
-
         try:
             select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
-        sql = 'SELECT %s %s GROUP BY 1 ORDER BY 1 %s' % \
+        table_name = backend.quote_name(self.model._meta.db_table)
+        field_name = backend.quote_name(self._field.column)
+
+        if backend.allows_group_by_ordinal:
+            group_by = '1'
+        else:
+            group_by = backend.get_date_trunc_sql(self._kind,
+                                                  '%s.%s' % (table_name, field_name))
+
+        sql = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s' % \
             (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
-            backend.quote_name(self._field.column))), sql, self._order)
+            backend.quote_name(self._field.column))), sql, group_by, self._order)
         cursor = connection.cursor()
         cursor.execute(sql, params)
-        # We have to manually run typecast_timestamp(str()) on the results, because
-        # MySQL doesn't automatically cast the result of date functions as datetime
-        # objects -- MySQL returns the values as strings, instead.
-        return [typecast_timestamp(str(row[0])) for row in cursor.fetchall()]
+
+        has_resolve_columns = hasattr(self, 'resolve_columns')
+        needs_datetime_string_cast = backend.needs_datetime_string_cast
+        dates = []
+        # It would be better to use self._field here instead of DateTimeField(),
+        # but in Oracle that will result in a list of datetime.date instead of
+        # datetime.datetime.
+        fields = [DateTimeField()]
+        while 1:
+            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
+            if not rows:
+                return dates
+            for row in rows:
+                date = row[0]
+                if has_resolve_columns:
+                    date = self.resolve_columns([date], fields)[0]
+                elif needs_datetime_string_cast:
+                    date = typecast_timestamp(str(date))
+                dates.append(date)
 
     def _clone(self, klass=None, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, **kwargs)
@@ -731,8 +770,17 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
+    if type(value) == datetime.datetime and backend.get_datetime_cast_sql():
+        cast_sql = backend.get_datetime_cast_sql()
+    else:
+        cast_sql = '%s'
+    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
+        format = 'UPPER(%s%s) %s'
+    else:
+        format = '%s%s %s'
     try:
-        return '%s%s %s' % (table_prefix, field_name, (backend.OPERATOR_MAPPING[lookup_type] % '%s'))
+        return format % (table_prefix, field_name,
+                         backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':

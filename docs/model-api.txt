@@ -492,6 +492,11 @@ has ``null=True``, that means it has two possible values for "no data":
 possible values for "no data;" Django convention is to use the empty
 string, not ``NULL``.
 
+.. note::
+    Due to database limitations, when using the Oracle backend the
+    ``null=True`` option will be coerced for string-based fields that can
+    blank, and the value ``NULL`` will be stored to denote the empty string.
+
 ``blank``
 ~~~~~~~~~
 
@@ -585,6 +590,13 @@ scenes.
 
 If ``True``, ``django-admin.py sqlindexes`` will output a ``CREATE INDEX``
 statement for this field.
+
+``db_tablespace``
+~~~~~~~~~~~~~~~~~
+
+If this field is indexed, the name of the database tablespace to use for the
+index. The default is the ``db_tablespace`` of the model, if any. If the
+backend doesn't support tablespaces, this option is ignored.
 
 ``default``
 ~~~~~~~~~~~
@@ -995,6 +1007,12 @@ See "Table names" below for more.
 If your database table name is an SQL reserved word, or contains characters
 that aren't allowed in Python variable names -- notably, the hyphen --
 that's OK. Django quotes column and table names behind the scenes.
+
+``db_tablespace``
+-----------------
+
+The name of the database tablespace to use for the model. If the backend
+doesn't support tablespaces, this option is ignored.
 
 ``get_latest_by``
 -----------------
