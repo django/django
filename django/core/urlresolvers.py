@@ -156,8 +156,10 @@ class RegexURLPattern(object):
         try:
             self._callback = get_callable(self._callback_str)
         except ImportError, e:
+            mod_name, _ = get_mod_func(self._callback_str)
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
         except AttributeError, e:
+            mod_name, func_name = get_mod_func(self._callback_str)
             raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
         return self._callback
     callback = property(_get_callback)
@@ -183,15 +185,19 @@ class RegexURLResolver(object):
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
-        self.reverse_dict = {}
+        self._reverse_dict = {}
 
-        for pattern in reversed(self.urlconf_module.urlpatterns):
-            if isinstance(pattern, RegexURLResolver):
-                for key, value in pattern.reverse_dict.iteritems():
-                    self.reverse_dict[key] = (pattern,) + value
-            else:
-                self.reverse_dict[pattern.callback] = (pattern,)
-                self.reverse_dict[pattern.name] = (pattern,)
+    def _get_reverse_dict(self):
+        if not self._reverse_dict:
+            for pattern in reversed(self.urlconf_module.urlpatterns):
+                if isinstance(pattern, RegexURLResolver):
+                    for key, value in pattern.reverse_dict.iteritems():
+                        self._reverse_dict[key] = (pattern,) + value
+                else:
+                    self._reverse_dict[pattern.callback] = (pattern,)
+                    self._reverse_dict[pattern.name] = (pattern,)
+        return self._reverse_dict
+    reverse_dict = property(_get_reverse_dict)
 
     def resolve(self, path):
         tried = []
