@@ -28,7 +28,8 @@ msgstr "To pole jest wymagane."
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Upewnij się, że tekst ma mniej niż %s znak."
-msgstr[1] "Upewnij się, że tekst ma mniej niż %s znaków."
+msgstr[1] "Upewnij się, że tekst ma mniej niż %s znaki."
+msgstr[2] "Upewnij się, że tekst ma mniej niż %s znaków."
 
 #: oldforms/__init__.py:397
 msgid "Line breaks are not allowed here."
@@ -75,7 +76,7 @@ msgid "Enter a whole number between 0 and 32,767."
 msgstr "Proszę wpisać liczbę całkowitą z zakresu od 0 do 32 767"
 
 #: db/models/manipulators.py:307
-#, fuzzy, python-format
+#, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr "%(object)s z %(type)s już istnieje dla %(field)s."
 
@@ -85,7 +86,7 @@ msgid "and"
 msgstr "i"
 
 #: db/models/fields/__init__.py:42
-#, fuzzy, python-format
+#, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Już istnieje %(optname)s z %(fieldname)s."
 
@@ -140,6 +141,9 @@ msgstr[0] ""
 "Proszę podać poprawne identyfikatory %(self)s. Wartość %(value)r jest "
 "niepoprawna."
 msgstr[1] ""
+"Proszę podać poprawne identyfikatory %(self)s. Wartości %(value)r są "
+"niepoprawne."
+msgstr[2] ""
 "Proszę podać poprawne identyfikatory %(self)s. Wartości %(value)r są "
 "niepoprawne."
 
@@ -370,7 +374,7 @@ msgstr "Niepoprawna data: %s"
 
 #: core/validators.py:153
 msgid "Enter a valid time in HH:MM format."
-msgstr "Proszę wpisać poprawną godzinę w formacie GG:MM."
+msgstr "Proszę wpisać poprawną godzinę w formacie HH:MM."
 
 #: core/validators.py:162 newforms/fields.py:271
 msgid "Enter a valid e-mail address."
@@ -439,6 +443,7 @@ msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Nie wolno przeklinać! Słowo %s nie jest dozwolone."
 msgstr[1] "Nie wolno przeklinać! Słowa %s nie są dozwolone."
+msgstr[2] "Nie wolno przeklinać! Słowa %s nie są dozwolone."
 
 #: core/validators.py:273
 #, python-format
@@ -497,13 +502,15 @@ msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural "Please enter a valid decimal number with at most %s total digits."
 msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną o nie więcej niż %s cyfrze."
 msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną o nie więcej niż %s cyfrach."
+msgstr[2] "Proszę wpisać poprawną liczbę dziesiętną o nie więcej niż %s cyfrach."
 
 #: core/validators.py:425
 #, python-format
 msgid "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż %s cyfry."
-msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfr."
+msgstr[0] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż %s cyfrę."
+msgstr[1] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfry."
+msgstr[2] "Proszę wpisać poprawną liczbę dziesiętną zawierającą nie więcej niż  %s cyfr."
 
 #: core/validators.py:428
 #, python-format
@@ -513,6 +520,9 @@ msgstr[0] ""
 "Proszę wpisać poprawną liczbę dziesiętną z dokładnością do %s miejsca po "
 "przecinku."
 msgstr[1] ""
+"Proszę wpisać poprawną liczbę dziesiętną z dokładnością do %s miejsc po "
+"przecinku."
+msgstr[2] ""
 "Proszę wpisać poprawną liczbę dziesiętną z dokładnością do %s miejsc po "
 "przecinku."
 
@@ -668,7 +678,7 @@ msgstr "Wpisz poprawny URL."
 
 #: newforms/fields.py:313
 msgid "This URL appears to be a broken link."
-msgstr "Odnośnik %s jest nieprawidłowy."
+msgstr "Ten odnośnik jest nieprawidłowy."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "th"
@@ -691,21 +701,24 @@ msgstr "-ci"
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milion"
-msgstr[1] "%(value).1f milionów"
+msgstr[1] "%(value).1f miliony"
+msgstr[2] "%(value).1f milionów"
 
 #: contrib/humanize/templatetags/humanize.py:50
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f miliard"
-msgstr[1] "%(value).1f miliardów"
+msgstr[1] "%(value).1f miliardy"
+msgstr[2] "%(value).1f miliardów"
 
 #: contrib/humanize/templatetags/humanize.py:53
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f bilion"
-msgstr[1] "%(value).1f bilionów"
+msgstr[1] "%(value).1f biliony"
+msgstr[2] "%(value).1f bilionów"
 
 #: contrib/humanize/templatetags/humanize.py:68
 msgid "one"
@@ -987,6 +1000,15 @@ msgstr[0] ""
 "\n"
 "%(text)s"
 msgstr[1] ""
+"Ten komentarz został wysłany przez użytkownika, który wysłał mniej niż %"
+"(count)s komentarze:\n"
+"\n"
+"%(text)s"
+msgstr[2] ""
+"Ten komentarz został wysłany przez użytkownika, który wysłał mniej niż %"
+"(count)s komentarzy:\n"
+"\n"
+"%(text)s"
 
 #: contrib/comments/views/comments.py:116
 #, python-format
@@ -1574,7 +1596,8 @@ msgstr "Szukaj"
 msgid "1 result"
 msgid_plural "%(counter)s results"
 msgstr[0] "1 wynik"
-msgstr[1] "%(counter)s wyników"
+msgstr[1] "%(counter)s wyniki"
+msgstr[2] "%(counter)s wyników"
 
 #: contrib/admin/templates/admin/search_form.html:10
 #, python-format
@@ -1681,6 +1704,7 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Proszę popraw poniższy błąd"
 msgstr[1] "Proszę popraw poniższe błędy"
+msgstr[2] "Proszę popraw poniższe błędy"
 
 #: contrib/admin/templates/admin/change_form.html:50
 msgid "Ordering"
@@ -2077,7 +2101,6 @@ msgstr ""
 msgid "user permissions"
 msgstr "uprawnienia użytkownika"
 
-# kurwa
 #: contrib/auth/models.py:115
 msgid "user"
 msgstr "użytkownik"
@@ -2831,37 +2854,43 @@ msgstr "Gru."
 msgid "year"
 msgid_plural "years"
 msgstr[0] "rok"
-msgstr[1] "lat"
+msgstr[1] "lata"
+msgstr[2] "lat"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
 msgstr[0] "miesiąc"
-msgstr[1] "miesięcy"
+msgstr[1] "miesięce"
+msgstr[2] "miesięcy"
 
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
 msgstr[0] "tydzień"
-msgstr[1] "tygodni"
+msgstr[1] "tygodnie"
+msgstr[2] "tygodni"
 
 #: utils/timesince.py:15
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dzień"
 msgstr[1] "dni"
+msgstr[2] "dni"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "godzina"
-msgstr[1] "godzin"
+msgstr[1] "godziny"
+msgstr[2] "godzin"
 
 #: utils/timesince.py:17
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minuta"
-msgstr[1] "minut"
+msgstr[1] "minuty"
+msgstr[2] "minut"
 
 #: utils/timesince.py:40
 #, python-format
@@ -2880,7 +2909,7 @@ msgstr ", %(number)d %(type)s"
 
 #: utils/dateformat.py:40
 msgid "p.m."
-msgstr "popołudniu"
+msgstr "po południu"
 
 #: utils/dateformat.py:41
 msgid "a.m."
@@ -2888,7 +2917,7 @@ msgstr "rano"
 
 #: utils/dateformat.py:46
 msgid "PM"
-msgstr "popołudniu"
+msgstr "po południu"
 
 #: utils/dateformat.py:47
 msgid "AM"
@@ -2931,13 +2960,13 @@ msgstr "tak,nie,może"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d bajt"
-msgstr[1] "%(size)d bajtów"
-msgstr[2] ""
+msgstr[1] "%(size)d bajty"
+msgstr[2] "%(size)d bajtów"
 
 #: template/defaultfilters.py:522
 #, python-format
 msgid "%.1f KB"
-msgstr "%.1f kB"
+msgstr "%.1f KB"
 
 #: template/defaultfilters.py:524
 #, python-format
