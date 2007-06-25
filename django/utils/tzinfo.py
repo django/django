@@ -1,8 +1,11 @@
 "Implementation of tzinfo classes for use with datetime.datetime."
 
+import locale
 import time
 from datetime import timedelta, tzinfo
 from django.utils.encoding import smart_unicode
+
+DEFAULT_ENCODING = locale.getdefaultlocale()[1]
 
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."
@@ -26,7 +29,7 @@ class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
     def __init__(self, dt):
         tzinfo.__init__(self, dt)
-        self._tzname = smart_unicode(time.tzname[self._isdst(dt)])
+        self._tzname = self.tzname(dt)
 
     def __repr__(self):
         return self._tzname
@@ -44,7 +47,10 @@ class LocalTimezone(tzinfo):
             return timedelta(0)
 
     def tzname(self, dt):
-        return unicode(time.tzname[self._isdst(dt)])
+        try:
+            return smart_unicode(time.tzname[self._isdst(dt)], DEFAULT_ENCODING)
+        except UnicodeDecodeError:
+            return None
 
     def _isdst(self, dt):
         tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.weekday(), 0, -1)
