@@ -11,7 +11,8 @@ class CommonMiddleware(object):
         - Forbids access to User-Agents in settings.DISALLOWED_USER_AGENTS
 
         - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
-          this middleware appends missing slashes and/or prepends missing "www."s.
+          this middleware appends missing slashes and/or prepends missing
+          "www."s.
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
@@ -74,7 +75,10 @@ class CommonMiddleware(object):
 
         # Use ETags, if requested.
         if settings.USE_ETAGS:
-            etag = md5.new(response.content).hexdigest()
+            if response.has_header('ETag'):
+                etag = response['ETag']
+            else:
+                etag = md5.new(response.content).hexdigest()
             if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
                 response = http.HttpResponseNotModified()
             else:

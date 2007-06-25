@@ -124,9 +124,23 @@ u'fran%C3%A7ois%20%26%20jill'
 u'<a href="http://short.com/" rel="nofollow">http://short.com/</a>'
 
 >>> urlizetrunc(u'http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
-u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google.co...</a>'
+u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google....</a>'
 
->>> wordcount(u'')
+>>> urlizetrunc('http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=', 20)
+u'<a href="http://www.google.co.uk/search?hl=en&q=some+long+url&btnG=Search&meta=" rel="nofollow">http://www.google...</a>'
+
+# Check truncating of URIs which are the exact length
+>>> uri = 'http://31characteruri.com/test/'
+>>> len(uri)
+31
+>>> urlizetrunc(uri, 31)
+u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri.com/test/</a>'
+>>> urlizetrunc(uri, 30)
+u'<a href="http://31characteruri.com/test/" rel="nofollow">http://31characteruri.com/t...</a>'
+>>> urlizetrunc(uri, 2)
+u'<a href="http://31characteruri.com/test/" rel="nofollow">...</a>'
+
+>>> wordcount('')
 0
 
 >>> wordcount(u'oneword')

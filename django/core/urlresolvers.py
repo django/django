@@ -10,7 +10,16 @@ a string) and returns a tuple in this format:
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.encoding import iri_to_uri
+from django.utils.functional import memoize
 import re
+
+try:
+    reversed
+except NameError:
+    from django.utils.itercompat import reversed     # Python 2.3 fallback
+
+_resolver_cache = {} # Maps urlconf modules to RegexURLResolver instances.
+_callable_cache = {} # Maps view and url pattern names to their view functions.
 
 class Resolver404(Http404):
     pass
@@ -18,6 +27,34 @@ class Resolver404(Http404):
 class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
     silent_variable_failure = True
+
+def get_callable(lookup_view, can_fail=False):
+    """
+    Convert a string version of a function name to the callable object.
+
+    If the lookup_view is not an import path, it is assumed to be a URL pattern
+    label and the original string is returned.
+
+    If can_fail is True, lookup_view might be a URL pattern label, so errors
+    during the import fail and the string is returned.
+    """
+    if not callable(lookup_view):
+        mod_name, func_name = get_mod_func(lookup_view)
+        try:
+            if func_name != '':
+                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        except (ImportError, AttributeError):
+            if not can_fail:
+                raise
+    return lookup_view
+get_callable = memoize(get_callable, _callable_cache)
+
+def get_resolver(urlconf):
+    if urlconf is None:
+        from django.conf import settings
+        urlconf = settings.ROOT_URLCONF
+    return RegexURLResolver(r'^/', urlconf)
+get_resolver = memoize(get_resolver, _resolver_cache)
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -130,12 +167,13 @@ class RegexURLPattern(object):
     def _get_callback(self):
         if self._callback is not None:
             return self._callback
-        mod_name, func_name = get_mod_func(self._callback_str)
         try:
-            self._callback = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+            self._callback = get_callable(self._callback_str)
         except ImportError, e:
+            mod_name, _ = get_mod_func(self._callback_str)
             raise ViewDoesNotExist, "Could not import %s. Error was: %s" % (mod_name, str(e))
         except AttributeError, e:
+            mod_name, func_name = get_mod_func(self._callback_str)
             raise ViewDoesNotExist, "Tried %s in module %s. Error was: %s" % (func_name, mod_name, str(e))
         return self._callback
     callback = property(_get_callback)
@@ -161,6 +199,19 @@ class RegexURLResolver(object):
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
+        self._reverse_dict = {}
+
+    def _get_reverse_dict(self):
+        if not self._reverse_dict:
+            for pattern in reversed(self.urlconf_module.urlpatterns):
+                if isinstance(pattern, RegexURLResolver):
+                    for key, value in pattern.reverse_dict.iteritems():
+                        self._reverse_dict[key] = (pattern,) + value
+                else:
+                    self._reverse_dict[pattern.callback] = (pattern,)
+                    self._reverse_dict[pattern.name] = (pattern,)
+        return self._reverse_dict
+    reverse_dict = property(_get_reverse_dict)
 
     def resolve(self, path):
         tried = []
@@ -210,24 +261,12 @@ class RegexURLResolver(object):
         return self._resolve_special('500')
 
     def reverse(self, lookup_view, *args, **kwargs):
-        if not callable(lookup_view):
-            mod_name, func_name = get_mod_func(lookup_view)
-            try:
-                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-            except (ImportError, AttributeError):
-                if func_name != '':
-                    raise NoReverseMatch
-        for pattern in self.urlconf_module.urlpatterns:
-            if isinstance(pattern, RegexURLResolver):
-                try:
-                    return pattern.reverse_helper(lookup_view, *args, **kwargs)
-                except NoReverseMatch:
-                    continue
-            elif pattern.callback == lookup_view or pattern.name == lookup_view:
-                try:
-                    return pattern.reverse_helper(*args, **kwargs)
-                except NoReverseMatch:
-                    continue
+        try:
+            lookup_view = get_callable(lookup_view, True)
+        except (ImportError, AttributeError):
+            raise NoReverseMatch
+        if lookup_view in self.reverse_dict:
+            return ''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
         raise NoReverseMatch
 
     def reverse_helper(self, lookup_view, *args, **kwargs):
@@ -236,17 +275,10 @@ class RegexURLResolver(object):
         return result + sub_match
 
 def resolve(path, urlconf=None):
-    if urlconf is None:
-        from django.conf import settings
-        urlconf = settings.ROOT_URLCONF
-    resolver = RegexURLResolver(r'^/', urlconf)
-    return resolver.resolve(path)
+    return get_resolver(urlconf).resolve(path)
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None):
     args = args or []
     kwargs = kwargs or {}
-    if urlconf is None:
-        from django.conf import settings
-        urlconf = settings.ROOT_URLCONF
-    resolver = RegexURLResolver(r'^/', urlconf)
-    return iri_to_uri(u'/' + resolver.reverse(viewname, *args, **kwargs))
+    return iri_to_uri(u'/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs))
+

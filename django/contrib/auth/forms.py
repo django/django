@@ -79,32 +79,32 @@ class PasswordResetForm(oldforms.Manipulator):
 
     def isValidUserEmail(self, new_data, all_data):
         "Validates that a user exists with the given e-mail address"
-        try:
-            self.user_cache = User.objects.get(email__iexact=new_data)
-        except User.DoesNotExist:
+        self.users_cache = list(User.objects.filter(email__iexact=new_data))
+        if len(self.users_cache) == 0:
             raise validators.ValidationError, _("That e-mail address doesn't have an associated user account. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
-        new_pass = User.objects.make_random_password()
-        self.user_cache.set_password(new_pass)
-        self.user_cache.save()
-        if not domain_override:
-            current_site = Site.objects.get_current()
-            site_name = current_site.name
-            domain = current_site.domain
-        else:
-            site_name = domain = domain_override
-        t = loader.get_template(email_template_name)
-        c = {
-            'new_password': new_pass,
-            'email': self.user_cache.email,
-            'domain': domain,
-            'site_name': site_name,
-            'user': self.user_cache,
-        }
-        send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [self.user_cache.email])
+        for user in self.users_cache:
+            new_pass = User.objects.make_random_password()
+            user.set_password(new_pass)
+            user.save()
+            if not domain_override:
+                current_site = Site.objects.get_current()
+                site_name = current_site.name
+                domain = current_site.domain
+            else:
+                site_name = domain = domain_override
+            t = loader.get_template(email_template_name)
+            c = {
+                'new_password': new_pass,
+                'email': user.email,
+                'domain': domain,
+                'site_name': site_name,
+                'user': user,
+                }
+            send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [user.email])
 
 class PasswordChangeForm(oldforms.Manipulator):
     "A form that lets a user change his password."

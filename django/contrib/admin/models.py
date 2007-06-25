@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_unicode
 
 ADDITION = 1
 CHANGE = 2
@@ -9,7 +10,7 @@ DELETION = 3
 
 class LogEntryManager(models.Manager):
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
-        e = self.model(None, None, user_id, content_type_id, object_id, object_repr[:200], action_flag, change_message)
+        e = self.model(None, None, user_id, content_type_id, smart_unicode(object_id), object_repr[:200], action_flag, change_message)
         e.save()
 
 class LogEntry(models.Model):

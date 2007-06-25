@@ -65,13 +65,13 @@ def urlize(text, trim_url_limit=None, nofollow=False):
     close-parens) and leading punctuation (opening parens) and it'll still do
     the right thing.
 
-    If trim_url_limit is not None, the URLs in link text will be limited to
-    trim_url_limit characters.
+    If trim_url_limit is not None, the URLs in link text longer than this limit
+    will truncated to trim_url_limit-3 characters and appended with an elipsis.
 
     If nofollow is True, the URLs in link text will get a rel="nofollow"
     attribute.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (x[:limit] + (len(x) >=limit and '...' or ''))  or x
+    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     words = word_split_re.split(force_unicode(text))
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):

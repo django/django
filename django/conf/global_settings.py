@@ -48,6 +48,7 @@ LANGUAGES = (
     ('en', gettext_noop('English')),
     ('es', gettext_noop('Spanish')),
     ('es_AR', gettext_noop('Argentinean Spanish')),
+    ('fa', gettext_noop('Persian')),
     ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
     ('gl', gettext_noop('Galician')),

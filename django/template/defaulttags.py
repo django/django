@@ -5,16 +5,14 @@ from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
+from django.utils.itercompat import groupby
 import sys
 import re
 
-if not hasattr(__builtins__, 'reversed'):
-    # For Python 2.3.
-    # From http://www.python.org/doc/current/tut/node11.html
-    def reversed(data):
-        for index in xrange(len(data)-1, -1, -1):
-            yield data[index]
-
+try:
+    reversed
+except NameError:
+    from django.utils.itercompat import reversed     # Python 2.3 fallback
 
 register = Library()
 
@@ -253,15 +251,10 @@ class RegroupNode(Node):
         if obj_list == None: # target_var wasn't found in context; fail silently
             context[self.var_name] = []
             return ''
-        output = [] # list of dictionaries in the format {'grouper': 'key', 'list': [list of contents]}
-        for obj in obj_list:
-            grouper = self.expression.resolve(obj, True)
-            # TODO: Is this a sensible way to determine equality?
-            if output and repr(output[-1]['grouper']) == repr(grouper):
-                output[-1]['list'].append(obj)
-            else:
-                output.append({'grouper': grouper, 'list': [obj]})
-        context[self.var_name] = output
+        # List of dictionaries in the format
+        # {'grouper': 'key', 'list': [list of contents]}.
+        context[self.var_name] = [{'grouper':key, 'list':list(val)} for key, val in
+            groupby(obj_list, lambda v, f=self.expression.resolve: f(v, True))]
         return ''
 
 def include_is_allowed(filepath):

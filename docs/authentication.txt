@@ -161,8 +161,8 @@ The ``User`` model has a custom manager that has the following helper functions:
     * ``make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')``
       Returns a random password with the given length and given string of
       allowed characters. (Note that the default value of ``allowed_chars``
-      doesn't contain ``"I"`` or letters that look like it, to avoid user
-      confusion.
+      doesn't contain letters that can cause user confusion, including
+      ``1``, ``I`` and ``0``).
 
 Basic usage
 -----------

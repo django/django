@@ -598,7 +598,7 @@ related ``Person`` *and* the related ``City``::
     p = b.author         # Doesn't hit the database.
     c = p.hometown       # Doesn't hit the database.
 
-    sv = Book.objects.get(id=4) # No select_related() in this example.
+    b = Book.objects.get(id=4) # No select_related() in this example.
     p = b.author         # Hits the database.
     c = p.hometown       # Hits the database.
 
