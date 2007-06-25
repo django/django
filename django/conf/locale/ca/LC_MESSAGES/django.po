@@ -1,20 +1,18 @@
 # translation of django.po to
-# This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-25 13:04+0200\n"
-"PO-Revision-Date: 2007-05-25 13:04+0200\n"
-"Last-Translator: Marc Fargas <marc@fargas.com>\n"
+"POT-Creation-Date: 2007-06-25 17:31+0200\n"
+"PO-Revision-Date: 2007-06-25 17:47+0200\n"
+"Last-Translator: Marc Fargas <telenieko@telenieko.com>\n"
 "Language-Team:  <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: VIM 7.0\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);"
 
 #: template/defaultfilters.py:491
 msgid "yes,no,maybe"
@@ -42,38 +40,38 @@ msgstr "%.1f MB"
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: newforms/models.py:173 newforms/fields.py:432
+#: newforms/models.py:172 newforms/fields.py:432
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Esculli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
-#: newforms/models.py:186 newforms/fields.py:87 newforms/fields.py:444
-#: newforms/fields.py:520 newforms/fields.py:531 oldforms/__init__.py:357
-#: db/models/fields/__init__.py:121 db/models/fields/__init__.py:278
-#: db/models/fields/__init__.py:675 db/models/fields/__init__.py:686
+#: newforms/models.py:185 newforms/fields.py:87 newforms/fields.py:444
+#: newforms/fields.py:522 newforms/fields.py:533 oldforms/__init__.py:357
+#: db/models/fields/__init__.py:126 db/models/fields/__init__.py:283
+#: db/models/fields/__init__.py:680 db/models/fields/__init__.py:691
 msgid "This field is required."
 msgstr "Aquest camp és obligatori."
 
-#: newforms/models.py:190 newforms/fields.py:448 newforms/fields.py:524
+#: newforms/models.py:189 newforms/fields.py:448 newforms/fields.py:526
 msgid "Enter a list of values."
 msgstr "Introdueixi una llista de valors."
 
-#: newforms/models.py:196 newforms/fields.py:457
+#: newforms/models.py:195 newforms/fields.py:457
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Esculli una opció vàlida; %s' no és una de les opcions vàlides."
 
-#: newforms/widgets.py:182 contrib/admin/filterspecs.py:150
+#: newforms/widgets.py:181 contrib/admin/filterspecs.py:150
 #: oldforms/__init__.py:577
 msgid "Unknown"
 msgstr "Desconegut"
 
-#: newforms/widgets.py:182 contrib/admin/filterspecs.py:143
+#: newforms/widgets.py:181 contrib/admin/filterspecs.py:143
 #: oldforms/__init__.py:577
 msgid "Yes"
 msgstr "Si"
 
-#: newforms/widgets.py:182 contrib/admin/filterspecs.py:143
+#: newforms/widgets.py:181 contrib/admin/filterspecs.py:143
 #: oldforms/__init__.py:577
 msgid "No"
 msgstr "No"
@@ -121,11 +119,11 @@ msgstr "Asseguris de que no hi ha més de %s decimals."
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asseguris de que no hia ha més de %s dígits decimals."
 
-#: newforms/fields.py:233
+#: newforms/fields.py:233 newforms/fields.py:566
 msgid "Enter a valid date."
 msgstr "Introdueixi una data vàlida."
 
-#: newforms/fields.py:260
+#: newforms/fields.py:260 newforms/fields.py:568
 msgid "Enter a valid time."
 msgstr "Introdueixi una hora vàlida."
 
@@ -198,118 +196,122 @@ msgid "Argentinean Spanish"
 msgstr "Castellà Argentí"
 
 #: conf/global_settings.py:51
+msgid "Persian"
+msgstr "Persa"
+
+#: conf/global_settings.py:52
 msgid "Finnish"
 msgstr "Finlandès"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "French"
 msgstr "Francès"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Galician"
 msgstr "Galleg"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Hungarian"
 msgstr "Húngar"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Hebrew"
 msgstr "Hebreu"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Icelandic"
 msgstr "Islandès"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Italian"
 msgstr "Italià"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Japanese"
 msgstr "Japonès"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Korean"
 msgstr "Coreà"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Kannada"
 msgstr ""
 
-#: conf/global_settings.py:61
-msgid "Latvian"
-msgstr ""
-
 #: conf/global_settings.py:62
+msgid "Latvian"
+msgstr "Letó"
+
+#: conf/global_settings.py:63
 msgid "Macedonian"
 msgstr "Macedoni"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Dutch"
 msgstr "Holandès"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Norwegian"
 msgstr "Norueg"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Polish"
 msgstr "Polac"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Portugese"
 msgstr "Portuguès"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Brazilian"
 msgstr "Brasileny"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Romanian"
 msgstr "Rumanès"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Russian"
 msgstr "Rús"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Slovak"
 msgstr "Eslovac"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Slovenian"
 msgstr "Esloveni"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Serbian"
 msgstr "Serbi"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Swedish"
 msgstr "Suec"
 
-#: conf/global_settings.py:74
-msgid "Tamil"
-msgstr ""
-
 #: conf/global_settings.py:75
-msgid "Telugu"
-msgstr ""
+msgid "Tamil"
+msgstr "Tàmil"
 
 #: conf/global_settings.py:76
+msgid "Telugu"
+msgstr "Telugu"
+
+#: conf/global_settings.py:77
 msgid "Turkish"
 msgstr "Turc"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Ukrainian"
 msgstr "Ucranià"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Simplified Chinese"
 msgstr "Xinés simplificat"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Traditional Chinese"
 msgstr "Xinés tradicional"
 
@@ -576,17 +578,15 @@ msgid ""
 "comment:\n"
 "\n"
 "%(text)s"
-msgid_plural ""
 "This comment was posted by a user who has posted fewer than %(count)s "
 "comments:\n"
 "\n"
 "%(text)s"
-msgstr[0] ""
+msgstr ""
 "Aquest comentari el va enviar un usuari que ha enviat menys de %(count)s "
 "comentari:\n"
 "\n"
 "%(text)s"
-msgstr[1] ""
 "Aquest comentari el va enviar un usuari que ha enviat menys de %(count)s "
 "comentaris:\n"
 "\n"
@@ -1218,13 +1218,13 @@ msgstr "Editar aquest objecte (nova finestra)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."
 
-#: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:257
+#: contrib/admin/views/auth.py:19 contrib/admin/views/main.py:262
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "El/la %(name)s \"%(obj)s\".ha estat agregat/da amb èxit."
 
-#: contrib/admin/views/auth.py:24 contrib/admin/views/main.py:261
-#: contrib/admin/views/main.py:347
+#: contrib/admin/views/auth.py:24 contrib/admin/views/main.py:266
+#: contrib/admin/views/main.py:352
 msgid "You may edit it again below."
 msgstr "Pot editar-lo de nou abaix."
 
@@ -1241,96 +1241,96 @@ msgstr "Canvi de clau exitós"
 msgid "Change password: %s"
 msgstr "Canviar clau: %s"
 
-#: contrib/admin/views/main.py:223
+#: contrib/admin/views/main.py:228
 msgid "Site administration"
 msgstr "Lloc administratiu"
 
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
+#: contrib/admin/views/main.py:276 contrib/admin/views/main.py:361
 #, python-format
 msgid "You may add another %s below."
 msgstr "Pot agregar un altre %s abaix."
 
-#: contrib/admin/views/main.py:289
+#: contrib/admin/views/main.py:294
 #, python-format
 msgid "Add %s"
 msgstr "Agregar %s"
 
-#: contrib/admin/views/main.py:335
+#: contrib/admin/views/main.py:340
 #, python-format
 msgid "Added %s."
 msgstr "Agregat %s."
 
-#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
-#: contrib/admin/views/main.py:339 db/models/manipulators.py:308
+#: contrib/admin/views/main.py:340 contrib/admin/views/main.py:342
+#: contrib/admin/views/main.py:344 db/models/manipulators.py:308
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/views/main.py:337
+#: contrib/admin/views/main.py:342
 #, python-format
 msgid "Changed %s."
 msgstr "Modificat %s."
 
-#: contrib/admin/views/main.py:339
+#: contrib/admin/views/main.py:344
 #, python-format
 msgid "Deleted %s."
 msgstr "Eliminat %s."
 
-#: contrib/admin/views/main.py:342
+#: contrib/admin/views/main.py:347
 msgid "No fields changed."
 msgstr "Cap camp canviat."
 
-#: contrib/admin/views/main.py:345
+#: contrib/admin/views/main.py:350
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "S'ha modificat amb èxist el/la %(name)s \"%(obj)s."
 
-#: contrib/admin/views/main.py:353
+#: contrib/admin/views/main.py:358
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "S'ha agregat amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou abaix."
 
-#: contrib/admin/views/main.py:391
+#: contrib/admin/views/main.py:396
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/views/main.py:476
+#: contrib/admin/views/main.py:481
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Un o més %(fieldname)s en %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:481
+#: contrib/admin/views/main.py:486
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Un o més %(fieldname)s en %(name)s:"
 
-#: contrib/admin/views/main.py:514
+#: contrib/admin/views/main.py:518
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "El/la %(name)s \"%(obj)s\".ha estat eliminat amb èxit."
 
-#: contrib/admin/views/main.py:517
+#: contrib/admin/views/main.py:521
 msgid "Are you sure?"
 msgstr "Està segur?"
 
-#: contrib/admin/views/main.py:539
+#: contrib/admin/views/main.py:543
 #, python-format
 msgid "Change history: %s"
 msgstr "Modificar històric: %s"
 
-#: contrib/admin/views/main.py:573
+#: contrib/admin/views/main.py:577
 #, python-format
 msgid "Select %s"
 msgstr "Seleccioni %s"
 
-#: contrib/admin/views/main.py:573
+#: contrib/admin/views/main.py:577
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccioni %s per modificar"
 
-#: contrib/admin/views/main.py:768
+#: contrib/admin/views/main.py:772
 msgid "Database error"
 msgstr "Error de/en la base de dades"
 
@@ -1697,35 +1697,35 @@ msgstr "llocs"
 msgid "Logged out"
 msgstr "Sessió finalitzada"
 
-#: contrib/auth/models.py:44 contrib/auth/models.py:64
+#: contrib/auth/models.py:49 contrib/auth/models.py:69
 msgid "name"
 msgstr "nom"
 
-#: contrib/auth/models.py:46
+#: contrib/auth/models.py:51
 msgid "codename"
 msgstr "nom en clau"
 
-#: contrib/auth/models.py:49
+#: contrib/auth/models.py:54
 msgid "permission"
 msgstr "permís"
 
-#: contrib/auth/models.py:50 contrib/auth/models.py:65
+#: contrib/auth/models.py:55 contrib/auth/models.py:70
 msgid "permissions"
 msgstr "permissos"
 
-#: contrib/auth/models.py:68
+#: contrib/auth/models.py:73
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:69 contrib/auth/models.py:109
+#: contrib/auth/models.py:74 contrib/auth/models.py:114
 msgid "groups"
 msgstr "grups"
 
-#: contrib/auth/models.py:99
+#: contrib/auth/models.py:104
 msgid "username"
 msgstr "nom d'usuari"
 
-#: contrib/auth/models.py:99
+#: contrib/auth/models.py:104
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
@@ -1733,23 +1733,23 @@ msgstr ""
 "Requerit. 30 o menys caracters. Només caracters alfanumèrics (lletres, "
 "dígits i guions baixos)."
 
-#: contrib/auth/models.py:100
+#: contrib/auth/models.py:105
 msgid "first name"
 msgstr "nom propi"
 
-#: contrib/auth/models.py:101
+#: contrib/auth/models.py:106
 msgid "last name"
 msgstr "cognoms"
 
-#: contrib/auth/models.py:102
+#: contrib/auth/models.py:107
 msgid "e-mail address"
 msgstr "adreça de correu electrònic"
 
-#: contrib/auth/models.py:103
+#: contrib/auth/models.py:108
 msgid "password"
 msgstr "contrasenya"
 
-#: contrib/auth/models.py:103
+#: contrib/auth/models.py:108
 msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
@@ -1757,19 +1757,19 @@ msgstr ""
 "Utilitzi '[algo]$[salt]$[hexdigest]' o el <a href=\"password/\">formulari de "
 "canvi de contrasenya</a>."
 
-#: contrib/auth/models.py:104
+#: contrib/auth/models.py:109
 msgid "staff status"
 msgstr "és membre del personal"
 
-#: contrib/auth/models.py:104
+#: contrib/auth/models.py:109
 msgid "Designates whether the user can log into this admin site."
 msgstr "Indica si l'usuari pot entrar en el lloc administratiu."
 
-#: contrib/auth/models.py:105
+#: contrib/auth/models.py:110
 msgid "active"
 msgstr "actiu"
 
-#: contrib/auth/models.py:105
+#: contrib/auth/models.py:110
 msgid ""
 "Designates whether this user can log into the Django admin. Unselect this "
 "instead of deleting accounts."
@@ -1777,11 +1777,11 @@ msgstr ""
 "Designa si aquest usuari pot iniciar sessió a la interfície administrativa "
 "Djano. Deselecciona-ho enlloc de esborrar comptes d'usuari."
 
-#: contrib/auth/models.py:106
+#: contrib/auth/models.py:111
 msgid "superuser status"
 msgstr "estat de superusuari"
 
-#: contrib/auth/models.py:106
+#: contrib/auth/models.py:111
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -1789,15 +1789,15 @@ msgstr ""
 "Designa que aquest usuari té tots els permisos sense assignar-los "
 "explícitament."
 
-#: contrib/auth/models.py:107
+#: contrib/auth/models.py:112
 msgid "last login"
 msgstr "últim inici de sessió"
 
-#: contrib/auth/models.py:108
+#: contrib/auth/models.py:113
 msgid "date joined"
 msgstr "data de creació"
 
-#: contrib/auth/models.py:110
+#: contrib/auth/models.py:115
 msgid ""
 "In addition to the permissions manually assigned, this user will also get "
 "all permissions granted to each group he/she is in."
@@ -1805,39 +1805,39 @@ msgstr ""
 "Junt amb els permissos asignats manualment, aquest usuari tindrà, també, els "
 "permissos dels grups dels que sigui membre."
 
-#: contrib/auth/models.py:111
+#: contrib/auth/models.py:116
 msgid "user permissions"
 msgstr "permissos de l'usuari"
 
-#: contrib/auth/models.py:115
+#: contrib/auth/models.py:120
 msgid "user"
 msgstr "usuari"
 
-#: contrib/auth/models.py:116
+#: contrib/auth/models.py:121
 msgid "users"
 msgstr "usuaris"
 
-#: contrib/auth/models.py:122
+#: contrib/auth/models.py:127
 msgid "Personal info"
 msgstr "Informaciò personal"
 
-#: contrib/auth/models.py:123
+#: contrib/auth/models.py:128
 msgid "Permissions"
 msgstr "permissos"
 
-#: contrib/auth/models.py:124
+#: contrib/auth/models.py:129
 msgid "Important dates"
 msgstr "Dates importants"
 
-#: contrib/auth/models.py:125
+#: contrib/auth/models.py:130
 msgid "Groups"
 msgstr "Grups"
 
-#: contrib/auth/models.py:269
+#: contrib/auth/models.py:273
 msgid "message"
 msgstr "missatge"
 
-#: contrib/auth/models.py:282
+#: contrib/auth/models.py:286
 msgid "AnonymousUser"
 msgstr "AnonymousUser"
 
@@ -1861,7 +1861,7 @@ msgstr ""
 msgid "This account is inactive."
 msgstr "Aquest compte està inactiu"
 
-#: contrib/auth/forms.py:85
+#: contrib/auth/forms.py:84
 msgid ""
 "That e-mail address doesn't have an associated user account. Are you sure "
 "you've registered?"
@@ -2423,7 +2423,7 @@ msgstr "L'any ha de ser posterior al 1900"
 msgid "Invalid date: %s"
 msgstr "Data invàlida: %s"
 
-#: core/validators.py:149 db/models/fields/__init__.py:463
+#: core/validators.py:149 db/models/fields/__init__.py:468
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "Introdueixi una data vàlida en el forma AAAA-MM-DD."
 
@@ -2431,7 +2431,7 @@ msgstr "Introdueixi una data vàlida en el forma AAAA-MM-DD."
 msgid "Enter a valid time in HH:MM format."
 msgstr "Introdueixi una hora vàlida en el format HH:MM."
 
-#: core/validators.py:158 db/models/fields/__init__.py:532
+#: core/validators.py:158 db/models/fields/__init__.py:537
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Introdueixi un data/hora vàlida en format YYYY-MM-DD HH:MM."
 
@@ -2558,35 +2558,29 @@ msgstr "Si us plau, introdueixi un número decimal vàlid."
 #: core/validators.py:423
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] ""
+msgstr ""
 "Si us plau, introdueixi un número decimal vàlid amb no més de %s digit."
-msgstr[1] ""
 "Si us plau, introdueixi un número decimal vàlid amb no més de %s digits."
 
 #: core/validators.py:426
 #, python-format
 msgid ""
 "Please enter a valid decimal number with a whole part of at most %s digit."
-msgid_plural ""
 "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] ""
+msgstr ""
 "Si us plau, introdueixi un número decimal vàlid amb la part entera amb com a "
 "màxim %s dígit."
-msgstr[1] ""
 "Si us plau, introdueixi un número decimal vàlid amb la part entera amb com a "
 "màxim %s dígits."
 
 #: core/validators.py:429
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] ""
+msgstr ""
 "Si us plau, introdueixi un número decimal vàlid amb no més de %s dígit en la "
 "part decimal."
-msgstr[1] ""
 "Si us plau, introdueixi un número decimal vàlid amb no més de %s dígits en "
 "la part decimal."
 
@@ -2983,52 +2977,51 @@ msgstr "Ja existeix un %(object)s del tipus %(type)s amb aquest %(field)s."
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "Ja existeix  %(optname)s amb auqest %(fieldname)s."
 
-#: db/models/fields/__init__.py:373
+#: db/models/fields/__init__.py:378
 msgid "This value must be an integer."
 msgstr "Aquest valor ha de ser  un enter."
 
-#: db/models/fields/__init__.py:408
+#: db/models/fields/__init__.py:413
 msgid "This value must be either True or False."
 msgstr "Aquest valor ha de ser True (Veritat) o False (Fals)"
 
-#: db/models/fields/__init__.py:429
+#: db/models/fields/__init__.py:434
 msgid "This field cannot be null."
 msgstr "Aquest camp no pot ser null (estar buit)."
 
-#: db/models/fields/__init__.py:592
+#: db/models/fields/__init__.py:597
 msgid "This value must be a decimal number."
 msgstr "Aquest valor ha de ser un número decimal."
 
-#: db/models/fields/__init__.py:695
+#: db/models/fields/__init__.py:700
 msgid "Enter a valid filename."
 msgstr "Introdueixi un nom de fitxer vàlid."
 
-#: db/models/fields/__init__.py:818
+#: db/models/fields/__init__.py:824
 msgid "This value must be either None, True or False."
 msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 
-#: db/models/fields/related.py:53
+#: db/models/fields/related.py:54
 #, python-format
 msgid "Please enter a valid %s."
 msgstr "Si us plau, introdueixi un %s vàlid."
 
-#: db/models/fields/related.py:642
+#: db/models/fields/related.py:640
 msgid "Separate multiple IDs with commas."
 msgstr "Separi múltiples IDs amb comes."
 
-#: db/models/fields/related.py:644
+#: db/models/fields/related.py:642
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr "Premi \"Control\" o \"Command\" en un Mac per escollir més d'un."
 
-#: db/models/fields/related.py:691
+#: db/models/fields/related.py:689
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] ""
+msgstr ""
 "Si us plau, introdueixi IDs de %(self)s vàlids. El valor %(value)r és "
 "invàlid."
-msgstr[1] ""
 "Si us plau, introdueixi IDs de %(self)s vàlids. Els valors %(value)r són "
 "invàlids."
+
