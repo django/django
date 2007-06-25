@@ -59,7 +59,7 @@ def truncate_html_words(s, num):
         return u''
     html4_singlets = ('br', 'col', 'link', 'base', 'img', 'param', 'area', 'hr', 'input')
     # Set up regular expressions
-    re_words = re.compile(r'&.*?;|<.*?>|([A-Za-z0-9][\w-]*)')
+    re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U)
     re_tag = re.compile(r'<(/)?([^ ]+?)(?: (/)| .*?)?>')
     # Count non-HTML words and keep note of open tags
     pos = 0

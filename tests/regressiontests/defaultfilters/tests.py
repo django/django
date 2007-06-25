@@ -104,6 +104,9 @@ u'<p>one <a href="#">two - three <br>four</a> five</p>'
 >>> truncatewords_html(u'<p>one <a href="#">two - three <br>four</a> five</p>', 100)
 u'<p>one <a href="#">two - three <br>four</a> five</p>'
 
+>>> truncatewords_html(u'\xc5ngstr\xf6m was here', 1)
+u'\xc5ngstr\xf6m ...'
+
 >>> upper(u'Mixed case input')
 u'MIXED CASE INPUT'
 
