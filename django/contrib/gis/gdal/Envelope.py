@@ -1,0 +1,112 @@
+from ctypes import Structure, c_double
+from types import TupleType
+
+"""
+ The GDAL/OGR library uses an Envelope structure to hold the bounding
+  box information for a geometry.  The envelope (bounding box) contains
+  two pairs of coordinates, one for the lower left coordinate and one
+  for the upper right coordinate:
+
+                            +----------o Upper right; (max_x, max_y)
+                            |          |
+                            |          |
+                            |          |
+  Lower left (min_x, min_y) o----------+
+  
+"""
+
+# The OGR definition of an Envelope is a C structure containing four doubles.
+#  See the 'ogr_core.h' source file for more information:
+#   http://www.gdal.org/ogr/ogr__core_8h-source.html
+class OGREnvelope(Structure):
+    "Represents the OGREnvelope C Structure."
+    _fields_ = [("MinX", c_double),
+                ("MaxX", c_double),
+                ("MinY", c_double),
+                ("MaxY", c_double),
+                ]
+
+class Envelope(object):
+    "A class that will wrap an OGR Envelope structure."
+
+    def __init__(self, *args):
+        if len(args) == 1:
+            if isinstance(args[0], OGREnvelope):
+                # OGREnvelope (a ctypes Structure) was passed in.
+                self._envelope = args[0]
+            elif isinstance(args[0], TupleType) and len(args[0]) == 4:
+                # A Tuple was passed in
+                self._from_tuple(args[0])
+            else:
+                raise OGRException, 'Incorrect type of argument: %s' % str(type(args[0]))
+        elif len(args) == 4:
+            self._from_tuple(args)
+        else:
+            raise OGRException, 'Incorrect number of arguments!'
+
+    def __eq__(self, other):
+        "Returns true if the envelopes are equivalent; can compare against other Envelopes and 4-tuples."
+        if isinstance(other, Envelope):
+            return (self.min_x == other.min_x) and (self.min_y == other.min_y) and \
+                   (self.max_x == other.max_x) and (self.max_y == other.max_y)
+        elif isinstance(other, TupleType) and len(other) == 4:
+            return (self.min_x == other[0]) and (self.min_y == other[1]) and \
+                   (self.max_x == other[2]) and (self.max_y == other[3])
+        else:
+            raise OGRException, 'Equivalence testing only works with other Envelopes.'
+
+    def __str__(self):
+        "Returns a string representation of the tuple."
+        return str(self.tuple)
+
+    def _from_tuple(self, tup):
+        "Initializes the C OGR Envelope structure from the given tuple."
+        self._envelope = OGREnvelope()
+        self._envelope.MinX = tup[0]
+        self._envelope.MinY = tup[1]
+        self._envelope.MaxX = tup[2]
+        self._envelope.MaxY = tup[3]
+    
+    @property
+    def min_x(self):
+        "Returns the value of the minimum X coordinate."
+        return self._envelope.MinX
+
+    @property
+    def min_y(self):
+        "Returns the value of the minimum Y coordinate."
+        return self._envelope.MinY
+
+    @property
+    def max_x(self):
+        "Returns the value of the maximum X coordinate."
+        return self._envelope.MaxX
+
+    @property
+    def max_y(self):
+        "Returns the value of the maximum Y coordinate."
+        return self._envelope.MaxY
+
+    @property
+    def ur(self):
+        "Returns the upper-right coordinate."
+        return (self.max_x, self.max_y)
+
+    @property
+    def ll(self):
+        "Returns the lower-left coordinate."
+        return (self.min_x, self.min_y)
+
+    @property
+    def tuple(self):
+        "Returns a tuple representing the envelope."
+        return (self.min_x, self.min_y, self.max_x, self.max_y)
+
+    @property
+    def wkt(self):
+        "Returns WKT representing a Polygon for this envelope."
+        # TODO: Fix significant figures.
+        return 'POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))' % (self.min_x, self.min_y, self.min_x, self.max_y,
+                                                             self.max_x, self.max_y, self.max_x, self.min_y,
+                                                             self.min_x, self.min_y)
+

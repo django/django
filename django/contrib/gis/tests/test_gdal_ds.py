@@ -1,5 +1,6 @@
 import os, os.path, unittest
 from django.contrib.gis.gdal import DataSource, OGRException
+from django.contrib.gis.gdal.Envelope import Envelope
 from django.contrib.gis.gdal.Field import OFTReal, OFTInteger, OFTString
 
 # Path for SHP files
@@ -16,8 +17,10 @@ class TestSHP:
 
 # List of acceptable data sources.
 ds_list = (TestSHP('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, fields={'dbl' : OFTReal, 'int' : OFTReal, 'str' : OFTString,},
+                   extent=(-1.35011,0.166623,-0.524093,0.824508), # Got extent from QGIS
                    srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
            TestSHP('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3, fields={'float' : OFTReal, 'int' : OFTReal, 'str' : OFTString,},
+                   extent=(-1.01513,-0.558245,0.161876,0.839637), # Got extent from QGIS
                    srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
            )
 
@@ -67,8 +70,15 @@ class DataSourceTest(unittest.TestCase):
                 self.assertEqual(len(layer), source.nfeat)
 
                 # Making sure we get the number of fields we expect
-                self.assertEqual(layer.num_fields, source.nfld)
-                self.assertEqual(len(layer.fields), source.nfld)
+                self.assertEqual(source.nfld, layer.num_fields)
+                self.assertEqual(source.nfld, len(layer.fields))
+
+                # Testing the layer's extent (an Envelope), and it's properties
+                self.assertEqual(True, isinstance(layer.extent, Envelope))
+                self.assertAlmostEqual(source.extent[0], layer.extent.min_x, 5)
+                self.assertAlmostEqual(source.extent[1], layer.extent.min_y, 5)
+                self.assertAlmostEqual(source.extent[2], layer.extent.max_x, 5)
+                self.assertAlmostEqual(source.extent[3], layer.extent.max_y, 5)
 
                 # Now checking the field names.
                 flds = layer.fields
@@ -113,7 +123,7 @@ class DataSourceTest(unittest.TestCase):
 
                     # Making sure the SpatialReference is as expected.
                     self.assertEqual(source.srs_wkt, g.srs.wkt)
-                    
+                        
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(DataSourceTest))

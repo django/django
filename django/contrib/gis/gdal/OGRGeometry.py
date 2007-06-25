@@ -4,6 +4,7 @@ from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
 
 # Getting the GDAL C library and error checking facilities
 from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.Envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.OGRError import check_err, OGRException
 from django.contrib.gis.gdal.SpatialReference import SpatialReference, CoordTransform
 
@@ -248,6 +249,13 @@ class OGRGeometry(object):
         "Returns the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
         a = lgdal.OGR_G_GetArea(self._g)
         return a.value
+
+    @property
+    def envelope(self):
+        "Returns the envelope for this Geometry."
+        env = OGREnvelope()
+        lgdal.OGR_G_GetEnvelope(self._g, byref(env))
+        return Envelope(env)
     
     #### Geometry Methods ####
     def clone(self):
@@ -322,10 +330,22 @@ class OGRGeometry(object):
         return self._topology(lgdal.OGR_G_Overlaps, other)
 
     #### Geometry-generation Methods ####
-    def _geomgen(self, gen_func, other):
-        if not isinstance(other, OGRGeometry):
-            raise OGRException, 'Must use another OGRGeometry object for geometry-generating operations!'
-        return OGRGeometry(gen_func(self._g, other._g))
+    def _geomgen(self, gen_func, other=None):
+        "A helper routine for the OGR routines that generate geometries."
+        if isinstance(other, OGRGeometry):
+            return OGRGeometry(gen_func(self._g, other._g))
+        else:
+            return OGRGeometry(gen_func(self._g))
+
+    @property
+    def boundary(self):
+        "Returns the boundary of this geometry."
+        return self._geomgen(lgdal.OGR_G_GetBoundary)
+
+    @property
+    def convex_hull(self):
+        "Returns the smallest convex Polygon that contains all the points in the Geometry."
+        return self._geomgen(lgdal.OGR_G_ConvexHull)
 
     def union(self, other):
         """Returns a new geometry consisting of the region which is the union of

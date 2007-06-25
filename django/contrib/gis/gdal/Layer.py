@@ -1,12 +1,13 @@
 # Needed ctypes routines
-from ctypes import c_int, c_long, c_void_p, string_at
+from ctypes import c_int, c_long, c_void_p, byref, string_at
 
 # The GDAL C Library
 from django.contrib.gis.gdal.libgdal import lgdal
 
 # Other GDAL imports.
+from django.contrib.gis.gdal.Envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.Feature import Feature
-from django.contrib.gis.gdal.OGRError import OGRException
+from django.contrib.gis.gdal.OGRError import OGRException, check_err
 from django.contrib.gis.gdal.SpatialReference import SpatialReference
 
 # For more information, see the OGR C API source code:
@@ -57,6 +58,13 @@ class Layer(object):
         return self.name
 
     #### Layer properties ####
+    @property
+    def extent(self):
+        "Returns the extent (an Envelope) of this layer."
+        env = OGREnvelope()
+        check_err(lgdal.OGR_L_GetExtent(self._layer, byref(env), c_int(1)))
+        return Envelope(env)
+
     @property
     def name(self):
         "Returns the name of this layer in the Data Source."

@@ -1,4 +1,5 @@
 from Driver import Driver
+from Envelope import Envelope
 from DataSource import DataSource
 from SpatialReference import SpatialReference, CoordTransform
 from OGRGeometry import OGRGeometry, OGRGeomType
