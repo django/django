@@ -342,7 +342,7 @@ If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 
     * ``user`` -- An ``auth.User`` instance representing the currently
       logged-in user (or an ``AnonymousUser`` instance, if the client isn't
-      logged in). See the `user authentication docs`.
+      logged in). See the `user authentication docs`_.
 
     * ``messages`` -- A list of messages (as strings) for the currently
       logged-in user. Behind the scenes, this calls

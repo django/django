@@ -104,7 +104,7 @@ Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu makes us all look like rock stars. By day, he's an
-    interactive designer for `Apple`. Don't ask him what he's working on, or
+    interactive designer for `Apple`_. Don't ask him what he's working on, or
     he'll have to kill you. He lives in San Francisco.
 
     On IRC, Wilson goes by ``wilsonian``.
