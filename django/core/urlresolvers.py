@@ -201,7 +201,7 @@ class RegexURLResolver(object):
         self._reverse_dict = {}
 
     def _get_reverse_dict(self):
-        if not self._reverse_dict:
+        if not self._reverse_dict and hasattr(self.urlconf_module, 'urlpatterns'):
             for pattern in reversed(self.urlconf_module.urlpatterns):
                 if isinstance(pattern, RegexURLResolver):
                     for key, value in pattern.reverse_dict.iteritems():
