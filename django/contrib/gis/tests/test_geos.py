@@ -19,11 +19,15 @@ class GeosTest2(unittest.TestCase):
 
     def test0102_errors(self):
         "Testing the Error handlers."
+
+        print "\nBEGIN - expecting ParseError; safe to ignore.\n"
         for err in errors:
             if err.hex:
                 self.assertRaises(GEOSException, GEOSGeometry, err.wkt, 'hex')
             else:
                 self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
+        print "\nEND - expecting ParseError; safe to ignore.\n"
+
                 
     def test02_points(self):
         "Testing Point objects."
