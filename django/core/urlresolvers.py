@@ -27,11 +27,24 @@ class NoReverseMatch(Exception):
     # Don't make this raise an error when used in a template.
     silent_variable_failure = True
 
-def get_callable(lookup_view):
+def get_callable(lookup_view, can_fail=False):
+    """
+    Convert a string version of a function name to the callable object.
+
+    If the lookup_view is not an import path, it is assumed to be a URL pattern
+    label and the original string is returned.
+
+    If can_fail is True, lookup_view might be a URL pattern label, so errors
+    during the import fail and the string is returned.
+    """
     if not callable(lookup_view):
         mod_name, func_name = get_mod_func(lookup_view)
-        if func_name != '':
-            lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        try:
+            if func_name != '':
+                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        except (ImportError, AttributeError):
+            if not can_fail:
+                raise
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache)
 
@@ -248,7 +261,7 @@ class RegexURLResolver(object):
 
     def reverse(self, lookup_view, *args, **kwargs):
         try:
-            lookup_view = get_callable(lookup_view)
+            lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError):
             raise NoReverseMatch
         if lookup_view in self.reverse_dict:
