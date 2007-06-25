@@ -80,7 +80,7 @@ needs_datetime_string_cast = False
 needs_upper_for_iops = False
 supports_constraints = True
 supports_tablespaces = False
-uses_case_insensitive_names = True
+uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith('"') and name.endswith('"'):
