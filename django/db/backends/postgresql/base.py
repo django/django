@@ -6,7 +6,6 @@ Requires psycopg 1: http://initd.org/projects/psycopg1
 
 from django.utils.encoding import smart_str, smart_unicode
 from django.db.backends import util
-from django.db.backends.postgresql.encodings import ENCODING_MAP
 try:
     import psycopg as Database
 except ImportError, e:
@@ -64,7 +63,6 @@ class UnicodeCursorWrapper(object):
             return getattr(self.cursor, attr)
 
 postgres_version = None
-client_encoding = None
 
 class DatabaseWrapper(local):
     def __init__(self, **kwargs):
@@ -94,15 +92,8 @@ class DatabaseWrapper(local):
         cursor = self.connection.cursor()
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
-        cursor.execute("SHOW client_encoding")
-        encoding = ENCODING_MAP[cursor.fetchone()[0]]
-        cursor = UnicodeCursorWrapper(cursor, encoding)
-        global client_encoding
-        if not client_encoding:
-            # We assume the client encoding isn't going to change for random
-            # reasons.
-            Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
-            client_encoding = encoding
+        cursor.execute("SET client_encoding to 'UNICODE'")
+        cursor = UnicodeCursorWrapper(cursor, 'utf-8')
         global postgres_version
         if not postgres_version:
             cursor.execute("SELECT version()")
@@ -289,7 +280,7 @@ def typecast_string(s):
     """
     if not s:
         return s
-    return smart_unicode(s, client_encoding)
+    return smart_unicode(s)
 
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg
@@ -302,6 +293,7 @@ Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
 Database.register_type(Database.new_type((1700,), "NUMERIC", util.typecast_decimal))
+Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
 
 OPERATOR_MAPPING = {
     'exact': '= %s',
