@@ -309,10 +309,6 @@ class FormField(object):
         return data
     html2python = staticmethod(html2python)
 
-    def iter_render(self, data):
-        # this even needed?
-        return (self.render(data),)
-
     def render(self, data):
         raise NotImplementedError
 

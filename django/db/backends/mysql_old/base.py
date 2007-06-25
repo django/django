@@ -135,7 +135,14 @@ class DatabaseWrapper(local):
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+autoindexes_primary_keys = False
+needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
+needs_upper_for_iops = False
 supports_constraints = True
+supports_tablespaces = False
+uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith("`") and name.endswith("`"):
@@ -168,6 +175,9 @@ def get_date_trunc_sql(lookup_type, field_name):
         sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
     return sql
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
     if offset and offset != 0:
@@ -189,11 +199,20 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
+def get_max_name_length():
+    return None;
+
+def get_start_transaction_sql():
+    return "BEGIN;"
+
+def get_autoinc_sql(table):
+    return None
+
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
-    
+
     """
     # NB: The generated SQL below is specific to MySQL
     # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
@@ -205,7 +224,7 @@ def get_sql_flush(style, tables, sequences):
                  style.SQL_FIELD(quote_name(table))
                 )  for table in tables] + \
               ['SET FOREIGN_KEY_CHECKS = 1;']
-              
+
         # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
         # to reset sequence indices
         sql.extend(["%s %s %s %s %s;" % \

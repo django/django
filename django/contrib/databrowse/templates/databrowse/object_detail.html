@@ -32,10 +32,10 @@
     <li class="{% cycle odd,even %}"><a href="{{ object.url }}">{{ object }}</a></li>
     {% endfor %}
   </ul>
-  </div>
   {% else %}
   <p class="quiet">(None)</p>
   {% endif %}
+  </div>
 {% endfor %}
 
 {% endblock %}

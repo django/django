@@ -55,7 +55,6 @@ times with multiple contexts)
 '\n<html>\n\n</html>\n'
 """
 import re
-import types
 from inspect import getargspec
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
@@ -168,12 +167,9 @@ class Template(object):
             for subnode in node:
                 yield subnode
 
-    def iter_render(self, context):
-        "Display stage -- can be called many times"
-        return self.nodelist.iter_render(context)
-
     def render(self, context):
-        return ''.join(self.iter_render(context))
+        "Display stage -- can be called many times"
+        return self.nodelist.render(context)
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
@@ -699,26 +695,10 @@ def resolve_variable(path, context):
             del bits[0]
     return current
 
-class NodeBase(type):
-    def __new__(cls, name, bases, attrs):
-        """
-        Ensures that either a 'render' or 'render_iter' method is defined on
-        any Node sub-class. This avoids potential infinite loops at runtime.
-        """
-        if not (isinstance(attrs.get('render'), types.FunctionType) or
-                isinstance(attrs.get('iter_render'), types.FunctionType)):
-            raise TypeError('Unable to create Node subclass without either "render" or "iter_render" method.')
-        return type.__new__(cls, name, bases, attrs)
-
 class Node(object):
-    __metaclass__ = NodeBase
-
-    def iter_render(self, context):
-        return (self.render(context),)
-
     def render(self, context):
         "Return the node rendered as a string"
-        return ''.join(self.iter_render(context))
+        pass
 
     def __iter__(self):
         yield self
@@ -734,12 +714,13 @@ class Node(object):
 
 class NodeList(list):
     def render(self, context):
-        return ''.join(self.iter_render(context))
-
-    def iter_render(self, context):
+        bits = []
         for node in self:
-            for chunk in node.iter_render(context):
-                yield chunk
+            if isinstance(node, Node):
+                bits.append(self.render_node(node, context))
+            else:
+                bits.append(node)
+        return ''.join(bits)
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -748,25 +729,24 @@ class NodeList(list):
             nodes.extend(node.get_nodes_by_type(nodetype))
         return nodes
 
+    def render_node(self, node, context):
+        return(node.render(context))
+
 class DebugNodeList(NodeList):
-    def iter_render(self, context):
-        for node in self:
-            if not isinstance(node, Node):
-                yield node
-                continue
-            try:
-                for chunk in node.iter_render(context):
-                    yield chunk
-            except TemplateSyntaxError, e:
-                if not hasattr(e, 'source'):
-                    e.source = node.source
-                raise
-            except Exception, e:
-                from sys import exc_info
-                wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
-                wrapped.source = node.source
-                wrapped.exc_info = exc_info()
-                raise wrapped
+    def render_node(self, node, context):
+        try:
+            result = node.render(context)
+        except TemplateSyntaxError, e:
+            if not hasattr(e, 'source'):
+                e.source = node.source
+            raise
+        except Exception, e:
+            from sys import exc_info
+            wrapped = TemplateSyntaxError('Caught an exception while rendering: %s' % e)
+            wrapped.source = node.source
+            wrapped.exc_info = exc_info()
+            raise wrapped
+        return result
 
 class TextNode(Node):
     def __init__(self, s):
@@ -774,9 +754,6 @@ class TextNode(Node):
 
     def __repr__(self):
         return "<Text Node: '%s'>" % self.s[:25]
-
-    def iter_render(self, context):
-        return (self.s,)
 
     def render(self, context):
         return self.s
@@ -800,9 +777,6 @@ class VariableNode(Node):
             return output.encode(settings.DEFAULT_CHARSET)
         else:
             return output
-
-    def iter_render(self, context):
-        return (self.render(context),)
 
     def render(self, context):
         output = self.filter_expression.resolve(context)
@@ -892,9 +866,6 @@ class Library(object):
             def __init__(self, vars_to_resolve):
                 self.vars_to_resolve = vars_to_resolve
 
-            #def iter_render(self, context):
-            #    return (self.render(context),)
-
             def render(self, context):
                 resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
                 return func(*resolved_vars)
@@ -917,7 +888,7 @@ class Library(object):
                 def __init__(self, vars_to_resolve):
                     self.vars_to_resolve = vars_to_resolve
 
-                def iter_render(self, context):
+                def render(self, context):
                     resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
                     if takes_context:
                         args = [context] + resolved_vars
@@ -933,7 +904,7 @@ class Library(object):
                         else:
                             t = get_template(file_name)
                         self.nodelist = t.nodelist
-                    return self.nodelist.iter_render(context_class(dict))
+                    return self.nodelist.render(context_class(dict))
 
             compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
             compile_func.__doc__ = func.__doc__

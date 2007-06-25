@@ -14,6 +14,11 @@ from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 import operator
 
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
+
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 if not LogEntry._meta.installed:
     raise ImproperlyConfigured, "You'll need to put 'django.contrib.admin' in your INSTALLED_APPS setting before you can use the admin application."
@@ -489,7 +494,6 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 perms_needed.add(related.opts.verbose_name)
 
 def delete_stage(request, app_label, model_name, object_id):
-    import sets
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
@@ -502,7 +506,7 @@ def delete_stage(request, app_label, model_name, object_id):
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
     deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
-    perms_needed = sets.Set()
+    perms_needed = set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
     if request.POST: # The user has already confirmed the deletion.

@@ -96,9 +96,9 @@ class Model(object):
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
-        
+
         # There is a rather weird disparity here; if kwargs, it's set, then args
-        # overrides it. It should be one or the other; don't duplicate the work 
+        # overrides it. It should be one or the other; don't duplicate the work
         # The reason for the kwargs check is that standard iterator passes in by
         # args, and nstantiation for iteration is 33% faster.
         args_len = len(args)
@@ -122,10 +122,10 @@ class Model(object):
                 # Maintain compatibility with existing calls.
                 if isinstance(field.rel, ManyToOneRel):
                     kwargs.pop(field.attname, None)
-        
+
         # Now we're left with the unprocessed fields that *must* come from
         # keywords, or default.
-        
+
         for field in fields_iter:
             if kwargs:
                 if isinstance(field.rel, ManyToOneRel):
@@ -147,7 +147,7 @@ class Model(object):
                             try:
                                 val = getattr(rel_obj, field.rel.get_related_field().attname)
                             except AttributeError:
-                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" % 
+                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" %
                                     (field.name, field.rel.to, type(rel_obj)))
                 else:
                     val = kwargs.pop(field.attname, field.get_default())
@@ -210,17 +210,18 @@ class Model(object):
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
-                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
+            cursor.execute("SELECT COUNT(*) FROM %s WHERE %s=%%s" % \
+                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
+                self._meta.pk.get_db_prep_lookup('exact', pk_val))
             # If it does already exist, do an UPDATE.
-            if cursor.fetchone():
+            if cursor.fetchone()[0] > 0:
                 db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
                 if db_values:
                     cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                         (backend.quote_name(self._meta.db_table),
                         ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
                         backend.quote_name(self._meta.pk.column)),
-                        db_values + [pk_val])
+                        db_values + self._meta.pk.get_db_prep_lookup('exact', pk_val))
             else:
                 record_exists = False
         if not pk_set or not record_exists:

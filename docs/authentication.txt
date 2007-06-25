@@ -325,7 +325,7 @@ Manually checking a user's password
 
 If you'd like to manually authenticate a user by comparing a
 plain-text password to the hashed password in the database, use the
-convenience function `django.contrib.auth.models.check_password`. It
+convenience function ``django.contrib.auth.models.check_password``. It
 takes two arguments: the plain-text password to check, and the full
 value of a user's ``password`` field in the database to check against,
 and returns ``True`` if they match, ``False`` otherwise.

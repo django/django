@@ -34,7 +34,7 @@ def groupby(iterable, keyfunc=None):
         keyfunc = lambda x:x
     iterable = iter(iterable)
     l = [iterable.next()]
-    lastkey = keyfunc(l)
+    lastkey = keyfunc(l[0])
     for item in iterable:
         key = keyfunc(item)
         if key != lastkey:
@@ -44,6 +44,12 @@ def groupby(iterable, keyfunc=None):
         else:
             l.append(item)
     yield lastkey, l
+
+# Not really in itertools, since it's a builtin in Python 2.4 and later, but it
+# does operate as an iterator.
+def reversed(data):
+    for index in xrange(len(data)-1, -1, -1):
+        yield data[index]
 
 if hasattr(itertools, 'tee'):
     tee = itertools.tee

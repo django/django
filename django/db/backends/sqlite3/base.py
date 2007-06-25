@@ -107,7 +107,14 @@ class SQLiteCursorWrapper(Database.Cursor):
     def convert_query(self, query, num_params):
         return query % tuple("?" * num_params)
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+autoindexes_primary_keys = True
+needs_datetime_string_cast = True
+needs_upper_for_iops = False
 supports_constraints = False
+supports_tablespaces = False
+uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith('"') and name.endswith('"'):
@@ -139,6 +146,9 @@ def get_date_trunc_sql(lookup_type, field_name):
     # sqlite doesn't support DATE_TRUNC, so we fake it as above.
     return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:
@@ -160,11 +170,20 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "NULL"
 
+def get_max_name_length():
+    return None
+
+def get_start_transaction_sql():
+    return "BEGIN;"
+
+def get_autoinc_sql(table):
+    return None
+
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
-    
+
     """
     # NB: The generated SQL below is specific to SQLite
     # Note: The DELETE FROM... SQL generated below works for SQLite databases
@@ -182,7 +201,7 @@ def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
     # No sequence reset required
     return []
-    
+
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)

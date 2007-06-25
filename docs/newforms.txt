@@ -110,7 +110,7 @@ shortly.
 Creating ``Form`` instances
 ---------------------------
 
-A ``Form`` instance is either **bound** or **unbound** to a set of data.
+A ``Form`` instance is either **bound** to a set of data, or **unbound**.
 
     * If it's **bound** to a set of data, it's capable of validating that data
       and rendering the form as HTML with the data displayed in the HTML.

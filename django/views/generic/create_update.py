@@ -68,7 +68,7 @@ def create_object(request, model, template_name=None,
             c[key] = value()
         else:
             c[key] = value
-    return HttpResponse(t.iter_render(c))
+    return HttpResponse(t.render(c))
 
 def update_object(request, model, object_id=None, slug=None,
         slug_field=None, template_name=None, template_loader=loader,
@@ -141,7 +141,7 @@ def update_object(request, model, object_id=None, slug=None,
             c[key] = value()
         else:
             c[key] = value
-    response = HttpResponse(t.iter_render(c))
+    response = HttpResponse(t.render(c))
     populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
     return response
 
@@ -195,6 +195,6 @@ def delete_object(request, model, post_delete_redirect,
                 c[key] = value()
             else:
                 c[key] = value
-        response = HttpResponse(t.iter_render(c))
+        response = HttpResponse(t.render(c))
         populate_xheaders(request, response, model, getattr(object, object._meta.pk.attname))
         return response

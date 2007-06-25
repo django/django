@@ -1,6 +1,7 @@
 import sys, time
 from django.conf import settings
-from django.db import connection, transaction, backend
+from django.db import connection, backend, get_creation_module
+from django.core import management, mail
 from django.core import management, mail
 from django.dispatch import dispatcher
 from django.test import signals
@@ -11,21 +12,12 @@ from django.template import Template
 TEST_DATABASE_PREFIX = 'test_'
 
 def instrumented_test_render(self, context):
-    """
-    An instrumented Template render method, providing a signal that can be
-    intercepted by the test system Client.
+    """An instrumented Template render method, providing a signal 
+    that can be intercepted by the test system Client
+    
     """
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)
-
-def instrumented_test_iter_render(self, context):
-    """
-    An instrumented Template iter_render method, providing a signal that can be
-    intercepted by the test system Client.
-    """
-    for chunk in self.nodelist.iter_render(context):
-        yield chunk
-    dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     
 class TestSMTPConnection(object):
     """A substitute SMTP connection for use during test sessions.
@@ -53,9 +45,7 @@ def setup_test_environment():
         
     """
     Template.original_render = Template.render
-    Template.original_iter_render = Template.iter_render
     Template.render = instrumented_test_render
-    Template.iter_render = instrumented_test_render
     
     mail.original_SMTPConnection = mail.SMTPConnection
     mail.SMTPConnection = TestSMTPConnection
@@ -70,8 +60,7 @@ def teardown_test_environment():
         
     """
     Template.render = Template.original_render
-    Template.iter_render = Template.original_iter_render
-    del Template.original_render, Template.original_iter_render
+    del Template.original_render
     
     mail.SMTPConnection = mail.original_SMTPConnection
     del mail.original_SMTPConnection
@@ -100,6 +89,12 @@ def get_postgresql_create_suffix():
     return ''
 
 def create_test_db(verbosity=1, autoclobber=False):
+    # If the database backend wants to create the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "create_test_db"):
+        creation_module.create_test_db(settings, connection, backend, verbosity, autoclobber)
+        return
+    
     if verbosity >= 1:
         print "Creating test database..."
     # If we're using SQLite, it's more convenient to test against an
@@ -154,6 +149,12 @@ def create_test_db(verbosity=1, autoclobber=False):
     cursor = connection.cursor()
 
 def destroy_test_db(old_database_name, verbosity=1):
+    # If the database wants to drop the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "destroy_test_db"):
+        creation_module.destroy_test_db(settings, connection, backend, old_database_name, verbosity)
+        return
+    
     # Unless we're using SQLite, remove the test database to clean up after
     # ourselves. Connect to the previous database (not the test database)
     # to do so, because it's not allowed to delete a database while being
