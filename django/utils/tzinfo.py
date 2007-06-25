@@ -2,6 +2,7 @@
 
 import time
 from datetime import timedelta, tzinfo
+from django.utils.encoding import smart_unicode
 
 class FixedOffset(tzinfo):
     "Fixed offset in minutes east from UTC."
@@ -25,7 +26,7 @@ class LocalTimezone(tzinfo):
     "Proxy timezone information from time module."
     def __init__(self, dt):
         tzinfo.__init__(self, dt)
-        self._tzname = unicode(time.tzname[self._isdst(dt)])
+        self._tzname = smart_unicode(time.tzname[self._isdst(dt)])
 
     def __repr__(self):
         return self._tzname
