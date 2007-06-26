@@ -800,6 +800,7 @@ class IntegerField(Field):
         return super(IntegerField, self).formfield(**defaults)
 
 class IPAddressField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 15
         Field.__init__(self, *args, **kwargs)
