@@ -1189,14 +1189,16 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
 
+    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+
     SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
 
     SELECT ... WHERE title REGEXP '^(An?|The) +'; -- sqlite
 
 Using raw strings for passing in the regular expression syntax is recommended.
 
-Regular expression matching is not supported on the ``ado_mssql`` and
-``oracle`` backends; these will raise a ``NotImplementedError``.
+Regular expression matching is not supported on the ``ado_mssql`` backend; it
+will raise a ``NotImplementedError``.
 
 iregex
 ~~~~~~
@@ -1210,6 +1212,8 @@ Example::
 SQL equivalents::
 
     SELECT ... WHERE title REGEXP '^(an?|the) +'; -- MySQL
+
+    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'i'); -- Oracle
 
     SELECT ... WHERE title ~* '^(an?|the) +'; -- PostgreSQL
 
