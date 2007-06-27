@@ -173,13 +173,14 @@ class EmailMessage(object):
     multipart_subtype = 'mixed'
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
-            connection=None, attachments=None):
+            connection=None, attachments=None, headers=None):
         self.to = to or []
         self.bcc = bcc or []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
         self.attachments = attachments or []
+        self.extra_headers = headers or {}
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
@@ -206,6 +207,8 @@ class EmailMessage(object):
         msg['Message-ID'] = make_msgid()
         if self.bcc:
             msg['Bcc'] = ', '.join(self.bcc)
+        for name, value in self.extra_headers.items():
+            msg[name] = value
         return msg
 
     def recipients(self):
