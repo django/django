@@ -169,6 +169,9 @@ class EmailMessage(object):
     """
     A container for email information.
     """
+    content_subtype = 'plain'
+    multipart_subtype = 'mixed'
+
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None):
         self.to = to or []
@@ -185,10 +188,10 @@ class EmailMessage(object):
         return self.connection
 
     def message(self):
-        msg = SafeMIMEText(self.body, 'plain', settings.DEFAULT_CHARSET)
+        msg = SafeMIMEText(self.body, self.content_subtype, settings.DEFAULT_CHARSET)
         if self.attachments:
             body_msg = msg
-            msg = SafeMIMEMultipart()
+            msg = SafeMIMEMultipart(_subtype=self.multipart_subtype)
             if self.body:
                 msg.attach(body_msg)
             for attachment in self.attachments:
@@ -216,14 +219,17 @@ class EmailMessage(object):
         """Send the email message."""
         return self.get_connection(fail_silently).send_messages([self])
 
-    def attach(self, filename, content=None, mimetype=None):
+    def attach(self, filename=None, content=None, mimetype=None):
         """
-        Attaches a file with the given filename and content.
+        Attaches a file with the given filename and content. The filename can
+        be omitted (useful for multipart/alternative messages) and the mimetype
+        is guessed, if not provided.
 
-        Alternatively, the first parameter can be a MIMEBase subclass, which
-        is inserted directly into the resulting message attachments.
+        If the first parameter is a MIMEBase subclass it is inserted directly
+        into the resulting message attachments.
         """
         if isinstance(filename, MIMEBase):
+            assert content == mimetype == None
             self.attachements.append(filename)
         else:
             assert content is not None
@@ -252,8 +258,21 @@ class EmailMessage(object):
             attachment = MIMEBase(basetype, subtype)
             attachment.set_payload(content)
             Encoders.encode_base64(attachment)
-        attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+        if filename:
+            attachment.add_header('Content-Disposition', 'attachment', filename=filename)
         return attachment
+
+class EmailMultiAlternatives(EmailMessage):
+    """
+    A version of EmailMessage that makes it easy to send multipart/alternative
+    messages. For example, including text and HTML versions of the text is
+    made easier.
+    """
+    multipart_subtype = 'alternative'
+
+    def attach_alternative(self, content, mimetype=None):
+        """Attach an alternative content representation."""
+        self.attach(content=content, mimetype=mimetype)
 
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None):
     """

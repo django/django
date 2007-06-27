@@ -281,6 +281,42 @@ The class has the following methods:
 
         message.attach_file('/images/weather_map.png')
 
+Sending alternative content types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is often useful to include multiple versions of the content in an e-mail.
+For instance, sending both text and HTML versions of an e-mail. You can do
+this using the ``EmailMultiAlternatives`` class. This sub-class of
+``EmailMessage`` has an ``attach_alternative()`` method for including
+extra versions of the message body in the e-mail. All the other methods
+(including the class initialization) are inherited directly from
+``EmailMessage``.
+
+To send a text and HTML combination, you could write::
+
+    from django.core.mail import EmailMultiAlternatives
+
+    subject, from_email, to = ...
+    text_content = "This is an important message."
+    html_content = "<p>This is an <strong>important</strong> message."
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+
+
+By default, the MIME type of the ``body`` parameter in an ``EmailMessage`` is
+``"text/plain"``. It is good practice to leave this alone, since it guarantees
+that any recipient will be able to read the e-mail, regardless of their mail
+client. However, if you are confident that your recipients can handle an
+alternative content type, you can use the ``content_subtype`` attribute on the
+``EmailMessage`` class to change the main content type. The major type will
+always be ``"text"``, but you can change to the subtype. For example::
+
+    msg = EmailMessage(subject, html_content, from_email, to)
+    msg.content_subtype = "html"  # Main content is now text/html
+    msg.send()
+
 SMTP network connections
 -------------------------
 
