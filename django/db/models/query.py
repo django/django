@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import backend, connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals, loading
@@ -22,6 +23,7 @@ QUERY_TERMS = (
     'gt', 'gte', 'lt', 'lte', 'in',
     'startswith', 'istartswith', 'endswith', 'iendswith',
     'range', 'year', 'month', 'day', 'isnull', 'search',
+    'regex', 'iregex',
 )
 
 # Size of each "chunk" for get_iterator calls.
@@ -797,6 +799,15 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
     elif lookup_type == 'search':
         return backend.get_fulltext_search_sql(table_prefix + field_name)
+    elif lookup_type in ('regex', 'iregex'):
+        if settings.DATABASE_ENGINE == 'oracle':
+            if lookup_type == 'regex':
+                match_option = 'c'
+            else:
+                match_option = 'i'
+            return "REGEXP_LIKE(%s%s, %s, '%s')" % (table_prefix, field_name, cast_sql, match_option)
+        else:
+            raise NotImplementedError
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0):

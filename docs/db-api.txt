@@ -1173,6 +1173,48 @@ like ``contains`` but is significantly faster due to full-text indexing.
 Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index.
 
+regex
+~~~~~
+
+Case-sensitive regular expression match.
+
+The regular expression syntax is that of the database backend in use; for the
+``sqlite`` backend, the syntax is that of Python's ``re`` module.
+
+Example::
+
+    Entry.objects.get(title__regex=r'^(An?|The) +')
+
+SQL equivalents::
+
+    SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
+
+    SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
+
+    SELECT ... WHERE title REGEXP '^(An?|The) +'; -- sqlite
+
+Using raw strings for passing in the regular expression syntax is recommended.
+
+Regular expression matching is not supported on the ``ado_mssql`` and
+``oracle`` backends; these will raise a ``NotImplementedError``.
+
+iregex
+~~~~~~
+
+Case-insensitive regular expression match.
+
+Example::
+
+    Entry.objects.get(title__iregex=r'^(an?|the) +')
+
+SQL equivalents::
+
+    SELECT ... WHERE title REGEXP '^(an?|the) +'; -- MySQL
+
+    SELECT ... WHERE title ~* '^(an?|the) +'; -- PostgreSQL
+
+    SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- sqlite
+
 Default lookups are exact
 -------------------------
 
