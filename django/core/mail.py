@@ -171,6 +171,7 @@ class EmailMessage(object):
     """
     content_subtype = 'plain'
     multipart_subtype = 'mixed'
+    encoding = None     # None => use settings default
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None, headers=None):
@@ -189,7 +190,8 @@ class EmailMessage(object):
         return self.connection
 
     def message(self):
-        msg = SafeMIMEText(self.body, self.content_subtype, settings.DEFAULT_CHARSET)
+        encoding = self.encoding or settings.DEFAULT_CHARSET
+        msg = SafeMIMEText(self.body, self.content_subtype, encoding)
         if self.attachments:
             body_msg = msg
             msg = SafeMIMEMultipart(_subtype=self.multipart_subtype)
