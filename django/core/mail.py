@@ -3,10 +3,13 @@ Tools for sending email.
 """
 
 from django.conf import settings
+from email import Charset, Encoders
 from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
 from email.Header import Header
 from email.Utils import formatdate
-from email import Charset
+import mimetypes
 import os
 import smtplib
 import socket
@@ -16,6 +19,10 @@ import random
 # Don't BASE64-encode UTF-8 messages so that we avoid unwanted attention from
 # some spam filters.
 Charset.add_charset('utf-8', Charset.SHORTEST, Charset.QP, 'utf-8')
+
+# Default MIME type to use on attachments (if it is not explicitly given
+# and cannot be guessed).
+DEFAULT_ATTACHMENT_MIME_TYPE = 'application/octet-stream'
 
 # Cache the hostname, but do it lazily: socket.getfqdn() can take a couple of
 # seconds, which slows down the restart of the server.
@@ -55,14 +62,22 @@ def make_msgid(idstring=None):
 class BadHeaderError(ValueError):
     pass
 
-class SafeMIMEText(MIMEText):
+class SafeHeaderMixin(object):
     def __setitem__(self, name, val):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
         if name == "Subject":
             val = Header(val, settings.DEFAULT_CHARSET)
-        MIMEText.__setitem__(self, name, val)
+        # Note: using super() here is safe; any __setitem__ overrides must use
+        # the same argument signature.
+        super(SafeHeaderMixin, self).__setitem__(name, val)
+
+class SafeMIMEText(MIMEText, SafeHeaderMixin):
+    pass
+
+class SafeMIMEMultipart(MIMEMultipart, SafeHeaderMixin):
+    pass
 
 class SMTPConnection(object):
     """
@@ -154,12 +169,14 @@ class EmailMessage(object):
     """
     A container for email information.
     """
-    def __init__(self, subject='', body='', from_email=None, to=None, bcc=None, connection=None):
+    def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
+            connection=None, attachments=None):
         self.to = to or []
         self.bcc = bcc or []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
+        self.attachments = attachments or []
         self.connection = connection
 
     def get_connection(self, fail_silently=False):
@@ -169,6 +186,16 @@ class EmailMessage(object):
 
     def message(self):
         msg = SafeMIMEText(self.body, 'plain', settings.DEFAULT_CHARSET)
+        if self.attachments:
+            body_msg = msg
+            msg = SafeMIMEMultipart()
+            if self.body:
+                msg.attach(body_msg)
+            for attachment in self.attachments:
+                if isinstance(attachment, MIMEBase):
+                    msg.attach(attachment)
+                else:
+                    msg.attach(self._create_attachment(*attachment))
         msg['Subject'] = self.subject
         msg['From'] = self.from_email
         msg['To'] = ', '.join(self.to)
@@ -188,6 +215,45 @@ class EmailMessage(object):
     def send(self, fail_silently=False):
         """Send the email message."""
         return self.get_connection(fail_silently).send_messages([self])
+
+    def attach(self, filename, content=None, mimetype=None):
+        """
+        Attaches a file with the given filename and content.
+
+        Alternatively, the first parameter can be a MIMEBase subclass, which
+        is inserted directly into the resulting message attachments.
+        """
+        if isinstance(filename, MIMEBase):
+            self.attachements.append(filename)
+        else:
+            assert content is not None
+            self.attachments.append((filename, content, mimetype))
+
+    def attach_file(self, path, mimetype=None):
+        """Attaches a file from the filesystem."""
+        filename = os.path.basename(path)
+        content = open(path, 'rb').read()
+        self.attach(filename, content, mimetype)
+
+    def _create_attachment(self, filename, content, mimetype=None):
+        """
+        Convert the filename, content, mimetype triple into a MIME attachment
+        object.
+        """
+        if mimetype is None:
+            mimetype, _ = mimetypes.guess_type(filename)
+            if mimetype is None:
+                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+        basetype, subtype = mimetype.split('/', 1)
+        if basetype == 'text':
+            attachment = SafeMIMEText(content, subtype, settings.DEFAULT_CHARSET)
+        else:
+            # Encode non-text attachments with base64.
+            attachment = MIMEBase(basetype, subtype)
+            attachment.set_payload(content)
+            Encoders.encode_base64(attachment)
+        attachment.add_header('Content-Disposition', 'attachment', filename=filename)
+        return attachment
 
 def send_mail(subject, message, from_email, recipient_list, fail_silently=False, auth_user=None, auth_password=None):
     """
