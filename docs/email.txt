@@ -249,7 +249,7 @@ For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
                 ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                headers = {'Reply-To: 'another@example.com'})
+                headers = {'Reply-To': 'another@example.com'})
 
 The class has the following methods:
 
