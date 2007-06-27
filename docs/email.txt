@@ -303,8 +303,6 @@ To send a text and HTML combination, you could write::
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
-
-
 By default, the MIME type of the ``body`` parameter in an ``EmailMessage`` is
 ``"text/plain"``. It is good practice to leave this alone, since it guarantees
 that any recipient will be able to read the e-mail, regardless of their mail
