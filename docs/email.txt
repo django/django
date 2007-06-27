@@ -207,9 +207,6 @@ e-mail, you can subclass these two classes to suit your needs.
     move to a more object-oriented design for e-mail messages and retain the
     original functions only for backwards compatibility.
 
-    If you need to add new functionality to the e-mail infrastrcture,
-    sub-classing the ``EmailMessage`` class should make this a simple task.
-
 In general, ``EmailMessage`` is responsible for creating the e-mail message
 itself. ``SMTPConnection`` is responsible for the network connection side of
 the operation. This means you can reuse the same connection (an
