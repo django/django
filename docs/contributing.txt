@@ -427,18 +427,19 @@ documentation:
 	* **Web**, **World Wide Web**, **the Web** -- note Web is always
 	  capitalized when referring to the World Wide Web.
 
-    * **Web site** -- two words, with Web capitalized.
+    * **Web site** -- use two words, with Web capitalized.
 
 Django-specific terminology
 ---------------------------
 
-	* **model** -- not capitalized.
+	* **model** -- it's not capitalized.
 
-	* **template** -- not capitalized.
+	* **template** -- it's not capitalized.
 
-	* **URLconf** -- three capitalized letters, no space before "conf."
+	* **URLconf** -- use three capitalized letters, with no space before
+	  "conf."
 
-	* **view** -- not capitalized.
+	* **view** -- it's not capitalized.
 
 Committing code
 ===============
