@@ -410,10 +410,16 @@ documentation:
 
 	* **e-mail** -- it has a hyphen.
 
+	* **MySQL**
+
+	* **PostgreSQL**
+
 	* **Python** -- when referring to the language, capitalize Python.
 
 	* **Realize**, **customize**, **initialize**, etc. -- use the American
 	  "ize" suffix, not "ise."
+
+	* **SQLite**
 
 	* **Web**, **World Wide Web**, **the Web** -- note Web is always
 	  capitalized when referring to the World Wide Web.
