@@ -1176,10 +1176,13 @@ database to add the full-text index.
 regex
 ~~~~~
 
+**New in Django development version**
+
 Case-sensitive regular expression match.
 
-The regular expression syntax is that of the database backend in use; for the
-``sqlite`` backend, the syntax is that of Python's ``re`` module.
+The regular expression syntax is that of the database backend in use. In the
+case of SQLite, which doesn't natively support regular-expression lookups, the
+syntax is that of Python's ``re`` module.
 
 Example::
 
@@ -1193,15 +1196,18 @@ SQL equivalents::
 
     SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
 
-    SELECT ... WHERE title REGEXP '^(An?|The) +'; -- sqlite
+    SELECT ... WHERE title REGEXP '^(An?|The) +'; -- SQLite
 
-Using raw strings for passing in the regular expression syntax is recommended.
+Using raw strings (e.g., ``r'foo'`` instead of ``'foo'``) for passing in the
+regular expression syntax is recommended.
 
-Regular expression matching is not supported on the ``ado_mssql`` backend; it
-will raise a ``NotImplementedError``.
+Regular expression matching is not supported on the ``ado_mssql`` backend.
+It will raise a ``NotImplementedError`` at runtime.
 
 iregex
 ~~~~~~
+
+**New in Django development version**
 
 Case-insensitive regular expression match.
 
@@ -1217,7 +1223,7 @@ SQL equivalents::
 
     SELECT ... WHERE title ~* '^(an?|the) +'; -- PostgreSQL
 
-    SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- sqlite
+    SELECT ... WHERE title REGEXP '(?i)^(an?|the) +'; -- SQLite
 
 Default lookups are exact
 -------------------------
