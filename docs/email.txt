@@ -300,32 +300,33 @@ The class has the following methods:
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is often useful to include multiple versions of the content in an e-mail.
-For instance, sending both text and HTML versions of an e-mail. You can do
-this using the ``EmailMultiAlternatives`` class. This sub-class of
-``EmailMessage`` has an ``attach_alternative()`` method for including
-extra versions of the message body in the e-mail. All the other methods
-(including the class initialization) are inherited directly from
+It can be useful to include multiple versions of the content in an e-mail;
+the classic example is to send both text and HTML versions of a message. With
+Django's e-mail library, you can do this using the ``EmailMultiAlternatives``
+class. This subclass of ``EmailMessage`` has an ``attach_alternative()`` method
+for including extra versions of the message body in the e-mail. All the other
+methods (including the class initialization) are inherited directly from
 ``EmailMessage``.
 
 To send a text and HTML combination, you could write::
 
     from django.core.mail import EmailMultiAlternatives
 
-    subject, from_email, to = ...
-    text_content = "This is an important message."
-    html_content = "<p>This is an <strong>important</strong> message."
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    text_content = 'This is an important message.'
+    html_content = '<p>This is an <strong>important</strong> message.'
     msg = EmailMultiAlternatives(subject, text_content, from_email, to)
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 
 By default, the MIME type of the ``body`` parameter in an ``EmailMessage`` is
-``"text/plain"``. It is good practice to leave this alone, since it guarantees
-that any recipient will be able to read the e-mail, regardless of their mail
-client. However, if you are confident that your recipients can handle an
-alternative content type, you can use the ``content_subtype`` attribute on the
-``EmailMessage`` class to change the main content type. The major type will
-always be ``"text"``, but you can change to the subtype. For example::
+``"text/plain"``. It is good practice to leave this alone, because it
+guarantees that any recipient will be able to read the e-mail, regardless of
+their mail client. However, if you are confident that your recipients can
+handle an alternative content type, you can use the ``content_subtype``
+attribute on the ``EmailMessage`` class to change the main content type. The
+major type will always be ``"text"``, but you can change it to the subtype. For
+example::
 
     msg = EmailMessage(subject, html_content, from_email, to)
     msg.content_subtype = "html"  # Main content is now text/html
