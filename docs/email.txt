@@ -203,7 +203,7 @@ e-mail, you can subclass these two classes to suit your needs.
 
     This is a design feature. ``send_mail()`` and related functions were
     originally the only interface Django provided. However, the list of
-    parameters they accepted was slowly growing over time.  It made sense to
+    parameters they accepted was slowly growing over time. It made sense to
     move to a more object-oriented design for e-mail messages and retain the
     original functions only for backwards compatibility.
 
@@ -213,7 +213,7 @@ the operation. This means you can reuse the same connection (an
 ``SMTPConnection`` instance) for multiple messages.
 
 E-mail messages
-----------------
+---------------
 
 The ``EmailMessage`` class is initialized with the following parameters (in
 the given order, if positional arguments are used). All parameters are
@@ -274,13 +274,13 @@ The class has the following methods:
     * ``attach()`` creates a new file attachment and adds it to the message.
       There are two ways to call ``attach()``:
 
-       * You can pass it a single argument which is an
+       * You can pass it a single argument that is an
          ``email.MIMBase.MIMEBase`` instance. This will be inserted directly
          into the resulting message.
 
        * Alternatively, you can pass ``attach()`` three arguments:
          ``filename``, ``content`` and ``mimetype``. ``filename`` is the name
-         of the file attachment as it will appear in the email, ``content`` is
+         of the file attachment as it will appear in the e-mail, ``content`` is
          the data that will be contained inside the attachment and
          ``mimetype`` is the optional MIME type for the attachment. If you
          omit ``mimetype``, the MIME content type will be guessed from the
@@ -298,7 +298,7 @@ The class has the following methods:
         message.attach_file('/images/weather_map.png')
 
 Sending alternative content types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is often useful to include multiple versions of the content in an e-mail.
 For instance, sending both text and HTML versions of an e-mail. You can do
@@ -332,7 +332,7 @@ always be ``"text"``, but you can change to the subtype. For example::
     msg.send()
 
 SMTP network connections
--------------------------
+------------------------
 
 The ``SMTPConnection`` class is initialized with the host, port, username and
 password for the SMTP server. If you don't specify one or more of those
