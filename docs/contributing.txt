@@ -416,7 +416,7 @@ documentation:
 
 	* **Python** -- when referring to the language, capitalize Python.
 
-	* **Realize**, **customize**, **initialize**, etc. -- use the American
+	* **realize**, **customize**, **initialize**, etc. -- use the American
 	  "ize" suffix, not "ise."
 
 	* **SQLite**
