@@ -382,6 +382,55 @@ Model style
               ('F', 'Female'),
           )
 
+Documentation style
+===================
+
+We place a high importance on consistency and readability of documentation.
+(After all, Django was created in a journalism environment!)
+
+Guidelines for ReST files
+-------------------------
+
+These guidelines regulate the format of our ReST documentation:
+
+	* In section titles, capitalize only initial words and proper nouns.
+
+	* Wrap the documentation at 80 characters wide, unless a code example
+	  is significantly less readable when split over two lines, or for another
+	  good reason.
+
+Commonly used terms
+-------------------
+
+Here are some style guidelines on commonly used terms throughout the
+documentation:
+
+	* **Django** -- when referring to the framework, capitalize Django. It is
+	  lowercase only in Python code and in the djangoproject.com logo.
+
+	* **e-mail** -- it has a hyphen.
+
+	* **Python** -- when referring to the language, capitalize Python.
+
+	* **Realize**, **customize**, **initialize**, etc. -- use the American
+	  "ize" suffix, not "ise."
+
+	* **Web**, **World Wide Web**, **the Web** -- note Web is always
+	  capitalized when referring to the World Wide Web.
+
+    * **Web site** -- two words, with Web capitalized.
+
+Django-specific terminology
+---------------------------
+
+	* **model** -- not capitalized.
+
+	* **template** -- not capitalized.
+
+	* **URLconf** -- three capitalized letters, no space before "conf."
+
+	* **view** -- not capitalized.
+
 Committing code
 ===============
 
