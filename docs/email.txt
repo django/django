@@ -241,7 +241,7 @@ optional and can be set at any time prior to calling the ``send()`` method.
       content, mimetype)`` triples.
 
     * ``headers``: A dictionary of extra headers to put on the message. The
-      keys are the header name, values are the header values. It is up to the
+      keys are the header name, values are the header values. It's up to the
       caller to ensure header names and values are in the correct format for
       an e-mail message.
 
@@ -258,15 +258,15 @@ The class has the following methods:
       if none already exists.
 
     * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
-      sub-class of Python's ``email.MIMEText.MIMEText`` class) or a
+      subclass of Python's ``email.MIMEText.MIMEText`` class) or a
       ``django.core.mail.SafeMIMEMultipart`` object holding the
-      message to be sent. If you ever need to extend the `EmailMessage` class,
-      you'll probably want to override this method to put the content you wish
+      message to be sent. If you ever need to extend the ``EmailMessage`` class,
+      you'll probably want to override this method to put the content you want
       into the MIME object.
 
     * ``recipients()`` returns a list of all the recipients of the message,
       whether they're recorded in the ``to`` or ``bcc`` attributes. This is
-      another method you might need to override when sub-classing, because the
+      another method you might need to override when subclassing, because the
       SMTP server needs to be told the full list of recipients when the message
       is sent. If you add another way to specify recipients in your class, they
       need to be returned from this method as well.
