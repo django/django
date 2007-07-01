@@ -175,7 +175,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'regex', 'iregex', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -801,6 +801,7 @@ class IntegerField(Field):
         return super(IntegerField, self).formfield(**defaults)
 
 class IPAddressField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 15
         Field.__init__(self, *args, **kwargs)

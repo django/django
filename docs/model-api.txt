@@ -493,9 +493,9 @@ possible values for "no data;" Django convention is to use the empty
 string, not ``NULL``.
 
 .. note::
-    Due to database limitations, when using the Oracle backend the
-    ``null=True`` option will be coerced for string-based fields that can
-    blank, and the value ``NULL`` will be stored to denote the empty string.
+    When using the Oracle database backend, the ``null=True`` option will
+    be coerced for string-based fields that can blank, and the value
+    ``NULL`` will be stored to denote the empty string.
 
 ``blank``
 ~~~~~~~~~
@@ -594,9 +594,12 @@ statement for this field.
 ``db_tablespace``
 ~~~~~~~~~~~~~~~~~
 
-If this field is indexed, the name of the database tablespace to use for the
-index. The default is the ``db_tablespace`` of the model, if any. If the
-backend doesn't support tablespaces, this option is ignored.
+**New in Django development version**
+
+The name of the database tablespace to use for this field's index, if
+indeed this field is indexed. The default is the ``db_tablespace`` of
+the model, if any. If the backend doesn't support tablespaces, this
+option is ignored.
 
 ``default``
 ~~~~~~~~~~~
@@ -1010,6 +1013,8 @@ that's OK. Django quotes column and table names behind the scenes.
 
 ``db_tablespace``
 -----------------
+
+**New in Django development version**
 
 The name of the database tablespace to use for the model. If the backend
 doesn't support tablespaces, this option is ignored.

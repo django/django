@@ -360,7 +360,7 @@ Note the following:
       quotes. The author of this tutorial runs PostgreSQL, so the example
       output is in PostgreSQL syntax.
 
-    * The `sql` command doesn't actually run the SQL in your database - it just
+    * The ``sql`` command doesn't actually run the SQL in your database - it just
       prints it to the screen so that you can see what SQL Django thinks is required.
       If you wanted to, you could copy and paste this SQL into your database prompt.
       However, as we will see shortly, Django provides an easier way of committing

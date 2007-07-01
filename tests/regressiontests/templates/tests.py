@@ -225,6 +225,9 @@ class Templates(unittest.TestCase):
             # in the final output.
             'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'),
 
+            # Numbers as filter arguments should work
+            'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
+
             ### COMMENT SYNTAX ########################################################
             'comment-syntax01': ("{# this is hidden #}hello", {}, "hello"),
             'comment-syntax02': ("{# this is hidden #}hello{# foo #}", {}, "hello"),
