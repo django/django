@@ -48,7 +48,7 @@ class BaseFormSet(object):
             self.management_form = ManagementForm(initial={FORM_COUNT_FIELD_NAME: self.total_forms}, auto_id=self.auto_id, prefix=self.prefix)
 
     def _get_add_forms(self):
-        """Return a list of all the change forms in this ``FormSet``."""
+        """Return a list of all the add forms in this ``FormSet``."""
         Form = self.form_class
         if not hasattr(self, '_add_forms'):
             add_forms = []
