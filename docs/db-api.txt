@@ -1831,7 +1831,7 @@ use the default manager, or if you want to search a list of related objects,
 you can provide ``get_object_or_404()`` with a manager object instead.
 For example::
 
-    # Get the author of blog instance `e` with a name of 'Fred'
+    # Get the author of blog instance e with a name of 'Fred'
     a = get_object_or_404(e.authors, name='Fred')
 
     # Use a custom manager 'recent_entries' in the search for an
