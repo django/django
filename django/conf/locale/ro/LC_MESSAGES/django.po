@@ -23,13 +23,13 @@ msgstr "id obiect"
 
 #: contrib/comments/models.py:68
 msgid "headline"
-msgstr ""
+msgstr "titlu"
 
 #: contrib/comments/models.py:69 contrib/comments/models.py:90
 #: contrib/comments/models.py:167
 #, fuzzy
 msgid "comment"
-msgstr "conţinut"
+msgstr "comentariu"
 
 #: contrib/comments/models.py:70
 msgid "rating #1"
@@ -69,20 +69,19 @@ msgstr ""
 
 #: contrib/comments/models.py:83 contrib/comments/models.py:169
 msgid "date/time submitted"
-msgstr ""
+msgstr "data/ora crearii"
 
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
-msgstr ""
+msgstr "public"
 
 #: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
-#, fuzzy
 msgid "IP address"
-msgstr "adresa email"
+msgstr "adresa ip"
 
 #: contrib/comments/models.py:86
 msgid "is removed"
-msgstr ""
+msgstr "sters"
 
 #: contrib/comments/models.py:86
 msgid ""
@@ -122,7 +121,7 @@ msgstr "adresa email"
 
 #: contrib/comments/models.py:173
 msgid "approved by staff"
-msgstr ""
+msgstr "aprobat de echipa"
 
 #: contrib/comments/models.py:176
 #, fuzzy
@@ -282,9 +281,8 @@ msgid "Password:"
 msgstr "Parola:"
 
 #: contrib/comments/templates/comments/form.html:6
-#, fuzzy
 msgid "Forgotten your password?"
-msgstr "Schimbă-mi parola"
+msgstr "Ai uitat parola?"
 
 #: contrib/comments/templates/comments/form.html:8
 #: contrib/admin/templates/admin/object_history.html:3
@@ -338,9 +336,8 @@ msgid "Preview comment"
 msgstr "permite comentarii"
 
 #: contrib/comments/templates/comments/freeform.html:4
-#, fuzzy
 msgid "Your name:"
-msgstr "nume utilizator"
+msgstr "numele dumneavoastra"
 
 #: contrib/admin/filterspecs.py:40
 #, python-format
@@ -352,41 +349,39 @@ msgstr ""
 #: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
 #: contrib/admin/filterspecs.py:143
 msgid "All"
-msgstr ""
+msgstr "tot"
 
 #: contrib/admin/filterspecs.py:109
 msgid "Any date"
-msgstr ""
+msgstr "orice data"
 
 #: contrib/admin/filterspecs.py:110
-#, fuzzy
 msgid "Today"
-msgstr "Luni"
+msgstr "Astazi"
 
 #: contrib/admin/filterspecs.py:113
 msgid "Past 7 days"
-msgstr ""
+msgstr "Ultimele 7 zile"
 
 #: contrib/admin/filterspecs.py:115
 msgid "This month"
-msgstr ""
+msgstr "Luna aceasta"
 
 #: contrib/admin/filterspecs.py:117
 msgid "This year"
-msgstr ""
+msgstr "Anul acesta"
 
 #: contrib/admin/filterspecs.py:143
 msgid "Yes"
-msgstr ""
+msgstr "Da"
 
 #: contrib/admin/filterspecs.py:143
-#, fuzzy
 msgid "No"
-msgstr "Noi."
+msgstr "Nu"
 
 #: contrib/admin/filterspecs.py:150
 msgid "Unknown"
-msgstr ""
+msgstr "Necunoscut"
 
 #: contrib/admin/models.py:16
 msgid "action time"
@@ -418,7 +413,7 @@ msgstr "intrări log"
 
 #: contrib/admin/templatetags/admin_list.py:228
 msgid "All dates"
-msgstr ""
+msgstr "Toate datele"
 
 #: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
 #: contrib/auth/forms.py:41
@@ -426,6 +421,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
+"Va rugam sa introduceti username-ul si parola corecta. Aveti grija deoarece"
+"casutele sunt case sensitive."
 
 #: contrib/admin/views/decorators.py:23
 #: contrib/admin/templates/admin/login.html:25
@@ -437,16 +434,21 @@ msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
+"Va rugam sa va inregistrati din nou, deoarece sesiunea a expirat. Nu va "
+"faceti griji datele au fost salvate."
 
 #: contrib/admin/views/decorators.py:68
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
+"Se pare ca browserul dumneavostra nu este configurat sa accepte cookies. Va "
+"rugam sa va setati browserul sa accepte cookies, dati un reload la pagina si "
+"incercati din nou."
 
 #: contrib/admin/views/decorators.py:82
 msgid "Usernames cannot contain the '@' character."
-msgstr ""
+msgstr "Username-ul nu are voie sa contina caracterul '@'."
 
 #: contrib/admin/views/decorators.py:84
 #, python-format
@@ -461,61 +463,62 @@ msgstr "Administrare Django"
 #: contrib/admin/views/main.py:260
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" a fost inserat cu succes."
 
 #: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
 msgid "You may edit it again below."
-msgstr ""
+msgstr "Va puteti edita datele din nou mai jos."
 
 #: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
 #, python-format
 msgid "You may add another %s below."
-msgstr ""
+msgstr "Mai puteti adauga un alt %s mai jos."
 
 #: contrib/admin/views/main.py:290
-#, fuzzy, python-format
+#, python-format
 msgid "Add %s"
-msgstr "Adaugă"
+msgstr "Adaugă %s"
 
 #: contrib/admin/views/main.py:336
 #, python-format
 msgid "Added %s."
-msgstr ""
+msgstr "Adaugat %s."
 
 #: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
 #: contrib/admin/views/main.py:340
 msgid "and"
-msgstr ""
+msgstr "si"
 
 #: contrib/admin/views/main.py:338
-#, fuzzy, python-format
+#, python-format
 msgid "Changed %s."
-msgstr "Schimbă"
+msgstr "Schimbă %s."
 
 #: contrib/admin/views/main.py:340
 #, python-format
 msgid "Deleted %s."
-msgstr ""
+msgstr "Am sters %s."
 
 #: contrib/admin/views/main.py:343
 msgid "No fields changed."
-msgstr ""
+msgstr "Nu s-a facut nicio schimbare."
 
 #: contrib/admin/views/main.py:346
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" au fost modificate cu succes."
 
 #: contrib/admin/views/main.py:354
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
+"%(name)s \"%(obj)s\" au fost adaugate cu succes. Le puteti edita mai jos."
 
 #: contrib/admin/views/main.py:392
-#, fuzzy, python-format
+#, python-format
 msgid "Change %s"
-msgstr "Schimbă"
+msgstr "Schimbă %s"
 
 #: contrib/admin/views/main.py:470
 #, python-format
@@ -530,16 +533,16 @@ msgstr ""
 #: contrib/admin/views/main.py:508
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" au fost sterse cu succes."
 
 #: contrib/admin/views/main.py:511
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sunteti sigur?"
 
 #: contrib/admin/views/main.py:533
-#, fuzzy, python-format
+#, python-format
 msgid "Change history: %s"
-msgstr "Schimbă parola"
+msgstr "Schimbari facute: %s"
 
 #: contrib/admin/views/main.py:565
 #, python-format
@@ -549,13 +552,13 @@ msgstr ""
 #: contrib/admin/views/main.py:565
 #, python-format
 msgid "Select %s to change"
-msgstr ""
+msgstr "Selecteaza %s pentru schimbare"
 
 #: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
 #: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
 #: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
 msgid "Integer"
-msgstr ""
+msgstr "Intreg"
 
 #: contrib/admin/views/doc.py:278
 msgid "Boolean (Either True or False)"
@@ -564,26 +567,23 @@ msgstr ""
 #: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
 #, python-format
 msgid "String (up to %(maxlength)s)"
-msgstr ""
+msgstr "String (pana la %(maxlength)s caractere)"
 
 #: contrib/admin/views/doc.py:280
 msgid "Comma-separated integers"
 msgstr ""
 
 #: contrib/admin/views/doc.py:281
-#, fuzzy
 msgid "Date (without time)"
-msgstr "timp acţiune"
+msgstr "Data (fara ora)"
 
 #: contrib/admin/views/doc.py:282
-#, fuzzy
 msgid "Date (with time)"
-msgstr "Dată/oră"
+msgstr "Data (cu ora)"
 
 #: contrib/admin/views/doc.py:283
-#, fuzzy
 msgid "E-mail address"
-msgstr "Adresa email:"
+msgstr "Adresa email"
 
 #: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
 msgid "File path"
@@ -603,9 +603,8 @@ msgid "Relation to parent model"
 msgstr ""
 
 #: contrib/admin/views/doc.py:293
-#, fuzzy
 msgid "Phone number"
-msgstr "Introduceţi un număr întreg."
+msgstr "Numar de telefon"
 
 #: contrib/admin/views/doc.py:298
 msgid "Text"
@@ -613,7 +612,7 @@ msgstr ""
 
 #: contrib/admin/views/doc.py:299
 msgid "Time"
-msgstr ""
+msgstr "Timp"
 
 #: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
 msgid "URL"
@@ -636,7 +635,7 @@ msgstr ""
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Documentation"
-msgstr ""
+msgstr "Documentatie"
 
 #: contrib/admin/templates/admin/object_history.html:3
 #: contrib/admin/templates/admin/change_list.html:5
@@ -770,9 +769,9 @@ msgid "None available"
 msgstr "Indisponibil"
 
 #: contrib/admin/templates/admin/change_list.html:11
-#, fuzzy, python-format
+#, python-format
 msgid "Add %(name)s"
-msgstr "Adaugă"
+msgstr "Adaugă %(name)s"
 
 #: contrib/admin/templates/admin/login.html:22
 msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
@@ -785,7 +784,7 @@ msgstr "Bine ai venit,"
 #: contrib/admin/templates/admin/delete_confirmation.html:9
 #: contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
-msgstr ""
+msgstr "Sterge"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
@@ -814,7 +813,7 @@ msgstr "Da, sînt sigur"
 #: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(title)s "
-msgstr ""
+msgstr " Dupa %(title)s "
 
 #: contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
@@ -827,33 +826,32 @@ msgstr ""
 #: contrib/admin/templates/admin/change_form.html:30
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Va rugam sa corectati eroarea de mai jos"
+msgstr[1] "Va rugam sa corectati erorile de mai jos"
 
 #: contrib/admin/templates/admin/change_form.html:48
 msgid "Ordering"
-msgstr ""
+msgstr "Ordonate dupa"
 
 #: contrib/admin/templates/admin/change_form.html:51
 msgid "Order:"
-msgstr ""
+msgstr "Ordonare:"
 
 #: contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
-msgstr ""
+msgstr "Salvati ca nou"
 
 #: contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
-msgstr ""
+msgstr "Salvati si adaugati altul"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr ""
+msgstr "Salvati si continuati"
 
 #: contrib/admin/templates/admin/submit_line.html:7
-#, fuzzy
 msgid "Save"
-msgstr "activ"
+msgstr "Salveaza"
 
 #: contrib/admin/templates/registration/password_change_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
@@ -1133,24 +1131,20 @@ msgid "codename"
 msgstr "nume cod"
 
 #: contrib/auth/models.py:17
-#, fuzzy
 msgid "permission"
-msgstr "Permisiune"
+msgstr "permisiune"
 
 #: contrib/auth/models.py:18 contrib/auth/models.py:27
-#, fuzzy
 msgid "permissions"
-msgstr "Permisiuni"
+msgstr "permisiuni"
 
 #: contrib/auth/models.py:29
-#, fuzzy
 msgid "group"
-msgstr "Grup"
+msgstr "grup"
 
 #: contrib/auth/models.py:30 contrib/auth/models.py:65
-#, fuzzy
 msgid "groups"
-msgstr "Grupuri"
+msgstr "grupuri"
 
 #: contrib/auth/models.py:55
 msgid "username"
@@ -1209,19 +1203,16 @@ msgstr ""
 "permisiunile alocate fiecărui grup din care el/ea face parte."
 
 #: contrib/auth/models.py:67
-#, fuzzy
 msgid "user permissions"
-msgstr "Permisiuni"
+msgstr "permisiuni utilizator"
 
 #: contrib/auth/models.py:70
-#, fuzzy
 msgid "user"
-msgstr "Utilizator"
+msgstr "utilizator"
 
 #: contrib/auth/models.py:71
-#, fuzzy
 msgid "users"
-msgstr "Utilizatori"
+msgstr "utilizatori"
 
 #: contrib/auth/models.py:76
 msgid "Personal info"
@@ -1240,15 +1231,16 @@ msgid "Groups"
 msgstr "Grupuri"
 
 #: contrib/auth/models.py:219
-#, fuzzy
 msgid "message"
-msgstr "Mesaj"
+msgstr "mesaj"
 
 #: contrib/auth/forms.py:30
 msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
+"Se pare ca browserul dumneavoastra nu suporta cookies. Aveti nevoie de un "
+"browser care suporta cookies ca sa va logati."
 
 #: contrib/contenttypes/models.py:25
 #, fuzzy
@@ -1277,7 +1269,7 @@ msgstr "data expirare"
 
 #: contrib/sessions/models.py:41
 msgid "session"
-msgstr "seiune"
+msgstr "sesiune"
 
 #: contrib/sessions/models.py:42
 msgid "sessions"
@@ -1389,7 +1381,7 @@ msgstr "Decembrie"
 
 #: utils/dates.py:19
 msgid "jan"
-msgstr ""
+msgstr "ian"
 
 #: utils/dates.py:19
 msgid "feb"
@@ -1404,17 +1396,16 @@ msgid "apr"
 msgstr ""
 
 #: utils/dates.py:19
-#, fuzzy
 msgid "may"
-msgstr "Mai"
+msgstr "mai"
 
 #: utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "iun"
 
 #: utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "iul"
 
 #: utils/dates.py:20
 msgid "aug"
@@ -1430,7 +1421,7 @@ msgstr ""
 
 #: utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "noi"
 
 #: utils/dates.py:20
 msgid "dec"
@@ -1467,40 +1458,38 @@ msgstr "Dec."
 #: utils/timesince.py:12
 msgid "year"
 msgid_plural "years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "an"
+msgstr[1] "ani"
 
 #: utils/timesince.py:13
 msgid "month"
 msgid_plural "months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "luna"
+msgstr[1] "luni"
 
 #: utils/timesince.py:14
 msgid "week"
 msgid_plural "weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "saptamana"
+msgstr[1] "saptamani"
 
 #: utils/timesince.py:15
-#, fuzzy
 msgid "day"
 msgid_plural "days"
-msgstr[0] "Mai"
-msgstr[1] "Mai"
+msgstr[0] "zi"
+msgstr[1] "zile"
 
 #: utils/timesince.py:16
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ora"
+msgstr[1] "ore"
 
 #: utils/timesince.py:17
-#, fuzzy
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] "sit"
-msgstr[1] "sit"
+msgstr[0] "minut"
+msgstr[1] "minute"
 
 #: conf/global_settings.py:37
 msgid "Bengali"
@@ -1545,7 +1534,7 @@ msgstr "Galiciană"
 
 #: conf/global_settings.py:47
 msgid "Hungarian"
-msgstr ""
+msgstr "Ungara"
 
 #: conf/global_settings.py:48
 msgid "Hebrew"
@@ -1577,7 +1566,7 @@ msgstr "Braziliană"
 
 #: conf/global_settings.py:55
 msgid "Romanian"
-msgstr ""
+msgstr "Romana"
 
 #: conf/global_settings.py:56
 msgid "Russian"
@@ -1750,7 +1739,7 @@ msgstr[1] "Îngrijiţi-vă limbajul! Cuvintele %s nu sînt permise aici."
 #: core/validators.py:236
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr ""
+msgstr "Acest camp trebuie sa fie identic cu '%s'."
 
 #: core/validators.py:255
 #, fuzzy
@@ -1897,9 +1886,8 @@ msgstr ""
 #: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
 #: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
 #: forms/__init__.py:346
-#, fuzzy
 msgid "This field is required."
-msgstr "Cîmpul este invalid."
+msgstr "Campul acesta trebuie completat obligatoriu."
 
 #: db/models/fields/__init__.py:337
 #, fuzzy
@@ -1917,14 +1905,13 @@ msgid "This field cannot be null."
 msgstr "Cîmpul este invalid."
 
 #: db/models/fields/__init__.py:562
-#, fuzzy
 msgid "Enter a valid filename."
-msgstr "Introduceţi o adresă de email validă."
+msgstr "Introduceti un nume de fisier valid."
 
 #: db/models/fields/related.py:43
-#, fuzzy, python-format
+#, python-format
 msgid "Please enter a valid %s."
-msgstr "Introduceţi vă rog o adresă IP validă."
+msgstr "Introduceti va rog un %s valid."
 
 #: db/models/fields/related.py:579
 #, fuzzy
@@ -1953,6 +1940,7 @@ msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] ""
 msgstr[1] ""
+"Va rugam asigurati-va ca textul dumneavoastra are mai putin de %s caractere."
 
 #: forms/__init__.py:385
 #, fuzzy
@@ -1966,7 +1954,7 @@ msgstr ""
 
 #: forms/__init__.py:645
 msgid "The submitted file is empty."
-msgstr ""
+msgstr "Fisierul uploadat este gol"
 
 #: forms/__init__.py:699
 #, fuzzy
@@ -1985,7 +1973,7 @@ msgstr "Introduceţi un număr întreg."
 
 #: template/defaultfilters.py:379
 msgid "yes,no,maybe"
-msgstr ""
+msgstr "da,nu,poate"
 
 #, fuzzy
 #~ msgid "Comments"

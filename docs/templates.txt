@@ -1266,7 +1266,8 @@ Converts URLs in plain text into clickable links.
 urlizetrunc
 ~~~~~~~~~~~
 
-Converts URLs into clickable links, truncating URLs to the given character limit.
+Converts URLs into clickable links, truncating URLs longer than the given
+character limit.
 
 **Argument:** Length to truncate URLs to
 

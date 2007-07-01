@@ -28,7 +28,7 @@ The following changes may require you to update your code when you switch from
 
 Due to a bug in older versions of the ``MySQLdb`` Python module (which
 Django uses to connect to MySQL databases), Django's MySQL backend now
-requires version 1.2.1p2 or higher of `MySQLdb`, and will raise
+requires version 1.2.1p2 or higher of ``MySQLdb``, and will raise
 exceptions if you attempt to use an older version.
 
 If you're currently unable to upgrade your copy of ``MySQLdb`` to meet

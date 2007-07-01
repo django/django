@@ -72,12 +72,17 @@ class Field(object):
         maxlength=None, unique=False, blank=False, null=False, db_index=False,
         core=False, rel=None, default=NOT_PROVIDED, editable=True, serialize=True,
         unique_for_date=None, unique_for_month=None, unique_for_year=None,
-        validator_list=None, choices=None, radio_admin=None, help_text='', db_column=None):
+        validator_list=None, choices=None, radio_admin=None, help_text='', db_column=None,
+        db_tablespace=None):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
         self.maxlength, self.unique = maxlength, unique
         self.blank, self.null = blank, null
+        # Oracle treats the empty string ('') as null, so coerce the null
+        # option whenever '' is a possible value.
+        if self.empty_strings_allowed and settings.DATABASE_ENGINE == 'oracle':
+            self.null = True
         self.core, self.rel, self.default = core, rel, default
         self.editable = editable
         self.serialize = serialize
@@ -88,6 +93,7 @@ class Field(object):
         self.radio_admin = radio_admin
         self.help_text = help_text
         self.db_column = db_column
+        self.db_tablespace = db_tablespace
 
         # Set db_index to True if the field has a relationship and doesn't explicitly set db_index.
         self.db_index = db_index
@@ -166,7 +172,7 @@ class Field(object):
 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup."
-        if lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
+        if lookup_type in ('exact', 'regex', 'iregex', 'gt', 'gte', 'lt', 'lte', 'month', 'day', 'search'):
             return [value]
         elif lookup_type in ('range', 'in'):
             return value
@@ -198,7 +204,7 @@ class Field(object):
             if callable(self.default):
                 return self.default()
             return self.default
-        if not self.empty_strings_allowed or self.null:
+        if not self.empty_strings_allowed or (self.null and settings.DATABASE_ENGINE != 'oracle'):
             return None
         return ""
 
@@ -792,6 +798,7 @@ class IntegerField(Field):
         return super(IntegerField, self).formfield(**defaults)
 
 class IPAddressField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['maxlength'] = 15
         Field.__init__(self, *args, **kwargs)
@@ -803,6 +810,7 @@ class IPAddressField(Field):
         validators.isValidIPAddress4(field_data, None)
 
 class NullBooleanField(Field):
+    empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True
         Field.__init__(self, *args, **kwargs)
@@ -877,10 +885,18 @@ class TimeField(Field):
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_lookup(self, lookup_type, value):
-        if lookup_type == 'range':
-            value = [str(v) for v in value]
+        if settings.DATABASE_ENGINE == 'oracle':
+            # Oracle requires a date in order to parse.
+            def prep(value):
+                if isinstance(value, datetime.time):
+                    value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
+                return str(value)
         else:
-            value = str(value)
+            prep = str
+        if lookup_type == 'range':
+            value = [prep(v) for v in value]
+        else:
+            value = prep(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def pre_save(self, model_instance, add):
@@ -898,7 +914,15 @@ class TimeField(Field):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            value = str(value)
+            if settings.DATABASE_ENGINE == 'oracle':
+                # cx_Oracle expects a datetime.datetime to persist into TIMESTAMP field.
+                if isinstance(value, datetime.time):
+                    value = datetime.datetime(1900, 1, 1, value.hour, value.minute,
+                                              value.second, value.microsecond)
+                elif isinstance(value, basestring):
+                    value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
+            else:
+                value = str(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):

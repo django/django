@@ -40,7 +40,6 @@ msgid "Chosen %s"
 msgstr "Wybrano %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
-#, fuzzy
 msgid "Select your choice(s) and click "
 msgstr "Zaznacz swój wybór i kliknij "
 

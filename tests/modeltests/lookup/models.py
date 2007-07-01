@@ -251,4 +251,98 @@ Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id, headline, pub_date
 
+# Create some articles with a bit more interesting headlines for testing field lookups:
+>>> now = datetime.now()
+>>> for a in Article.objects.all():
+...     a.delete()
+>>> a1 = Article(pub_date=now, headline='f')
+>>> a1.save()
+>>> a2 = Article(pub_date=now, headline='fo')
+>>> a2.save()
+>>> a3 = Article(pub_date=now, headline='foo')
+>>> a3.save()
+>>> a4 = Article(pub_date=now, headline='fooo')
+>>> a4.save()
+>>> a5 = Article(pub_date=now, headline='Foo')
+>>> a5.save()
+
+# zero-or-more
+>>> Article.objects.filter(headline__regex=r'fo*')
+[<Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>]
+>>> Article.objects.filter(headline__iregex=r'fo*')
+[<Article: Foo>, <Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>]
+
+# one-or-more
+>>> Article.objects.filter(headline__regex=r'fo+')
+[<Article: fo>, <Article: foo>, <Article: fooo>]
+
+# wildcard
+>>> Article.objects.filter(headline__regex=r'fooo?')
+[<Article: foo>, <Article: fooo>]
+
+# and some more:
+>>> a6 = Article(pub_date=now, headline='bar')
+>>> a6.save()
+>>> a7 = Article(pub_date=now, headline='Bar')
+>>> a7.save()
+>>> a8 = Article(pub_date=now, headline='baz')
+>>> a8.save()
+>>> a9 = Article(pub_date=now, headline='baZ')
+>>> a9.save()
+
+# leading anchor
+>>> Article.objects.filter(headline__regex=r'^b')
+[<Article: baZ>, <Article: bar>, <Article: baz>]
+>>> Article.objects.filter(headline__iregex=r'^b')
+[<Article: Bar>, <Article: baZ>, <Article: bar>, <Article: baz>]
+
+# trailing anchor
+>>> Article.objects.filter(headline__regex=r'z$')
+[<Article: baz>]
+>>> Article.objects.filter(headline__iregex=r'z$')
+[<Article: baZ>, <Article: baz>]
+
+# character sets
+>>> Article.objects.filter(headline__regex=r'ba[rz]')
+[<Article: bar>, <Article: baz>]
+>>> Article.objects.filter(headline__regex=r'ba[RZ]')
+[<Article: baZ>]
+>>> Article.objects.filter(headline__iregex=r'ba[RZ]')
+[<Article: Bar>, <Article: baZ>, <Article: bar>, <Article: baz>]
+
+# and yet more:
+>>> a10 = Article(pub_date=now, headline='foobar')
+>>> a10.save()
+>>> a11 = Article(pub_date=now, headline='foobaz')
+>>> a11.save()
+>>> a12 = Article(pub_date=now, headline='FooBarBaz')
+>>> a12.save()
+>>> a13 = Article(pub_date=now, headline='foobarbaz')
+>>> a13.save()
+>>> a14 = Article(pub_date=now, headline='zoocarfaz')
+>>> a14.save()
+>>> a15 = Article(pub_date=now, headline='barfoobaz')
+>>> a15.save()
+>>> a16 = Article(pub_date=now, headline='BAZBARFOO')
+>>> a16.save()
+
+# alternation
+>>> Article.objects.filter(headline__regex=r'foo(bar|baz)')
+[<Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
+>>> Article.objects.filter(headline__iregex=r'foo(bar|baz)')
+[<Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
+>>> Article.objects.filter(headline__regex=r'^foo(bar|baz)')
+[<Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
+
+# greedy matching
+>>> Article.objects.filter(headline__regex=r'f.*z')
+[<Article: barfoobaz>, <Article: foobarbaz>, <Article: foobaz>, <Article: zoocarfaz>]
+>>> Article.objects.filter(headline__iregex=r'f.*z')
+[<Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobarbaz>, <Article: foobaz>, <Article: zoocarfaz>]
+
+# grouping and backreferences
+>>> Article.objects.filter(headline__regex=r'b(.).*b\1')
+[<Article: barfoobaz>, <Article: foobarbaz>]
+>>> Article.objects.filter(headline__iregex=r'b(.).*b\1')
+[<Article: BAZBARFOO>, <Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobarbaz>]
 """}

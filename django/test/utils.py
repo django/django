@@ -1,6 +1,7 @@
 import sys, time
 from django.conf import settings
-from django.db import connection, transaction, backend
+from django.db import connection, backend, get_creation_module
+from django.core import management, mail
 from django.core import management, mail
 from django.dispatch import dispatcher
 from django.test import signals
@@ -88,6 +89,12 @@ def get_postgresql_create_suffix():
     return ''
 
 def create_test_db(verbosity=1, autoclobber=False):
+    # If the database backend wants to create the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "create_test_db"):
+        creation_module.create_test_db(settings, connection, backend, verbosity, autoclobber)
+        return
+    
     if verbosity >= 1:
         print "Creating test database..."
     # If we're using SQLite, it's more convenient to test against an
@@ -142,6 +149,12 @@ def create_test_db(verbosity=1, autoclobber=False):
     cursor = connection.cursor()
 
 def destroy_test_db(old_database_name, verbosity=1):
+    # If the database wants to drop the test DB itself, let it
+    creation_module = get_creation_module()
+    if hasattr(creation_module, "destroy_test_db"):
+        creation_module.destroy_test_db(settings, connection, backend, old_database_name, verbosity)
+        return
+    
     # Unless we're using SQLite, remove the test database to clean up after
     # ourselves. Connect to the previous database (not the test database)
     # to do so, because it's not allowed to delete a database while being

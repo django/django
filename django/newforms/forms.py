@@ -159,7 +159,7 @@ class BaseForm(StrAndUnicode):
 
     def as_p(self):
         "Returns this form rendered as HTML <p>s."
-        return self._html_output(u'<p>%(label)s %(field)s%(help_text)s</p>', u'<p>%s</p>', '</p>', u' %s', True)
+        return self._html_output(u'<p>%(label)s %(field)s%(help_text)s</p>', u'%s', '</p>', u' %s', True)
 
     def non_field_errors(self):
         """

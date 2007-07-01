@@ -162,7 +162,7 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None):
+    def __init__(self, content='', mimetype=None, status=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
@@ -175,6 +175,8 @@ class HttpResponse(object):
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
+        if status:
+            self.status_code = status
 
     def __str__(self):
         "Full HTTP message, including headers"

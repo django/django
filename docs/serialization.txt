@@ -48,12 +48,12 @@ Subset of fields
 ~~~~~~~~~~~~~~~~
 
 If you only want a subset of fields to be serialized, you can 
-specify a `fields` argument to the serializer::
+specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
     data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
 
-In this example, only the `name` and `size` attributes of each model will
+In this example, only the ``name`` and ``size`` attributes of each model will
 be serialized. 
 
 .. note::

@@ -15,6 +15,7 @@ from django.utils.functional import curry
 from django.core import serializers
 from django.db import transaction
 from django.core import management
+from django.conf import settings
 
 from models import *
 try:
@@ -116,10 +117,13 @@ test_data = [
     (data_obj, 31, DateTimeData, None),
     (data_obj, 40, EmailData, "hovercraft@example.com"),
     (data_obj, 41, EmailData, None),
+    (data_obj, 42, EmailData, ""),
     (data_obj, 50, FileData, 'file:///foo/bar/whiz.txt'),
     (data_obj, 51, FileData, None),
+    (data_obj, 52, FileData, ""),
     (data_obj, 60, FilePathData, "/foo/bar/whiz.txt"),
     (data_obj, 61, FilePathData, None),
+    (data_obj, 62, FilePathData, ""),
     (data_obj, 70, DecimalData, decimal.Decimal('12.345')),
     (data_obj, 71, DecimalData, decimal.Decimal('-12.345')),
     (data_obj, 72, DecimalData, decimal.Decimal('0.0')),
@@ -146,6 +150,7 @@ test_data = [
     (data_obj, 131, PositiveSmallIntegerData, None),
     (data_obj, 140, SlugData, "this-is-a-slug"),
     (data_obj, 141, SlugData, None),
+    (data_obj, 142, SlugData, ""),
     (data_obj, 150, SmallData, 12),
     (data_obj, 151, SmallData, -12),
     (data_obj, 152, SmallData, 0),
@@ -160,8 +165,10 @@ The end."""),
     (data_obj, 171, TimeData, None),
     (data_obj, 180, USStateData, "MA"),
     (data_obj, 181, USStateData, None),
+    (data_obj, 182, USStateData, ""),
     (data_obj, 190, XMLData, "<foo></foo>"),
     (data_obj, 191, XMLData, None),
+    (data_obj, 192, XMLData, ""),
 
     (generic_obj, 200, GenericData, ['Generic Object 1', 'tag1', 'tag2']),
     (generic_obj, 201, GenericData, ['Generic Object 2', 'tag2', 'tag3']),
@@ -240,6 +247,15 @@ The end."""),
     (pk_obj, 780, USStatePKData, "MA"),
 #     (pk_obj, 790, XMLPKData, "<foo></foo>"),
 ]
+
+# Because Oracle treats the empty string as NULL, Oracle is expected to fail
+# when field.empty_strings_allowed is True and the value is None; skip these
+# tests.
+if settings.DATABASE_ENGINE == 'oracle':
+    test_data = [data for data in test_data
+                 if not (data[0] == data_obj and
+                         data[2]._meta.get_field('data').empty_strings_allowed and
+                         data[3] is None)]
 
 # Dynamically create serializer tests to ensure that all
 # registered serializers are automatically tested.

@@ -10,9 +10,10 @@ from django import oldforms
 from django import newforms as forms
 from django.dispatch import dispatcher
 
-# For Python 2.3
-if not hasattr(__builtins__, 'set'):
-    from sets import Set as set
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 # Values for Relation.edit_inline.
 TABULAR, STACKED = 1, 2
@@ -335,10 +336,7 @@ def create_many_related_manager(superclass):
                     (target_col_name, self.join_table, source_col_name,
                     target_col_name, ",".join(['%s'] * len(new_ids))),
                     [self._pk_val] + list(new_ids))
-                if cursor.rowcount is not None and cursor.rowcount != 0:
-                    existing_ids = set([row[0] for row in cursor.fetchmany(cursor.rowcount)])
-                else:
-                    existing_ids = set()
+                existing_ids = set([row[0] for row in cursor.fetchall()])
 
                 # Add the ones that aren't there already
                 for obj_id in (new_ids - existing_ids):
