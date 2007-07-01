@@ -64,9 +64,10 @@ class DatabaseWrapper(local):
             }
             kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
-            # Register extract and date_trunc functions.
+            # Register extract, date_trunc, and regexp functions.
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
+            self.connection.create_function("regexp", 2, _sqlite_regexp)
         cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
         cursor.row_factory = utf8rowFactory
         if settings.DEBUG:
@@ -214,6 +215,13 @@ def _sqlite_date_trunc(lookup_type, dt):
     elif lookup_type == 'day':
         return "%i-%02i-%02i 00:00:00" % (dt.year, dt.month, dt.day)
 
+def _sqlite_regexp(re_pattern, re_string):
+    import re
+    try:
+        return bool(re.search(re_pattern, re_string))
+    except:
+        return False
+
 # SQLite requires LIKE statements to include an ESCAPE clause if the value
 # being escaped has a percent or underscore in it.
 # See http://www.sqlite.org/lang_expr.html for an explanation.
@@ -222,6 +230,8 @@ OPERATOR_MAPPING = {
     'iexact': "LIKE %s ESCAPE '\\'",
     'contains': "LIKE %s ESCAPE '\\'",
     'icontains': "LIKE %s ESCAPE '\\'",
+    'regex': 'REGEXP %s',
+    'iregex': "REGEXP '(?i)' || %s",
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

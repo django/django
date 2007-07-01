@@ -513,7 +513,7 @@ Example usage::
 
 Verbosity determines the amount of notification and debug information that
 will be printed to the console. '0' is no output, '1' is normal output,
-and `2` is verbose output.
+and ``2`` is verbose output.
 
 --adminmedia
 ------------

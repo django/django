@@ -5,6 +5,7 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
+from django.conf import settings
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
@@ -251,4 +252,100 @@ Traceback (most recent call last):
     ...
 TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id, headline, pub_date
 
+# Create some articles with a bit more interesting headlines for testing field lookups:
+>>> now = datetime.now()
+>>> for a in Article.objects.all():
+...     a.delete()
+>>> a1 = Article(pub_date=now, headline='f')
+>>> a1.save()
+>>> a2 = Article(pub_date=now, headline='fo')
+>>> a2.save()
+>>> a3 = Article(pub_date=now, headline='foo')
+>>> a3.save()
+>>> a4 = Article(pub_date=now, headline='fooo')
+>>> a4.save()
+>>> a5 = Article(pub_date=now, headline='hey-Foo')
+>>> a5.save()
+
+# zero-or-more
+>>> Article.objects.filter(headline__regex=r'fo*')
+[<Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>]
+>>> Article.objects.filter(headline__iregex=r'fo*')
+[<Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>, <Article: hey-Foo>]
+
+# one-or-more
+>>> Article.objects.filter(headline__regex=r'fo+')
+[<Article: fo>, <Article: foo>, <Article: fooo>]
+
+# wildcard
+>>> Article.objects.filter(headline__regex=r'fooo?')
+[<Article: foo>, <Article: fooo>]
+
+# and some more:
+>>> a6 = Article(pub_date=now, headline='bar')
+>>> a6.save()
+>>> a7 = Article(pub_date=now, headline='AbBa')
+>>> a7.save()
+>>> a8 = Article(pub_date=now, headline='baz')
+>>> a8.save()
+>>> a9 = Article(pub_date=now, headline='baxZ')
+>>> a9.save()
+
+# leading anchor
+>>> Article.objects.filter(headline__regex=r'^b')
+[<Article: bar>, <Article: baxZ>, <Article: baz>]
+>>> Article.objects.filter(headline__iregex=r'^a')
+[<Article: AbBa>]
+
+# trailing anchor
+>>> Article.objects.filter(headline__regex=r'z$')
+[<Article: baz>]
+>>> Article.objects.filter(headline__iregex=r'z$')
+[<Article: baxZ>, <Article: baz>]
+
+# character sets
+>>> Article.objects.filter(headline__regex=r'ba[rz]')
+[<Article: bar>, <Article: baz>]
+>>> Article.objects.filter(headline__regex=r'ba.[RxZ]')
+[<Article: baxZ>]
+>>> Article.objects.filter(headline__iregex=r'ba[RxZ]')
+[<Article: bar>, <Article: baxZ>, <Article: baz>]
+
+# and yet more:
+>>> a10 = Article(pub_date=now, headline='foobar')
+>>> a10.save()
+>>> a11 = Article(pub_date=now, headline='foobaz')
+>>> a11.save()
+>>> a12 = Article(pub_date=now, headline='ooF')
+>>> a12.save()
+>>> a13 = Article(pub_date=now, headline='foobarbaz')
+>>> a13.save()
+>>> a14 = Article(pub_date=now, headline='zoocarfaz')
+>>> a14.save()
+>>> a15 = Article(pub_date=now, headline='barfoobaz')
+>>> a15.save()
+>>> a16 = Article(pub_date=now, headline='bazbaRFOO')
+>>> a16.save()
+
+# alternation
+>>> Article.objects.filter(headline__regex=r'oo(f|b)')
+[<Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
+>>> Article.objects.filter(headline__iregex=r'oo(f|b)')
+[<Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>, <Article: ooF>]
+>>> Article.objects.filter(headline__regex=r'^foo(f|b)')
+[<Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
+
+# greedy matching
+>>> Article.objects.filter(headline__regex=r'b.*az')
+[<Article: barfoobaz>, <Article: baz>, <Article: bazbaRFOO>, <Article: foobarbaz>, <Article: foobaz>]
+>>> Article.objects.filter(headline__iregex=r'b.*ar')
+[<Article: bar>, <Article: barfoobaz>, <Article: bazbaRFOO>, <Article: foobar>, <Article: foobarbaz>]
 """}
+
+
+if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
+    __test__['API_TESTS'] += r"""
+# grouping and backreferences
+>>> Article.objects.filter(headline__regex=r'b(.).*b\1')
+[<Article: barfoobaz>, <Article: bazbaRFOO>, <Article: foobarbaz>]
+"""

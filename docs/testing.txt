@@ -253,8 +253,8 @@ can be invoked on the ``Client`` instance.
         f.close()
 
     will result in the evaluation of a POST request on ``/customers/wishes/``,
-    with a POST dictionary that contains `name`, `attachment` (containing the
-    file name), and `attachment_file` (containing the file data). Note that you
+    with a POST dictionary that contains ``name``, ``attachment`` (containing the
+    file name), and ``attachment_file`` (containing the file data). Note that you
     need to manually close the file after it has been provided to the POST.
 
 ``login(**credentials)``
@@ -660,8 +660,8 @@ arguments:
     tested. This is the same format returned by ``django.db.models.get_apps()``
 
     Verbosity determines the amount of notification and debug information that
-    will be printed to the console; `0` is no output, `1` is normal output,
-    and `2` is verbose output.
+    will be printed to the console; ``0`` is no output, ``1`` is normal output,
+    and ``2`` is verbose output.
 
     This method should return the number of tests that failed.
 

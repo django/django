@@ -461,7 +461,7 @@ block::
 Other built-in views
 --------------------
 
-In addition to the `login` view, the authentication system includes a
+In addition to the ``login`` view, the authentication system includes a
 few other useful built-in views:
 
 ``django.contrib.auth.views.logout``

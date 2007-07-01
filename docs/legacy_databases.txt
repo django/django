@@ -18,7 +18,7 @@ You'll need to tell Django what your database connection parameters are, and
 what the name of the database is. Do that by editing these settings in your
 `settings file`_:
 
-    * `DATABASE_NAME`
+    * `DATABASE_NAME`_
     * `DATABASE_ENGINE`_
     * `DATABASE_USER`_
     * `DATABASE_PASSWORD`_

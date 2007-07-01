@@ -28,9 +28,9 @@ settings, if set, are used to authenticate to the SMTP server, and the
 .. note::
 
     The character set of e-mail sent with ``django.core.mail`` will be set to
-    the value of your `DEFAULT_CHARSET setting`_.
+    the value of your `DEFAULT_CHARSET`_ setting.
 
-.. _DEFAULT_CHARSET setting: ../settings/#default-charset
+.. _DEFAULT_CHARSET: ../settings/#default-charset
 .. _EMAIL_HOST: ../settings/#email-host
 .. _EMAIL_PORT: ../settings/#email-port
 .. _EMAIL_HOST_USER: ../settings/#email-host-user
@@ -198,27 +198,58 @@ e-mail, you can subclass these two classes to suit your needs.
 .. note::
     Not all features of the ``EmailMessage`` class are available through the
     ``send_mail()`` and related wrapper functions. If you wish to use advanced
-    features, such as BCC'ed recipients or multi-part e-mail, you'll need to
-    create ``EmailMessage`` instances directly.
+    features, such as BCC'ed recipients, file attachments, or multi-part
+    e-mail, you'll need to create ``EmailMessage`` instances directly.
+
+    This is a design feature. ``send_mail()`` and related functions were
+    originally the only interface Django provided. However, the list of
+    parameters they accepted was slowly growing over time. It made sense to
+    move to a more object-oriented design for e-mail messages and retain the
+    original functions only for backwards compatibility.
 
 In general, ``EmailMessage`` is responsible for creating the e-mail message
 itself. ``SMTPConnection`` is responsible for the network connection side of
 the operation. This means you can reuse the same connection (an
 ``SMTPConnection`` instance) for multiple messages.
 
-The ``EmailMessage`` class is initialized as follows::
+E-mail messages
+---------------
 
-    email = EmailMessage(subject, body, from_email, to, bcc, connection)
+The ``EmailMessage`` class is initialized with the following parameters (in
+the given order, if positional arguments are used). All parameters are
+optional and can be set at any time prior to calling the ``send()`` method.
 
-All of these parameters are optional. If ``from_email`` is omitted, the value
-from ``settings.DEFAULT_FROM_EMAIL`` is used. Both the ``to`` and ``bcc``
-parameters are lists of addresses, as strings.
+    * ``subject``: The subject line of the e-mail.
+
+    * ``body``: The body text. This should be a plain text message.
+
+    * ``from_email``: The sender's address. Both ``fred@example.com`` and
+      ``Fred <fred@example.com>`` forms are legal. If omitted, the
+      ``DEFAULT_FROM_EMAIL`` setting is used.
+
+    * ``to``: A list or tuple of recipient addresses.
+
+    * ``bcc``: A list or tuple of addresses used in the "Bcc" header when
+      sending the e-mail.
+
+    * ``connection``: An ``SMTPConnection`` instance. Use this parameter if
+      you want to use the same conneciton for multiple messages. If omitted, a
+      new connection is created when ``send()`` is called.
+
+    * ``attachments``: A list of attachments to put on the message. These can
+      be either ``email.MIMEBase.MIMEBase`` instances, or ``(filename,
+      content, mimetype)`` triples.
+
+    * ``headers``: A dictionary of extra headers to put on the message. The
+      keys are the header name, values are the header values. It's up to the
+      caller to ensure header names and values are in the correct format for
+      an e-mail message.
 
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
-                ['to1@example.com', 'to2@example.com'],
-                ['bcc@example.com'])
+                ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
+                headers = {'Reply-To': 'another@example.com'})
 
 The class has the following methods:
 
@@ -227,17 +258,82 @@ The class has the following methods:
       if none already exists.
 
     * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
-      sub-class of Python's ``email.MIMEText.MIMEText`` class) holding the
-      message to be sent. If you ever need to extend the `EmailMessage` class,
-      you'll probably want to override this method to put the content you wish
+      subclass of Python's ``email.MIMEText.MIMEText`` class) or a
+      ``django.core.mail.SafeMIMEMultipart`` object holding the
+      message to be sent. If you ever need to extend the ``EmailMessage`` class,
+      you'll probably want to override this method to put the content you want
       into the MIME object.
 
     * ``recipients()`` returns a list of all the recipients of the message,
       whether they're recorded in the ``to`` or ``bcc`` attributes. This is
-      another method you might need to override when sub-classing, because the
+      another method you might need to override when subclassing, because the
       SMTP server needs to be told the full list of recipients when the message
       is sent. If you add another way to specify recipients in your class, they
       need to be returned from this method as well.
+
+    * ``attach()`` creates a new file attachment and adds it to the message.
+      There are two ways to call ``attach()``:
+
+       * You can pass it a single argument that is an
+         ``email.MIMBase.MIMEBase`` instance. This will be inserted directly
+         into the resulting message.
+
+       * Alternatively, you can pass ``attach()`` three arguments:
+         ``filename``, ``content`` and ``mimetype``. ``filename`` is the name
+         of the file attachment as it will appear in the e-mail, ``content`` is
+         the data that will be contained inside the attachment and
+         ``mimetype`` is the optional MIME type for the attachment. If you
+         omit ``mimetype``, the MIME content type will be guessed from the
+         filename of the attachment.
+
+         For example::
+
+            message.attach('design.png', img_data, 'image/png')
+
+    * ``attach_file()`` creates a new attachment using a file from your
+      filesystem. Call it with the path of the file to attach and, optionally,
+      the MIME type to use for the attachment. If the MIME type is omitted, it
+      will be guessed from the filename. The simplest use would be::
+
+        message.attach_file('/images/weather_map.png')
+
+Sending alternative content types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It can be useful to include multiple versions of the content in an e-mail;
+the classic example is to send both text and HTML versions of a message. With
+Django's e-mail library, you can do this using the ``EmailMultiAlternatives``
+class. This subclass of ``EmailMessage`` has an ``attach_alternative()`` method
+for including extra versions of the message body in the e-mail. All the other
+methods (including the class initialization) are inherited directly from
+``EmailMessage``.
+
+To send a text and HTML combination, you could write::
+
+    from django.core.mail import EmailMultiAlternatives
+
+    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
+    text_content = 'This is an important message.'
+    html_content = '<p>This is an <strong>important</strong> message.'
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+By default, the MIME type of the ``body`` parameter in an ``EmailMessage`` is
+``"text/plain"``. It is good practice to leave this alone, because it
+guarantees that any recipient will be able to read the e-mail, regardless of
+their mail client. However, if you are confident that your recipients can
+handle an alternative content type, you can use the ``content_subtype``
+attribute on the ``EmailMessage`` class to change the main content type. The
+major type will always be ``"text"``, but you can change it to the subtype. For
+example::
+
+    msg = EmailMessage(subject, html_content, from_email, to)
+    msg.content_subtype = "html"  # Main content is now text/html
+    msg.send()
+
+SMTP network connections
+------------------------
 
 The ``SMTPConnection`` class is initialized with the host, port, username and
 password for the SMTP server. If you don't specify one or more of those

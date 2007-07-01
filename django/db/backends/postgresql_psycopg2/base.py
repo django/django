@@ -225,6 +225,8 @@ OPERATOR_MAPPING = {
     'iexact': 'ILIKE %s',
     'contains': 'LIKE %s',
     'icontains': 'ILIKE %s',
+    'regex': '~ %s',
+    'iregex': '~* %s',
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',
