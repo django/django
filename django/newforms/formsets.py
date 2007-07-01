@@ -49,14 +49,14 @@ class BaseFormSet(object):
 
     def _get_add_forms(self):
         """Return a list of all the add forms in this ``FormSet``."""
-        Form = self.form_class
+        FormClass = self.form_class
         if not hasattr(self, '_add_forms'):
             add_forms = []
             for i in range(self.change_form_count, self.total_forms):
                 kwargs = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
                 if self.data:
                     kwargs['data'] = self.data
-                add_form = Form(**kwargs)
+                add_form = FormClass(**kwargs)
                 self.add_fields(add_form, i)
                 add_forms.append(add_form)
             self._add_forms = add_forms
@@ -65,7 +65,7 @@ class BaseFormSet(object):
 
     def _get_change_forms(self):
         """Return a list of all the change forms in this ``FormSet``."""
-        Form = self.form_class
+        FormClass = self.form_class
         if not hasattr(self, '_add_forms'):
             change_forms = []
             for i in range(0, self.change_form_count):
@@ -74,7 +74,7 @@ class BaseFormSet(object):
                     kwargs['data'] = self.data
                 if self.initial:
                     kwargs['initial'] = self.initial[i]
-                change_form = Form(**kwargs)
+                change_form = FormClass(**kwargs)
                 self.add_fields(change_form, i)
                 change_forms.append(change_form)
             self._change_forms= change_forms
