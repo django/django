@@ -234,11 +234,11 @@ class BaseModelFormSet(BaseFormSet):
         super(BaseModelFormSet, self).__init__(**kwargs)
 
     def save_new(self, form, commit=True):
-        """Saves and retrutns a new model instance for the given form."""
+        """Saves and returns a new model instance for the given form."""
         return save_instance(form, self.model(), commit=commit)
 
     def save_instance(self, form, instance, commit=True):
-        """Saves and retrutns an existing model instance for the given form."""
+        """Saves and returns an existing model instance for the given form."""
         return save_instance(form, instance, commit=commit)
 
     def save(self, commit=True):
