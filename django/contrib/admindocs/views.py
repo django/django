@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404, get_host
 from django.core import urlresolvers
-from django.contrib.admin import utils
+from django.contrib.admindocs import utils
 from django.contrib.sites.models import Site
 import inspect, os, re
 
