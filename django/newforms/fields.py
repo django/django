@@ -482,17 +482,18 @@ class ComboField(Field):
 
 class MultiValueField(Field):
     """
-    A Field that is composed of multiple Fields.
-
-    Its clean() method takes a "decompressed" list of values. Each value in
+    A Field that aggregates the logic of multiple Fields.
+    
+    Its clean() method takes a "decompressed" list of values, which are then
+    cleaned into a single value according to self.fields. Each value in
     this list is cleaned by the corresponding field -- the first value is
     cleaned by the first field, the second value is cleaned by the second
     field, etc. Once all fields are cleaned, the list of clean values is
     "compressed" into a single value.
 
-    Subclasses should implement compress(), which specifies how a list of
-    valid values should be converted to a single value. Subclasses should not
-    have to implement clean().
+    Subclasses should not have to implement clean(). Instead, they must
+    implement compress(), which takes a list of valid values and returns a
+    "compressed" version of those values -- a single value.
 
     You'll probably want to use this with MultiWidget.
     """
