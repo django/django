@@ -108,7 +108,7 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        # For ManyToManyFields with a filter interface, use a special Widget.
+        # For ManyToManyFields with a filter interface, use a special widget.
         if isinstance(db_field, models.ManyToManyField) and db_field.name in (self.filter_vertical + self.filter_horizontal):
             kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
             return db_field.formfield(**kwargs)
