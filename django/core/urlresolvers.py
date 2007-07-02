@@ -38,14 +38,20 @@ def get_callable(lookup_view, can_fail=False):
     If can_fail is True, lookup_view might be a URL pattern label, so errors
     during the import fail and the string is returned.
     """
-    if not callable(lookup_view):
-        mod_name, func_name = get_mod_func(lookup_view)
-        try:
-            if func_name != '':
-                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-        except (ImportError, AttributeError):
-            if not can_fail:
-                raise
+    try:
+        # Bail out early if lookup_view is not ASCII. This can't be a function.
+        lookup_view = lookup_view.encode('ascii')
+
+        if not callable(lookup_view):
+            mod_name, func_name = get_mod_func(lookup_view)
+            try:
+                if func_name != '':
+                    lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+            except (ImportError, AttributeError):
+                if not can_fail:
+                    raise
+    except UnicodeEncodeError:
+        pass
     return lookup_view
 get_callable = memoize(get_callable, _callable_cache)
 
@@ -266,7 +272,7 @@ class RegexURLResolver(object):
         except (ImportError, AttributeError):
             raise NoReverseMatch
         if lookup_view in self.reverse_dict:
-            return ''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
+            return u''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
         raise NoReverseMatch
 
     def reverse_helper(self, lookup_view, *args, **kwargs):

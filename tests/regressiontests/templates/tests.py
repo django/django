@@ -735,6 +735,7 @@ class Templates(unittest.TestCase):
             'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04' : ('{% url named.client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
+            'url05' : (u'{% url метка_оператора 1 %}', {}, '/url_tag/unicode/1/'),
 
             # Failures
             'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),
