@@ -48,7 +48,7 @@ class SpatialRefSys(models.Model):
         db_table = 'spatial_ref_sys'
 
     def _cache_osr(self):
-        "Caches a GDAL OSR object for this Spatial Reference."
+        "Caches a GDAL OSR SpatialReference object for this SpatialRefSys model."
         if HAS_OSR:
             if not hasattr(self, '_srs'):
                 # Trying to get from WKT first
@@ -71,6 +71,7 @@ class SpatialRefSys(models.Model):
 
     @property
     def srs(self):
+        "Returns the SpatialReference equivalent of this model."
         self._cache_osr()
         return self._srs.clone()
                                                                                 
@@ -79,12 +80,8 @@ class SpatialRefSys(models.Model):
         """Returns a tuple of the ellipsoid parameters:
         (semimajor axis, semiminor axis, and inverse flattening)."""
         if HAS_OSR:
-            # Setting values initially to False
             self._cache_osr()
-            major = self._srs.semi_major
-            minor = self._srs.semi_minor
-            invflat  = self._srs.inverse_flattening
-            return (major, minor, invflat)
+            return self._srs.ellipsoid
         else:
             m = spheroid_regex.match(self.srtext)
             if m: return (float(m.group('major')), float(m.group('flattening')))

@@ -101,8 +101,10 @@ class DataSourceTest(unittest.TestCase):
                     for k, v in source.fields.items():
                         fld = feat[k] # Indexing with string value
 
-                        # Asserting the string representation (which asserts the type)
-                        self.assertEqual('%s (%s)' % (k, v.__name__), str(fld))
+                        # Asserting the string representation, and making sure we get
+                        #  the proper OGR Field instance.
+                        self.assertEqual('%s (%s)' % (k, fld.value), str(fld))
+                        self.assertEqual(True, isinstance(fld, v))
 
                     # Testing __iter__ on the Feature
                     for fld in feat: self.assertEqual(fld.name in source.fields.keys(), True)

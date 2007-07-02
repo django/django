@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.libgdal import lgdal
 # Other GDAL imports.
 from django.contrib.gis.gdal.Envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.Feature import Feature
+from django.contrib.gis.gdal.OGRGeometry import OGRGeomType
 from django.contrib.gis.gdal.OGRError import OGRException, check_err
 from django.contrib.gis.gdal.SpatialReference import SpatialReference
 
@@ -83,12 +84,16 @@ class Layer(object):
     @property
     def geom_type(self):
         "Returns the geometry type (OGRGeomType) of the Layer."
-        return lgdal.OGR_FD_GetGeomType(self._ldefn)
+        return OGRGeomType(lgdal.OGR_FD_GetGeomType(self._ldefn))
 
     @property
     def srs(self):
         "Returns the Spatial Reference used in this Layer."
-        return SpatialReference(lgdal.OSRClone(lgdal.OGR_L_GetSpatialRef(self._layer)), 'ogr')
+        ptr = lgdal.OGR_L_GetSpatialRef(self._layer)
+        if ptr:
+            srs = SpatialReference(lgdal.OSRClone(ptr), 'ogr')
+        else:
+            return None
 
     @property
     def fields(self):

@@ -85,6 +85,13 @@ else:
 
 # The GEOSException class
 class GEOSException(Exception): pass
+class GEOSGeometryIndexError(GEOSException, KeyError):
+    """This exception is raised when an invalid index is encountered, and has
+    the 'silent_variable_feature' attribute set to true.  This ensures that
+    django's templates proceed to use the next lookup type gracefully when
+    an Exception is raised.  Fixes ticket #4740.
+    """
+    silent_variable_failure = True
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 #  both *NIX and Windows.
@@ -345,7 +352,7 @@ class GEOSGeometry(object):
 
     @property
     def envelope(self):
-        "Return the geometries bounding box."
+        "Return the envelope for this geometry (a polygon)."
         return GEOSGeometry(lgeos.GEOSEnvelope(self._g))
 
     @property
@@ -432,7 +439,7 @@ class GEOSCoordSeq(object):
         "Checks the index."
         sz = self.size
         if (sz < 1) or (index < 0) or (index >= sz):
-            raise IndexError, 'index out of range'
+            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
 
     def _checkdim(self, dim):
         "Checks the given dimension."
@@ -594,7 +601,7 @@ class LineString(GEOSGeometry):
         "Gets the point at the specified index."
         self._cache_cs()
         if index < 0 or index >= self._cs.size:
-            raise IndexError, 'index out of range'
+            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
         else:
             return self._cs[index]
 
@@ -624,7 +631,7 @@ class Polygon(GEOSGeometry):
         """Returns the ring at the specified index.  The first index, 0, will always
         return the exterior ring.  Indices > 0 will return the interior ring."""
         if index < 0 or index > self.num_interior_rings:
-            raise IndexError, 'index out of range'
+            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
         else:
             if index == 0:
                 return self.exterior_ring
@@ -687,7 +694,7 @@ class GeometryCollection(GEOSGeometry):
     def _checkindex(self, index):
         "Checks the given geometry index."
         if index < 0 or index >= self.num_geom:
-            raise IndexError, 'index out of range'
+            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
 
     def __iter__(self):
         "For iteration on the multiple geometries."

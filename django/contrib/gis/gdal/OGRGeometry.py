@@ -131,6 +131,14 @@ class OGRGeomType(object):
         return self.__ogr_int[self._index]
 
 #### OGRGeometry Class ####
+class OGRGeometryIndexError(OGRException, KeyError):
+    """This exception is raised when an invalid index is encountered, and has
+    the 'silent_variable_feature' attribute set to true.  This ensures that
+    django's templates proceed to use the next lookup type gracefully when
+    an Exception is raised.  Fixes ticket #4740.
+    """
+    silent_variable_failure = True
+
 class OGRGeometry(object):
     "Generally encapsulates an OGR geometry."
 
@@ -412,7 +420,7 @@ class LineString(OGRGeometry):
             elif self.coord_dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise IndexError, 'index out of range'
+            raise OGRGeometryIndexError, 'index out of range: %s' % str(index)
 
     def __iter__(self):
         "Iterates over each point in the LineString."
@@ -445,7 +453,7 @@ class Polygon(OGRGeometry):
     def __getitem__(self, index):
         "Gets the ring at the specified index."
         if index < 0 or index >= self.geom_count:
-            raise IndexError, 'index out of range'
+            raise OGRGeometryIndexError, 'index out of range: %s' % str(index)
         else:
             return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))))
 
@@ -481,7 +489,7 @@ class GeometryCollection(OGRGeometry):
     def __getitem__(self, index):
         "Gets the Geometry at the specified index."
         if index < 0 or index >= self.geom_count:
-            raise IndexError, 'index out of range'
+            raise OGRGeometryIndexError, 'index out of range: %s' % str(index)
         else:
             return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))))
         
