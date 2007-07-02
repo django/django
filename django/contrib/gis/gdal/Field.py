@@ -25,7 +25,7 @@ class Field(object):
 
     def __str__(self):
         "Returns the string representation of the Field."
-        return '%s (%s)' % (self.name, self.__class__.__name__)
+        return '%s (%s)' % (self.name, self.value)
 
     #### Field Properties ####
     @property

@@ -158,7 +158,7 @@ def check_feature(feat, model_fields, mapping):
             geom  = feat.geom
             gtype = geom.geom_type
             gname = geom.geom_name
-            
+
             if make_multi(gname, model_type):
                 # Do we have to 'upsample' into a Geometry Collection?
                 pass
@@ -166,7 +166,7 @@ def check_feature(feat, model_fields, mapping):
                 # The geometry type otherwise was expected
                 pass
             else:
-                raise Exception, 'Invalid mapping geometry!'
+                raise Exception, 'Invalid mapping geometry; model has %s, feature has %s' % (model_type, gtype)
 
         ## Handling other fields 
         else:
@@ -237,10 +237,10 @@ class LayerMapping:
                 if ogr_field in ogc_types:
                     ## Getting the OGR geometry from the field
                     geom = feat.geom
-                    
+
                     if make_multi(geom.geom_name, model_type):
                         # Constructing a multi-geometry type to contain the single geometry
-                        multi_type = multi_types[gname]
+                        multi_type = multi_types[geom.geom_name]
                         g = OGRGeometry(multi_type)
                         g.add(geom)
                     else:
