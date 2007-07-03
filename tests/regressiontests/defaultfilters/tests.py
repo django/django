@@ -76,6 +76,8 @@ u''
 >>> title('a nice title, isn\'t it?')
 u"A Nice Title, Isn't It?"
 
+>>> title(u'discoth\xe8que')
+u'Discoth\xe8que'
 
 >>> truncatewords(u'A sentence with a few words in it', 1)
 u'A ...'
