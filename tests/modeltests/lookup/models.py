@@ -5,6 +5,7 @@ This demonstrates features of the database API.
 """
 
 from django.db import models
+from django.conf import settings
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
@@ -263,14 +264,14 @@ TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id
 >>> a3.save()
 >>> a4 = Article(pub_date=now, headline='fooo')
 >>> a4.save()
->>> a5 = Article(pub_date=now, headline='Foo')
+>>> a5 = Article(pub_date=now, headline='hey-Foo')
 >>> a5.save()
 
 # zero-or-more
 >>> Article.objects.filter(headline__regex=r'fo*')
 [<Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>]
 >>> Article.objects.filter(headline__iregex=r'fo*')
-[<Article: Foo>, <Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>]
+[<Article: f>, <Article: fo>, <Article: foo>, <Article: fooo>, <Article: hey-Foo>]
 
 # one-or-more
 >>> Article.objects.filter(headline__regex=r'fo+')
@@ -283,39 +284,39 @@ TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id
 # and some more:
 >>> a6 = Article(pub_date=now, headline='bar')
 >>> a6.save()
->>> a7 = Article(pub_date=now, headline='Bar')
+>>> a7 = Article(pub_date=now, headline='AbBa')
 >>> a7.save()
 >>> a8 = Article(pub_date=now, headline='baz')
 >>> a8.save()
->>> a9 = Article(pub_date=now, headline='baZ')
+>>> a9 = Article(pub_date=now, headline='baxZ')
 >>> a9.save()
 
 # leading anchor
 >>> Article.objects.filter(headline__regex=r'^b')
-[<Article: baZ>, <Article: bar>, <Article: baz>]
->>> Article.objects.filter(headline__iregex=r'^b')
-[<Article: Bar>, <Article: baZ>, <Article: bar>, <Article: baz>]
+[<Article: bar>, <Article: baxZ>, <Article: baz>]
+>>> Article.objects.filter(headline__iregex=r'^a')
+[<Article: AbBa>]
 
 # trailing anchor
 >>> Article.objects.filter(headline__regex=r'z$')
 [<Article: baz>]
 >>> Article.objects.filter(headline__iregex=r'z$')
-[<Article: baZ>, <Article: baz>]
+[<Article: baxZ>, <Article: baz>]
 
 # character sets
 >>> Article.objects.filter(headline__regex=r'ba[rz]')
 [<Article: bar>, <Article: baz>]
->>> Article.objects.filter(headline__regex=r'ba[RZ]')
-[<Article: baZ>]
->>> Article.objects.filter(headline__iregex=r'ba[RZ]')
-[<Article: Bar>, <Article: baZ>, <Article: bar>, <Article: baz>]
+>>> Article.objects.filter(headline__regex=r'ba.[RxZ]')
+[<Article: baxZ>]
+>>> Article.objects.filter(headline__iregex=r'ba[RxZ]')
+[<Article: bar>, <Article: baxZ>, <Article: baz>]
 
 # and yet more:
 >>> a10 = Article(pub_date=now, headline='foobar')
 >>> a10.save()
 >>> a11 = Article(pub_date=now, headline='foobaz')
 >>> a11.save()
->>> a12 = Article(pub_date=now, headline='FooBarBaz')
+>>> a12 = Article(pub_date=now, headline='ooF')
 >>> a12.save()
 >>> a13 = Article(pub_date=now, headline='foobarbaz')
 >>> a13.save()
@@ -323,26 +324,28 @@ TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id
 >>> a14.save()
 >>> a15 = Article(pub_date=now, headline='barfoobaz')
 >>> a15.save()
->>> a16 = Article(pub_date=now, headline='BAZBARFOO')
+>>> a16 = Article(pub_date=now, headline='bazbaRFOO')
 >>> a16.save()
 
 # alternation
->>> Article.objects.filter(headline__regex=r'foo(bar|baz)')
+>>> Article.objects.filter(headline__regex=r'oo(f|b)')
 [<Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
->>> Article.objects.filter(headline__iregex=r'foo(bar|baz)')
-[<Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
->>> Article.objects.filter(headline__regex=r'^foo(bar|baz)')
+>>> Article.objects.filter(headline__iregex=r'oo(f|b)')
+[<Article: barfoobaz>, <Article: foobar>, <Article: foobarbaz>, <Article: foobaz>, <Article: ooF>]
+>>> Article.objects.filter(headline__regex=r'^foo(f|b)')
 [<Article: foobar>, <Article: foobarbaz>, <Article: foobaz>]
 
 # greedy matching
->>> Article.objects.filter(headline__regex=r'f.*z')
-[<Article: barfoobaz>, <Article: foobarbaz>, <Article: foobaz>, <Article: zoocarfaz>]
->>> Article.objects.filter(headline__iregex=r'f.*z')
-[<Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobarbaz>, <Article: foobaz>, <Article: zoocarfaz>]
+>>> Article.objects.filter(headline__regex=r'b.*az')
+[<Article: barfoobaz>, <Article: baz>, <Article: bazbaRFOO>, <Article: foobarbaz>, <Article: foobaz>]
+>>> Article.objects.filter(headline__iregex=r'b.*ar')
+[<Article: bar>, <Article: barfoobaz>, <Article: bazbaRFOO>, <Article: foobar>, <Article: foobarbaz>]
+"""}
 
+
+if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
+    __test__['API_TESTS'] += r"""
 # grouping and backreferences
 >>> Article.objects.filter(headline__regex=r'b(.).*b\1')
-[<Article: barfoobaz>, <Article: foobarbaz>]
->>> Article.objects.filter(headline__iregex=r'b(.).*b\1')
-[<Article: BAZBARFOO>, <Article: FooBarBaz>, <Article: barfoobaz>, <Article: foobarbaz>]
-"""}
+[<Article: barfoobaz>, <Article: bazbaRFOO>, <Article: foobarbaz>]
+"""

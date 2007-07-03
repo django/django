@@ -267,7 +267,7 @@ class AnonymousUser(object):
         pass
 
     def __str__(self):
-        return _('AnonymousUser')
+        return 'AnonymousUser'
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)
