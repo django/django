@@ -73,7 +73,7 @@ class AdminSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__class__.__name__)
+                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
             self._registry[model] = admin_class(model)
 
     def unregister(self, model_or_iterable):
@@ -86,7 +86,7 @@ class AdminSite(object):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model not in self._registry:
-                raise NotRegistered('The model %s is not registered' % model.__class__.__name__)
+                raise NotRegistered('The model %s is not registered' % model.__name__)
             del self._registry[model]
 
     def has_permission(self, request):
