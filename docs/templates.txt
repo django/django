@@ -1044,11 +1044,11 @@ iriencode
 ~~~~~~~~~
 
 Converts an IRI (Internationalized Resource Identifier) to a string that is
-suitable for including in a URL. This is necessary if you are trying to use
+suitable for including in a URL. This is necessary if you're trying to use
 strings containing non-ASCII characters in a URL.
 
-You can use this filter after you have used the ``urlencode`` filter on a
-string, without harm.
+It's safe to use this filter on a string that has already gone through the
+``urlencode`` filter.
 
 join
 ~~~~

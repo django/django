@@ -14,7 +14,7 @@ class ContentTypeManager(models.Manager):
         try:
             ct = CONTENT_TYPE_CACHE[key]
         except KeyError:
-            # The unicode() is needed around opts.verbose_name because it might
+            # The smart_unicode() is needed around opts.verbose_name_raw because it might
             # be a django.utils.functional.__proxy__ object.
             ct, created = self.model._default_manager.get_or_create(app_label=key[0],
                 model=key[1], defaults={'name': smart_unicode(opts.verbose_name_raw)})

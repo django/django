@@ -50,7 +50,7 @@ class HttpRequest(object):
     def _set_encoding(self, val):
         """
         Sets the encoding used for GET/POST accesses. If the GET or POST
-        dictionary has already been created it is removed and recreated on the
+        dictionary has already been created, it is removed and recreated on the
         next access (so that it is decoded correctly).
         """
         self._encoding = val
@@ -101,7 +101,7 @@ class QueryDict(MultiValueDict):
     This is immutable unless you create a copy of it.
 
     Values retrieved from this class are converted from the default encoding to
-    unicode (this is done on retrieval, rather than input to avoid breaking
+    unicode (this is done on retrieval, rather than input, to avoid breaking
     references or mutating referenced objects).
     """
     def __init__(self, query_string, mutable=False, encoding=None):

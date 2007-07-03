@@ -7,7 +7,7 @@ from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
-        # 'url' must already be ASCII and URL-quoted, so no need for encodign
+        # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
         url = u'http://%s%s' % (domain, url)
     return url

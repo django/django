@@ -492,20 +492,21 @@ your own sanity when dealing with the interactive prompt, but also because
 objects' representations are used throughout Django's automatically-generated
 admin.
 
-.. admonition:: Why ``__unicode__`` and not ``__str__``?
+.. admonition:: Why ``__unicode__()`` and not ``__str__()``?
 
-    If you are wondering why we add a ``__unicode__()`` method, rather than a
-    simple ``__str__()`` method, it is because Django models will contain
-    unicode strings by default. The values returned from the database, for
-    example, are all unicode strings. In most cases, your code should be
-    prepared to handle non-ASCII characters and this is a litle fiddly in
-    ``__str__()`` methods, since you have to worry about which encoding to
-    use, amongst other things. If you create a ``__unicode__()`` method,
-    Django will provide a ``__str__()`` method that calls your
-    ``__unicode__()`` and then converts the result to UTF-8 strings when
-    required. So ``unicode(p)`` will return a unicode string and ``str(p)``
-    will return a normal string, with the characters encoded as UTF-8 when
-    necessary..
+	If you're familiar with Python, you might be in the habit of adding
+	``__str__()`` methods to your classes, not ``__unicode__()`` methods.
+    We use ``__unicode__()`` here because Django models deal with Unicode by
+    default. All data stored in your database is converted to Unicode when it's
+    returned.
+
+	Django models have a default ``__str__()`` method that calls ``__unicode__()``
+	and converts the result to a UTF-8 bytestring. This means that ``unicode(p)``
+	will return a Unicode string, and ``str(p)`` will return a normal string,
+	with characters encoded as UTF-8.
+
+	If all of this is jibberish to you, just remember to add ``__unicode__()``
+	methods to your models. With any luck, things should Just Work for you.
 
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration::

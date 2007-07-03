@@ -68,26 +68,24 @@ In Python code
 Standard translation
 ~~~~~~~~~~~~~~~~~~~~
 
-Specify a translation string by using the function ``ugettext()``. Since you
-may well be typing this a lot, it's often worthwhile importing it as a shorter
-alias and ``_`` is a very common choice.
+Specify a translation string by using the function ``ugettext()``. It's
+convention to import this as a shorter alias, ``_``, to save typing.
 
 .. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-      1. For international character set (unicode) support, you really wanting
-         to be using ``ugettext()``, rather than ``gettext()``. Sometimes, you
-         should be using ``ugettext_lazy()`` as the default translation method
-         for a particular file. By not installing ``_`` directly, the
-         developer has to think about which is the most appropriate function
-         to use.
+      1. For international character set (Unicode) support, ``ugettext()`` is
+         more useful than ``gettext()``. Sometimes, you should be using
+         ``ugettext_lazy()`` as the default translation method for a particular
+         file. Without ``_()`` in the global namespace, the developer has to
+         think about which is the most appropriate translation function.
 
-      2. Python's interactive shell uses ``_`` to represent "the previous
-         result". This is also used in doctest tests and having ``_()`` causes
-         interference. Explicitly importing ``ugettext()`` as ``_()`` avoids
-         this problem.
+      2. The underscore character (``_``) is used to represent "the previous
+         result" in Python's interactive shell and doctest tests. Installing a
+         global ``_()`` function causes interference. Explicitly importing
+         ``ugettext()`` as ``_()`` avoids this problem.
 
 In this example, the text ``"Welcome to my site."`` is marked as a translation
 string::
@@ -98,7 +96,7 @@ string::
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-Obviously you could code this without using the alias. This example is
+Obviously, you could code this without using the alias. This example is
 identical to the previous one::
 
     from django.utils.translation import ugettext
@@ -300,7 +298,7 @@ Working with lazy translation objects
 =====================================
 
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
-and utility functions is a common operation. When you are working with these
+and utility functions is a common operation. When you're working with these
 objects elsewhere in your code, you should ensure that you don't accidentally
 convert them to strings, because they should be converted as late as possible
 (so that the correct locale is in effect). This necessitates the use of a
@@ -328,20 +326,20 @@ rendering time).
 The allow_lazy() decorator
 --------------------------
 
-There are a lot of useful utility functions in Django (particularly in
-``django.utils``) that take a string as their first argument and do something
-to that string. These functions are used by template filters as well as
-directly in other code.
+Django offers many utility functions (particularly in ``django.utils``) that
+take a string as their first argument and do something to that string. These
+functions are used by template filters as well as directly in other code.
 
-If you write your own similar functions, you will rapidly come across the
-problem of what to do when the first argument is a lazy translation object.
-You don't want to convert it to a string immediately, because you may be using
-this function outside of a view (and hence the current thread's locale setting
-will not be correct). For cases like this, the
-``django.utils.functional.allow_lazy()`` decorator will be useful. It modifies
-the function so that *if* it is called with a lazy translation as the first
-argument, the function evaluation is delayed until it needs to be converted to
-a string.
+If you write your own similar functions and deal with translations, you'll 
+face the problem of what to do when the first argument is a lazy translation
+object. You don't want to convert it to a string immediately, because you might
+be using this function outside of a view (and hence the current thread's locale
+setting will not be correct).
+
+For cases like this, use the  ``django.utils.functional.allow_lazy()``
+decorator. It modifies the function so that *if* it's called with a lazy
+translation as the first argument, the function evaluation is delayed until it
+needs to be converted to a string.
 
 For example::
 
@@ -353,9 +351,9 @@ For example::
     fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
 The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-a number of extra arguments specifying the type(s) that the original function
-can return. Usually, it will be enough to just include ``unicode`` here and
-ensure that your function returns Unicode strings.
+a number of extra arguments (``*args``) specifying the type(s) that the
+original function can return. Usually, it's enough to include ``unicode`` here
+and ensure that your function returns only Unicode strings.
 
 Using this decorator means you can write your function and assume that the
 input is a proper string, then add support for lazy translation objects at the
