@@ -314,7 +314,7 @@ optional, third positional argument, ``processors``. In this example, the
         c = RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
-		return t.render(c)
+        return t.render(c)
 
 Note::
     If you're using Django's ``render_to_response()`` shortcut to populate a
