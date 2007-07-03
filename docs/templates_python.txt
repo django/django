@@ -678,7 +678,7 @@ an object to it's string value before being passed to your function::
 
     @template.stringfilter
     def lower(value):
-    	return value.lower()
+        return value.lower()
 
 Writing custom template tags
 ----------------------------
