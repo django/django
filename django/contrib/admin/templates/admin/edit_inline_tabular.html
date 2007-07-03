@@ -3,6 +3,7 @@
    <h2>{{ bound_inline.verbose_name_plural|capfirst|escape }}</h2>
    <table>
      <thead><tr>
+     {% if bound_inline.formset.deletable %}<th>Delete?</th>{% endif %}
      {% for field in bound_inline.fields %}
        {% if not field.is_hidden %}
          <th>{{ field.label|capfirst|escape }}</th>
@@ -21,15 +22,12 @@
         {% endif %}
         
         <tr class="{% cycle row1,row2 %}">
+        {{ bound_inline_object.pk_field.field }}
+        {% if bound_inline.formset.deletable %}<td>{{ bound_inline_object.deletion_field.field }}</td>{% endif %}
         {% for bfset in bound_inline_object.form %}
           {% for line in bfset %}
             {% for field in line %}
-              
-              {% if not field.field.is_hidden %}
-                <td>{{ field.field }}</td>
-              {% else %}
-                {{ field.field }}
-              {% endif %}
+              <td>{{ field.field }}</td>
             {% endfor %}
           {% endfor %}
         {% endfor %}

@@ -649,15 +649,12 @@ class BoundInline(object):
 
     def __iter__(self):
         for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
-            yield BoundInlineObject(form, original, self.inline_admin)
+            yield BoundInlineObject(self.formset, form, original, self.inline_admin)
         for form in self.formset.add_forms:
-            yield BoundInlineObject(form, None, self.inline_admin)
+            yield BoundInlineObject(self.formset, form, None, self.inline_admin)
 
     def fields(self):
-        # HACK: each form instance has some extra fields. Getting those fields
-        # from the form class will take some rearranging. Get them from the 
-        # first form instance for now.
-        return list(self.formset.forms[0])
+        return self.formset.form_class.base_fields.values()
 
     def verbose_name(self):
         return self.inline_admin.verbose_name
@@ -666,7 +663,8 @@ class BoundInline(object):
         return self.inline_admin.verbose_name_plural
 
 class BoundInlineObject(object):
-    def __init__(self, form, original, inline_admin):
+    def __init__(self, formset, form, original, inline_admin):
+        self.formset = formset
         self.inline_admin = inline_admin
         self.base_form = form
         self.form = AdminForm(form, self.fieldsets(), inline_admin.prepopulated_fields)
@@ -682,8 +680,19 @@ class BoundInlineObject(object):
         given HttpRequest object.
         """
         if self.inline_admin.fields is None:
-            default_fields = [f for f in self.base_form.fields]
+            default_fields = [f for f in self.base_form.base_fields]
             yield Fieldset(fields=default_fields)
         else:
             for name, options in self.opts.fields:
                 yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
+
+    def pk_field(self):
+        return BoundField(self.base_form, self.formset._pk_field_name, False)
+
+    def deletion_field(self):
+        from django.newforms.formsets import DELETION_FIELD_NAME
+        return BoundField(self.base_form, DELETION_FIELD_NAME, False)
+
+    def ordering_field(self):
+        from django.newforms.formsets import ORDERING_FIELD_NAME
+        return BoundField(self.base_form, ORDERING_FIELD_NAME, False)

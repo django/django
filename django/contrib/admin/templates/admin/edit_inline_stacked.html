@@ -19,6 +19,8 @@
           {% endfor %}
           </div>
       {% endfor %}
+      {{ bound_inline_object.pk_field.field }}
+      {% if bound_inline.formset.deletable %}<div class="form-row">{{ bound_inline_object.deletion_field.field }} {{ bound_inline_object.deletion_field.label_tag }}</div>{% endif %}
       </fieldset>
   {% endfor %}
 </fieldset>
