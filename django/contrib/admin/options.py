@@ -423,7 +423,7 @@ class ModelAdmin(BaseModelAdmin):
             for FormSet in self.get_inline_formsets():
                 inline_formset = FormSet(data=new_data)
                 inline_formsets.append(inline_formset)
-            if form.is_valid() and all_valid(inline_formsets):
+            if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
@@ -477,7 +477,7 @@ class ModelAdmin(BaseModelAdmin):
                 inline_formset = FormSet(obj, new_data)
                 inline_formsets.append(inline_formset)
 
-            if form.is_valid() and all_valid(inline_formsets):
+            if all_valid(inline_formsets) and form.is_valid():
                 return self.save_change(request, model, form, inline_formsets)
         else:
             form = ModelForm()
