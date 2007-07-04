@@ -22,7 +22,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     def __str__(self):
-        return smart_str(self.headline)
+        return self.headline
 
 class InternationalArticle(models.Model):
     headline = models.CharField(maxlength=100)
