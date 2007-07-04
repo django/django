@@ -100,9 +100,8 @@ class QueryDict(MultiValueDict):
     A specialized MultiValueDict that takes a query string when initialized.
     This is immutable unless you create a copy of it.
 
-    Values retrieved from this class are converted from the default encoding to
-    unicode (this is done on retrieval, rather than input, to avoid breaking
-    references or mutating referenced objects).
+    Values retrieved from this class are converted from the given encoding
+    (DEFAULT_CHARSET by default) to unicode.
     """
     def __init__(self, query_string, mutable=False, encoding=None):
         MultiValueDict.__init__(self)
