@@ -1,5 +1,4 @@
-var LATIN_MAP =
-{
+var LATIN_MAP = {
     'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE', 'Ç':
     'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I', 'Î': 'I',
     'Ï': 'I', 'Ð': 'D', 'Ñ': 'N', 'Ò': 'O', 'Ó': 'O', 'Ô': 'O', 'Õ': 'O', 'Ö':
@@ -13,8 +12,7 @@ var LATIN_MAP =
 var LATIN_SYMBOLS_MAP = {
     '©':'(c)'
 }
-var GREEK_MAP =
-{
+var GREEK_MAP = {
     'α':'a', 'β':'b', 'γ':'g', 'δ':'d', 'ε':'e', 'ζ':'z', 'η':'h', 'θ':'8',
     'ι':'i', 'κ':'k', 'λ':'l', 'μ':'m', 'ν':'n', 'ξ':'3', 'ο':'o', 'π':'p',
     'ρ':'r', 'σ':'s', 'τ':'t', 'υ':'y', 'φ':'f', 'χ':'x', 'ψ':'ps', 'ω':'w',
@@ -30,16 +28,25 @@ var TURKISH_MAP = {
     'ş':'s', 'Ş':'S', 'ı':'i', 'İ':'I', 'ç':'c', 'Ç':'C', 'ü':'u', 'Ü':'U',
     'ö':'o', 'Ö':'O', 'ğ':'g', 'Ğ':'G'
 }
-// var RUSSIAN_MAP =
-// {
-// }
+var RUSSIAN_MAP = {
+    'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d', 'е':'e', 'ё':'yo', 'ж':'zh',
+    'з':'z', 'и':'i', 'й':'j', 'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o',
+    'п':'p', 'р':'r', 'с':'s', 'т':'t', 'у':'u', 'ф':'f', 'х':'h', 'ц':'c',
+    'ч':'ch', 'ш':'sh', 'щ':'sh', 'ъ':'', 'ы':'y', 'ь':'', 'э':'e', 'ю':'yu',
+    'я':'ya',
+    'А':'A', 'Б':'B', 'В':'V', 'Г':'G', 'Д':'D', 'Е':'E', 'Ё':'Yo', 'Ж':'Zh',
+    'З':'Z', 'И':'I', 'Й':'J', 'К':'K', 'Л':'L', 'М':'M', 'Н':'N', 'О':'O',
+    'П':'P', 'Р':'R', 'С':'S', 'Т':'T', 'У':'U', 'Ф':'F', 'Х':'H', 'Ц':'C',
+    'Ч':'Ch', 'Ш':'Sh', 'Щ':'Sh', 'Ъ':'', 'Ы':'Y', 'Ь':'', 'Э':'E', 'Ю':'Yu',
+    'Я':'Ya'
+}
 
 var ALL_DOWNCODE_MAPS=new Array()
 ALL_DOWNCODE_MAPS[0]=LATIN_MAP
 ALL_DOWNCODE_MAPS[1]=LATIN_SYMBOLS_MAP
 ALL_DOWNCODE_MAPS[2]=GREEK_MAP
 ALL_DOWNCODE_MAPS[3]=TURKISH_MAP
-//ALL_DOWNCODE_MAPS[4]=RUSSIAN_MAP
+ALL_DOWNCODE_MAPS[4]=RUSSIAN_MAP
 
 var Downcoder = new Object();
 Downcoder.Initialize = function()
