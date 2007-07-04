@@ -65,9 +65,12 @@ class DataSourceTest(unittest.TestCase):
             ds = DataSource(source.ds)
 
             # Incrementing through each layer, this tests __iter__
-            for layer in ds:
+            for layer in ds:                
                 # Making sure we get the number of features we expect
                 self.assertEqual(len(layer), source.nfeat)
+
+                layer[0] #can index
+                layer[:1] #can slice
 
                 # Making sure we get the number of fields we expect
                 self.assertEqual(source.nfld, layer.num_fields)
@@ -94,7 +97,7 @@ class DataSourceTest(unittest.TestCase):
                 # Incrementing through each feature in the layer
                 for feat in layer:
                     # Making sure the number of fields is what's expected.
-                    self.assertEqual(source.nfld, len(feat))
+                    self.assertEqual(source.nfld, len(list(feat)))
                     self.assertEqual(source.gtype, feat.geom_type)
 
                     # Making sure the fields match to an appropriate OFT type.

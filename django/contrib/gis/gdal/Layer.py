@@ -35,20 +35,26 @@ class Layer(object):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        if index < 0 or index >= self.num_feat:
-            raise IndexError, 'index out of range'
-        return Feature(lgdal.OGR_L_GetFeature(self._layer, c_long(index)))
+        def make_feature(offset):
+            return Feature(lgdal.OGR_L_GetFeature(self._layer,
+                                                  c_long(offset)))
+        end = self.num_feat
+        if not isinstance(index, (slice, int)):
+            raise TypeError
+        if isinstance(index,int):
+            if index < 0:
+                index = end - index
+            if index < 0 or index >= self.num_feat:
+                raise IndexError, 'index out of range'
+            yield make_feature(index)
+        else: #isinstance(index,slice)
+            start, stop, stride = index.indices(end)
+            for offset in xrange(start,stop,stride):
+                yield make_feature(offset)
 
     def __iter__(self):
         "Iterates over each Feature in the Layer."
-
-        # Resetting the Layer before beginning iteration
-        lgdal.OGR_L_ResetReading(self._layer)
-
-        # Incrementing over each feature in the layer, and yielding
-        #  to the caller of the function.
-        for i in xrange(self.num_feat):
-            yield self.__getitem__(i)
+        return self.__getitem__(slice(self.num_feat))
 
     def __len__(self):
         "The length is the number of features."

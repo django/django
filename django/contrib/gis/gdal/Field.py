@@ -48,14 +48,24 @@ class OFTInteger(Field):
     @property
     def value(self):
         "Returns an integer contained in this field."
-        return int(self._val)
+        try:
+            return int(self._val)
+        except ValueError:
+            return 0
     
 class OFTIntegerList(Field): pass
 class OFTReal(Field):
     @property
     def value(self):
         "Returns a float contained in this field."
-        return float(self._val)
+
+        try:
+            return float(self._val)
+        except ValueError:
+            #FIXME: 0?  None?
+            return 0
+
+        
 
 class OFTRealList(Field): pass
 class OFTString(Field): pass
