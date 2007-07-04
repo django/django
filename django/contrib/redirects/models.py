@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.sites.models import Site
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 class Redirect(models.Model):
     site = models.ForeignKey(Site, radio_admin=models.VERTICAL)
@@ -20,5 +20,5 @@ class Redirect(models.Model):
         list_filter = ('site',)
         search_fields = ('old_path', 'new_path')
 
-    def __str__(self):
-        return "%s ---> %s" % (self.old_path, self.new_path)
+    def __unicode__(self):
+        return u"%s ---> %s" % (self.old_path, self.new_path)

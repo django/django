@@ -2,8 +2,10 @@ from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import backend, connection, models
 from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import gettext_lazy as _
+from django.utils.encoding import smart_str
+from django.utils.translation import ugettext_lazy as _
 import datetime
+import urllib
 
 try:
     set
@@ -18,16 +20,16 @@ def check_password(raw_password, enc_password):
     algo, salt, hsh = enc_password.split('$')
     if algo == 'md5':
         import md5
-        return hsh == md5.new(salt+raw_password).hexdigest()
+        return hsh == md5.new(smart_str(salt + raw_password)).hexdigest()
     elif algo == 'sha1':
         import sha
-        return hsh == sha.new(salt+raw_password).hexdigest()
+        return hsh == sha.new(smart_str(salt + raw_password)).hexdigest()
     elif algo == 'crypt':
         try:
             import crypt
         except ImportError:
             raise ValueError, "Crypt password algorithm not supported in this environment."
-        return hsh == crypt.crypt(raw_password, salt)
+        return hsh == crypt.crypt(smart_str(raw_password), smart_str(salt))
     raise ValueError, "Got unknown password algorithm type in password."
 
 class SiteProfileNotAvailable(Exception):
@@ -56,8 +58,8 @@ class Permission(models.Model):
         unique_together = (('content_type', 'codename'),)
         ordering = ('content_type', 'codename')
 
-    def __str__(self):
-        return "%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
+    def __unicode__(self):
+        return u"%s | %s | %s" % (self.content_type.app_label, self.content_type, self.name)
 
 class Group(models.Model):
     """Groups are a generic way of categorizing users to apply permissions, or some other label, to those users. A user can belong to any number of groups.
@@ -77,7 +79,7 @@ class Group(models.Model):
     class Admin:
         search_fields = ('name',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class UserManager(models.Manager):
@@ -133,11 +135,11 @@ class User(models.Model):
         list_filter = ('is_staff', 'is_superuser')
         search_fields = ('username', 'first_name', 'last_name', 'email')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.username
 
     def get_absolute_url(self):
-        return "/users/%s/" % self.username
+        return "/users/%s/" % urllib.quote(smart_str(self.username))
 
     def is_anonymous(self):
         "Always returns False. This is a way of comparing User objects to anonymous users."
@@ -150,14 +152,14 @@ class User(models.Model):
 
     def get_full_name(self):
         "Returns the first_name plus the last_name, with a space in between."
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = u'%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def set_password(self, raw_password):
         import sha, random
         algo = 'sha1'
         salt = sha.new(str(random.random())).hexdigest()[:5]
-        hsh = sha.new(salt+raw_password).hexdigest()
+        hsh = sha.new(salt + smart_str(raw_password)).hexdigest()
         self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
@@ -169,7 +171,7 @@ class User(models.Model):
         # algorithm or salt.
         if '$' not in self.password:
             import md5
-            is_correct = (self.password == md5.new(raw_password).hexdigest())
+            is_correct = (self.password == md5.new(smart_str(raw_password)).hexdigest())
             if is_correct:
                 # Convert the password to the new, more secure format.
                 self.set_password(raw_password)
@@ -209,7 +211,7 @@ class User(models.Model):
 
     def get_all_permissions(self):
         if not hasattr(self, '_perm_cache'):
-            self._perm_cache = set(["%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
+            self._perm_cache = set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
             self._perm_cache.update(self.get_group_permissions())
         return self._perm_cache
 
@@ -271,7 +273,7 @@ class Message(models.Model):
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))
 
-    def __str__(self):
+    def __unicode__(self):
         return self.message
 
 class AnonymousUser(object):
@@ -281,8 +283,11 @@ class AnonymousUser(object):
     def __init__(self):
         pass
 
-    def __str__(self):
+    def __unicode__(self):
         return 'AnonymousUser'
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     def __eq__(self, other):
         return isinstance(other, self.__class__)

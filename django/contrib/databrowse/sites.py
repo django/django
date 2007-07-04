@@ -60,7 +60,7 @@ class ModelDatabrowse(object):
 
     def main_view(self, request):
         easy_model = EasyModel(self.site, self.model)
-        html_snippets = '\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()])
+        html_snippets = u'\n'.join([p.model_index_html(request, self.model, self.site) for p in self.plugins.values()])
         return render_to_response('databrowse/model_detail.html', {
             'model': easy_model,
             'root_url': self.site.root_url,

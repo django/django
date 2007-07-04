@@ -34,13 +34,13 @@ class Category(models.Model):
     name = models.CharField(maxlength=20)
     url = models.CharField('The URL', maxlength=40)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Writer(models.Model):
     name = models.CharField(maxlength=50, help_text='Use both first and last names.')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -58,14 +58,14 @@ class Article(models.Model):
             self.created = datetime.date.today()
         return super(Article, self).save()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
     description = models.CharField(maxlength=20)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.phone
 
 __test__ = {'API_TESTS': """
@@ -244,10 +244,10 @@ True
 1
 >>> test_art = Article.objects.get(id=1)
 >>> test_art.headline
-'Test headline'
+u'Test headline'
 
-You can create a form over a subset of the available fields 
-by specifying a 'fields' argument to form_for_instance. 
+You can create a form over a subset of the available fields
+by specifying a 'fields' argument to form_for_instance.
 >>> PartialArticleForm = form_for_instance(art, fields=('headline','pub_date'))
 >>> f = PartialArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04'}, auto_id=False)
 >>> print f.as_ul()
@@ -260,7 +260,7 @@ True
 1
 >>> new_art = Article.objects.get(id=1)
 >>> new_art.headline
-'New headline'
+u'New headline'
 
 Add some categories and test the many-to-many form output.
 >>> new_art.categories.all()

@@ -1456,7 +1456,7 @@ Consider this set of models::
         title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
     class Book(models.Model):

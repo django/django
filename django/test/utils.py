@@ -12,9 +12,9 @@ from django.template import Template
 TEST_DATABASE_PREFIX = 'test_'
 
 def instrumented_test_render(self, context):
-    """An instrumented Template render method, providing a signal 
+    """
+    An instrumented Template render method, providing a signal
     that can be intercepted by the test system Client
-    
     """
     dispatcher.send(signal=signals.template_rendered, sender=self, template=self, context=context)
     return self.nodelist.render(context)

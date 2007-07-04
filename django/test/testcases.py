@@ -129,11 +129,11 @@ class TestCase(unittest.TestCase):
         if isinstance(response.template, list):
             template_names = [t.name for t in response.template]
             self.failUnless(template_name in template_names,
-                "Template '%s' was not one of the templates used to render the response. Templates used: %s" %
-                    (template_name, template_names))
+                u"Template '%s' was not one of the templates used to render the response. Templates used: %s" %
+                    (template_name, u', '.join(template_names)))
         elif response.template:
             self.assertEqual(template_name, response.template.name,
-                "Template '%s' was not used to render the response. Actual template was '%s'" %
+                u"Template '%s' was not used to render the response. Actual template was '%s'" %
                     (template_name, response.template.name))
         else:
             self.fail('No templates used to render the response')
@@ -142,8 +142,8 @@ class TestCase(unittest.TestCase):
         "Assert that the template with the provided name was NOT used in rendering the response"
         if isinstance(response.template, list):            
             self.failIf(template_name in [t.name for t in response.template],
-                "Template '%s' was used unexpectedly in rendering the response" % template_name)
+                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
         elif response.template:
             self.assertNotEqual(template_name, response.template.name,
-                "Template '%s' was used unexpectedly in rendering the response" % template_name)
-        
+                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
+

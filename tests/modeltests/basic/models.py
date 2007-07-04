@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 1. Bare-bones model
 
@@ -13,7 +14,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('pub_date','headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS': """
@@ -351,7 +352,7 @@ __test__['API_TESTS'] += """
 >>> a101.save()
 >>> a101 = Article.objects.get(pk=101)
 >>> a101.headline
-'Article 101'
+u'Article 101'
 
 # You can create saved objects in a single step
 >>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))

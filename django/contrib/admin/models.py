@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_unicode
 
 ADDITION = 1
 CHANGE = 2
@@ -9,7 +10,7 @@ DELETION = 3
 
 class LogEntryManager(models.Manager):
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
-        e = self.model(None, None, user_id, content_type_id, str(object_id), object_repr[:200], action_flag, change_message)
+        e = self.model(None, None, user_id, content_type_id, smart_unicode(object_id), object_repr[:200], action_flag, change_message)
         e.save()
 
 class LogEntry(models.Model):
@@ -28,7 +29,7 @@ class LogEntry(models.Model):
         ordering = ('-action_time',)
 
     def __repr__(self):
-        return str(self.action_time)
+        return smart_unicode(self.action_time)
 
     def is_addition(self):
         return self.action_flag == ADDITION
@@ -48,4 +49,4 @@ class LogEntry(models.Model):
         Returns the admin URL to edit the object represented by this log entry.
         This is relative to the Django admin index page.
         """
-        return "%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id)
+        return u"%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id)

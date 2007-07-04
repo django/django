@@ -13,7 +13,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':r"""
@@ -100,7 +100,7 @@ TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 # values() returns a list of dictionaries instead of object instances -- and
 # you can specify which fields you want to retrieve.
 >>> Article.objects.values('headline')
-[{'headline': 'Article 5'}, {'headline': 'Article 6'}, {'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 7'}, {'headline': 'Article 1'}]
+[{'headline': u'Article 5'}, {'headline': u'Article 6'}, {'headline': u'Article 4'}, {'headline': u'Article 2'}, {'headline': u'Article 3'}, {'headline': u'Article 7'}, {'headline': u'Article 1'}]
 >>> Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id')
 [{'id': 2}, {'id': 3}, {'id': 7}]
 >>> list(Article.objects.values('id', 'headline')) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 7, 'headline': 'Article 7'}, {'id': 1, 'headline': 'Article 1'}]
@@ -110,13 +110,13 @@ True
 ...     i = d.items()
 ...     i.sort()
 ...     i
-[('headline', 'Article 5'), ('id', 5)]
-[('headline', 'Article 6'), ('id', 6)]
-[('headline', 'Article 4'), ('id', 4)]
-[('headline', 'Article 2'), ('id', 2)]
-[('headline', 'Article 3'), ('id', 3)]
-[('headline', 'Article 7'), ('id', 7)]
-[('headline', 'Article 1'), ('id', 1)]
+[('headline', u'Article 5'), ('id', 5)]
+[('headline', u'Article 6'), ('id', 6)]
+[('headline', u'Article 4'), ('id', 4)]
+[('headline', u'Article 2'), ('id', 2)]
+[('headline', u'Article 3'), ('id', 3)]
+[('headline', u'Article 7'), ('id', 7)]
+[('headline', u'Article 1'), ('id', 1)]
 
 # You can use values() with iterator() for memory savings, because iterator()
 # uses database-level iteration.
@@ -124,13 +124,13 @@ True
 ...     i = d.items()
 ...     i.sort()
 ...     i
-[('headline', 'Article 5'), ('id', 5)]
-[('headline', 'Article 6'), ('id', 6)]
-[('headline', 'Article 4'), ('id', 4)]
-[('headline', 'Article 2'), ('id', 2)]
-[('headline', 'Article 3'), ('id', 3)]
-[('headline', 'Article 7'), ('id', 7)]
-[('headline', 'Article 1'), ('id', 1)]
+[('headline', u'Article 5'), ('id', 5)]
+[('headline', u'Article 6'), ('id', 6)]
+[('headline', u'Article 4'), ('id', 4)]
+[('headline', u'Article 2'), ('id', 2)]
+[('headline', u'Article 3'), ('id', 3)]
+[('headline', u'Article 7'), ('id', 7)]
+[('headline', u'Article 1'), ('id', 1)]
 
 
 # you can use values() even on extra fields

@@ -1,6 +1,6 @@
 import datetime, math, time
 from django.utils.tzinfo import LocalTimezone
-from django.utils.translation import ngettext, gettext
+from django.utils.translation import ungettext, ugettext
 
 def timesince(d, now=None):
     """
@@ -9,12 +9,12 @@ def timesince(d, now=None):
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
-      (60 * 60 * 24 * 365, lambda n: ngettext('year', 'years', n)),
-      (60 * 60 * 24 * 30, lambda n: ngettext('month', 'months', n)),
-      (60 * 60 * 24 * 7, lambda n : ngettext('week', 'weeks', n)),
-      (60 * 60 * 24, lambda n : ngettext('day', 'days', n)),
-      (60 * 60, lambda n: ngettext('hour', 'hours', n)),
-      (60, lambda n: ngettext('minute', 'minutes', n))
+      (60 * 60 * 24 * 365, lambda n: ungettext('year', 'years', n)),
+      (60 * 60 * 24 * 30, lambda n: ungettext('month', 'months', n)),
+      (60 * 60 * 24 * 7, lambda n : ungettext('week', 'weeks', n)),
+      (60 * 60 * 24, lambda n : ungettext('day', 'days', n)),
+      (60 * 60, lambda n: ungettext('hour', 'hours', n)),
+      (60, lambda n: ungettext('minute', 'minutes', n))
     )
     # Convert datetime.date to datetime.datetime for comparison
     if d.__class__ is not datetime.datetime:
@@ -37,14 +37,14 @@ def timesince(d, now=None):
         if count != 0:
             break
     if count < 0:
-        return gettext('%d milliseconds') % math.floor((now - d).microseconds / 1000)
-    s = gettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
+        return ugettext('%d milliseconds') % math.floor((now - d).microseconds / 1000)
+    s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
     if i + 1 < len(chunks):
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
         count2 = (since - (seconds * count)) / seconds2
         if count2 != 0:
-            s += gettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
+            s += ugettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
     return s
 
 def timeuntil(d, now=None):

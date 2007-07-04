@@ -3,7 +3,9 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
+from django.utils.encoding import smart_unicode
+
 
 from util import ValidationError
 from forms import BaseForm, SortedDictFromList
@@ -122,7 +124,7 @@ class QuerySetIterator(object):
         if self.empty_label is not None:
             yield (u"", self.empty_label)
         for obj in self.queryset:
-            yield (obj._get_pk_val(), str(obj))
+            yield (obj._get_pk_val(), smart_unicode(obj))
         # Clear the QuerySet cache if required.
         if not self.cache_choices:
             self.queryset._result_cache = None
@@ -169,7 +171,7 @@ class ModelChoiceField(ChoiceField):
         try:
             value = self.queryset.model._default_manager.get(pk=value)
         except self.queryset.model.DoesNotExist:
-            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class ModelMultipleChoiceField(ModelChoiceField):
@@ -182,17 +184,17 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def clean(self, value):
         if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(gettext(u'Enter a list of values.'))
+            raise ValidationError(ugettext(u'Enter a list of values.'))
         final_values = []
         for val in value:
             try:
                 obj = self.queryset.model._default_manager.get(pk=val)
             except self.queryset.model.DoesNotExist:
-                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
             else:
                 final_values.append(obj)
         return final_values

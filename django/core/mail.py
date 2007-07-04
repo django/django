@@ -3,12 +3,13 @@ Tools for sending email.
 """
 
 from django.conf import settings
+from django.utils.encoding import smart_str, force_unicode
 from email import Charset, Encoders
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email.Header import Header
-from email.Utils import formatdate
+from email.Utils import formatdate, parseaddr, formataddr
 import mimetypes
 import os
 import smtplib
@@ -67,8 +68,18 @@ class SafeMIMEText(MIMEText):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
-        if name == "Subject":
-            val = Header(val, settings.DEFAULT_CHARSET)
+        try:
+            val = str(force_unicode(val))
+        except UnicodeEncodeError:
+            if name.lower() in ('to', 'from', 'cc'):
+                result = []
+                for item in val.split(', '):
+                    nm, addr = parseaddr(item)
+                    nm = str(Header(nm, settings.DEFAULT_CHARSET))
+                    result.append(formataddr((nm, str(addr))))
+                val = ', '.join(result)
+            else:
+                val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
         MIMEText.__setitem__(self, name, val)
 
 class SafeMIMEMultipart(MIMEMultipart):
@@ -76,8 +87,18 @@ class SafeMIMEMultipart(MIMEMultipart):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
-        if name == "Subject":
-            val = Header(val, settings.DEFAULT_CHARSET)
+        try:
+            val = str(force_unicode(val))
+        except UnicodeEncodeError:
+            if name.lower() in ('to', 'from', 'cc'):
+                result = []
+                for item in val.split(', '):
+                    nm, addr = parseaddr(item)
+                    nm = str(Header(nm, settings.DEFAULT_CHARSET))
+                    result.append(formataddr((nm, str(addr))))
+                val = ', '.join(result)
+            else:
+                val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
         MIMEMultipart.__setitem__(self, name, val)
 
 class SMTPConnection(object):
@@ -176,6 +197,14 @@ class EmailMessage(object):
 
     def __init__(self, subject='', body='', from_email=None, to=None, bcc=None,
             connection=None, attachments=None, headers=None):
+        """
+        Initialise a single email message (which can be sent to multiple
+        recipients).
+
+        All strings used to create the message can be unicode strings (or UTF-8
+        bytestrings). The SafeMIMEText class will handle any necessary encoding
+        conversions.
+        """
         self.to = to or []
         self.bcc = bcc or []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
@@ -192,7 +221,7 @@ class EmailMessage(object):
 
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
-        msg = SafeMIMEText(self.body, self.content_subtype, encoding)
+        msg = SafeMIMEText(smart_str(self.body, settings.DEFAULT_CHARSET), self.content_subtype, encoding)
         if self.attachments:
             body_msg = msg
             msg = SafeMIMEMultipart(_subtype=self.multipart_subtype)

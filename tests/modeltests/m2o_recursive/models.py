@@ -16,7 +16,7 @@ class Category(models.Model):
     name = models.CharField(maxlength=20)
     parent = models.ForeignKey('self', null=True, related_name='child_set')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

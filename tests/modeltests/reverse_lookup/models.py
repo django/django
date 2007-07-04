@@ -9,14 +9,14 @@ from django.db import models
 class User(models.Model):
     name = models.CharField(maxlength=200)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Poll(models.Model):
     question = models.CharField(maxlength=200)
     creator = models.ForeignKey(User)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.question
 
 class Choice(models.Model):
@@ -24,7 +24,7 @@ class Choice(models.Model):
     poll = models.ForeignKey(Poll, related_name="poll_choice")
     related_poll = models.ForeignKey(Poll, related_name="related_choice")
 
-    def __str(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

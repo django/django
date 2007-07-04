@@ -10,8 +10,8 @@ except NameError:
 from itertools import chain
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
-from django.utils.translation import gettext
-from django.utils.encoding import StrAndUnicode, smart_unicode
+from django.utils.translation import ugettext
+from django.utils.encoding import StrAndUnicode, force_unicode
 from util import flatatt
 
 __all__ = (
@@ -77,7 +77,7 @@ class Input(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        if value != '': final_attrs['value'] = smart_unicode(value) # Only add the 'value' attribute if a value is non-empty.
+        if value != '': final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
 
 class TextInput(Input):
@@ -111,7 +111,7 @@ class MultipleHiddenInput(HiddenInput):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=smart_unicode(v), **final_attrs))) for v in value])
+        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=force_unicode(v), **final_attrs))) for v in value])
 
     def value_from_datadict(self, data, name):
         if isinstance(data, MultiValueDict):
@@ -130,7 +130,7 @@ class Textarea(Widget):
 
     def render(self, name, value, attrs=None):
         if value is None: value = ''
-        value = smart_unicode(value)
+        value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
 
@@ -150,7 +150,7 @@ class CheckboxInput(Widget):
         if result:
             final_attrs['checked'] = 'checked'
         if value not in ('', True, False, None):
-            final_attrs['value'] = smart_unicode(value) # Only add the 'value' attribute if a value is non-empty.
+            final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
 
 class Select(Widget):
@@ -165,11 +165,11 @@ class Select(Widget):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select%s>' % flatatt(final_attrs)]
-        str_value = smart_unicode(value) # Normalize to string.
+        str_value = force_unicode(value) # Normalize to string.
         for option_value, option_label in chain(self.choices, choices):
-            option_value = smart_unicode(option_value)
+            option_value = force_unicode(option_value)
             selected_html = (option_value == str_value) and u' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
+            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
 
@@ -178,7 +178,7 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = ((u'1', gettext('Unknown')), (u'2', gettext('Yes')), (u'3', gettext('No')))
+        choices = ((u'1', ugettext('Unknown')), (u'2', ugettext('Yes')), (u'3', ugettext('No')))
         super(NullBooleanSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
@@ -202,11 +202,11 @@ class SelectMultiple(Widget):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select multiple="multiple"%s>' % flatatt(final_attrs)]
-        str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
+        str_values = set([force_unicode(v) for v in value]) # Normalize to strings.
         for option_value, option_label in chain(self.choices, choices):
-            option_value = smart_unicode(option_value)
+            option_value = force_unicode(option_value)
             selected_html = (option_value in str_values) and ' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(smart_unicode(option_label))))
+            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
         output.append(u'</select>')
         return u'\n'.join(output)
 
@@ -220,8 +220,8 @@ class RadioInput(StrAndUnicode):
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
-        self.choice_value = smart_unicode(choice[0])
-        self.choice_label = smart_unicode(choice[1])
+        self.choice_value = force_unicode(choice[0])
+        self.choice_label = force_unicode(choice[1])
         self.index = index
 
     def __unicode__(self):
@@ -254,13 +254,13 @@ class RadioFieldRenderer(StrAndUnicode):
 
     def __unicode__(self):
         "Outputs a <ul> for this set of radio fields."
-        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % w for w in self])
+        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % force_unicode(w) for w in self])
 
 class RadioSelect(Select):
     def render(self, name, value, attrs=None, choices=()):
         "Returns a RadioFieldRenderer instance rather than a Unicode string."
         if value is None: value = ''
-        str_value = smart_unicode(value) # Normalize to string.
+        str_value = force_unicode(value) # Normalize to string.
         final_attrs = self.build_attrs(attrs)
         return RadioFieldRenderer(name, str_value, final_attrs, list(chain(self.choices, choices)))
 
@@ -280,16 +280,16 @@ class CheckboxSelectMultiple(SelectMultiple):
         has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
-        str_values = set([smart_unicode(v) for v in value]) # Normalize to strings.
+        str_values = set([force_unicode(v) for v in value]) # Normalize to strings.
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
             if has_id:
                 final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
             cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
-            option_value = smart_unicode(option_value)
+            option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
-            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(smart_unicode(option_label))))
+            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(force_unicode(option_label))))
         output.append(u'</ul>')
         return u'\n'.join(output)
 

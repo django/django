@@ -4,6 +4,7 @@ Creates content types for all installed models.
 
 from django.dispatch import dispatcher
 from django.db.models import get_apps, get_models, signals
+from django.utils.encoding import smart_unicode
 
 def create_contenttypes(app, created_models, verbosity=2):
     from django.contrib.contenttypes.models import ContentType
@@ -17,7 +18,7 @@ def create_contenttypes(app, created_models, verbosity=2):
             ContentType.objects.get(app_label=opts.app_label,
                 model=opts.object_name.lower())
         except ContentType.DoesNotExist:
-            ct = ContentType(name=str(opts.verbose_name),
+            ct = ContentType(name=smart_unicode(opts.verbose_name_raw),
                 app_label=opts.app_label, model=opts.object_name.lower())
             ct.save()
             if verbosity >= 2:

@@ -12,6 +12,7 @@ from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
+from django.utils.encoding import smart_str, force_unicode
 from django.conf import settings
 from itertools import izip
 import types
@@ -83,9 +84,11 @@ class Model(object):
         return getattr(self, self._meta.pk.attname)
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self)
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
 
     def __str__(self):
+        if hasattr(self, '__unicode__'):
+            return force_unicode(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
@@ -318,14 +321,14 @@ class Model(object):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return dict(field.choices).get(value, value)
+        return force_unicode(dict(field.choices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
         where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
             backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op)
-        param = str(getattr(self, field.attname))
+        param = smart_str(getattr(self, field.attname))
         q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
         q._where.append(where)
         q._params.extend([param, param, getattr(self, self._meta.pk.attname)])

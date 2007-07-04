@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.views.generic import date_based
+from django.utils.encoding import force_unicode
 import datetime
 import time
 
@@ -27,13 +28,13 @@ class CalendarPlugin(DatabrowsePlugin):
     def model_index_html(self, request, model, site):
         fields = self.field_dict(model)
         if not fields:
-            return ''
-        return '<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
-            ', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, capfirst(f.verbose_name)) for f in fields.values()])
+            return u''
+        return u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
+            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()])
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
-            return ['%s%s/%s/%s/%s/%s/' % (easy_instance_field.model.url(),
+            return [u'%s%s/%s/%s/%s/%s/' % (easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 easy_instance_field.raw_value.year,
                 easy_instance_field.raw_value.strftime('%b').lower(),

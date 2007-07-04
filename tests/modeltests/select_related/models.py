@@ -13,49 +13,49 @@ from django.db import models
 
 class Domain(models.Model):
     name = models.CharField(maxlength=50)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Kingdom(models.Model):
     name = models.CharField(maxlength=50)
     domain = models.ForeignKey(Domain)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Phylum(models.Model):
     name = models.CharField(maxlength=50)
     kingdom = models.ForeignKey(Kingdom)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
     
 class Klass(models.Model):
     name = models.CharField(maxlength=50)
     phylum = models.ForeignKey(Phylum)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
     
 class Order(models.Model):
     name = models.CharField(maxlength=50)
     klass = models.ForeignKey(Klass)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Family(models.Model):
     name = models.CharField(maxlength=50)
     order = models.ForeignKey(Order)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Genus(models.Model):
     name = models.CharField(maxlength=50)
     family = models.ForeignKey(Family)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Species(models.Model):
     name = models.CharField(maxlength=50)
     genus = models.ForeignKey(Genus)
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 def create_tree(stringtree):

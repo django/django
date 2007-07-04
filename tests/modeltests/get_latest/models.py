@@ -17,7 +17,7 @@ class Article(models.Model):
     class Meta:
         get_latest_by = 'pub_date'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class Person(models.Model):
@@ -26,7 +26,7 @@ class Person(models.Model):
 
     # Note that this model doesn't have "get_latest_by" set.
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

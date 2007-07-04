@@ -6,7 +6,8 @@ from django.db import models
 from django.utils import dateformat
 from django.utils.html import escape
 from django.utils.text import capfirst
-from django.utils.translation import get_date_formats, get_partial_date_formats
+from django.utils.translation import get_date_formats, get_partial_date_formats, ugettext as _
+from django.utils.encoding import smart_unicode, smart_str, force_unicode
 from django.template import Library
 import datetime
 
@@ -16,11 +17,11 @@ DOT = '.'
 
 def paginator_number(cl,i):
     if i == DOT:
-        return '... '
+        return u'... '
     elif i == cl.page_num:
-        return '<span class="this-page">%d</span> ' % (i+1)
+        return u'<span class="this-page">%d</span> ' % (i+1)
     else:
-        return '<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
+        return u'<a href="%s"%s>%d</a> ' % (cl.get_query_string({PAGE_VAR: i}), (i == cl.paginator.pages-1 and ' class="end"' or ''), i+1)
 paginator_number = register.simple_tag(paginator_number)
 
 def pagination(cl):
@@ -75,10 +76,12 @@ def result_headers(cl):
             admin_order_field = None
         except models.FieldDoesNotExist:
             # For non-field list_display values, check for the function
-            # attribute "short_description". If that doesn't exist, fall
-            # back to the method name. And __str__ is a special-case.
-            if field_name == '__str__':
-                header = lookup_opts.verbose_name
+            # attribute "short_description". If that doesn't exist, fall back
+            # to the method name. And __str__ and __unicode__ are special-cases.
+            if field_name == '__unicode__':
+                header = force_unicode(lookup_opts.verbose_name)
+            elif field_name == '__str__':
+                header = smart_str(lookup_opts.verbose_name)
             else:
                 attr = getattr(cl.model, field_name) # Let AttributeErrors propagate.
                 try:
@@ -114,7 +117,7 @@ def result_headers(cl):
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return '<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
+    return u'<img src="%simg/admin/icon-%s.gif" alt="%s" />' % (settings.ADMIN_MEDIA_PREFIX, BOOLEAN_MAPPING[field_val], field_val)
 
 def items_for_result(cl, result):
     first = True
@@ -136,7 +139,7 @@ def items_for_result(cl, result):
                     allow_tags = True
                     result_repr = _boolean_icon(attr)
                 else:
-                    result_repr = str(attr)
+                    result_repr = smart_unicode(attr)
             except (AttributeError, ObjectDoesNotExist):
                 result_repr = EMPTY_CHANGELIST_VALUE
             else:
@@ -179,19 +182,19 @@ def items_for_result(cl, result):
             elif f.choices:
                 result_repr = dict(f.choices).get(field_val, EMPTY_CHANGELIST_VALUE)
             else:
-                result_repr = escape(str(field_val))
-        if result_repr == '':
+                result_repr = escape(field_val)
+        if force_unicode(result_repr) == '':
             result_repr = '&nbsp;'
         # If list_display_links not defined, add the link tag to the first field
-        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links: 
+        if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
             first = False
             url = cl.url_for_result(result)
-            result_id = str(getattr(result, pk)) # str() is needed in case of 23L (long ints)
-            yield ('<%s%s><a href="%s"%s>%s</a></%s>' % \
+            result_id = smart_unicode(getattr(result, pk)) # conversion to string is needed in case of 23L (long ints)
+            yield (u'<%s%s><a href="%s"%s>%s</a></%s>' % \
                 (table_tag, row_class, url, (cl.is_popup and ' onclick="opener.dismissRelatedLookupPopup(window, %r); return false;"' % result_id or ''), result_repr, table_tag))
         else:
-            yield ('<td%s>%s</td>' % (row_class, result_repr))
+            yield (u'<td%s>%s</td>' % (row_class, result_repr))
 
 def results(cl):
     for res in cl.result_list:

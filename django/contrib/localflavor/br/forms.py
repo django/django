@@ -6,7 +6,7 @@ BR-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 import re
 
 phone_digits_re = re.compile(r'^(\d{2})[-\.]?(\d{4})[-\.]?(\d{4})$')
@@ -15,8 +15,8 @@ class BRZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
             max_length=None, min_length=None,
-            error_message=gettext('Enter a zip code in the format XXXXX-XXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXXX-XXX.'),
+                    *args, **kwargs)
 
 class BRPhoneNumberField(Field):
     def clean(self, value):
@@ -27,7 +27,7 @@ class BRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(gettext(u'Phone numbers must be in XX-XXXX-XXXX format.'))
+        raise ValidationError(ugettext('Phone numbers must be in XX-XXXX-XXXX format.'))
 
 class BRStateSelect(Select):
     """
@@ -35,7 +35,7 @@ class BRStateSelect(Select):
     as its choices.
     """
     def __init__(self, attrs=None):
-        from br_states import STATE_CHOICES # relative import
+        from br_states import STATE_CHOICES
         super(BRStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
 
@@ -69,9 +69,9 @@ class BRCPFField(CharField):
         try:
             int(value)
         except ValueError:
-            raise ValidationError(gettext("This field requires only numbers."))
+            raise ValidationError(ugettext("This field requires only numbers."))
         if len(value) != 11:
-            raise ValidationError(gettext("This field requires at most 11 digits or 14 characters."))
+            raise ValidationError(ugettext("This field requires at most 11 digits or 14 characters."))
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(10, 1, -1))])
@@ -81,7 +81,7 @@ class BRCPFField(CharField):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(gettext("Invalid CPF number."))
+            raise ValidationError(ugettext("Invalid CPF number."))
 
         return orig_value
 
@@ -103,7 +103,7 @@ class BRCNPJField(Field):
             raise ValidationError("This field requires only numbers.")
         if len(value) != 14:
             raise ValidationError(
-                gettext("This field requires at least 14 digits"))
+                ugettext("This field requires at least 14 digits"))
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(5, 1, -1) + range(9, 1, -1))])
@@ -113,7 +113,7 @@ class BRCNPJField(Field):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(gettext("Invalid CNPJ number."))
+            raise ValidationError(ugettext("Invalid CNPJ number."))
 
         return orig_value
 

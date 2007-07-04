@@ -442,6 +442,16 @@ Default: ``False``
 
 Whether to use a TLS (secure) connection when talking to the SMTP server.
 
+FILE_CHARSET
+------------
+
+**New in Django development version**
+
+Default: ``'utf-8'``
+
+The character encoding used to decode any files read from disk. This includes
+template files and initial SQL data files.
+
 FIXTURE_DIRS
 -------------
 

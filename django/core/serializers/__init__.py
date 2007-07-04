@@ -6,7 +6,7 @@ Usage::
     >>> from django.core import serializers
     >>> json = serializers.serialize("json", some_query_set)
     >>> objects = list(serializers.deserialize("json", json))
-        
+
 To add your own serializers, use the SERIALIZATION_MODULES setting::
 
     SERIALIZATION_MODULES = {
@@ -30,19 +30,19 @@ try:
     import yaml
     BUILTIN_SERIALIZERS["yaml"] = "django.core.serializers.pyyaml"
 except ImportError:
-    pass    
+    pass
 
 _serializers = {}
-        
+
 def register_serializer(format, serializer_module):
     """Register a new serializer by passing in a module name."""
     module = __import__(serializer_module, {}, {}, [''])
     _serializers[format] = module
-    
+
 def unregister_serializer(format):
     """Unregister a given serializer"""
     del _serializers[format]
-    
+
 def get_serializer(format):
     if not _serializers:
         _load_serializers()
@@ -52,12 +52,12 @@ def get_serializer_formats():
     if not _serializers:
         _load_serializers()
     return _serializers.keys()
-    
+
 def get_deserializer(format):
     if not _serializers:
         _load_serializers()
     return _serializers[format].Deserializer
-    
+
 def serialize(format, queryset, **options):
     """
     Serialize a queryset (or any iterator that returns database objects) using

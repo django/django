@@ -21,7 +21,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""

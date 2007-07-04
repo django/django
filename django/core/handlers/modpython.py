@@ -49,7 +49,7 @@ class ModPythonRequest(http.HttpRequest):
         if 'content-type' in self._req.headers_in and self._req.headers_in['content-type'].startswith('multipart'):
             self._post, self._files = http.parse_file_upload(self._req.headers_in, self.raw_post_data)
         else:
-            self._post, self._files = http.QueryDict(self.raw_post_data), datastructures.MultiValueDict()
+            self._post, self._files = http.QueryDict(self.raw_post_data, encoding=self._encoding), datastructures.MultiValueDict()
 
     def _get_request(self):
         if not hasattr(self, '_request'):
@@ -58,7 +58,7 @@ class ModPythonRequest(http.HttpRequest):
 
     def _get_get(self):
         if not hasattr(self, '_get'):
-            self._get = http.QueryDict(self._req.args)
+            self._get = http.QueryDict(self._req.args, encoding=self._encoding)
         return self._get
 
     def _set_get(self, get):
@@ -160,7 +160,7 @@ class ModPythonHandler(BaseHandler):
         req.content_type = response['Content-Type']
         for key, value in response.headers.items():
             if key != 'Content-Type':
-                req.headers_out[key] = value
+                req.headers_out[str(key)] = str(value)
         for c in response.cookies.values():
             req.headers_out.add('Set-Cookie', c.output(header=''))
         req.status = response.status_code

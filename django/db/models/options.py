@@ -5,6 +5,8 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
+from django.utils.translation import activate, deactivate_all, get_language, string_concat
+from django.utils.encoding import force_unicode, smart_str
 from bisect import bisect
 import re
 
@@ -42,6 +44,7 @@ class Options(object):
         self.object_name = cls.__name__
         self.module_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
+
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__
@@ -51,12 +54,12 @@ class Options(object):
                 setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', self.verbose_name + 's'))
+            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
                 raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         else:
-            self.verbose_name_plural = self.verbose_name + 's'
+            self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
     def _prepare(self, model):
@@ -95,7 +98,20 @@ class Options(object):
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.module_name)
+        return "%s.%s" % (smart_str(self.app_label), smart_str(self.module_name))
+
+    def verbose_name_raw(self):
+        """
+        There are a few places where the untranslated verbose name is needed
+        (so that we get the same value regardless of currently active
+        locale).
+        """
+        lang = get_language()
+        deactivate_all()
+        raw = force_unicode(self.verbose_name)
+        activate(lang)
+        return raw
+    verbose_name_raw = property(verbose_name_raw)
 
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."

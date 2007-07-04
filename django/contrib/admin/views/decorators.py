@@ -3,11 +3,11 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
-from django.utils.translation import gettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
 import base64, datetime, md5
 import cPickle as pickle
 
-ERROR_MESSAGE = gettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
+ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
 def _display_login_form(request, error_message=''):

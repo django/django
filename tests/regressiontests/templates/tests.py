@@ -8,10 +8,16 @@ if __name__ == '__main__':
 
 from django import template
 from django.template import loader
-from django.utils.translation import activate, deactivate, install
+from django.utils.translation import activate, deactivate, install, ugettext as _
 from django.utils.tzinfo import LocalTimezone
 from datetime import datetime, timedelta
+from unicode import unicode_tests
 import unittest
+
+# Some other tests we would like to run
+__test__ = {
+        'unicode': unicode_tests,
+}
 
 #################################
 # Custom template tag for tests #
@@ -63,10 +69,10 @@ class OtherClass:
     def method(self):
         return "OtherClass.method"
 
-class UnicodeInStrClass:
-    "Class whose __str__ returns a Unicode object."
+class UTF8Class:
+    "Class whose __str__ returns non-ASCII data"
     def __str__(self):
-        return u'ŠĐĆŽćžšđ'
+        return u'ŠĐĆŽćžšđ'.encode('utf-8')
 
 class Templates(unittest.TestCase):
     def test_templates(self):
@@ -215,9 +221,9 @@ class Templates(unittest.TestCase):
             # Empty strings can be passed as arguments to filters
             'filter-syntax17': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the
-            # value will be converted to a bytestring.
-            'filter-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            # Make sure that any unicode strings are converted to bytestrings
+            # in the final output.
+            'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'),
 
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
@@ -729,6 +735,7 @@ class Templates(unittest.TestCase):
             'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04' : ('{% url named.client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
+            'url05' : (u'{% url метка_оператора 1 %}', {}, '/url_tag/unicode/1/'),
 
             # Failures
             'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),

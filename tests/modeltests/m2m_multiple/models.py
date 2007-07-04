@@ -14,7 +14,7 @@ class Category(models.Model):
     class Meta:
        ordering = ('name',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -25,7 +25,7 @@ class Article(models.Model):
     class Meta:
        ordering = ('pub_date',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""

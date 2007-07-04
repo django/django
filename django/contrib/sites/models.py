@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 class SiteManager(models.Manager):
     def get_current(self):
@@ -19,5 +19,5 @@ class Site(models.Model):
         list_display = ('domain', 'name')
         search_fields = ('domain', 'name')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.domain

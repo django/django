@@ -1,7 +1,7 @@
 import base64, md5, random, sys, datetime, os, time
 import cPickle as pickle
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 class SessionManager(models.Manager):

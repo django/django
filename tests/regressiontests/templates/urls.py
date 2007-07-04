@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.conf.urls.defaults import *
 from regressiontests.templates import views
 
@@ -8,4 +9,5 @@ urlpatterns = patterns('',
     (r'^client/(\d+)/$', views.client),
     (r'^client/(\d+)/(?P<action>[^/]+)/$', views.client_action),
     url(r'^named-client/(\d+)/$', views.client, name="named.client"),
+    url(r'^unicode/(\d+)/$', views.client, name=u"метка_оператора"),
 )

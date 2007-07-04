@@ -3,8 +3,9 @@ from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy, string_concat, ngettext
+from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
+from django.utils.encoding import smart_unicode
 from django.core import validators
 from django import oldforms
 from django import newforms as forms
@@ -637,9 +638,9 @@ class ManyToManyField(RelatedField, Field):
         Field.__init__(self, **kwargs)
 
         if self.rel.raw_id_admin:
-            msg = gettext_lazy('Separate multiple IDs with commas.')
+            msg = ugettext_lazy('Separate multiple IDs with commas.')
         else:
-            msg = gettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            msg = ugettext_lazy('Hold down "Control", or "Command" on a Mac, to select more than one.')
         self.help_text = string_concat(self.help_text, ' ', msg)
 
     def get_manipulator_field_objs(self):
@@ -686,7 +687,7 @@ class ManyToManyField(RelatedField, Field):
         objects = mod._default_manager.in_bulk(pks)
         if len(objects) != len(pks):
             badkeys = [k for k in pks if k not in objects]
-            raise validators.ValidationError, ngettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
+            raise validators.ValidationError, ungettext("Please enter valid %(self)s IDs. The value %(value)r is invalid.",
                     "Please enter valid %(self)s IDs. The values %(value)r are invalid.", len(badkeys)) % {
                 'self': self.verbose_name,
                 'value': len(badkeys) == 1 and badkeys[0] or tuple(badkeys),
@@ -697,7 +698,7 @@ class ManyToManyField(RelatedField, Field):
         if obj:
             instance_ids = [instance._get_pk_val() for instance in getattr(obj, self.name).all()]
             if self.rel.raw_id_admin:
-                new_data[self.name] = ",".join([str(id) for id in instance_ids])
+                new_data[self.name] = u",".join([smart_unicode(id) for id in instance_ids])
             else:
                 new_data[self.name] = instance_ids
         else:
