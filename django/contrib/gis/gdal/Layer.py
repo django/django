@@ -41,19 +41,25 @@ class Layer(object):
         end = self.num_feat
         if not isinstance(index, (slice, int)):
             raise TypeError
+       
         if isinstance(index,int):
+            # An integer index was given
             if index < 0:
                 index = end - index
             if index < 0 or index >= self.num_feat:
                 raise IndexError, 'index out of range'
             yield make_feature(index)
-        else: #isinstance(index,slice)
+        else: 
+            # A slice was given
             start, stop, stride = index.indices(end)
             for offset in xrange(start,stop,stride):
                 yield make_feature(offset)
 
     def __iter__(self):
         "Iterates over each Feature in the Layer."
+        # Resetting the Layer before beginning iteration
+        lgdal.OGR_L_ResetReading(self._layer)
+
         return self.__getitem__(slice(self.num_feat))
 
     def __len__(self):

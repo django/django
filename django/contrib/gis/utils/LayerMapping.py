@@ -28,7 +28,13 @@ Usage:
              is a geographic then it should correspond to the OGR
              geometry type, e.g. 'POINT', 'LINESTRING', 'POLYGON'.
 
- Example:
+Keyword Args:
+  layer -- The index of the layer to use from the Data Source (defaults to 0)
+
+  source_srs -- Use this to specify the source SRS manually (for example, 
+                 some shapefiles don't come with a '.prj' file)
+
+Example:
 
  1. You need a GDAL-supported data source, like a shapefile.
 
@@ -68,7 +74,6 @@ Usage:
                  } # The mapping is a dictionary
   >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping) 
   >>> lm.save(verbose=True) # Save the layermap, imports the data. 
-  >>> lm.save(verbose=True)
   Saved: Name: 1
   Saved: Name: 2
   Saved: Name: 3
@@ -187,10 +192,23 @@ def check_layer(layer, fields, mapping):
     for feat in layer:
         check_feature(feat, fields, mapping)
 
+def check_srs(layer, source_srs):
+    "Checks the compatibility of the given spatial reference object."
+    if isinstance(source_srs, SpatialReference):
+        sr = source_srs
+    elif isinstance(source_srs, SpatialRefSys):
+        sr = source_srs.srs
+    else:
+        sr = layer.srs
+    if not sr:
+        raise Exception, 'No source reference system defined.'
+    else:
+        return sr
+
 class LayerMapping:
     "A class that maps OGR Layers to Django Models."
 
-    def __init__(self, model, ogr_file, mapping, layer=0):
+    def __init__(self, model, ogr_file, mapping, layer=0, source_srs=None):
         "Takes the Django model, the mapping (dictionary), and the SHP file."
 
         # Getting the field names and types from the model
@@ -208,6 +226,7 @@ class LayerMapping:
         self.fields = fields
         self.mapping = mapping
         self.model = model
+        self.source_srs = check_srs(self.layer, source_srs)
         
     def save(self, verbose=False):
         "Runs the layer mapping on the given SHP file, and saves to the database."
@@ -220,10 +239,12 @@ class LayerMapping:
         
         # Getting the coordinate system needed for transformation (with CoordTransform)  
         try:
-            source_srs = self.layer.srs
+            # Getting the target spatial reference system
             target_srs = SpatialRefSys.objects.get(srid=geo_col.srid).srs
-            ct = CoordTransform(source_srs, target_srs)
-        except:
+
+            # Creating the CoordTransform object
+            ct = CoordTransform(self.source_srs, target_srs)
+        except Exception, msg:
             raise Exception, 'Could not translate between the data source and model geometry.'
         
         for feat in self.layer:
