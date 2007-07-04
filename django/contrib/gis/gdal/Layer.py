@@ -97,7 +97,7 @@ class Layer(object):
         "Returns the Spatial Reference used in this Layer."
         ptr = lgdal.OGR_L_GetSpatialRef(self._layer)
         if ptr:
-            srs = SpatialReference(lgdal.OSRClone(ptr), 'ogr')
+            return SpatialReference(lgdal.OSRClone(ptr), 'ogr')
         else:
             return None
 
