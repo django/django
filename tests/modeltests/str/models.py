@@ -22,6 +22,8 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     def __str__(self):
+        # Caution: this is only safe if you are certain that headline will be
+        # in ASCII.
         return self.headline
 
 class InternationalArticle(models.Model):
