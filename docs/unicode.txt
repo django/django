@@ -47,7 +47,8 @@ rendering or anywhere else -- you have two choices for encoding those strings.
 You can use Unicode strings, or you can use normal strings (sometimes called
 "bytestrings") that are encoded using UTF-8.
 
-.. warning::
+.. admonition:: Warning
+
     A bytestring does not carry any information with it about its encoding.
     For that reason, we have to make an assumption, and Django assumes that all
     bytestrings are in UTF-8.
@@ -140,6 +141,8 @@ for converting back and forth between Unicode and bytestrings.
 Normally, you'll only need to use ``smart_unicode()``. Call it as early as
 possible on any input data that might be either Unicode or a bytestring, and
 from then on, you can treat the result as always being Unicode.
+
+.. _lazy translation: ../i18n/#lazy-translation
 
 URI and IRI handling
 ~~~~~~~~~~~~~~~~~~~~
@@ -260,7 +263,7 @@ something like "Jack visited Paris & Orléans". (In fact, the ``iri_to_uri()``
 call isn't strictly necessary in the above example, because all the
 non-ASCII characters would have been removed in quoting in the first line.)
 
-.. _above: uri_and_iri_
+.. _above: `URI and IRI handling`_
 
 The database API
 ================
