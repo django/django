@@ -115,10 +115,13 @@ def make_list(value):
 make_list = stringfilter(make_list)
 
 def slugify(value):
-    "Converts to lowercase, removes non-alpha chars and converts spaces to hyphens"
-    # Don't compile patterns as unicode because \w then would mean any letter.
-    # Slugify is effectively a conversion to ASCII.
-    value = re.sub('[^\w\s-]', '', value).strip().lower()
+    """
+    Normalizes string, converts to lowercase, removes non-alpha chars and
+    converts spaces to hyphens.
+    """
+    import unicodedata
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore')
+    value = unicode(re.sub('[^\w\s-]', '', value).strip().lower())
     return re.sub('[-\s]+', '-', value)
 slugify = stringfilter(slugify)
 

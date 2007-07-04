@@ -67,6 +67,9 @@ u'\xeb'
 >>> slugify(' Jack & Jill like numbers 1,2,3 and 4 and silly characters ?%.$!/')
 u'jack-jill-like-numbers-123-and-4-and-silly-characters'
 
+>>> slugify(u"Un \xe9l\xe9phant \xe0 l'or\xe9e du bois")
+u'un-elephant-a-loree-du-bois'
+
 >>> stringformat(1, u'03d')
 u'001'
 
