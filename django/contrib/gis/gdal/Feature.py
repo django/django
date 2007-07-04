@@ -93,8 +93,9 @@ class Feature(object):
         return OGRGeomType(lgdal.OGR_FD_GetGeomType(self._fdefn))
     
     #### Feature Methods ####
-    def get(self, field_name):
+    def get(self, field):
         "Returns the value of the field, instead of an instance of the Field object."
+        field_name = getattr(field, 'name', field)
         return self.__getitem__(field_name).value
 
     def index(self, field_name):
