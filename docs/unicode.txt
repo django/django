@@ -345,9 +345,7 @@ client.
 
 By default, the ``DEFAULT_CHARSET`` setting is used as the assumed encoding
 for form data. If you need to change this for a particular form, you can set
-the ``encoding`` attribute on the ``GET`` and ``POST`` data structures. For
-convenience, changing the ``encoding`` property on an ``HttpRequest`` instance
-does this for you. For example::
+the ``encoding`` attribute on an ``HttpRequest`` instance. For example::
 
     def some_view(request):
         # We know that the data must be encoded as KOI8-R (for some reason).
