@@ -233,11 +233,20 @@ Default: ``'simple://'``
 The cache backend to use. See the `cache docs`_.
 
 CACHE_MIDDLEWARE_KEY_PREFIX
+---------------------------
 
 Default: ``''`` (Empty string)
 
 The cache key prefix that the cache middleware should use. See the
 `cache docs`_.
+
+CACHE_MIDDLEWARE_SECONDS
+------------------------
+
+Default: ``600``
+
+The default number of seconds to cache a page when the caching middleware or
+``cache_page()`` decorator is used.
 
 DATABASE_ENGINE
 ---------------

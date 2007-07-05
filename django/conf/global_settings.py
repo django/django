@@ -283,6 +283,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # Whether sessions expire when a user 
 # possible values.
 CACHE_BACKEND = 'simple://'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_SECONDS = 600
 
 ####################
 # COMMENTS         #
