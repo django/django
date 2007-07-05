@@ -63,7 +63,7 @@ class TestCase(unittest.TestCase):
         
         """
         self.assertEqual(response.status_code, status_code, 
-            "Response didn't redirect as expected: Reponse code was %d (expected %d)" % 
+            "Response didn't redirect as expected: Response code was %d (expected %d)" % 
                 (response.status_code, status_code))
         scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
         self.assertEqual(path, expected_path, 
