@@ -9,7 +9,7 @@ from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, force_unicode, smart_str
 import datetime, os, time
 try:
     import decimal
@@ -735,7 +735,7 @@ class FileField(Field):
                 func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"], save)
 
     def get_directory_name(self):
-        return os.path.normpath(datetime.datetime.now().strftime(self.upload_to))
+        return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
 
     def get_filename(self, filename):
         from django.utils.text import get_valid_filename
