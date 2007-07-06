@@ -70,7 +70,7 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/test_client/get_view/')
         except AssertionError, e:
-            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -79,10 +79,10 @@ class AssertRedirectsTests(TestCase):
             # Should redirect to get_view
             self.assertRedirects(response, '/test_client/some_view/')
         except AssertionError, e:
-            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
         
     def test_target_page(self):
-        "An assertion is raised if the reponse redirect target cannot be retrieved as expected"
+        "An assertion is raised if the response redirect target cannot be retrieved as expected"
         response = self.client.get('/test_client/double_redirect_view/')
         try:
             # The redirect target responds with a 301 code, not 200
