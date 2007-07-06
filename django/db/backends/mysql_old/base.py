@@ -5,6 +5,7 @@ Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
 from django.db.backends import util
+from django.utils.encoding import force_unicode
 try:
     import MySQLdb as Database
 except ImportError, e:
@@ -25,6 +26,9 @@ django_conversions.update({
     FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
     FIELD_TYPE.DECIMAL: util.typecast_decimal,
+    FIELD_TYPE.STRING: force_unicode,
+    FIELD_TYPE.VAR_STRING: force_unicode,
+    # Note: We don't add a convertor for BLOB here. Doesn't seem to be required.
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -87,11 +91,12 @@ class DatabaseWrapper(local):
         from django.conf import settings
         if not self._valid_connection():
             kwargs = {
+                # Note: use_unicode intentonally not set to work around some
+                # backwards-compat issues. We do it manually.
                 'user': settings.DATABASE_USER,
                 'db': settings.DATABASE_NAME,
                 'passwd': settings.DATABASE_PASSWORD,
                 'conv': django_conversions,
-                'use_unicode': True,
             }
             if settings.DATABASE_HOST.startswith('/'):
                 kwargs['unix_socket'] = settings.DATABASE_HOST
@@ -102,9 +107,16 @@ class DatabaseWrapper(local):
             kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
             cursor = self.connection.cursor()
-            if self.connection.get_server_info() >= '4.1':
-                cursor.execute("SET NAMES 'utf8'")
-                cursor.execute("SET CHARACTER SET 'utf8'")
+            if self.connection.get_server_info() >= '4.1' and not self.connection.character_set_name().startswith('utf8'):
+                if hasattr(self.connection, 'charset'):
+                    # MySQLdb < 1.2.1 backwards-compat hacks.
+                    conn = self.connection
+                    cursor.execute("SET NAMES 'utf8'")
+                    cursor.execute("SET CHARACTER SET 'utf8'")
+                    to_str = lambda u, dummy=None, c=conn: c.literal(u.encode('utf-8'))
+                    conn.converter[unicode] = to_str
+                else:
+                    self.connection.set_character_set('utf8')
         else:
             cursor = self.connection.cursor()
         if settings.DEBUG:
