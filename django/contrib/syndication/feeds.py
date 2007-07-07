@@ -2,14 +2,14 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site
 from django.utils import feedgenerator
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
-        url = u'http://%s%s' % (domain, url)
+        url = iri_to_uri(u'http://%s%s' % (domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
