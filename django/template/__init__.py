@@ -512,7 +512,7 @@ filter_raw_string = r"""
          )?
  )""" % {
     'str': r"""[^"\\]*(?:\\.[^"\\]*)*""",
-    'var_chars': "A-Za-z0-9\_\." ,
+    'var_chars': "\w\." ,
     'filter_sep': re.escape(FILTER_SEPARATOR),
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
     'i18n_open' : re.escape("_("),
@@ -520,7 +520,7 @@ filter_raw_string = r"""
   }
 
 filter_raw_string = filter_raw_string.replace("\n", "").replace(" ", "")
-filter_re = re.compile(filter_raw_string)
+filter_re = re.compile(filter_raw_string, re.UNICODE)
 
 class FilterExpression(object):
     """

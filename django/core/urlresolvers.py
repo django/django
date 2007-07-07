@@ -9,7 +9,7 @@ a string) and returns a tuple in this format:
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.utils.encoding import iri_to_uri
+from django.utils.encoding import iri_to_uri, force_unicode
 from django.utils.functional import memoize
 import re
 
@@ -101,7 +101,7 @@ class MatchChecker(object):
         # First we need to figure out whether it's a named or unnamed group.
         #
         grouped = match_obj.group(1)
-        m = re.search(r'^\?P<(\w+)>(.*?)$', grouped)
+        m = re.search(r'^\?P<(\w+)>(.*?)$', grouped, re.UNICODE)
         if m: # If this was a named group...
             # m.group(1) is the name of the group
             # m.group(2) is the regex.
@@ -127,9 +127,9 @@ class MatchChecker(object):
             test_regex = grouped
         # Note we're using re.match here on purpose because the start of
         # to string needs to match.
-        if not re.match(test_regex + '$', str(value)): # TODO: Unicode?
+        if not re.match(test_regex + '$', force_unicode(value), re.UNICODE):
             raise NoReverseMatch("Value %r didn't match regular expression %r" % (value, test_regex))
-        return str(value) # TODO: Unicode?
+        return force_unicode(value)
 
 class RegexURLPattern(object):
     def __init__(self, regex, callback, default_args=None, name=None):
@@ -137,7 +137,7 @@ class RegexURLPattern(object):
         # callback is either a string like 'foo.views.news.stories.story_detail'
         # which represents the path to a module and a view function name, or a
         # callable object (view).
-        self.regex = re.compile(regex)
+        self.regex = re.compile(regex, re.UNICODE)
         if callable(callback):
             self._callback = callback
         else:
@@ -201,7 +201,7 @@ class RegexURLResolver(object):
     def __init__(self, regex, urlconf_name, default_kwargs=None):
         # regex is a string representing a regular expression.
         # urlconf_name is a string representing the module containing urlconfs.
-        self.regex = re.compile(regex)
+        self.regex = re.compile(regex, re.UNICODE)
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
