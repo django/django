@@ -8,7 +8,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.functional import curry
 from django.utils.itercompat import tee
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.encoding import smart_unicode, force_unicode, smart_str
 import datetime, os, time
 try:
     import decimal
@@ -25,7 +26,7 @@ BLANK_CHOICE_DASH = [("", "---------")]
 BLANK_CHOICE_NONE = [("", "None")]
 
 # prepares a value for use in a LIKE query
-prep_for_like_query = lambda x: str(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
+prep_for_like_query = lambda x: smart_unicode(x).replace("\\", "\\\\").replace("%", "\%").replace("_", "\_")
 
 # returns the <ul> class for a given radio_admin value
 get_ul_class = lambda x: 'radiolist%s' % ((x == HORIZONTAL) and ' inline' or '')
@@ -42,7 +43,7 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
         return
     if getattr(self, 'original_object', None) and self.original_object._get_pk_val() == old_obj._get_pk_val():
         return
-    raise validators.ValidationError, gettext("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
+    raise validators.ValidationError, _("%(optname)s with this %(fieldname)s already exists.") % {'optname': capfirst(opts.verbose_name), 'fieldname': f.verbose_name}
 
 # A guide to Field parameters:
 #
@@ -121,7 +122,7 @@ class Field(object):
         Subclasses should implement validate(), not validate_full().
         """
         if not self.blank and not field_data:
-            return [gettext_lazy('This field is required.')]
+            return [_('This field is required.')]
         try:
             self.validate(field_data, all_data)
         except validators.ValidationError, e:
@@ -278,7 +279,7 @@ class Field(object):
                     core_field_names.extend(f.get_manipulator_field_names(name_prefix))
             # Now, if there are any, add the validator to this FormField.
             if core_field_names:
-                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, gettext_lazy("This field is required.")))
+                params['validator_list'].append(validators.RequiredIfOtherFieldsGiven(core_field_names, ugettext_lazy("This field is required.")))
 
         # Finally, add the field_names.
         field_names = self.get_manipulator_field_names(name_prefix)
@@ -306,9 +307,9 @@ class Field(object):
             return first_choice + list(self.choices)
         rel_model = self.rel.to
         if hasattr(self.rel, 'get_related_field'):
-            lst = [(getattr(x, self.rel.get_related_field().attname), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+            lst = [(getattr(x, self.rel.get_related_field().attname), smart_unicode(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
         else:
-            lst = [(x._get_pk_val(), str(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
+            lst = [(x._get_pk_val(), smart_unicode(x)) for x in rel_model._default_manager.complex_filter(self.rel.limit_choices_to)]
         return first_choice + lst
 
     def get_choices_default(self):
@@ -373,7 +374,7 @@ class AutoField(Field):
         try:
             return int(value)
         except (TypeError, ValueError):
-            raise validators.ValidationError, gettext("This value must be an integer.")
+            raise validators.ValidationError, _("This value must be an integer.")
 
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         if not rel:
@@ -408,7 +409,7 @@ class BooleanField(Field):
         if value in (True, False): return value
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, gettext("This value must be either True or False.")
+        raise validators.ValidationError, _("This value must be either True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.CheckboxField]
@@ -429,8 +430,8 @@ class CharField(Field):
             if self.null:
                 return value
             else:
-                raise validators.ValidationError, gettext_lazy("This field cannot be null.")
-        return str(value)
+                raise validators.ValidationError, ugettext_lazy("This field cannot be null.")
+        return smart_unicode(value)
 
     def formfield(self, **kwargs):
         defaults = {'max_length': self.maxlength}
@@ -463,15 +464,15 @@ class DateField(Field):
         try:
             return datetime.date(*time.strptime(value, '%Y-%m-%d')[:3])
         except ValueError:
-            raise validators.ValidationError, gettext('Enter a valid date in YYYY-MM-DD format.')
+            raise validators.ValidationError, _('Enter a valid date in YYYY-MM-DD format.')
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [smart_unicode(v) for v in value]
         elif lookup_type in ('exact', 'gt', 'gte', 'lt', 'lte') and hasattr(value, 'strftime'):
             value = value.strftime('%Y-%m-%d')
         else:
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def pre_save(self, model_instance, add):
@@ -532,7 +533,7 @@ class DateTimeField(DateField):
                 try:
                     return datetime.datetime(*time.strptime(value, '%Y-%m-%d')[:3])
                 except ValueError:
-                    raise validators.ValidationError, gettext('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
+                    raise validators.ValidationError, _('Enter a valid date/time in YYYY-MM-DD HH:MM format.')
 
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
@@ -541,14 +542,14 @@ class DateTimeField(DateField):
             # doesn't support microseconds.
             if settings.DATABASE_ENGINE == 'mysql' and hasattr(value, 'microsecond'):
                 value = value.replace(microsecond=0)
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_save(self, value)
 
     def get_db_prep_lookup(self, lookup_type, value):
         if lookup_type == 'range':
-            value = [str(v) for v in value]
+            value = [smart_unicode(v) for v in value]
         else:
-            value = str(value)
+            value = smart_unicode(value)
         return Field.get_db_prep_lookup(self, lookup_type, value)
 
     def get_manipulator_field_objs(self):
@@ -592,7 +593,7 @@ class DecimalField(Field):
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
-            raise validators.ValidationError, gettext("This value must be a decimal number.")
+            raise validators.ValidationError, ugettext("This value must be a decimal number.")
 
     def _format(self, value):
         if isinstance(value, basestring):
@@ -613,7 +614,7 @@ class DecimalField(Field):
         if value < 0:
             num_chars += 1
 
-        return "%.*f" % (self.decimal_places, value)
+        return u"%.*f" % (self.decimal_places, value)
 
     def get_db_prep_save(self, value):
         if value is not None:
@@ -675,7 +676,7 @@ class FileField(Field):
                         self.always_test = True
                     def __call__(self, field_data, all_data):
                         if not all_data.get(self.other_file_field_name, False):
-                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, gettext_lazy("This field is required."))
+                            c = validators.RequiredIfOtherFieldsGiven(self.other_field_names, ugettext_lazy("This field is required."))
                             c(field_data, all_data)
                 # First, get the core fields, if any.
                 core_field_names = []
@@ -686,7 +687,7 @@ class FileField(Field):
                 if core_field_names:
                     field_list[0].validator_list.append(RequiredFileField(core_field_names, field_list[1].field_name))
             else:
-                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, gettext_lazy("This field is required."))
+                v = validators.RequiredIfOtherFieldNotGiven(field_list[1].field_name, ugettext_lazy("This field is required."))
                 v.always_test = True
                 field_list[0].validator_list.append(v)
                 field_list[0].is_required = field_list[1].is_required = False
@@ -732,7 +733,7 @@ class FileField(Field):
                 func(new_data[upload_field_name]["filename"], new_data[upload_field_name]["content"], save)
 
     def get_directory_name(self):
-        return os.path.normpath(datetime.datetime.now().strftime(self.upload_to))
+        return os.path.normpath(force_unicode(datetime.datetime.now().strftime(smart_str(self.upload_to))))
 
     def get_filename(self, filename):
         from django.utils.text import get_valid_filename
@@ -820,7 +821,7 @@ class NullBooleanField(Field):
         if value in ('None'): return None
         if value in ('t', 'True', '1'): return True
         if value in ('f', 'False', '0'): return False
-        raise validators.ValidationError, gettext("This value must be either None, True or False.")
+        raise validators.ValidationError, _("This value must be either None, True or False.")
 
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]
@@ -890,9 +891,9 @@ class TimeField(Field):
             def prep(value):
                 if isinstance(value, datetime.time):
                     value = datetime.datetime.combine(datetime.date(1900, 1, 1), value)
-                return str(value)
+                return smart_unicode(value)
         else:
-            prep = str
+            prep = smart_unicode
         if lookup_type == 'range':
             value = [prep(v) for v in value]
         else:
@@ -922,7 +923,7 @@ class TimeField(Field):
                 elif isinstance(value, basestring):
                     value = datetime.datetime(*(time.strptime(value, '%H:%M:%S')[:6]))
             else:
-                value = str(value)
+                value = smart_unicode(value)
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):

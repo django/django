@@ -10,7 +10,7 @@
 
 <ul class="objectlist">
 {% for object in object_list %}
-<li class="{% cycle odd,even %}"><a href="{{ object }}/">{{ object|escape }}</a></li>
+<li class="{% cycle odd,even %}"><a href="{{ object|iriencode }}/">{{ object|escape }}</a></li>
 {% endfor %}
 </ul>
 

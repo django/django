@@ -1,7 +1,10 @@
 "HTML utilities suitable for global use."
 
-import re, string
-from django.utils.encoding import smart_unicode
+import re
+import string
+import urllib
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.functional import allow_lazy
 
 # Configuration for urlize() function
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
@@ -24,32 +27,36 @@ del x # Temporary variable
 
 def escape(html):
     "Returns the given HTML with ampersands, quotes and carets encoded"
-    if not isinstance(html, basestring):
-        html = str(html)
-    return html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    return force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+escape = allow_lazy(escape, unicode)
 
 def linebreaks(value):
     "Converts newlines into <p> and <br />s"
-    value = re.sub(r'\r\n|\r|\n', '\n', value) # normalize newlines
+    value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
     paras = re.split('\n{2,}', value)
-    paras = ['<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
-    return '\n\n'.join(paras)
+    paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
+    return u'\n\n'.join(paras)
+linebreaks = allow_lazy(linebreaks, unicode)
 
 def strip_tags(value):
     "Returns the given HTML with all tags stripped"
-    return re.sub(r'<[^>]*?>', '', value)
+    return re.sub(r'<[^>]*?>', '', force_unicode(value))
+strip_tags = allow_lazy(strip_tags)
 
 def strip_spaces_between_tags(value):
     "Returns the given HTML with spaces between tags removed"
-    return re.sub(r'>\s+<', '><', value)
+    return re.sub(r'>\s+<', '><', force_unicode(value))
+strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, unicode)
 
 def strip_entities(value):
     "Returns the given HTML with all entities (&something;) stripped"
-    return re.sub(r'&(?:\w+|#\d);', '', value)
+    return re.sub(r'&(?:\w+|#\d);', '', force_unicode(value))
+strip_entities = allow_lazy(strip_entities, unicode)
 
 def fix_ampersands(value):
     "Returns the given HTML with all unencoded ampersands encoded correctly"
-    return unencoded_ampersands_re.sub('&amp;', value)
+    return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
+fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
 def urlize(text, trim_url_limit=None, nofollow=False):
     """
@@ -65,7 +72,7 @@ def urlize(text, trim_url_limit=None, nofollow=False):
     attribute.
     """
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
-    words = word_split_re.split(text)
+    words = word_split_re.split(force_unicode(text))
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):
         match = punctuation_re.match(word)
@@ -82,7 +89,8 @@ def urlize(text, trim_url_limit=None, nofollow=False):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
                 words[i] = lead + middle + trail
-    return ''.join(words)
+    return u''.join(words)
+urlize = allow_lazy(urlize, unicode)
 
 def clean_html(text):
     """
@@ -97,7 +105,7 @@ def clean_html(text):
           bottom of the text.
     """
     from django.utils.text import normalize_newlines
-    text = normalize_newlines(text)
+    text = normalize_newlines(force_unicode(text))
     text = re.sub(r'<(/?)\s*b\s*>', '<\\1strong>', text)
     text = re.sub(r'<(/?)\s*i\s*>', '<\\1em>', text)
     text = fix_ampersands(text)
@@ -110,9 +118,10 @@ def clean_html(text):
         s = match.group().replace('</p>', '</li>')
         for d in DOTS:
             s = s.replace('<p>%s' % d, '<li>')
-        return '<ul>\n%s\n</ul>' % s
+        return u'<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
     # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
     text = trailing_empty_content_re.sub('', text)
     return text
+clean_html = allow_lazy(clean_html, unicode)
 

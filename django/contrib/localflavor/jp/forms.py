@@ -4,7 +4,7 @@ JP-specific Form helpers
 
 from django.core import validators
 from django.newforms import ValidationError
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 from django.newforms.fields import RegexField, Select
 
 import re
@@ -18,8 +18,8 @@ class JPPostalCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(JPPostalCodeField, self).__init__(r'^\d{3}-\d{4}$|^\d{7}$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a postal code in the format XXXXXXX or XXX-XXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a postal code in the format XXXXXXX or XXX-XXXX.'),
+                    *args, **kwargs)
 
     def clean(self, value):
         """

@@ -2,6 +2,7 @@ from django import template
 from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
 from django.utils.text import capfirst
+from django.utils.encoding import force_unicode
 from django.db import models
 from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
@@ -13,7 +14,7 @@ register = template.Library()
 word_re = re.compile('[A-Z][a-z]+')
 
 def class_name_to_underscored(name):
-    return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
+    return u'_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
 def submit_row(context):
     opts = context['opts']
@@ -45,7 +46,7 @@ class FieldWidgetNode(template.Node):
         if klass not in cls.nodelists:
             try:
                 field_class_name = klass.__name__
-                template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
+                template_name = u"widget/%s.html" % class_name_to_underscored(field_class_name)
                 nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
@@ -95,7 +96,7 @@ class FormFieldCollectionWrapper(object):
         self.index = index
 
 def output_all(form_fields):
-    return ''.join([str(f) for f in form_fields])
+    return u''.join([force_unicode(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
 
 def field_widget(parser, token):

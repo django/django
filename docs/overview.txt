@@ -27,7 +27,7 @@ quick example::
     class Reporter(models.Model):
         full_name = models.CharField(maxlength=70)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.full_name
 
     class Article(models.Model):
@@ -36,7 +36,7 @@ quick example::
         article = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.headline
 
 Install it

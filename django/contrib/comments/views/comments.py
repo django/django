@@ -11,7 +11,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
-from django.utils.translation import ngettext
+from django.utils.translation import ungettext, ugettext as _
+from django.utils.encoding import smart_unicode
 import base64, datetime
 
 COMMENTS_PER_PAGE = 20
@@ -108,7 +109,7 @@ class PublicCommentManipulator(AuthenticationForm):
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
         if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
-            message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
+            message = ungettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s', settings.COMMENTS_FIRST_FEW) % \
                 {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
@@ -248,7 +249,7 @@ def post_comment(request):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
-            mail_admins("Banned IP attempted to post comment", str(request.POST) + "\n\n" + str(request.META))
+            mail_admins("Banned IP attempted to post comment", smart_unicode(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)
@@ -312,7 +313,7 @@ def post_free_comment(request):
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             from django.core.mail import mail_admins
-            mail_admins("Practical joker", str(request.POST) + "\n\n" + str(request.META))
+            mail_admins("Practical joker", smart_unicode(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)

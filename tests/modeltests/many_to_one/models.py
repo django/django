@@ -11,15 +11,15 @@ class Reporter(models.Model):
     last_name = models.CharField(maxlength=30)
     email = models.EmailField()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:
@@ -47,7 +47,7 @@ __test__ = {'API_TESTS':"""
 # Article objects have access to their related Reporter objects.
 >>> r = a.reporter
 >>> r.first_name, r.last_name
-('John', 'Smith')
+(u'John', u'Smith')
 
 # Create an Article via the Reporter object.
 >>> new_article = r.article_set.create(headline="John's second story", pub_date=datetime(2005, 7, 29))
@@ -154,8 +154,13 @@ False
 >>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
 [<Article: John's second story>, <Article: This is a test>]
 
+# And should work fine with the unicode that comes out of
+# newforms.Form.cleaned_data
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='%s'" % u'Smith'])
+[<Article: John's second story>, <Article: This is a test>]
+
 # Find all Articles for the Reporter whose ID is 1.
-# Use direct ID check, pk check, and object comparison 
+# Use direct ID check, pk check, and object comparison
 >>> Article.objects.filter(reporter__id__exact=1)
 [<Article: John's second story>, <Article: This is a test>]
 >>> Article.objects.filter(reporter__pk=1)

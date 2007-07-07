@@ -7,33 +7,34 @@ other serializers.
 from django.conf import settings
 from django.core.serializers import base
 from django.db import models
+from django.utils.encoding import smart_unicode
 
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to basic Python objects.
     """
-    
+
     def start_serialization(self):
         self._current = None
         self.objects = []
-        
+
     def end_serialization(self):
         pass
-        
+
     def start_object(self, obj):
         self._current = {}
-        
+
     def end_object(self, obj):
         self.objects.append({
-            "model"  : str(obj._meta),
-            "pk"     : str(obj._get_pk_val()),
+            "model"  : smart_unicode(obj._meta),
+            "pk"     : smart_unicode(obj._get_pk_val()),
             "fields" : self._current
         })
         self._current = None
-        
+
     def handle_field(self, obj, field):
         self._current[field.name] = getattr(obj, field.name)
-        
+
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
         if related is not None:
@@ -44,17 +45,17 @@ class Serializer(base.Serializer):
                 # Related to remote object via other field
                 related = getattr(related, field.rel.field_name)
         self._current[field.name] = related
-    
+
     def handle_m2m_field(self, obj, field):
         self._current[field.name] = [related._get_pk_val() for related in getattr(obj, field.name).iterator()]
-    
+
     def getvalue(self):
         return self.objects
 
 def Deserializer(object_list, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
-    
+
     It's expected that you pass the Python objects themselves (instead of a
     stream or a string) to the constructor
     """
@@ -64,36 +65,30 @@ def Deserializer(object_list, **options):
         Model = _get_model(d["model"])
         data = {Model._meta.pk.attname : Model._meta.pk.to_python(d["pk"])}
         m2m_data = {}
-        
+
         # Handle each field
         for (field_name, field_value) in d["fields"].iteritems():
-            if isinstance(field_value, unicode):
-                field_value = field_value.encode(options.get("encoding", settings.DEFAULT_CHARSET))
-                
+            if isinstance(field_value, str):
+                field_value = smart_unicode(field_value, options.get("encoding", settings.DEFAULT_CHARSET), strings_only=True)
+
             field = Model._meta.get_field(field_name)
-            
+
             # Handle M2M relations
             if field.rel and isinstance(field.rel, models.ManyToManyRel):
-                pks = []
                 m2m_convert = field.rel.to._meta.pk.to_python
-                for pk in field_value:
-                    if isinstance(pk, unicode):
-                        pks.append(m2m_convert(pk.encode(options.get("encoding", settings.DEFAULT_CHARSET))))
-                    else:
-                        pks.append(m2m_convert(pk))
-                m2m_data[field.name] = pks
-                
+                m2m_data[field.name] = [m2m_convert(smart_unicode(pk)) for pk in field_value]
+
             # Handle FK fields
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 if field_value:
                     data[field.attname] = field.rel.to._meta.get_field(field.rel.field_name).to_python(field_value)
                 else:
                     data[field.attname] = None
-                    
+
             # Handle all other fields
             else:
                 data[field.name] = field.to_python(field_value)
-                
+
         yield base.DeserializedObject(Model(**data), m2m_data)
 
 def _get_model(model_identifier):
@@ -105,5 +100,5 @@ def _get_model(model_identifier):
     except TypeError:
         Model = None
     if Model is None:
-        raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
+        raise base.DeserializationError(u"Invalid model identifier: '%s'" % model_identifier)
     return Model

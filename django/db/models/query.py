@@ -4,6 +4,7 @@ from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals, loading
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+from django.utils.encoding import smart_unicode
 from django.contrib.contenttypes import generic
 import datetime
 import operator
@@ -52,7 +53,7 @@ def handle_legacy_orderlist(order_list):
         return order_list
     else:
         import warnings
-        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
+        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', smart_unicode(i)) for i, j in order_list]
         warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
         return new_order_list
 

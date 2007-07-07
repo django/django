@@ -2,10 +2,13 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
 from django.contrib.sites.models import Site
 from django.utils import feedgenerator
+from django.utils.encoding import smart_unicode
 from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
+        # 'url' must already be ASCII and URL-quoted, so no need for encoding
+        # conversions here.
         url = u'http://%s%s' % (domain, url)
     return url
 
@@ -97,9 +100,9 @@ class Feed(object):
             enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
                 enc = feedgenerator.Enclosure(
-                    url = enc_url.decode('utf-8'),
-                    length = str(self.__get_dynamic_attr('item_enclosure_length', item)).decode('utf-8'),
-                    mime_type = self.__get_dynamic_attr('item_enclosure_mime_type', item).decode('utf-8'),
+                    url = smart_unicode(enc_url),
+                    length = smart_unicode(self.__get_dynamic_attr('item_enclosure_length', item)),
+                    mime_type = smart_unicode(self.__get_dynamic_attr('item_enclosure_mime_type', item))
                 )
             author_name = self.__get_dynamic_attr('item_author_name', item)
             if author_name is not None:
@@ -108,9 +111,9 @@ class Feed(object):
             else:
                 author_email = author_link = None
             feed.add_item(
-                title = title_tmp.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
+                title = title_tmp.render(Context({'obj': item, 'site': current_site})),
                 link = link,
-                description = description_tmp.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
+                description = description_tmp.render(Context({'obj': item, 'site': current_site})),
                 unique_id = link,
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),

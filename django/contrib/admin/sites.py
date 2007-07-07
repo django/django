@@ -4,13 +4,13 @@ from django.contrib.auth import authenticate, login
 from django.db.models import Model
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
-from django.utils.translation import gettext_lazy
+from django.utils.translation import ugettext_lazy, ugettext as _
 import base64
 import cPickle as pickle
 import datetime
 import md5
 
-ERROR_MESSAGE = gettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
+ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
 
 class AlreadyRegistered(Exception):
@@ -199,7 +199,7 @@ class AdminSite(object):
         user = authenticate(username=username, password=password)
         if user is None:
             message = ERROR_MESSAGE
-            if '@' in username:
+            if u'@' in username:
                 # Mistakenly entered e-mail address instead of username? Look it up.
                 try:
                     user = User.objects.get(email=username)

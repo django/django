@@ -9,6 +9,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
+from django.utils.translation import ugettext as _
+from django.utils.encoding import force_unicode
 import sets
 
 class IncorrectLookupParameters(Exception):
@@ -50,7 +52,7 @@ class AdminForm(object):
 class Fieldset(object):
     def __init__(self, name=None, fields=(), classes=(), description=None):
         self.name, self.fields = name, fields
-        self.classes = ' '.join(classes)
+        self.classes = u' '.join(classes)
         self.description = description
 
 class BoundFieldset(object):
@@ -85,15 +87,15 @@ class BoundField(object):
     def label_tag(self):
         classes = []
         if self.is_checkbox:
-            classes.append('vCheckboxLabel')
+            classes.append(u'vCheckboxLabel')
             contents = escape(self.field.label)
         else:
-            contents = escape(self.field.label) + ':'
+            contents = escape(self.field.label) + u':'
         if self.field.field.required:
-            classes.append('required')
+            classes.append(u'required')
         if not self.is_first:
-            classes.append('inline')
-        attrs = classes and {'class': ' '.join(classes)} or {}
+            classes.append(u'inline')
+        attrs = classes and {'class': u' '.join(classes)} or {}
         return self.field.label_tag(contents=contents, attrs=attrs)
 
 class BaseModelAdmin(object):
@@ -561,7 +563,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
+        deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), object_id, escape(str(obj))), []]
         perms_needed = sets.Set()
         _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
@@ -571,7 +573,7 @@ class ModelAdmin(BaseModelAdmin):
             obj_display = str(obj)
             obj.delete()
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(self.model).id, object_id, obj_display, DELETION)
-            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
+            request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
             return HttpResponseRedirect("../../")
         extra_context = {
             "title": _("Are you sure?"),
@@ -596,7 +598,7 @@ class ModelAdmin(BaseModelAdmin):
         # If no history was found, see whether this object even exists.
         obj = get_object_or_404(model, pk=object_id)
         extra_context = {
-            'title': _('Change history: %s') % obj,
+            'title': _('Change history: %s') % force_unicode(obj),
             'action_list': action_list,
             'module_name': capfirst(opts.verbose_name_plural),
             'object': obj,
@@ -618,7 +620,7 @@ class ModelAdmin(BaseModelAdmin):
 class InlineModelAdmin(BaseModelAdmin):
     """
     Options for inline editing of ``model`` instances.
-    
+
     Provide ``name`` to specify the attribute name of the ``ForeignKey`` from
     ``model`` to its parent. This is required if ``model`` has more than one
     ``ForeignKey`` to its parent.

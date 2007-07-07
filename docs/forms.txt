@@ -47,7 +47,7 @@ this document, we'll be working with the following model, a "place" object::
         class Admin:
             pass
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
 Defining the above class is enough to create an admin interface to a ``Place``,

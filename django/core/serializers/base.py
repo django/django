@@ -7,6 +7,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 from django.db import models
+from django.utils.encoding import smart_str, smart_unicode
 
 class SerializationError(Exception):
     """Something bad happened during serialization."""
@@ -59,7 +60,7 @@ class Serializer(object):
             value = getattr(obj, "get_%s_url" % field.name, lambda: None)()
         else:
             value = field.flatten_data(follow=None, obj=obj).get(field.name, "")
-        return str(value)
+        return smart_unicode(value)
 
     def start_serialization(self):
         """
@@ -154,7 +155,7 @@ class DeserializedObject(object):
         self.m2m_data = m2m_data
 
     def __repr__(self):
-        return "<DeserializedObject: %s>" % str(self.object)
+        return "<DeserializedObject: %s>" % smart_str(self.object)
 
     def save(self, save_m2m=True):
         self.object.save()

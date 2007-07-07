@@ -126,6 +126,7 @@ def django_tests(verbosity, tests_to_run):
     for model_dir, model_name in get_invalid_models():
         model_label = '.'.join([model_dir, model_name])
         if not tests_to_run or model_name in tests_to_run:
+            print >> sys.stderr,'****', model_label
             extra_tests.append(InvalidModelTestCase(model_label))
 
     # Run the test suite, including the extra validation tests.

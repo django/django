@@ -14,8 +14,8 @@ class Reporter(models.Model):
     last_name = models.CharField(maxlength=30)
     email = models.EmailField()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 __test__ = {'API_TESTS':"""
 >>> from django.db import connection, transaction

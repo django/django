@@ -4,6 +4,7 @@ Regression tests for the Test Client, especially the customized assertions.
 """
 from django.test import Client, TestCase
 from django.core import mail
+import os
 
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
@@ -59,7 +60,7 @@ class AssertTemplateUsedTests(TestCase):
         try:
             self.assertTemplateUsed(response, "Valid POST Template")        
         except AssertionError, e:
-            self.assertEquals(str(e), "Template 'Valid POST Template' was not one of the templates used to render the response. Templates used: ['form_view.html', 'base.html']")
+            self.assertEquals(str(e), "Template 'Valid POST Template' was not one of the templates used to render the response. Templates used: form_view.html, base.html")
 
 class AssertRedirectsTests(TestCase):
     def test_redirect_page(self):
@@ -69,7 +70,7 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/test_client/get_view/')
         except AssertionError, e:
-            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -78,10 +79,10 @@ class AssertRedirectsTests(TestCase):
             # Should redirect to get_view
             self.assertRedirects(response, '/test_client/some_view/')
         except AssertionError, e:
-            self.assertEquals(str(e), "Response didn't redirect as expected: Reponse code was 301 (expected 302)")
+            self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
         
     def test_target_page(self):
-        "An assertion is raised if the reponse redirect target cannot be retrieved as expected"
+        "An assertion is raised if the response redirect target cannot be retrieved as expected"
         response = self.client.get('/test_client/double_redirect_view/')
         try:
             # The redirect target responds with a 301 code, not 200
@@ -162,3 +163,12 @@ class AssertFormErrorTests(TestCase):
         except AssertionError, e:
             self.assertEqual(str(e), "The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [u'Enter a valid e-mail address.'])")
 
+class AssertFileUploadTests(TestCase):
+    def test_simple_upload(self):
+        fd = open(os.path.join(os.path.dirname(__file__), "views.py"))
+        post_data = {
+            'name': 'Ringo',
+            'file_field': fd,
+        }
+        response = self.client.post('/test_client_regress/file_upload/', post_data)
+        self.assertEqual(response.status_code, 200)

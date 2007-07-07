@@ -1,5 +1,5 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 class SiteManager(models.Manager):
     def get_current(self):
@@ -17,7 +17,7 @@ class Site(models.Model):
         verbose_name_plural = _('sites')
         ordering = ('domain',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.domain
 
 # Register the admin options for these models.

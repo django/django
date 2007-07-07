@@ -6,11 +6,11 @@ If your database column name is different than your model attribute, use the
 name, in API usage.
 
 If your database table name is different than your model name, use the
-``db_table`` Meta attribute. This has no effect on the API used to 
+``db_table`` Meta attribute. This has no effect on the API used to
 query the database.
 
-If you need to use a table name for a many-to-many relationship that differs 
-from the default generated name, use the ``db_table`` parameter on the 
+If you need to use a table name for a many-to-many relationship that differs
+from the default generated name, use the ``db_table`` parameter on the
 ManyToMany field. This has no effect on the API for querying the database.
 
 """
@@ -21,8 +21,8 @@ class Author(models.Model):
     first_name = models.CharField(maxlength=30, db_column='firstname')
     last_name = models.CharField(maxlength=30, db_column='last')
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u'%s %s' % (self.first_name, self.last_name)
 
     class Meta:
         db_table = 'my_author_table'
@@ -32,12 +32,12 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:
         ordering = ('headline',)
-        
+
 __test__ = {'API_TESTS':"""
 # Create a Author.
 >>> a = Author(first_name='John', last_name='Smith')
@@ -75,9 +75,9 @@ TypeError: Cannot resolve keyword 'firstname' into field. Choices are: article, 
 
 >>> a = Author.objects.get(last_name__exact='Smith')
 >>> a.first_name
-'John'
+u'John'
 >>> a.last_name
-'Smith'
+u'Smith'
 >>> a.firstname
 Traceback (most recent call last):
     ...

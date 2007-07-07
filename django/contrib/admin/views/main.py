@@ -12,6 +12,8 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404
 from django.utils.html import escape
 from django.utils.text import capfirst
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _
 import operator
 
 try:
@@ -77,11 +79,11 @@ class AdminBoundField(object):
 
         classes = []
         if self.raw_id_admin:
-            classes.append('nowrap')
+            classes.append(u'nowrap')
         if max([bool(f.errors()) for f in self.form_fields]):
-            classes.append('error')
+            classes.append(u'error')
         if classes:
-            self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
+            self.cell_class_attribute = u' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
 
     def original_value(self):
@@ -93,9 +95,9 @@ class AdminBoundField(object):
             return self._display
         except AttributeError:
             if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = getattr(self.original, self.field.name)
+                self._display = force_unicode(getattr(self.original, self.field.name), strings_only=True)
             elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.name).all()])
+                self._display = u", ".join([force_unicode(obj) for obj in getattr(self.original, self.field.name).all()])
             return self._display
 
     def __repr__(self):
@@ -173,11 +175,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), sub_obj), []])
+                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(),
+                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
                         sub_obj._get_pk_val(), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
@@ -187,11 +189,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -218,17 +220,17 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                        {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
+                        {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name), 'obj': escape(sub_obj)}, []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
-                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
-                        (' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
+                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name)}) + \
+                        (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
-            p = '%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
+            p = u'%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
 
@@ -264,7 +266,7 @@ class ChangeList(object):
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set()
         self.get_results(request)
-        self.title = (self.is_popup and _('Select %s') % self.opts.verbose_name or _('Select %s to change') % self.opts.verbose_name)
+        self.title = (self.is_popup and _('Select %s') % force_unicode(self.opts.verbose_name) or _('Select %s to change') % force_unicode(self.opts.verbose_name))
         self.filter_specs, self.has_filters = self.get_filters(request)
         self.pk_attname = self.lookup_opts.pk.attname
 
@@ -291,7 +293,7 @@ class ChangeList(object):
                 del p[k]
             elif v is not None:
                 p[k] = v
-        return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
+        return '?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
     def get_results(self, request):
         paginator = ObjectPaginator(self.query_set, self.list_per_page)
@@ -377,6 +379,12 @@ class ChangeList(object):
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
             if i in lookup_params:
                 del lookup_params[i]
+        for key, value in lookup_params.items():
+            if not isinstance(key, str):
+                # 'key' will be used as a keyword argument later, so Python
+                # requires it to be a string.
+                del lookup_params[key]
+                lookup_params[smart_str(key)] = value
 
         # Apply lookup parameters from the query string.
         qs = qs.filter(**lookup_params)

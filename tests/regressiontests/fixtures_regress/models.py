@@ -4,8 +4,8 @@ class Animal(models.Model):
     name = models.CharField(maxlength=150)
     latin_name = models.CharField(maxlength=150)
 
-    def __str__(self):
-        return self.common_name    
+    def __unicode__(self):
+        return self.common_name
 
 class Plant(models.Model):
     name = models.CharField(maxlength=150)

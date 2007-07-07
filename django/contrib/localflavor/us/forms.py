@@ -5,7 +5,7 @@ USA-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 import re
 
 phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
@@ -15,8 +15,8 @@ class USZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(USZipCodeField, self).__init__(r'^\d{5}(?:-\d{4})?$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
+                    *args, **kwargs)
 
 class USPhoneNumberField(Field):
     def clean(self, value):
@@ -38,17 +38,17 @@ class USSocialSecurityNumberField(Field):
         * Conforms to the XXX-XX-XXXX format.
         * No group consists entirely of zeroes.
         * The leading group is not "666" (block "666" will never be allocated).
-        * The number is not in the promotional block 987-65-4320 through 987-65-4329,
-          which are permanently invalid.
+        * The number is not in the promotional block 987-65-4320 through
+          987-65-4329, which are permanently invalid.
         * The number is not one known to be invalid due to otherwise widespread
-          promotional use or distribution (e.g., the Woolworth's number or the 1962
-          promotional number).
+          promotional use or distribution (e.g., the Woolworth's number or the
+          1962 promotional number).
     """
     def clean(self, value):
         super(USSocialSecurityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
-        msg = gettext(u'Enter a valid U.S. Social Security number in XXX-XX-XXXX format.')
+        msg = ugettext('Enter a valid U.S. Social Security number in XXX-XX-XXXX format.')
         match = re.match(ssn_re, value)
         if not match:
             raise ValidationError(msg)
@@ -75,7 +75,7 @@ class USStateField(Field):
     abbreviation for the given state.
     """
     def clean(self, value):
-        from us_states import STATES_NORMALIZED # relative import
+        from us_states import STATES_NORMALIZED
         super(USStateField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
@@ -95,5 +95,5 @@ class USStateSelect(Select):
     A Select widget that uses a list of U.S. states/territories as its choices.
     """
     def __init__(self, attrs=None):
-        from us_states import STATE_CHOICES # relative import
+        from us_states import STATE_CHOICES
         super(USStateSelect, self).__init__(attrs, choices=STATE_CHOICES)

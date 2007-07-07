@@ -1,5 +1,5 @@
-from django.utils.translation import ngettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ungettext, ugettext as _
+from django.utils.encoding import force_unicode
 from django import template
 import re
 
@@ -16,8 +16,8 @@ def ordinal(value):
         return value
     t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return "%d%s" % (value, t[0])
-    return '%d%s' % (value, t[value % 10])
+        return u"%d%s" % (value, t[0])
+    return u'%d%s' % (value, t[value % 10])
 register.filter(ordinal)
 
 def intcomma(value):
@@ -25,8 +25,8 @@ def intcomma(value):
     Converts an integer to a string containing commas every three digits.
     For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
-    orig = str(value)
-    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', str(value))
+    orig = force_unicode(value)
+    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
     if orig == new:
         return new
     else:
@@ -44,13 +44,13 @@ def intword(value):
         return value
     if value < 1000000000:
         new_value = value / 1000000.0
-        return ngettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
+        return ungettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
     if value < 1000000000000:
         new_value = value / 1000000000.0
-        return ngettext('%(value).1f billion', '%(value).1f billion', new_value) % {'value': new_value}
+        return ungettext('%(value).1f billion', '%(value).1f billion', new_value) % {'value': new_value}
     if value < 1000000000000000:
         new_value = value / 1000000000000.0
-        return ngettext('%(value).1f trillion', '%(value).1f trillion', new_value) % {'value': new_value}
+        return ungettext('%(value).1f trillion', '%(value).1f trillion', new_value) % {'value': new_value}
     return value
 register.filter(intword)
 

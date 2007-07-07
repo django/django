@@ -474,22 +474,39 @@ Once you're in the shell, explore the database API::
 
 Wait a minute. ``<Poll: Poll object>`` is, utterly, an unhelpful
 representation of this object. Let's fix that by editing the polls model (in
-the ``polls/models.py`` file) and adding a ``__str__()`` method to both
+the ``polls/models.py`` file) and adding a ``__unicode__()`` method to both
 ``Poll`` and ``Choice``::
 
     class Poll(models.Model):
         # ...
-        def __str__(self):
+        def __unicode__(self):
             return self.question
 
     class Choice(models.Model):
         # ...
-        def __str__(self):
+        def __unicode__(self):
             return self.choice
 
-It's important to add ``__str__()`` methods to your models, not only for your
-own sanity when dealing with the interactive prompt, but also because objects'
-representations are used throughout Django's automatically-generated admin.
+It's important to add ``__unicode__()`` methods to your models, not only for
+your own sanity when dealing with the interactive prompt, but also because
+objects' representations are used throughout Django's automatically-generated
+admin.
+
+.. admonition:: Why ``__unicode__()`` and not ``__str__()``?
+
+	If you're familiar with Python, you might be in the habit of adding
+	``__str__()`` methods to your classes, not ``__unicode__()`` methods.
+    We use ``__unicode__()`` here because Django models deal with Unicode by
+    default. All data stored in your database is converted to Unicode when it's
+    returned.
+
+	Django models have a default ``__str__()`` method that calls ``__unicode__()``
+	and converts the result to a UTF-8 bytestring. This means that ``unicode(p)``
+	will return a Unicode string, and ``str(p)`` will return a normal string,
+	with characters encoded as UTF-8.
+
+	If all of this is jibberish to you, just remember to add ``__unicode__()``
+	methods to your models. With any luck, things should Just Work for you.
 
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration::
@@ -509,7 +526,7 @@ Let's jump back into the Python interactive shell by running
 
     >>> from mysite.polls.models import Poll, Choice
 
-    # Make sure our __str__() addition worked.
+    # Make sure our __unicode__() addition worked.
     >>> Poll.objects.all()
     [<Poll: What's up?>]
 

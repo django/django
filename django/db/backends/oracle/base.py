@@ -6,13 +6,18 @@ Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 
 from django.conf import settings
 from django.db.backends import util
+from django.utils.datastructures import SortedDict
+from django.utils.encoding import smart_str, force_unicode
+import datetime
+import os
+
+# Oracle takes client-side character set encoding from the environment.
+os.environ['NLS_LANG'] = '.UTF8'
 try:
     import cx_Oracle as Database
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
-import datetime
-from django.utils.datastructures import SortedDict
 
 
 DatabaseError = Database.Error
@@ -45,9 +50,9 @@ class DatabaseWrapper(local):
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
         cursor = FormatStylePlaceholderCursor(self.connection)
-        # default arraysize of 1 is highly sub-optimal
+        # Default arraysize of 1 is highly sub-optimal.
         cursor.arraysize = 100
-        # set oracle date to ansi date format
+        # Set oracle date to ansi date format.
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
         cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
         if settings.DEBUG:
@@ -78,23 +83,22 @@ uses_case_insensitive_names = True
 
 class FormatStylePlaceholderCursor(Database.Cursor):
     """
-    Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var" style.
-    This fixes it -- but note that if you want to use a literal "%s" in a query,
-    you'll need to use "%%s".
+    Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
+    style. This fixes it -- but note that if you want to use a literal "%s" in
+    a query, you'll need to use "%%s".
+
+    We also do automatic conversion between Unicode on the Python side and
+    UTF-8 -- for talking to Oracle -- in here.
     """
+    charset = 'utf-8'
+
     def _rewrite_args(self, query, params=None):
         if params is None:
             params = []
         else:
-            # cx_Oracle can't handle unicode parameters, so cast to str for now
-            for i, param in enumerate(params):
-                if type(param) == unicode:
-                    try:
-                        params[i] = param.encode('utf-8')
-                    except UnicodeError:
-                        params[i] = str(param)
+            params = self._format_params(params)
         args = [(':arg%d' % i) for i in range(len(params))]
-        query = query % tuple(args)
+        query = smart_str(query, self.charset) % tuple(args)
         # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
@@ -103,6 +107,16 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             query = query[:-1]
         return query, params
 
+    def _format_params(self, params):
+        if isinstance(params, dict):
+            result = {}
+            charset = self.charset
+            for key, value in params.items():
+                result[smart_str(key, charset)] = smart_str(value, charset)
+            return result
+        else:
+            return tuple([smart_str(p, self.charset, True) for p in params])
+
     def execute(self, query, params=None):
         query, params = self._rewrite_args(query, params)
         return Database.Cursor.execute(self, query, params)
@@ -110,6 +124,26 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     def executemany(self, query, params=None):
         query, params = self._rewrite_args(query, params)
         return Database.Cursor.executemany(self, query, params)
+
+    def fetchone(self):
+        return to_unicode(Database.Cursor.fetchone(self))
+
+    def fetchmany(self, size=None):
+        if size is None:
+            size = self.arraysize
+        return tuple([tuple([to_unicode(e) for e in r]) for r in Database.Cursor.fetchmany(self, size)])
+
+    def fetchall(self):
+        return tuple([tuple([to_unicode(e) for e in r]) for r in Database.Cursor.fetchall(self)])
+
+def to_unicode(s):
+    """
+    Convert strings to Unicode objects (and return all other data types
+    unchanged).
+    """
+    if isinstance(s, basestring):
+        return force_unicode(s)
+    return s
 
 def quote_name(name):
     # SQL92 requires delimited (quoted) names to be case-sensitive.  When

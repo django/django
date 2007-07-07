@@ -1367,10 +1367,11 @@ A few special cases to note about ``list_display``:
               born_in_fifties.boolean = True
 
 
-    * The ``__str__()`` method is just as valid in ``list_display`` as any
-      other model method, so it's perfectly OK to do this::
+    * The ``__str__()`` and ``__unicode__()`` methods are just as valid in
+      ``list_display`` as any other model method, so it's perfectly OK to do
+      this::
 
-          list_display = ('__str__', 'some_other_field')
+          list_display = ('__unicode__', 'some_other_field')
 
     * Usually, elements of ``list_display`` that aren't actual database fields
       can't be used in sorting (because Django does all the sorting at the
@@ -1776,11 +1777,13 @@ A few object methods have special meaning:
 -----------
 
 ``__str__()`` is a Python "magic method" that defines what should be returned
-if you call ``str()`` on the object. Django uses ``str(obj)`` in a number of
-places, most notably as the value displayed to render an object in the Django
-admin site and as the value inserted into a template when it displays an
-object. Thus, you should always return a nice, human-readable string for the
-object's ``__str__``. Although this isn't required, it's strongly encouraged.
+if you call ``str()`` on the object. Django uses ``str(obj)`` (or the related
+function, ``unicode(obj)`` -- see below) in a number of places, most notably
+as the value displayed to render an object in the Django admin site and as the
+value inserted into a template when it displays an object. Thus, you should
+always return a nice, human-readable string for the object's ``__str__``.
+Although this isn't required, it's strongly encouraged (see the description of
+``__unicode__``, below, before putting ``_str__`` methods everywhere).
 
 For example::
 
@@ -1789,7 +1792,32 @@ For example::
         last_name = models.CharField(maxlength=50)
 
         def __str__(self):
-            return '%s %s' % (self.first_name, self.last_name)
+            # Note use of django.utils.encoding.smart_str() here because
+            # first_name and last_name will be unicode strings.
+            return smart_str('%s %s' % (self.first_name, self.last_name))
+
+``__unicode__``
+---------------
+
+The ``__unicode__()`` method is called whenever you call ``unicode()`` on an
+object. Since Django's database backends will return Unicode strings in your
+model's attributes, you would normally want to write a ``__unicode__()``
+method for your model. The example in the previous section could be written
+more simply as::
+
+    class Person(models.Model):
+        first_name = models.CharField(maxlength=50)
+        last_name = models.CharField(maxlength=50)
+
+        def __unicode__(self):
+            return u'%s %s' % (self.first_name, self.last_name)
+
+If you define a ``__unicode__()`` method on your model and not a ``__str__()``
+method, Django will automatically provide you with a ``__str__()`` that calls
+``__unicode()__`` and then converts the result correctly to a UTF-8 encoded
+string object. This is recommended development practice: define only
+``__unicode__()`` and let Django take care of the conversion to string objects
+when required.
 
 ``get_absolute_url``
 --------------------
@@ -1823,7 +1851,9 @@ But this template code is good::
     characters (required by the URI spec, `RFC 2396`_) that have been
     URL-encoded, if necessary. Code and templates using ``get_absolute_url()``
     should be able to use the result directly without needing to do any
-    further processing.
+    further processing. You may wish to use the
+    ``django.utils.encoding.iri_to_uri()`` function to help with this if you
+    are using unicode strings a lot.
 
 .. _RFC 2396: http://www.ietf.org/rfc/rfc2396.txt
 

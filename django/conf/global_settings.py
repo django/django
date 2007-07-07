@@ -97,6 +97,9 @@ MANAGERS = ADMINS
 DEFAULT_CONTENT_TYPE = 'text/html'
 DEFAULT_CHARSET = 'utf-8'
 
+# Encoding of files read from disk (template and initial SQL files).
+FILE_CHARSET = 'utf-8'
+
 # E-mail address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
@@ -280,6 +283,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # Whether sessions expire when a user 
 # possible values.
 CACHE_BACKEND = 'simple://'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_SECONDS = 600
 
 ####################
 # COMMENTS         #

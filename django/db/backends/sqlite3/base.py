@@ -34,14 +34,6 @@ Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
-def utf8rowFactory(cursor, row):
-    def utf8(s):
-        if type(s) == unicode:
-            return s.encode("utf-8")
-        else:
-            return s
-    return [utf8(r) for r in row]
-
 try:
     # Only exists in Python 2.4+
     from threading import local
@@ -69,7 +61,6 @@ class DatabaseWrapper(local):
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
             self.connection.create_function("regexp", 2, _sqlite_regexp)
         cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
-        cursor.row_factory = utf8rowFactory
         if settings.DEBUG:
             return util.CursorDebugWrapper(cursor, self)
         else:
@@ -85,8 +76,9 @@ class DatabaseWrapper(local):
 
     def close(self):
         from django.conf import settings
-        # If database is in memory, closing the connection destroys the database.
-        # To prevent accidental data loss, ignore close requests on an in-memory db.
+        # If database is in memory, closing the connection destroys the
+        # database.  To prevent accidental data loss, ignore close requests on
+        # an in-memory db.
         if self.connection is not None and settings.DATABASE_NAME != ":memory:":
             self.connection.close()
             self.connection = None
@@ -181,10 +173,10 @@ def get_autoinc_sql(table):
     return None
 
 def get_sql_flush(style, tables, sequences):
-    """Return a list of SQL statements required to remove all data from
+    """
+    Return a list of SQL statements required to remove all data from
     all tables in the database (without actually removing the tables
     themselves) and put the database in an empty 'initial' state
-
     """
     # NB: The generated SQL below is specific to SQLite
     # Note: The DELETE FROM... SQL generated below works for SQLite databases
@@ -241,3 +233,4 @@ OPERATOR_MAPPING = {
     'istartswith': "LIKE %s ESCAPE '\\'",
     'iendswith': "LIKE %s ESCAPE '\\'",
 }
+

@@ -4,7 +4,8 @@ Chile specific form helpers.
 
 from django.newforms import ValidationError
 from django.newforms.fields import RegexField, EMPTY_VALUES
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
+from django.utils.encoding import smart_unicode
 
 class CLRutField(RegexField):
     """
@@ -18,12 +19,12 @@ class CLRutField(RegexField):
         if 'strict' in kwargs:
             del kwargs['strict']
             super(CLRutField, self).__init__(r'^(\d{1,2}\.)?\d{3}\.\d{3}-[\dkK]$',
-                error_message=gettext('Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.'),
-                *args, **kwargs)
+                error_message=ugettext('Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.'),
+                        *args, **kwargs)
         else:
             # In non-strict mode, accept RUTs that validate but do not exist in
             # the real world.
-            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', error_message=gettext(u'Enter valid a Chilean RUT'), *args, **kwargs)
+            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', error_message=ugettext('Enter valid a Chilean RUT'), *args, **kwargs)
 
     def clean(self, value):
         """
@@ -49,14 +50,14 @@ class CLRutField(RegexField):
             multi += 1
             if multi == 8:
                 multi = 2
-        return '0123456789K0'[11 - suma % 11]
+        return u'0123456789K0'[11 - suma % 11]
 
     def _canonify(self, rut):
         """
         Turns the RUT into one normalized format. Returns a (rut, verifier)
         tuple.
         """
-        rut = str(rut).replace(' ', '').replace('.', '').replace('-', '')
+        rut = smart_unicode(rut).replace(' ', '').replace('.', '').replace('-', '')
         return rut[:-1], rut[-1]
 
     def _format(self, code, verifier=None):
@@ -74,5 +75,5 @@ class CLRutField(RegexField):
             else:
                 new_dot = pos - 3
             code = code[:new_dot] + '.' + code[new_dot:]
-        return '%s-%s' % (code, verifier)
+        return u'%s-%s' % (code, verifier)
 

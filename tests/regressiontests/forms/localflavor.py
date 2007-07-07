@@ -1303,9 +1303,9 @@ strict.
 >>> rut = CLRutField()
 
 >>> rut.clean('11-6')
-'11-6'
+u'11-6'
 >>> rut.clean('116')
-'11-6'
+u'11-6'
 
 # valid format, bad verifier.
 >>> rut.clean('11.111.111-0')
@@ -1318,13 +1318,13 @@ Traceback (most recent call last):
 ValidationError: [u'The Chilean RUT is not valid.']
 
 >>> rut.clean('767484100')
-'76.748.410-0'
+u'76.748.410-0'
 >>> rut.clean('78.412.790-7')
-'78.412.790-7'
+u'78.412.790-7'
 >>> rut.clean('8.334.6043')
-'8.334.604-3'
+u'8.334.604-3'
 >>> rut.clean('76793310-K')
-'76.793.310-K'
+u'76.793.310-K'
 
 Strict RUT usage (does not allow imposible values)
 >>> rut = CLRutField(strict=True)
@@ -1346,7 +1346,7 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
 >>> rut.clean('78.412.790-7')
-'78.412.790-7'
+u'78.412.790-7'
 >>> rut.clean('8.334.6043')
 Traceback (most recent call last):
 ...

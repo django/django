@@ -13,7 +13,7 @@ class Category(models.Model):
     class Meta:
        ordering = ('name',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Author(models.Model):
@@ -22,7 +22,7 @@ class Author(models.Model):
     class Meta:
         ordering = ('name',)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -34,15 +34,15 @@ class Article(models.Model):
     class Meta:
        ordering = ('pub_date',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class AuthorProfile(models.Model):
     author = models.OneToOneField(Author)
     date_of_birth = models.DateField()
     
-    def __str__(self):
-        return "Profile of %s" % self.author
+    def __unicode__(self):
+        return u"Profile of %s" % self.author
 
 __test__ = {'API_TESTS':"""
 # Create some data:

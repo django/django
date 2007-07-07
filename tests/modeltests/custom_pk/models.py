@@ -15,8 +15,8 @@ class Employee(models.Model):
     class Meta:
         ordering = ('last_name', 'first_name')
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 class Business(models.Model):
     name = models.CharField(maxlength=20, primary_key=True)
@@ -24,7 +24,7 @@ class Business(models.Model):
     class Meta:
         verbose_name_plural = 'businesses'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""
@@ -62,7 +62,7 @@ DoesNotExist: Employee matching query does not exist.
 >>> Employee.objects.filter(last_name__exact='Jones')
 [<Employee: Dan Jones>, <Employee: Fran Jones>]
 >>> Employee.objects.in_bulk(['ABC123', 'XYZ456'])
-{'XYZ456': <Employee: Fran Jones>, 'ABC123': <Employee: Dan Jones>}
+{u'XYZ456': <Employee: Fran Jones>, u'ABC123': <Employee: Dan Jones>}
 
 >>> b = Business(name='Sears')
 >>> b.save()
@@ -72,7 +72,7 @@ DoesNotExist: Employee matching query does not exist.
 >>> fran.business_set.all()
 [<Business: Sears>]
 >>> Business.objects.in_bulk(['Sears'])
-{'Sears': <Business: Sears>}
+{u'Sears': <Business: Sears>}
 
 >>> Business.objects.filter(name__exact='Sears')
 [<Business: Sears>]

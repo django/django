@@ -1,15 +1,18 @@
 import re
-
 from django.conf import settings
+from django.utils.encoding import force_unicode
+from django.utils.functional import allow_lazy
 
 # Capitalizes the first letter of a string.
-capfirst = lambda x: x and x[0].upper() + x[1:]
+capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
+capfirst = allow_lazy(capfirst, unicode)
 
 def wrap(text, width):
     """
     A word-wrap function that preserves existing line breaks and most spaces in
     the text. Expects that existing line breaks are posix newlines.
     """
+    text = force_unicode(text)
     def _generator():
         it = iter(text.split(' '))
         word = it.next()
@@ -29,29 +32,34 @@ def wrap(text, width):
                 if len(lines) > 1:
                     pos = len(lines[-1])
             yield word
-    return "".join(_generator())
+    return u''.join(_generator())
+wrap = allow_lazy(wrap, unicode)
 
 def truncate_words(s, num):
     "Truncates a string after a certain number of words."
+    s = force_unicode(s)
     length = int(num)
     words = s.split()
     if len(words) > length:
         words = words[:length]
         if not words[-1].endswith('...'):
             words.append('...')
-    return ' '.join(words)
+    return u' '.join(words)
+truncate_words = allow_lazy(truncate_words, unicode)
 
 def truncate_html_words(s, num):
     """
-    Truncates html to a certain number of words (not counting tags and comments).
-    Closes opened tags if they were correctly closed in the given html.
+    Truncates html to a certain number of words (not counting tags and
+    comments). Closes opened tags if they were correctly closed in the given
+    html.
     """
+    s = force_unicode(s)
     length = int(num)
     if length <= 0:
-        return ''
+        return u''
     html4_singlets = ('br', 'col', 'link', 'base', 'img', 'param', 'area', 'hr', 'input')
     # Set up regular expressions
-    re_words = re.compile(r'&.*?;|<.*?>|([A-Za-z0-9][\w-]*)')
+    re_words = re.compile(r'&.*?;|<.*?>|(\w[\w-]*)', re.U)
     re_tag = re.compile(r'<(/)?([^ ]+?)(?: (/)| .*?)?>')
     # Count non-HTML words and keep note of open tags
     pos = 0
@@ -100,6 +108,7 @@ def truncate_html_words(s, num):
         out += '</%s>' % tag
     # Return string
     return out
+truncate_html_words = allow_lazy(truncate_html_words, unicode)
 
 def get_valid_filename(s):
     """
@@ -110,10 +119,11 @@ def get_valid_filename(s):
     >>> get_valid_filename("john's portrait in 2004.jpg")
     'johns_portrait_in_2004.jpg'
     """
-    s = s.strip().replace(' ', '_')
+    s = force_unicode(s).strip().replace(' ', '_')
     return re.sub(r'[^-A-Za-z0-9_.]', '', s)
+get_valid_filename = allow_lazy(get_valid_filename, unicode)
 
-def get_text_list(list_, last_word='or'):
+def get_text_list(list_, last_word=u'or'):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
@@ -126,23 +136,22 @@ def get_text_list(list_, last_word='or'):
     >>> get_text_list([])
     ''
     """
-    if len(list_) == 0: return ''
-    if len(list_) == 1: return list_[0]
-    return '%s %s %s' % (', '.join([str(i) for i in list_][:-1]), last_word, list_[-1])
+    if len(list_) == 0: return u''
+    if len(list_) == 1: return force_unicode(list_[0])
+    return u'%s %s %s' % (', '.join([force_unicode(i) for i in list_][:-1]), force_unicode(last_word), force_unicode(list_[-1]))
+get_text_list = allow_lazy(get_text_list, unicode)
 
 def normalize_newlines(text):
-    return re.sub(r'\r\n|\r|\n', '\n', text)
+    return force_unicode(re.sub(r'\r\n|\r|\n', '\n', text))
+normalize_newlines = allow_lazy(normalize_newlines, unicode)
 
 def recapitalize(text):
     "Recapitalizes text, placing caps after end-of-sentence punctuation."
-#     capwords = ()
-    text = text.lower()
+    text = force_unicode(text).lower()
     capsRE = re.compile(r'(?:^|(?<=[\.\?\!] ))([a-z])')
     text = capsRE.sub(lambda x: x.group(1).upper(), text)
-#     for capword in capwords:
-#         capwordRE = re.compile(r'\b%s\b' % capword, re.I)
-#         text = capwordRE.sub(capword, text)
     return text
+recapitalize = allow_lazy(recapitalize)
 
 def phone2numeric(phone):
     "Converts a phone number with letters into its numeric equivalent."
@@ -153,6 +162,7 @@ def phone2numeric(phone):
          's': '7', 'r': '7', 'u': '8', 't': '8', 'w': '9', 'v': '8',
          'y': '9', 'x': '9'}.get(m.group(0).lower())
     return letters.sub(char2number, phone)
+phone2numeric = allow_lazy(phone2numeric)
 
 # From http://www.xhaus.com/alan/python/httpcomp.html#gzip
 # Used with permission.
@@ -172,7 +182,7 @@ def javascript_quote(s, quote_double_quotes=False):
         return r"\u%04x" % ord(match.group(1))
 
     if type(s) == str:
-        s = s.decode(settings.DEFAULT_CHARSET)
+        s = s.decode('utf-8')
     elif type(s) != unicode:
         raise TypeError, s
     s = s.replace('\\', '\\\\')
@@ -183,6 +193,7 @@ def javascript_quote(s, quote_double_quotes=False):
     if quote_double_quotes:
         s = s.replace('"', '&quot;')
     return str(ustring_re.sub(fix, s))
+javascript_quote = allow_lazy(javascript_quote, unicode)
 
 smart_split_re = re.compile('("(?:[^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'(?:[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'|[^\\s]+)')
 def smart_split(text):
@@ -195,6 +206,7 @@ def smart_split(text):
     >>> list(smart_split('This is "a person\'s" test.'))
     ['This', 'is', '"a person\'s"', 'test.']
     """
+    text = force_unicode(text)
     for bit in smart_split_re.finditer(text):
         bit = bit.group(0)
         if bit[0] == '"' and bit[-1] == '"':
@@ -203,3 +215,5 @@ def smart_split(text):
             yield "'" + bit[1:-1].replace("\\'", "'").replace("\\\\", "\\") + "'"
         else:
             yield bit
+smart_split = allow_lazy(smart_split, unicode)
+

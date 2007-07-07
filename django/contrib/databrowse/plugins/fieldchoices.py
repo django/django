@@ -4,9 +4,11 @@ from django.contrib.databrowse.datastructures import EasyModel
 from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
+from django.utils.encoding import smart_str, force_unicode
 from django.views.generic import date_based
 import datetime
 import time
+import urllib
 
 class FieldChoicePlugin(DatabrowsePlugin):
     def __init__(self, field_filter=None):
@@ -29,15 +31,15 @@ class FieldChoicePlugin(DatabrowsePlugin):
     def model_index_html(self, request, model, site):
         fields = self.field_dict(model)
         if not fields:
-            return ''
-        return '<p class="filter"><strong>View by:</strong> %s</p>' % \
-            ', '.join(['<a href="fields/%s/">%s</a>' % (f.name, capfirst(f.verbose_name)) for f in fields.values()])
+            return u''
+        return u'<p class="filter"><strong>View by:</strong> %s</p>' % \
+            u', '.join(['<a href="fields/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()])
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():
-            return ['%s%s/%s/%s/' % (easy_instance_field.model.url(),
+            return [u'%s%s/%s/%s/' % (easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                easy_instance_field.raw_value)]
+                urllib.quote(smart_str(easy_instance_field.raw_value)))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

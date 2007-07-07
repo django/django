@@ -1,12 +1,35 @@
 "Functions that help with dynamically creating decorators for views."
 
+import types
+
 def decorator_from_middleware(middleware_class):
     """
     Given a middleware class (not an instance), returns a view decorator. This
     lets you use middleware functionality on a per-view basis.
     """
-    def _decorator_from_middleware(view_func, *args, **kwargs):
+    def _decorator_from_middleware(*args, **kwargs):
+        has_func = True
+        try:
+            view_func = kwargs.pop('view_func')
+        except KeyError:
+            if len(args):
+                view_func, args = args[0], args[1:]
+            else:
+                has_func = False
+        if not (has_func and isinstance(view_func, types.FunctionType)):
+            # For historical reasons, these decorators are also called as
+            # dec(func, *args) instead of dec(*args)(func). This branch handles
+            # the backwards compatibility.
+            if has_func:
+                args = (view_func,) + args
+            middleware = middleware_class(*args, **kwargs)
+
+            def decorator_func(fn):
+                return _decorator_from_middleware(fn, *args, **kwargs)
+            return decorator_func
+
         middleware = middleware_class(*args, **kwargs)
+
         def _wrapped_view(request, *args, **kwargs):
             if hasattr(middleware, 'process_request'):
                 result = middleware.process_request(request)

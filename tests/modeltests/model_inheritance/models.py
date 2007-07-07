@@ -10,21 +10,21 @@ class Place(models.Model):
     name = models.CharField(maxlength=50)
     address = models.CharField(maxlength=80)
 
-    def __str__(self):
-        return "%s the place" % self.name
+    def __unicode__(self):
+        return u"%s the place" % self.name
 
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
-    def __str__(self):
-        return "%s the restaurant" % self.name
+    def __unicode__(self):
+        return u"%s the restaurant" % self.name
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField()
 
-    def __str__(self):
-        return "%s the italian restaurant" % self.name
+    def __unicode__(self):
+        return u"%s the italian restaurant" % self.name
 
 __test__ = {'API_TESTS':"""
 # Make sure Restaurant has the right fields in the right order.

@@ -4,6 +4,7 @@ Form Widget classes specific to the Django admin site.
 
 from django import newforms as forms
 from django.utils.text import capfirst
+from django.utils.translation import ugettext as _
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     """
