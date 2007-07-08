@@ -48,19 +48,17 @@ class Layer(object):
                 index = end - index
             if index < 0 or index >= self.num_feat:
                 raise IndexError, 'index out of range'
-            yield make_feature(index)
+            return make_feature(index)
         else: 
             # A slice was given
             start, stop, stride = index.indices(end)
-            for offset in xrange(start,stop,stride):
-                yield make_feature(offset)
+            return [make_feature(offset) for offset in range(start,stop,stride)]
 
     def __iter__(self):
         "Iterates over each Feature in the Layer."
-        # Resetting the Layer before beginning iteration
-        lgdal.OGR_L_ResetReading(self._layer)
-
-        return self.__getitem__(slice(self.num_feat))
+        #TODO: is OGR's GetNextFeature faster here?
+        for i in range(self.num_feat):
+            yield self.__getitem__(i)
 
     def __len__(self):
         "The length is the number of features."
