@@ -38,29 +38,27 @@ def get_callable(lookup_view, can_fail=False):
     If can_fail is True, lookup_view might be a URL pattern label, so errors
     during the import fail and the string is returned.
     """
-    try:
-        # Bail out early if lookup_view is not ASCII. This can't be a function.
-        lookup_view = lookup_view.encode('ascii')
-
-        if not callable(lookup_view):
+    if not callable(lookup_view):
+        try:
+            # Bail early for non-ASCII strings (they can't be functions).
+            lookup_view = lookup_view.encode('ascii')
             mod_name, func_name = get_mod_func(lookup_view)
-            try:
-                if func_name != '':
-                    lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
-            except (ImportError, AttributeError):
-                if not can_fail:
-                    raise
-    except UnicodeEncodeError:
-        pass
+            if func_name != '':
+                lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
+        except (ImportError, AttributeError):
+            if not can_fail:
+                raise
+        except UnicodeEncodeError:
+            pass
     return lookup_view
-get_callable = memoize(get_callable, _callable_cache)
+get_callable = memoize(get_callable, _callable_cache, 1)
 
 def get_resolver(urlconf):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return RegexURLResolver(r'^/', urlconf)
-get_resolver = memoize(get_resolver, _resolver_cache)
+get_resolver = memoize(get_resolver, _resolver_cache, 1)
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
