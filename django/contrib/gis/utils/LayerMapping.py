@@ -20,7 +20,8 @@ Usage:
 
   model -- GeoDjango model (not an instance)
 
-  source_file -- OGR-supported data source file (e.g. a shapefile)
+  data -- OGR-supported data source file (e.g. a shapefile) or
+          gdal.DataSource instance
 
   mapping -- A python dictionary, keys are strings corresponding
              to the GeoDjango model field, and values correspond to
@@ -91,6 +92,9 @@ from django.contrib.gis.gdal import \
 from django.contrib.gis.gdal.Field import Field, OFTInteger, OFTReal, OFTString, OFTDateTime
 from django.contrib.gis.models import GeometryColumns, SpatialRefSys
 
+from django.db import connection, transaction
+from django.core.exceptions import ObjectDoesNotExist
+
 # A mapping of given geometry types to their OGR integer type.
 ogc_types = {'POINT' : OGRGeomType('Point'),
              'LINESTRING' : OGRGeomType('LineString'),
@@ -115,9 +119,22 @@ multi_types = {'POINT' : OGRGeomType('MultiPoint'),
                'LINESTRING' : OGRGeomType('MultiLineString'),
                'POLYGON' : OGRGeomType('MultiPolygon'),
                }
+
+def map_foreign_key(django_field):
+    from django.db.models.fields.related import ForeignKey
+
+    if not django_field.__class__ is ForeignKey:
+        return django_field.__class__.__name__
+
+     
+    rf=django_field.rel.get_related_field()
+
+    return rf.get_internal_type()
                 
 # The acceptable Django field types that map to OGR fields.
-field_types = {'IntegerField' : OFTInteger,
+field_types = {
+               'AutoField' : OFTInteger,
+               'IntegerField' : OFTInteger,
                'FloatField' : OFTReal,
                'DateTimeField' : OFTDateTime,
                'DecimalField' : OFTReal,
@@ -142,10 +159,12 @@ def check_feature(feat, model_fields, mapping):
     for model_field, ogr_field in mapping.items():
 
         # Making sure the given mapping model field is in the given model fields.
-        if not model_field in model_fields:
-            raise Exception, 'Given mapping field "%s" not in given Model fields!' % model_field
-        else:
+        if model_field in model_fields:
             model_type = model_fields[model_field]
+        elif model_field[:-3] in model_fields: #foreign key
+            model_type = model_fields[model_field[:-3]]
+        else:
+            raise Exception, 'Given mapping field "%s" not in given Model fields!' % model_field
 
         ## Handling if we get a geometry in the Field ###
         if ogr_field in ogc_types:
@@ -175,7 +194,7 @@ def check_feature(feat, model_fields, mapping):
 
         ## Handling other fields 
         else:
-            # Making sure the model field is 
+            # Making sure the model field is
             if not model_type in field_types:
                 raise Exception, 'Django field type "%s" has no OGR mapping (yet).' % model_type
 
@@ -208,14 +227,16 @@ def check_srs(layer, source_srs):
 class LayerMapping:
     "A class that maps OGR Layers to Django Models."
 
-    def __init__(self, model, ogr_file, mapping, layer=0, source_srs=None):
+    def __init__(self, model, data, mapping, layer=0, source_srs=None):
         "Takes the Django model, the mapping (dictionary), and the SHP file."
 
         # Getting the field names and types from the model
-        fields = dict((f.name, f.__class__.__name__) for f in model._meta.fields)
-
+        fields = dict((f.name, map_foreign_key(f)) for f in model._meta.fields)
         # Getting the DataSource and its Layer
-        self.ds = DataSource(ogr_file)
+        if isinstance(data, basestring):
+            self.ds = DataSource(data)
+        else:
+            self.ds = data
         self.layer = self.ds[layer]
 
         # Checking the layer -- intitialization of the object will fail if
@@ -227,7 +248,8 @@ class LayerMapping:
         self.mapping = mapping
         self.model = model
         self.source_srs = check_srs(self.layer, source_srs)
-        
+
+    @transaction.commit_on_success
     def save(self, verbose=False):
         "Runs the layer mapping on the given SHP file, and saves to the database."
 
@@ -246,14 +268,21 @@ class LayerMapping:
             ct = CoordTransform(self.source_srs, target_srs)
         except Exception, msg:
             raise Exception, 'Could not translate between the data source and model geometry.'
-        
+
         for feat in self.layer:
             # The keyword arguments for model construction
             kwargs = {}
 
             # Incrementing through each model field and the OGR field in the mapping
+            all_prepped = True
+
             for model_field, ogr_field in self.mapping.items():
-                model_type = self.fields[model_field]
+                is_fk = False
+                try:
+                    model_type = self.fields[model_field]
+                except KeyError: #foreign key
+                    model_type = self.fields[model_field[:-3]]
+                    is_fk = True
 
                 if ogr_field in ogc_types:
                     ## Getting the OGR geometry from the field
@@ -271,17 +300,40 @@ class LayerMapping:
                     g.transform(ct)
 
                     # Updating the keyword args with the WKT of the transformed model.
-                    kwargs[model_field] = g.wkt
+                    val = g.wkt
                 else:
                     ## Otherwise, this is an OGR field type
                     fi = feat.index(ogr_field)
                     val = feat[fi].value
+
+                if is_fk:
+                    rel_obj = None
+                    field_name = model_field[:-3]
+                    try:
+                        #FIXME: refactor to efficiently fetch FKs.
+                        #  Requires significant re-work. :-/
+                        rel = self.model._meta.get_field(field_name).rel
+                        rel_obj = rel.to._default_manager.get(**{('%s__exact' % rel.field_name):val})
+                    except ObjectDoesNotExist:
+                        all_prepped = False
+                    
+                    kwargs[model_field[:-3]] = rel_obj
+                else:
                     kwargs[model_field] = val
 
             # Constructing the model using the constructed keyword args
-            m = self.model(**kwargs)
+            if all_prepped:
+                m = self.model(**kwargs)
 
-            # Saving the model
-            m.save()
-            if verbose: print 'Saved: %s' % str(m)
-
+                # Saving the model
+                try:
+                    if all_prepped:
+                        m.save()
+                        if verbose: print 'Saved: %s' % str(m)                        
+                    else:
+                        print "Skipping %s due to missing relation." % kwargs
+                except SystemExit:
+                    raise
+                except Exception, e:
+                    print "Failed to save %s\n  Continuing" % kwargs
+                
