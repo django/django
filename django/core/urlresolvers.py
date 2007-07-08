@@ -9,7 +9,7 @@ a string) and returns a tuple in this format:
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.utils.encoding import iri_to_uri, force_unicode
+from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize
 import re
 
@@ -229,8 +229,10 @@ class RegexURLResolver(object):
                     tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
                 else:
                     if sub_match:
-                        sub_match_dict = dict(self.default_kwargs, **sub_match[2])
-                        return sub_match[0], sub_match[1], dict(match.groupdict(), **sub_match_dict)
+                        sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
+                        sub_match_dict.update(self.default_kwargs)
+                        sub_match_dict.update([(smart_str(k), v) for k, v in sub_match[2].items()])
+                        return sub_match[0], sub_match[1], sub_match_dict
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
