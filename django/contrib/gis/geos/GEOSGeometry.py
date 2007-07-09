@@ -1,166 +1,76 @@
-# Copyright (c) 2007, Justin Bronn
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
-#
-#     1. Redistributions of source code must retain the above copyright notice, 
-#        this list of conditions and the following disclaimer.
-#    
-#     2. Redistributions in binary form must reproduce the above copyright 
-#        notice, this list of conditions and the following disclaimer in the
-#        documentation and/or other materials provided with the distribution.
-#
-#     3. Neither the name of GEOSGeometry nor the names of its contributors may be used
-#        to endorse or promote products derived from this software without
-#        specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-
 # Trying not to pollute the namespace.
 from ctypes import \
-     CDLL, CFUNCTYPE, byref, string_at, create_string_buffer, \
+     byref, string_at, create_string_buffer, pointer, \
      c_char_p, c_double, c_float, c_int, c_uint, c_size_t
-import os, sys
-from types import StringType, IntType, FloatType
+from types import StringType, IntType, FloatType, TupleType, ListType
 
-"""
-  The goal of this module is to be a ctypes wrapper around the GEOS library
-  that will work on both *NIX and Windows systems.  Specifically, this uses
-  the GEOS C api.
+# Getting GEOS-related dependencies.
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
+from django.contrib.gis.geos.GEOSError import GEOSException
+from django.contrib.gis.geos.GEOSCoordSeq import GEOSCoordSeq, create_cs
 
-  I have several motivations for doing this:
-    (1) The GEOS SWIG wrapper is no longer maintained, and requires the
-        installation of SWIG.
-    (2) The PCL implementation is over 2K+ lines of C and would make
-        PCL a requisite package for the GeoDjango application stack.
-    (3) Windows and Mac compatibility becomes substantially easier, and does not
-        require the additional compilation of PCL or GEOS and SWIG -- all that
-        is needed is a Win32 or Mac compiled GEOS C library (dll or dylib)
-        in a location that Python can read (e.g. 'C:\Python25').
-
-  In summary, I wanted to wrap GEOS in a more maintainable and portable way using
-   only Python and the excellent ctypes library (now standard in Python 2.5).
-
-  In the spirit of loose coupling, this library does not require Django or
-   GeoDjango.  Only the GEOS C library and ctypes are needed for the platform
-   of your choice.
-
-  For more information about GEOS:
-    http://geos.refractions.net
-  
-  For more info about PCL and the discontinuation of the Python GEOS
-   library see Sean Gillies' writeup (and subsequent update) at:
-     http://zcologia.com/news/150/geometries-for-python/
-     http://zcologia.com/news/429/geometries-for-python-update/
-"""
-
-# Setting the appropriate name for the GEOS-C library, depending on which
-# OS and POSIX platform we're running.
-if os.name == 'nt':
-    # Windows NT library
-    lib_name = 'libgeos_c-1.dll'
-elif os.name == 'posix':
-    platform = os.uname()[0] # Using os.uname()
-    if platform in ('Linux', 'SunOS'):
-        # Linux or Solaris shared library
-        lib_name = 'libgeos_c.so'
-    elif platform == 'Darwin':
-        # Mac OSX Shared Library (Thanks Matt!)
-        lib_name = 'libgeos_c.dylib'
-    else:
-        raise GEOSException, 'Unknown POSIX platform "%s"' % platform
-else:
-    raise GEOSException, 'Unsupported OS "%s"' % os.name
-
-# The GEOSException class
-class GEOSException(Exception): pass
-class GEOSGeometryIndexError(GEOSException, KeyError):
-    """This exception is raised when an invalid index is encountered, and has
-    the 'silent_variable_feature' attribute set to true.  This ensures that
-    django's templates proceed to use the next lookup type gracefully when
-    an Exception is raised.  Fixes ticket #4740.
-    """
-    silent_variable_failure = True
-
-# Getting the GEOS C library.  The C interface (CDLL) is used for
-#  both *NIX and Windows.
-# See the GEOS C API source code for more details on the library function calls:
-#  http://geos.refractions.net/ro/doxygen_docs/html/geos__c_8h-source.html
-lgeos = CDLL(lib_name)
-
-# The notice and error handler C function callback definitions.
-#  Supposed to mimic the GEOS message handler (C below):
-#  "typedef void (*GEOSMessageHandler)(const char *fmt, ...);"
-NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
-def notice_h(fmt, list):
-    sys.stdout.write((fmt + '\n') % list)
-notice_h = NOTICEFUNC(notice_h)
-
-ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
-def error_h(fmt, list):
-    if list:
-        err_msg = fmt % list
-    else:
-        err_msg = fmt
-    sys.stderr.write(err_msg)
-error_h = ERRORFUNC(error_h)
-
-# The initGEOS routine should be called first, however, that routine takes
-#  the notice and error functions as parameters.  Here is the C code that
-#  we need to wrap:
-#  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
-lgeos.initGEOS(notice_h, error_h)
+if HAS_NUMPY:
+    from numpy import ndarray, array
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
     
-    _g = 0  # Initially NULL
-
     #### Python 'magic' routines ####
-    def __init__(self, input, input_type='wkt'):
-        "Takes an input and the type of the input for initialization."
+    def __init__(self, geo_input, input_type='wkt', child=False):
+        """The constructor for GEOS geometry objects.  May take the following
+        strings as inputs, WKT ("wkt"), HEXEWKB ("hex", PostGIS-specific canonical form).
 
-        if isinstance(input, StringType):
+        When a hex string is to be used, the `input_type` keyword should be set with 'hex'.
+
+        The `child` keyword is for internal use only, and indicates to the garbage collector
+          not to delete this geometry if it was spawned from a parent (e.g., the exterior
+          ring from a polygon).
+        """
+
+        # Initially, setting the pointer to NULL
+        self._ptr = GEOSPointer(0)
+
+        if isinstance(geo_input, StringType):
             if input_type == 'wkt':
                 # If the geometry is in WKT form
-                g = lgeos.GEOSGeomFromWKT(c_char_p(input))
+                g = lgeos.GEOSGeomFromWKT(c_char_p(geo_input))
             elif input_type == 'hex':
                 # If the geometry is in HEX form.
-                sz = c_size_t(len(input))
-                buf = create_string_buffer(input)
+                sz = c_size_t(len(geo_input))
+                buf = create_string_buffer(geo_input)
                 g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
             else:
-                raise GEOSException, 'GEOS input geometry type "%s" not supported!' % input_type
-        elif isinstance(input, IntType):
-            # When the input is a C pointer (Python integer)
-            g = input
+                raise TypeError, 'GEOS input geometry type "%s" not supported.' % input_type
+        elif isinstance(geo_input, (IntType, GEOSPointer)):
+            # When the input is either a raw pointer value (an integer), or a GEOSPointer object.
+            g = geo_input
         else:
             # Invalid geometry type.
-            raise GEOSException, 'Improper geometry input type: %s' % str(type(input))
+            raise TypeError, 'Improper geometry input type: %s' % str(type(geo_input))
 
-        # If the geometry pointer is NULL (0), raise an exception.
-        if not g:
-            raise GEOSException, 'Invalid %s given!' % input_type.upper()
+        if bool(g):
+            # If we have a GEOSPointer object, just set the '_ptr' attribute with g
+            if isinstance(g, GEOSPointer): self._ptr = g
+            else: self._ptr.set(g) # Otherwise, set the address
         else:
-            self._g = g
+            raise GEOSException, 'Could not initialize GEOS Geometry with given input.'
 
-        # Setting the class type (e.g. 'Point', 'Polygon', etc.)
+        # Setting the 'child' flag -- when the object is labeled with this flag
+        #  it will not be destroyed by __del__().  This is used for child geometries from
+        #  parent geometries (e.g., LinearRings from a Polygon, Points from a MultiPoint, etc.).
+        self._child = child
+
+        # Setting the class type (e.g., 'Point', 'Polygon', etc.)
         self.__class__ = GEOS_CLASSES[self.geom_type]
 
+        # Extra setup needed for Geometries that may be parents.
+        if isinstance(self, GeometryCollection): self._geoms = {}
+        if isinstance(self, Polygon): self._rings = {}
+
     def __del__(self):
-        "This cleans up the memory allocated for the geometry."
-        if self._g: lgeos.GEOSGeom_destroy(self._g)
+        "Destroys this geometry -- only if the pointer is valid and this is not a child geometry."
+        #print 'Deleting %s (child=%s, valid=%s)' % (self.geom_type, self._child, self._ptr.valid)
+        if self._ptr.valid and not self._child: lgeos.GEOSGeom_destroy(self._ptr())
 
     def __str__(self):
         "WKT is used for the string representation."
@@ -170,29 +80,48 @@ class GEOSGeometry(object):
         "Equivalence testing."
         return self.equals(other)
 
+    #### Coordinate Sequence Routines ####
+    def _cache_cs(self):
+        "Caches the coordinate sequence for this Geometry."
+        if not hasattr(self, '_cs'):
+            # Only these geometries are allowed to have coordinate sequences.
+            if self.geom_type in ('LineString', 'LinearRing', 'Point'):
+                self._cs = GEOSCoordSeq(GEOSPointer(lgeos.GEOSGeom_getCoordSeq(self._ptr())), self.hasz)
+            else:
+                self._cs = None
+
+    @property
+    def coord_seq(self):
+        "Returns the coordinate sequence for the geometry."
+        # Getting the coordinate sequence for the geometry
+        self._cache_cs()
+
+        # Returning a GEOSCoordSeq wrapped around the pointer.
+        return self._cs
+
     #### Geometry Info ####
     @property
     def geom_type(self):
         "Returns a string representing the geometry type, e.g. 'Polygon'"
-        return string_at(lgeos.GEOSGeomType(self._g))
+        return string_at(lgeos.GEOSGeomType(self._ptr()))
 
     @property
     def geom_typeid(self):
         "Returns an integer representing the geometry type."
-        return lgeos.GEOSGeomTypeId(self._g)
+        return lgeos.GEOSGeomTypeId(self._ptr())
 
     @property
     def num_geom(self):
         "Returns the number of geometries in the geometry."
-        n = lgeos.GEOSGetNumGeometries(self._g)
-        if n == -1: raise GEOSException, 'Error getting number of geometries!'
+        n = lgeos.GEOSGetNumGeometries(self._ptr())
+        if n == -1: raise GEOSException, 'Error getting number of geometries.'
         else: return n
 
     @property
     def num_coords(self):
         "Returns the number of coordinates in the geometry."
-        n = lgeos.GEOSGetNumCoordinates(self._g)
-        if n == -1: raise GEOSException, 'Error getting number of coordinates!'
+        n = lgeos.GEOSGetNumCoordinates(self._ptr())
+        if n == -1: raise GEOSException, 'Error getting number of coordinates.'
         else: return n
 
     @property
@@ -203,63 +132,54 @@ class GEOSGeometry(object):
     @property
     def dims(self):
         "Returns the dimension of this Geometry (0=point, 1=line, 2=surface)."
-        return lgeos.GEOSGeom_getDimensions(self._g)
-
-    @property
-    def coord_seq(self):
-        "Returns the coordinate sequence for the geometry."
-
-        # Only these geometries can return coordinate sequences
-        if self.geom_type not in ['LineString', 'LinearRing', 'Point']:
-            return None
-
-        # Getting the coordinate sequence for the geometry
-        cs = lgeos.GEOSGeom_getCoordSeq(self._g)
-
-        # Cloning the coordinate sequence (if the original is returned,
-        #  and it is garbage-collected we will get a segmentation fault!)
-        clone = lgeos.GEOSCoordSeq_clone(cs)
-        return GEOSCoordSeq(clone, z=self.hasz)
+        return lgeos.GEOSGeom_getDimensions(self._ptr())
 
     def normalize(self):
         "Converts this Geometry to normal form (or canonical form)."
-        status = lgeos.GEOSNormalize(self._g)
+        status = lgeos.GEOSNormalize(self._ptr())
         if status == -1: raise GEOSException, 'failed to normalize geometry'
 
-    def _predicate(self, val):
-        "Checks the result, 2 for exception, 1 on true, 0 on false."
-        if val == 0:
-            return False
-        elif val == 1:
-            return True
-        else:
-            raise GEOSException, 'Predicate exception occurred!'
+    def _unary_predicate(self, func):
+        "Returns the result, or raises an exception for the given unary predicate function."
+        val = func(self._ptr())
+        if val == 0: return False
+        elif val == 1: return True
+        else: raise GEOSException, '%s: exception occurred.' % func.__name__
 
-    ### Unary predicates ###
+    def _binary_predicate(self, func, other, *args):
+        "Returns the result, or raises an exception for the given binary predicate function."
+        if not isinstance(other, GEOSGeometry):
+            raise TypeError, 'Binary predicate operation ("%s") requires another GEOSGeometry instance.' % func.__name__
+        val = func(self._ptr(), other._ptr(), *args)
+        if val == 0: return False
+        elif val == 1: return True
+        else: raise GEOSException, '%s: exception occurred.' % func.__name__
+
+    #### Unary predicates ####
     @property
     def empty(self):
         "Returns a boolean indicating whether the set of points in this geometry are empty."
-        return self._predicate(lgeos.GEOSisEmpty(self._g))
+        return self._unary_predicate(lgeos.GEOSisEmpty)
 
     @property
     def valid(self):
         "This property tests the validity of this geometry."
-        return self._predicate(lgeos.GEOSisValid(self._g))
+        return self._unary_predicate(lgeos.GEOSisValid)
 
     @property
     def simple(self):
         "Returns false if the Geometry not simple."
-        return self._predicate(lgeos.GEOSisSimple(self._g))
+        return self._unary_predicate(lgeos.GEOSisSimple)
 
     @property
     def ring(self):
         "Returns whether or not the geometry is a ring."
-        return self._predicate(lgeos.GEOSisRing(self._g))
+        return self._unary_predicate(lgeos.GEOSisRing)
 
     @property
     def hasz(self):
         "Returns whether the geometry has a 3D dimension."
-        return self._predicate(lgeos.GEOSHasZ(self._g))
+        return self._unary_predicate(lgeos.GEOSHasZ)
 
     #### Binary predicates. ####
     def relate_pattern(self, other, pattern):
@@ -267,52 +187,52 @@ class GEOSGeometry(object):
         the two Geometrys match the elements in pattern."""
         if len(pattern) > 9:
             raise GEOSException, 'invalid intersection matrix pattern'
-        return self._predicate(lgeos.GEOSRelatePattern(self._g, other._g, c_char_p(pattern)))
+        return self._binary_predicate(lgeos.GEOSRelatePattern, other, c_char_p(pattern))
 
     def disjoint(self, other):
         "Returns true if the DE-9IM intersection matrix for the two Geometrys is FF*FF****."
-        return self._predicate(lgeos.GEOSDisjoint(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSDisjoint, other)
 
     def touches(self, other):
         "Returns true if the DE-9IM intersection matrix for the two Geometrys is FT*******, F**T***** or F***T****."
-        return self._predicate(lgeos.GEOSTouches(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSTouches, other)
 
     def intersects(self, other):
         "Returns true if disjoint returns false."
-        return self._predicate(lgeos.GEOSIntersects(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSIntersects, other)
 
     def crosses(self, other):
         """Returns true if the DE-9IM intersection matrix for the two Geometrys is T*T****** (for a point and a curve,
         a point and an area or a line and an area) 0******** (for two curves)."""
-        return self._predicate(lgeos.GEOSCrosses(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSCrosses, other)
 
     def within(self, other):
         "Returns true if the DE-9IM intersection matrix for the two Geometrys is T*F**F***."
-        return self._predicate(lgeos.GEOSWithin(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSWithin, other)
 
     def contains(self, other):
         "Returns true if other.within(this) returns true."
-        return self._predicate(lgeos.GEOSContains(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSContains, other)
 
     def overlaps(self, other):
         """Returns true if the DE-9IM intersection matrix for the two Geometrys is T*T***T** (for two points
         or two surfaces) 1*T***T** (for two curves)."""
-        return self._predicate(lgeos.GEOSOverlaps(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSOverlaps, other)
 
     def equals(self, other):
         "Returns true if the DE-9IM intersection matrix for the two Geometrys is T*F**FFF*."
-        return self._predicate(lgeos.GEOSEquals(self._g, other._g))
+        return self._binary_predicate(lgeos.GEOSEquals, other)
 
     def equals_exact(self, other, tolerance=0):
         "Returns true if the two Geometrys are exactly equal, up to a specified tolerance."
         tol = c_double(tolerance)
-        return self._predicate(lgeos.GEOSEqualsExact(self._g, other._g, tol))
+        return self._binary_predicate(lgeos.GEOSEqualsExact, other, tol)
 
     #### SRID Routines ####
     @property
     def srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
-        s = lgeos.GEOSGetSRID(self._g)
+        s = lgeos.GEOSGetSRID(self._ptr())
         if s == 0:
             return None
         else:
@@ -320,22 +240,30 @@ class GEOSGeometry(object):
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
-        lgeos.GEOSSetSRID(self._g, c_int(srid))
+        lgeos.GEOSSetSRID(self._ptr(), c_int(srid))
     
     #### Output Routines ####
     @property
     def wkt(self):
         "Returns the WKT of the Geometry."
-        return string_at(lgeos.GEOSGeomToWKT(self._g))
+        return string_at(lgeos.GEOSGeomToWKT(self._ptr()))
 
     @property
     def hex(self):
         "Returns the WKBHEX of the Geometry."
         sz = c_size_t()
-        h = lgeos.GEOSGeomToHEX_buf(self._g, byref(sz))
+        h = lgeos.GEOSGeomToHEX_buf(self._ptr(), byref(sz))
         return string_at(h, sz.value)
 
     #### Topology Routines ####
+    def _unary_topology(self, func, *args):
+        "Returns a GEOSGeometry for the given unary (only takes one geomtry as a paramter) topological operation."
+        return GEOSGeometry(func(self._ptr(), *args))
+
+    def _binary_topology(self, func, other, *args):
+        "Returns a GEOSGeometry for the given binary (takes two geometries as parameters) topological operation."
+        return GEOSGeometry(func(self._ptr(), other._ptr(), *args))
+
     def buffer(self, width, quadsegs=8):
         """Returns a geometry that represents all points whose distance from this
         Geometry is less than or equal to distance. Calculations are in the
@@ -343,247 +271,162 @@ class GEOSGeometry(object):
         the number of segment used to approximate a quarter circle (defaults to 8).
         (Text from PostGIS documentation at ch. 6.1.3)
         """
-        if not isinstance(width, FloatType):
+        if not isinstance(width, (FloatType, IntType)):
             raise TypeError, 'width parameter must be a float'
         if not isinstance(quadsegs, IntType):
             raise TypeError, 'quadsegs parameter must be an integer'
-        b = lgeos.GEOSBuffer(self._g, c_double(width), c_int(quadsegs))
-        return GEOSGeometry(b)
+        return self._unary_topology(lgeos.GEOSBuffer, c_double(width), c_int(quadsegs))
 
     @property
     def envelope(self):
         "Return the envelope for this geometry (a polygon)."
-        return GEOSGeometry(lgeos.GEOSEnvelope(self._g))
+        return self._unary_topology(lgeos.GEOSEnvelope)
 
     @property
     def centroid(self):
         """The centroid is equal to the centroid of the set of component Geometrys
         of highest dimension (since the lower-dimension geometries contribute zero
         "weight" to the centroid)."""
-        return GEOSGeometry(lgeos.GEOSGetCentroid(self._g))
+        return self._unary_topology(lgeos.GEOSGetCentroid)
 
     @property
     def boundary(self):
         "Returns the boundary as a newly allocated Geometry object."
-        return GEOSGeometry(lgeos.GEOSBoundary(self._g))
+        return self._unary_topology(lgeos.GEOSBoundary)
 
     @property
     def convex_hull(self):
         "Returns the smallest convex Polygon that contains all the points in the Geometry."
-        return GEOSGeometry(lgeos.GEOSConvexHull(self._g))
+        return self._unary_topology(lgeos.GEOSConvexHull)
 
     @property
     def point_on_surface(self):
         "Computes an interior point of this Geometry."
-        return GEOSGeometry(lgeos.GEOSPointOnSurface(self._g))
+        return self._unary_topology(lgeos.GEOSPointOnSurface)
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this geometry and the other."
-        return string_at(lgeos.GEOSRelate(self._g, other._g))
+        return string_at(lgeos.GEOSRelate(self._ptr(), other._ptr()))
 
     def difference(self, other):
         """Returns a Geometry representing the points making up this Geometry
         that do not make up other."""
-        return GEOSGeometry(lgeos.GEOSDifference(self._g, other._g))
+        return self._binary_topology(lgeos.GEOSDifference, other)
 
     def sym_difference(self, other):
         """Returns a set combining the points in this Geometry not in other,
         and the points in other not in this Geometry."""
-        return GEOSGeometry(lgeos.GEOSSymDifference(self._g, other._g))
+        return self._binary_topology(lgeos.GEOSSymDifference, other)
 
     def intersection(self, other):
         "Returns a Geometry representing the points shared by this Geometry and other."
-        return GEOSGeometry(lgeos.GEOSIntersection(self._g, other._g))
+        return self._binary_topology(lgeos.GEOSIntersection, other)
 
     def union(self, other):
         "Returns a Geometry representing all the points in this Geometry and other."
-        return GEOSGeometry(lgeos.GEOSUnion(self._g, other._g))
+        return self._binary_topology(lgeos.GEOSUnion, other)
 
     #### Other Routines ####
     @property
     def area(self):
         "Returns the area of the Geometry."
         a = c_double()
-        status = lgeos.GEOSArea(self._g, byref(a))
-        if not status:
-            return None
-        else:
-            return a.value
+        status = lgeos.GEOSArea(self._ptr(), byref(a))
+        if not status: return None
+        else: return a.value
 
-class GEOSCoordSeq(object):
-    "The internal representation of a list of coordinates inside a Geometry."
-
-    def __init__(self, ptr, z=False):
-        "Initializes from a GEOS pointer."
-        self._cs = ptr
-        self._z = z
-
-    def __del__(self):
-        "Destroys the reference to this coordinate sequence."
-        if self._cs: lgeos.GEOSCoordSeq_destroy(self._cs)
-
-    def __iter__(self):
-        "Iterates over each point in the coordinate sequence."
-        for i in xrange(self.size):
-            yield self.__getitem__(i)
-
-    def __len__(self):
-        "Returns the number of points in the coordinate sequence."
-        return int(self.size)
-
-    def __str__(self):
-        "The string representation of the coordinate sequence."
-        return str(self.tuple)
-
-    def _checkindex(self, index):
-        "Checks the index."
-        sz = self.size
-        if (sz < 1) or (index < 0) or (index >= sz):
-            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
-
-    def _checkdim(self, dim):
-        "Checks the given dimension."
-        if dim < 0 or dim > 2:
-            raise GEOSException, 'invalid ordinate dimension "%d"' % dim
-        
-    def __getitem__(self, index):
-        "Can use the index [] operator to get coordinate sequence at an index."
-        coords = [self.getX(index), self.getY(index)]
-        if self.dims == 3 and self._z:
-            coords.append(self.getZ(index))
-        return tuple(coords)
-
-    def __setitem__(self, index, value):
-        "Can use the index [] operator to set coordinate sequence at an index."
-        if self.dims == 3 and self._z:
-            n_args = 3
-            set_3d = True
-        else:
-            n_args = 2
-            set_3d = False
-        if len(value) != n_args:
-            raise GEOSException, 'Improper value given!'
-        self.setX(index, value[0])
-        self.setY(index, value[1])
-        if set_3d: self.setZ(index, value[2])
-        
-    # Getting and setting the X coordinate for the given index.
-    def getX(self, index):
-        return self.getOrdinate(0, index)
-
-    def setX(self, index, value):
-        self.setOrdinate(0, index, value)
-
-    # Getting and setting the Y coordinate for the given index.
-    def getY(self, index):
-        return self.getOrdinate(1, index)
-
-    def setY(self, index, value):
-        self.setOrdinate(1, index, value)
-
-    # Getting and setting the Z coordinate for the given index
-    def getZ(self, index):
-        return self.getOrdinate(2, index)
-
-    def setZ(self, index, value):
-        self.setOrdinate(2, index, value)
-
-    def getOrdinate(self, dimension, index):
-        "Gets the value for the given dimension and index."
-        self._checkindex(index)
-        self._checkdim(dimension)
-
-        # Wrapping the dimension, index
-        dim = c_uint(dimension)
-        idx = c_uint(index)
-
-        # 'd' is the value of the point, passed in by reference
-        d = c_double()
-        status = lgeos.GEOSCoordSeq_getOrdinate(self._cs, idx, dim, byref(d))
-        if status == 0:
-            raise GEOSException, 'Could not get the ordinate for (dim, index): (%d, %d)' % (dimension, index)
-        return d.value
-
-    def setOrdinate(self, dimension, index, value):
-        "Sets the value for the given dimension and index."
-        self._checkindex(index)
-        self._checkdim(dimension)
-
-        # Wrapping the dimension, index
-        dim = c_uint(dimension)
-        idx = c_uint(index)
-
-        # Setting the ordinate
-        status = lgeos.GEOSCoordSeq_setOrdinate(self._cs, idx, dim, c_double(value))
-        if status == 0:
-            raise GEOSException, 'Could not set the ordinate for (dim, index): (%d, %d)' % (dimension, index)
-
-    ### Dimensions ###
-    @property
-    def size(self):
-        "Returns the size of this coordinate sequence."
-        n = c_uint(0)
-        status = lgeos.GEOSCoordSeq_getSize(self._cs, byref(n))
-        if status == 0:
-            raise GEOSException, 'Could not get CoordSeq size!'
-        return n.value
-
-    @property
-    def dims(self):
-        "Returns the dimensions of this coordinate sequence."
-        n = c_uint(0)
-        status = lgeos.GEOSCoordSeq_getDimensions(self._cs, byref(n))
-        if status == 0:
-            raise GEOSException, 'Could not get CoordSeq dimensoins!'
-        return n.value
-
-    @property
-    def hasz(self):
-        "Inherits this from the parent geometry."
-        return self._z
-
-    ### Other Methods ###
-    @property
-    def tuple(self):
-        "Returns a tuple version of this coordinate sequence."
-        n = self.size
-        if n == 1:
-            return self.__getitem__(0)
-        else:
-            return tuple(self.__getitem__(i) for i in xrange(n))
-            
-# Factory coordinate sequence Function
-def createCoordSeq(size, dims):
-        return GEOSCoordSeq(lgeos.GEOSCoordSeq_create(c_uint(size), c_uint(dims)))
-
+    def clone(self):
+        "Clones this Geometry."
+        return GEOSGeometry(lgeos.GEOSGeom_clone(self._ptr()))
+    
 class Point(GEOSGeometry):
 
-    def _cache_cs(self):
-        "Caches the coordinate sequence."
-        if not hasattr(self, '_cs'): self._cs = self.coord_seq        
+    def __init__(self, x, y=None, z=None):
+        """The Point object may be initialized with either a tuple, or individual
+        parameters.  For example:
+          >>> p = Point((5, 23)) # 2D point, passed in as a tuple
+          >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
+        """
+        
+        if isinstance(x, (TupleType, ListType)):
+            # Here a tuple or list was passed in under the ``x`` parameter.
+            ndim = len(x)
+            if ndim < 2 or ndim > 3:
+                raise TypeError, 'Invalid sequence parameter: %s' % str(x)
+            coords = x
+        elif isinstance(x, (IntType, FloatType)) and isinstance(y, (IntType, FloatType)):
+            # Here X, Y, and (optionally) Z were passed in individually as parameters.
+            if isinstance(z, (IntType, FloatType)):
+                ndim = 3
+                coords = [x, y, z]
+            else:
+                ndim = 2
+                coords = [x, y]
+        else:
+            raise TypeError, 'Invalid parameters given for Point initialization.'
+
+        # Creating the coordinate sequence
+        cs = create_cs(c_uint(1), c_uint(ndim))
+
+        # Setting the X
+        status = lgeos.GEOSCoordSeq_setX(cs, c_uint(0), c_double(coords[0]))
+        if not status: raise GEOSException, 'Could not set X during Point initialization.'
+
+        # Setting the Y
+        status = lgeos.GEOSCoordSeq_setY(cs, c_uint(0), c_double(coords[1]))
+        if not status: raise GEOSException, 'Could not set Y during Point initialization.'
+
+        # Setting the Z
+        if ndim == 3:
+            status = lgeos.GEOSCoordSeq_setZ(cs, c_uint(0), c_double(coords[2]))
+
+        # Initializing from the geometry, and getting a Python object
+        super(Point, self).__init__(lgeos.GEOSGeom_createPoint(cs))
 
     def _getOrdinate(self, dim, idx):
         "The coordinate sequence getOrdinate() wrapper."
         self._cache_cs()
         return self._cs.getOrdinate(dim, idx)
 
-    @property
-    def x(self):
+    def _setOrdinate(self, dim, idx, value):
+        "The coordinate sequence setOrdinate() wrapper."
+        self._cache_cs()
+        self._cs.setOrdinate(dim, idx, value)
+
+    def get_x(self):
         "Returns the X component of the Point."
         return self._getOrdinate(0, 0)
 
-    @property
-    def y(self):
+    def set_x(self, value):
+        "Sets the X component of the Point."
+        self._setOrdinate(0, 0, value)
+
+    def get_y(self):
         "Returns the Y component of the Point."
         return self._getOrdinate(1, 0)
 
-    @property
-    def z(self):
+    def set_y(self, value):
+        "Sets the Y component of the Point."
+        self._setOrdinate(1, 0, value)
+
+    def get_z(self):
         "Returns the Z component of the Point."
         if self.hasz:
             return self._getOrdinate(2, 0)
         else:
             return None
+
+    def set_z(self, value):
+        "Sets the Z component of the Point."
+        if self.hasz:
+            self._setOrdinate(2, 0, value)
+        else:
+            raise GEOSException, 'Cannot set Z on 2D Point.'
+    
+    # X, Y, Z properties
+    x = property(get_x, set_x)
+    y = property(get_y, set_y)
+    z = property(get_z, set_z)
 
     @property
     def tuple(self):
@@ -593,22 +436,64 @@ class Point(GEOSGeometry):
 
 class LineString(GEOSGeometry):
 
-    def _cache_cs(self):
-        "Caches the coordinate sequence."
-        if not hasattr(self, '_cs'): self._cs = self.coord_seq 
+    #### Python 'magic' routines ####
+    def __init__(self, coords, ring=False):
+        """Initializes on the given sequence, may take lists, tuples, or NumPy arrays
+        of X,Y pairs."""
+
+        if isinstance(coords, (TupleType, ListType)):
+            ncoords = len(coords)
+            first = True
+            for coord in coords:
+                if not isinstance(coord, (TupleType, ListType)):
+                    raise TypeError, 'each coordinate should be a sequence (list or tuple)'
+                if first:
+                    ndim = len(coord)
+                    self._checkdim(ndim)
+                    first = False
+                else:
+                    if len(coord) != ndim: raise TypeError, 'Dimension mismatch.'
+            numpy_coords = False
+        elif HAS_NUMPY and isinstance(coords, ndarray):
+            shape = coords.shape
+            if len(shape) != 2: raise TypeError, 'Too many dimensions.'
+            self._checkdim(shape[1])
+            ncoords = shape[0]
+            ndim = shape[1]
+            numpy_coords = True
+        else:
+            raise TypeError, 'Invalid initialization input for LineStrings.'
+
+        # Creating the coordinate sequence
+        cs = GEOSCoordSeq(GEOSPointer(create_cs(c_uint(ncoords), c_uint(ndim))))
+
+        # Setting each point in the coordinate sequence
+        for i in xrange(ncoords):
+            if numpy_coords: cs[i] = coords[i,:]
+            else: cs[i] = coords[i]        
+
+        # Getting the initialization function
+        if ring:
+            func = lgeos.GEOSGeom_createLinearRing
+        else:
+            func = lgeos.GEOSGeom_createLineString
+       
+        # Calling the base geometry initialization with the returned pointer from the function.
+        super(LineString, self).__init__(func(cs._ptr()))
 
     def __getitem__(self, index):
         "Gets the point at the specified index."
         self._cache_cs()
-        if index < 0 or index >= self._cs.size:
-            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
-        else:
-            return self._cs[index]
+        return self._cs[index]
+
+    def __setitem__(self, index, value):
+        "Sets the point at the specified index, e.g., line_str[0] = (1, 2)."
+        self._cache_cs()
+        self._cs[index] = value
 
     def __iter__(self):
         "Allows iteration over this LineString."
-        self._cache_cs()
-        for i in xrange(self._cs.size):
+        for i in xrange(self.__len__()):
             yield self.__getitem__(index)
 
     def __len__(self):
@@ -616,17 +501,62 @@ class LineString(GEOSGeometry):
         self._cache_cs()
         return len(self._cs)
 
+    def _checkdim(self, dim):
+        if dim not in (2, 3): raise TypeError, 'Dimension mismatch.'
+
+    #### Sequence Properties ####
     @property
     def tuple(self):
         "Returns a tuple version of the geometry from the coordinate sequence."
         self._cache_cs()
         return self._cs.tuple
 
+    def _listarr(self, func):
+        """Internal routine that returns a sequence (list) corresponding with
+        the given function.  Will return a numpy array if possible."""
+        lst = [func(i) for i in xrange(self.__len__())] # constructing the list, using the function
+        if HAS_NUMPY: return array(lst) # ARRRR!
+        else: return lst
+
+    @property
+    def array(self):
+        "Returns a numpy array for the LineString."
+        self._cache_cs()
+        return self._listarr(self._cs.__getitem__)
+
+    @property
+    def x(self):
+        "Returns a list or numpy array of the X variable."
+        self._cache_cs()
+        return self._listarr(self._cs.getX)
+    
+    @property
+    def y(self):
+        "Returns a list or numpy array of the Y variable."
+        self._cache_cs()
+        return self._listarr(self._cs.getY)
+
+    @property
+    def z(self):
+        "Returns a list or numpy array of the Z variable."
+        self._cache_cs()
+        if not self.hasz: return None
+        else: return self._listarr(self._cs.getZ)
+
 # LinearRings are LineStrings used within Polygons.
-class LinearRing(LineString): pass
+class LinearRing(LineString):
+    def __init__(self, coords):
+        "Overriding the initialization function to set the ring keyword."
+        super(LinearRing, self).__init__(coords, ring=True)
 
 class Polygon(GEOSGeometry):
 
+    def __del__(self):
+        "Override the GEOSGeometry delete routine to safely take care of any spawned rings."
+        # Nullifying the pointers to internal rings, preventing any attempted future access
+        for k in self._rings: self._rings[k].nullify()
+        super(Polygon, self).__del__() # Calling the parent __del__() method.
+    
     def __getitem__(self, index):
         """Returns the ring at the specified index.  The first index, 0, will always
         return the exterior ring.  Indices > 0 will return the interior ring."""
@@ -649,15 +579,20 @@ class Polygon(GEOSGeometry):
         return self.num_interior_rings + 1
 
     def get_interior_ring(self, ring_i):
-        "Gets the interior ring at the specified index."
+        """Gets the interior ring at the specified index,
+        0 is for the first interior ring, not the exterior ring."""
 
         # Making sure the ring index is within range
-        if ring_i >= self.num_interior_rings:
-            raise GEOSException, 'Invalid ring index.'
-        
-        # Getting a clone of the ring geometry at the given ring index.
-        r = lgeos.GEOSGeom_clone(lgeos.GEOSGetInteriorRingN(self._g, c_int(ring_i)))
-        return GEOSGeometry(r, 'geos')
+        if ring_i < 0 or ring_i >= self.num_interior_rings:
+            raise IndexError, 'ring index out of range'
+
+        # Placing the ring in internal rings dictionary.
+        idx = ring_i+1 # the index for the polygon is +1 because of the exterior ring
+        if not idx in self._rings:
+            self._rings[idx] = GEOSPointer(lgeos.GEOSGetInteriorRingN(self._ptr(), c_int(ring_i)))
+
+        # Returning the ring at the given index.
+        return GEOSGeometry(self._rings[idx], child=True)
                                                         
     #### Polygon Properties ####
     @property
@@ -665,19 +600,18 @@ class Polygon(GEOSGeometry):
         "Returns the number of interior rings."
 
         # Getting the number of rings
-        n = lgeos.GEOSGetNumInteriorRings(self._g)
+        n = lgeos.GEOSGetNumInteriorRings(self._ptr())
 
         # -1 indicates an exception occurred
-        if n == -1: raise GEOSException, 'Error getting the number of interior rings!'
+        if n == -1: raise GEOSException, 'Error getting the number of interior rings.'
         else: return n
 
     @property
     def exterior_ring(self):
         "Gets the exterior ring of the Polygon."
-
-        # Getting a clone of the ring geometry
-        r = lgeos.GEOSGeom_clone(lgeos.GEOSGetExteriorRing(self._g))
-        return GEOSGeometry(r, 'geos')
+        # Returns exterior ring 
+        self._rings[0] = GEOSPointer(lgeos.GEOSGetExteriorRing((self._ptr())))
+        return GEOSGeometry(self._rings[0], child=True)
 
     @property
     def shell(self):
@@ -691,25 +625,36 @@ class Polygon(GEOSGeometry):
 
 class GeometryCollection(GEOSGeometry):
 
-    def _checkindex(self, index):
-        "Checks the given geometry index."
-        if index < 0 or index >= self.num_geom:
-            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
-
-    def __iter__(self):
-        "For iteration on the multiple geometries."
-        for i in xrange(self.num_geom):
-            yield self.__getitem__(i)
+    def __del__(self):
+        "Override the GEOSGeometry delete routine to safely take care of any spawned geometries."
+        # Nullifying the pointers to internal geometries, preventing any attempted future access
+        for k in self._geoms: self._geoms[k].nullify()
+        super(GeometryCollection, self).__del__() # Calling the parent __del__() method.
 
     def __getitem__(self, index):
         "For indexing on the multiple geometries."
         self._checkindex(index)
+
+        # Setting an entry in the _geoms dictionary for the requested geometry.
+        if not index in self._geoms:
+            self._geoms[index] = GEOSPointer(lgeos.GEOSGetGeometryN(self._ptr(), c_int(index)))
+
         # Cloning the GEOS Geometry first, before returning it.
-        return GEOSGeometry(lgeos.GEOSGeom_clone(lgeos.GEOSGetGeometryN(self._g, c_int(index))))
+        return GEOSGeometry(self._geoms[index], child=True)
+
+    def __iter__(self):
+        "For iteration on the multiple geometries."
+        for i in xrange(self.__len__()):
+            yield self.__getitem__(i)
 
     def __len__(self):
         "Returns the number of geometries in this collection."
         return self.num_geom
+
+    def _checkindex(self, index):
+        "Checks the given geometry index."
+        if index < 0 or index >= self.num_geom:
+            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
 class MultiPoint(GeometryCollection): pass
