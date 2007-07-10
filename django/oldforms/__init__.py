@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
-from django.utils.encoding import smart_unicode, force_unicode, smart_str
+from django.utils.encoding import smart_unicode, force_unicode
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -502,7 +502,7 @@ class SelectField(FormField):
 
     def isValidChoice(self, data, form):
         str_data = smart_unicode(data)
-        str_choices = [smart_str(item[0]) for item in self.choices]
+        str_choices = [smart_unicode(item[0]) for item in self.choices]
         if str_data not in str_choices:
             raise validators.ValidationError, ugettext("Select a valid choice; '%(data)s' is not in %(choices)s.") % {'data': str_data, 'choices': str_choices}
 

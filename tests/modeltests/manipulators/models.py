@@ -54,7 +54,7 @@ True
 
 # Attempt to create an Album with an invalid musician.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['foo']}))
-{'musician': [u"Select a valid choice; 'foo' is not in ['', '1']."]}
+{'musician': [u"Select a valid choice; 'foo' is not in [u'', u'1']."]}
 
 # Attempt to create an Album with an invalid release_date.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['1'], 'release_date': 'today'}))
