@@ -317,7 +317,7 @@ Old::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/?$', 'django.views.generic.date_based.archive_index'),
+        (r'^$', 'django.views.generic.date_based.archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
         (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
     )
@@ -327,7 +327,7 @@ New::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('django.views.generic.date_based',
-        (r'^/?$', 'archive_index'),
+        (r'^$', 'archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
     )
 
@@ -392,7 +392,7 @@ dictionary of extra keyword arguments to pass to the view function.
 For example::
 
     urlpatterns = patterns('blog.views',
-        (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
+        (r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
 
 In this example, for a request to ``/blog/2005/``, Django will call the

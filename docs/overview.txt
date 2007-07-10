@@ -165,9 +165,9 @@ example above::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(\d{4})/$', 'mysite.views.year_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
     )
 
 The code above maps URLs, as simple regular expressions, to the location of

@@ -103,10 +103,10 @@ Do this by wrapping an ``if DEBUG`` statement around the
     from django.conf import settings
 
     urlpatterns = patterns('',
-        (r'^/articles/2003/$', 'news.views.special_case_2003'),
-        (r'^/articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
-        (r'^/articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
+        (r'^articles/2003/$', 'news.views.special_case_2003'),
+        (r'^articles/(?P<year>\d{4})/$', 'news.views.year_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', 'news.views.month_archive'),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d+)/$', 'news.views.article_detail'),
     )
 
     if settings.DEBUG:

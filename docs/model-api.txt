@@ -1871,7 +1871,7 @@ works out the correct full URL path using the URLconf, substituting the
 parameters you have given into the URL. For example, if your URLconf
 contained a line such as::
 
-    (r'^/people/(\d+)/$', 'people.views.details'),
+    (r'^people/(\d+)/$', 'people.views.details'),
 
 ...your model could have a ``get_absolute_url`` method that looked like this::
 
