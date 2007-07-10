@@ -83,6 +83,7 @@ class Feed(object):
             author_email = self.__get_dynamic_attr('author_email', obj),
             categories = self.__get_dynamic_attr('categories', obj),
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
+            feed_guid = self.__get_dynamic_attr('feed_guid', obj),
         )
 
         try:
@@ -114,7 +115,7 @@ class Feed(object):
                 title = title_tmp.render(Context({'obj': item, 'site': current_site})),
                 link = link,
                 description = description_tmp.render(Context({'obj': item, 'site': current_site})),
-                unique_id = link,
+                unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),
                 author_name = author_name,

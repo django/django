@@ -416,6 +416,24 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         link = '/foo/bar/' # Hard-coded link.
 
+        # GUID -- One of the following three is optional. The framework looks
+        # for them in this order. This property is only used for Atom feeds
+        # (where it is the feed-level id element). If not provided, the feed
+        # link is used as the id.
+
+        def feed_guid(self, obj):
+            """
+            Takes the object returned by get_object() and returns the globally
+            unique id for the feed as a normal Python string.
+            """
+
+        def feed_guid(self):
+            """
+            Returns the feed's globally unique id as a normal Python string.
+            """
+
+        feed_guid = '/foo/bar/1234' # Hard-coded guid.
+
         # DESCRIPTION -- One of the following three is required. The framework
         # looks for them in this order.
 
@@ -554,6 +572,15 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         def item_link(self):
             """
             Returns the URL for every item in the feed.
+            """
+
+        # ITEM_GUID -- The following method is optional. This property is
+        # only used for Atom feeds (it is the id element for an item in an
+        # Atom feed). If not provided, the item's link is used by default.
+
+        def item_guid(self, obj):
+            """
+            Takes an item, as return by items(), and returns the item's id.
             """
 
         # ITEM AUTHOR NAME --One of the following three is optional. The
