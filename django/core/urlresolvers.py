@@ -231,7 +231,8 @@ class RegexURLResolver(object):
                     if sub_match:
                         sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
                         sub_match_dict.update(self.default_kwargs)
-                        sub_match_dict.update([(smart_str(k), v) for k, v in sub_match[2].items()])
+                        for k, v in sub_match[2].iteritems():
+                            sub_match_dict[smart_str(k)] = v
                         return sub_match[0], sub_match[1], sub_match_dict
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
