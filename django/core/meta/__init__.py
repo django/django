@@ -1134,14 +1134,6 @@ def method_get_many_to_many(field_with_rel, self):
 # Handles setting many-to-many relationships.
 # Example: Poll.set_sites()
 def method_set_many_to_many(rel_field, self, id_list):
-    if len(id_list) == 1 and isinstance(id_list[0], basestring) and ',' in id_list[0]:
-        new_id_list = []
-        for bit in id_list[0].split(','):
-            try:
-                new_id_list.append(int(bit.strip()))
-            except ValueError:
-                continue
-        id_list = new_id_list
     current_ids = [getattr(obj, obj._meta.pk.attname) for obj in method_get_many_to_many(rel_field, self)]
     ids_to_add, ids_to_delete = dict([(i, 1) for i in id_list]), []
     for current_id in current_ids:
