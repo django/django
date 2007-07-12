@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
 from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
@@ -22,9 +22,10 @@ class Feed(object):
     title_template = None
     description_template = None
 
-    def __init__(self, slug, feed_url):
+    def __init__(self, slug, request):
         self.slug = slug
-        self.feed_url = feed_url
+        self.request = request
+        self.feed_url = request.path
         self.title_template_name = self.title_template or ('feeds/%s_title.html' % slug)
         self.description_template_name = self.description_template or ('feeds/%s_description.html' % slug)
 
@@ -67,7 +68,11 @@ class Feed(object):
         else:
             obj = None
 
-        current_site = Site.objects.get_current()
+        if Site._meta.installed:
+            current_site = Site.objects.get_current()
+        else:
+            current_site = RequestSite(self.request)
+
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
