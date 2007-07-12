@@ -227,7 +227,7 @@ class DateFormat(TimeFormat):
                 week_number = 1
             else:
                 j = day_of_year + (7 - weekday) + (jan1_weekday - 1)
-                week_number = j / 7
+                week_number = j // 7
                 if jan1_weekday > 4:
                     week_number -= 1
         return week_number

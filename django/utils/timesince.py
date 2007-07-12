@@ -33,16 +33,14 @@ def timesince(d, now=None):
     delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
     since = delta.days * 24 * 60 * 60 + delta.seconds
     for i, (seconds, name) in enumerate(chunks):
-        count = since / seconds
+        count = since // seconds
         if count != 0:
             break
-    if count < 0:
-        return ugettext('%d milliseconds') % math.floor((now - d).microseconds / 1000)
     s = ugettext('%(number)d %(type)s') % {'number': count, 'type': name(count)}
     if i + 1 < len(chunks):
         # Now get the second item
         seconds2, name2 = chunks[i + 1]
-        count2 = (since - (seconds * count)) / seconds2
+        count2 = (since - (seconds * count)) // seconds2
         if count2 != 0:
             s += ugettext(', %(number)d %(type)s') % {'number': count2, 'type': name2(count2)}
     return s
