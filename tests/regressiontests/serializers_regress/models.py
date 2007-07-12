@@ -209,3 +209,16 @@ class ComplexModel(models.Model):
     field1 = models.CharField(maxlength=10)
     field2 = models.CharField(maxlength=10)
     field3 = models.CharField(maxlength=10)
+
+# Tests for handling fields with pre_save functions, or
+# models with save functions that modify data
+class AutoNowDateTimeData(models.Model):
+    data = models.DateTimeField(null=True, auto_now=True)
+
+class ModifyingSaveData(models.Model):
+    data = models.IntegerField(null=True)
+
+    def save(self):
+        "A save method that modifies the data in the object"
+        self.data = 666
+        super(ModifyingSaveData, self).save(raw)

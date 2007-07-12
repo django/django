@@ -201,7 +201,7 @@ class Model(object):
 
     _prepare = classmethod(_prepare)
 
-    def save(self):
+    def save(self, raw=False):
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
@@ -218,7 +218,7 @@ class Model(object):
                 self._meta.pk.get_db_prep_lookup('exact', pk_val))
             # If it does already exist, do an UPDATE.
             if cursor.fetchone()[0] > 0:
-                db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
+                db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
                 if db_values:
                     cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                         (backend.quote_name(self._meta.db_table),
@@ -229,11 +229,11 @@ class Model(object):
                 record_exists = False
         if not pk_set or not record_exists:
             field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
-            db_values = [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
+            db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
             if pk_set:
                 field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
-                db_values += [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
+                db_values += [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
                 field_names.append(backend.quote_name('_order'))

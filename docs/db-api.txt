@@ -118,6 +118,23 @@ happens.
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
 objects, when you're confident you won't have primary-key collision.
 
+Raw saves
+---------
+
+When you save an Django object, some pre-processing will occur on the the data
+that is in the object. For example, if your model has a ``DateField`` with 
+``auto_now=True`` set, the pre-save phase will alter the data in the object 
+to ensure that the date field contains the current date stamp.
+
+Although these automated changes can be very useful, there will be times when
+you just want to save the data as-is. In these cases, you can invoke a *Raw Save* 
+by passing ``raw=True`` as an argument to the ``save()`` method::
+
+    b4.save(raw=True)  # Saves object, but does no pre-processing
+
+A raw save saves all the data in your object, but performs no pre-save processing 
+on the data in the object. 
+
 Saving changes to objects
 =========================
 
