@@ -50,8 +50,8 @@ directive. The latter is used for pointing at places on your filesystem,
 whereas ``<Location>`` points at places in the URL structure of a Web site.
 ``<Directory>`` would be meaningless here.
 
-Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
-on it, you'll need to tell mod_python:
+Also, if your Django project is not on the default ``PYTHONPATH`` for your
+computer, you'll have to tell mod_python where your project can be found:
 
 .. parsed-literal::
 
