@@ -1,6 +1,6 @@
 # GEOS Routines
 from warnings import warn
-from django.contrib.gis.geos import GEOSGeometry, hex_to_wkt, centroid, area
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.gdal import OGRGeometry, SpatialReference
 
 # Until model subclassing is a possibility, a mixin class is used to add
@@ -17,7 +17,7 @@ class GeoMixin:
 
     def _get_GEOM_ogr(self, field, srid):
         "Returns an OGR Python object for the geometry."
-        return OGRGeometry(hex_to_wkt(getattr(self, field.attname)),
+        return OGRGeometry(getattr(self, field.attname).wkt,
                            SpatialReference('EPSG:%d' % srid))
 
     def _get_GEOM_srid(self, srid):
