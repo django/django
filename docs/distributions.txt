@@ -65,6 +65,19 @@ The `current Gentoo build`_ can be installed by typing ``emerge django``.
 .. _Gentoo Linux: http://www.gentoo.org/
 .. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django
 
+Mac OS X
+========
+
+MacPorts
+--------
+
+Django 0.96 can be installed via the `MacPorts`_ system. If you're using Python 2.4,
+type ``sudo port install py-django-devel``. For Python 2.5, type ``sudo port
+install py25-django-devel``. MacPorts can also be used to install a database,
+and the Python interface to your chosen database.
+
+.. _MacPorts: http://www.macports.org/
+
 For distributors
 ================
 
