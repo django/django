@@ -21,16 +21,17 @@ Linux distributions
 Debian
 ------
 
-A `packaged version of Django`_ is available for `Debian GNU/Linux`_, and can be
-installed from either the "testing" or the "unstable" repositories by typing
-``apt-get install python-django``.
+A `packaged version of Django`_ is available for `Debian GNU/Linux`_. Version
+0.95.1 is available in the "stable" repository; Version 0.96 is available in
+the "testing" and "unstable" repositories. Regardless of your chosen repository,
+you can install Django by typing ``apt-get install python-django``.
 
 When you install this package, ``apt`` will recommend installing a database
 adapter; you should select and install the adapter for whichever database you
 plan to use with Django.
 
 .. _Debian GNU/Linux: http://www.debian.org/
-.. _packaged version of Django: http://packages.debian.org/testing/python/python-django
+.. _packaged version of Django: http://packages.debian.org/stable/python/python-django
 
 Ubuntu
 ------
@@ -68,7 +69,7 @@ For distributors
 ================
 
 If you'd like to package Django for distribution, we'd be happy to help out!
-Please join the `django-developers mailing list`_ and introduce yourself. 
+Please join the `django-developers mailing list`_ and introduce yourself.
 
 We also encourage all distributors to subscribe to the `django-announce mailing
 list`_, which is a (very) low-traffic list for announcing new releases of Django
