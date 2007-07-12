@@ -3,9 +3,19 @@ Chile specific form helpers.
 """
 
 from django.newforms import ValidationError
-from django.newforms.fields import RegexField, EMPTY_VALUES
+from django.newforms.fields import RegexField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext
 from django.utils.encoding import smart_unicode
+
+
+class CLRegionSelect(Select):
+    """
+    A Select widget that uses a list of Chilean Regions (Regiones)
+    as its choices.
+    """
+    def __init__(self, attrs=None):
+        from cl_regions import REGION_CHOICES
+        super(CLRegionSelect, self).__init__(attrs, choices=REGION_CHOICES)
 
 class CLRutField(RegexField):
     """
