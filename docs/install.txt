@@ -109,25 +109,29 @@ Install the Django code
 =======================
 
 Installation instructions are slightly different depending on whether you're
-using the latest official version or the latest development version.
+installing a distribution-specific package, downloading the the latest official
+release, or fetching the latest development version.
 
-It's easy either way.
+It's easy, no matter which way you choose.
 
-Installing the official version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing a distribution-specific package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    1. Check the `distribution specific notes`_ to see if your
-       platform/distribution provides official Django packages/installers.
-       Distribution-provided packages will typically allow for automatic
-       installation of dependancies and easy upgrade paths.
+Check the `distribution specific notes`_ to see if your
+platform/distribution provides official Django packages/installers.
+Distribution-provided packages will typically allow for automatic
+installation of dependancies and easy upgrade paths.
 
-    2. Download the latest release from our `download page`_.
+Installing an official release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    3. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``).
+    1. Download the latest release from our `download page`_.
 
-    4. Change into the downloaded directory (e.g. ``cd Django-NNN``).
+    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``).
 
-    5. Run ``sudo python setup.py install``.
+    3. Change into the downloaded directory (e.g. ``cd Django-NNN``).
+
+    4. Run ``sudo python setup.py install``.
 
 The command will install Django in your Python installation's ``site-packages``
 directory.
