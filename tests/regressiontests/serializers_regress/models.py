@@ -176,8 +176,9 @@ class IntegerPKData(models.Model):
 class IPAddressPKData(models.Model):
     data = models.IPAddressField(primary_key=True)
 
-class NullBooleanPKData(models.Model):
-    data = models.NullBooleanField(primary_key=True)
+# This is just a Boolean field with null=True, and we can't test a PK value of NULL.
+# class NullBooleanPKData(models.Model):
+#     data = models.NullBooleanField(primary_key=True)
 
 class PhonePKData(models.Model):
     data = models.PhoneNumberField(primary_key=True)
