@@ -4,7 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 class SiteManager(models.Manager):
     def get_current(self):
         from django.conf import settings
-        return self.get(pk=settings.SITE_ID)
+        try:
+            sid = settings.SITE_ID
+        except AttributeError:
+            from django.core.exceptions import ImproperlyConfigured
+            raise ImproperlyConfigured("You're using the Django \"sites framework\" without having set the SITE_ID setting. Create a site in your database and set the SITE_ID setting to fix this error.")
+        return self.get(pk=sid)
 
 class Site(models.Model):
     domain = models.CharField(_('domain name'), maxlength=100)
