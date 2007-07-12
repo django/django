@@ -4,7 +4,7 @@
   when an error occurs in GEOS).
 """
 
-from django.contrib.gis.geos.GEOSError import GEOSException
+from django.contrib.gis.geos.error import GEOSException
 from ctypes import \
      c_char_p, c_int, c_size_t, c_ubyte, pointer, addressof, \
      CDLL, CFUNCTYPE, POINTER, Structure

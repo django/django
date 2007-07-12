@@ -1,5 +1,5 @@
 from django.contrib.gis.geos.libgeos import lgeos
-from django.contrib.gis.geos.GEOSError import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from ctypes import c_double, c_int, c_uint, byref
 
 """

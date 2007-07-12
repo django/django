@@ -29,22 +29,23 @@
      http://zcologia.com/news/429/geometries-for-python-update/
 """
 
-from GEOSGeometry import GEOSGeometry, Point, LineString, LinearRing, HAS_NUMPY
-from GEOSError import GEOSException
+from base import GEOSGeometry
+from geometries import Point, LineString, LinearRing, HAS_NUMPY
+from error import GEOSException
 
 def hex_to_wkt(hex):
     "Converts HEXEWKB into WKT."
-    return GEOSGeometry(hex, 'hex').wkt
+    return GEOSGeometry(hex).wkt
 
 def wkt_to_hex(wkt):
     "Converts WKT into HEXEWKB."
-    return GEOSGeometry(wkt, 'wkt').hex
+    return GEOSGeometry(wkt).hex
 
-def centroid(input, geom_type='hex'):
+def centroid(input):
     "Returns the centroid of the geometry (given in HEXEWKB)."
-    return GEOSGeometry(input, geom_type).centroid.wkt
+    return GEOSGeometry(input).centroid.wkt
 
-def area(input, geom_type='hex'):
+def area(input):
     "Returns the area of the geometry (given in HEXEWKB)."
-    return GEOSGeometry(input, geom_type).area
+    return GEOSGeometry(input).area
     

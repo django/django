@@ -24,7 +24,7 @@ class GEOSTest(unittest.TestCase):
         print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
         for err in errors:
             if err.hex:
-                self.assertRaises(GEOSException, GEOSGeometry, err.wkt, 'hex')
+                self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
             else:
                 self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
         print "\nEND - expecting GEOS_ERROR; safe to ignore.\n"
