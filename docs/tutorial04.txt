@@ -193,7 +193,7 @@ Change it like so::
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
-        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html')),
+        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html'), 'poll_results'),
         (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
@@ -208,6 +208,12 @@ objects" and "display a detail page for a particular type of object."
     * The ``object_detail`` generic view expects the ID value captured
       from the URL to be called ``"object_id"``, so we've changed ``poll_id`` to
       ``object_id`` for the generic views.
+
+    * We've added a name, ``poll_results``, to the results view so that we have
+      a way to refer to its url later on (see `naming URL patterns`_ for more on
+      named patterns).
+      
+.. _naming URL patterns: http://www.djangoproject.com/documentation/url_dispatch/#naming-url-patterns
 
 By default, the ``object_detail`` generic view uses a template called
 ``<app name>/<model name>_detail.html``. In our case, it'll use the template
@@ -254,6 +260,15 @@ The ``vote()`` view is still required. However, it must be modified to match
 the new templates and context variables. Change the template call from
 ``polls/detail.html`` to ``polls/poll_detail.html``, and pass ``object`` in the
 context instead of ``poll``.
+
+The last thing to do is fix the url handling to account for the use of generic
+views. In the vote view above we used the ``reverse()`` function to avoid
+hard-coding our URLs. Now that we've switched to a generic view, we'll need to
+change the ``reverse()`` call to point back to our new generic view. We can't
+simply use the view function anymore -- generic views can be (and are) used
+multiple times -- but we can use the name we've given::
+    
+    return HttpResponseRedirect(reverse('poll_results', args=(p.id,)))
 
 Run the server, and use your new polling app based on generic views.
 
