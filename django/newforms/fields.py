@@ -446,10 +446,7 @@ class MultipleChoiceField(ChoiceField):
             return []
         if not isinstance(value, (list, tuple)):
             raise ValidationError(ugettext(u'Enter a list of values.'))
-        new_value = []
-        for val in value:
-            val = smart_unicode(val)
-            new_value.append(val)
+        new_value = [smart_unicode(val) for val in value]
         # Validate that each value in the value list is in self.choices.
         valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:
