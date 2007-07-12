@@ -38,7 +38,7 @@ POSTGIS_OPERATORS = {
 
 # PostGIS Geometry Functions -- most of these use GEOS.
 POSTGIS_GEOMETRY_FUNCTIONS = {
-    'distance' : 'Distance',
+    #'distance' : 'Distance', -- doesn't work right now.
     'equals' : 'Equals',
     'disjoint' : 'Disjoint',
     'touches' : 'Touches',

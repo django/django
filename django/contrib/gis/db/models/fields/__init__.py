@@ -1,5 +1,6 @@
 # The Django base Field class.
 from django.db.models.fields import Field
+from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.db.models.postgis import POSTGIS_TERMS, quotename
 from django.contrib.gis.oldforms import WKTField
 from django.utils.functional import curry
@@ -86,8 +87,19 @@ class GeometryField(Field):
         else:
             return post_sql
 
+    def _post_delete_sql(self, style, db_table):
+        "Drops the geometry column."
+        sql = style.SQL_KEYWORD('SELECT ') + \
+            style.SQL_KEYWORD('DropGeometryColumn') + '(' + \
+            style.SQL_TABLE(quotename(db_table)) + ', ' + \
+            style.SQL_FIELD(quotename(self.column)) +  ');'
+        return sql
+
     def contribute_to_class(self, cls, name):
         super(GeometryField, self).contribute_to_class(cls, name)
+
+        # setup for lazy-instantiated GEOSGeometry objects
+        setattr(cls, self.attname, GeometryProxy(self))
 
         # Adding needed accessor functions
         setattr(cls, 'get_%s_geos' % self.name, curry(cls._get_GEOM_geos, field=self))

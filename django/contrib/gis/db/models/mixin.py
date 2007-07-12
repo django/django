@@ -1,4 +1,5 @@
 # GEOS Routines
+from warnings import warn
 from django.contrib.gis.geos import GEOSGeometry, hex_to_wkt, centroid, area
 from django.contrib.gis.gdal import OGRGeometry, SpatialReference
 
@@ -11,7 +12,8 @@ class GeoMixin:
     # routines are present for instantiations of the models.
     def _get_GEOM_geos(self, field):
         "Returns a GEOS Python object for the geometry."
-        return GEOSGeometry(getattr(self, field.attname), 'hex')
+        warn("use model.%s" % field.attname, DeprecationWarning) 
+        return getattr(self, field.attname)
 
     def _get_GEOM_ogr(self, field, srid):
         "Returns an OGR Python object for the geometry."
@@ -20,6 +22,7 @@ class GeoMixin:
 
     def _get_GEOM_srid(self, srid):
         "Returns the spatial reference identifier (SRID) of the geometry."
+        warn("use model.geometry_field.srid", DeprecationWarning)
         return srid
 
     def _get_GEOM_srs(self, srid):
@@ -28,17 +31,17 @@ class GeoMixin:
 
     def _get_GEOM_wkt(self, field):
         "Returns the WKT of the geometry."
-        hex = getattr(self, field.attname)
-        return hex_to_wkt(hex)
+        warn("use model.%s.centroid.wkt" % field.attname, DeprecationWarning) 
+        return getattr(self, field.attname).wkt
 
     def _get_GEOM_centroid(self, field):
         "Returns the centroid of the geometry, in WKT."
-        hex = getattr(self, field.attname)
-        return centroid(hex)
+        warn("use model.%s.centroid.wkt" % field.attname, DeprecationWarning) 
+        return getattr(self, field.attname).centroid.wkt
     
     def _get_GEOM_area(self, field):
         "Returns the area of the geometry, in projected units."
-        hex = getattr(self, field.attname)
-        return area(hex)
+        warn("use model.%s.area" % field.attname, DeprecationWarning)
+        return getattr(self, field.attname).area
 
 

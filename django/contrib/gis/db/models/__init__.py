@@ -14,4 +14,4 @@ from django.contrib.gis.db.models.fields import \
      GeometryCollectionField
 
 # The geographic mixin class.
-from GeoMixin import GeoMixin
+from mixin import GeoMixin
