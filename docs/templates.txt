@@ -950,7 +950,7 @@ Removes all values of arg from the given string.
 date
 ~~~~
 
-Formats a date according to the given format (same as the ``now`` tag).
+Formats a date according to the given format (same as the `now`_ tag).
 
 default
 ~~~~~~~
@@ -1189,7 +1189,10 @@ Strips all [X]HTML tags.
 time
 ~~~~
 
-Formats a time according to the given format (same as the ``now`` tag).
+Formats a time according to the given format (same as the `now`_ tag).
+The time filter will only accept parameters in the format string that relate
+to the time of day, not the date (for obvious reasons). If you need to
+format a date, use the `date`_ filter.
 
 timesince
 ~~~~~~~~~
