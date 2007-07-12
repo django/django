@@ -117,7 +117,8 @@ class M2MData(models.Model):
     data = models.ManyToManyField(Anchor, null=True)
     
 class O2OData(models.Model):
-    data = models.OneToOneField(Anchor, null=True)
+    # One to one field can't be null, since it is a PK.
+    data = models.OneToOneField(Anchor)
 
 class FKSelfData(models.Model):
     data = models.ForeignKey('self', null=True)
