@@ -228,6 +228,12 @@ class ClientTest(TestCase):
         login = self.client.login(username='otheruser', password='nopassword')
         self.failIf(login)
 
+    def test_view_with_inactive_login(self):
+        "Request a page that is protected with @login, but use an inactive login"
+
+        login = self.client.login(username='inactive', password='password')
+        self.failIf(login)
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially

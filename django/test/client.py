@@ -225,10 +225,11 @@ class Client:
         """Set the Client to appear as if it has sucessfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or if the Sessions framework is not available.
+        are incorrect, or the user is inactive, or if the Sessions framework is
+        not available.
         """
         user = authenticate(**credentials)
-        if user and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if user and user.is_active and 'django.contrib.sessions' in settings.INSTALLED_APPS:
             obj = Session.objects.get_new_session_object()
 
             # Create a fake request to store login details
