@@ -26,3 +26,20 @@ class Site(models.Model):
 
     def __unicode__(self):
         return self.domain
+
+class RequestSite(object):
+    """
+    A class that shares the primary interface of Site (i.e., it has
+    ``domain`` and ``name`` attributes) but gets its data from a Django
+    HttpRequest object rather than from a database.
+
+    The save() and delete() methods raise NotImplementedError.
+    """
+    def __init__(self, request):
+        self.domain = self.name = request.META['SERVER_NAME']
+
+    def save(self):
+        raise NotImplementedError('RequestSite cannot be saved.')
+
+    def delete(self):
+        raise NotImplementedError('RequestSite cannot be deleted.')
