@@ -674,9 +674,9 @@ If you are writing a template filter which only expects a string as the first
 argument, you should use the included decorator ``stringfilter`` which will convert
 an object to it's string value before being passed to your function::
 
-    from django import template
+    from django.template.defaultfilters import stringfilter
 
-    @template.stringfilter
+    @stringfilter
     def lower(value):
         return value.lower()
 
