@@ -1495,6 +1495,13 @@ example::
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
 doesn't validate -- i.e., ``if form.errors``.
 
+This ``save()`` method accepts an optional ``commit`` keyword argument, which
+accepts either ``True`` or ``False``. If you call ``save()`` with
+``commit=False``, then it will return an object that hasn't yet been saved to
+the database. In this case, it's up to you to call ``save()`` on the resulting
+model instance. This is useful if you want to do custom processing on the
+object before saving it. ``commit`` is ``True`` by default.
+
 Using an alternate base class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
