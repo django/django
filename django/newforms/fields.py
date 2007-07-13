@@ -298,18 +298,17 @@ class DateTimeField(Field):
                 continue
         raise ValidationError(ugettext(u'Enter a valid date/time.'))
 
-class RegexField(Field):
+class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
         """
         regex can be either a string or a compiled regular expression object.
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
-        super(RegexField, self).__init__(*args, **kwargs)
+        super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
-        self.max_length, self.min_length = max_length, min_length
         self.error_message = error_message or ugettext(u'Enter a valid value.')
 
     def clean(self, value):
@@ -317,16 +316,9 @@ class RegexField(Field):
         Validates that the input matches the regular expression. Returns a
         Unicode object.
         """
-        super(RegexField, self).clean(value)
-        if value in EMPTY_VALUES:
-            value = u''
-        value = smart_unicode(value)
+        value = super(RegexField, self).clean(value)
         if value == u'':
             return value
-        if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
-        if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
