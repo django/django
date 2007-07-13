@@ -30,11 +30,8 @@ def get_relations(cursor, table_name):
             AND con.contype = 'f'""", [table_name])
     relations = {}
     for row in cursor.fetchall():
-        try:
-            # row[0] and row[1] are single-item lists, so grab the single item.
-            relations[int(row[0][0]) - 1] = (int(row[1][0]) - 1, row[2])
-        except ValueError:
-            continue
+        # row[0] and row[1] are single-item lists, so grab the single item.
+        relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
     return relations
 
 def get_indexes(cursor, table_name):
