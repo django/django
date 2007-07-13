@@ -31,8 +31,8 @@ def get_relations(cursor, table_name):
     relations = {}
     for row in cursor.fetchall():
         try:
-            # row[0] and row[1] are like "{2}", so strip the curly braces.
-            relations[int(row[0][1:-1]) - 1] = (int(row[1][1:-1]) - 1, row[2])
+            # row[0] and row[1] are single-item lists, so grab the single item.
+            relations[int(row[0][0]) - 1] = (int(row[1][0]) - 1, row[2])
         except ValueError:
             continue
     return relations
