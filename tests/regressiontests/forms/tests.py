@@ -1176,6 +1176,10 @@ ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
 Decimal("1.5")
 >>> f.clean('0.5')
 Decimal("0.5")
+>>> f.clean('.5')
+Decimal("0.5")
+>>> f.clean('00.50')
+Decimal("0.50")
 
 # DateField ###################################################################
 

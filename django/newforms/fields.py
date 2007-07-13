@@ -12,6 +12,11 @@ from django.utils.encoding import smart_unicode
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 
+try:
+    from decimal import Decimal, DecimalException
+except ImportError:
+    from django.utils._decimal import Decimal, DecimalException
+
 __all__ = (
     'Field', 'CharField', 'IntegerField',
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
@@ -162,8 +167,6 @@ class FloatField(Field):
             raise ValidationError(ugettext('Ensure this value is greater than or equal to %s.') % self.min_value)
         return value
 
-decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
-
 class DecimalField(Field):
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -181,13 +184,13 @@ class DecimalField(Field):
         if not self.required and value in EMPTY_VALUES:
             return None
         value = value.strip()
-        match = decimal_re.search(value)
-        if not match:
-            raise ValidationError(ugettext('Enter a number.'))
-        else:
+        try:
             value = Decimal(value)
-        digits = len(match.group('digits') or '')
-        decimals = len(match.group('decimals') or '')
+        except DecimalException:
+            raise ValidationError(ugettext('Enter a number.'))
+        pieces = str(value).split('.')
+        decimals = (len(pieces) == 2) and len(pieces[1]) or 0
+        digits = len(pieces[0])
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(ugettext('Ensure this value is less than or equal to %s.') % self.max_value)
         if self.min_value is not None and value < self.min_value:

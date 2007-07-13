@@ -14,6 +14,10 @@ from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
 from django.utils.functional import Promise, lazy
 from django.utils.encoding import force_unicode
 import re
+try:
+    from decimal import Decimal, DecimalException
+except ImportError:
+    from django.utils._decimal import Decimal, DecimalException    # Python 2.3
 
 _datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
@@ -26,7 +30,6 @@ email_re = re.compile(
     r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*"  # dot-atom
     r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"' # quoted-string
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
-decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
 integer_re = re.compile(r'^-?\d+$')
 ip4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 phone_re = re.compile(r'^[A-PR-Y0-9]{3}-[A-PR-Y0-9]{3}-[A-PR-Y0-9]{4}$', re.IGNORECASE)
@@ -415,13 +418,15 @@ class IsValidDecimal(object):
         self.max_digits, self.decimal_places = max_digits, decimal_places
 
     def __call__(self, field_data, all_data):
-        match = decimal_re.search(str(field_data))
-        if not match:
+        try:
+            val = Decimal(field_data)
+        except DecimalException:
             raise ValidationError, _("Please enter a valid decimal number.")
-        
-        digits = len(match.group('digits') or '')
-        decimals = len(match.group('decimals') or '')
-        
+
+        pieces = str(val).split('.')
+        decimals = (len(pieces) == 2) and len(pieces[1]) or 0
+        digits = len(pieces[0])
+
         if digits + decimals > self.max_digits:
             raise ValidationError, ungettext("Please enter a valid decimal number with at most %s total digit.",
                 "Please enter a valid decimal number with at most %s total digits.", self.max_digits) % self.max_digits
