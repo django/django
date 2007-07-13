@@ -896,7 +896,7 @@ u'1234567890'
 >>> f.clean('1234567890a')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 10 characters.']
+ValidationError: [u'Ensure this value has at most 10 characters (it has 11).']
 
 CharField accepts an optional min_length parameter:
 >>> f = CharField(min_length=10, required=False)
@@ -905,7 +905,7 @@ u''
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 5).']
 >>> f.clean('1234567890')
 u'1234567890'
 >>> f.clean('1234567890a')
@@ -919,7 +919,7 @@ ValidationError: [u'This field is required.']
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 5).']
 >>> f.clean('1234567890')
 u'1234567890'
 >>> f.clean('1234567890a')
@@ -1443,11 +1443,11 @@ RegexField also access min_length and max_length parameters, for convenience.
 >>> f.clean('123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 5 characters.']
+ValidationError: [u'Ensure this value has at least 5 characters (it has 3).']
 >>> f.clean('abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 5 characters.']
+ValidationError: [u'Ensure this value has at least 5 characters (it has 3).']
 >>> f.clean('12345')
 u'12345'
 >>> f.clean('1234567890')
@@ -1455,7 +1455,7 @@ u'1234567890'
 >>> f.clean('12345678901')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 10 characters.']
+ValidationError: [u'Ensure this value has at most 10 characters (it has 11).']
 >>> f.clean('12345a')
 Traceback (most recent call last):
 ...
@@ -1512,13 +1512,13 @@ EmailField also access min_length and max_length parameters, for convenience.
 >>> f.clean('a@foo.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 9).']
 >>> f.clean('alf@foo.com')
 u'alf@foo.com'
 >>> f.clean('alf123456788@foo.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 15 characters.']
+ValidationError: [u'Ensure this value has at most 15 characters (it has 20).']
 
 # URLField ##################################################################
 
@@ -1622,13 +1622,13 @@ URLField also access min_length and max_length parameters, for convenience.
 >>> f.clean('http://f.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 15 characters.']
+ValidationError: [u'Ensure this value has at least 15 characters (it has 12).']
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://abcdefghijklmnopqrstuvwxyz.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 37).']
 
 # BooleanField ################################################################
 
@@ -1800,7 +1800,7 @@ u'test@example.com'
 >>> f.clean('longemailaddress@example.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
 >>> f.clean('not an e-mail')
 Traceback (most recent call last):
 ...
@@ -1820,7 +1820,7 @@ u'test@example.com'
 >>> f.clean('longemailaddress@example.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
 >>> f.clean('not an e-mail')
 Traceback (most recent call last):
 ...
@@ -3271,7 +3271,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>

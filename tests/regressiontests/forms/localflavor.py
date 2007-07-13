@@ -913,11 +913,11 @@ ValidationError: [u'This field requires only numbers.']
 >>> f.clean('375.788.573-000')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 14 characters.']
+ValidationError: [u'Ensure this value has at most 14 characters (it has 15).']
 >>> f.clean('123.456.78')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 11 characters.']
+ValidationError: [u'Ensure this value has at least 11 characters (it has 10).']
 >>> f.clean('123456789555')
 Traceback (most recent call last):
 ...
@@ -1208,11 +1208,11 @@ u'230880-3449'
 >>> f.clean('230880343')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 9).']
 >>> f.clean('230880343234')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 11 characters.']
+ValidationError: [u'Ensure this value has at most 11 characters (it has 12).']
 >>> f.clean('abcdefghijk')
 Traceback (most recent call last):
 ...
@@ -1254,18 +1254,18 @@ ValidationError: [u'Enter a valid value.']
 >>> f.clean('123456')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 7 characters.']
+ValidationError: [u'Ensure this value has at least 7 characters (it has 6).']
 >>> f.clean('123456555')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters.']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
 >>> f.clean('abcdefg')
 Traceback (most recent call last):
 ValidationError: [u'Enter a valid value.']
 >>> f.clean(' 1234567 ')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 8 characters.']
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
 >>> f.clean(' 12367  ')
 Traceback (most recent call last):
 ...

@@ -111,10 +111,11 @@ class CharField(Field):
         if value in EMPTY_VALUES:
             return u''
         value = smart_unicode(value)
-        if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
-        if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
+        value_length = len(value)
+        if self.max_length is not None and value_length > self.max_length:
+            raise ValidationError(ugettext(u'Ensure this value has at most %d characters (it has %d).') % (self.max_length, value_length))
+        if self.min_length is not None and value_length < self.min_length:
+            raise ValidationError(ugettext(u'Ensure this value has at least %d characters (it has %d).') % (self.min_length, value_length))
         return value
 
     def widget_attrs(self, widget):
