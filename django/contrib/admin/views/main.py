@@ -261,7 +261,7 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
             new_object = manipulator.save(new_data)
             pk_value = new_object._get_pk_val()
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), ADDITION)
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
+            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
             if "_continue" in request.POST:
@@ -349,7 +349,7 @@ def change_stage(request, app_label, model_name, object_id):
                 change_message = _('No fields changed.')
             LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object}
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
             if "_continue" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
                 if '_popup' in request.REQUEST:
@@ -357,7 +357,7 @@ def change_stage(request, app_label, model_name, object_id):
                 else:
                     return HttpResponseRedirect(request.path)
             elif "_saveasnew" in request.POST:
-                request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': new_object})
+                request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)})
                 return HttpResponseRedirect("../%s/" % pk_value)
             elif "_addanother" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
