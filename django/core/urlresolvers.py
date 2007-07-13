@@ -144,6 +144,9 @@ class RegexURLPattern(object):
         self.default_args = default_args or {}
         self.name = name
 
+    def __repr__(self):
+        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
+
     def add_prefix(self, prefix):
         """
         Adds the prefix string to a string-based callback.
@@ -204,6 +207,9 @@ class RegexURLResolver(object):
         self.callback = None
         self.default_kwargs = default_kwargs or {}
         self._reverse_dict = {}
+
+    def __repr__(self):
+        return '<%s %s %s>' % (self.__class__.__name__, self.urlconf_name, self.regex.pattern)
 
     def _get_reverse_dict(self):
         if not self._reverse_dict and hasattr(self.urlconf_module, 'urlpatterns'):
