@@ -400,6 +400,19 @@ install them in the database. This includes any apps shipped with Django that
 might be in ``INSTALLED_APPS`` by default. When you start a new project, run
 this command to install the default apps.
 
+.. admonition:: Syncdb will not alter existing tables
+
+   ``syncdb`` will only create tables for models which have not yet been
+   installed. It will *never* issue ``ALTER TABLE`` statements to match
+   changes made to a model class after installation. Changes to model classes
+   and database schemas often involve some form of ambiguity and, in those
+   cases, Django would have to guess at the correct changes to make. There is
+   a risk that critical data would be lost in the process.
+
+   If you have made changes to a model and wish to alter the database tables
+   to match, use the ``sql`` command to display the new SQL structure and
+   compare that to your existing table schema to work out the changes.
+
 If you're installing the ``django.contrib.auth`` application, ``syncdb`` will
 give you the option of creating a superuser immediately.
 
