@@ -1713,14 +1713,15 @@ def setup_environ(settings_mod):
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
-    project_directory = os.path.dirname(settings_mod.__file__)
+    project_directory, settings_filename = os.path.split(settings_mod.__file__)
     project_name = os.path.basename(project_directory)
+    settings_name = os.path.splitext(settings_filename)[0]
     sys.path.append(os.path.join(project_directory, '..'))
     project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
-    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
     return project_directory
 
 def execute_manager(settings_mod, argv=None):
