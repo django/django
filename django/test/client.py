@@ -225,7 +225,7 @@ class Client:
         """Set the Client to appear as if it has sucessfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or the user is inactive, or if the Sessions framework is
+        are incorrect, or the user is inactive, or if the sessions framework is
         not available.
         """
         user = authenticate(**credentials)
