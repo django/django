@@ -8,14 +8,13 @@ representation of the object. Do this not only for your own sanity when dealing
 with the interactive prompt, but also because objects' representations are used
 throughout Django's automatically-generated admin.
 
-Normally,  you should write ``__unicode__``() method, since this will work for
+Normally,  you should write ``__unicode__()`` method, since this will work for
 all field types (and Django will automatically provide an appropriate
 ``__str__()`` method). However, you can write a ``__str__()`` method directly,
 if you prefer. You must be careful to encode the results correctly, though.
 """
 
 from django.db import models
-from django.utils.encoding import smart_str
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
