@@ -62,7 +62,7 @@ model-level doctests in the docstring for each model.
 
 For example::
 
-    from django.db import model
+    from django.db import models
 
     class Animal(models.Model):
         """
