@@ -118,25 +118,74 @@ happens.
 Explicitly specifying auto-primary-key values is mostly useful for bulk-saving
 objects, when you're confident you won't have primary-key collision.
 
-Raw saves
----------
+What happens when you save?
+---------------------------
+
+When you save an object, Django performs the following steps:
+
+    1. **Emit a ``pre_save`` signal.** This provides a notification that
+       an object is about to be saved. You can register a listener that
+       will be invoked whenever this signal is emitted.
+
+    2. **Pre-process the data.** Each field on the object is asked to
+       perform any automated data modification that the field may need
+       to perform.
+
+       Most fields do *no* pre-processing - the field data is kept as-is.
+       Pre-processing is only used on fields that have special behavior.
+       For example, if your model has a ``DateField`` with ``auto_now=True``,
+       the pre-save phase will alter the data in the object to ensure that
+       the date field contains the current date stamp.
+
+    3. **Prepare the data for the database.** Each field is asked to provide
+       their current value in a datatype that can be written to the database.
+
+       Again, most fields require *no* data preparation. Simple data types,
+       such as integers and strings, are 'ready to write' as a Python object.
+       However, more complex data types often require some modification. For
+       example, ``DateFields`` use a Python ``datetime`` object to store data.
+       Databases don't store ``datetime`` objects, so the field value
+       must be converted into an ISO compliant date string for insertion
+       into the database.
+
+    4. **Insert the data into the database.** The pre-processed, prepared
+       data is then composed into an SQL statement for insertion into the
+       database.
+
+    5. **Emit a ``post_save`` signal.** As with the ``pre_save`` signal, this
+       is used to provide notification that an object has been successfully
+       saved.
+
+Raw Saves
+~~~~~~~~~
 
 **New in Django development version**
 
-When you save an Django object, some pre-processing might occur on the the
-object's data before it's saved to the database. For example, if your model has
-a ``DateField`` with ``auto_now=True`` set, the pre-save phase will alter the
-data in the object  to ensure that the date field contains the current date
-stamp.
+The pre-processing step performed by Django is extremely useful for
+implementing special field behavior (such as the ``auto_now`` feature of
+``DateField``), but it does modify the data stored in a field. This can cause
+problems if you are relying upon the data you provide being used as-is. For
+example, if you are setting up conditions for a test, you will want the test
+conditions to be repeatable. If pre-processing is performed, the data used
+to specify test conditions may be modified, changing the conditions for the
+test each time the test is run.
 
-Although these automated changes can be useful, sometimes you just want to save
-the data as-is. In these cases, you can invoke a **raw save**  by passing
+In cases such as this, you need to prevent pre-processing from being performed
+when you save an object. To do this, you can invoke a **raw save**  by passing
 ``raw=True`` as an argument to the ``save()`` method::
 
-    b4.save(raw=True)  # Saves object, but does no pre-processing
+    b4.save(raw=True) # Save object, but do no pre-processing
 
-A raw save saves all the data in your object, but performs no pre-save processing
-on the data in the object.
+A raw save skips the usual data pre-processing that is performed during the
+save. All other steps in the save (pre-save signal, data preparation, data
+insertion, and post-save signal) are performed as normal.
+
+.. admonition:: When to use a raw save
+
+    Generally speaking, you shouldn't need use use a raw save. Disabling field
+    pre-processing is an extraordinary measure that should only be required
+    in extraordinary circumstances (such as setting up reliable test
+    conditions).
 
 Saving changes to objects
 =========================
@@ -160,7 +209,7 @@ object of the right type to the field in question::
     joe = Author.objects.create(name="Joe")
     entry.author = joe
     entry.save()
-    
+
 Django will complain if you try to assign an object of the wrong type.
 
 How Django knows to UPDATE vs. INSERT
