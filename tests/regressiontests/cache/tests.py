@@ -4,7 +4,7 @@
 from django.core.cache import cache
 import time, unittest
 
-# functions/classes for complex data type tests        
+# functions/classes for complex data type tests
 def f():
     return 42
 class C:
@@ -46,13 +46,12 @@ class Cache(unittest.TestCase):
         self.assertEqual(cache.has_key("hello"), True)
         self.assertEqual(cache.has_key("goodbye"), False)
 
-    def test_in(self): 
-        cache.set("hello", "goodbye") 
-        self.assertEqual("hello" in cache, True) 
-        self.assertEqual("goodbye" in cache, False) 
+    def test_in(self):
+        cache.set("hello", "goodbye")
+        self.assertEqual("hello" in cache, True)
+        self.assertEqual("goodbye" in cache, False)
 
     def test_data_types(self):
-        # test data types
         stuff = {
             'string'    : 'this is a string',
             'int'       : 42,
@@ -61,11 +60,12 @@ class Cache(unittest.TestCase):
             'dict'      : {'A': 1, 'B' : 2},
             'function'  : f,
             'class'     : C,
+            'iter'      : iter([1, 2 ,3]),
         }
         for (key, value) in stuff.items():
             cache.set(key, value)
             self.assertEqual(cache.get(key), value)
-    
+
     def test_expiration(self):
         # expiration
         cache.set('expire', 'very quickly', 1)
