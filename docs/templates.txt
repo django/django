@@ -741,8 +741,19 @@ regroup
 Regroup a list of alike objects by a common attribute.
 
 This complex tag is best illustrated by use of an example:  say that ``people``
-is a list of ``Person`` objects that have ``first_name``, ``last_name``, and
-``gender`` attributes, and you'd like to display a list that looks like:
+is a list of people represented by dictionaries with ``first_name``,
+``last_name``, and ``gender`` keys::
+
+    people = [
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+    ]
+
+...and you'd like to display a hierarchical list that is ordered by gender,
+like this:
 
     * Male:
         * George Bush
@@ -753,33 +764,72 @@ is a list of ``Person`` objects that have ``first_name``, ``last_name``, and
     * Unknown:
         * Pat Smith
 
-The following snippet of template code would accomplish this dubious task::
+You can use the ``{% regroup %}`` tag to group the list of people by gender.
+The following snippet of template code would accomplish this::
 
-    {% regroup people by gender as grouped %}
+    {% regroup people by gender as gender_list %}
+
     <ul>
-    {% for group in grouped %}
-        <li>{{ group.grouper }}
+    {% for gender in gender_list %}
+        <li>{{ gender.grouper }}
         <ul>
-            {% for item in group.list %}
-            <li>{{ item }}</li>
+            {% for item in gender.list %}
+            <li>{{ item.first_name }} {{ item.last_name }}</li>
             {% endfor %}
         </ul>
         </li>
     {% endfor %}
     </ul>
 
-As you can see, ``{% regroup %}`` populates a variable with a list of objects
-with ``grouper`` and ``list`` attributes.  ``grouper`` contains the item that
-was grouped by; ``list`` contains the list of objects that share that
-``grouper``.  In this case, ``grouper`` would be ``Male``, ``Female`` and
-``Unknown``, and ``list`` is the list of people with those genders.
+Let's walk through this example. ``{% regroup %}`` takes three arguments: the
+list you want to regroup, the attribute to group by, and the name of the
+resulting list. Here, we're regrouping the ``people`` list by the ``gender``
+attribute and calling the result ``gender_list``.
 
-Note that ``{% regroup %}`` does not work when the list to be grouped is not
-sorted by the key you are grouping by!  This means that if your list of people
-was not sorted by gender, you'd need to make sure it is sorted before using it,
-i.e.::
+``{% regroup %}`` produces a list (in this case, ``gender_list``) of
+**group objects**. Each group object has two attributes:
 
-    {% regroup people|dictsort:"gender" by gender as grouped %}
+    * ``grouper`` -- the item that was grouped by (e.g., the string "Male" or
+      "Female").
+    * ``list`` -- a list of all items in this group (e.g., a list of all people
+      with gender='Male').
+
+Note that ``{% regroup %}`` does not order its input! Our example relies on
+the fact that the ``people`` list was ordered by ``gender`` in the first place.
+If the ``people`` list did *not* order its members by ``gender``, the regrouping
+would naively display more than one group for a single gender. For example,
+say the ``people`` list was set to this (note that the males are not grouped
+together)::
+
+    people = [
+        {'first_name': 'Bill', 'last_name': 'Clinton', 'gender': 'Male'},
+        {'first_name': 'Pat', 'last_name': 'Smith', 'gender': 'Unknown'},
+        {'first_name': 'Margaret', 'last_name': 'Thatcher', 'gender': 'Female'},
+        {'first_name': 'George', 'last_name': 'Bush', 'gender': 'Male'},
+        {'first_name': 'Condoleezza', 'last_name': 'Rice', 'gender': 'Female'},
+    ]
+
+With this input for ``people``, the example ``{% regroup %}`` template code
+above would result in the following output:
+
+    * Male:
+        * Bill Clinton
+    * Unknown:
+        * Pat Smith
+    * Female:
+        * Margaret Thatcher
+    * Male:
+        * George Bush
+    * Female:
+        * Condoleezza Rice
+
+The easiest solution to this gotcha is to make sure in your view code that the
+data is ordered according to how you want to display it.
+
+Another solution is to sort the data in the template using the ``dictsort``
+filter, if your data is in a list of dictionaries::
+
+    {% regroup people|dictsort:"gender" by gender as gender_list %}
 
 spaceless
 ~~~~~~~~~
@@ -965,14 +1015,14 @@ If value is ``None``, use given default.
 dictsort
 ~~~~~~~~
 
-Takes a list of dicts, returns that list sorted by the property given in the
-argument.
+Takes a list of dictionaries, returns that list sorted by the key given in
+the argument.
 
 dictsortreversed
 ~~~~~~~~~~~~~~~~
 
-Takes a list of dicts, returns that list sorted in reverse order by the
-property given in the argument.
+Takes a list of dictionaries, returns that list sorted in reverse order by the
+key given in the argument.
 
 divisibleby
 ~~~~~~~~~~~
