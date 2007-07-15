@@ -50,7 +50,7 @@ strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, unicode)
 
 def strip_entities(value):
     "Returns the given HTML with all entities (&something;) stripped"
-    return re.sub(r'&(?:\w+|#\d);', '', force_unicode(value))
+    return re.sub(r'&(?:\w+|#\d+);', '', force_unicode(value))
 strip_entities = allow_lazy(strip_entities, unicode)
 
 def fix_ampersands(value):
