@@ -1,12 +1,13 @@
 "Thread-safe in-memory cache backend."
 
-from django.core.cache.backends.simple import CacheClass as SimpleCacheClass
-from django.utils.synch import RWLock
 import time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+from django.core.cache.backends.simple import CacheClass as SimpleCacheClass
+from django.utils.synch import RWLock
 
 class CacheClass(SimpleCacheClass):
     def __init__(self, host, params):
