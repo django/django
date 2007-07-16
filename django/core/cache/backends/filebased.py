@@ -1,7 +1,8 @@
 "File-based cache backend"
 
 from django.core.cache.backends.simple import CacheClass as SimpleCacheClass
-import os, time, urllib
+from django.utils.http import urlquote_plus
+import os, time
 try:
     import cPickle as pickle
 except ImportError:
@@ -77,4 +78,4 @@ class CacheClass(SimpleCacheClass):
             raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
 
     def _key_to_file(self, key):
-        return os.path.join(self._dir, urllib.quote_plus(key))
+        return os.path.join(self._dir, urlquote_plus(key))

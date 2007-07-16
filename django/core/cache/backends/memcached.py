@@ -1,6 +1,7 @@
 "Memcached cache backend"
 
 from django.core.cache.backends.base import BaseCache, InvalidCacheBackendError
+from django.utils.encoding import smart_unicode, smart_str
 
 try:
     import cmemcache as memcache
@@ -16,17 +17,22 @@ class CacheClass(BaseCache):
         self._cache = memcache.Client(server.split(';'))
 
     def get(self, key, default=None):
-        val = self._cache.get(key)
+        val = self._cache.get(smart_str(key))
         if val is None:
             return default
         else:
-            return val
+            if isinstance(val, basestring):
+                return smart_unicode(val)
+            else:
+                return val
 
     def set(self, key, value, timeout=0):
-        self._cache.set(key, value, timeout or self.default_timeout)
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+        self._cache.set(smart_str(key), value, timeout or self.default_timeout)
 
     def delete(self, key):
-        self._cache.delete(key)
+        self._cache.delete(smart_str(key))
 
     def get_many(self, keys):
-        return self._cache.get_multi(keys)
+        return self._cache.get_multi(map(smart_str,keys))
