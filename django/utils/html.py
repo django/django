@@ -2,8 +2,8 @@
 
 import re
 import string
-import urllib
-from django.utils.encoding import force_unicode, smart_str
+
+from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 
 # Configuration for urlize() function
@@ -26,12 +26,12 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 del x # Temporary variable
 
 def escape(html):
-    "Returns the given HTML with ampersands, quotes and carets encoded"
+    "Return the given HTML with ampersands, quotes and carets encoded."
     return force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
 escape = allow_lazy(escape, unicode)
 
 def linebreaks(value):
-    "Converts newlines into <p> and <br />s"
+    "Convert newlines into <p> and <br />s."
     value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
     paras = re.split('\n{2,}', value)
     paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
@@ -39,31 +39,32 @@ def linebreaks(value):
 linebreaks = allow_lazy(linebreaks, unicode)
 
 def strip_tags(value):
-    "Returns the given HTML with all tags stripped"
+    "Return the given HTML with all tags stripped."
     return re.sub(r'<[^>]*?>', '', force_unicode(value))
 strip_tags = allow_lazy(strip_tags)
 
 def strip_spaces_between_tags(value):
-    "Returns the given HTML with spaces between tags removed"
+    "Return the given HTML with spaces between tags removed."
     return re.sub(r'>\s+<', '><', force_unicode(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, unicode)
 
 def strip_entities(value):
-    "Returns the given HTML with all entities (&something;) stripped"
+    "Return the given HTML with all entities (&something;) stripped."
     return re.sub(r'&(?:\w+|#\d+);', '', force_unicode(value))
 strip_entities = allow_lazy(strip_entities, unicode)
 
 def fix_ampersands(value):
-    "Returns the given HTML with all unencoded ampersands encoded correctly"
+    "Return the given HTML with all unencoded ampersands encoded correctly."
     return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
 fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
 def urlize(text, trim_url_limit=None, nofollow=False):
     """
-    Converts any URLs in text into clickable links. Works on http://, https://
-    and www. links. Links can have trailing punctuation (periods, commas,
-    close-parens) and leading punctuation (opening parens) and it'll still do
-    the right thing.
+    Convert any URLs in text into clickable links.
+
+    Works on http://, https://, and www. links.  Links can have trailing
+    punctuation (periods, commas, close-parens) and leading punctuation
+    (opening parens) and it'll still do the right thing.
 
     If trim_url_limit is not None, the URLs in link text longer than this limit
     will truncated to trim_url_limit-3 characters and appended with an elipsis.
@@ -94,14 +95,14 @@ urlize = allow_lazy(urlize, unicode)
 
 def clean_html(text):
     """
-    Cleans the given HTML. Specifically, it does the following:
-        * Converts <b> and <i> to <strong> and <em>.
-        * Encodes all ampersands correctly.
-        * Removes all "target" attributes from <a> tags.
-        * Removes extraneous HTML, such as presentational tags that open and
+    Clean the given HTML.  Specifically, do the following:
+        * Convert <b> and <i> to <strong> and <em>.
+        * Encode all ampersands correctly.
+        * Remove all "target" attributes from <a> tags.
+        * Remove extraneous HTML, such as presentational tags that open and
           immediately close and <br clear="all">.
-        * Converts hard-coded bullets into HTML unordered lists.
-        * Removes stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
+        * Convert hard-coded bullets into HTML unordered lists.
+        * Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the
           bottom of the text.
     """
     from django.utils.text import normalize_newlines
@@ -120,8 +121,8 @@ def clean_html(text):
             s = s.replace('<p>%s' % d, '<li>')
         return u'<ul>\n%s\n</ul>' % s
     text = hard_coded_bullets_re.sub(replace_p_tags, text)
-    # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom of the text.
+    # Remove stuff like "<p>&nbsp;&nbsp;</p>", but only if it's at the bottom
+    # of the text.
     text = trailing_empty_content_re.sub('', text)
     return text
 clean_html = allow_lazy(clean_html, unicode)
-
