@@ -5,6 +5,7 @@ from django import template
 from django.template import loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import smart_str
 import re
 
 register = template.Library()
@@ -174,6 +175,7 @@ class DoCommentForm:
             if tokens[4] != 'with':
                 raise template.TemplateSyntaxError, "Fourth argument in %r tag must be 'with'" % tokens[0]
             for option, args in zip(tokens[5::2], tokens[6::2]):
+                option = smart_str(option)
                 if option in ('photos_optional', 'photos_required') and not self.free:
                     # VALIDATION ##############################################
                     option_list = args.split(',')
