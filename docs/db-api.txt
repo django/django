@@ -409,7 +409,7 @@ For example, this returns the first 5 objects (``LIMIT 5``)::
 
     Entry.objects.all()[:5]
 
-This returns the fifth through tenth objects (``OFFSET 5 LIMIT 5``)::
+This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
 
     Entry.objects.all()[5:10]
 
