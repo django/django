@@ -60,7 +60,6 @@ class Cache(unittest.TestCase):
             'dict'      : {'A': 1, 'B' : 2},
             'function'  : f,
             'class'     : C,
-            'iter'      : iter([1, 2 ,3]),
         }
         for (key, value) in stuff.items():
             cache.set(key, value)
