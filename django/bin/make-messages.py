@@ -9,6 +9,7 @@ import re
 import os
 import sys
 import getopt
+from itertools import dropwhile
 
 pythonize_re = re.compile(r'\n\s*//')
 
@@ -118,7 +119,7 @@ def make_messages():
                         msgs = msgs.replace(old, new)
                     if os.path.exists(potfile):
                         # Strip the header
-                        msgs = '\n'.join(msgs.split('\n')[17:])
+                        msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
                     else:
                         msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                     if msgs:
