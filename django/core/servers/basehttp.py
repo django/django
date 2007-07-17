@@ -376,7 +376,7 @@ class ServerHandler(object):
                 self._write('HTTP/%s %s\r\n' % (self.http_version,self.status))
                 if 'Date' not in self.headers:
                     self._write(
-                        'Date: %s\r\n' % formatdate()[:26] + "GMT"
+                        'Date: %s\r\n' % (formatdate()[:26] + "GMT")
                     )
                 if self.server_software and 'Server' not in self.headers:
                     self._write('Server: %s\r\n' % self.server_software)
