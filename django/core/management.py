@@ -161,31 +161,34 @@ def _get_sql_model_create(model, known_models=set()):
     for f in opts.fields:
         col_type = f.db_type()
         tablespace = f.db_tablespace or opts.db_tablespace
-        if col_type is not None:
-            # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
-            field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
-                style.SQL_COLTYPE(col_type)]
-            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-            if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
-                field_output.append(style.SQL_KEYWORD('UNIQUE'))
-            if f.primary_key:
-                field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
-                # We must specify the index tablespace inline, because we
-                # won't be generating a CREATE INDEX statement for this field.
-                field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
-            if f.rel:
-                if f.rel.to in known_models:
-                    field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
-                        style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
-                        backend.get_deferrable_sql()
-                    )
-                else:
-                    # We haven't yet created the table to which this field
-                    # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
-            table_output.append(' '.join(field_output))
+        if col_type is None:
+            # Skip ManyToManyFields, because they're not represented as
+            # database columns in this table.
+            continue
+        # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
+        field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
+            style.SQL_COLTYPE(col_type)]
+        field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
+        if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
+            field_output.append(style.SQL_KEYWORD('UNIQUE'))
+        if f.primary_key:
+            field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+        if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
+            # We must specify the index tablespace inline, because we
+            # won't be generating a CREATE INDEX statement for this field.
+            field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
+        if f.rel:
+            if f.rel.to in known_models:
+                field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
+                    style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
+                    backend.get_deferrable_sql()
+                )
+            else:
+                # We haven't yet created the table to which this field
+                # is related, so save it for later.
+                pr = pending_references.setdefault(f.rel.to, []).append((model, f))
+        table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
             style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
