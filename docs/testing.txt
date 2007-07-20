@@ -123,6 +123,8 @@ to find all the test cases (that is, subclasses of ``unittest.TestCase``)
 in ``models.py`` and ``tests.py``, automatically build a test suite out of
 those test cases, and run that suite.
 
+**New in Django development version**
+
 However, if you define a method called ``suite()`` in either ``models.py`` or
 ``tests.py``, that method will be used to construct the test suite for that
 module. This follows the `suggested organization`_ for unit tests. See the
