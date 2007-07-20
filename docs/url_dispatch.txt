@@ -45,8 +45,8 @@ algorithm the system follows to determine which Python code to execute:
        `request object`_ as its first argument and any values captured in the
        regex as remaining arguments.
 
-.. _settings file: http://www.djangoproject.com/documentation/settings/
-.. _request object: http://www.djangoproject.com/documentation/request_response/#httprequest-objects
+.. _settings file: ../settings/
+.. _request object: ../request_response/#httprequest-objects
 
 Example
 =======
@@ -185,10 +185,26 @@ The first argument to ``patterns()`` is a string ``prefix``. See
 
 The remaining arguments should be tuples in this format::
 
-    (regular expression, Python callback function [, optional dictionary])
+    (regular expression, Python callback function [, optional dictionary [, optional name]])
 
-...where ``optional dictionary`` is optional. (See
-_`Passing extra options to view functions` below.)
+...where ``optional dictionary`` and ``optional name`` are optional. (See
+`Passing extra options to view functions`_ below.)
+
+url
+---
+
+**New in Django development version**
+
+You can use the ``url()`` function, instead of a tuple, as an argument to
+``patterns()``. This is convenient if you want to specify a name without the
+optional extra arguments dictionary. For example::
+
+    urlpatterns = patterns('',
+        url(r'/index/$', index_view, name="main-view"),
+        ...
+    )
+
+See `Naming URL patterns`_ for why the ``name`` parameter is useful.
 
 handler404
 ----------
@@ -286,7 +302,7 @@ With this in mind, the above example can be written more concisely as::
 Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
 that in automatically.
 
-.. _Django overview: http://www.djangoproject.com/documentation/overview/
+.. _Django overview: ../overview/
 
 Multiple view prefixes
 ----------------------
@@ -301,7 +317,7 @@ Old::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/?$', 'django.views.generic.date_based.archive_index'),
+        (r'^$', 'django.views.generic.date_based.archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'django.views.generic.date_based.archive_month'),
         (r'^tag/(?P<tag>\w+)/$', 'weblog.views.tag'),
     )
@@ -311,7 +327,7 @@ New::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('django.views.generic.date_based',
-        (r'^/?$', 'archive_index'),
+        (r'^$', 'archive_index'),
         (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$','archive_month'),
     )
 
@@ -376,7 +392,7 @@ dictionary of extra keyword arguments to pass to the view function.
 For example::
 
     urlpatterns = patterns('blog.views',
-        (r'^/blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
+        (r'^blog/(?P<year>\d{4})/$', 'year_archive', {'foo': 'bar'}),
     )
 
 In this example, for a request to ``/blog/2005/``, Django will call the
@@ -387,13 +403,18 @@ In this example, for a request to ``/blog/2005/``, Django will call the
 This technique is used in `generic views`_ and in the `syndication framework`_
 to pass metadata and options to views.
 
-.. _generic views: http://www.djangoproject.com/documentation/generic_views/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
+.. _generic views: ../generic_views/
+.. _syndication framework: ../syndication/
+
+.. admonition:: Dealing with conflicts
+
+    It's possible to have a URL pattern which captures named keyword arguments,
+    and also passes arguments with the same names in its dictionary of extra
+    arguments. When this happens, the arguments in the dictionary will be used
+    instead of the arguments captured in the URL.
 
 Passing extra options to ``include()``
 --------------------------------------
-
-**New in the Django development version.**
 
 Similarly, you can pass extra options to ``include()``. When you pass extra
 options to ``include()``, *each* line in the included URLconf will be passed
@@ -435,8 +456,6 @@ every view in the the included URLconf accepts the extra options you're passing.
 Passing callable objects instead of strings
 ===========================================
 
-**New in the Django development version.**
-
 Some developers find it more natural to pass the actual Python function object
 rather than a string containing the path to its module. This alternative is
 supported -- you can pass any callable object as the view.
@@ -476,3 +495,94 @@ The style you use is up to you.
 
 Note that if you use this technique -- passing objects rather than strings --
 the view prefix (as explained in "The view prefix" above) will have no effect.
+
+Naming URL patterns
+===================
+
+**New in Django development version**
+
+It's fairly common to use the same view function in multiple URL patterns in
+your URLconf. For example, these two URL patterns both point to the ``archive``
+view::
+
+    urlpatterns = patterns('',
+        (r'/archive/(\d{4})/$', archive),
+        (r'/archive-summary/(\d{4})/$', archive, {'summary': True}),
+    )
+
+This is completely valid, but it leads to problems when you try to do reverse
+URL matching (through the ``permalink()`` decorator or the ``{% url %}``
+template tag). Continuing this example, if you wanted to retrieve the URL for
+the ``archive`` view, Django's reverse URL matcher would get confused, because
+*two* URLpatterns point at that view.
+
+To solve this problem, Django supports **named URL patterns**. That is, you can
+give a name to a URL pattern in order to distinguish it from other patterns
+using the same view and parameters. Then, you can use this name in reverse URL
+matching.
+
+Here's the above example, rewritten to used named URL patterns::
+
+    urlpatterns = patterns('',
+        url(r'/archive/(\d{4})/$', archive, name="full-archive"),
+        url(r'/archive-summary/(\d{4})/$', archive, {'summary': True}, "arch-summary"),
+    )
+
+With these names in place (``full-archive`` and ``arch-summary``), you can
+target each pattern individually by using its name::
+
+    {% url arch-summary 1945 %}
+    {% url full-archive 2007 %}
+
+Even though both URL patterns refer to the ``archive`` view here, using the
+``name`` parameter to ``url()`` allows you to tell them apart in templates.
+
+The string used for the URL name can contain any characters you like. You are
+not restricted to valid Python names.
+
+.. note::
+
+    When you name your URL patterns, make sure you use names that are unlikely
+    to clash with any other application's choice of names. If you call your URL
+    pattern ``comment``, and another application does the same thing, there's
+    no guarantee which URL will be inserted into your template when you use
+    this name.
+
+    Putting a prefix on your URL names, perhaps derived from the application
+    name, will decrease the chances of collision. We recommend something like
+    ``myapp-comment`` instead of ``comment``.
+
+Utility methods
+===============
+
+reverse()
+---------
+
+If you need to use something similar to the ``{% url %}`` template tag in your
+code, Django provides the ``django.core.urlresolvers.reverse()``. The
+``reverse()`` function has the following signature::
+
+    reverse(viewname, urlconf=None, args=None, kwargs=None)
+
+``viewname`` is either the function name (either a function reference, or the
+string version of the name, if you used that form in ``urlpatterns``) or the
+`URL pattern name`_.  Normally, you won't need to worry about the
+``urlconf`` parameter and will only pass in the positional and keyword
+arguments to use in the URL matching. For example::
+
+    from django.core.urlresolvers import reverse
+
+    def myview(request):
+        return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+
+.. _URL pattern name: `Naming URL patterns`_
+
+permalink()
+-----------
+
+The ``permalink()`` decorator is useful for writing short methods that return
+a full URL path. For example, a model's ``get_absolute_url()`` method. Refer
+to the `model API documentation`_ for more information about ``permalink()``.
+
+.. _model API documentation: ../model-api/#the-permalink-decorator
+

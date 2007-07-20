@@ -2,6 +2,7 @@ from django import template
 from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
 from django.utils.text import capfirst
+from django.utils.encoding import force_unicode
 from django.db import models
 from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
@@ -11,25 +12,27 @@ import re
 register = template.Library()
 
 word_re = re.compile('[A-Z][a-z]+')
+absolute_url_re = re.compile(r'^(?:http(?:s)?:/)?/', re.IGNORECASE)
 
 def class_name_to_underscored(name):
-    return '_'.join([s.lower() for s in word_re.findall(name)[:-1]])
+    return u'_'.join([s.lower() for s in word_re.findall(name)[:-1]])
 
 def include_admin_script(script_path):
     """
     Returns an HTML script element for including a script from the admin
-    media url.
+    media url (or other location if an absolute url is given).
 
     Example usage::
 
-        {% include_admin_script js/calendar.js %}
+        {% include_admin_script "js/calendar.js" %}
 
     could return::
 
         <script type="text/javascript" src="/media/admin/js/calendar.js">
     """
-
-    return '<script type="text/javascript" src="%s%s"></script>' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    if not absolute_url_re.match(script_path):
+        script_path = '%s%s' % (settings.ADMIN_MEDIA_PREFIX, script_path)
+    return u'<script type="text/javascript" src="%s"></script>' % script_path
 include_admin_script = register.simple_tag(include_admin_script)
 
 def submit_row(context):
@@ -59,9 +62,9 @@ def field_label(bound_field):
         if not bound_field.first:
             class_names.append('inline')
         colon = ":"
-    class_str = class_names and ' class="%s"' % ' '.join(class_names) or ''
-    return '<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
-        capfirst(bound_field.field.verbose_name), colon)
+    class_str = class_names and u' class="%s"' % u' '.join(class_names) or u''
+    return u'<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
+        force_unicode(capfirst(bound_field.field.verbose_name)), colon)
 field_label = register.simple_tag(field_label)
 
 class FieldWidgetNode(template.Node):
@@ -72,10 +75,10 @@ class FieldWidgetNode(template.Node):
         self.bound_field_var = bound_field_var
 
     def get_nodelist(cls, klass):
-        if not cls.nodelists.has_key(klass):
+        if klass not in cls.nodelists:
             try:
                 field_class_name = klass.__name__
-                template_name = "widget/%s.html" % class_name_to_underscored(field_class_name)
+                template_name = u"widget/%s.html" % class_name_to_underscored(field_class_name)
                 nodelist = loader.get_template(template_name).nodelist
             except template.TemplateDoesNotExist:
                 super_klass = bool(klass.__bases__) and klass.__bases__[0] or None
@@ -173,30 +176,30 @@ class EditInlineNode(template.Node):
         return output
 
 def output_all(form_fields):
-    return ''.join([str(f) for f in form_fields])
+    return u''.join([force_unicode(f) for f in form_fields])
 output_all = register.simple_tag(output_all)
 
 def auto_populated_field_script(auto_pop_fields, change = False):
+    t = []
     for field in auto_pop_fields:
-        t = []
         if change:
-            t.append('document.getElementById("id_%s")._changed = true;' % field.name)
+            t.append(u'document.getElementById("id_%s")._changed = true;' % field.name)
         else:
-            t.append('document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
+            t.append(u'document.getElementById("id_%s").onchange = function() { this._changed = true; };' % field.name)
 
-        add_values = ' + " " + '.join(['document.getElementById("id_%s").value' % g for g in field.prepopulate_from])
+        add_values = u' + " " + '.join([u'document.getElementById("id_%s").value' % g for g in field.prepopulate_from])
         for f in field.prepopulate_from:
-            t.append('document.getElementById("id_%s").onkeyup = function() {' \
+            t.append(u'document.getElementById("id_%s").onkeyup = function() {' \
                      ' var e = document.getElementById("id_%s");' \
                      ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
                      f, field.name, add_values, field.maxlength))
-    return ''.join(t)
+    return u''.join(t)
 auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
     if f.rel and isinstance(f.rel, models.ManyToManyRel) and f.rel.filter_interface:
-        return '<script type="text/javascript">addEvent(window, "load", function(e) {' \
+        return u'<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
               f.name, f.verbose_name.replace('"', '\\"'), f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
     else:

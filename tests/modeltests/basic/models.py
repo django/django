@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 1. Bare-bones model
 
@@ -10,7 +11,10 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
-    def __str__(self):
+    class Meta:
+        ordering = ('pub_date','headline')
+
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS': """
@@ -245,7 +249,7 @@ datetime.datetime(2005, 7, 28, 0, 0)
 
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>]
 
 # Slicing again works:
 >>> Article.objects.all()[0:5][0:2]
@@ -253,17 +257,17 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> Article.objects.all()[0:5][:2]
 [<Article: Area woman programs in Python>, <Article: Second article>]
 >>> Article.objects.all()[0:5][4:]
-[<Article: Article 6>]
+[<Article: Default headline>]
 >>> Article.objects.all()[0:5][5:]
 []
 
 # Some more tests!
 >>> Article.objects.all()[2:][0:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][:2]
-[<Article: Third article>, <Article: Fourth article>]
+[<Article: Third article>, <Article: Article 6>]
 >>> Article.objects.all()[2:][2:3]
-[<Article: Article 6>]
+[<Article: Default headline>]
 
 # Note that you can't use 'offset' without 'limit' (on some dbs), so this doesn't work:
 >>> Article.objects.all()[2:]
@@ -312,11 +316,10 @@ AttributeError: Manager isn't accessible via Article instances
 
 # Bulk delete test: How many objects before and after the delete?
 >>> Article.objects.all()
-[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Fourth article>, <Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
+[<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>, <Article: Fourth article>, <Article: Article 7>, <Article: Updated article 8>]
 >>> Article.objects.filter(id__lte=4).delete()
 >>> Article.objects.all()
 [<Article: Article 6>, <Article: Default headline>, <Article: Article 7>, <Article: Updated article 8>]
-
 """}
 
 from django.conf import settings
@@ -349,10 +352,23 @@ __test__['API_TESTS'] += """
 >>> a101.save()
 >>> a101 = Article.objects.get(pk=101)
 >>> a101.headline
-'Article 101'
+u'Article 101'
 
 # You can create saved objects in a single step
 >>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))
 >>> Article.objects.get(headline="Article 10")
 <Article: Article 10>
+
+# Edge-case test: A year lookup should retrieve all objects in the given
+year, including Jan. 1 and Dec. 31.
+>>> a11 = Article.objects.create(headline='Article 11', pub_date=datetime(2008, 1, 1))
+>>> a12 = Article.objects.create(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999))
+>>> Article.objects.filter(pub_date__year=2008)
+[<Article: Article 11>, <Article: Article 12>]
+
+# Unicode data works, too.
+>>> a = Article(headline=u'\u6797\u539f \u3081\u3050\u307f', pub_date=datetime(2005, 7, 28))
+>>> a.save()
+>>> Article.objects.get(pk=a.id).headline
+u'\u6797\u539f \u3081\u3050\u307f'
 """

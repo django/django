@@ -66,10 +66,19 @@ deleting arbitrary data in the cache. All data is stored directly in memory,
 so there's no overhead of database or filesystem usage.
 
 After installing Memcached itself, you'll need to install the Memcached Python
-bindings. They're in a single Python module, memcache.py, available at
-ftp://ftp.tummy.com/pub/python-memcached/ . If that URL is no longer valid,
-just go to the Memcached Web site (http://www.danga.com/memcached/) and get the
-Python bindings from the "Client APIs" section.
+bindings. Two versions of this are available. Choose and install *one* of the
+following modules:
+
+    * The fastest available option is a module called ``cmemcache``, available
+      at http://gijsbert.org/cmemcache/ . (This module is only compatible with
+      the Django development version. Django 0.96 is only compatible with the
+      second option, below.)
+
+    * If you can't install ``cmemcache``, you can install ``python-memcached``,
+      available at ftp://ftp.tummy.com/pub/python-memcached/ . If that URL is
+      no longer valid, just go to the Memcached Web site
+      (http://www.danga.com/memcached/) and get the Python bindings from the
+      "Client APIs" section.
 
 To use Memcached with Django, set ``CACHE_BACKEND`` to
 ``memcached://ip:port/``, where ``ip`` is the IP address of the Memcached
@@ -250,7 +259,7 @@ Additionally, ``CacheMiddleware`` automatically sets a few headers in each
 
 See the `middleware documentation`_ for more on middleware.
 
-.. _`middleware documentation`: http://www.djangoproject.com/documentation/middleware/
+.. _`middleware documentation`: ../middleware/
 
 The per-view cache
 ==================
@@ -534,7 +543,7 @@ Order of MIDDLEWARE_CLASSES
 If you use ``CacheMiddleware``, it's important to put it in the right place
 within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
 to know which headers by which to vary the cache storage. Middleware always
-adds something the ``Vary`` response header when it can.
+adds something to the ``Vary`` response header when it can.
 
 Put the ``CacheMiddleware`` after any middlewares that might add something to
 the ``Vary`` header. The following middlewares do so:

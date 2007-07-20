@@ -12,7 +12,9 @@ from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
+from django.utils.encoding import smart_str, force_unicode
 from django.conf import settings
+from itertools import izip
 import types
 import sys
 import os
@@ -21,8 +23,13 @@ class ModelBase(type):
     "Metaclass for all models"
     def __new__(cls, name, bases, attrs):
         # If this isn't a subclass of Model, don't do anything special.
-        if not bases or bases == (object,):
-            return type.__new__(cls, name, bases, attrs)
+        try:
+            if not filter(lambda b: issubclass(b, Model), bases):
+                return super(ModelBase, cls).__new__(cls, name, bases, attrs)
+        except NameError:
+            # 'Model' isn't defined yet, meaning we're looking at Django's own
+            # Model class, defined below.
+            return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
@@ -36,11 +43,11 @@ class ModelBase(type):
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
 
-        model_module = sys.modules[new_class.__module__]
 
         if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
             # For 'django.contrib.sites.models', this would be 'sites'.
+            model_module = sys.modules[new_class.__module__]
             new_class._meta.app_label = model_module.__name__.split('.')[-2]
 
         # Bail out early if we have already created this class.
@@ -77,9 +84,11 @@ class Model(object):
         return getattr(self, self._meta.pk.attname)
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self)
+        return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
 
     def __str__(self):
+        if hasattr(self, '__unicode__'):
+            return force_unicode(self).encode('utf-8')
         return '%s object' % self.__class__.__name__
 
     def __eq__(self, other):
@@ -90,41 +99,74 @@ class Model(object):
 
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
-        for f in self._meta.fields:
-            if isinstance(f.rel, ManyToOneRel):
-                try:
-                    # Assume object instance was passed in.
-                    rel_obj = kwargs.pop(f.name)
-                except KeyError:
+
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and nstantiation for iteration is 33% faster.
+        args_len = len(args)
+        if args_len > len(self._meta.fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+
+        fields_iter = iter(self._meta.fields)
+        if not kwargs:
+            # The ordering of the izip calls matter - izip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            for val, field in izip(args, fields_iter):
+                setattr(self, field.attname, val)
+                kwargs.pop(field.name, None)
+                # Maintain compatibility with existing calls.
+                if isinstance(field.rel, ManyToOneRel):
+                    kwargs.pop(field.attname, None)
+
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+
+        for field in fields_iter:
+            if kwargs:
+                if isinstance(field.rel, ManyToOneRel):
                     try:
-                        # Object instance wasn't passed in -- must be an ID.
-                        val = kwargs.pop(f.attname)
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
                     except KeyError:
-                        val = f.get_default()
-                else:
-                    # Object instance was passed in.
-                    # Special case: You can pass in "None" for related objects if it's allowed.
-                    if rel_obj is None and f.null:
-                        val = None
-                    else:
                         try:
-                            val = getattr(rel_obj, f.rel.get_related_field().attname)
-                        except AttributeError:
-                            raise TypeError, "Invalid value: %r should be a %s instance, not a %s" % (f.name, f.rel.to, type(rel_obj))
-                setattr(self, f.attname, val)
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                    else:
+                        # Object instance was passed in. Special case: You can
+                        # pass in "None" for related objects if it's allowed.
+                        if rel_obj is None and field.null:
+                            val = None
+                        else:
+                            try:
+                                val = getattr(rel_obj, field.rel.get_related_field().attname)
+                            except AttributeError:
+                                raise TypeError("Invalid value: %r should be a %s instance, not a %s" %
+                                    (field.name, field.rel.to, type(rel_obj)))
+                else:
+                    val = kwargs.pop(field.attname, field.get_default())
             else:
-                val = kwargs.pop(f.attname, f.get_default())
-                setattr(self, f.attname, val)
-        for prop in kwargs.keys():
-            try:
-                if isinstance(getattr(self.__class__, prop), property):
-                    setattr(self, prop, kwargs.pop(prop))
-            except AttributeError:
-                pass
+                val = field.get_default()
+            setattr(self, field.attname, val)
+
         if kwargs:
-            raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
-        for i, arg in enumerate(args):
-            setattr(self, self._meta.fields[i].attname, arg)
+            for prop in kwargs.keys():
+                try:
+                    if isinstance(getattr(self.__class__, prop), property):
+                        setattr(self, prop, kwargs.pop(prop))
+                except AttributeError:
+                    pass
+            if kwargs:
+                raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, value):
@@ -159,7 +201,7 @@ class Model(object):
 
     _prepare = classmethod(_prepare)
 
-    def save(self):
+    def save(self, raw=False):
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
@@ -171,26 +213,27 @@ class Model(object):
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
-                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)), [pk_val])
+            cursor.execute("SELECT COUNT(*) FROM %s WHERE %s=%%s" % \
+                (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
+                self._meta.pk.get_db_prep_lookup('exact', pk_val))
             # If it does already exist, do an UPDATE.
-            if cursor.fetchone():
-                db_values = [f.get_db_prep_save(f.pre_save(self, False)) for f in non_pks]
+            if cursor.fetchone()[0] > 0:
+                db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
                 if db_values:
                     cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                         (backend.quote_name(self._meta.db_table),
                         ','.join(['%s=%%s' % backend.quote_name(f.column) for f in non_pks]),
                         backend.quote_name(self._meta.pk.column)),
-                        db_values + [pk_val])
+                        db_values + self._meta.pk.get_db_prep_lookup('exact', pk_val))
             else:
                 record_exists = False
         if not pk_set or not record_exists:
             field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
-            db_values = [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
+            db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
             if pk_set:
                 field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
-                db_values += [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
+                db_values += [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
                 field_names.append(backend.quote_name('_order'))
@@ -278,14 +321,14 @@ class Model(object):
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
-        return dict(field.choices).get(value, value)
+        return force_unicode(dict(field.choices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         op = is_next and '>' or '<'
         where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (backend.quote_name(field.column), op, backend.quote_name(field.column),
             backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column), op)
-        param = str(getattr(self, field.attname))
+        param = smart_str(getattr(self, field.attname))
         q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
         q._where.append(where)
         q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
@@ -322,7 +365,7 @@ class Model(object):
     def _get_FIELD_size(self, field):
         return os.path.getsize(self._get_FIELD_filename(field))
 
-    def _save_FIELD_file(self, field, filename, raw_contents):
+    def _save_FIELD_file(self, field, filename, raw_contents, save=True):
         directory = field.get_directory_name()
         try: # Create the date-based directory if it doesn't exist.
             os.makedirs(os.path.join(settings.MEDIA_ROOT, directory))
@@ -357,8 +400,9 @@ class Model(object):
             if field.height_field:
                 setattr(self, field.height_field, height)
 
-        # Save the object, because it has changed.
-        self.save()
+        # Save the object because it has changed unless save is False
+        if save:
+            self.save()
 
     _save_FIELD_file.alters_data = True
 
@@ -375,24 +419,6 @@ class Model(object):
             filename = self._get_FIELD_filename(field)
             setattr(self, cachename, get_image_dimensions(filename))
         return getattr(self, cachename)
-
-    # Handles setting many-to-many related objects.
-    # Example: Album.set_songs()
-    def _set_related_many_to_many(self, rel_class, rel_field, id_list):
-        id_list = map(int, id_list) # normalize to integers
-        rel = rel_field.rel.to
-        m2m_table = rel_field.m2m_db_table()
-        this_id = self._get_pk_val()
-        cursor = connection.cursor()
-        cursor.execute("DELETE FROM %s WHERE %s = %%s" % \
-            (backend.quote_name(m2m_table),
-            backend.quote_name(rel_field.m2m_column_name())), [this_id])
-        sql = "INSERT INTO %s (%s, %s) VALUES (%%s, %%s)" % \
-            (backend.quote_name(m2m_table),
-            backend.quote_name(rel_field.m2m_column_name()),
-            backend.quote_name(rel_field.m2m_reverse_name()))
-        cursor.executemany(sql, [(this_id, i) for i in id_list])
-        transaction.commit_unless_managed()
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #

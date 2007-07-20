@@ -12,23 +12,23 @@ class Place(models.Model):
     name = models.CharField(maxlength=50)
     address = models.CharField(maxlength=80)
 
-    def __str__(self):
-        return "%s the place" % self.name
+    def __unicode__(self):
+        return u"%s the place" % self.name
 
 class Restaurant(models.Model):
     place = models.OneToOneField(Place)
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
-    def __str__(self):
-        return "%s the restaurant" % self.place.name
+    def __unicode__(self):
+        return u"%s the restaurant" % self.place.name
 
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
     name = models.CharField(maxlength=50)
 
-    def __str__(self):
-        return "%s the waiter at %s" % (self.name, self.restaurant)
+    def __unicode__(self):
+        return u"%s the waiter at %s" % (self.name, self.restaurant)
 
 class ManualPrimaryKey(models.Model):
     primary_key = models.CharField(maxlength=10, primary_key=True)

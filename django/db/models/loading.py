@@ -48,7 +48,7 @@ def get_app(app_label, emptyOK=False):
 def load_app(app_name):
     "Loads the app with the provided fully qualified name, and returns the model module."
     global _app_list
-    mod = __import__(app_name, '', '', ['models'])
+    mod = __import__(app_name, {}, {}, ['models'])
     if not hasattr(mod, 'models'):
         return None
     if mod.models not in _app_list:
@@ -103,7 +103,7 @@ def register_models(app_label, *models):
         # in the _app_models dictionary
         model_name = model._meta.object_name.lower()
         model_dict = _app_models.setdefault(app_label, {})
-        if model_dict.has_key(model_name):
+        if model_name in model_dict:
             # The same model may be imported via different paths (e.g.
             # appname.models and project.appname.models). We use the source
             # filename as a means to detect identity.

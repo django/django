@@ -3,7 +3,24 @@ def curry(_curried_func, *args, **kwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
     return _curried
 
-class Promise:
+def memoize(func, cache, num_args):
+    """
+    Wrap a function so that results for any argument tuple are stored in
+    'cache'. Note that the args to the function must be usable as dictionary
+    keys.
+
+    Only the first num_args are considered when creating the key.
+    """
+    def wrapper(*args):
+        mem_args = args[:num_args]
+        if mem_args in cache:
+            return cache[mem_args]
+        result = func(*args)
+        cache[mem_args] = result
+        return result
+    return wrapper
+
+class Promise(object):
     """
     This is just a base class for the proxy class created in
     the closure of the lazy function. It can be used to recognize
@@ -32,6 +49,11 @@ def lazy(func, *resultclasses):
                 self.__dispatch[resultclass] = {}
                 for (k, v) in resultclass.__dict__.items():
                     setattr(self, k, self.__promise__(resultclass, k, v))
+            self._delegate_str = str in resultclasses
+            self._delegate_unicode = unicode in resultclasses
+            assert not (self._delegate_str and self._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
+            if self._delegate_unicode:
+                self.__unicode__ = self.__unicode_cast
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
@@ -42,13 +64,61 @@ def lazy(func, *resultclasses):
                 res = self.__func(*self.__args, **self.__kw)
                 return self.__dispatch[type(res)][funcname](res, *args, **kw)
 
-            if not self.__dispatch.has_key(klass):
+            if klass not in self.__dispatch:
                 self.__dispatch[klass] = {}
             self.__dispatch[klass][funcname] = func
             return __wrapper__
+
+        def __unicode_cast(self):
+            return self.__func(*self.__args, **self.__kw)
+
+        def __str__(self):
+            # As __str__ is always a method on the type (class), it is looked
+            # up (and found) there first. So we can't just assign to it on a
+            # per-instance basis in __init__.
+            if self._delegate_str:
+                return str(self.__func(*self.__args, **self.__kw))
+            else:
+                return Promise.__str__(self)
+
+        def __cmp__(self, rhs):
+            if self._delegate_str:
+                s = str(self.__func(*self.__args, **self.__kw))
+            elif self._delegate_unicode:
+                s = unicode(self.__func(*self.__args, **self.__kw))
+            else:
+                s = self.__func(*self.__args, **self.__kw)
+            if isinstance(rhs, Promise):
+                return -cmp(rhs, s)
+            else:
+                return cmp(s, rhs)
+
+        def __mod__(self, rhs):
+            if self._delegate_str:
+                return str(self) % rhs
+            elif self._delegate_unicode:
+                return unicode(self) % rhs
+            else:
+                raise AssertionError('__mod__ not supported for non-string types')
 
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
         return __proxy__(args, kw)
 
     return __wrapper__
+
+def allow_lazy(func, *resultclasses):
+    """
+    A decorator that allows a function to be called with one or more lazy
+    arguments. If none of the args are lazy, the function is evaluated
+    immediately, otherwise a __proxy__ is returned that will evaluate the
+    function when needed.
+    """
+    def wrapper(*args, **kwargs):
+        for arg in list(args) + kwargs.values():
+            if isinstance(arg, Promise):
+                break
+        else:
+            return func(*args, **kwargs)
+        return lazy(func, *resultclasses)(*args, **kwargs)
+    return wrapper

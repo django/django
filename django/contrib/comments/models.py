@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 import datetime
 
@@ -34,7 +34,7 @@ class CommentManager(models.Manager):
         """
         Given a rating_string, this returns a tuple of (rating_range, options).
         >>> s = "scale:1-10|First_category|Second_category"
-        >>> get_rating_options(s)
+        >>> Comment.objects.get_rating_options(s)
         ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], ['First category', 'Second category'])
         """
         rating_range, options = rating_string.split('|', 1)
@@ -209,7 +209,7 @@ class FreeComment(models.Model):
 class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
-            karma = self.objects.get(comment__pk=comment_id, user__pk=user_id)
+            karma = self.get(comment__pk=comment_id, user__pk=user_id)
         except self.model.DoesNotExist:
             karma = self.model(None, user_id=user_id, comment_id=comment_id, score=score, scored_date=datetime.datetime.now())
             karma.save()

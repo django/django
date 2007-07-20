@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Preview your submission</h1>
+
+<table>
+{% for field in form %}
+<tr>
+<th>{{ field.label }}:</th>
+<td>{{ field.data|escape }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<p>Security hash: {{ hash_value }}</p>
+
+<form action="" method="post">
+{% for field in form %}{{ field.as_hidden }}
+{% endfor %}
+<input type="hidden" name="{{ stage_field }}" value="2" />
+<input type="hidden" name="{{ hash_field }}" value="{{ hash_value }}" />
+<p><input type="submit" value="Submit" /></p>
+</form>
+
+<h1>Or edit it again</h1>
+
+<form action="" method="post">
+<table>
+{{ form }}
+</table>
+<input type="hidden" name="{{ stage_field }}" value="1" />
+<p><input type="submit" value="Preview" /></p>
+</form>
+
+{% endblock %}

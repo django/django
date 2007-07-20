@@ -1,20 +1,39 @@
+# translation of djangojs.po to Italiano
 # Italian translation for the django-admin JS files
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
-# Carlo C8E Miron <carlo.miron AT gmail.com>, 2006.
 #
+# Carlo C8E Miron <carlo.miron AT gmail.com>, 2006.
+# Nicola 'tekNico' Larosa <nico@tekNico.net>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Django JavaScript 1.0\n"
+"Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2005-12-04 21:47+0100\n"
-"Last-Translator: Carlo C8E Miron <carlo.miron AT gmail.com>\n"
-"Language-Team: Italian <Django-I18N@googlegroups.com>\n"
+"POT-Creation-Date: 2007-02-26 20:46+0100\n"
+"PO-Revision-Date: 2007-02-26 20:55+0100\n"
+"Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.2\n"
+
+#: contrib/admin/media/js/calendar.js:24
+#: contrib/admin/media/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre "
+"Novembre Dicembre"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "D L M M G V S"
+
+#: contrib/admin/media/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "Domenica Lunedì Martedì Mercoledì Giovedì Venerdì Sabato"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -23,7 +42,7 @@ msgstr "Disponibile %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Seleziona tutto"
+msgstr "Scegli tutto"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
@@ -36,7 +55,7 @@ msgstr "Rimuovi"
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr "Selezionato %s"
+msgstr "Scelto %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
@@ -46,66 +65,59 @@ msgstr "Seleziona le tue scelte e clicca "
 msgid "Clear all"
 msgstr "Cancella tutto"
 
-#: contrib/admin/media/js/dateparse.js:26
-#: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre "
-"Novembre Dicembre"
-
-#: contrib/admin/media/js/dateparse.js:27
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Domenica Lunedì Martedì Mercoledì Giovedì Venerdì Sabato"
-
-#: contrib/admin/media/js/calendar.js:25
-msgid "S M T W T F S"
-msgstr "D L M M G V S"
-
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
 msgstr "Adesso"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
 msgstr "Orologio"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr "Seleziona un orario"
+msgstr "Scegli un orario"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
 msgstr "Mezzanotte"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
 msgstr "6 del mattino"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
 msgstr "Mezzogiorno"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
 msgstr "Annulla"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
 msgstr "Oggi"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
 msgstr "Calendario"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
 msgstr "Ieri"
 
-#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
 msgstr "Domani"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
+msgid "Show"
+msgstr "Mostra"
+
+#: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
+msgid "Hide"
+msgstr "Nascondi"
+

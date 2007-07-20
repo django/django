@@ -16,14 +16,14 @@ class Reporter(models.Model):
     first_name = models.CharField(maxlength=30)
     last_name = models.CharField(maxlength=30)
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 class Article(models.Model):
     headline = models.CharField(maxlength=100)
     pub_date = models.DateField()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class Writer(models.Model):
@@ -31,8 +31,8 @@ class Writer(models.Model):
     article = models.ForeignKey(Article)
     position = models.CharField(maxlength=100)
 
-    def __str__(self):
-        return '%s (%s)' % (self.reporter, self.position)
+    def __unicode__(self):
+        return u'%s (%s)' % (self.reporter, self.position)
 
 __test__ = {'API_TESTS':"""
 # Create a few Reporters.

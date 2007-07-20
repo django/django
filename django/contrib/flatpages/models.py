@@ -1,10 +1,10 @@
 from django.core import validators
 from django.db import models
 from django.contrib.sites.models import Site
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 class FlatPage(models.Model):
-    url = models.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL],
+    url = models.CharField(_('URL'), maxlength=100, validator_list=[validators.isAlphaNumericURL], db_index=True,
         help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."))
     title = models.CharField(_('title'), maxlength=200)
     content = models.TextField(_('content'))
@@ -26,8 +26,8 @@ class FlatPage(models.Model):
         list_filter = ('sites',)
         search_fields = ('url', 'title')
 
-    def __str__(self):
-        return "%s -- %s" % (self.url, self.title)
+    def __unicode__(self):
+        return u"%s -- %s" % (self.url, self.title)
 
     def get_absolute_url(self):
         return self.url

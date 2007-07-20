@@ -5,6 +5,8 @@ from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
+from django.utils.translation import activate, deactivate_all, get_language, string_concat
+from django.utils.encoding import force_unicode, smart_str
 from bisect import bisect
 import re
 
@@ -13,7 +15,7 @@ get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label', 'aka')
+                 'order_with_respect_to', 'app_label', 'db_tablespace')
 
 class Options(object):
     def __init__(self, meta):
@@ -21,13 +23,13 @@ class Options(object):
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
-        self.aka = ''
         self.ordering = []
         self.unique_together =  []
         self.permissions =  []
         self.object_name, self.app_label = None, None
         self.get_latest_by = None
         self.order_with_respect_to = None
+        self.db_tablespace = None
         self.admin = None
         self.meta = meta
         self.pk = None
@@ -42,6 +44,7 @@ class Options(object):
         self.object_name = cls.__name__
         self.module_name = self.object_name.lower()
         self.verbose_name = get_verbose_name(self.object_name)
+
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
             meta_attrs = self.meta.__dict__
@@ -51,15 +54,17 @@ class Options(object):
                 setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
-            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', self.verbose_name + 's'))
+            setattr(self, 'verbose_name_plural', meta_attrs.pop('verbose_name_plural', string_concat(self.verbose_name, 's')))
             # Any leftover attributes must be invalid.
             if meta_attrs != {}:
                 raise TypeError, "'class Meta' got invalid attribute(s): %s" % ','.join(meta_attrs.keys())
         else:
-            self.verbose_name_plural = self.verbose_name + 's'
+            self.verbose_name_plural = string_concat(self.verbose_name, 's')
         del self.meta
 
     def _prepare(self, model):
+        from django.db import backend
+        from django.db.backends.util import truncate_name
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
             self.ordering = ('_order',)
@@ -70,18 +75,12 @@ class Options(object):
             auto = AutoField(verbose_name='ID', primary_key=True)
             auto.creation_counter = -1
             model.add_to_class('id', auto)
-        
-        if isinstance(self.aka, str):
-            self.aka = "%s_%s" % (self.app_label, self.aka.lower())
-        if isinstance(self.aka, tuple):
-            real_aka = []
-            for some_aka in self.aka:
-                real_aka.append( "%s_%s" % (self.app_label, some_aka.lower()) )
-            self.aka = tuple(real_aka)
 
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
+            self.db_table = truncate_name(self.db_table,
+                                          backend.get_max_name_length())
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
@@ -93,13 +92,27 @@ class Options(object):
             self.fields.insert(bisect(self.fields, field), field)
             if not self.pk and field.primary_key:
                 self.pk = field
+                field.serialize = False
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
-        
+
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.module_name)
-        
+        return "%s.%s" % (smart_str(self.app_label), smart_str(self.module_name))
+
+    def verbose_name_raw(self):
+        """
+        There are a few places where the untranslated verbose name is needed
+        (so that we get the same value regardless of currently active
+        locale).
+        """
+        lang = get_language()
+        deactivate_all()
+        raw = force_unicode(self.verbose_name)
+        activate(lang)
+        return raw
+    verbose_name_raw = property(verbose_name_raw)
+
     def get_field(self, name, many_to_many=True):
         "Returns the requested field by name. Raises FieldDoesNotExist on error."
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
@@ -148,7 +161,7 @@ class Options(object):
     def get_follow(self, override=None):
         follow = {}
         for f in self.fields + self.many_to_many + self.get_all_related_objects():
-            if override and override.has_key(f.name):
+            if override and f.name in override:
                 child_override = override[f.name]
             else:
                 child_override = None
@@ -190,7 +203,7 @@ class Options(object):
         # TODO: follow
         if not hasattr(self, '_field_types'):
             self._field_types = {}
-        if not self._field_types.has_key(field_type):
+        if field_type not in self._field_types:
             try:
                 # First check self.fields.
                 for f in self.fields:

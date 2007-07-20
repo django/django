@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django import forms
+from django import oldforms
 from django.core import validators
 from django.db.models.fields import FileField, AutoField
 from django.dispatch import dispatcher
@@ -7,6 +7,8 @@ from django.db.models import signals
 from django.utils.functional import curry
 from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
+from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 import types
 
 def add_manipulators(sender):
@@ -40,7 +42,7 @@ class ManipulatorDescriptor(object):
                 self.man._prepare(model)
             return self.man
 
-class AutomaticManipulator(forms.Manipulator):
+class AutomaticManipulator(oldforms.Manipulator):
     def _prepare(cls, model):
         cls.model = model
         cls.manager = model._default_manager
@@ -76,7 +78,7 @@ class AutomaticManipulator(forms.Manipulator):
 
         # Add field for ordering.
         if self.change and self.opts.get_ordered_objects():
-            self.fields.append(forms.CommaSeparatedIntegerField(field_name="order_"))
+            self.fields.append(oldforms.CommaSeparatedIntegerField(field_name="order_"))
 
     def save(self, new_data):
         # TODO: big cleanup when core fields go -> use recursive manipulators.
@@ -96,20 +98,22 @@ class AutomaticManipulator(forms.Manipulator):
         if self.change:
             params[self.opts.pk.attname] = self.obj_key
 
-        # First, save the basic object itself.
+        # First, create the basic object itself.
         new_object = self.model(**params)
-        new_object.save()
 
-        # Now that the object's been saved, save any uploaded files.
+        # Now that the object's been created, save any uploaded files.
         for f in self.opts.fields:
             if isinstance(f, FileField):
-                f.save_file(new_data, new_object, self.change and self.original_object or None, self.change, rel=False)
+                f.save_file(new_data, new_object, self.change and self.original_object or None, self.change, rel=False, save=False)
+
+        # Now save the object
+        new_object.save()
 
         # Calculate which primary fields have changed.
         if self.change:
             self.fields_added, self.fields_changed, self.fields_deleted = [], [], []
             for f in self.opts.fields:
-                if not f.primary_key and str(getattr(self.original_object, f.attname)) != str(getattr(new_object, f.attname)):
+                if not f.primary_key and smart_str(getattr(self.original_object, f.attname)) != smart_str(getattr(new_object, f.attname)):
                     self.fields_changed.append(f.verbose_name)
 
         # Save many-to-many objects. Example: Set sites for a poll.
@@ -209,7 +213,7 @@ class AutomaticManipulator(forms.Manipulator):
                                 self.fields_added.append('%s "%s"' % (related.opts.verbose_name, new_rel_obj))
                             else:
                                 for f in related.opts.fields:
-                                    if not f.primary_key and f != related.field and str(getattr(old_rel_obj, f.attname)) != str(getattr(new_rel_obj, f.attname)):
+                                    if not f.primary_key and f != related.field and smart_str(getattr(old_rel_obj, f.attname)) != smart_str(getattr(new_rel_obj, f.attname)):
                                         self.fields_changed.append('%s for %s "%s"' % (f.verbose_name, related.opts.verbose_name, new_rel_obj))
 
                         # Save many-to-many objects.
@@ -286,7 +290,7 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         # This is really not going to work for fields that have different
         # form fields, e.g. DateTime.
         # This validation needs to occur after html2python to be effective.
-        field_val = all_data.get(f.attname, None)
+        field_val = all_data.get(f.name, None)
         if field_val is None:
             # This will be caught by another validator, assuming the field
             # doesn't have blank=True.
@@ -303,12 +307,12 @@ def manipulator_validator_unique_together(field_name_list, opts, self, field_dat
         pass
     else:
         raise validators.ValidationError, _("%(object)s with this %(type)s already exists for the given %(field)s.") % \
-            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list([f.verbose_name for f in field_list[1:]], 'and')}
+            {'object': capfirst(opts.verbose_name), 'type': field_list[0].verbose_name, 'field': get_text_list([f.verbose_name for f in field_list[1:]], _('and'))}
 
 def manipulator_validator_unique_for_date(from_field, date_field, opts, lookup_type, self, field_data, all_data):
     from django.db.models.fields.related import ManyToOneRel
     date_str = all_data.get(date_field.get_manipulator_field_names('')[0], None)
-    date_val = forms.DateField.html2python(date_str)
+    date_val = oldforms.DateField.html2python(date_str)
     if date_val is None:
         return # Date was invalid. This will be caught by another validator.
     lookup_kwargs = {'%s__year' % date_field.name: date_val.year}

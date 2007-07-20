@@ -30,11 +30,8 @@ def get_relations(cursor, table_name):
             AND con.contype = 'f'""", [table_name])
     relations = {}
     for row in cursor.fetchall():
-        try:
-            # row[0] and row[1] are like "{2}", so strip the curly braces.
-            relations[int(row[0][1:-1]) - 1] = (int(row[1][1:-1]) - 1, row[2])
-        except ValueError:
-            continue
+        # row[0] and row[1] are single-item lists, so grab the single item.
+        relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
     return relations
 
 def get_indexes(cursor, table_name):
@@ -72,6 +69,7 @@ DATA_TYPES_REVERSE = {
     21: 'SmallIntegerField',
     23: 'IntegerField',
     25: 'TextField',
+    701: 'FloatField',
     869: 'IPAddressField',
     1043: 'CharField',
     1082: 'DateField',
@@ -79,5 +77,5 @@ DATA_TYPES_REVERSE = {
     1114: 'DateTimeField',
     1184: 'DateTimeField',
     1266: 'TimeField',
-    1700: 'FloatField',
+    1700: 'DecimalField',
 }

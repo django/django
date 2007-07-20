@@ -63,7 +63,7 @@ at any level -- database servers, caching servers or Web/application servers.
 The framework cleanly separates components such as its database layer and
 application layer. And it ships with a simple-yet-powerful `cache framework`_.
 
-.. _`cache framework`: http://www.djangoproject.com/documentation/cache/
+.. _`cache framework`: ../cache/
 
 Who's behind this?
 ------------------
@@ -104,7 +104,7 @@ Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu makes us all look like rock stars. By day, he's an
-    interactive designer for `Apple`. Don't ask him what he's working on, or
+    interactive designer for `Apple`_. Don't ask him what he's working on, or
     he'll have to kill you. He lives in San Francisco.
 
     On IRC, Wilson goes by ``wilsonian``.
@@ -191,7 +191,7 @@ Like we said: We're picky.
 
 We've documented our philosophies on the `design philosophies page`_.
 
-.. _design philosophies page: http://www.djangoproject.com/documentation/design_philosophies/
+.. _design philosophies page: ../design_philosophies/
 
 Do you have any of those nifty "screencast" things?
 ---------------------------------------------------
@@ -277,9 +277,9 @@ How do I get started?
        run into trouble.
 
 .. _`Download the code`: http://www.djangoproject.com/download/
-.. _`installation guide`: http://www.djangoproject.com/documentation/install/
-.. _tutorial:  http://www.djangoproject.com/documentation/tutorial1/
-.. _documentation: http://www.djangoproject.com/documentation/
+.. _`installation guide`: ../install/
+.. _tutorial:  ../tutorial01/
+.. _documentation: ../
 .. _ask questions: http://www.djangoproject.com/community/
 
 How do I fix the "install a later version of setuptools" error?
@@ -301,7 +301,7 @@ means it can run on a variety of server platforms.
 
 If you want to use Django with a database, which is probably the case, you'll
 also need a database engine. PostgreSQL_ is recommended, because we're
-PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
+PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 
 .. _Python: http://www.python.org/
 .. _Apache 2: http://httpd.apache.org/
@@ -310,6 +310,7 @@ PostgreSQL fans, and MySQL_ and `SQLite 3`_ are also supported.
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _`SQLite 3`: http://www.sqlite.org/
+.. _Oracle: http://www.oracle.com/
 
 Do I lose anything by using Python 2.3 versus newer Python versions, such as Python 2.5?
 ----------------------------------------------------------------------------------------
@@ -328,8 +329,9 @@ Do I have to use mod_python?
 
 Although we recommend mod_python for production use, you don't have to use it,
 thanks to the fact that Django uses an arrangement called WSGI_. Django can
-talk to any WSGI-enabled server. The most common non-mod_python deployment
-setup is FastCGI. See `How to use Django with FastCGI`_ for full information.
+talk to any WSGI-enabled server. Other non-mod_python deployment setups are
+FastCGI, SCGI or AJP. See `How to use Django with FastCGI, SCGI or AJP`_ for
+full information.
 
 Also, see the `server arrangements wiki page`_ for other deployment strategies.
 
@@ -337,7 +339,7 @@ If you just want to play around and develop things on your local computer, use
 the development Web server that comes with Django. Things should Just Work.
 
 .. _WSGI: http://www.python.org/peps/pep-0333.html
-.. _How to use Django with FastCGI: http://www.djangoproject.com/documentation/fastcgi/
+.. _How to use Django with FastCGI, SCGI or AJP: ../fastcgi/
 .. _server arrangements wiki page: http://code.djangoproject.com/wiki/ServerArrangements
 
 How do I install mod_python on Windows?
@@ -381,9 +383,9 @@ Why do I get an error about importing DJANGO_SETTINGS_MODULE?
 Make sure that:
 
     * The environment variable DJANGO_SETTINGS_MODULE is set to a fully-qualified
-      Python module (i.e. "mysite.settings.main").
+      Python module (i.e. "mysite.settings").
 
-    * Said module is on ``sys.path`` (``import mysite.settings.main`` should work).
+    * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
     * The module doesn't contain syntax errors (of course).
 
@@ -464,7 +466,7 @@ Can I use Django with a pre-existing database?
 
 Yes. See `Integrating with a legacy database`_.
 
-.. _`Integrating with a legacy database`: http://www.djangoproject.com/documentation/legacy_databases/
+.. _`Integrating with a legacy database`: ../legacy_databases/
 
 If I make changes to a model, how do I update the database?
 -----------------------------------------------------------
@@ -511,7 +513,7 @@ type, create an initial data file and put something like this in it::
 As explained in the `SQL initial data file`_ documentation, this SQL file can
 contain arbitrary SQL, so you can make any sorts of changes you need to make.
 
-.. _SQL initial data file: http://www.djangoproject.com/documentation/model_api/#providing-initial-sql-data
+.. _SQL initial data file: ../model-api/#providing-initial-sql-data
 
 Why is Django leaking memory?
 -----------------------------
@@ -592,7 +594,7 @@ My admin-site CSS and images showed up fine using the development server, but th
 See `serving the admin files`_ in the "How to use Django with mod_python"
 documentation.
 
-.. _serving the admin files: http://www.djangoproject.com/documentation/modpython/#serving-the-admin-files
+.. _serving the admin files: ../modpython/#serving-the-admin-files
 
 My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ----------------------------------------------------------------------------
@@ -630,7 +632,7 @@ site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet. We've got a
 `guide to the CSS used in the admin`_ to get you started.
 
-.. _`guide to the CSS used in the admin`: http://www.djangoproject.com/documentation/admin_css/
+.. _`guide to the CSS used in the admin`: ../admin_css/
 
 How do I create users without having to edit password hashes?
 -------------------------------------------------------------
@@ -640,7 +642,7 @@ development version, where this problem was fixed on Aug. 4, 2006.
 
 You can also use the Python API. See `creating users`_ for full info.
 
-.. _creating users: http://www.djangoproject.com/documentation/authentication/#creating-users
+.. _creating users: ../authentication/#creating-users
 
 Contributing code
 =================
@@ -651,7 +653,7 @@ How can I get started contributing code to Django?
 Thanks for asking! We've written an entire document devoted to this question.
 It's titled `Contributing to Django`_.
 
-.. _Contributing to Django: http://www.djangoproject.com/documentation/contributing/
+.. _Contributing to Django: ../contributing/
 
 I submitted a bug fix in the ticket system several weeks ago. Why are you ignoring my patch?
 --------------------------------------------------------------------------------------------

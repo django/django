@@ -3,16 +3,17 @@ from django.contrib.auth import authenticate
 from django.contrib.sites.models import Site
 from django.template import Context, loader
 from django.core import validators
-from django import forms
+from django import oldforms
+from django.utils.translation import ugettext as _
 
-class UserCreationForm(forms.Manipulator):
+class UserCreationForm(oldforms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
     def __init__(self):
         self.fields = (
-            forms.TextField(field_name='username', length=30, maxlength=30, is_required=True,
+            oldforms.TextField(field_name='username', length=30, maxlength=30, is_required=True,
                 validator_list=[validators.isAlphaNumeric, self.isValidUsername]),
-            forms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
-            forms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
+            oldforms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
+            oldforms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 
@@ -27,7 +28,7 @@ class UserCreationForm(forms.Manipulator):
         "Creates the user."
         return User.objects.create_user(new_data['username'], '', new_data['password1'])
 
-class AuthenticationForm(forms.Manipulator):
+class AuthenticationForm(oldforms.Manipulator):
     """
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
@@ -41,9 +42,9 @@ class AuthenticationForm(forms.Manipulator):
         """
         self.request = request
         self.fields = [
-            forms.TextField(field_name="username", length=15, maxlength=30, is_required=True,
+            oldforms.TextField(field_name="username", length=15, maxlength=30, is_required=True,
                 validator_list=[self.isValidUser, self.hasCookiesEnabled]),
-            forms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True),
+            oldforms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True),
         ]
         self.user_cache = None
 
@@ -68,53 +69,53 @@ class AuthenticationForm(forms.Manipulator):
     def get_user(self):
         return self.user_cache
 
-class PasswordResetForm(forms.Manipulator):
+class PasswordResetForm(oldforms.Manipulator):
     "A form that lets a user request a password reset"
     def __init__(self):
         self.fields = (
-            forms.EmailField(field_name="email", length=40, is_required=True,
+            oldforms.EmailField(field_name="email", length=40, is_required=True,
                 validator_list=[self.isValidUserEmail]),
         )
 
     def isValidUserEmail(self, new_data, all_data):
         "Validates that a user exists with the given e-mail address"
-        try:
-            self.user_cache = User.objects.get(email__iexact=new_data)
-        except User.DoesNotExist:
+        self.users_cache = list(User.objects.filter(email__iexact=new_data))
+        if len(self.users_cache) == 0:
             raise validators.ValidationError, _("That e-mail address doesn't have an associated user account. Are you sure you've registered?")
 
     def save(self, domain_override=None, email_template_name='registration/password_reset_email.html'):
         "Calculates a new password randomly and sends it to the user"
         from django.core.mail import send_mail
-        new_pass = User.objects.make_random_password()
-        self.user_cache.set_password(new_pass)
-        self.user_cache.save()
-        if not domain_override:
-            current_site = Site.objects.get_current()
-            site_name = current_site.name
-            domain = current_site.domain
-        else:
-            site_name = domain = domain_override
-        t = loader.get_template(email_template_name)
-        c = {
-            'new_password': new_pass,
-            'email': self.user_cache.email,
-            'domain': domain,
-            'site_name': site_name,
-            'user': self.user_cache,
-        }
-        send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [self.user_cache.email])
+        for user in self.users_cache:
+            new_pass = User.objects.make_random_password()
+            user.set_password(new_pass)
+            user.save()
+            if not domain_override:
+                current_site = Site.objects.get_current()
+                site_name = current_site.name
+                domain = current_site.domain
+            else:
+                site_name = domain = domain_override
+            t = loader.get_template(email_template_name)
+            c = {
+                'new_password': new_pass,
+                'email': user.email,
+                'domain': domain,
+                'site_name': site_name,
+                'user': user,
+                }
+            send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [user.email])
 
-class PasswordChangeForm(forms.Manipulator):
+class PasswordChangeForm(oldforms.Manipulator):
     "A form that lets a user change his password."
     def __init__(self, user):
         self.user = user
         self.fields = (
-            forms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
+            oldforms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
                 validator_list=[self.isValidOldPassword]),
-            forms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
+            oldforms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('new_password2', _("The two 'new password' fields didn't match."))]),
-            forms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
+            oldforms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
         )
 
     def isValidOldPassword(self, new_data, all_data):
@@ -125,4 +126,19 @@ class PasswordChangeForm(forms.Manipulator):
     def save(self, new_data):
         "Saves the new password."
         self.user.set_password(new_data['new_password1'])
+        self.user.save()
+
+class AdminPasswordChangeForm(oldforms.Manipulator):
+    "A form used to change the password of a user in the admin interface."
+    def __init__(self, user):
+        self.user = user
+        self.fields = (
+            oldforms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
+            oldforms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
+                validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
+        )
+
+    def save(self, new_data):
+        "Saves the new password."
+        self.user.set_password(new_data['password1'])
         self.user.save()

@@ -1,0 +1,116 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Django-kn 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-09-25 15:43+0200\n"
+"PO-Revision-Date: 2007-01-08 20:22+0530\n"
+"Last-Translator: Kannada Localization Team <translation@sampada.info>\n"
+"Language-Team: Kannada <translation@sampada.info>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "ಲಭ್ಯ %s "
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "ಎಲ್ಲವನ್ನೂ  ಆಯ್ದುಕೊಳ್ಳಿ"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "ಸೇರಿಸಿ"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "ತೆಗೆದು ಹಾಕಿ"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s ಆಯ್ದುಕೊಳ್ಳಲಾಗಿದೆ"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr ""
+"ನಿಮ್ಮ ಆಯ್ಕೆ(ಗಳ)ನ್ನು ಆರಿಸಿ "
+"ಮತ್ತು ಕ್ಲಿಕ್ಕಿಸಿ"
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "ಎಲ್ಲವನ್ನೂ  ತೆರವುಗೊಳಿಸಿ"
+
+#: contrib/admin/media/js/dateparse.js:26
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"ಜನವರಿ ಫೆಬ್ರುವರಿ ಮಾರ್ಚ್ "
+"ಎಪ್ರಿಲ್ ಮೇ ಜೂನ್ ಜುಲೈ ಆಗಸ್ಟ್ "
+"ಸೆಪ್ಟೆಂಬರ್ ನವೆಂಬರ್ ಡಿಸೆಂಬರ್"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr ""
+"ರವಿವಾರ ಸೋಮವಾರ ಮಂಗಳವಾರ "
+"ಬುಧವಾರ ಗುರುವಾರ ಶುಕ್ರವಾರ "
+"ಶನಿವಾರ"
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "ರ ಸೋ ಮ ಬು ಗು ಶು ಶ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Now"
+msgstr "ಈಗ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+msgid "Clock"
+msgstr "ಗಡಿಯಾರ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+msgid "Choose a time"
+msgstr "ಸಮಯವೊಂದನ್ನು ಆರಿಸಿ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Midnight"
+msgstr "ಮಧ್ಯರಾತ್ರಿ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "6 a.m."
+msgstr "ಬೆಳಗಿನ ೬ ಗಂಟೆ "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Noon"
+msgstr "ಮಧ್ಯಾಹ್ನ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+msgid "Cancel"
+msgstr "ರದ್ದುಗೊಳಿಸಿ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+msgid "Today"
+msgstr "ಈ ದಿನ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+msgid "Calendar"
+msgstr "ಪಂಚಾಂಗ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+msgid "Yesterday"
+msgstr "ನಿನ್ನೆ"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+msgid "Tomorrow"
+msgstr "ನಾಳೆ"

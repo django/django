@@ -1,15 +1,15 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Português do Brasil translation of django.
+# Copyright (C) 2006 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Carlos Eduardo de Paula <carlosedp@gmail.com>, 2006.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2006-01-23 19:54-0200\n"
-"Last-Translator: João Marcus Christ <joaoma@gmail.com>\n"
+"PO-Revision-Date: 2006-11-01 17:45-0300\n"
+"Last-Translator: Carlos Eduardo de Paula <carlosedp@gmail.com>\n"
 "Language-Team: Português do Brasil <pt-br@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -51,7 +51,7 @@ msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
-"Janeiro Fevereiro Março Abrio Maio Junho Julho Agosto Setembro Outubro Novembro "
+"Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro Novembro "
 "Dezembro"
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"

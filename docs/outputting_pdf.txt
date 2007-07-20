@@ -29,7 +29,7 @@ Test your installation by importing it in the Python interactive interpreter::
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _user guide: http://www.reportlab.org/rsrc/userguide.pdf
+.. _user guide: http://www.reportlab.com/docs/userguide.pdf
 
 Write your view
 ===============
@@ -43,7 +43,7 @@ objects.
     For more information on ``HttpResponse`` objects, see
     `Request and response objects`_.
 
-    .. _Request and response objects: http://www.djangoproject.com/documentation/request_response/
+    .. _Request and response objects: ../request_response/
 
 Here's a "Hello World" example::
 

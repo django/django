@@ -21,7 +21,7 @@ class Thing(models.Model):
     class Meta:
        db_table = 'select'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.when
 
 __test__ = {'API_TESTS':"""

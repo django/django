@@ -29,6 +29,8 @@ urlpatterns = patterns('',
 
     # "Add user" -- a special-case view
     ('^auth/user/add/$', 'django.contrib.admin.views.auth.user_add_stage'),
+    # "Change user password" -- another special-case view
+    ('^auth/user/(\d+)/password/$', 'django.contrib.admin.views.auth.user_change_password'),
 
     # Add/change/delete/history
     ('^([^/]+)/([^/]+)/$', 'django.contrib.admin.views.main.change_list'),

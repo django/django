@@ -1,54 +1,46 @@
-from math import ceil
-
 class InvalidPage(Exception):
     pass
 
 class ObjectPaginator(object):
     """
-    This class makes pagination easy. Feed it a QuerySet, plus the number of
-    objects you want on each page. Then read the hits and pages properties to
+    This class makes pagination easy. Feed it a QuerySet or list, plus the number
+    of objects you want on each page. Then read the hits and pages properties to
     see how many pages it involves. Call get_page with a page number (starting
     at 0) to get back a list of objects for that page.
 
     Finally, check if a page number has a next/prev page using
     has_next_page(page_number) and has_previous_page(page_number).
+    
+    Use orphans to avoid small final pages. For example:
+    13 records, num_per_page=10, orphans=2 --> pages==2, len(self.get_page(0))==10
+    12 records, num_per_page=10, orphans=2 --> pages==1, len(self.get_page(0))==12
     """
-    def __init__(self, query_set, num_per_page):
+    def __init__(self, query_set, num_per_page, orphans=0):
         self.query_set = query_set
         self.num_per_page = num_per_page
-        self._hits, self._pages = None, None
-        self._has_next = {} # Caches page_number -> has_next_boolean
+        self.orphans = orphans
+        self._hits = self._pages = None
 
-    def get_page(self, page_number):
+    def validate_page_number(self, page_number):
         try:
             page_number = int(page_number)
         except ValueError:
             raise InvalidPage
-        if page_number < 0:
+        if page_number < 0 or page_number > self.pages - 1:
             raise InvalidPage
+        return page_number
 
-        # Retrieve one extra record, and check for the existence of that extra
-        # record to determine whether there's a next page.
-        limit = self.num_per_page + 1
-        offset = page_number * self.num_per_page
-
-        object_list = list(self.query_set[offset:offset+limit])
-
-        if not object_list:
-            raise InvalidPage
-
-        self._has_next[page_number] = (len(object_list) > self.num_per_page)
-        return object_list[:self.num_per_page]
+    def get_page(self, page_number):
+        page_number = self.validate_page_number(page_number)
+        bottom = page_number * self.num_per_page
+        top = bottom + self.num_per_page
+        if top + self.orphans >= self.hits:
+            top = self.hits
+        return self.query_set[bottom:top]
 
     def has_next_page(self, page_number):
         "Does page $page_number have a 'next' page?"
-        if not self._has_next.has_key(page_number):
-            if self._pages is None:
-                offset = (page_number + 1) * self.num_per_page
-                self._has_next[page_number] = len(self.query_set[offset:offset+1]) > 0
-            else:
-                self._has_next[page_number] = page_number < (self.pages - 1)
-        return self._has_next[page_number]
+        return page_number < self.pages - 1
 
     def has_previous_page(self, page_number):
         return page_number > 0
@@ -58,8 +50,7 @@ class ObjectPaginator(object):
         Returns the 1-based index of the first object on the given page,
         relative to total objects found (hits).
         """
-        if page_number == 0:
-            return 1
+        page_number = self.validate_page_number(page_number)
         return (self.num_per_page * page_number) + 1
 
     def last_on_page(self, page_number):
@@ -67,20 +58,30 @@ class ObjectPaginator(object):
         Returns the 1-based index of the last object on the given page,
         relative to total objects found (hits).
         """
-        if page_number == 0 and self.num_per_page >= self._hits:
-            return self._hits
-        elif page_number == (self._pages - 1) and (page_number + 1) * self.num_per_page > self._hits:
-            return self._hits
-        return (page_number + 1) * self.num_per_page
+        page_number = self.validate_page_number(page_number)
+        page_number += 1   # 1-base
+        if page_number == self.pages:
+            return self.hits
+        return page_number * self.num_per_page
 
     def _get_hits(self):
         if self._hits is None:
-            self._hits = self.query_set.count()
+            # Try .count() or fall back to len().
+            try:
+                self._hits = int(self.query_set.count())
+            except (AttributeError, TypeError, ValueError):
+                # AttributeError if query_set has no object count.
+                # TypeError if query_set.count() required arguments.
+                # ValueError if int() fails.
+                self._hits = len(self.query_set)
         return self._hits
 
     def _get_pages(self):
         if self._pages is None:
-            self._pages = int(ceil(self.hits / float(self.num_per_page)))
+            hits = (self.hits - 1 - self.orphans)
+            if hits < 1:
+                hits = 0
+            self._pages = hits // self.num_per_page + 1
         return self._pages
 
     hits = property(_get_hits)

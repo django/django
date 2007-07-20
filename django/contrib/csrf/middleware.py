@@ -11,7 +11,7 @@ import md5
 import re
 import itertools
 
-_ERROR_MSG = "<h1>403 Forbidden</h1><p>Cross Site Request Forgery detected.  Request aborted.</p>"
+_ERROR_MSG = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><body><h1>403 Forbidden</h1><p>Cross Site Request Forgery detected. Request aborted.</p></body></html>'
 
 _POST_FORM_RE = \
     re.compile(r'(<form\W[^>]*\bmethod=(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)

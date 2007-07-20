@@ -1,5 +1,5 @@
 """
-32. get_or_create()
+33. get_or_create()
 
 get_or_create() does what it says: it tries to look up an object with the given
 parameters. If an object isn't found, it creates one with the given parameters.
@@ -12,8 +12,8 @@ class Person(models.Model):
     last_name = models.CharField(maxlength=100)
     birthday = models.DateField()
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u'%s %s' % (self.first_name, self.last_name)
 
 __test__ = {'API_TESTS':"""
 # Acting as a divine being, create an Person.

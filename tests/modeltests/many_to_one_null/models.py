@@ -10,7 +10,7 @@ from django.db import models
 class Reporter(models.Model):
     name = models.CharField(maxlength=30)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -20,7 +20,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('headline',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""

@@ -1,4 +1,4 @@
-from django import forms, template
+from django import oldforms, template
 from django.conf import settings
 from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.views.decorators import staff_member_required
@@ -12,7 +12,14 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
+from django.utils.encoding import force_unicode, smart_str
+from django.utils.translation import ugettext as _
 import operator
+
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 if not LogEntry._meta.installed:
@@ -46,8 +53,8 @@ def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
     any '/', '_' and ':' characters. Similar to urllib.quote, except that the
-    quoting is slightly different so that it doesn't get autoamtically
-    unquoted by the web browser.
+    quoting is slightly different so that it doesn't get automatically
+    unquoted by the Web browser.
     """
     if type(s) != type(''):
         return s
@@ -125,11 +132,11 @@ class AdminBoundField(object):
         if max([bool(f.errors()) for f in self.form_fields]):
             classes.append('error')
         if classes:
-            self.cell_class_attribute = ' class="%s" ' % ' '.join(classes)
+            self.cell_class_attribute = u' class="%s" ' % ' '.join(classes)
         self._repr_filled = False
 
         if field.rel:
-            self.related_url = '../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
+            self.related_url = u'../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
 
     def original_value(self):
         if self.original:
@@ -140,9 +147,9 @@ class AdminBoundField(object):
             return self._display
         except AttributeError:
             if isinstance(self.field.rel, models.ManyToOneRel):
-                self._display = getattr(self.original, self.field.name)
+                self._display = force_unicode(getattr(self.original, self.field.name), strings_only=True)
             elif isinstance(self.field.rel, models.ManyToManyRel):
-                self._display = ", ".join([str(obj) for obj in getattr(self.original, self.field.name).all()])
+                self._display = u", ".join([force_unicode(obj) for obj in getattr(self.original, self.field.name).all()])
             return self._display
 
     def __repr__(self):
@@ -226,7 +233,7 @@ index = staff_member_required(never_cache(index))
 def add_stage(request, app_label, model_name, show_delete=False, form_url='', post_url=None, post_url_continue='../%s/', object_id_override=None):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_add_permission()):
@@ -253,22 +260,22 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         if not errors:
             new_object = manipulator.save(new_data)
             pk_value = new_object._get_pk_val()
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), ADDITION)
+            msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
             # Here, we distinguish between different save types by checking for
             # the presence of keys in request.POST.
-            if request.POST.has_key("_continue"):
+            if "_continue" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                if request.POST.has_key("_popup"):
+                if "_popup" in request.POST:
                     post_url_continue += "?_popup=1"
                 return HttpResponseRedirect(post_url_continue % pk_value)
-            if request.POST.has_key("_popup"):
+            if "_popup" in request.POST:
                 if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
                     pk_value = '"%s"' % pk_value.replace('"', '\\"')
                 return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                    (pk_value, str(new_object).replace('"', '\\"')))
-            elif request.POST.has_key("_addanother"):
-                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+                    (pk_value, force_unicode(new_object).replace('"', '\\"')))
+            elif "_addanother" in request.POST:
+                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
                 return HttpResponseRedirect(request.path)
             else:
                 request.user.message_set.create(message=msg)
@@ -283,12 +290,12 @@ def add_stage(request, app_label, model_name, show_delete=False, form_url='', po
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
 
     c = template.RequestContext(request, {
-        'title': _('Add %s') % opts.verbose_name,
+        'title': _('Add %s') % force_unicode(opts.verbose_name),
         'form': form,
-        'is_popup': request.REQUEST.has_key('_popup'),
+        'is_popup': '_popup' in request.REQUEST,
         'show_delete': show_delete,
     })
 
@@ -302,19 +309,19 @@ def change_stage(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
 
     if not request.user.has_perm(app_label + '.' + opts.get_change_permission()):
         raise PermissionDenied
 
-    if request.POST and request.POST.has_key("_saveasnew"):
+    if request.POST and "_saveasnew" in request.POST:
         return add_stage(request, app_label, model_name, form_url='../../add/')
 
     try:
         manipulator = model.ChangeManipulator(object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except model.DoesNotExist:
+        raise Http404('%s object with primary key %r does not exist' % (model_name, escape(object_id)))
 
     if request.POST:
         new_data = request.POST.copy()
@@ -340,20 +347,20 @@ def change_stage(request, app_label, model_name, object_id):
             change_message = ' '.join(change_message)
             if not change_message:
                 change_message = _('No fields changed.')
-            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
+            LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
-            if request.POST.has_key("_continue"):
+            msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)}
+            if "_continue" in request.POST:
                 request.user.message_set.create(message=msg + ' ' + _("You may edit it again below."))
-                if request.REQUEST.has_key('_popup'):
+                if '_popup' in request.REQUEST:
                     return HttpResponseRedirect(request.path + "?_popup=1")
                 else:
                     return HttpResponseRedirect(request.path)
-            elif request.POST.has_key("_saveasnew"):
-                request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': opts.verbose_name, 'obj': new_object})
+            elif "_saveasnew" in request.POST:
+                request.user.message_set.create(message=_('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % {'name': force_unicode(opts.verbose_name), 'obj': force_unicode(new_object)})
                 return HttpResponseRedirect("../%s/" % pk_value)
-            elif request.POST.has_key("_addanother"):
-                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
+            elif "_addanother" in request.POST:
+                request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % force_unicode(opts.verbose_name)))
                 return HttpResponseRedirect("../add/")
             else:
                 request.user.message_set.create(message=msg)
@@ -374,7 +381,7 @@ def change_stage(request, app_label, model_name, object_id):
         errors = {}
 
     # Populate the FormWrapper.
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     form.original = manipulator.original_object
     form.order_objects = []
 
@@ -388,11 +395,11 @@ def change_stage(request, app_label, model_name, object_id):
             form.order_objects.extend(orig_list)
 
     c = template.RequestContext(request, {
-        'title': _('Change %s') % opts.verbose_name,
+        'title': _('Change %s') % force_unicode(opts.verbose_name),
         'form': form,
         'object_id': object_id,
         'original': manipulator.original_object,
-        'is_popup': request.REQUEST.has_key('_popup'),
+        'is_popup': '_popup' in request.REQUEST,
     })
     return render_change_form(model, manipulator, c, change=True)
 change_stage = staff_member_required(never_cache(change_stage))
@@ -429,11 +436,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), sub_obj), []])
+                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(),
+                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
                         sub_obj._get_pk_val(), sub_obj), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
@@ -443,11 +450,11 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, ['%s: %s' % (capfirst(related.opts.verbose_name), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, ['%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (capfirst(related.opts.verbose_name), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(str(sub_obj))), []])
+                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -461,9 +468,12 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
         opts_seen.append(related.opts)
         rel_opts_name = related.get_accessor_name()
         has_related_objs = False
-        rel_objs = getattr(obj, rel_opts_name, None)
-        if rel_objs:
-            has_related_objs = True
+
+        # related.get_accessor_name() could return None for symmetrical relationships
+        if rel_opts_name:
+            rel_objs = getattr(obj, rel_opts_name, None)
+            if rel_objs:
+                has_related_objs = True
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
@@ -471,26 +481,25 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                        {'fieldname': related.field.verbose_name, 'name': related.opts.verbose_name, 'obj': escape(str(sub_obj))}, []])
+                        {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name), 'obj': escape(sub_obj)}, []])
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
-                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': related.field.verbose_name, 'name':related.opts.verbose_name}) + \
-                        (' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(str(sub_obj)))), []])
+                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name)}) + \
+                        (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
-            p = '%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
+            p = u'%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
 
 def delete_stage(request, app_label, model_name, object_id):
-    import sets
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     opts = model._meta
     if not request.user.has_perm(app_label + '.' + opts.get_delete_permission()):
         raise PermissionDenied
@@ -498,21 +507,21 @@ def delete_stage(request, app_label, model_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = ['%s: <a href="../../%s/">%s</a>' % (capfirst(opts.verbose_name), object_id, escape(str(obj))), []]
-    perms_needed = sets.Set()
+    deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), force_unicode(object_id), escape(obj)), []]
+    perms_needed = set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
     if request.POST: # The user has already confirmed the deletion.
         if perms_needed:
             raise PermissionDenied
-        obj_display = str(obj)
+        obj_display = force_unicode(obj)
         obj.delete()
         LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, object_id, obj_display, DELETION)
-        request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': opts.verbose_name, 'obj': obj_display})
+        request.user.message_set.create(message=_('The %(name)s "%(obj)s" was deleted successfully.') % {'name': force_unicode(opts.verbose_name), 'obj': obj_display})
         return HttpResponseRedirect("../../")
     extra_context = {
         "title": _("Are you sure?"),
-        "object_name": opts.verbose_name,
+        "object_name": force_unicode(opts.verbose_name),
         "object": obj,
         "deleted_objects": deleted_objects,
         "perms_lacking": perms_needed,
@@ -527,7 +536,7 @@ def history(request, app_label, model_name, object_id):
     model = models.get_model(app_label, model_name)
     object_id = unquote(object_id)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     action_list = LogEntry.objects.filter(object_id=object_id,
         content_type__id__exact=ContentType.objects.get_for_model(model).id).select_related().order_by('action_time')
     # If no history was found, see whether this object even exists.
@@ -535,7 +544,7 @@ def history(request, app_label, model_name, object_id):
     extra_context = {
         'title': _('Change history: %s') % obj,
         'action_list': action_list,
-        'module_name': capfirst(model._meta.verbose_name_plural),
+        'module_name': force_unicode(capfirst(model._meta.verbose_name_plural)),
         'object': obj,
     }
     return render_to_response(["admin/%s/%s/object_history.html" % (app_label, model._meta.object_name.lower()),
@@ -555,19 +564,19 @@ class ChangeList(object):
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
             self.page_num = 0
-        self.show_all = request.GET.has_key(ALL_VAR)
-        self.is_popup = request.GET.has_key(IS_POPUP_VAR)
+        self.show_all = ALL_VAR in request.GET
+        self.is_popup = IS_POPUP_VAR in request.GET
         self.params = dict(request.GET.items())
-        if self.params.has_key(PAGE_VAR):
+        if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
-        if self.params.has_key(ERROR_FLAG):
+        if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
         self.order_field, self.order_type = self.get_ordering()
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set()
         self.get_results(request)
-        self.title = (self.is_popup and _('Select %s') % self.opts.verbose_name or _('Select %s to change') % self.opts.verbose_name)
+        self.title = (self.is_popup and _('Select %s') % force_unicode(self.opts.verbose_name) or _('Select %s to change') % force_unicode(self.opts.verbose_name))
         self.filter_specs, self.has_filters = self.get_filters(request)
         self.pk_attname = self.lookup_opts.pk.attname
 
@@ -591,11 +600,11 @@ class ChangeList(object):
                 if k.startswith(r):
                     del p[k]
         for k, v in new_params.items():
-            if p.has_key(k) and v is None:
+            if k in p and v is None:
                 del p[k]
             elif v is not None:
                 p[k] = v
-        return '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
+        return '?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
 
     def get_results(self, request):
         paginator = ObjectPaginator(self.query_set, self.lookup_opts.admin.list_per_page)
@@ -653,18 +662,25 @@ class ChangeList(object):
             order_field, order_type = ordering[0][1:], 'desc'
         else:
             order_field, order_type = ordering[0], 'asc'
-        if params.has_key(ORDER_VAR):
+        if ORDER_VAR in params:
             try:
+                field_name = lookup_opts.admin.list_display[int(params[ORDER_VAR])]
                 try:
-                    f = lookup_opts.get_field(lookup_opts.admin.list_display[int(params[ORDER_VAR])])
+                    f = lookup_opts.get_field(field_name)
                 except models.FieldDoesNotExist:
-                    pass
+                    # see if field_name is a name of a non-field
+                    # that allows sorting
+                    try:
+                        attr = getattr(lookup_opts.admin.manager.model, field_name)
+                        order_field = attr.admin_order_field
+                    except IndexError:
+                        pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:
                         order_field = f.name
             except (IndexError, ValueError):
                 pass # Invalid ordering specified. Just use the default.
-        if params.has_key(ORDER_TYPE_VAR) and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
+        if ORDER_TYPE_VAR in params and params[ORDER_TYPE_VAR] in ('asc', 'desc'):
             order_type = params[ORDER_TYPE_VAR]
         return order_field, order_type
 
@@ -672,8 +688,14 @@ class ChangeList(object):
         qs = self.manager.get_query_set()
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR):
-            if lookup_params.has_key(i):
+            if i in lookup_params:
                 del lookup_params[i]
+        for key, value in lookup_params.items():
+            if not isinstance(key, str):
+                # 'key' will be used as a keyword argument later, so Python
+                # requires it to be a string.
+                del lookup_params[key]
+                lookup_params[smart_str(key)] = value
 
         # Apply lookup parameters from the query string.
         qs = qs.filter(**lookup_params)
@@ -743,7 +765,7 @@ class ChangeList(object):
 def change_list(request, app_label, model_name):
     model = models.get_model(app_label, model_name)
     if model is None:
-        raise Http404, "App %r, model %r, not found" % (app_label, model_name)
+        raise Http404("App %r, model %r, not found" % (app_label, model_name))
     if not request.user.has_perm(app_label + '.' + model._meta.get_change_permission()):
         raise PermissionDenied
     try:

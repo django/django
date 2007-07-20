@@ -10,19 +10,34 @@ try:
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
+
+# We want version (1, 2, 1, 'final', 2) or later. We can't just use
+# lexicographic ordering in this check because then (1, 2, 1, 'gamma')
+# inadvertently passes the version test.
+version = Database.version_info
+if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
+        (len(version) < 5 or version[3] != 'final' or version[4] < 2))):
+    raise ImportError, "MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__
+
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
 import re
 
 DatabaseError = Database.DatabaseError
+IntegrityError = Database.IntegrityError
 
+# MySQLdb-1.2.1 supports the Python boolean type, and only uses datetime
+# module for time-related columns; older versions could have used mx.DateTime
+# or strings if there were no datetime module. However, MySQLdb still returns
+# TIME columns as timedelta -- they are more like timedelta in terms of actual
+# behavior as they are signed and include days -- and Django expects time, so
+# we still need to override that.
 django_conversions = conversions.copy()
 django_conversions.update({
-    types.BooleanType: util.rev_typecast_boolean,
-    FIELD_TYPE.DATETIME: util.typecast_timestamp,
-    FIELD_TYPE.DATE: util.typecast_date,
     FIELD_TYPE.TIME: util.typecast_time,
+    FIELD_TYPE.DECIMAL: util.typecast_decimal,
+    FIELD_TYPE.NEWDECIMAL: util.typecast_decimal,
 })
 
 # This should match the numerical portion of the version numbers (we can treat
@@ -31,31 +46,12 @@ django_conversions.update({
 # http://dev.mysql.com/doc/refman/5.0/en/news.html .
 server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
-# This is an extra debug layer over MySQL queries, to display warnings.
-# It's only used when DEBUG=True.
-class MysqlDebugWrapper:
-    def __init__(self, cursor):
-        self.cursor = cursor
-
-    def execute(self, sql, params=()):
-        try:
-            return self.cursor.execute(sql, params)
-        except Database.Warning, w:
-            self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
-
-    def executemany(self, sql, param_list):
-        try:
-            return self.cursor.executemany(sql, param_list)
-        except Database.Warning, w:
-            self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
-
-    def __getattr__(self, attr):
-        if self.__dict__.has_key(attr):
-            return self.__dict__[attr]
-        else:
-            return getattr(self.cursor, attr)
+# MySQLdb-1.2.1 and newer automatically makes use of SHOW WARNINGS on
+# MySQL-4.1 and newer, so the MysqlDebugWrapper is unnecessary. Since the
+# point is to raise Warnings as exceptions, this can be done with the Python
+# warning module, and this is setup when the connection is created, and the
+# standard util.CursorDebugWrapper can be used. Also, using sql_mode
+# TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 try:
     # Only exists in Python 2.4+
@@ -65,10 +61,11 @@ except ImportError:
     from django.utils._threading_local import local
 
 class DatabaseWrapper(local):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.connection = None
         self.queries = []
         self.server_version = None
+        self.options = kwargs
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -82,32 +79,41 @@ class DatabaseWrapper(local):
 
     def cursor(self):
         from django.conf import settings
+        from warnings import filterwarnings
         if not self._valid_connection():
             kwargs = {
-                'user': settings.DATABASE_USER,
-                'db': settings.DATABASE_NAME,
-                'passwd': settings.DATABASE_PASSWORD,
                 'conv': django_conversions,
+                'charset': 'utf8',
+                'use_unicode': True,
             }
+            if settings.DATABASE_USER:
+                kwargs['user'] = settings.DATABASE_USER
+            if settings.DATABASE_NAME:
+                kwargs['db'] = settings.DATABASE_NAME
+            if settings.DATABASE_PASSWORD:
+                kwargs['passwd'] = settings.DATABASE_PASSWORD
             if settings.DATABASE_HOST.startswith('/'):
                 kwargs['unix_socket'] = settings.DATABASE_HOST
-            else:
+            elif settings.DATABASE_HOST:
                 kwargs['host'] = settings.DATABASE_HOST
             if settings.DATABASE_PORT:
                 kwargs['port'] = int(settings.DATABASE_PORT)
+            kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
-        cursor = self.connection.cursor()
-        if self.connection.get_server_info() >= '4.1':
-            cursor.execute("SET NAMES 'utf8'")
+            cursor = self.connection.cursor()
+        else:
+            cursor = self.connection.cursor()
         if settings.DEBUG:
-            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
+            filterwarnings("error", category=Database.Warning)
+            return util.CursorDebugWrapper(cursor, self)
         return cursor
 
     def _commit(self):
-        self.connection.commit()
+        if self.connection is not None:
+            self.connection.commit()
 
     def _rollback(self):
-        if self.connection:
+        if self.connection is not None:
             try:
                 self.connection.rollback()
             except Database.NotSupportedError:
@@ -128,7 +134,14 @@ class DatabaseWrapper(local):
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
 
+allows_group_by_ordinal = True
+allows_unique_and_pk = True
+autoindexes_primary_keys = False
+needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
+needs_upper_for_iops = False
 supports_constraints = True
+supports_tablespaces = False
+uses_case_insensitive_names = False
 
 def quote_name(name):
     if name.startswith("`") and name.endswith("`"):
@@ -161,6 +174,9 @@ def get_date_trunc_sql(lookup_type, field_name):
         sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
     return sql
 
+def get_datetime_cast_sql():
+    return None
+
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
     if offset and offset != 0:
@@ -169,6 +185,9 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "RAND()"
+
+def get_deferrable_sql():
+    return ""
 
 def get_fulltext_search_sql(field_name):
     return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
@@ -179,53 +198,57 @@ def get_drop_foreignkey_sql():
 def get_pk_default_value():
     return "DEFAULT"
 
-def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
-    # mysql doesn't support column renames (AFAIK), so we fake it
-    # TODO: only supports a single primary key so far
-    pk_name = None
-    for key in indexes.keys():
-        if indexes[key]['primary_key']: pk_name = key
-    output = []
-    output.append( 'ALTER TABLE '+ quote_name(table_name) +' CHANGE COLUMN '+ quote_name(old_col_name) +' '+ quote_name(new_col_name) +' '+ col_def + ';' )
-    return '\n'.join(output)
+def get_max_name_length():
+    return None;
 
-def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
-    output = []
-    col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
-    if unique:
-        col_def += ' '+ 'UNIQUE'
-    if primary_key:
-        col_def += ' '+ 'PRIMARY KEY'
-    output.append( 'ALTER TABLE '+ quote_name(table_name) +' MODIFY COLUMN '+ quote_name(col_name) +' '+ col_def + ';' )
-    return '\n'.join(output)
+def get_start_transaction_sql():
+    return "BEGIN;"
 
-def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
-    output = []
-    field_output = []
-    field_output.append('ALTER TABLE')
-    field_output.append(quote_name(table_name))
-    field_output.append('ADD COLUMN')
-    field_output.append(quote_name(col_name))
-    field_output.append(col_type)
-    field_output.append(('%sNULL' % (not null and 'NOT ' or '')))
-    if unique:
-        field_output.append(('UNIQUE'))
-    if primary_key:
-        field_output.append(('PRIMARY KEY'))
-    output.append(' '.join(field_output) + ';')
-    return '\n'.join(output)
+def get_autoinc_sql(table):
+    return None
 
-def get_drop_column_sql( table_name, col_name ):
-    output = []
-    output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
-    return '\n'.join(output)
-    
-    
+def get_sql_flush(style, tables, sequences):
+    """Return a list of SQL statements required to remove all data from
+    all tables in the database (without actually removing the tables
+    themselves) and put the database in an empty 'initial' state
+
+    """
+    # NB: The generated SQL below is specific to MySQL
+    # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+    # to clear all tables of all data
+    if tables:
+        sql = ['SET FOREIGN_KEY_CHECKS = 0;'] + \
+              ['%s %s;' % \
+                (style.SQL_KEYWORD('TRUNCATE'),
+                 style.SQL_FIELD(quote_name(table))
+                )  for table in tables] + \
+              ['SET FOREIGN_KEY_CHECKS = 1;']
+
+        # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
+        # to reset sequence indices
+        sql.extend(["%s %s %s %s %s;" % \
+            (style.SQL_KEYWORD('ALTER'),
+             style.SQL_KEYWORD('TABLE'),
+             style.SQL_TABLE(quote_name(sequence['table'])),
+             style.SQL_KEYWORD('AUTO_INCREMENT'),
+             style.SQL_FIELD('= 1'),
+            ) for sequence in sequences])
+        return sql
+    else:
+        return []
+
+def get_sql_sequence_reset(style, model_list):
+    "Returns a list of the SQL statements to reset sequences for the given models."
+    # No sequence reset required
+    return []
+
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',
     'contains': 'LIKE BINARY %s',
     'icontains': 'LIKE %s',
+    'regex': 'REGEXP BINARY %s',
+    'iregex': 'REGEXP %s',
     'gt': '> %s',
     'gte': '>= %s',
     'lt': '< %s',

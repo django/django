@@ -1,5 +1,5 @@
 """
-XXX. Serialization
+41. Serialization
 
 ``django.core.serializers`` provides interfaces to converting Django querysets
 to and from "flat" data (i.e. strings).
@@ -13,7 +13,7 @@ class Category(models.Model):
     class Meta:
        ordering = ('name',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Author(models.Model):
@@ -22,7 +22,7 @@ class Author(models.Model):
     class Meta:
         ordering = ('name',)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 class Article(models.Model):
@@ -34,8 +34,15 @@ class Article(models.Model):
     class Meta:
        ordering = ('pub_date',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
+
+class AuthorProfile(models.Model):
+    author = models.OneToOneField(Author)
+    date_of_birth = models.DateField()
+    
+    def __unicode__(self):
+        return u"Profile of %s" % self.author
 
 __test__ = {'API_TESTS':"""
 # Create some data:
@@ -117,5 +124,43 @@ __test__ = {'API_TESTS':"""
 
 >>> Article.objects.all()
 [<Article: Just kidding; I love TV poker>, <Article: Time to reform copyright>]
+
+# If you use your own primary key field (such as a OneToOneField), 
+# it doesn't appear in the serialized field list - it replaces the
+# pk identifier.
+>>> profile = AuthorProfile(author=joe, date_of_birth=datetime(1970,1,1))
+>>> profile.save()
+
+>>> json = serializers.serialize("json", AuthorProfile.objects.all())
+>>> json
+'[{"pk": "1", "model": "serializers.authorprofile", "fields": {"date_of_birth": "1970-01-01"}}]'
+
+>>> for obj in serializers.deserialize("json", json):
+...     print obj
+<DeserializedObject: Profile of Joe>
+
+# Objects ids can be referenced before they are defined in the serialization data
+# However, the deserialization process will need to be contained within a transaction
+>>> json = '[{"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00", "categories": [4, 1], "author": 4}}, {"pk": "4", "model": "serializers.category", "fields": {"name": "Reference"}}, {"pk": "4", "model": "serializers.author", "fields": {"name": "Agnes"}}]'
+>>> from django.db import transaction
+>>> transaction.enter_transaction_management()
+>>> transaction.managed(True)
+>>> for obj in serializers.deserialize("json", json):
+...     obj.save()
+
+>>> transaction.commit()
+>>> transaction.leave_transaction_management()
+
+>>> article = Article.objects.get(pk=3)
+>>> article
+<Article: Forward references pose no problem>
+>>> article.categories.all()
+[<Category: Reference>, <Category: Sports>]
+>>> article.author
+<Author: Agnes>
+
+# Serializer output can be restricted to a subset of fields
+>>> print serializers.serialize("json", Article.objects.all(), fields=('headline','pub_date'))
+[{"pk": "1", "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": "2", "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
 
 """}

@@ -1,0 +1,112 @@
+# translation of djangojs.po to tamil
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# PONNUSAMY.A <ponnusamy.simpleman@gmail.com>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: djangojs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-12-09 11:51+0100\n"
+"PO-Revision-Date: 2007-03-14 16:40+0530\n"
+"Last-Translator: PONNUSAMY <ponnusamy.simpleman@gmail.com>\n"
+"Language-Team: tamil <tamilinix@yahoogroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: contrib/admin/media/js/SelectFilter2.js:33
+#, perl-format
+msgid "Available %s"
+msgstr "%s இருக்கிறதா "
+
+#: contrib/admin/media/js/SelectFilter2.js:41
+msgid "Choose all"
+msgstr "எல்லாவற்றையும் தேர்ந்த்தெடுக்க"
+
+#: contrib/admin/media/js/SelectFilter2.js:46
+msgid "Add"
+msgstr "சேர்க்க"
+
+#: contrib/admin/media/js/SelectFilter2.js:48
+msgid "Remove"
+msgstr "அழிக்க"
+
+#: contrib/admin/media/js/SelectFilter2.js:53
+#, perl-format
+msgid "Chosen %s"
+msgstr "%s தேர்ந்த்தெடுக்கப்பட்ட"
+
+#: contrib/admin/media/js/SelectFilter2.js:54
+msgid "Select your choice(s) and click "
+msgstr "தேவையானவற்றை தேர்ந்த்தெடுத்து கிளிக் செய்க"
+
+#: contrib/admin/media/js/SelectFilter2.js:59
+msgid "Clear all"
+msgstr "எல்லாவற்றையும் அழிக்க "
+
+#: contrib/admin/media/js/dateparse.js:26
+#: contrib/admin/media/js/calendar.js:24
+msgid ""
+"January February March April May June July August September October November "
+"December"
+msgstr ""
+"ஜனவரி பிப்ரவரி மார்ச் ஏப்ரல் மே ஜூன் ஜூலை ஆகஸ்டு செப்டம்பர் அக்டோபர் நவம்பர் "
+"டிசம்பர்"
+
+#: contrib/admin/media/js/dateparse.js:27
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "ஞாயிறு திங்கள் செவ்வாய் புதன்  வியாழன் வெள்ளி சனி "
+
+#: contrib/admin/media/js/calendar.js:25
+msgid "S M T W T F S"
+msgstr "ஞா தி செ பு வி வெ ச"
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:45
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:80
+msgid "Now"
+msgstr "இப்பொழுது "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:48
+msgid "Clock"
+msgstr "கடிகாரம் "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
+msgid "Choose a time"
+msgstr "ஒரு நேரத்தை தேர்ந்த்தெடுக்க  "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
+msgid "Midnight"
+msgstr "நடு இரவு "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
+msgid "6 a.m."
+msgstr "காலை 6 மணி  "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
+msgid "Noon"
+msgstr "மதியம் "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:168
+msgid "Cancel"
+msgstr "வேண்டாம் "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:162
+msgid "Today"
+msgstr "இன்று "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:114
+msgid "Calendar"
+msgstr "நாள்காட்டி  "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:160
+msgid "Yesterday"
+msgstr "நேற்று "
+
+#: contrib/admin/media/js/admin/DateTimeShortcuts.js:164
+msgid "Tomorrow"
+msgstr "நாளை"
+

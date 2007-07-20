@@ -1,8 +1,9 @@
 import os
 from Cookie import SimpleCookie
 from pprint import pformat
-from urllib import urlencode, quote
+from urllib import urlencode
 from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 
@@ -17,6 +18,10 @@ class Http404(Exception):
 
 class HttpRequest(object):
     "A basic HTTP request"
+
+    # The encoding used in GET/POST dicts. None means use default setting.
+    _encoding = None
+
     def __init__(self):
         self.GET, self.POST, self.COOKIES, self.META, self.FILES = {}, {}, {}, {}, {}
         self.path = ''
@@ -29,12 +34,12 @@ class HttpRequest(object):
 
     def __getitem__(self, key):
         for d in (self.POST, self.GET):
-            if d.has_key(key):
+            if key in d:
                 return d[key]
         raise KeyError, "%s not found in either POST or GET" % key
 
     def has_key(self, key):
-        return self.GET.has_key(key) or self.POST.has_key(key)
+        return key in self.GET or key in self.POST
 
     def get_full_path(self):
         return ''
@@ -42,22 +47,39 @@ class HttpRequest(object):
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
 
+    def _set_encoding(self, val):
+        """
+        Sets the encoding used for GET/POST accesses. If the GET or POST
+        dictionary has already been created, it is removed and recreated on the
+        next access (so that it is decoded correctly).
+        """
+        self._encoding = val
+        if hasattr(self, '_get'):
+            del self._get
+        if hasattr(self, '_post'):
+            del self._post
+
+    def _get_encoding(self):
+        return self._encoding
+
+    encoding = property(_get_encoding, _set_encoding)
+
 def parse_file_upload(header_dict, post_data):
-    "Returns a tuple of (POST MultiValueDict, FILES MultiValueDict)"
+    "Returns a tuple of (POST QueryDict, FILES MultiValueDict)"
     import email, email.Message
     from cgi import parse_header
     raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
     raw_message += '\r\n\r\n' + post_data
     msg = email.message_from_string(raw_message)
-    POST = MultiValueDict()
+    POST = QueryDict('', mutable=True)
     FILES = MultiValueDict()
     for submessage in msg.get_payload():
-        if isinstance(submessage, email.Message.Message):
+        if submessage and isinstance(submessage, email.Message.Message):
             name_dict = parse_header(submessage['Content-Disposition'])[1]
             # name_dict is something like {'name': 'file', 'filename': 'test.txt'} for file uploads
             # or {'name': 'blah'} for POST fields
             # We assume all uploaded files have a 'filename' set.
-            if name_dict.has_key('filename'):
+            if 'filename' in name_dict:
                 assert type([]) != type(submessage.get_payload()), "Nested MIME messages are not supported"
                 if not name_dict['filename'].strip():
                     continue
@@ -66,7 +88,7 @@ def parse_file_upload(header_dict, post_data):
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
                 FILES.appendlist(name_dict['name'], {
                     'filename': filename,
-                    'content-type': (submessage.has_key('Content-Type') and submessage['Content-Type'] or None),
+                    'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
                     'content': submessage.get_payload(),
                 })
             else:
@@ -74,13 +96,24 @@ def parse_file_upload(header_dict, post_data):
     return POST, FILES
 
 class QueryDict(MultiValueDict):
-    """A specialized MultiValueDict that takes a query string when initialized.
-    This is immutable unless you create a copy of it."""
-    def __init__(self, query_string, mutable=False):
+    """
+    A specialized MultiValueDict that takes a query string when initialized.
+    This is immutable unless you create a copy of it.
+
+    Values retrieved from this class are converted from the given encoding
+    (DEFAULT_CHARSET by default) to unicode.
+    """
+    def __init__(self, query_string, mutable=False, encoding=None):
         MultiValueDict.__init__(self)
+        if not encoding:
+            # *Important*: do not import settings any earlier because of note
+            # in core.handlers.modpython.
+            from django.conf import settings
+            encoding = settings.DEFAULT_CHARSET
+        self.encoding = encoding
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(key, value)
+            self.appendlist(force_unicode(key, encoding, errors='replace'), force_unicode(value, encoding, errors='replace'))
         self._mutable = mutable
 
     def _assert_mutable(self):
@@ -89,7 +122,13 @@ class QueryDict(MultiValueDict):
 
     def __setitem__(self, key, value):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        value = str_to_unicode(value, self.encoding)
         MultiValueDict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        self._assert_mutable()
+        super(QueryDict, self).__delitem__(key)
 
     def __copy__(self):
         result = self.__class__('', mutable=True)
@@ -107,19 +146,31 @@ class QueryDict(MultiValueDict):
 
     def setlist(self, key, list_):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        list_ = [str_to_unicode(elt, self.encoding) for elt in list_]
         MultiValueDict.setlist(self, key, list_)
+
+    def setlistdefault(self, key, default_list=()):
+        self._assert_mutable()
+        if key not in self:
+            self.setlist(key, default_list)
+        return MultiValueDict.getlist(self, key)
 
     def appendlist(self, key, value):
         self._assert_mutable()
+        key = str_to_unicode(key, self.encoding)
+        value = str_to_unicode(value, self.encoding)
         MultiValueDict.appendlist(self, key, value)
 
     def update(self, other_dict):
         self._assert_mutable()
-        MultiValueDict.update(self, other_dict)
+        f = lambda s: str_to_unicode(s, self.encoding)
+        d = dict([(f(k), f(v)) for k, v in other_dict.items()])
+        MultiValueDict.update(self, d)
 
-    def pop(self, key):
+    def pop(self, key, *args):
         self._assert_mutable()
-        return MultiValueDict.pop(self, key)
+        return MultiValueDict.pop(self, key, *args)
 
     def popitem(self):
         self._assert_mutable()
@@ -129,9 +180,11 @@ class QueryDict(MultiValueDict):
         self._assert_mutable()
         MultiValueDict.clear(self)
 
-    def setdefault(self, *args):
+    def setdefault(self, key, default=None):
         self._assert_mutable()
-        return MultiValueDict.setdefault(self, *args)
+        key = str_to_unicode(key, self.encoding)
+        default = str_to_unicode(default, self.encoding)
+        return MultiValueDict.setdefault(self, key, default)
 
     def copy(self):
         "Returns a mutable copy of this object."
@@ -140,7 +193,8 @@ class QueryDict(MultiValueDict):
     def urlencode(self):
         output = []
         for k, list_ in self.lists():
-            output.extend([urlencode({k: v}) for v in list_])
+            k = smart_str(k, self.encoding)
+            output.extend([urlencode({k: smart_str(v, self.encoding)}) for v in list_])
         return '&'.join(output)
 
 def parse_cookie(cookie):
@@ -155,12 +209,15 @@ def parse_cookie(cookie):
 
 class HttpResponse(object):
     "A basic HTTP response, with content and dictionary-accessed headers"
-    def __init__(self, content='', mimetype=None):
+
+    status_code = 200
+
+    def __init__(self, content='', mimetype=None, status=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
         if not mimetype:
             mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
-        if hasattr(content, '__iter__'):
+        if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:
@@ -168,7 +225,8 @@ class HttpResponse(object):
             self._is_string = True
         self.headers = {'Content-Type': mimetype}
         self.cookies = SimpleCookie()
-        self.status_code = 200
+        if status:
+            self.status_code = status
 
     def __str__(self):
         "Full HTTP message, including headers"
@@ -208,14 +266,12 @@ class HttpResponse(object):
         if path is not None:
             self.cookies[key]['path'] = path
         if domain is not None:
-            self.cookies[key]['domain'] = path
+            self.cookies[key]['domain'] = domain
         self.cookies[key]['expires'] = 0
         self.cookies[key]['max-age'] = 0
 
     def _get_content(self):
-        content = ''.join(self._container)
-        if isinstance(content, unicode):
-            content = content.encode(self._charset)
+        content = smart_str(''.join(self._container), self._charset)
         return content
 
     def _set_content(self, value):
@@ -254,47 +310,49 @@ class HttpResponse(object):
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseRedirect(HttpResponse):
+    status_code = 302
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 302
+        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponsePermanentRedirect(HttpResponse):
+    status_code = 301
+
     def __init__(self, redirect_to):
         HttpResponse.__init__(self)
-        self['Location'] = quote(redirect_to, safe=RESERVED_CHARS)
-        self.status_code = 301
+        self['Location'] = iri_to_uri(redirect_to)
 
 class HttpResponseNotModified(HttpResponse):
-    def __init__(self):
-        HttpResponse.__init__(self)
-        self.status_code = 304
+    status_code = 304
+
+class HttpResponseBadRequest(HttpResponse):
+    status_code = 400
 
 class HttpResponseNotFound(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 404
+    status_code = 404
 
 class HttpResponseForbidden(HttpResponse):
-    def __init__(self, *args, **kwargs):
-        HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 403
+    status_code = 403
 
 class HttpResponseNotAllowed(HttpResponse):
+    status_code = 405
+
     def __init__(self, permitted_methods):
         HttpResponse.__init__(self)
         self['Allow'] = ', '.join(permitted_methods)
-        self.status_code = 405
 
 class HttpResponseGone(HttpResponse):
+    status_code = 410
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 410
 
 class HttpResponseServerError(HttpResponse):
+    status_code = 500
+
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
-        self.status_code = 500
 
 def get_host(request):
     "Gets the HTTP host from the environment or request headers."
@@ -302,3 +360,20 @@ def get_host(request):
     if not host:
         host = request.META.get('HTTP_HOST', '')
     return host
+
+# It's neither necessary nor appropriate to use
+# django.utils.encoding.smart_unicode for parsing URLs and form inputs. Thus,
+# this slightly more restricted function.
+def str_to_unicode(s, encoding):
+    """
+    Convert basestring objects to unicode, using the given encoding. Illegaly
+    encoded input characters are replaced with Unicode "unknown" codepoint
+    (\ufffd).
+
+    Returns any non-basestring objects without change.
+    """
+    if isinstance(s, str):
+        return unicode(s, encoding, 'replace')
+    else:
+        return s
+

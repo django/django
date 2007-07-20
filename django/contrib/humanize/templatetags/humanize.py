@@ -1,3 +1,5 @@
+from django.utils.translation import ungettext, ugettext as _
+from django.utils.encoding import force_unicode
 from django import template
 import re
 
@@ -12,10 +14,10 @@ def ordinal(value):
         value = int(value)
     except ValueError:
         return value
-    t = ('th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th')
+    t = (_('th'), _('st'), _('nd'), _('rd'), _('th'), _('th'), _('th'), _('th'), _('th'), _('th'))
     if value % 100 in (11, 12, 13): # special case
-        return '%dth' % value
-    return '%d%s' % (value, t[value % 10])
+        return u"%d%s" % (value, t[0])
+    return u'%d%s' % (value, t[value % 10])
 register.filter(ordinal)
 
 def intcomma(value):
@@ -23,8 +25,8 @@ def intcomma(value):
     Converts an integer to a string containing commas every three digits.
     For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
     """
-    orig = str(value)
-    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', str(value))
+    orig = force_unicode(value)
+    new = re.sub("^(-?\d+)(\d{3})", '\g<1>,\g<2>', orig)
     if orig == new:
         return new
     else:
@@ -41,11 +43,14 @@ def intword(value):
     if value < 1000000:
         return value
     if value < 1000000000:
-        return '%.1f million' % (value / 1000000.0)
+        new_value = value / 1000000.0
+        return ungettext('%(value).1f million', '%(value).1f million', new_value) % {'value': new_value}
     if value < 1000000000000:
-        return '%.1f billion' % (value / 1000000000.0)
+        new_value = value / 1000000000.0
+        return ungettext('%(value).1f billion', '%(value).1f billion', new_value) % {'value': new_value}
     if value < 1000000000000000:
-        return '%.1f trillion' % (value / 1000000000000.0)
+        new_value = value / 1000000000000.0
+        return ungettext('%(value).1f trillion', '%(value).1f trillion', new_value) % {'value': new_value}
     return value
 register.filter(intword)
 
@@ -60,5 +65,5 @@ def apnumber(value):
         return value
     if not 0 < value < 10:
         return value
-    return ('one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine')[value-1]
+    return (_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine'))[value-1]
 register.filter(apnumber)

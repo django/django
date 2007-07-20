@@ -1,5 +1,5 @@
 """
-29. Object pagination
+30. Object pagination
 
 Django provides a framework for paginating a list of objects in a few lines
 of code. This is often useful for dividing search results or long lists of
@@ -12,7 +12,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100, default='Default headline')
     pub_date = models.DateTimeField()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""
@@ -64,4 +64,17 @@ True
 >>> paginator.last_on_page(1)
 9
 
+# Add a few more records to test out the orphans feature.
+>>> for x in range(10, 13):
+...     Article(headline="Article %s" % x, pub_date=datetime(2006, 10, 6)).save()
+
+# With orphans set to 3 and 10 items per page, we should get all 12 items on a single page:
+>>> paginator = ObjectPaginator(Article.objects.all(), 10, orphans=3)
+>>> paginator.pages
+1
+
+# With orphans only set to 1, we should get two pages:
+>>> paginator = ObjectPaginator(Article.objects.all(), 10, orphans=1)
+>>> paginator.pages
+2
 """}

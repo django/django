@@ -276,8 +276,8 @@ you want your admin site to have access to all objects (not just site-specific
 ones), put ``objects = models.Manager()`` in your model, before you define
 ``CurrentSiteManager``.
 
-.. _manager: http://www.djangoproject.com/documentation/model_api/#managers
-.. _manager documentation: http://www.djangoproject.com/documentation/model_api/#managers
+.. _manager: ../model-api/#managers
+.. _manager documentation: ../model-api/#managers
 
 How Django uses the sites framework
 ===================================
@@ -316,7 +316,25 @@ Here's how Django uses the sites framework:
     * The shortcut view (``django.views.defaults.shortcut``) uses the domain of
       the current ``Site`` object when calculating an object's URL.
 
-.. _redirects framework: http://www.djangoproject.com/documentation/redirects/
-.. _flatpages framework: http://www.djangoproject.com/documentation/flatpages/
-.. _syndication framework: http://www.djangoproject.com/documentation/syndication/
-.. _authentication framework: http://www.djangoproject.com/documentation/authentication/
+.. _redirects framework: ../redirects/
+.. _flatpages framework: ../flatpages/
+.. _syndication framework: ../syndication/
+.. _authentication framework: ../authentication/
+
+``RequestSite`` objects
+=======================
+
+**New in Django development version**
+
+Some ``django.contrib`` applications take advantage of the sites framework but
+are architected in a way that doesn't *require* the sites framework to be
+installed in your database. (Some people don't want to, or just aren't *able*
+to install the extra database table that the sites framework requires.) For
+those cases, the framework provides a ``RequestSite`` class, which can be used
+as a fallback when the database-backed sites framework is not available.
+
+A ``RequestSite`` object has a similar interface to a normal ``Site`` object,
+except its ``__init__()`` method takes an ``HttpRequest`` object. It's able to
+deduce the ``domain`` and ``name`` by looking at the request's domain. It has
+``save()`` and ``delete()`` methods to match the interface of ``Site``, but
+the methods raise ``NotImplementedError``.

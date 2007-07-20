@@ -1,5 +1,5 @@
 """
-33. Generic relations
+34. Generic relations
 
 Generic relations let an object have a foreign key to any object through a
 content-type/object-id field. A generic foreign key can point to any object,
@@ -11,6 +11,7 @@ from complete).
 
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 
 class TaggedItem(models.Model):
     """A tag on an item."""
@@ -18,30 +19,30 @@ class TaggedItem(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     
-    content_object = models.GenericForeignKey()
+    content_object = generic.GenericForeignKey()
     
     class Meta:
         ordering = ["tag"]
     
-    def __str__(self):
+    def __unicode__(self):
         return self.tag
 
 class Animal(models.Model):
     common_name = models.CharField(maxlength=150)
     latin_name = models.CharField(maxlength=150)
     
-    tags = models.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.common_name
         
 class Vegetable(models.Model):
     name = models.CharField(maxlength=150)
     is_yucky = models.BooleanField(default=True)
     
-    tags = models.GenericRelation(TaggedItem)
+    tags = generic.GenericRelation(TaggedItem)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
     
 class Mineral(models.Model):
@@ -50,7 +51,7 @@ class Mineral(models.Model):
     
     # note the lack of an explicit GenericRelation here...
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
         
 __test__ = {'API_TESTS':"""
@@ -65,14 +66,14 @@ __test__ = {'API_TESTS':"""
 
 # Objects with declared GenericRelations can be tagged directly -- the API
 # mimics the many-to-many API.
->>> lion.tags.create(tag="yellow")
-<TaggedItem: yellow>
->>> lion.tags.create(tag="hairy")
-<TaggedItem: hairy>
 >>> bacon.tags.create(tag="fatty")
 <TaggedItem: fatty>
 >>> bacon.tags.create(tag="salty")
 <TaggedItem: salty>
+>>> lion.tags.create(tag="yellow")
+<TaggedItem: yellow>
+>>> lion.tags.create(tag="hairy")
+<TaggedItem: hairy>
 
 >>> lion.tags.all()
 [<TaggedItem: hairy>, <TaggedItem: yellow>]
@@ -105,4 +106,30 @@ __test__ = {'API_TESTS':"""
 [<TaggedItem: shiny>]
 >>> TaggedItem.objects.filter(content_type__pk=ctype.id, object_id=quartz.id)
 [<TaggedItem: clearish>]
+
+# If you delete an object with an explicit Generic relation, the related
+# objects are deleted when the source object is deleted.
+# Original list of tags:
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'hairy', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2), (u'yellow', <ContentType: animal>, 1)]
+
+>>> lion.delete()
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+
+# If Generic Relation is not explicitly defined, any related objects 
+# remain after deletion of the source object.
+>>> quartz.delete()
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+
+# If you delete a tag, the objects using the tag are unaffected 
+# (other than losing a tag)
+>>> tag = TaggedItem.objects.get(id=1)
+>>> tag.delete()
+>>> bacon.tags.all()
+[<TaggedItem: salty>]
+>>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
+[(u'clearish', <ContentType: mineral>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+
 """}

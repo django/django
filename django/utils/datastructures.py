@@ -17,7 +17,10 @@ class MergeDict(object):
     def __contains__(self, key):
         return self.has_key(key)
 
-    def get(self, key, default):
+    def __copy__(self):
+        return self.__class__(*self.dicts)
+
+    def get(self, key, default=None):
         try:
             return self[key]
         except KeyError:
@@ -39,9 +42,13 @@ class MergeDict(object):
 
     def has_key(self, key):
         for dict in self.dicts:
-            if dict.has_key(key):
+            if key in dict:
                 return True
         return False
+
+    def copy(self):
+        """ returns a copy of this object"""
+        return self.__copy__()
 
 class SortedDict(dict):
     "A dictionary that keeps its keys in the order in which they're inserted."
@@ -70,7 +77,7 @@ class SortedDict(dict):
         return self.keyOrder[:]
 
     def values(self):
-        return [dict.__getitem__(self,k) for k in self.keyOrder]
+        return [dict.__getitem__(self, k) for k in self.keyOrder]
 
     def update(self, dict):
         for k, v in dict.items():
@@ -80,6 +87,24 @@ class SortedDict(dict):
         if key not in self.keyOrder:
             self.keyOrder.append(key)
         return dict.setdefault(self, key, default)
+
+    def value_for_index(self, index):
+        "Returns the value of the item at the given zero-based index."
+        return self[self.keyOrder[index]]
+
+    def copy(self):
+        "Returns a copy of this object."
+        # This way of initializing the copy means it works for subclasses, too.
+        obj = self.__class__(self)
+        obj.keyOrder = self.keyOrder
+        return obj
+
+    def __repr__(self):
+        """
+        Replaces the normal dict.__repr__ with a version that returns the keys
+        in their sorted order.
+        """
+        return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
 
 class MultiValueDictKeyError(KeyError):
     pass
@@ -193,7 +218,7 @@ class MultiValueDict(dict):
     def update(self, *args, **kwargs):
         "update() extends rather than replaces existing key lists. Also accepts keyword args."
         if len(args) > 1:
-            raise TypeError, "update expected at most 1 arguments, got %d", len(args)
+            raise TypeError, "update expected at most 1 arguments, got %d" % len(args)
         if args:
             other_dict = args[0]
             if isinstance(other_dict, MultiValueDict):

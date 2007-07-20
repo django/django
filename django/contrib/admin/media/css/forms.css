@@ -26,7 +26,7 @@ form .aligned p, form .aligned ul { margin-left:7em; padding-left:30px; }
 form .aligned table p { margin-left:0; padding-left:0; }
 form .aligned p.help { padding-left:38px; }
 .aligned .vCheckboxLabel { float:none !important; display:inline; padding-left:4px; }
-.colM .aligned .vLargeTextField, colM .aligned .vXMLLargeTextField { width:610px; }
+.colM .aligned .vLargeTextField, .colM .aligned .vXMLLargeTextField { width:610px; }
 .checkbox-row p.help { margin-left:0; padding-left:0 !important; }
 
 /* WIDE FIELDSETS */

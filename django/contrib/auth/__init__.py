@@ -1,17 +1,19 @@
+import datetime
 from django.core.exceptions import ImproperlyConfigured
 
 SESSION_KEY = '_auth_user_id'
 BACKEND_SESSION_KEY = '_auth_user_backend'
-LOGIN_URL = '/accounts/login/'
 REDIRECT_FIELD_NAME = 'next'
 
 def load_backend(path):
     i = path.rfind('.')
     module, attr = path[:i], path[i+1:]
     try:
-        mod = __import__(module, '', '', [attr])
+        mod = __import__(module, {}, {}, [attr])
     except ImportError, e:
         raise ImproperlyConfigured, 'Error importing authentication backend %s: "%s"' % (module, e)
+    except ValueError, e:
+        raise ImproperlyConfigured, 'Error importing authentication backends. Is AUTHENTICATION_BACKENDS a correctly defined list or tuple?'
     try:
         cls = getattr(mod, attr)
     except AttributeError:
@@ -49,8 +51,12 @@ def login(request, user):
     if user is None:
         user = request.user
     # TODO: It would be nice to support different login methods, like signed cookies.
+    user.last_login = datetime.datetime.now()
+    user.save()
     request.session[SESSION_KEY] = user.id
     request.session[BACKEND_SESSION_KEY] = user.backend
+    if hasattr(request, 'user'):
+        request.user = user
 
 def logout(request):
     """
@@ -64,6 +70,9 @@ def logout(request):
         del request.session[BACKEND_SESSION_KEY]
     except KeyError:
         pass
+    if hasattr(request, 'user'):
+        from django.contrib.auth.models import AnonymousUser
+        request.user = AnonymousUser()
 
 def get_user(request):
     from django.contrib.auth.models import AnonymousUser

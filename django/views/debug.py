@@ -2,7 +2,8 @@ from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
-import os, re
+from django.utils.encoding import smart_unicode
+import os, re, sys
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
@@ -75,7 +76,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         loader_debug_info = []
         for loader in template_source_loaders:
             try:
-                source_list_func = getattr(__import__(loader.__module__, '', '', ['get_template_sources']), 'get_template_sources')
+                source_list_func = getattr(__import__(loader.__module__, {}, {}, ['get_template_sources']), 'get_template_sources')
                 # NOTE: This assumes exc_value is the name of the template that
                 # the loader attempted to load.
                 template_list = [{'name': t, 'exists': os.path.exists(t)} \
@@ -90,11 +91,18 @@ def technical_500_response(request, exc_type, exc_value, tb):
         exc_type, exc_value, tb, template_info = get_template_exception_info(exc_type, exc_value, tb)
     frames = []
     while tb is not None:
+        # support for __traceback_hide__ which is used by a few libraries
+        # to hide internal frames.
+        if tb.tb_frame.f_locals.get('__traceback_hide__'):
+            tb = tb.tb_next
+            continue
         filename = tb.tb_frame.f_code.co_filename
         function = tb.tb_frame.f_code.co_name
         lineno = tb.tb_lineno - 1
-        pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7)
-        if pre_context_lineno:
+        loader = tb.tb_frame.f_globals.get('__loader__')
+        module_name = tb.tb_frame.f_globals.get('__name__')
+        pre_context_lineno, pre_context, context_line, post_context = _get_lines_from_file(filename, lineno, 7, loader, module_name)
+        if pre_context_lineno is not None:
             frames.append({
                 'tb': tb,
                 'filename': filename,
@@ -118,12 +126,14 @@ def technical_500_response(request, exc_type, exc_value, tb):
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
-        'exception_value': exc_value,
+        'exception_value': smart_unicode(exc_value, errors='replace'),
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
         'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
+        'sys_executable' : sys.executable,
+        'sys_version_info' : '%d.%d.%d' % sys.version_info[0:3],
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -144,6 +154,7 @@ def technical_404_response(request, exception):
     t = Template(TECHNICAL_404_TEMPLATE, name='Technical 404 template')
     c = Context({
         'root_urlconf': settings.ROOT_URLCONF,
+        'request_path': request.path[1:], # Trim leading slash
         'urlpatterns': tried,
         'reason': str(exception),
         'request': request,
@@ -160,23 +171,45 @@ def empty_urlconf(request):
     })
     return HttpResponseNotFound(t.render(c), mimetype='text/html')
 
-def _get_lines_from_file(filename, lineno, context_lines):
+def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_name=None):
     """
     Returns context_lines before and after lineno from file.
     Returns (pre_context_lineno, pre_context, context_line, post_context).
     """
-    try:
-        source = open(filename).readlines()
-        lower_bound = max(0, lineno - context_lines)
-        upper_bound = lineno + context_lines
-
-        pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
-        context_line = source[lineno].strip('\n')
-        post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
-
-        return lower_bound, pre_context, context_line, post_context
-    except (OSError, IOError):
+    source = None
+    if loader is not None:
+        source = loader.get_source(module_name).splitlines()
+    else:
+        try:
+            f = open(filename)
+            try:
+                source = f.readlines()
+            finally:
+                f.close()
+        except (OSError, IOError):
+            pass
+    if source is None:
         return None, [], None, []
+
+    encoding=None
+    for line in source[:2]:
+        # File coding may be specified (and may not be UTF-8). Match
+        # pattern from PEP-263 (http://www.python.org/dev/peps/pep-0263/)
+        match = re.search(r'coding[:=]\s*([-\w.]+)', line)
+        if match:
+            encoding = match.group(1)
+            break
+    if encoding:
+        source = [unicode(sline, encoding) for sline in source]
+
+    lower_bound = max(0, lineno - context_lines)
+    upper_bound = lineno + context_lines
+
+    pre_context = [line.strip('\n') for line in source[lower_bound:lineno]]
+    context_line = source[lineno].strip('\n')
+    post_context = [line.strip('\n') for line in source[lineno+1:upper_bound]]
+
+    return lower_bound, pre_context, context_line, post_context
 
 #
 # Templates are embedded in the file so that we know the error handler will
@@ -313,7 +346,15 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
     <tr>
       <th>Exception Location:</th>
-      <td>{{ lastframe.filename }} in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
+      <td>{{ lastframe.filename|escape }} in {{ lastframe.function|escape }}, line {{ lastframe.lineno }}</td>
+    </tr>
+    <tr>
+      <th>Python Executable:</th>
+      <td>{{ sys_executable|escape }}</td>
+    </tr>
+    <tr>
+      <th>Python Version:</th>
+      <td>{{ sys_version_info }}</td>
     </tr>
   </table>
 </div>
@@ -360,7 +401,7 @@ TECHNICAL_500_TEMPLATE = """
     <ul class="traceback">
       {% for frame in frames %}
         <li class="frame">
-          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
+          <code>{{ frame.filename|escape }}</code> in <code>{{ frame.function|escape }}</code>
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
@@ -591,7 +632,7 @@ TECHNICAL_404_TEMPLATE = """
           <li>{{ pattern|escape }}</li>
         {% endfor %}
       </ol>
-      <p>The current URL, <code>{{ request.path|escape }}</code>, didn't match any of these.</p>
+      <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
     {% else %}
       <p>{{ reason|escape }}</p>
     {% endif %}

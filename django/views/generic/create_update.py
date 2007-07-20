@@ -1,12 +1,12 @@
 from django.core.xheaders import populate_xheaders
 from django.template import loader
-from django import forms
+from django import oldforms
 from django.db.models import FileField
 from django.contrib.auth.views import redirect_to_login
 from django.template import RequestContext
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 
 def create_object(request, model, template_name=None,
         template_loader=loader, extra_context=None, post_save_redirect=None,
@@ -40,7 +40,7 @@ def create_object(request, model, template_name=None,
             new_object = manipulator.save(new_data)
 
             if request.user.is_authenticated():
-                request.user.message_set.create(message=gettext("The %(verbose_name)s was created successfully.") % {"verbose_name": model._meta.verbose_name})
+                request.user.message_set.create(message=ugettext("The %(verbose_name)s was created successfully.") % {"verbose_name": model._meta.verbose_name})
 
             # Redirect to the new object: first by trying post_save_redirect,
             # then by obj.get_absolute_url; fail if neither works.
@@ -56,7 +56,7 @@ def create_object(request, model, template_name=None,
         new_data = manipulator.flatten_data()
 
     # Create the FormWrapper, template, context, response
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -114,7 +114,7 @@ def update_object(request, model, object_id=None, slug=None,
             object = manipulator.save(new_data)
 
             if request.user.is_authenticated():
-                request.user.message_set.create(message=gettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": model._meta.verbose_name})
+                request.user.message_set.create(message=ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": model._meta.verbose_name})
 
             # Do a post-after-redirect so that reload works, etc.
             if post_save_redirect:
@@ -128,7 +128,7 @@ def update_object(request, model, object_id=None, slug=None,
         # This makes sure the form acurate represents the fields of the place.
         new_data = manipulator.flatten_data()
 
-    form = forms.FormWrapper(manipulator, new_data, errors)
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
     if not template_name:
         template_name = "%s/%s_form.html" % (model._meta.app_label, model._meta.object_name.lower())
     t = template_loader.get_template(template_name)
@@ -181,7 +181,7 @@ def delete_object(request, model, post_delete_redirect,
     if request.method == 'POST':
         object.delete()
         if request.user.is_authenticated():
-            request.user.message_set.create(message=gettext("The %(verbose_name)s was deleted.") % {"verbose_name": model._meta.verbose_name})
+            request.user.message_set.create(message=ugettext("The %(verbose_name)s was deleted.") % {"verbose_name": model._meta.verbose_name})
         return HttpResponseRedirect(post_delete_redirect)
     else:
         if not template_name:

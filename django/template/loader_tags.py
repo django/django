@@ -129,7 +129,7 @@ def do_block(parser, token):
         parser.__loaded_blocks.append(block_name)
     except AttributeError: # parser.__loaded_blocks isn't a list yet
         parser.__loaded_blocks = [block_name]
-    nodelist = parser.parse(('endblock',))
+    nodelist = parser.parse(('endblock', 'endblock %s' % block_name))
     parser.delete_first_token()
     return BlockNode(block_name, nodelist)
 

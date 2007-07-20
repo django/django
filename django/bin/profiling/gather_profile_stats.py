@@ -22,7 +22,7 @@ def gather_stats(p):
         else:
             continue
         print "Processing %s" % f
-        if profiles.has_key(path):
+        if path in profiles:
             profiles[path].add(prof)
         else:
             profiles[path] = prof

@@ -169,8 +169,8 @@ var dateParsePatterns = [
         handler: function(bits) {
             var d = new Date();
             d.setYear(parseInt(bits[1]));
-            d.setDate(parseInt(bits[3], 10));
             d.setMonth(parseInt(bits[2], 10) - 1);
+            d.setDate(parseInt(bits[3], 10));
             return d;
         }
     },

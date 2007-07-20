@@ -48,7 +48,7 @@ def get_cache(backend_uri):
     if host.endswith('/'):
         host = host[:-1]
 
-    cache_class = getattr(__import__('django.core.cache.backends.%s' % BACKENDS[scheme], '', '', ['']), 'CacheClass')
+    cache_class = getattr(__import__('django.core.cache.backends.%s' % BACKENDS[scheme], {}, {}, ['']), 'CacheClass')
     return cache_class(host, params)
 
 cache = get_cache(settings.CACHE_BACKEND)

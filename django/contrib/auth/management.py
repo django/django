@@ -7,13 +7,13 @@ from django.db.models import get_models, signals
 from django.contrib.auth import models as auth_app
 
 def _get_permission_codename(action, opts):
-    return '%s_%s' % (action, opts.object_name.lower())
+    return u'%s_%s' % (action, opts.object_name.lower())
 
 def _get_all_permissions(opts):
     "Returns (codename, name) for all permissions in the given opts."
     perms = []
     for action in ('add', 'change', 'delete'):
-        perms.append((_get_permission_codename(action, opts), 'Can %s %s' % (action, opts.verbose_name)))
+        perms.append((_get_permission_codename(action, opts), u'Can %s %s' % (action, opts.verbose_name_raw)))
     return perms + list(opts.permissions)
 
 def create_permissions(app, created_models, verbosity):

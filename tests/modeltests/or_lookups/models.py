@@ -20,7 +20,7 @@ class Article(models.Model):
     class Meta:
        ordering = ('pub_date',)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""
@@ -69,6 +69,21 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.filter(Q(pk=1) | Q(pk=2) | Q(pk=3))
 [<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
+# You could also use "in" to accomplish the same as above.
+>>> Article.objects.filter(pk__in=[1,2,3])
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
+
+>>> Article.objects.filter(pk__in=[1,2,3,4])
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
+
+# Passing "in" an empty list returns no results ...
+>>> Article.objects.filter(pk__in=[])
+[]
+
+# ... but can return results if we OR it with another query.
+>>> Article.objects.filter(Q(pk__in=[]) | Q(headline__icontains='goodbye'))
+[<Article: Goodbye>, <Article: Hello and goodbye>]
+
 # Q arg objects are ANDed
 >>> Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
 [<Article: Hello and goodbye>]
@@ -85,7 +100,7 @@ __test__ = {'API_TESTS':"""
 3
 
 >>> list(Article.objects.filter(Q(headline__startswith='Hello'), Q(headline__contains='bye')).values())
-[{'headline': 'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
+[{'headline': u'Hello and goodbye', 'pub_date': datetime.datetime(2005, 11, 29, 0, 0), 'id': 3}]
 
 >>> Article.objects.filter(Q(headline__startswith='Hello')).in_bulk([1,2])
 {1: <Article: Hello>}

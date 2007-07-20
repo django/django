@@ -20,7 +20,7 @@ class Person(models.Model):
     name = models.CharField(maxlength=20)
     gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""
@@ -33,7 +33,7 @@ __test__ = {'API_TESTS':"""
 >>> s.gender
 'F'
 >>> a.get_gender_display()
-'Male'
+u'Male'
 >>> s.get_gender_display()
-'Female'
+u'Female'
 """}

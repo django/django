@@ -12,7 +12,7 @@ from django.db import models
 class Publication(models.Model):
     title = models.CharField(maxlength=30)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
     class Meta:
@@ -22,7 +22,7 @@ class Article(models.Model):
     headline = models.CharField(maxlength=100)
     publications = models.ManyToManyField(Publication)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
     class Meta:
@@ -203,7 +203,19 @@ __test__ = {'API_TESTS':"""
 >>> p2.article_set.all()
 [<Article: Oxygen-free diet works wonders>]
 
-# Recreate the article and Publication we just deleted.
+# Relation sets can also be set using primary key values
+>>> p2.article_set = [a4.id, a5.id]
+>>> p2.article_set.all()
+[<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]
+>>> a4.publications.all()
+[<Publication: Science News>]
+>>> a4.publications = [p3.id]
+>>> p2.article_set.all()
+[<Article: Oxygen-free diet works wonders>]
+>>> a4.publications.all()
+[<Publication: Science Weekly>]
+
+# Recreate the article and Publication we have deleted.
 >>> p1 = Publication(id=None, title='The Python Journal')
 >>> p1.save()
 >>> a2 = Article(id=None, headline='NASA uses Python')
@@ -230,5 +242,17 @@ __test__ = {'API_TESTS':"""
 []
 >>> p1.article_set.all()
 [<Article: NASA uses Python>]
+
+# An alternate to calling clear() is to assign the empty set
+>>> p1.article_set = []
+>>> p1.article_set.all()
+[]
+
+>>> a2.publications = [p1, new_publication]
+>>> a2.publications.all()
+[<Publication: Highlights for Children>, <Publication: The Python Journal>]
+>>> a2.publications = []
+>>> a2.publications.all()
+[]
 
 """}

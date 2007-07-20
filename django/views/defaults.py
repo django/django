@@ -21,7 +21,7 @@ def shortcut(request, content_type_id, object_id):
     # if necessary.
 
     # If the object actually defines a domain, we're done.
-    if absurl.startswith('http://'):
+    if absurl.startswith('http://') or absurl.startswith('https://'):
         return http.HttpResponseRedirect(absurl)
 
     object_domain = None
@@ -61,7 +61,8 @@ def shortcut(request, content_type_id, object_id):
     # If all that malarkey found an object domain, use it; otherwise fall back
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
-        return http.HttpResponseRedirect('http://%s%s' % (object_domain, absurl))
+        protocol = request.is_secure() and 'https' or 'http'
+        return http.HttpResponseRedirect('%s://%s%s' % (protocol, object_domain, absurl))
     else:
         return http.HttpResponseRedirect(absurl)
 
@@ -75,7 +76,7 @@ def page_not_found(request, template_name='404.html'):
         request_path
             The path of the requested URL (e.g., '/app/pages/bad_page/')
     """
-    t = loader.get_template(template_name)
+    t = loader.get_template(template_name) # You need to create a 404.html template.
     return http.HttpResponseNotFound(t.render(RequestContext(request, {'request_path': request.path})))
 
 def server_error(request, template_name='500.html'):
@@ -85,5 +86,5 @@ def server_error(request, template_name='500.html'):
     Templates: `500.html`
     Context: None
     """
-    t = loader.get_template(template_name)
+    t = loader.get_template(template_name) # You need to create a 500.html template.
     return http.HttpResponseServerError(t.render(Context({})))
