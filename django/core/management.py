@@ -95,19 +95,12 @@ def _get_sequence_list():
 
     return sequence_list
 
-# If the foreign key points to an AutoField, a PositiveIntegerField or a
-# PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
-# referred field type. Otherwise, the foreign key should be the same type of
-# field as the field to which it points.
-get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
-
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import get_creation_module, models
+    from django.db import models
+    from django.conf import settings
 
-    data_types = get_creation_module().DATA_TYPES
-
-    if not data_types:
+    if settings.DATABASE_ENGINE == 'dummy':
         # This must be the "dummy" database backend, which means the user
         # hasn't set DATABASE_ENGINE.
         sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
@@ -159,28 +152,19 @@ def _get_sql_model_create(model, known_models=set()):
 
     Returns list_of_sql, pending_references_dict
     """
-    from django.db import backend, get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
+    from django.db import backend, models
 
     opts = model._meta
     final_output = []
     table_output = []
     pending_references = {}
     for f in opts.fields:
-        if isinstance(f, (models.ForeignKey, models.OneToOneField)):
-            rel_field = f.rel.get_related_field()
-            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
-                rel_field = rel_field.rel.get_related_field()
-            data_type = get_rel_data_type(rel_field)
-        else:
-            rel_field = f
-            data_type = f.get_internal_type()
-        col_type = data_types[data_type]
+        col_type = f.db_type()
         tablespace = f.db_tablespace or opts.db_tablespace
         if col_type is not None:
             # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
             field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
-                style.SQL_COLTYPE(col_type % rel_field.__dict__)]
+                style.SQL_COLTYPE(col_type)]
             field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
             if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
                 field_output.append(style.SQL_KEYWORD('UNIQUE'))
@@ -204,7 +188,7 @@ def _get_sql_model_create(model, known_models=set()):
             table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
-            style.SQL_COLTYPE(data_types['IntegerField']) + ' ' + \
+            style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
             style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
         table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
@@ -232,9 +216,8 @@ def _get_sql_for_pending_references(model, pending_references):
     """
     Get any ALTER TABLE statements to add constraints after the fact.
     """
-    from django.db import backend, get_creation_module
+    from django.db import backend
     from django.db.backends.util import truncate_name
-    data_types = get_creation_module().DATA_TYPES
 
     final_output = []
     if backend.supports_constraints:
@@ -257,10 +240,8 @@ def _get_sql_for_pending_references(model, pending_references):
     return final_output
 
 def _get_many_to_many_sql_for_model(model):
-    from django.db import backend, get_creation_module
+    from django.db import backend, models
     from django.contrib.contenttypes import generic
-
-    data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
@@ -275,19 +256,19 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s%s,' % \
                 (style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_COLTYPE(data_types['AutoField']),
+                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type()),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
                 tablespace_sql))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+                style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(opts.db_table)),
                 style.SQL_FIELD(backend.quote_name(opts.pk.column)),
                 backend.get_deferrable_sql()))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+                style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
                 style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column)),
@@ -517,7 +498,7 @@ def _emit_post_sync_signal(created_models, verbosity, interactive):
 
 def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import backend, connection, transaction, models, get_creation_module
+    from django.db import backend, connection, transaction, models
     from django.conf import settings
 
     disable_termcolors()
@@ -532,8 +513,6 @@ def syncdb(verbosity=1, interactive=True):
             __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
-
-    data_types = get_creation_module().DATA_TYPES
 
     cursor = connection.cursor()
 
@@ -1266,8 +1245,7 @@ runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port nu
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
-    from django.db import backend, connection, transaction, get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
+    from django.db import backend, connection, transaction, models
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
         models.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
@@ -1277,7 +1255,7 @@ def createcachetable(tablename):
     table_output = []
     index_output = []
     for f in fields:
-        field_output = [backend.quote_name(f.name), data_types[f.get_internal_type()] % f.__dict__]
+        field_output = [backend.quote_name(f.name), f.db_type()]
         field_output.append("%sNULL" % (not f.null and "NOT " or ""))
         if f.unique:
             field_output.append("UNIQUE")

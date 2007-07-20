@@ -1,3 +1,4 @@
+from django.db import get_creation_module
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.conf import settings
@@ -116,6 +117,30 @@ class Field(object):
         converted value. Subclasses should override this.
         """
         return value
+
+    def db_type(self):
+        """
+        Returns the database column data type for this field, taking into
+        account the DATABASE_ENGINE setting.
+        """
+        # The default implementation of this method looks at the
+        # backend-specific DATA_TYPES dictionary, looking up the field by its
+        # "internal type".
+        #
+        # A Field class can implement the get_internal_type() method to specify
+        # which *preexisting* Django Field class it's most similar to -- i.e.,
+        # an XMLField is represented by a TEXT column type, which is the same
+        # as the TextField Django field type, which means XMLField's
+        # get_internal_type() returns 'TextField'.
+        #
+        # But the limitation of the get_internal_type() / DATA_TYPES approach
+        # is that it cannot handle database column types that aren't already
+        # mapped to one of the built-in Django field types. In this case, you
+        # can implement db_type() instead of get_internal_type() to specify
+        # exactly which wacky database column type you want to use.
+        data_types = get_creation_module().DATA_TYPES
+        internal_type = self.get_internal_type()
+        return data_types[internal_type] % self.__dict__
 
     def validate_full(self, field_data, all_data):
         """

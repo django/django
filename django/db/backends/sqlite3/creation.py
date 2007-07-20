@@ -15,7 +15,6 @@ DATA_TYPES = {
     'ImageField':                   'varchar(100)',
     'IntegerField':                 'integer',
     'IPAddressField':               'char(15)',
-    'ManyToManyField':              None,
     'NullBooleanField':             'bool',
     'OneToOneField':                'integer',
     'PhoneNumberField':             'varchar(20)',

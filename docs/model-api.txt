@@ -981,6 +981,77 @@ See the `One-to-one relationship model example`_ for a full example.
 
 .. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
 
+Custom field types
+------------------
+
+**New in Django development version**
+
+Django's built-in field types don't cover every possible database column type --
+only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
+column types, such as geographic polygons or even user-created types such as
+`PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
+
+.. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
+
+.. admonition:: Experimental territory
+
+    This is an area of Django that traditionally has not been documented, but
+    we're starting to include bits of documentation, one feature at a time.
+    Please forgive the sparseness of this section.
+
+    If you like living on the edge and are comfortable with the risk of
+    unstable, undocumented APIs, see the code for the core ``Field`` class
+    in ``django/db/models/fields/__init__.py`` -- but if/when the innards
+    change, don't say we didn't warn you.
+
+To create a custom field type, simply subclass ``django.db.models.Field``.
+Here is an incomplete list of the methods you should implement:
+
+``db_type()``
+~~~~~~~~~~~~~
+
+Returns the database column data type for the ``Field``, taking into account
+the current ``DATABASE_ENGINE`` setting.
+
+Say you've created a PostgreSQL custom type called ``mytype``. You can use this
+field with Django by subclassing ``Field`` and implementing the ``db_type()``
+method, like so::
+
+    from django.db import models
+
+    class MytypeField(models.Field):
+        def db_type(self):
+            return 'mytype'
+
+Once you have ``MytypeField``, you can use it in any model, just like any other
+``Field`` type::
+
+    class Person(models.Model):
+        name = models.CharField(maxlength=80)
+        gender = models.CharField(maxlength=1)
+        something_else = MytypeField()
+
+If you aim to build a database-agnostic application, you should account for
+differences in database column types. For example, the date/time column type
+in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
+``datetime``. The simplest way to handle this in a ``db_type()`` method is to
+import the Django settings module and check the ``DATABASE_ENGINE`` setting.
+For example::
+
+    class MyDateField(models.Field):
+        def db_type(self):
+            from django.conf import settings
+            if settings.DATABASE_ENGINE == 'mysql':
+                return 'datetime'
+            else:
+                return 'timestamp'
+
+The ``db_type()`` method is only called by Django when the framework constructs
+the ``CREATE TABLE`` statements for your application -- that is, when you first
+create your tables. It's not called at any other time, so it can afford to
+execute slightly complex code, such as the ``DATABASE_ENGINE`` check in the
+above example.
+
 Meta options
 ============
 

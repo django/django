@@ -1,6 +1,6 @@
 from django.db import backend, transaction
 from django.db.models import signals, get_model
-from django.db.models.fields import AutoField, Field, IntegerField, get_ul_class
+from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
 from django.db.models.related import RelatedObject
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
@@ -556,6 +556,16 @@ class ForeignKey(RelatedField, Field):
         defaults.update(kwargs)
         return super(ForeignKey, self).formfield(**defaults)
 
+    def db_type(self):
+        # The database column type of a ForeignKey is the column type
+        # of the field to which it points. An exception is if the ForeignKey
+        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
+        # in which case the column type is simply that of an IntegerField.
+        rel_field = self.rel.get_related_field()
+        if isinstance(rel_field, (AutoField, PositiveIntegerField, PositiveSmallIntegerField)):
+            return IntegerField().db_type()
+        return rel_field.db_type()
+
 class OneToOneField(RelatedField, IntegerField):
     def __init__(self, to, to_field=None, **kwargs):
         try:
@@ -621,6 +631,16 @@ class OneToOneField(RelatedField, IntegerField):
         defaults = {'form_class': forms.ModelChoiceField, 'queryset': self.rel.to._default_manager.all()}
         defaults.update(kwargs)
         return super(OneToOneField, self).formfield(**defaults)
+
+    def db_type(self):
+        # The database column type of a OneToOneField is the column type
+        # of the field to which it points. An exception is if the OneToOneField
+        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
+        # in which case the column type is simply that of an IntegerField.
+        rel_field = self.rel.get_related_field()
+        if isinstance(rel_field, (AutoField, PositiveIntegerField, PositiveSmallIntegerField)):
+            return IntegerField().db_type()
+        return rel_field.db_type()
 
 class ManyToManyField(RelatedField, Field):
     def __init__(self, to, **kwargs):
@@ -744,6 +764,11 @@ class ManyToManyField(RelatedField, Field):
         if defaults.get('initial') is not None:
             defaults['initial'] = [i._get_pk_val() for i in defaults['initial']]
         return super(ManyToManyField, self).formfield(**defaults)
+
+    def db_type(self):
+        # A ManyToManyField is not represented by a single column,
+        # so return None.
+        return None
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
