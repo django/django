@@ -6,6 +6,36 @@ from django.test import Client, TestCase
 from django.core import mail
 import os
 
+class AssertContainsTests(TestCase):
+    def test_contains(self):
+        "Reponses can be inspected for content, including counting repeated substrings"
+        response = self.client.get('/test_client_regress/no_template_view/')
+        
+        self.assertContains(response, 'once')
+        self.assertContains(response, 'once', 1)
+        self.assertContains(response, 'twice')
+        self.assertContains(response, 'twice', 2)
+
+        try:
+            self.assertContains(response, 'once', 2)
+        except AssertionError, e:
+            self.assertEquals(str(e), "Found 1 instances of 'once' in response (expected 2)")
+        
+        try:
+            self.assertContains(response, 'twice', 1)
+        except AssertionError, e:
+            self.assertEquals(str(e), "Found 2 instances of 'twice' in response (expected 1)")
+        
+        try:
+            self.assertContains(response, 'thrice')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Couldn't find 'thrice' in response")
+
+        try:
+            self.assertContains(response, 'thrice', 3)
+        except AssertionError, e:
+            self.assertEquals(str(e), "Found 0 instances of 'thrice' in response (expected 3)")
+        
 class AssertTemplateUsedTests(TestCase):
     fixtures = ['testdata.json']
     

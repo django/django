@@ -481,10 +481,11 @@ Normal Python unit tests have a wide range of assertions, such as
 ``django.TestCase`` adds to these, providing some assertions
 that can be useful in testing the behavior of web sites.
 
-``assertContains(response, text, count=1, status_code=200)``
+``assertContains(response, text, count=None, status_code=200)``
     Assert that a response indicates that a page could be retrieved and
-    produced the nominated status code, and that ``text`` occurs ``count``
-    times in the content of the response.
+    produced the nominated status code, and that ``text`` in the content 
+    of the response. If ``count`` is provided, ``text`` must occur exactly 
+    ``count`` times in the response.
 
 ``assertFormError(response, form, field, errors)``
     Assert that a field on a form raised the provided list of errors when

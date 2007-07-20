@@ -73,19 +73,23 @@ class TestCase(unittest.TestCase):
             "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
                 (path, redirect_response.status_code, target_status_code))
     
-    def assertContains(self, response, text, count=1, status_code=200):
+    def assertContains(self, response, text, count=None, status_code=200):
         """Assert that a response indicates that a page was retreived successfully,
         (i.e., the HTTP status code was as expected), and that ``text`` occurs ``count``
-        times in the content of the response.
+        times in the content of the response. If ``count`` is None, the count doesn't
+        matter - the assertion is true if the text occurs at least once in the response.
         
         """
         self.assertEqual(response.status_code, status_code,
             "Couldn't retrieve page: Response code was %d (expected %d)'" % 
                 (response.status_code, status_code))
         real_count = response.content.count(text)
-        self.assertEqual(real_count, count,
-            "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
-    
+        if count:
+            self.assertEqual(real_count, count,
+                "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
+        else:
+            self.assertTrue(real_count != 0, "Couldn't find '%s' in response" % text)
+                
     def assertFormError(self, response, form, field, errors):
         "Assert that a form used to render the response has a specific field error"
         if not response.context:
