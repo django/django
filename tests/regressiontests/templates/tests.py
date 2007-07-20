@@ -602,7 +602,7 @@ class Templates(unittest.TestCase):
             # translation of a constant string
             'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 
-            ### HANDLING OF TEMPLATE_TAG_IF_INVALID ###################################
+            ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
             'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
