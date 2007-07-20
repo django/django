@@ -14,15 +14,19 @@ def build_suite(app_module):
     "Create a complete Django test suite for the provided application module"
     suite = unittest.TestSuite()
     
-    # Load unit and doctests in the models.py file
-    suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(app_module))
-    try:
-        suite.addTest(doctest.DocTestSuite(app_module,
-                                           checker=doctestOutputChecker,
-                                           runner=DocTestRunner))
-    except ValueError:
-        # No doc tests in models.py
-        pass
+    # Load unit and doctests in the models.py module. If module has
+    # a suite() method, use it. Otherwise build the test suite ourselves.
+    if hasattr(app_module, 'suite'):
+        suite.addTest(app_module.suite())
+    else:
+        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(app_module))
+        try:
+            suite.addTest(doctest.DocTestSuite(app_module,
+                                               checker=doctestOutputChecker,
+                                               runner=DocTestRunner))
+        except ValueError:
+            # No doc tests in models.py
+            pass
     
     # Check to see if a separate 'tests' module exists parallel to the 
     # models module
@@ -30,14 +34,19 @@ def build_suite(app_module):
         app_path = app_module.__name__.split('.')[:-1]
         test_module = __import__('.'.join(app_path + [TEST_MODULE]), {}, {}, TEST_MODULE)
         
-        suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(test_module))
-        try:            
-            suite.addTest(doctest.DocTestSuite(test_module, 
-                                               checker=doctestOutputChecker,
-                                               runner=DocTestRunner))
-        except ValueError:
-            # No doc tests in tests.py
-            pass
+        # Load unit and doctests in the tests.py module. If module has
+        # a suite() method, use it. Otherwise build the test suite ourselves.
+        if hasattr(test_module, 'suite'):
+            suite.addTest(test_module.suite())
+        else:
+            suite.addTest(unittest.defaultTestLoader.loadTestsFromModule(test_module))
+            try:            
+                suite.addTest(doctest.DocTestSuite(test_module, 
+                                                   checker=doctestOutputChecker,
+                                                   runner=DocTestRunner))
+            except ValueError:
+                # No doc tests in tests.py
+                pass
     except ImportError, e:
         # Couldn't import tests.py. Was it due to a missing file, or
         # due to an import error in a tests.py that actually exists?

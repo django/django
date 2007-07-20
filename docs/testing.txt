@@ -118,10 +118,16 @@ An equivalent unittest test case for the above example would look like::
             self.assertEquals(self.lion.speak(), 'The lion says "roar"')
             self.assertEquals(self.cat.speak(), 'The cat says "meow"')
 
-When you `run your tests`_, the test utility will find all the test cases
-(that is, subclasses of ``unittest.TestCase``) in ``models.py`` and
-``tests.py``, automatically build a test suite out of those test cases,
-and run that suite.
+When you `run your tests`_, the default behavior of the test utility is
+to find all the test cases (that is, subclasses of ``unittest.TestCase``)
+in ``models.py`` and ``tests.py``, automatically build a test suite out of
+those test cases, and run that suite.
+
+However, if you define a method called ``suite()`` in either ``models.py`` or
+``tests.py``, that method will be used to construct the test suite for that
+module. This follows the `suggested organization`_ for unit tests. See the
+Python documentation for more details on how to construct a complex test
+suite.
 
 For more details about ``unittest``, see the `standard library unittest
 documentation`_.
@@ -129,6 +135,7 @@ documentation`_.
 .. _unittest: http://docs.python.org/lib/module-unittest.html
 .. _standard library unittest documentation: unittest_
 .. _run your tests: `Running tests`_
+.. _suggested organization: http://docs.python.org/lib/organizing-tests.html
 
 Which should I use?
 -------------------
