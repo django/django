@@ -1,0 +1,262 @@
+=====================================
+Django Schema Evolution Documentation    
+=====================================
+
+Schema evolution is the function of updating an existing Django generated
+database schema to a newer/modified version based upon a newer/modified set of
+Django models.
+
+This documentation will take you through several common model changes and show
+you how Django's schema evolution handles them. Each example provides the pre 
+and post model source code, as well as the SQL output.
+
+Adding / Removing Fields
+------------------------
+
+Model: version 1
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        votes = models.IntegerField()
+        def __str__(self):
+            return self.choice
+
+Model: version 2
+	
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+    
+        # new fields
+        pub_date2 = models.DateTimeField('date published')
+
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        votes = models.IntegerField()
+        def __str__(self):
+            return self.choice
+    
+        # new fields
+        votes2 = models.IntegerField()
+        hasSomething = models.BooleanField()
+        creatorIp = models.IPAddressField()
+
+Output: v1⇒v2 	
+
+    BEGIN;
+    ALTER TABLE `case01_add_field_poll` ADD COLUMN `pub_date2` datetime NOT NULL;
+    ALTER TABLE `case01_add_field_choice` ADD COLUMN `votes2` integer NOT NULL;
+    ALTER TABLE `case01_add_field_choice` ADD COLUMN `hasSomething` bool NOT NULL;
+    ALTER TABLE `case01_add_field_choice` ADD COLUMN `creatorIp` char(15) NOT NULL;
+    COMMIT;
+
+Output: v2⇒v1 	
+
+    -- warning: as the following may cause data loss, it/they must be run manually
+    -- ALTER TABLE `case01_add_field_poll` DROP COLUMN `pub_date2`;
+    -- end warning
+    -- warning: as the following may cause data loss, it/they must be run manually
+    -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `votes2`;
+    -- end warning
+    -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `creatorIp`;
+    -- end warning
+    -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `hasSomething`;
+    -- end warning
+
+Renaming Fields
+---------------
+
+Model: version 1
+
+    from django.db import models
+
+    class Poll(models.Model):
+        """this model originally had fields named pub_date and the_author.  you can use 
+        either a str or a tuple for the aka value.  (tuples are used if you have changed 
+        its name more than once)"""
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published', aka='publish_date')
+        the_author = models.CharField(maxlength=200, aka='the_author')
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        votes = models.IntegerField(aka='votes')
+        def __str__(self):
+            return self.choice
+
+Model: version 2
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        """this model originally had fields named pub_date and the_author.  you can use
+        either a str or a tuple for the aka value.  (tuples are used if you have changed
+        its name more than once)"""
+        question = models.CharField(maxlength=200)
+        published_date = models.DateTimeField('date published', aka=('pub_date', 'publish_date'))
+        author = models.CharField(maxlength=200, aka='the_author')
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        number_of_votes = models.IntegerField(aka='votes')
+        def __str__(self):
+            return self.choice
+
+Output: v1⇒v2 	
+
+    BEGIN;
+    ALTER TABLE `case02_rename_field_poll` CHANGE COLUMN `pub_date` `published_date` datetime NOT NULL;
+    ALTER TABLE `case02_rename_field_poll` CHANGE COLUMN `the_author` `author` varchar(200) NOT NULL;
+    ALTER TABLE `case02_rename_field_choice` CHANGE COLUMN `votes` `number_of_votes` integer NOT NULL;
+    COMMIT;
+
+Renaming Models
+---------------
+
+Model: version 1
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        "the original name for this model was 'Choice'"
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        number_of_votes = models.IntegerField()
+        def __str__(self):
+            return self.choice
+        class Meta:
+            aka = ('Choice', 'OtherBadName')
+
+Model: version 2
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+        
+    class Option(models.Model):
+        "the original name for this model was 'Choice'"
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        # show that field name changes work too
+        votes = models.IntegerField(aka='number_of_votes')
+        def __str__(self):
+            return self.choice
+        class Meta:
+            aka = ('Choice', 'BadName')
+    
+Output: v1⇒v2 	
+
+    BEGIN;
+    ALTER TABLE `case03_rename_model_choice` RENAME TO `case03_rename_model_option`;
+    ALTER TABLE `case03_rename_model_option` CHANGE COLUMN `number_of_votes` `votes` integer NOT NULL;
+    COMMIT;
+
+Changing Flags
+--------------
+
+Model: version 1
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=200)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        "the original name for this model was 'Choice'"
+        poll = models.ForeignKey(Poll)
+        choice = models.CharField(maxlength=200)
+        votes = models.IntegerField()
+        def __str__(self):
+            return self.choice
+
+    class Foo(models.Model):
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+    
+Model: version 2
+
+    from django.db import models
+    
+    class Poll(models.Model):
+        question = models.CharField(maxlength=100)
+        pub_date = models.DateTimeField('date published')
+        author = models.CharField(maxlength=200)
+        def __str__(self):
+            return self.question
+        
+    class Choice(models.Model):
+        "the original name for this model was 'Choice'"
+        poll = models.ForeignKey(Poll)
+        # make sure aka still works with a flag change
+        option = models.CharField(maxlength=400, aka='choice')
+        votes = models.IntegerField()
+        votes2 = models.IntegerField() # make sure column adds still work
+        def __str__(self):
+            return self.choice
+    
+    class Foo(models.Model):
+        GENDER_CHOICES = (
+            ('M', 'Male'),
+            ('F', 'Female'),
+        )
+        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES, db_index=True)
+        gender2 = models.CharField(maxlength=1, null=True, unique=True)
+            
+
+Output: v1⇒v2 	
+
+    BEGIN;
+    ALTER TABLE `case04_change_flag_poll` MODIFY COLUMN `question` varchar(100) NOT NULL;
+    ALTER TABLE `case04_change_flag_foo` ADD COLUMN `gender2` varchar(1) NULL UNIQUE;
+    ALTER TABLE `case04_change_flag_choice` MODIFY COLUMN `choice` varchar(400) NOT NULL;
+    ALTER TABLE `case04_change_flag_choice` CHANGE COLUMN `choice` `option` varchar(400) NOT NULL;
+    ALTER TABLE `case04_change_flag_choice` ADD COLUMN `votes2` integer NOT NULL;
+    COMMIT;
+
+Conclusion
+----------
+
+That's pretty much it. If you can suggest additional examples or test cases you
+think would be of value, please email me at public@kered.org.
+
