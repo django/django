@@ -8,7 +8,7 @@ import os
 
 class AssertContainsTests(TestCase):
     def test_contains(self):
-        "Reponses can be inspected for content, including counting repeated substrings"
+        "Responses can be inspected for content, including counting repeated substrings"
         response = self.client.get('/test_client_regress/no_template_view/')
         
         self.assertContains(response, 'once')
