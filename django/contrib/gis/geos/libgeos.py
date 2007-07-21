@@ -5,9 +5,7 @@
 """
 
 from django.contrib.gis.geos.error import GEOSException
-from ctypes import \
-     c_char_p, c_int, c_size_t, c_ubyte, pointer, addressof, \
-     CDLL, CFUNCTYPE, POINTER, Structure
+from ctypes import c_char_p, c_int, pointer, CDLL, CFUNCTYPE, POINTER, Structure
 import os, sys
 
 # NumPy supported?
@@ -64,29 +62,55 @@ error_h = ERRORFUNC(error_h)
 #  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
 lgeos.initGEOS(notice_h, error_h)
 
+#### GEOS Geometry Pointer utilities. ####
+
+# Opaque GEOS geometry structure
+class GEOSGeom_t(Structure): 
+    "Opaque structure used when arrays of geometries are needed as parameters."
+    pass
+# Pointer to opaque geometry structure
+GEOM_PTR = POINTER(GEOSGeom_t)
+# Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection GEOS routines
+def get_pointer_arr(n):
+    "Gets a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
+    GeomArr = GEOM_PTR * n
+    return GeomArr()
+
+#### GEOS Pointer object and routines ####
 class GEOSPointer(object):
-    """The GEOSPointer provides a layer of abstraction to accessing the values returned by
-    GEOS geometry creation routines."""
+    """The GEOSPointer provides a layer of abstraction in accessing the values returned by
+    GEOS geometry creation routines.  Memory addresses (integers) are kept in a C pointer,
+    which allows parent geometries to be 'nullified' if their children's memory is used
+    in construction of another geometry. Related coordinate sequence pointers are kept
+    in this object for the same reason."""
 
     ### Python 'magic' routines ###
-    def __init__(self, ptr):
-        "Given a ctypes pointer(c_int)"
-        if isinstance(ptr, int):
-            self._ptr = pointer(c_int(ptr))
+    def __init__(self, address, coordseq=0):
+        "Initializes on an address (an integer)."
+        if isinstance(address, int):
+            self._geom = pointer(c_int(address))
+            self._coordseq = pointer(c_int(coordseq))
         else:
             raise TypeError, 'GEOSPointer object must initialize with an integer.'
         
     def __call__(self):
         """If the pointer is NULL, then an exception will be raised, otherwise the
-        address value (a GEOSGeom_ptr) will be returned."""
+        address value (an integer) will be returned."""
         if self.valid: return self.address
-        else: raise GEOSException, 'GEOS pointer no longer valid (was the parent geometry deleted?)'
+        else: raise GEOSException, 'GEOS pointer no longer valid (was this geometry or the parent geometry deleted or modified?)'
+
+    def __bool__(self):
+        "Returns True when the GEOSPointer is valid."
+        return self.valid
+
+    def __str__(self):
+        return str(self.address)
 
     ### GEOSPointer Properties ###
     @property
     def address(self):
         "Returns the address of the GEOSPointer (represented as an integer)."
-        return self._ptr.contents.value
+        return self._geom.contents.value
 
     @property
     def valid(self):
@@ -94,13 +118,55 @@ class GEOSPointer(object):
         if bool(self.address): return True
         else: return False
     
+    ### Coordinate Sequence properties ###
+    def coordseq(self):
+        "If the coordinate sequence pointer is NULL (0), an exception will be raised."
+        if self.coordseq_valid: return self.coordseq_address
+        else: raise GEOSException, 'GEOS coordinate sequence pointer invalid (was this geometry or the parent geometry deleted or modified?)'
+
+    @property
+    def coordseq_address(self):
+        "Returns the address of the related coordinate sequence."
+        return self._coordseq.contents.value
+    
+    @property
+    def coordseq_valid(self):
+        "Returns True if the coordinate sequence address is valid, False otherwise."
+        if bool(self.coordseq_address): return True
+        else: return False
+
     ### GEOSPointer Methods ###
-    def set(self, address):
+    def set(self, address, coordseq=False):
         "Sets this pointer with the new address (represented as an integer)"
         if not isinstance(address, int):
             raise TypeError, 'GEOSPointer must be set with an address (an integer).'
-        self._ptr.contents = c_int(address)
+        if coordseq:
+            self._coordseq.contents = c_int(address)
+        else:
+            self._geom.contents = c_int(address)
 
     def nullify(self):
-        "Nullify this geometry pointer (set the address to 0)."
+        """Nullify this geometry pointer (set the address to 0).  This does not delete
+        any memory, rather, it sets the GEOS pointer to a NULL address, to prevent 
+        access to addressses of deleted objects."""
+        # Nullifying both the geometry and coordinate sequence pointer.
         self.set(0)
+        self.set(0, coordseq=True)
+
+def init_from_geom(geom):
+    """During initialization of geometries from other geometries, this routine is 
+    used to nullify any parent geometries (since they will now be missing memory 
+    components) and to nullify the geometry itself to prevent future access.  
+    Only the address (an integer) of the current geometry is returned for use in 
+    initializing the new geometry."""
+    # First getting the memory address of the geometry.
+    address = geom._ptr()
+
+    # If the geometry is a child geometry, then the parent geometry pointer is
+    #  nullified.
+    if geom._parent: geom._parent.nullify()
+
+    # Nullifying the geometry pointer
+    geom._ptr.nullify()
+
+    return address

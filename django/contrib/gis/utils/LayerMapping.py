@@ -228,7 +228,7 @@ class LayerMapping:
     "A class that maps OGR Layers to Django Models."
 
     def __init__(self, model, data, mapping, layer=0, source_srs=None):
-        "Takes the Django model, the mapping (dictionary), and the SHP file."
+        "Takes the Django model, the data source, and the mapping (dictionary)"
 
         # Getting the field names and types from the model
         fields = dict((f.name, map_foreign_key(f)) for f in model._meta.fields)

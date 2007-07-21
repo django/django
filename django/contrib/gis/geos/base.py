@@ -1,35 +1,38 @@
-# Trying not to pollute the namespace.
+"""
+  This module contains the 'base' GEOSGeometry object -- all GEOS geometries
+  inherit from this object.
+"""
+
+# ctypes and types dependencies.
 from ctypes import \
      byref, string_at, create_string_buffer, pointer, \
      c_char_p, c_double, c_int, c_size_t
-from types import StringType, IntType, FloatType, TupleType, ListType
+from types import StringType, IntType, FloatType
 
-# Getting GEOS-related dependencies.
+# Python and GEOS-related dependencies.
 import re
 from warnings import warn
 from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
+if HAS_NUMPY: from numpy import ndarray, array
 
-if HAS_NUMPY:
-    from numpy import ndarray, array
-
-# For recognizing HEXEWKB.
-hex_regex = re.compile(r'^[0-9A-Fa-f]+')
+# Regular expression for recognizing HEXEWKB.
+hex_regex = re.compile(r'^[0-9A-Fa-f]+$')
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
     
     #### Python 'magic' routines ####
-    def __init__(self, geo_input, input_type=False, child=False):
+    def __init__(self, geo_input, input_type=False, parent=False):
         """The constructor for GEOS geometry objects.  May take the following
         strings as inputs, WKT ("wkt"), HEXEWKB ("hex", PostGIS-specific canonical form).
 
         The `input_type` keyword has been deprecated -- geometry type is now auto-detected.
 
-        The `child` keyword is for internal use only, and indicates to the garbage collector
-          not to delete this geometry if it was spawned from a parent (e.g., the exterior
-          ring from a polygon).
+        The `parent` keyword is for internal use only, and indicates to the garbage collector
+          not to delete this geometry because it was spawned from a parent (e.g., the exterior
+          ring from a polygon).  Its value is the GEOSPointer of the parent geometry.
         """
 
         # Initially, setting the pointer to NULL
@@ -55,84 +58,126 @@ class GEOSGeometry(object):
             raise TypeError, 'Improper geometry input type: %s' % str(type(geo_input))
 
         if bool(g):
-            # If we have a GEOSPointer object, just set the '_ptr' attribute with g
+            # If we have a GEOSPointer object, just set the '_ptr' attribute with input
             if isinstance(g, GEOSPointer): self._ptr = g
-            else: self._ptr.set(g) # Otherwise, set the address
+            else: self._ptr.set(g) # Otherwise, set with the address
         else:
             raise GEOSException, 'Could not initialize GEOS Geometry with given input.'
 
-        # Setting the 'child' flag -- when the object is labeled with this flag
-        #  it will not be destroyed by __del__().  This is used for child geometries from
+        # Setting the 'parent' flag -- when the object is labeled with this flag
+        #  it will not be destroyed by __del__().  This is used for child geometries spawned from
         #  parent geometries (e.g., LinearRings from a Polygon, Points from a MultiPoint, etc.).
-        self._child = child
-
+        if isinstance(parent, GEOSPointer):
+            self._parent = parent
+        else:
+            self._parent = GEOSPointer(0)
+        
         # Setting the class type (e.g., 'Point', 'Polygon', etc.)
         self.__class__ = GEOS_CLASSES[self.geom_type]
 
+        # Getting the coordinate sequence for the geometry (will be None on geometries that
+        #   do not have coordinate sequences)
+        self._get_cs()
+
         # Extra setup needed for Geometries that may be parents.
-        if isinstance(self, GeometryCollection): self._geoms = {}
-        if isinstance(self, Polygon): self._rings = {}
+        if isinstance(self, (Polygon, GeometryCollection)): self._populate()
 
     def __del__(self):
-        "Destroys this geometry -- only if the pointer is valid and this is not a child geometry."
-        #print 'Deleting %s (child=%s, valid=%s)' % (self.geom_type, self._child, self._ptr.valid)
-        if self._ptr.valid and not self._child: lgeos.GEOSGeom_destroy(self._ptr())
+        "Destroys this geometry -- only if the pointer is valid and whether or not it belongs to a parent."
+        #print 'Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
+        # Only calling destroy on valid pointers not spawned from a parent
+        if self._ptr.valid and not self._parent: lgeos.GEOSGeom_destroy(self._ptr())
 
     def __str__(self):
         "WKT is used for the string representation."
         return self.wkt
 
+    def __repr__(self):
+        return '<%s object>' % self.geom_type
+
+    # Comparison operators
     def __eq__(self, other):
         "Equivalence testing."
         return self.equals(other)
 
+    def __ne__(self, other):
+        "The not equals operator."
+        return not self.equals(other)
+
+    ### Geometry set-like operations ###
+    # Thanks to Sean Gillies for inspiration:
+    #  http://lists.gispython.org/pipermail/community/2007-July/001034.html
+    # g = g1 | g2
+    def __or__(self, other):
+        "Returns the union of this Geometry and the other."
+        return self.union(other)
+
+    # g = g1 & g2
+    def __and__(self, other):
+        "Returns the intersection of this Geometry and the other."
+        return self.intersection(other)
+
+    # g = g1 - g2
+    def __sub__(self, other):
+        "Return the difference this Geometry and the other."
+        return self.difference(other)
+
+    # g = g1 ^ g2
+    def __xor__(self, other):
+        "Return the symmetric difference of this Geometry and the other."
+        return self.sym_difference(other)
+    
     #### Coordinate Sequence Routines ####
-    def _cache_cs(self):
-        "Caches the coordinate sequence for this Geometry."
-        if not hasattr(self, '_cs'):
-            # Only these geometries are allowed to have coordinate sequences.
-            if self.geom_type in ('LineString', 'LinearRing', 'Point'):
-                self._cs = GEOSCoordSeq(GEOSPointer(lgeos.GEOSGeom_getCoordSeq(self._ptr())), self.hasz)
-            else:
-                self._cs = None
+    @property
+    def has_cs(self):
+        "Returns True if this Geometry has a coordinate sequence, False if not."
+        # Only these geometries are allowed to have coordinate sequences.
+        if isinstance(self, (Point, LineString, LinearRing)):
+            return True
+        else:
+            return False
+
+    def _get_cs(self):
+        "Gets the coordinate sequence for this Geometry."
+        if self.has_cs:
+            self._ptr.set(lgeos.GEOSGeom_getCoordSeq(self._ptr()), coordseq=True)
+            self._cs = GEOSCoordSeq(self._ptr, self.hasz)
+        else:
+            self._cs = None
 
     @property
     def coord_seq(self):
-        "Returns the coordinate sequence for the geometry."
-        # Getting the coordinate sequence for the geometry
-        self._cache_cs()
-
-        # Returning a GEOSCoordSeq wrapped around the pointer.
+        "Returns the coordinate sequence for this Geometry."
         return self._cs
 
     #### Geometry Info ####
     @property
     def geom_type(self):
-        "Returns a string representing the geometry type, e.g. 'Polygon'"
+        "Returns a string representing the Geometry type, e.g. 'Polygon'"
         return string_at(lgeos.GEOSGeomType(self._ptr()))
 
     @property
     def geom_typeid(self):
-        "Returns an integer representing the geometry type."
+        "Returns an integer representing the Geometry type."
         return lgeos.GEOSGeomTypeId(self._ptr())
 
     @property
     def num_geom(self):
-        "Returns the number of geometries in the geometry."
+        "Returns the number of geometries in the Geometry."
         n = lgeos.GEOSGetNumGeometries(self._ptr())
         if n == -1: raise GEOSException, 'Error getting number of geometries.'
         else: return n
 
     @property
     def num_coords(self):
-        "Returns the number of coordinates in the geometry."
+        "Returns the number of coordinates in the Geometry."
         n = lgeos.GEOSGetNumCoordinates(self._ptr())
         if n == -1: raise GEOSException, 'Error getting number of coordinates.'
         else: return n
 
     @property
     def num_points(self):
-        "Returns the number points, or coordinates, in the geometry."
+        "Returns the number points, or coordinates, in the Geometry."
         return self.num_coords
 
     @property
@@ -145,6 +190,7 @@ class GEOSGeometry(object):
         status = lgeos.GEOSNormalize(self._ptr())
         if status == -1: raise GEOSException, 'failed to normalize geometry'
 
+    ## Internal for GEOS unary & binary predicate functions ##
     def _unary_predicate(self, func):
         "Returns the result, or raises an exception for the given unary predicate function."
         val = func(self._ptr())
@@ -164,12 +210,12 @@ class GEOSGeometry(object):
     #### Unary predicates ####
     @property
     def empty(self):
-        "Returns a boolean indicating whether the set of points in this geometry are empty."
+        "Returns a boolean indicating whether the set of points in this Geometry are empty."
         return self._unary_predicate(lgeos.GEOSisEmpty)
 
     @property
     def valid(self):
-        "This property tests the validity of this geometry."
+        "This property tests the validity of this Geometry."
         return self._unary_predicate(lgeos.GEOSisValid)
 
     @property
@@ -190,17 +236,17 @@ class GEOSGeometry(object):
     #### Binary predicates. ####
     def relate_pattern(self, other, pattern):
         """Returns true if the elements in the DE-9IM intersection matrix for
-        the two Geometrys match the elements in pattern."""
+        the two Geometries match the elements in pattern."""
         if len(pattern) > 9:
             raise GEOSException, 'invalid intersection matrix pattern'
         return self._binary_predicate(lgeos.GEOSRelatePattern, other, c_char_p(pattern))
 
     def disjoint(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometrys is FF*FF****."
+        "Returns true if the DE-9IM intersection matrix for the two Geometries is FF*FF****."
         return self._binary_predicate(lgeos.GEOSDisjoint, other)
 
     def touches(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometrys is FT*******, F**T***** or F***T****."
+        "Returns true if the DE-9IM intersection matrix for the two Geometries is FT*******, F**T***** or F***T****."
         return self._binary_predicate(lgeos.GEOSTouches, other)
 
     def intersects(self, other):
@@ -208,12 +254,12 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSIntersects, other)
 
     def crosses(self, other):
-        """Returns true if the DE-9IM intersection matrix for the two Geometrys is T*T****** (for a point and a curve,
+        """Returns true if the DE-9IM intersection matrix for the two Geometries is T*T****** (for a point and a curve,
         a point and an area or a line and an area) 0******** (for two curves)."""
         return self._binary_predicate(lgeos.GEOSCrosses, other)
 
     def within(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometrys is T*F**F***."
+        "Returns true if the DE-9IM intersection matrix for the two Geometries is T*F**F***."
         return self._binary_predicate(lgeos.GEOSWithin, other)
 
     def contains(self, other):
@@ -221,16 +267,16 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSContains, other)
 
     def overlaps(self, other):
-        """Returns true if the DE-9IM intersection matrix for the two Geometrys is T*T***T** (for two points
+        """Returns true if the DE-9IM intersection matrix for the two Geometries is T*T***T** (for two points
         or two surfaces) 1*T***T** (for two curves)."""
         return self._binary_predicate(lgeos.GEOSOverlaps, other)
 
     def equals(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometrys is T*F**FFF*."
+        "Returns true if the DE-9IM intersection matrix for the two Geometries is T*F**FFF*."
         return self._binary_predicate(lgeos.GEOSEquals, other)
 
     def equals_exact(self, other, tolerance=0):
-        "Returns true if the two Geometrys are exactly equal, up to a specified tolerance."
+        "Returns true if the two Geometries are exactly equal, up to a specified tolerance."
         tol = c_double(tolerance)
         return self._binary_predicate(lgeos.GEOSEqualsExact, other, tol)
 
@@ -290,7 +336,7 @@ class GEOSGeometry(object):
 
     @property
     def centroid(self):
-        """The centroid is equal to the centroid of the set of component Geometrys
+        """The centroid is equal to the centroid of the set of component Geometries
         of highest dimension (since the lower-dimension geometries contribute zero
         "weight" to the centroid)."""
         return self._unary_topology(lgeos.GEOSGetCentroid)
@@ -344,7 +390,7 @@ class GEOSGeometry(object):
     def clone(self):
         "Clones this Geometry."
         return GEOSGeometry(lgeos.GEOSGeom_clone(self._ptr()))
-    
+
 # Class mapping dictionary
 from django.contrib.gis.geos.geometries import Point, Polygon, LineString, LinearRing
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
@@ -352,8 +398,8 @@ GEOS_CLASSES = {'Point' : Point,
                 'Polygon' : Polygon,
                 'LineString' : LineString,
                 'LinearRing' : LinearRing,
-                'GeometryCollection' : GeometryCollection,
                 'MultiPoint' : MultiPoint,
                 'MultiLineString' : MultiLineString,
                 'MultiPolygon' : MultiPolygon,
+                'GeometryCollection' : GeometryCollection,  
                 }

@@ -1,12 +1,16 @@
-from ctypes import c_double, c_int, c_uint
+"""
+  This module houses the Point, LineString, LinearRing, and Polygon OGC
+   geometry classes.  All geometry classes in this module inherit from 
+   GEOSGeometry.
+"""
+
+from ctypes import c_double, c_int, c_uint, byref, cast
 from types import FloatType, IntType, ListType, TupleType
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, get_pointer_arr, init_from_geom, GEOM_PTR, HAS_NUMPY
 from django.contrib.gis.geos.base import GEOSGeometry
-from django.contrib.gis.geos.error import GEOSException
-
-if HAS_NUMPY:
-    from numpy import ndarray, array
+from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+if HAS_NUMPY: from numpy import ndarray, array
 
 class Point(GEOSGeometry):
 
@@ -16,6 +20,8 @@ class Point(GEOSGeometry):
           >>> p = Point((5, 23)) # 2D point, passed in as a tuple
           >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
         """
+
+        self._ptr = GEOSPointer(0) # Initially NULL
 
         if isinstance(x, (TupleType, ListType)):
             # Here a tuple or list was passed in under the ``x`` parameter.
@@ -52,14 +58,17 @@ class Point(GEOSGeometry):
         # Initializing from the geometry, and getting a Python object
         super(Point, self).__init__(lgeos.GEOSGeom_createPoint(cs))
 
+    def __len__(self):
+        "Returns the number of dimensions for this Point (either 2 or 3)."
+        if self.hasz: return 3
+        else: return 2
+        
     def _getOrdinate(self, dim, idx):
         "The coordinate sequence getOrdinate() wrapper."
-        self._cache_cs()
         return self._cs.getOrdinate(dim, idx)
 
     def _setOrdinate(self, dim, idx, value):
         "The coordinate sequence setOrdinate() wrapper."
-        self._cache_cs()
         self._cs.setOrdinate(dim, idx, value)
 
     def get_x(self):
@@ -100,38 +109,50 @@ class Point(GEOSGeometry):
     ### Tuple setting and retrieval routines. ###
     def get_tuple(self):
         "Returns a tuple of the point."
-        self._cache_cs()
         return self._cs.tuple
 
-    def set_tuple(self):
-        "Sets the tuple for this point object."
-        pass
-
+    def set_tuple(self, tup):
+        "Sets the coordinates of the point with the given tuple."
+        self._cs[0] = tup
+    
     # The tuple property
     tuple = property(get_tuple, set_tuple)
 
 class LineString(GEOSGeometry):
 
     #### Python 'magic' routines ####
-    def __init__(self, coords, ring=False):
-        """Initializes on the given sequence, may take lists, tuples, or NumPy arrays
-        of X,Y pairs."""
+    def __init__(self, *args, **kwargs):
+        """Initializes on the given sequence -- may take lists, tuples, NumPy arrays
+        of X,Y pairs, or Point objects.  If Point objects are used, ownership is
+        _not_ transferred to the LineString object.
+
+        Examples:
+          ls = LineString((1, 1), (2, 2))
+          ls = LineString([(1, 1), (2, 2)])
+          ls = LineString(array([(1, 1), (2, 2)]))
+          ls = LineString(Point(1, 1), Point(2, 2))
+        """
+        self._ptr = GEOSPointer(0) # Initially NULL
+
+        # If only one argument was provided, then set the coords array appropriately
+        if len(args) == 1: coords = args[0]
+        else: coords = args
 
         if isinstance(coords, (TupleType, ListType)):
+            # Getting the number of coords and the number of dimensions -- which
+            #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ncoords = len(coords)
-            first = True
-            for coord in coords:
-                if not isinstance(coord, (TupleType, ListType)):
+            if coords: ndim = len(coords[0])
+            else: raise TypeError, 'Cannot initialize on empty sequence.'
+            self._checkdim(ndim)
+            # Incrementing through each of the coordinates and verifying
+            for i in xrange(1, ncoords):
+                if not isinstance(coords[i], (TupleType, ListType, Point)):
                     raise TypeError, 'each coordinate should be a sequence (list or tuple)'
-                if first:
-                    ndim = len(coord)
-                    self._checkdim(ndim)
-                    first = False
-                else:
-                    if len(coord) != ndim: raise TypeError, 'Dimension mismatch.'
+                if len(coords[i]) != ndim: raise TypeError, 'Dimension mismatch.'
             numpy_coords = False
         elif HAS_NUMPY and isinstance(coords, ndarray):
-            shape = coords.shape
+            shape = coords.shape # Using numpy's shape.
             if len(shape) != 2: raise TypeError, 'Too many dimensions.'
             self._checkdim(shape[1])
             ncoords = shape[0]
@@ -141,40 +162,38 @@ class LineString(GEOSGeometry):
             raise TypeError, 'Invalid initialization input for LineStrings.'
 
         # Creating the coordinate sequence
-        cs = GEOSCoordSeq(GEOSPointer(create_cs(c_uint(ncoords), c_uint(ndim))))
+        cs = GEOSCoordSeq(GEOSPointer(0, create_cs(c_uint(ncoords), c_uint(ndim))))
 
         # Setting each point in the coordinate sequence
         for i in xrange(ncoords):
             if numpy_coords: cs[i] = coords[i,:]
+            elif isinstance(coords[i], Point): cs[i] = coords[i].tuple
             else: cs[i] = coords[i]        
 
         # Getting the initialization function
-        if ring:
+        if kwargs.get('ring', False):
             func = lgeos.GEOSGeom_createLinearRing
         else:
             func = lgeos.GEOSGeom_createLineString
        
         # Calling the base geometry initialization with the returned pointer from the function.
-        super(LineString, self).__init__(func(cs._ptr()))
+        super(LineString, self).__init__(func(cs._ptr.coordseq()))
 
     def __getitem__(self, index):
         "Gets the point at the specified index."
-        self._cache_cs()
         return self._cs[index]
 
     def __setitem__(self, index, value):
         "Sets the point at the specified index, e.g., line_str[0] = (1, 2)."
-        self._cache_cs()
         self._cs[index] = value
 
     def __iter__(self):
         "Allows iteration over this LineString."
         for i in xrange(self.__len__()):
-            yield self.__getitem__(index)
+            yield self.__getitem__(i)
 
     def __len__(self):
         "Returns the number of points in this LineString."
-        self._cache_cs()
         return len(self._cs)
 
     def _checkdim(self, dim):
@@ -184,55 +203,103 @@ class LineString(GEOSGeometry):
     @property
     def tuple(self):
         "Returns a tuple version of the geometry from the coordinate sequence."
-        self._cache_cs()
         return self._cs.tuple
 
     def _listarr(self, func):
         """Internal routine that returns a sequence (list) corresponding with
         the given function.  Will return a numpy array if possible."""
-        lst = [func(i) for i in xrange(self.__len__())] # constructing the list, using the function
+        lst = [func(i) for i in xrange(len(self))] # constructing the list, using the function
         if HAS_NUMPY: return array(lst) # ARRRR!
         else: return lst
 
     @property
     def array(self):
         "Returns a numpy array for the LineString."
-        self._cache_cs()
         return self._listarr(self._cs.__getitem__)
 
     @property
     def x(self):
         "Returns a list or numpy array of the X variable."
-        self._cache_cs()
         return self._listarr(self._cs.getX)
     
     @property
     def y(self):
         "Returns a list or numpy array of the Y variable."
-        self._cache_cs()
         return self._listarr(self._cs.getY)
 
     @property
     def z(self):
         "Returns a list or numpy array of the Z variable."
-        self._cache_cs()
         if not self.hasz: return None
         else: return self._listarr(self._cs.getZ)
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):
-    def __init__(self, coords):
+    def __init__(self, *args):
         "Overriding the initialization function to set the ring keyword."
-        super(LinearRing, self).__init__(coords, ring=True)
+        kwargs = {'ring' : True}
+        super(LinearRing, self).__init__(*args, **kwargs)
 
 class Polygon(GEOSGeometry):
 
+    def __init__(self, *args):
+        """Initializes on an exterior ring and a sequence of holes (both instances of LinearRings.
+        All LinearRing instances used for creation will become owned by this Polygon.
+        
+        Examples, where shell, hole1, and hole2 are valid LinearRing geometries:
+          poly = Polygon(shell, hole1, hole2)
+          poly = Polygon(shell, (hole1, hole2))
+        """
+        self._ptr = GEOSPointer(0) # Initially NULL
+        self._rings = {} 
+        if not args:
+            raise TypeError, 'Must provide at list one LinearRing instance to initialize Polygon.'
+
+        # Getting the ext_ring and init_holes parameters from the argument list
+        ext_ring = args[0]
+        init_holes = args[1:]
+        if len(init_holes) == 1 and isinstance(init_holes[0], (TupleType, ListType)): 
+            init_holes = init_holes[0]
+
+        # Ensuring the exterior ring parameter is a LinearRing object
+        if not isinstance(ext_ring, LinearRing):
+            raise TypeError, 'First argument for Polygon initialization must be a LinearRing.'
+
+        # Making sure all of the holes are LinearRing objects
+        if False in [isinstance(hole, LinearRing) for hole in init_holes]:
+            raise TypeError, 'Holes parameter must be a sequence of LinearRings.'
+
+        # Getting the holes
+        nholes = len(init_holes)
+        holes = get_pointer_arr(nholes)
+        for i in xrange(nholes):
+            # Casting to the Geometry Pointer type
+            holes[i] = cast(init_from_geom(init_holes[i]), GEOM_PTR)
+                      
+        # Getting the shell pointer address, 
+        shell = init_from_geom(ext_ring)
+
+        # Calling with the GEOS createPolygon factory.
+        super(Polygon, self).__init__(lgeos.GEOSGeom_createPolygon(shell, byref(holes), c_uint(nholes)))
+
     def __del__(self):
-        "Override the GEOSGeometry delete routine to safely take care of any spawned rings."
-        # Nullifying the pointers to internal rings, preventing any attempted future access
-        for k in self._rings: self._rings[k].nullify()
-        super(Polygon, self).__del__() # Calling the parent __del__() method.
-    
+        "Overloaded deletion method for Polygons."
+        #print 'Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
+        # If this geometry is still valid, it hasn't been modified by others.
+        if self._ptr.valid:
+            # Nulling the pointers to internal rings, preventing any attempted future access
+            for k in self._rings: self._rings[k].nullify()
+            super(Polygon, self).__del__()
+        else:
+            # Internal memory has become part of other objects; must delete the 
+            #  internal objects which are still valid individually, since calling
+            #  destructor on entire geometry will result in an attempted deletion 
+            #  of NULL pointers for the missing components.
+            for k in self._rings:
+                if self._rings[k].valid:
+                    lgeos.GEOSGeom_destroy(self._rings[k].address)
+                    self._rings[k].nullify()
+
     def __getitem__(self, index):
         """Returns the ring at the specified index.  The first index, 0, will always
         return the exterior ring.  Indices > 0 will return the interior ring."""
@@ -247,12 +314,21 @@ class Polygon(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each ring in the polygon."
-        for i in xrange(self.__len__()):
+        for i in xrange(len(self)):
             yield self.__getitem__(i)
 
     def __len__(self):
         "Returns the number of rings in this Polygon."
         return self.num_interior_rings + 1
+
+    def _populate(self):
+        "Populates the internal rings dictionary."
+        # Getting the exterior ring first for the 0th index.
+        self._rings = {0 : GEOSPointer(lgeos.GEOSGetExteriorRing(self._ptr()))}
+
+        # Getting the interior rings.
+        for i in xrange(self.num_interior_rings):
+            self._rings[i+1] = GEOSPointer(lgeos.GEOSGetInteriorRingN(self._ptr(), c_int(i)))
 
     def get_interior_ring(self, ring_i):
         """Gets the interior ring at the specified index,
@@ -262,13 +338,9 @@ class Polygon(GEOSGeometry):
         if ring_i < 0 or ring_i >= self.num_interior_rings:
             raise IndexError, 'ring index out of range'
 
-        # Placing the ring in internal rings dictionary.
-        idx = ring_i+1 # the index for the polygon is +1 because of the exterior ring
-        if not idx in self._rings:
-            self._rings[idx] = GEOSPointer(lgeos.GEOSGetInteriorRingN(self._ptr(), c_int(ring_i)))
-
-        # Returning the ring at the given index.
-        return GEOSGeometry(self._rings[idx], child=True)
+        # Returning the ring from the internal ring dictionary (have to
+        #   add one to the index)
+        return GEOSGeometry(self._rings[ring_i+1], parent=self._ptr)
                                                         
     #### Polygon Properties ####
     @property
@@ -282,17 +354,18 @@ class Polygon(GEOSGeometry):
         if n == -1: raise GEOSException, 'Error getting the number of interior rings.'
         else: return n
 
-    @property
-    def exterior_ring(self):
+    def get_ext_ring(self):
         "Gets the exterior ring of the Polygon."
-        # Returns exterior ring 
-        self._rings[0] = GEOSPointer(lgeos.GEOSGetExteriorRing((self._ptr())))
-        return GEOSGeometry(self._rings[0], child=True)
+        return GEOSGeometry(self._rings[0], parent=self._ptr)
 
-    @property
-    def shell(self):
-        "Gets the shell (exterior ring) of the Polygon."
-        return self.exterior_ring
+    def set_ext_ring(self):
+        "Sets the exterior ring of the Polygon."
+        # Sets the exterior ring
+        raise NotImplementedError
+
+    # properties for the exterior ring/shell
+    exterior_ring = property(get_ext_ring)
+    shell = property(get_ext_ring)
     
     @property
     def tuple(self):

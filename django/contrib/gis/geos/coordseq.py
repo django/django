@@ -1,6 +1,8 @@
-from django.contrib.gis.geos.libgeos import lgeos
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from ctypes import c_double, c_int, c_uint, byref
+from types import ListType, TupleType
+if HAS_NUMPY: from numpy import ndarray
 
 """
   This module houses the GEOSCoordSeq object, and is used internally
@@ -14,6 +16,8 @@ class GEOSCoordSeq(object):
     #### Python 'magic' routines ####
     def __init__(self, ptr, z=False):
         "Initializes from a GEOS pointer."
+        if not isinstance(ptr, GEOSPointer):
+            raise TypeError, 'Coordinate sequence should initialize with a GEOSPointer.'
         self._ptr = ptr
         self._z = z
 
@@ -39,6 +43,14 @@ class GEOSCoordSeq(object):
 
     def __setitem__(self, index, value):
         "Can use the index [] operator to set coordinate sequence at an index."
+        # Checking the input value
+        if isinstance(value, (ListType, TupleType)):
+            pass
+        elif HAS_NUMPY and isinstance(value, ndarray):
+            pass
+        else:
+            raise TypeError, 'Must set coordinate with a sequence (list, tuple, or numpy array).'
+        # Checking the dims of the input
         if self.dims == 3 and self._z:
             n_args = 3
             set_3d = True
@@ -47,6 +59,7 @@ class GEOSCoordSeq(object):
             set_3d = False
         if len(value) != n_args:
             raise TypeError, 'Dimension of value does not match.'
+        # Setting the X, Y, Z
         self.setX(index, value[0])
         self.setY(index, value[1])
         if set_3d: self.setZ(index, value[2])
@@ -73,11 +86,11 @@ class GEOSCoordSeq(object):
         dim = c_uint(dimension)
         idx = c_uint(index)
 
-        # 'd' is the value of the point, passed in by reference
+        # 'd' is the value of the ordinate, passed in by reference
         d = c_double()
-        status = lgeos.GEOSCoordSeq_getOrdinate(self._ptr(), idx, dim, byref(d))
+        status = lgeos.GEOSCoordSeq_getOrdinate(self._ptr.coordseq(), idx, dim, byref(d))
         if status == 0:
-            raise GEOSException, 'could not retrieve %th ordinate at index: %s' % (str(dimension), str(index))
+            raise GEOSException, 'could not retrieve %sth ordinate at index: %s' % (dimension, index)
         return d.value
 
     def setOrdinate(self, dimension, index, value):
@@ -90,7 +103,7 @@ class GEOSCoordSeq(object):
         idx = c_uint(index)
 
         # Setting the ordinate
-        status = lgeos.GEOSCoordSeq_setOrdinate(self._ptr(), idx, dim, c_double(value))
+        status = lgeos.GEOSCoordSeq_setOrdinate(self._ptr.coordseq(), idx, dim, c_double(value))
         if status == 0:
             raise GEOSException, 'Could not set the ordinate for (dim, index): (%d, %d)' % (dimension, index)
 
@@ -123,7 +136,7 @@ class GEOSCoordSeq(object):
     def size(self):
         "Returns the size of this coordinate sequence."
         n = c_uint(0)
-        status = lgeos.GEOSCoordSeq_getSize(self._ptr(), byref(n))
+        status = lgeos.GEOSCoordSeq_getSize(self._ptr.coordseq(), byref(n))
         if status == 0:
             raise GEOSException, 'Could not get CoordSeq size.'
         return n.value
@@ -132,7 +145,7 @@ class GEOSCoordSeq(object):
     def dims(self):
         "Returns the dimensions of this coordinate sequence."
         n = c_uint(0)
-        status = lgeos.GEOSCoordSeq_getDimensions(self._ptr(), byref(n))
+        status = lgeos.GEOSCoordSeq_getDimensions(self._ptr.coordseq(), byref(n))
         if status == 0:
             raise GEOSException, 'Could not get CoordSeq dimensions.'
         return n.value
@@ -146,7 +159,7 @@ class GEOSCoordSeq(object):
     @property
     def clone(self):
         "Clones this coordinate sequence."
-        pass
+        return GEOSCoordSeq(GEOSPointer(0, lgeos.GEOSCoordSeq_clone(self._ptr.coordseq())), self.hasz)
 
     @property
     def tuple(self):
