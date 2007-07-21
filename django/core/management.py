@@ -1236,7 +1236,8 @@ def runserver(addr, port, use_reloader=True, admin_media_dir=''):
             except (AttributeError, KeyError):
                 error_text = str(e)
             sys.stderr.write(style.ERROR("Error: %s" % error_text) + '\n')
-            sys.exit(1)
+            # Need to use an OS exit because sys.exit doesn't work in a thread
+            os._exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
     if use_reloader:
