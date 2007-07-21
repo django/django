@@ -10,11 +10,22 @@ class AssertContainsTests(TestCase):
     def test_contains(self):
         "Responses can be inspected for content, including counting repeated substrings"
         response = self.client.get('/test_client_regress/no_template_view/')
-        
+
+        self.assertContains(response, 'never', 0)
         self.assertContains(response, 'once')
         self.assertContains(response, 'once', 1)
         self.assertContains(response, 'twice')
         self.assertContains(response, 'twice', 2)
+
+        try:
+            self.assertContains(response, 'never', 1)
+        except AssertionError, e:
+            self.assertEquals(str(e), "Found 0 instances of 'never' in response (expected 1)")
+
+        try:
+            self.assertContains(response, 'once', 0)
+        except AssertionError, e:
+            self.assertEquals(str(e), "Found 1 instances of 'once' in response (expected 0)")
 
         try:
             self.assertContains(response, 'once', 2)
