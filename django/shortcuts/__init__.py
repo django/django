@@ -21,7 +21,7 @@ def get_object_or_404(klass, *args, **kwargs):
     Use get() to return an object, or raise a Http404 exception if the object
     does not exist.
 
-    klass may be a Model, Manager, or QuerySet object.  All other passed
+    klass may be a Model or Manager object.  All other passed
     arguments and keyword arguments are used in the get() query.
 
     Note: Like with get(), an AssertionError will be raised if more than one
@@ -42,7 +42,7 @@ def get_list_or_404(klass, *args, **kwargs):
     Use filter() to return a list of objects, or raise a Http404 exception if
     the list is empty.
 
-    klass may be a Model, Manager, or QuerySet object.  All other passed
+    klass may be a Model or Manager object.  All other passed
     arguments and keyword arguments are used in the filter() query.
     """
     if isinstance(klass, Manager):
