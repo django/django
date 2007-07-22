@@ -1,6 +1,6 @@
 import os, sys
 from ctypes import CDLL
-from django.contrib.gis.gdal.OGRError import OGRException
+from django.contrib.gis.gdal.error import OGRException
 
 if os.name == 'nt':
     # Windows NT shared library
@@ -20,4 +20,4 @@ else:
 
 # This loads the GDAL/OGR C library
 lgdal = CDLL(lib_name)
-                                                                            
+

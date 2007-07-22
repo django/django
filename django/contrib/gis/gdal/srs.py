@@ -9,7 +9,7 @@ from ctypes import \
 from django.contrib.gis.gdal.libgdal import lgdal
 
 # Getting the error checking routine and exceptions
-from django.contrib.gis.gdal.OGRError import check_err, OGRException, SRSException
+from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
 
 """
   The Spatial Reference class, represensents OGR Spatial Reference objects.
@@ -71,8 +71,6 @@ class SpatialReference(object):
     the SpatialReference object 'provide[s] services to represent coordinate systems
     (projections and datums) and to transform between them.'"""
 
-    _srs = 0 # Initially NULL
-
     # Well-Known Geographical Coordinate System Name
     _well_known = {'WGS84':4326, 'WGS72':4322, 'NAD27':4267, 'NAD83':4269}
     _epsg_regex = re.compile('^EPSG:(?P<epsg>\d+)$', re.I)
@@ -80,6 +78,8 @@ class SpatialReference(object):
     #### Python 'magic' routines ####
     def __init__(self, input='', srs_type='wkt'):
         "Creates a spatial reference object from the given OGC Well Known Text (WKT)."
+
+        self._srs = 0 # Initially NULL
 
         # Creating an initial empty string buffer.
         buf = c_char_p('')
@@ -99,6 +99,7 @@ class SpatialReference(object):
             else:
                 buf = c_char_p(input)
         elif isinstance(input, int):
+            if srs_type == 'wkt': srs_type = 'epsg' # want to try epsg if only integer provided
             if srs_type not in ('epsg', 'ogr'): 
                 raise SRSException, 'Integer input requires SRS type of "ogr" or "epsg".'
         else:
@@ -317,10 +318,9 @@ class SpatialReference(object):
 class CoordTransform(object):
     "A coordinate system transformation object."
 
-    _ct = 0 # Initially NULL
-
     def __init__(self, source, target):
         "Initializes on a source and target SpatialReference objects."
+        self._ct = 0 # Initially NULL 
         if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
             raise SRSException, 'source and target must be of type SpatialReference'
         ct = lgdal.OCTNewCoordinateTransformation(source._srs, target._srs)

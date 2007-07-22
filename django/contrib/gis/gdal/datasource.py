@@ -4,9 +4,9 @@ from ctypes import c_char_p, c_int, c_void_p, byref, string_at
 
 # The GDAL C library, OGR exceptions, and the Layer object.
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.OGRError import OGRException, check_err
-from django.contrib.gis.gdal.Layer import Layer
-from django.contrib.gis.gdal.Driver import Driver
+from django.contrib.gis.gdal.error import OGRException, check_err
+from django.contrib.gis.gdal.layer import Layer
+from django.contrib.gis.gdal.driver import Driver
 
 """
   DataSource is a wrapper for the OGR Data Source object, which provides
@@ -52,10 +52,10 @@ from django.contrib.gis.gdal.Driver import Driver
 class DataSource(object):
     "Wraps an OGR Data Source object."
 
-    _ds = 0 # Initially NULL
-    
     #### Python 'magic' routines ####
     def __init__(self, ds_input, ds_driver=False):
+
+        self._ds = 0 # Initially NULL
 
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.

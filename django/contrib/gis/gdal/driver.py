@@ -4,7 +4,7 @@ from ctypes import c_char_p, c_int, c_void_p, byref, string_at
 
 # The GDAL C library, OGR exceptions, and the Layer object.
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.OGRError import OGRException
+from django.contrib.gis.gdal.error import OGRException
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -13,8 +13,6 @@ from django.contrib.gis.gdal.OGRError import OGRException
 
 class Driver(object):
     "Wraps an OGR Data Source Driver."
-
-    _dr = 0 # Initially NULL
 
     # Case-insensitive aliases for OGR Drivers.
     _alias = {'esri' : 'ESRI Shapefile',
@@ -29,6 +27,7 @@ class Driver(object):
 
         if isinstance(input, StringType):
             # If a string name of the driver was passed in
+            self._dr = 0 # Initially NULL
             self._register()
 
             # Checking the alias dictionary (case-insensitive) to see if an alias

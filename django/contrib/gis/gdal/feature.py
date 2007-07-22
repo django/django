@@ -4,9 +4,9 @@ from ctypes import c_char_p, c_int, string_at
 
 # The GDAL C library, OGR exception, and the Field object
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.OGRError import OGRException
-from django.contrib.gis.gdal.Field import Field
-from django.contrib.gis.gdal.OGRGeometry import OGRGeometry, OGRGeomType
+from django.contrib.gis.gdal.error import OGRException
+from django.contrib.gis.gdal.field import Field
+from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -15,11 +15,11 @@ from django.contrib.gis.gdal.OGRGeometry import OGRGeometry, OGRGeomType
 class Feature(object):
     "A class that wraps an OGR Feature, needs to be instantiated from a Layer object."
 
-    _feat = 0 # Initially NULL
-
     #### Python 'magic' routines ####
     def __init__(self, f):
         "Needs a C pointer (Python integer in ctypes) in order to initialize."
+        self._feat = 0 # Initially NULL
+        self._fdefn = 0 
         if not f:
             raise OGRException, 'Cannot create OGR Feature, invalid pointer given.'
         self._feat = f

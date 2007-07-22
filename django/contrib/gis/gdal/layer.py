@@ -5,17 +5,18 @@ from ctypes import c_int, c_long, c_void_p, byref, string_at
 from django.contrib.gis.gdal.libgdal import lgdal
 
 # Other GDAL imports.
-from django.contrib.gis.gdal.Envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.Feature import Feature
-from django.contrib.gis.gdal.OGRGeometry import OGRGeomType
-from django.contrib.gis.gdal.OGRError import OGRException, check_err
-from django.contrib.gis.gdal.SpatialReference import SpatialReference
+from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
+from django.contrib.gis.gdal.feature import Feature
+from django.contrib.gis.gdal.geometries import OGRGeomType
+from django.contrib.gis.gdal.error import OGRException, check_err
+from django.contrib.gis.gdal.srs import SpatialReference
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
 #
 # The OGR_L_* routines are relevant here.
 
+# function prototype for obtaining the spatial reference system
 get_srs = lgdal.OGR_L_GetSpatialRef
 get_srs.restype = c_void_p
 get_srs.argtypes = [c_void_p]
@@ -23,11 +24,11 @@ get_srs.argtypes = [c_void_p]
 class Layer(object):
     "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
 
-    _layer = 0 # Initially NULL
-
     #### Python 'magic' routines ####
     def __init__(self, l):
         "Needs a C pointer (Python/ctypes integer) in order to initialize."
+        self._layer = 0 # Initially NULL
+        self._ldefn = 0
         if not l:
             raise OGRException, 'Cannot create Layer, invalid pointer given'
         self._layer = l

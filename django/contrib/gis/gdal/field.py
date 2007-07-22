@@ -1,7 +1,7 @@
 from ctypes import string_at
 
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.OGRError import OGRException
+from django.contrib.gis.gdal.error import OGRException
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html

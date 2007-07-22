@@ -281,8 +281,7 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSEqualsExact, other, tol)
 
     #### SRID Routines ####
-    @property
-    def srid(self):
+    def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = lgeos.GEOSGetSRID(self._ptr())
         if s == 0:
@@ -293,7 +292,8 @@ class GEOSGeometry(object):
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
         lgeos.GEOSSetSRID(self._ptr(), c_int(srid))
-    
+    srid = property(get_srid, set_srid)
+
     #### Output Routines ####
     @property
     def wkt(self):

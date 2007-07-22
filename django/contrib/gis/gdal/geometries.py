@@ -2,11 +2,12 @@
 from types import IntType, StringType
 from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
 
-# Getting the GDAL C library and error checking facilities
+# Getting geodjango gdal prerequisites
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.Envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.OGRError import check_err, OGRException
-from django.contrib.gis.gdal.SpatialReference import SpatialReference, CoordTransform
+from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
+from django.contrib.gis.gdal.error import check_err, OGRException
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 """
   The OGRGeometry is a wrapper for using the OGR Geometry class
@@ -64,72 +65,6 @@ getx = pnt_func(lgdal.OGR_G_GetX)
 gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
 
-#### OGRGeomType ####
-class OGRGeomType(object):
-    "Encapulates OGR Geometry Types."
-
-    # Ordered array of acceptable strings and their corresponding OGRwkbGeometryType
-    __ogr_str = ['Point', 'LineString', 'Polygon', 'MultiPoint',
-                 'MultiLineString', 'MultiPolygon', 'GeometryCollection',
-                 'LinearRing']
-    __ogr_int = [1, 2, 3, 4, 5, 6, 7, 101]
-
-    def __init__(self, input):
-        "Figures out the correct OGR Type based upon the input."
-        if isinstance(input, OGRGeomType):
-            self._index = input._index
-        elif isinstance(input, StringType):
-            idx = self._has_str(self.__ogr_str, input)
-            if idx == None:
-                raise OGRException, 'Invalid OGR String Type "%s"' % input
-            self._index = idx
-        elif isinstance(input, int):
-            if not input in self.__ogr_int:
-                raise OGRException, 'Invalid OGR Integer Type: %d' % input
-            self._index =  self.__ogr_int.index(input)
-        else:
-            raise TypeError, 'Invalid OGR Input type given!'
-
-    def __str__(self):
-        "Returns a short-hand string form of the OGR Geometry type."
-        return self.__ogr_str[self._index]
-
-    def __eq__(self, other):
-        """Does an equivalence test on the OGR type with the given
-        other OGRGeomType, the short-hand string, or the integer."""
-        if isinstance(other, OGRGeomType):
-            return self._index == other._index
-        elif isinstance(other, StringType):
-            idx = self._has_str(self.__ogr_str, other)
-            if not (idx == None): return self._index == idx
-            return False
-        elif isinstance(other, int):
-            if not other in self.__ogr_int: return False
-            return self.__ogr_int.index(other) == self._index
-        else:
-            raise TypeError, 'Cannot compare with type: %s' % str(type(other))
-
-    def _has_str(self, arr, s):
-        "Case-insensitive search of the string array for the given pattern."
-        s_low = s.lower()
-        for i in xrange(len(arr)):
-            if s_low == arr[i].lower(): return i
-        return None
-
-    @property
-    def django(self):
-        "Returns the Django GeometryField for this OGR Type."
-        s = self.__ogr_str[self._index]
-        if s in ('Unknown', 'LinearRing'):
-            return None
-        else:
-            return s + 'Field'
-
-    @property
-    def num(self):
-        "Returns the OGRwkbGeometryType number for the OGR Type."
-        return self.__ogr_int[self._index]
-
 #### OGRGeometry Class ####
 class OGRGeometryIndexError(OGRException, KeyError):
     """This exception is raised when an invalid index is encountered, and has
@@ -142,10 +77,10 @@ class OGRGeometryIndexError(OGRException, KeyError):
 class OGRGeometry(object):
     "Generally encapsulates an OGR geometry."
 
-    _g = 0 # Initially NULL
-
     def __init__(self, input, srs=False):
         "Initializes Geometry on either WKT or an OGR pointer as input."
+
+        self._g = 0 # Initially NULL
 
         if isinstance(input, StringType):
             # Getting the spatial reference
@@ -181,6 +116,10 @@ class OGRGeometry(object):
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
 
+    def __del__(self):
+        "Deletes this Geometry."
+        if self._g: lgdal.OGR_G_DestroyGeometry(self._g)
+
     def _init_srs(self, srs):
         # Getting the spatial
         if not isinstance(srs, SpatialReference):
@@ -188,17 +127,34 @@ class OGRGeometry(object):
         else:
             self._s = srs.clone() # cloning the given spatial reference
 
-    def __add__(self, other):
+    ### Geometry set-like operations ###
+    # g = g1 | g2
+    def __or__(self, other):
         "Returns the union of the two geometries."
         return self.union(other)
 
-    def __del__(self):
-        "Deletes this Geometry."
-        if self._g: lgdal.OGR_G_DestroyGeometry(self._g)
+    # g = g1 & g2
+    def __and__(self, other):
+        "Returns the intersection of this Geometry and the other."
+        return self.intersection(other)
+
+    # g = g1 - g2
+    def __sub__(self, other):
+        "Return the difference this Geometry and the other."
+        return self.difference(other)
+
+    # g = g1 ^ g2
+    def __xor__(self, other):
+        "Return the symmetric difference of this Geometry and the other."
+        return self.sym_difference(other)
 
     def __eq__(self, other):
         "Is this Geometry equal to the other?"
         return self.equals(other)
+
+    def __ne__(self, other):
+        "Tests for inequality."
+        return not self.equals(other)
 
     def __str__(self):
         "WKT is used for the string representation."

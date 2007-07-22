@@ -1,7 +1,7 @@
 import os, os.path, unittest
 from django.contrib.gis.gdal import DataSource, OGRException
-from django.contrib.gis.gdal.Envelope import Envelope
-from django.contrib.gis.gdal.Field import OFTReal, OFTInteger, OFTString
+from django.contrib.gis.gdal.envelope import Envelope
+from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 
 # Path for SHP files
 shp_path = os.path.dirname(__file__)

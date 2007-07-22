@@ -1,7 +1,8 @@
-from Driver import Driver
-from Envelope import Envelope
-from DataSource import DataSource
-from SpatialReference import SpatialReference, CoordTransform
-from OGRGeometry import OGRGeometry, OGRGeomType
-from OGRError import check_err, OGRException, SRSException
+from driver import Driver
+from envelope import Envelope
+from datasource import DataSource
+from srs import SpatialReference, CoordTransform
+from geometries import OGRGeometry
+from geomtype import OGRGeomType
+from error import check_err, OGRException, SRSException
 
