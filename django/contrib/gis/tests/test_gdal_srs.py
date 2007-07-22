@@ -38,11 +38,11 @@ srlist = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,29
           )
 
 # Well-Known Names
-well_known = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]', wk='WGS84'),
-              TestSRS('GEOGCS["WGS 72",DATUM["WGS_1972",SPHEROID["WGS 72",6378135,298.26,AUTHORITY["EPSG","7043"]],AUTHORITY["EPSG","6322"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4322"]]', wk='WGS72'),
-              TestSRS('GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]]', wk='NAD27'),
-              TestSRS('GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]]', wk='NAD83'),
-              TestSRS('PROJCS["NZGD49 / Karamea Circuit",GEOGCS["NZGD49",DATUM["New_Zealand_Geodetic_Datum_1949",SPHEROID["International 1924",6378388,297,AUTHORITY["EPSG","7022"]],TOWGS84[59.47,-5.04,187.44,0.47,-0.1,1.024,-4.5993],AUTHORITY["EPSG","6272"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4272"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",-41.28991152777778],PARAMETER["central_meridian",172.1090281944444],PARAMETER["scale_factor",1],PARAMETER["false_easting",300000],PARAMETER["false_northing",700000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","27216"]]', wk='EPSG:27216'),
+well_known = (TestSRS('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]', wk='WGS84', name='WGS 84', attrs=(('GEOGCS|AUTHORITY', 1, '4326'), ('SPHEROID', 'WGS 84'))),
+              TestSRS('GEOGCS["WGS 72",DATUM["WGS_1972",SPHEROID["WGS 72",6378135,298.26,AUTHORITY["EPSG","7043"]],AUTHORITY["EPSG","6322"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4322"]]', wk='WGS72', name='WGS 72', attrs=(('GEOGCS|AUTHORITY', 1, '4322'), ('SPHEROID', 'WGS 72'))),
+              TestSRS('GEOGCS["NAD27",DATUM["North_American_Datum_1927",SPHEROID["Clarke 1866",6378206.4,294.9786982138982,AUTHORITY["EPSG","7008"]],AUTHORITY["EPSG","6267"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4267"]]', wk='NAD27', name='NAD27', attrs=(('GEOGCS|AUTHORITY', 1, '4267'), ('SPHEROID', 'Clarke 1866'))),
+              TestSRS('GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]]', wk='NAD83', name='NAD83', attrs=(('GEOGCS|AUTHORITY', 1, '4269'), ('SPHEROID', 'GRS 1980'))),
+              TestSRS('PROJCS["NZGD49 / Karamea Circuit",GEOGCS["NZGD49",DATUM["New_Zealand_Geodetic_Datum_1949",SPHEROID["International 1924",6378388,297,AUTHORITY["EPSG","7022"]],TOWGS84[59.47,-5.04,187.44,0.47,-0.1,1.024,-4.5993],AUTHORITY["EPSG","6272"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4272"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",-41.28991152777778],PARAMETER["central_meridian",172.1090281944444],PARAMETER["scale_factor",1],PARAMETER["false_easting",300000],PARAMETER["false_northing",700000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","27216"]]', wk='EPSG:27216', name='NZGD49 / Karamea Circuit', attrs=(('PROJECTION','Transverse_Mercator'), ('SPHEROID', 'International 1924'))),
               )
 
 bad_srlist = ('Foobar', 'OOJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["standard_parallel_1",30.28333333333333],PARAMETER["standard_parallel_2",28.38333333333333],PARAMETER["latitude_of_origin",27.83333333333333],PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AUTHORITY["EPSG","32140"]]',)
@@ -86,7 +86,10 @@ class SpatialRefTest(unittest.TestCase):
             if s.epsg:
                 srs1 = SpatialReference(s.wkt)
                 srs2 = SpatialReference(s.epsg, 'epsg')
-                self.assertEqual(srs1.wkt, srs2.wkt)
+                #self.assertEqual(srs1.wkt, srs2.wkt)
+                for srs in (srs1, srs2):
+                    for attr, expected in s.attr:
+                        self.assertEqual(expected, srs[attr])
 
     def test07_boolean_props(self):
         "Testing the boolean properties."
@@ -126,7 +129,15 @@ class SpatialRefTest(unittest.TestCase):
         "Testing Well Known Names of Spatial References."
         for s in well_known:
             srs = SpatialReference(s.wk)
-            self.assertEqual(s.wkt, srs.wkt)
+            self.assertEqual(s.name, srs.name)
+            for tup in s.attrs:
+                if len(tup) == 2:
+                    key = tup[0]
+                    exp = tup[1]
+                elif len(tup) == 3:
+                    key = tup[:2]
+                    exp = tup[2]
+                self.assertEqual(srs[key], exp)
 
     def test12_coordtransform(self):
         "Testing initialization of a CoordTransform."
