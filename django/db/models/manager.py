@@ -3,10 +3,6 @@ from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
 
-# Size of each "chunk" for get_iterator calls.
-# Larger values are slightly faster at the expense of more storage space.
-GET_ITERATOR_CHUNK_SIZE = 100
-
 def ensure_default_manager(sender):
     cls = sender
     if not hasattr(cls, '_default_manager'):
