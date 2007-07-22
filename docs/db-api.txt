@@ -1891,8 +1891,8 @@ get_object_or_404()
 One common idiom to use ``get()`` and raise ``Http404`` if the
 object doesn't exist. This idiom is captured by ``get_object_or_404()``.
 This function takes a Django model as its first argument and an
-arbitrary number of keyword arguments, which it passes to the manager's
-``get()`` function. It raises ``Http404`` if the object doesn't
+arbitrary number of keyword arguments, which it passes to the default
+manager's ``get()`` function. It raises ``Http404`` if the object doesn't
 exist. For example::
 
     # Get the Entry with a primary key of 3
@@ -1901,7 +1901,7 @@ exist. For example::
 When you provide a model to this shortcut function, the default manager
 is used to execute the underlying ``get()`` query. If you don't want to
 use the default manager, or if you want to search a list of related objects,
-you can provide ``get_object_or_404()`` with a manager object instead.
+you can provide ``get_object_or_404()`` with a ``Manager`` object instead.
 For example::
 
     # Get the author of blog instance e with a name of 'Fred'
@@ -1910,6 +1910,14 @@ For example::
     # Use a custom manager 'recent_entries' in the search for an
     # entry with a primary key of 3
     e = get_object_or_404(Entry.recent_entries, pk=3)
+
+If you need to use a custom method that you added to a custom manager,
+then you can provide ``get_object_or_404()`` with a ``QuerySet`` object.
+For example::
+
+    # Use a QuerySet returned from a 'published' method of a custom manager
+    # in the search for an entry with primary key of 5
+    e = get_object_or_404(Entry.objects.published(), pk=5)
 
 get_list_or_404()
 -----------------
