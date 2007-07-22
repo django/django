@@ -50,7 +50,7 @@ def get_object_or_404(klass, *args, **kwargs):
 def get_list_or_404(klass, *args, **kwargs):
     """
     Use filter() to return a list of objects, or raise a Http404 exception if
-    the list is emtpy.
+    the list is empty.
 
     klass may be a Model, Manager, or QuerySet object.  All other passed
     arguments and keyword arguments are used in the filter() query.
