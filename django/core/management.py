@@ -1331,7 +1331,7 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(app_labels, verbosity=1):
+def test(app_labels, verbosity=1, interactive=True):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
@@ -1350,12 +1350,12 @@ def test(app_labels, verbosity=1):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
-    failures = test_runner(app_list, verbosity)
+    failures = test_runner(app_list, verbosity=verbosity, interactive=interactive)
     if failures:
         sys.exit(failures)
 
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
-test.args = '[--verbosity] ' + APP_ARGS
+test.args = '[--verbosity] [--noinput]' + APP_ARGS
 
 def load_data(fixture_labels, verbosity=1):
     "Installs the provided fixture file(s) as data in the database."
@@ -1631,7 +1631,12 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             action_mapping[action](args[1])
         except IndexError:
             parser.print_usage_and_exit()
-    elif action in ('test', 'loaddata'):
+    elif action == 'test':
+        try:
+            action_mapping[action](args[1:], int(options.verbosity), options.interactive)
+        except IndexError:
+            parser.print_usage_and_exit()
+    elif action == 'loaddata':
         try:
             action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:

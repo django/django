@@ -69,7 +69,7 @@ def build_suite(app_module):
             
     return suite
 
-def run_tests(module_list, verbosity=1, extra_tests=[]):
+def run_tests(module_list, verbosity=1, interactive=True, extra_tests=[]):
     """
     Run the unit tests for all the modules in the provided list.
     This testrunner will search each of the modules in the provided list,
@@ -91,7 +91,7 @@ def run_tests(module_list, verbosity=1, extra_tests=[]):
         suite.addTest(test)
 
     old_name = settings.DATABASE_NAME
-    create_test_db(verbosity)
+    create_test_db(verbosity, autoclobber=not interactive)
     result = unittest.TextTestRunner(verbosity=verbosity).run(suite)
     destroy_test_db(old_name, verbosity)
     
