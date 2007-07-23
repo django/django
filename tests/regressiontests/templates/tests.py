@@ -6,13 +6,17 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
+import os
+import unittest
+from datetime import datetime, timedelta
+
 from django import template
 from django.template import loader
+from django.template.loaders import app_directories, filesystem
 from django.utils.translation import activate, deactivate, install, ugettext as _
 from django.utils.tzinfo import LocalTimezone
-from datetime import datetime, timedelta
+
 from unicode import unicode_tests
-import unittest
 
 # Some other tests we would like to run
 __test__ = {
@@ -75,6 +79,46 @@ class UTF8Class:
         return u'ŠĐĆŽćžšđ'.encode('utf-8')
 
 class Templates(unittest.TestCase):
+    def test_loaders_security(self):
+        def test_template_sources(path, template_dirs, expected_sources):
+            # Fix expected sources so they are normcased and abspathed
+            expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
+            # Test app_directories loader
+            sources = app_directories.get_template_sources(path, template_dirs)
+            self.assertEqual(list(sources), expected_sources)
+            # Test filesystem loader
+            sources = filesystem.get_template_sources(path, template_dirs)
+            self.assertEqual(list(sources), expected_sources)
+
+        template_dirs = ['/dir1', '/dir2']
+        test_template_sources('index.html', template_dirs,
+                              ['/dir1/index.html', '/dir2/index.html'])
+        test_template_sources('/etc/passwd', template_dirs,
+                              [])
+        test_template_sources('etc/passwd', template_dirs,
+                              ['/dir1/etc/passwd', '/dir2/etc/passwd'])
+        test_template_sources('../etc/passwd', template_dirs,
+                              [])
+        test_template_sources('../../../etc/passwd', template_dirs,
+                              [])
+        test_template_sources('/dir1/index.html', template_dirs,
+                              ['/dir1/index.html'])
+        test_template_sources('../dir2/index.html', template_dirs,
+                              ['/dir2/index.html'])
+        test_template_sources('/dir1blah', template_dirs,
+                              [])
+        test_template_sources('../dir1blah', template_dirs,
+                              [])
+
+        # Case insensitive tests (for win32). Not run unless we're on
+        # a case insensitive operating system.
+        if os.path.normcase('/TEST') == os.path.normpath('/test'):
+            template_dirs = ['/dir1', '/DIR2']
+            test_template_sources('index.html', template_dirs,
+                                  ['/dir1/index.html', '/dir2/index.html'])
+            test_template_sources('/DIR1/index.HTML', template_dirs,
+                                  ['/dir1/index.html'])
+
     def test_templates(self):
         # NOW and NOW_tz are used by timesince tag tests.
         NOW = datetime.now()

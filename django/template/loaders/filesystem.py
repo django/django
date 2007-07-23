@@ -1,14 +1,20 @@
-# Wrapper for loading templates from the filesystem.
+"""
+Wrapper for loading templates from the filesystem.
+"""
 
 from django.conf import settings
 from django.template import TemplateDoesNotExist
-import os
+from django.utils._os import safe_join
 
 def get_template_sources(template_name, template_dirs=None):
     if not template_dirs:
         template_dirs = settings.TEMPLATE_DIRS
     for template_dir in template_dirs:
-        yield os.path.join(template_dir, template_name)
+        try:
+            yield safe_join(template_dir, template_name)
+        except ValueError:
+            # The joined path was located outside of template_dir.
+            pass
 
 def load_template_source(template_name, template_dirs=None):
     tried = []
