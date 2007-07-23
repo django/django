@@ -662,12 +662,13 @@ framework that can be executed from Python code.
 Defining a test runner
 ----------------------
 By convention, a test runner should be called ``run_tests``; however, you
-can call it anything you want. The only requirement is that it accept three
-arguments:
+can call it anything you want. The only requirement is that it has the
+same arguments as the Django test runner:
 
-``run_tests(module_list, verbosity=1, interactive=True)``
+``run_tests(module_list, verbosity=1, interactive=True, extra_tests=[])``
     The module list is the list of Python modules that contain the models to be
-    tested. This is the same format returned by ``django.db.models.get_apps()``
+    tested. This is the same format returned by ``django.db.models.get_apps()``.
+    The test runner should search these modules for tests to execute.
 
     Verbosity determines the amount of notification and debug information that
     will be printed to the console; ``0`` is no output, ``1`` is normal output,
@@ -678,6 +679,10 @@ arguments:
     executed. An example of this behavior would be asking for permission to
     delete an existing test database. If ``interactive`` is ``False, the 
     test suite must be able to run without any manual intervention.
+    
+    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the 
+    suite that is executed by the test runner. These extra tests are run 
+    in addition to those discovered in the modules listed in ``module_list``.
     
     This method should return the number of tests that failed.
 
