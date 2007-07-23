@@ -1,5 +1,8 @@
 from django.db.models.query import Q, QuerySet
+from django.db import backend
+from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.postgis import parse_lookup
+from django.db.models.fields import FieldDoesNotExist
 import operator
 
 class GeoQ(Q):
@@ -33,3 +36,11 @@ class GeoQuerySet(QuerySet):
         if len(args) > 0:
             clone._filters = clone._filters & reduce(operator.and_, map(mapper, args))
         return clone
+
+    def kml(self, field_name):
+        field = self.model._meta.get_field(field_name)
+
+        field_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
+                            backend.quote_name(field.column))
+        
+        return self.extra(select={'kml':'AsKML(%s,6)' % field_col})

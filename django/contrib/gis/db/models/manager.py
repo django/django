@@ -6,3 +6,6 @@ class GeoManager(Manager):
 
     def get_query_set(self):
         return GeoQuerySet(model=self.model)
+
+    def kml(self, field_name):
+        return self.get_query_set().kml(field_name)
