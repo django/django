@@ -55,15 +55,21 @@ from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 #
 # The OGR_G_* routines are relevant here.
 
-#### ctypes prototypes ####
+#### ctypes prototypes for functions that return double values ####
 def pnt_func(f):
     "For accessing point information."
     f.restype = c_double
     f.argtypes = [c_void_p, c_int]
     return f
+# GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)
 gety = pnt_func(lgdal.OGR_G_GetY)
 getz = pnt_func(lgdal.OGR_G_GetZ)
+
+# GetArea returns a double.
+get_area = lgdal.OGR_G_GetArea
+get_area.restype = c_double
+get_area.argtypes = [c_void_p]
 
 #### OGRGeometry Class ####
 class OGRGeometryIndexError(OGRException, KeyError):
@@ -211,8 +217,7 @@ class OGRGeometry(object):
     @property
     def area(self):
         "Returns the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
-        a = lgdal.OGR_G_GetArea(self._g)
-        return a.value
+        return get_area(self._g)
 
     @property
     def envelope(self):

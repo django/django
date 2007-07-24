@@ -10,11 +10,11 @@ from django.contrib.gis.gdal.error import OGRException
 class Field(object):
     "A class that wraps an OGR Field, needs to be instantiated from a Feature object."
 
-    _fld = 0 # Initially NULL
-
     #### Python 'magic' routines ####
     def __init__(self, fld, val=''):
         "Needs a C pointer (Python integer in ctypes) in order to initialize."
+        self._fld = 0 # Initially NULL
+
         if not fld:
             raise OGRException, 'Cannot create OGR Field, invalid pointer given.'
         self._fld = fld
@@ -51,23 +51,19 @@ class OFTInteger(Field):
         try:
             return int(self._val)
         except ValueError:
-            return 0
-    
+            return None
 class OFTIntegerList(Field): pass
+
 class OFTReal(Field):
     @property
     def value(self):
         "Returns a float contained in this field."
-
         try:
             return float(self._val)
         except ValueError:
-            #FIXME: 0?  None?
-            return 0
-
-        
-
+            return None
 class OFTRealList(Field): pass
+
 class OFTString(Field): pass
 class OFTStringList(Field): pass
 class OFTWideString(Field): pass
