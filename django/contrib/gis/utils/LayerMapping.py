@@ -81,17 +81,18 @@ Example:
 
  LayerMapping just transformed the three geometries from the SHP file from their
    source spatial reference system (WGS84) to the spatial reference system of
-   the GeoDjango model (NAD83).  Further, data is selectively imported from
-   the given 
+   the GeoDjango model (NAD83).  If no spatial reference system is defined for
+   the layer, use the `source_srs` keyword with a SpatialReference object to
+   specify one. Further, data is selectively imported from the given data source 
+   fields into the model fields.
 """
 from types import StringType, TupleType
 from datetime import datetime
 from django.contrib.gis.gdal import \
      OGRGeometry, OGRGeomType, SpatialReference, CoordTransform, \
-     DataSource, Layer, Feature, OGRException
-from django.contrib.gis.gdal.Field import Field, OFTInteger, OFTReal, OFTString, OFTDateTime
+     DataSource, OGRException
+from django.contrib.gis.gdal.field import Field, OFTInteger, OFTReal, OFTString, OFTDateTime
 from django.contrib.gis.models import GeometryColumns, SpatialRefSys
-
 from django.db import connection, transaction
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -257,7 +258,7 @@ class LayerMapping:
         try:
             geo_col = GeometryColumns.objects.get(f_table_name=self.model._meta.db_table)
         except:
-            raise Exception, 'Geometry column "%s" does not exist. (did you run syncdb?)'
+            raise Exception, 'Geometry column does not exist. (did you run syncdb?)'
         
         # Getting the coordinate system needed for transformation (with CoordTransform)  
         try:
@@ -336,4 +337,4 @@ class LayerMapping:
                     raise
                 except Exception, e:
                     print "Failed to save %s\n  Continuing" % kwargs
-                
+                    

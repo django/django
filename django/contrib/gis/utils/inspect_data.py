@@ -3,7 +3,7 @@ This module includes some utility functions for inspecting the layout
 of a gdal.DataSource.
 """
 
-from django.contrib.gis.gdal.OGRGeometry import GEO_CLASSES
+from django.contrib.gis.gdal.geometries import GEO_CLASSES
 
 def sample(data_source, num_features=10, gcs_file=None):
     """
