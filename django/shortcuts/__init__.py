@@ -11,7 +11,7 @@ from django.db.models.query import QuerySet
 
 def render_to_response(*args, **kwargs):
     """
-    Return a HttpResponse whose content is filled with the result of calling
+    Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
     return HttpResponse(loader.render_to_string(*args, **kwargs))
@@ -19,7 +19,7 @@ load_and_render = render_to_response # For backwards compatibility.
 
 def _get_queryset(klass):
     """
-    Return a QuerySet from a Model, Manager, or QuerySet. Created to make
+    Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
     get_object_or_404 and get_list_or_404 more DRY.
     """
     if isinstance(klass, QuerySet):
@@ -32,10 +32,10 @@ def _get_queryset(klass):
 
 def get_object_or_404(klass, *args, **kwargs):
     """
-    Use get() to return an object, or raise a Http404 exception if the object
+    Uses get() to return an object, or raises a Http404 exception if the object
     does not exist.
 
-    klass may be a Model, Manager, or QuerySet object.  All other passed
+    klass may be a Model, Manager, or QuerySet object. All other passed
     arguments and keyword arguments are used in the get() query.
 
     Note: Like with get(), an AssertionError will be raised if more than one
@@ -49,10 +49,10 @@ def get_object_or_404(klass, *args, **kwargs):
 
 def get_list_or_404(klass, *args, **kwargs):
     """
-    Use filter() to return a list of objects, or raise a Http404 exception if
+    Uses filter() to return a list of objects, or raise a Http404 exception if
     the list is empty.
 
-    klass may be a Model, Manager, or QuerySet object.  All other passed
+    klass may be a Model, Manager, or QuerySet object. All other passed
     arguments and keyword arguments are used in the filter() query.
     """
     queryset = _get_queryset(klass)
