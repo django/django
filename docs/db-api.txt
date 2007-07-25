@@ -1911,9 +1911,9 @@ For example::
     # entry with a primary key of 3
     e = get_object_or_404(Entry.recent_entries, pk=3)
 
-If you need to use a custom method that you added to a custom manager,
-then you can provide ``get_object_or_404()`` with a ``QuerySet`` object.
-For example::
+**New in Django development version:** The first argument to
+``get_object_or_404()`` can be a ``QuerySet`` object. This is useful in cases
+where you've defined a custom manager method. For example::
 
     # Use a QuerySet returned from a 'published' method of a custom manager
     # in the search for an entry with primary key of 5
