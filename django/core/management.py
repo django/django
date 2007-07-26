@@ -382,6 +382,12 @@ def get_sql_delete(app):
                 if hasattr(backend, 'get_drop_sequence'):
                     output.append(backend.get_drop_sequence("%s_%s" % (model._meta.db_table, f.column)))
 
+    # Any post deletion needed? (e.g., DropGeometryColumn() in PostGIS)
+    for model in app_models:
+        opts = model._meta
+        for f in opts.fields:
+            if hasattr(f, '_post_delete_sql'):
+                output.append(f._post_delete_sql(style, model._meta.db_table))
 
     app_label = app_models[0]._meta.app_label
 
@@ -417,6 +423,11 @@ def get_custom_sql_for_model(model):
     app_dir = os.path.normpath(os.path.join(os.path.dirname(models.get_app(model._meta.app_label).__file__), 'sql'))
     output = []
 
+    # Post-creation SQL should come before any initial SQL data is loaded.
+    for f in opts.fields:
+        if hasattr(f, '_post_create_sql'):
+            output.append(f._post_create_sql(style, model._meta.db_table))
+
     # Some backends can't execute more than one SQL statement at a time,
     # so split into separate statements.
     statements = re.compile(r";[ \t]*$", re.M)
@@ -433,10 +444,6 @@ def get_custom_sql_for_model(model):
                 if statement.strip():
                     output.append(statement + ";")
             fp.close()
-
-    for f in opts.fields:
-        if hasattr(f, '_post_create_sql'):
-            output.append(f._post_create_sql(style, model._meta.db_table))
 
     return output
 

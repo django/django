@@ -227,11 +227,12 @@ class Model(object):
         if not pk_set or not record_exists:
             field_names = [backend.quote_name(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
             db_values = [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
+            placeholders = [f.get_placeholder(f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
             # If the PK has been manually set, respect that.
             if pk_set:
                 field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
                 db_values += [f.get_db_prep_save(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
-            placeholders = ['%s'] * len(field_names)
+                placeholders += [f.get_placeholder(f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
             if self._meta.order_with_respect_to:
                 field_names.append(backend.quote_name('_order'))
                 # TODO: This assumes the database supports subqueries.
