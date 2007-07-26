@@ -2,6 +2,9 @@
   This module houses the ctypes initialization procedures, as well
   as the notice and error handler function callbacks (get called
   when an error occurs in GEOS).
+
+  This module also houses GEOS Pointer utilities, including the
+  GEOSPointer class, get_pointer_arr(), GEOM_PTR, and init_from_geom().
 """
 
 from django.contrib.gis.geos.error import GEOSException
@@ -14,6 +17,12 @@ try:
     HAS_NUMPY = True
 except ImportError:
     HAS_NUMPY = False
+
+# Psycopg2 supported?
+try:
+    from psycopg2.extensions import ISQLQuote
+except ImportError:
+    ISQLQuote = None
 
 # Setting the appropriate name for the GEOS-C library, depending on which
 # OS and POSIX platform we're running.
@@ -118,7 +127,7 @@ class GEOSPointer(object):
         if bool(self.address): return True
         else: return False
     
-    ### Coordinate Sequence properties ###
+    ### Coordinate Sequence routines and properties ###
     def coordseq(self):
         "If the coordinate sequence pointer is NULL (0), an exception will be raised."
         if self.coordseq_valid: return self.coordseq_address

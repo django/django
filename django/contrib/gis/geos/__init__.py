@@ -34,9 +34,9 @@ from geometries import Point, LineString, LinearRing, Polygon, HAS_NUMPY
 from collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
 from error import GEOSException, GEOSGeometryIndexError
 
-def fromstr(wkt_or_hex):
+def fromstr(wkt_or_hex, **kwargs):
     "Given a string value (wkt or hex), returns a GEOSGeometry object."
-    return GEOSGeometry(wkt_or_hex)
+    return GEOSGeometry(wkt_or_hex, **kwargs)
 
 def hex_to_wkt(hex):
     "Converts HEXEWKB into WKT."

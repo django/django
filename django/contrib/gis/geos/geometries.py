@@ -14,7 +14,7 @@ if HAS_NUMPY: from numpy import ndarray, array
 
 class Point(GEOSGeometry):
 
-    def __init__(self, x, y=None, z=None):
+    def __init__(self, x, y=None, z=None, srid=None):
         """The Point object may be initialized with either a tuple, or individual
         parameters.  For example:
           >>> p = Point((5, 23)) # 2D point, passed in as a tuple
@@ -56,7 +56,7 @@ class Point(GEOSGeometry):
             status = lgeos.GEOSCoordSeq_setZ(cs, c_uint(0), c_double(coords[2]))
 
         # Initializing from the geometry, and getting a Python object
-        super(Point, self).__init__(lgeos.GEOSGeom_createPoint(cs))
+        super(Point, self).__init__(lgeos.GEOSGeom_createPoint(cs), srid=srid)
 
     def __len__(self):
         "Returns the number of dimensions for this Point (either 2 or 3)."
@@ -175,9 +175,12 @@ class LineString(GEOSGeometry):
             func = lgeos.GEOSGeom_createLinearRing
         else:
             func = lgeos.GEOSGeom_createLineString
+
+        # If SRID was passed in with the keyword arguments
+        srid = kwargs.get('srid', None)
        
         # Calling the base geometry initialization with the returned pointer from the function.
-        super(LineString, self).__init__(func(cs._ptr.coordseq()))
+        super(LineString, self).__init__(func(cs._ptr.coordseq()), srid=srid)
 
     def __getitem__(self, index):
         "Gets the point at the specified index."
@@ -235,14 +238,14 @@ class LineString(GEOSGeometry):
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         "Overriding the initialization function to set the ring keyword."
-        kwargs = {'ring' : True}
+        kwargs['ring'] = True # Setting the ring keyword argument to True
         super(LinearRing, self).__init__(*args, **kwargs)
 
 class Polygon(GEOSGeometry):
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         """Initializes on an exterior ring and a sequence of holes (both instances of LinearRings.
         All LinearRing instances used for creation will become owned by this Polygon.
         
@@ -280,7 +283,7 @@ class Polygon(GEOSGeometry):
         shell = init_from_geom(ext_ring)
 
         # Calling with the GEOS createPolygon factory.
-        super(Polygon, self).__init__(lgeos.GEOSGeom_createPolygon(shell, byref(holes), c_uint(nholes)))
+        super(Polygon, self).__init__(lgeos.GEOSGeom_createPolygon(shell, byref(holes), c_uint(nholes)), **kwargs)
 
     def __del__(self):
         "Overloaded deletion method for Polygons."
@@ -340,7 +343,7 @@ class Polygon(GEOSGeometry):
 
         # Returning the ring from the internal ring dictionary (have to
         #   add one to the index)
-        return GEOSGeometry(self._rings[ring_i+1], parent=self._ptr)
+        return GEOSGeometry(self._rings[ring_i+1], parent=self._ptr, srid=self.srid)
                                                         
     #### Polygon Properties ####
     @property
@@ -356,7 +359,7 @@ class Polygon(GEOSGeometry):
 
     def get_ext_ring(self):
         "Gets the exterior ring of the Polygon."
-        return GEOSGeometry(self._rings[0], parent=self._ptr)
+        return GEOSGeometry(self._rings[0], parent=self._ptr, srid=self.srid)
 
     def set_ext_ring(self):
         "Sets the exterior ring of the Polygon."

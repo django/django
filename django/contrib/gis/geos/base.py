@@ -12,7 +12,7 @@ from types import StringType, IntType, FloatType
 # Python and GEOS-related dependencies.
 import re
 from warnings import warn
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY, ISQLQuote
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
 if HAS_NUMPY: from numpy import ndarray, array
@@ -24,7 +24,7 @@ class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
     
     #### Python 'magic' routines ####
-    def __init__(self, geo_input, input_type=False, parent=False):
+    def __init__(self, geo_input, input_type=False, parent=None, srid=None):
         """The constructor for GEOS geometry objects.  May take the following
         strings as inputs, WKT ("wkt"), HEXEWKB ("hex", PostGIS-specific canonical form).
 
@@ -72,6 +72,9 @@ class GEOSGeometry(object):
         else:
             self._parent = GEOSPointer(0)
         
+        # Setting the SRID, if given.
+        if srid and isinstance(srid, int): self.srid = srid
+
         # Setting the class type (e.g., 'Point', 'Polygon', etc.)
         self.__class__ = GEOS_CLASSES[self.geom_type]
 
@@ -126,6 +129,18 @@ class GEOSGeometry(object):
     def __xor__(self, other):
         "Return the symmetric difference of this Geometry and the other."
         return self.sym_difference(other)
+
+    #### Psycopg2 database adaptor routines ####
+    def __conform__(self, proto):
+        # Does the given protocol conform to what Psycopg2 expects?
+        if proto == ISQLQuote: 
+            return self
+        else:
+            raise GEOSException, 'Error implementing psycopg2 protocol.  Is psycopg2 installed?'
+
+    def getquoted(self):
+        "Returns a properly quoted string for use in PostgresSQL/PostGIS."
+        return "GeometryFromText('%s', %s)" % (self.wkt, self.srid or -1)
     
     #### Coordinate Sequence Routines ####
     @property

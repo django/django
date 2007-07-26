@@ -28,7 +28,7 @@ class GeometryCollection(GEOSGeometry):
     _allowed = (Point, LineString, LinearRing, Polygon)
     _typeid = 7
 
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         self._ptr = GEOSPointer(0) # Initially NULL
         self._geoms = {}
         self._parent = False
@@ -61,7 +61,7 @@ class GeometryCollection(GEOSGeometry):
                 geoms[i] = cast(init_from_geom(init_geoms[i]), GEOM_PTR)
 
         # Calling the parent class, using the pointer returned from GEOS createCollection()
-        super(GeometryCollection, self).__init__(lgeos.GEOSGeom_createCollection(c_int(self._typeid), byref(geoms), c_uint(ngeom)))
+        super(GeometryCollection, self).__init__(lgeos.GEOSGeom_createCollection(c_int(self._typeid), byref(geoms), c_uint(ngeom)), **kwargs)
 
     def __del__(self):
         "Overloaded deletion method for Geometry Collections."
@@ -85,7 +85,7 @@ class GeometryCollection(GEOSGeometry):
         "For indexing on the multiple geometries."
         # Checking the index and returning the corresponding GEOS geometry.
         self._checkindex(index)
-        return GEOSGeometry(self._geoms[index], parent=self._ptr)
+        return GEOSGeometry(self._geoms[index], parent=self._ptr, srid=self.srid)
 
     def __iter__(self):
         "For iteration on the multiple geometries."
