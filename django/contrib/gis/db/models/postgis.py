@@ -1,7 +1,7 @@
 # This module is meant to re-define the helper routines used by the
 # django.db.models.query objects to be customized for PostGIS.
 from django.db import backend
-from django.db.models.query import LOOKUP_SEPARATOR, find_field, FieldFound, QUERY_TERMS, get_where_clause
+from django.db.models.query import LOOKUP_SEPARATOR, field_choices, find_field, FieldFound, QUERY_TERMS, get_where_clause
 from django.utils.datastructures import SortedDict
 
 # PostGIS-specific operators. The commented descriptions of these
@@ -84,6 +84,12 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
 
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
 
+####    query.py overloaded functions    ####
+# parse_lookup() and lookup_inner() are modified from their django/db/models/query.py
+#  counterparts to support constructing SQL for geographic queries.
+#
+# Status: Synced with r5609.
+#
 def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
     # (e.g. "name__exact": "tom") to SQL.
@@ -117,7 +123,6 @@ def parse_lookup(kwarg_items, opts):
         # If there is only one part, or the last part is not a query
         # term, assume that the query is an __exact
         lookup_type = path.pop()
-
         if lookup_type == 'pk':
             lookup_type = 'exact'
             path.append(None)
@@ -133,6 +138,8 @@ def parse_lookup(kwarg_items, opts):
             # all uses of None as a query value.
             if lookup_type != 'exact':
                 raise ValueError, "Cannot use None as a query value"
+        elif callable(value):
+            value = value()
 
         joins2, where2, params2 = lookup_inner(path, lookup_type, value, opts, opts.db_table, None)
         joins.update(joins2)
@@ -206,7 +213,6 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
 
         # Does the name belong to a one-to-one, many-to-one, or regular field?
         field = find_field(name, current_opts.fields, False)
-
         if field:
             if field.rel: # One-to-One/Many-to-one field
                 new_table = current_table + '__' + name
@@ -225,7 +231,11 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     except FieldFound: # Match found, loop has been shortcut.
         pass
     else: # No match found.
-        raise TypeError, "Cannot resolve keyword '%s' into field" % name
+        choices = field_choices(current_opts.many_to_many, False) + \
+            field_choices(current_opts.get_all_related_many_to_many_objects(), True) + \
+            field_choices(current_opts.get_all_related_objects(), True) + \
+            field_choices(current_opts.fields, False)
+        raise TypeError, "Cannot resolve keyword '%s' into field. Choices are: %s" % (name, ", ".join(choices))
 
     # Check whether an intermediate join is required between current_table
     # and new_table.
@@ -298,9 +308,20 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # If the field is a geometry field, then the WHERE clause will need to be obtained
         # with the get_geo_where_clause()
         if hasattr(field, '_geom'):
-            where.append(get_geo_where_clause(lookup_type, current_table + '.', column, value))
+            # Getting the geographic where clause.
+            gwc = get_geo_where_clause(lookup_type, current_table + '.', column, value)
+
+            # Getting the geographic parameters from the field.
+            geo_params = field.get_db_prep_lookup(lookup_type, value)
+     
+            # If a dictionary was passed back from the field modify the where clause.
+            if isinstance(geo_params, dict):
+                gwc = gwc % geo_params['where']
+                geo_params = geo_params['params']
+            where.append(gwc)
+            params.extend(geo_params)
         else:
             where.append(get_where_clause(lookup_type, current_table + '.', column, value))
-        params.extend(field.get_db_prep_lookup(lookup_type, value))
+            params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params

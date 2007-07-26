@@ -5,10 +5,9 @@ from django.contrib.gis.db.models.postgis import POSTGIS_TERMS, quotename
 from django.contrib.gis.oldforms import WKTField
 from django.utils.functional import curry
 from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from types import StringType
 
 #TODO: Flesh out widgets.
-#TODO: GEOS and GDAL/OGR operations through fields as proxy.
-#TODO: pythonic usage, like "for point in zip.polygon" and "if point in polygon".
 
 class GeometryField(Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
@@ -114,15 +113,44 @@ class GeometryField(Field):
         return "NoField"
                                                                 
     def get_db_prep_lookup(self, lookup_type, value):
-        """Returns field's value prepared for database lookup; the SRID of the geometry is
-        included by default in these queries."""
+        "Returns field's value prepared for database lookup, accepts WKT and GEOS Geometries for the value."
+        if not bool(value): return None
         if lookup_type in POSTGIS_TERMS:
-            return [value and ("SRID=%d;%s" % (self._srid, value)) or None]
-        raise TypeError("Field has invalid lookup: %s" % lookup_type)
+            if isinstance(value, GEOSGeometry):
+                # GEOSGeometry instance passed in.
+                if value.srid != self._srid:
+                    # Returning a dictionary instructs the parse_lookup() to add what's in the 'where' key
+                    #  to the where parameters, since we need to transform the geometry in the query.
+                    return {'where' : "Transform(%s,%s)",
+                            'params' : [value, self._srid]
+                            }
+                else:
+                    # Just return the GEOSGeometry, it has its own psycopg2 adaptor.
+                    return [value]
+            elif isinstance(value, StringType):
+                # String instance passed in, assuming WKT.
+                # TODO: Any validation needed here to prevent SQL injection?
+                return ["SRID=%d;%s" % (self._srid, value)]
+            else:
+                raise TypeError("Invalid type (%s) used for field lookup value." % str(type(value)))
+        else:
+            raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
     def get_db_prep_save(self, value):
-        "Making sure the SRID is included before saving."
-        return value and ("SRID=%d;%s" % (self._srid, value)) or None
+        "Prepares the value for saving in the database."
+        if not bool(value): return None
+        if isinstance(value, GEOSGeometry):
+            return value
+        else:
+            return ("SRID=%d;%s" % (self._srid, wkt))
+
+    def get_placeholder(self, value):
+        "Provides a proper substitution value for "
+        if isinstance(value, GEOSGeometry) and value.srid != self._srid:
+            # Adding Transform() to the SQL placeholder.
+            return 'Transform(%%s, %s)' % self._srid
+        else:
+            return '%s'
 
     def get_manipulator_field_objs(self):
         "Using the WKTField (defined above) to be our manipulator."

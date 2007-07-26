@@ -24,7 +24,7 @@ class GeometryProxy(object):
     def __set__(self, obj, value): 
         if isinstance(value, GEOSGeometry): 
             if value and ((value.srid is None) and (self._field._srid is not None)): 
-                value.set_srid(self._field._srid) 
+                value.srid = self._field._srid
      
         obj.__dict__[self._field.attname] = value 
         return value 
