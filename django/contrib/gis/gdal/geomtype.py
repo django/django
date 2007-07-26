@@ -1,4 +1,5 @@
 from types import StringType
+from django.contrib.gis.gdal.error import OGRException
 
 #### OGRGeomType ####
 class OGRGeomType(object):
