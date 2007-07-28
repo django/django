@@ -581,7 +581,7 @@ name of the test case to the label on the command line::
 
     $ ./manage.py test animals.AnimalTestCase
 
-**New in Django development version:**To run a single test method inside a
+**New in Django development version:** To run a single test method inside a
 test case, add the name of the test method to the label::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
@@ -681,12 +681,15 @@ can call it anything you want. The only requirement is that it has the
 same arguments as the Django test runner:
 
 ``run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])``
+    
     **New in Django development version:** ``test_labels`` is a list of
     strings describing the tests to be run. A test label can take one of
     three forms:
+
         * ``app.TestCase.test_method`` - Run a single test method in a test case
         * ``app.TestCase`` - Run all the test methods in a test case
         * ``app`` - Search for and run all tests in the named application.
+
     If ``test_labels`` has a value of ``None``, the test runner should run
     search for tests in all the applications in ``INSTALLED_APPS``.
 
@@ -697,7 +700,7 @@ same arguments as the Django test runner:
     **New in Django development version:** If ``interactive`` is ``True``, the
     test suite may ask the user for instructions when the test suite is
     executed. An example of this behavior would be asking for permission to
-    delete an existing test database. If ``interactive`` is ``False, the
+    delete an existing test database. If ``interactive`` is ``False``, the
     test suite must be able to run without any manual intervention.
 
     ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
