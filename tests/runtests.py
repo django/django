@@ -73,7 +73,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.assert_(not unexpected, "Unexpected Errors: " + '\n'.join(unexpected))
         self.assert_(not missing, "Missing Errors: " + '\n'.join(missing))
 
-def django_tests(verbosity, interactive, tests_to_run):
+def django_tests(verbosity, interactive, test_labels):
     from django.conf import settings
 
     old_installed_apps = settings.INSTALLED_APPS
@@ -109,14 +109,13 @@ def django_tests(verbosity, interactive, tests_to_run):
             # if the model was named on the command line, or
             # no models were named (i.e., run all), import
             # this model and add it to the list to test.
-            if not tests_to_run or model_name in tests_to_run:
+            if not test_labels or model_name in set([label.split('.')[0] for label in test_labels]):
                 if verbosity >= 1:
                     print "Importing model %s" % model_name
                 mod = load_app(model_label)
                 if mod:
                     if model_label not in settings.INSTALLED_APPS:
                         settings.INSTALLED_APPS.append(model_label)
-                    test_models.append(mod)
         except Exception, e:
             sys.stderr.write("Error while importing %s:" % model_name + ''.join(traceback.format_exception(*sys.exc_info())[1:]))
             continue
@@ -125,12 +124,12 @@ def django_tests(verbosity, interactive, tests_to_run):
     extra_tests = []
     for model_dir, model_name in get_invalid_models():
         model_label = '.'.join([model_dir, model_name])
-        if not tests_to_run or model_name in tests_to_run:
+        if not test_labels or model_name in test_labels:
             extra_tests.append(InvalidModelTestCase(model_label))
 
     # Run the test suite, including the extra validation tests.
     from django.test.simple import run_tests
-    failures = run_tests(test_models, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
+    failures = run_tests(test_labels, verbosity=verbosity, interactive=interactive, extra_tests=extra_tests)
     if failures:
         sys.exit(failures)
 

@@ -1331,16 +1331,11 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(app_labels, verbosity=1, interactive=True):
+def test(test_labels, verbosity=1, interactive=True):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
-
-    if len(app_labels) == 0:
-        app_list = get_apps()
-    else:
-        app_list = [get_app(app_label) for app_label in app_labels]
-
+    
     test_path = settings.TEST_RUNNER.split('.')
     # Allow for Python 2.5 relative paths
     if len(test_path) > 1:
@@ -1350,7 +1345,7 @@ def test(app_labels, verbosity=1, interactive=True):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
-    failures = test_runner(app_list, verbosity=verbosity, interactive=interactive)
+    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
     if failures:
         sys.exit(failures)
 

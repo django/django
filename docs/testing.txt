@@ -450,6 +450,9 @@ look like::
         def setUp(self):
             # test definitions as before
 
+        def testFluffyAnimals(self):
+            # A test that uses the fixtures
+
 At the start of each test case, before ``setUp()`` is run, Django will
 flush the database, returning the database the state it was in directly
 after ``syncdb`` was called. Then, all the named fixtures are installed.
@@ -483,8 +486,8 @@ that can be useful in testing the behavior of web sites.
 
 ``assertContains(response, text, count=None, status_code=200)``
     Assert that a response indicates that a page could be retrieved and
-    produced the nominated status code, and that ``text`` in the content 
-    of the response. If ``count`` is provided, ``text`` must occur exactly 
+    produced the nominated status code, and that ``text`` in the content
+    of the response. If ``count`` is provided, ``text`` must occur exactly
     ``count`` times in the response.
 
 ``assertFormError(response, form, field, errors)``
@@ -570,6 +573,18 @@ application name to the command line. For example, if your
 but you only want to run the animals unit tests, run::
 
     $ ./manage.py test animals
+
+**New in Django development version:** If you use unit tests, you can be more
+specific in the tests that are executed. To run a single test case in an
+application (for example, the AnimalTestCase described previously), add the
+name of the test case to the label on the command line::
+
+    $ ./manage.py test animals.AnimalTestCase
+
+**New in Django development version:**To run a single test method inside a
+test case, add the name of the test method to the label::
+
+    $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
 
 When you run your tests, you'll see a bunch of text flow by as the test
 database is created and models are initialized. This test database is
@@ -665,25 +680,30 @@ By convention, a test runner should be called ``run_tests``; however, you
 can call it anything you want. The only requirement is that it has the
 same arguments as the Django test runner:
 
-``run_tests(module_list, verbosity=1, interactive=True, extra_tests=[])``
-    The module list is the list of Python modules that contain the models to be
-    tested. This is the same format returned by ``django.db.models.get_apps()``.
-    The test runner should search these modules for tests to execute.
+``run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[])``
+    **New in Django development version:** ``test_labels`` is a list of
+    strings describing the tests to be run. A test label can take one of
+    three forms:
+        * ``app.TestCase.test_method`` - Run a single test method in a test case
+        * ``app.TestCase`` - Run all the test methods in a test case
+        * ``app`` - Search for and run all tests in the named application.
+    If ``test_labels`` has a value of ``None``, the test runner should run
+    search for tests in all the applications in ``INSTALLED_APPS``.
 
     Verbosity determines the amount of notification and debug information that
     will be printed to the console; ``0`` is no output, ``1`` is normal output,
     and ``2`` is verbose output.
 
-    **New in Django development version** If ``interactive`` is ``True``, the
+    **New in Django development version:** If ``interactive`` is ``True``, the
     test suite may ask the user for instructions when the test suite is
     executed. An example of this behavior would be asking for permission to
-    delete an existing test database. If ``interactive`` is ``False, the 
+    delete an existing test database. If ``interactive`` is ``False, the
     test suite must be able to run without any manual intervention.
-    
-    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the 
-    suite that is executed by the test runner. These extra tests are run 
+
+    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+    suite that is executed by the test runner. These extra tests are run
     in addition to those discovered in the modules listed in ``module_list``.
-    
+
     This method should return the number of tests that failed.
 
 Testing utilities
