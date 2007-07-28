@@ -50,6 +50,9 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
     'relate' : 'Relate',
     }
 
+# Any other lookup types that do not require a mapping.
+MISC_TERMS = ['isnull']
+
 # The quotation used for postgis (uses single quotes).
 def quotename(value, dbl=False):
     if dbl: return '"%s"' % value
@@ -58,7 +61,8 @@ def quotename(value, dbl=False):
 # These are the PostGIS-customized QUERY_TERMS, combines both the operators
 # and the geometry functions.
 POSTGIS_TERMS = list(POSTGIS_OPERATORS.keys()) # Getting the operators first
-POSTGIS_TERMS.extend(list(POSTGIS_GEOMETRY_FUNCTIONS.keys())) # Adding on the Geometry Functions
+POSTGIS_TERMS += list(POSTGIS_GEOMETRY_FUNCTIONS.keys()) # Adding on the Geometry Functions
+POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnull')
 POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
 
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):

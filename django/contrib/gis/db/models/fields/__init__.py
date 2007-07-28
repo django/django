@@ -114,8 +114,9 @@ class GeometryField(Field):
                                                                 
     def get_db_prep_lookup(self, lookup_type, value):
         "Returns field's value prepared for database lookup, accepts WKT and GEOS Geometries for the value."
-        if not bool(value): return None
         if lookup_type in POSTGIS_TERMS:
+            if lookup_type == 'isnull': return [value] # special case for NULL geometries.
+            if not bool(value): return [None] # If invalid value passed in.
             if isinstance(value, GEOSGeometry):
                 # GEOSGeometry instance passed in.
                 if value.srid != self._srid:

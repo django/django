@@ -1,6 +1,6 @@
 import unittest
-from models import Country, City
-from django.contrib.gis.geos import fromstr, Point
+from models import Country, City, State
+from django.contrib.gis.geos import fromstr
 
 class GeoModelTest(unittest.TestCase):
     
@@ -9,8 +9,9 @@ class GeoModelTest(unittest.TestCase):
 
         # Ensuring that data was loaded from initial SQL.
         self.assertEqual(2, Country.objects.count())
-        self.assertEqual(5, City.objects.count())
-    
+        self.assertEqual(8, City.objects.count())
+        self.assertEqual(3, State.objects.count())
+
     def test002_contains_contained(self):
         "Testing the 'contained' and 'contains' lookup types."
 
@@ -22,23 +23,24 @@ class GeoModelTest(unittest.TestCase):
         #  _bounding box_ of the Geometries.
         qs = City.objects.filter(point__contained=texas.mpoly)
         self.assertEqual(3, qs.count())
-        city_names = [c.name for c in qs]
-        self.assertEqual(True, 'Houston' in city_names)
-        self.assertEqual(True, 'Dallas' in city_names)
-        self.assertEqual(True, 'Oklahoma City' in city_names)
+        cities = ['Houston', 'Dallas', 'Oklahoma City']
+        for c in qs: self.assertEqual(True, c.name in cities)
 
         # Pulling out some cities.
         houston = City.objects.get(name='Houston')
         wellington = City.objects.get(name='Wellington')
         pueblo = City.objects.get(name='Pueblo')
         okcity = City.objects.get(name='Oklahoma City')
+        lawrence = City.objects.get(name='Lawrence')
 
         # Now testing contains on the countries using the points for
         #  Houston and Wellington.
         tx = Country.objects.get(mpoly__contains=houston.point) # Query w/GEOSGeometry
         nz = Country.objects.get(mpoly__contains=wellington.point.hex) # Query w/EWKBHEX
+        ks = State.objects.get(poly__contains=lawrence.point)
         self.assertEqual('Texas', tx.name)
         self.assertEqual('New Zealand', nz.name)
+        self.assertEqual('Kansas', ks.name)
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         #  are not contained in Texas or New Zealand.
@@ -48,7 +50,7 @@ class GeoModelTest(unittest.TestCase):
     def test003_lookup_insert_transform(self):
         "Testing automatic transform for lookups and inserts."
 
-        # San Antonio in WGS84 and NAD83(HARN) / Texas Centric Lambert Conformal
+        # San Antonio in 'WGS84' (SRID 4326) and 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         sa_3084 = 'POINT (1645978.362408288754523 6276356.025927528738976)' # Used ogr.py in gdal 1.4.1 for this transform
 
@@ -66,6 +68,64 @@ class GeoModelTest(unittest.TestCase):
         sa = City.objects.get(name='San Antonio')
         self.assertAlmostEqual(wgs_pnt.x, sa.point.x, 6)
         self.assertAlmostEqual(wgs_pnt.y, sa.point.y, 6)
+
+    def test004_null_geometries(self):
+        "Testing NULL geometry support."
+
+        # Querying for both NULL and Non-NULL values.
+        nullqs = State.objects.filter(poly__isnull=True)
+        validqs = State.objects.filter(poly__isnull=False)
+
+        # Puerto Rico should be NULL (it's a commonwealth unincorporated territory)
+        self.assertEqual(1, len(nullqs))
+        self.assertEqual('Puerto Rico', nullqs[0].name)
+        
+        # The valid states should be Colorado & Kansas
+        self.assertEqual(2, len(validqs))
+        state_names = [s.name for s in validqs]
+        self.assertEqual(True, 'Colorado' in state_names)
+        self.assertEqual(True, 'Kansas' in state_names)
+
+        # Saving another commonwealth w/a NULL geometry.
+        nmi = State(name='Northern Mariana Islands', poly=None)
+        nmi.save()
+    
+    def test005_left_right(self):
+        "Testing the left ('<<') right ('>>') operators."
+        
+        # Left: A << B => true if xmax(A) < xmin(B)
+        # Right: A >> B => true if xmin(A) > xmax(B) 
+        #  See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
+        
+        # Getting the borders for Colorado & Kansas
+        co_border = State.objects.get(name='Colorado').poly
+        ks_border = State.objects.get(name='Kansas').poly
+
+        # Note: Wellington has an 'X' value of 174, so it will not be considered
+        #  to the left of CO.
+        
+        # These cities should be strictly to the right of the CO border.
+        cities = ['Houston', 'Dallas', 'San Antonio', 'Oklahoma City', 
+                  'Lawrence', 'Chicago', 'Wellington']
+        qs = City.objects.filter(point__right=co_border)
+        self.assertEqual(7, len(qs))
+        for c in qs: self.assertEqual(True, c.name in cities)
+
+        # These cities should be strictly to the right of the KS border.
+        cities = ['Chicago', 'Wellington']
+        qs = City.objects.filter(point__right=ks_border)
+        self.assertEqual(2, len(qs))
+        for c in qs: self.assertEqual(True, c.name in cities)
+
+        # Note: Wellington has an 'X' value of 174, so it will not be considered
+        #  to the left of CO.
+        vic = City.objects.get(point__left=co_border)
+        self.assertEqual('Victoria', vic.name)
+        
+        cities = ['Pueblo', 'Victoria']
+        qs = City.objects.filter(point__left=ks_border)
+        self.assertEqual(2, len(qs))
+        for c in qs: self.assertEqual(True, c.name in cities)
 
 def suite():
     s = unittest.TestSuite()

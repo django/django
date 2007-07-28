@@ -80,7 +80,7 @@ def _create_with_shell(db_name, verbosity=1, autoclobber=False):
         else:
             raise Exception, 'Unknown error occurred in creating database: %s' % output
 
-def create_spatial_db(test=False, verbosity=1, autoclobber=False):
+def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=False):
     "This Python routine creates a spatial database based on settings.py."
 
     # Making sure we're using PostgreSQL and psycopg2
@@ -113,7 +113,7 @@ def create_spatial_db(test=False, verbosity=1, autoclobber=False):
     settings.DATABASE_NAME = db_name
 
     # Syncing the database
-    syncdb(verbosity, interactive=False)
+    syncdb(verbosity, interactive=interactive)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
