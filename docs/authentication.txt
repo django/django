@@ -114,6 +114,17 @@ custom methods:
       string is the correct password for the user. (This takes care of the
       password hashing in making the comparison.)
 
+    * ``set_unusable_password()`` -- Marks the user as having no password set. 
+      This isn't the same as having a blank string for a password.
+      ``check_password()`` for this user will never return ``True``. Doesn't 
+      save the ``User`` object.
+      
+      You may need this if authentication for your application takes place  
+      against an existing external source such as an LDAP directory.
+
+    * ``has_usable_password()`` -- Returns ``False`` if 
+      ``set_unusable_password()`` has been called for this user.
+
     * ``get_group_permissions()`` -- Returns a list of permission strings that
       the user has, through his/her groups.
 
@@ -152,9 +163,11 @@ Manager functions
 
 The ``User`` model has a custom manager that has the following helper functions:
 
-    * ``create_user(username, email, password)`` -- Creates, saves and returns
-      a ``User``. The ``username``, ``email`` and ``password`` are set as
-      given, and the ``User`` gets ``is_active=True``.
+    * ``create_user(username, email, password=None)`` -- Creates, saves and 
+      returns a ``User``. The ``username``, ``email`` and ``password`` are set
+      as given, and the ``User`` gets ``is_active=True``.
+      
+      If no password is provided, ``set_unusable_password()`` will be called.
 
       See _`Creating users` for example usage.
 
