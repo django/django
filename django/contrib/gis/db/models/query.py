@@ -1,7 +1,7 @@
 from django.db.models.query import Q, QuerySet
 from django.db import backend
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.models.postgis import parse_lookup
+from django.contrib.gis.db.backend import parse_lookup # parse_lookup depends on the spatial database backend.
 from django.db.models.fields import FieldDoesNotExist
 import operator
 

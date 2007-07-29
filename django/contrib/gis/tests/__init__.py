@@ -1,6 +1,6 @@
 from copy import copy
 from unittest import TestSuite, TextTestRunner
-from django.contrib.gis.utils import create_spatial_db
+from django.contrib.gis.db.backend import create_spatial_db
 from django.db import connection
 from django.test.utils import destroy_test_db
 

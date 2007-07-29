@@ -1,92 +1,29 @@
-# This module is meant to re-define the helper routines used by the
-# django.db.models.query objects to be customized for PostGIS.
+"""
+  This module provides the backend for spatial SQL construction with Django.
+
+  Specifically, this module will import the correct routines and modules
+    needed for GeoDjango
+
+   (1) GeoBackEndField, a base class needed for GeometryField.
+   (2) The parse_lookup() function, used for spatial SQL construction by
+       the GeoQuerySet.
+      
+  Currently only PostGIS is supported, but someday backends will be aded for
+   additional spatial databases.
+"""
+from django.conf import settings
 from django.db import backend
 from django.db.models.query import LOOKUP_SEPARATOR, field_choices, find_field, FieldFound, QUERY_TERMS, get_where_clause
 from django.utils.datastructures import SortedDict
 
-# PostGIS-specific operators. The commented descriptions of these
-# operators come from Section 6.2.2 of the official PostGIS documentation.
-POSTGIS_OPERATORS = {
-    # The "&<" operator returns true if A's bounding box overlaps or is to the left of B's bounding box.
-    'overlaps_left' : '&< %s',
-    # The "&>" operator returns true if A's bounding box overlaps or is to the right of B's bounding box.
-    'overlaps_right' : '&> %s',
-    # The "<<" operator returns true if A's bounding box is strictly to the left of B's bounding box.
-    'left' : '<< %s',
-    # The ">>" operator returns true if A's bounding box is strictly to the right of B's bounding box.
-    'right' : '>> %s',
-    # The "&<|" operator returns true if A's bounding box overlaps or is below B's bounding box.
-    'overlaps_below' : '&<| %s',
-    # The "|&>" operator returns true if A's bounding box overlaps or is above B's bounding box.
-    'overlaps_above' : '|&> %s',
-    # The "<<|" operator returns true if A's bounding box is strictly below B's bounding box.
-    'strictly_below' : '<<| %s',
-    # The "|>>" operator returns true if A's bounding box is strictly above B's bounding box.
-    'strictly_above' : '|>> %s',
-    # The "~=" operator is the "same as" operator. It tests actual geometric equality of two features. So if
-    # A and B are the same feature, vertex-by-vertex, the operator returns true.
-    'same_as' : '~= %s',
-    'exact' : '~= %s',
-    # The "@" operator returns true if A's bounding box is completely contained by B's bounding box.
-    'contained' : '@ %s',
-    # The "~" operator returns true if A's bounding box completely contains B's bounding box.
-    'bbcontains' : '~ %s',
-    # The "&&" operator is the "overlaps" operator. If A's bounding boux overlaps B's bounding box the
-    # operator returns true.
-    'bboverlaps' : '&& %s',
-    }
-
-# PostGIS Geometry Functions -- most of these use GEOS.
-POSTGIS_GEOMETRY_FUNCTIONS = {
-    #'distance' : 'Distance', -- doesn't work right now.
-    'equals' : 'Equals',
-    'disjoint' : 'Disjoint',
-    'touches' : 'Touches',
-    'crosses' : 'Crosses',
-    'within' : 'Within',
-    'overlaps' : 'Overlaps',
-    'contains' : 'Contains',
-    'intersects' : 'Intersects',
-    'relate' : 'Relate',
-    }
-
-# Any other lookup types that do not require a mapping.
-MISC_TERMS = ['isnull']
-
-# The quotation used for postgis (uses single quotes).
-def quotename(value, dbl=False):
-    if dbl: return '"%s"' % value
-    else: return "'%s'" % value
-
-# These are the PostGIS-customized QUERY_TERMS, combines both the operators
-# and the geometry functions.
-POSTGIS_TERMS = list(POSTGIS_OPERATORS.keys()) # Getting the operators first
-POSTGIS_TERMS += list(POSTGIS_GEOMETRY_FUNCTIONS.keys()) # Adding on the Geometry Functions
-POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnull')
-POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
-
-def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
-    if table_prefix.endswith('.'):
-        table_prefix = backend.quote_name(table_prefix[:-1])+'.'
-    field_name = backend.quote_name(field_name)
-
-    # See if a PostGIS operator matches the lookup type first
-    try:
-        return '%s%s %s' % (table_prefix, field_name, (POSTGIS_OPERATORS[lookup_type] % '%s'))
-    except KeyError:
-        pass
-
-    # See if a PostGIS Geometry function matches the lookup type next
-    try:
-        return '%s(%s%s, %%s)' % (POSTGIS_GEOMETRY_FUNCTIONS[lookup_type], table_prefix, field_name)
-    except KeyError:
-        pass
-    
-    # For any other lookup type
-    if lookup_type == 'isnull':
-        return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
-
-    raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
+if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
+    # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
+    from postgis import \
+        PostGISField as GeoBackendField, \
+        POSTGIS_TERMS as GIS_TERMS, \
+        create_spatial_db, get_geo_where_clause
+else:
+    raise NotImplementedError, 'No Geographic Backend exists for %s' % settings.DATABASE_NAME
 
 ####    query.py overloaded functions    ####
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py
@@ -130,7 +67,7 @@ def parse_lookup(kwarg_items, opts):
         if lookup_type == 'pk':
             lookup_type = 'exact'
             path.append(None)
-        elif len(path) == 0 or not ((lookup_type in QUERY_TERMS) or (lookup_type in POSTGIS_TERMS)):
+        elif len(path) == 0 or not ((lookup_type in QUERY_TERMS) or (lookup_type in GIS_TERMS)):
             path.append(lookup_type)
             lookup_type = 'exact'
 

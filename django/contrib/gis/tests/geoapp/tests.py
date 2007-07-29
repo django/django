@@ -91,7 +91,7 @@ class GeoModelTest(unittest.TestCase):
         nmi.save()
     
     def test005_left_right(self):
-        "Testing the left ('<<') right ('>>') operators."
+        "Testing the 'left' and 'right' lookup types."
         
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B) 
