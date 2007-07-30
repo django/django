@@ -563,7 +563,7 @@ def get_sql_evolution_check_for_new_fields(klass, new_table_name):
         db_table = new_table_name
     for f in opts.fields:
         existing_fields = introspection.get_columns(cursor,db_table)
-        if f.column not in existing_fields and f.aka not in existing_fields and len(set(f.aka) & set(existing_fields))==0:
+        if f.column not in existing_fields and f.aka and f.aka not in existing_fields and len(set(f.aka) & set(existing_fields))==0:
             rel_field = f
             data_type = f.get_internal_type()
             col_type = data_types[data_type]
@@ -609,7 +609,7 @@ def get_sql_evolution_check_for_changed_field_name(klass, new_table_name):
         db_table = new_table_name
     for f in opts.fields:
         existing_fields = introspection.get_columns(cursor,db_table)
-        if f.column not in existing_fields and (f.aka in existing_fields or len(set(f.aka) & set(existing_fields)))==1:
+        if f.column not in existing_fields and f.aka and (f.aka in existing_fields or len(set(f.aka) & set(existing_fields)))==1:
             old_col = None
             if isinstance( f.aka, str ):
                 old_col = f.aka
@@ -648,7 +648,7 @@ def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
             cf = f.column
         elif f.aka in existing_fields:
             cf = f.aka
-        elif len(set(f.aka) & set(existing_fields))==1:
+        elif f.aka and len(set(f.aka) & set(existing_fields))==1:
             cf = f.aka[0]
         else:
             continue # no idea what column you're talking about - should be handled by get_sql_evolution_check_for_new_fields())
@@ -692,14 +692,17 @@ def get_sql_evolution_check_for_dead_fields(klass, new_table_name):
     if new_table_name: 
         db_table = new_table_name
     suspect_fields = set(introspection.get_columns(cursor,db_table))
+#    print 'suspect_fields = ', suspect_fields
     for f in opts.fields:
+#        print 'f = ', f
+#        print 'f.aka = ', f.aka
         suspect_fields.discard(f.column)
         suspect_fields.discard(f.aka)
-        suspect_fields.difference_update(f.aka)
+        if f.aka: suspect_fields.difference_update(f.aka)
     if len(suspect_fields)>0:
         output.append( '-- warning: as the following may cause data loss, it/they must be run manually' )
-    for suspect_field in suspect_fields:
-        output.append( backend.get_drop_column_sql( db_table, suspect_field ) )
+        for suspect_field in suspect_fields:
+            output.append( backend.get_drop_column_sql( db_table, suspect_field ) )
         output.append( '-- end warning' )
     return output
 
