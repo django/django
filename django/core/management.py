@@ -563,7 +563,7 @@ def get_sql_evolution_check_for_new_fields(klass, new_table_name):
         db_table = new_table_name
     for f in opts.fields:
         existing_fields = introspection.get_columns(cursor,db_table)
-        if f.column not in existing_fields and f.aka and f.aka not in existing_fields and len(set(f.aka) & set(existing_fields))==0:
+        if f.column not in existing_fields and (not f.aka or f.aka not in existing_fields and len(set(f.aka) & set(existing_fields))==0):
             rel_field = f
             data_type = f.get_internal_type()
             col_type = data_types[data_type]
@@ -702,7 +702,7 @@ def get_sql_evolution_check_for_dead_fields(klass, new_table_name):
     if len(suspect_fields)>0:
         output.append( '-- warning: as the following may cause data loss, it/they must be run manually' )
         for suspect_field in suspect_fields:
-            output.append( backend.get_drop_column_sql( db_table, suspect_field ) )
+            output.append( '-- '+ backend.get_drop_column_sql( db_table, suspect_field ) )
         output.append( '-- end warning' )
     return output
 

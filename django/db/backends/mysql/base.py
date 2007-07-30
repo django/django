@@ -280,7 +280,7 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
 
 def get_drop_column_sql( table_name, col_name ):
     output = []
-    output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
+    output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
     return '\n'.join(output)
     
     
