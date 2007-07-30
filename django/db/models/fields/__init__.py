@@ -620,7 +620,8 @@ class DecimalField(Field):
         try:
             return decimal.Decimal(value)
         except decimal.InvalidOperation:
-            raise validators.ValidationError, ugettext("This value must be a decimal number.")
+            raise validators.ValidationError(
+                _("This value must be a decimal number."))
 
     def _format(self, value):
         if isinstance(value, basestring):
