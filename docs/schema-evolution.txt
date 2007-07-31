@@ -47,7 +47,7 @@ patching file db/backends/postgresql/introspection.py
 patching file db/backends/sqlite3/base.py
 patching file db/backends/sqlite3/introspection.py
 patching file db/models/fields/__init__.py
-patching file db/models/options.py}}}
+patching file db/models/options.py
 }}}
 
 == How To Use ==
@@ -355,6 +355,33 @@ Output: v1⇒v2
     ALTER TABLE `case04_change_flag_choice` ADD COLUMN `votes2` integer NOT NULL;
     COMMIT;
 }}}
+
+== Criticisms == 
+
+''I _really_ don't like the aka representations in the model. The models file should always be a clean statement of the current state of the model. Migration is about
+getting an old database to match the currently required models - if I don't have a legacy database, I don't really want the cruft hanging around in my models. Migration plans or historical models really should be kept out of the core model file, IMHO.''
+
+We currently store all sorts of non-DB related metadata in the model that arguably should not be there, including presentation information.  We do this for clarity and convenience - you would have to duplicate a lot of information otherwise in multiple locations without any obvious direct connection.  So which paradigm is more critical here, DRY or MVC?  Or do we continue with the status-quo of a common-sense balance?  As far as cruft, if you don't have a legacy database, you wouldn't have any aka fields to begin with.  And as you phase out legacy support, simply delete them.
+
+''Unless I'm missing something, the aka approach doesn't track exactly which name versions correlate with other versions. Consider; your aka chain for one field could indicate a rename from 'foo' to 'bar' to 'foo' to 'bar'; a second field could indicate renames from 'whiz' to 'foo' to 'whiz', etc. A tuple of historical names doesn't tell me which sets of names were in use concurrently; so if I find a database with a field called 'foo' which requires migration, is 'foo' the first field or the second?''
+
+Correct, however I thought this to be a highly unlikely scenario, not warranting the extra notational complexity.  But just as we support strings and tuples, there is nothing to say we can't extend it to support say a mapping of historical names to date ranges, if the need arises.
+
+== Future Work ==
+
+The biggest missing piece I believe to be changing column types.  For instance, say you currently have:
+
+{{{
+    ssn = models.IntegerField()
+}}}
+
+Which you want to change into:
+
+{{{
+    ssn = models.CharField(maxlength=12)
+}}}
+
+Schema evolution should generate SQL to add the new column, push the data from the old to the new column, then delete the old column.  Warnings should be provided for completely incompatible types or other loss-of-information scenarios.
 
 == Conclusion ==
 
