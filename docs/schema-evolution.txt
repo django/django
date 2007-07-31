@@ -1,20 +1,102 @@
-=====================================
-Django Schema Evolution Documentation    
-=====================================
+= Schema Evolution Documentation =
 
-Schema evolution is the function of updating an existing Django generated
-database schema to a newer/modified version based upon a newer/modified set of
-Django models.
+== Introduction ==
 
-This documentation will take you through several common model changes and show
-you how Django's schema evolution handles them. Each example provides the pre 
-and post model source code, as well as the SQL output.
+Schema evolution is the function of updating an existing Django generated database schema to a newer/modified version based upon a newer/modified set of Django models.
 
-Adding / Removing Fields
-------------------------
+=== Limitations ===
+
+I feel it important to note that is an automated implementation designed to handle schema ''evolution'', not ''revolution''.  No tool, other than storing DBA written SQL scripts and auto-applying them via schema versioning or DB fingerprinting (which is a trivial solution - I have a Java implementation if anyone wants it), can handle the full scope of possible database changes.  Once you accept this fact, the following becomes self-evident:
+
+ * There is a trade off between ease of use and the scope of coverable problems.
+
+Combine that with:
+
+ * The vast majority of database changes are minor, evolutionary tweaks. (*)
+ * Very few people are DBAs.
+
+And I believe the ideal solution is in easing the life of common Django developer, not in appeasing the DBA's or power-developer's desire for an all-in-one-comprehensive solution.  Massive schema changes (w/ data retention) are always going to require someone with database skill, but we can empower the people to do the simple things for themselves.
+
+(*) By this I mean adding/removing/renaming tables and adding/removing/renaming/changing-attributes-of columns.
+
+== Downloading / Installing ==
+
+This functionality is not yet in Django/trunk, but in a separate schema-evolution branch.  To download this branch, run the following:
+
+{{{
+svn co http://code.djangoproject.com/svn/django/schema-evolution/ django_se_src
+ln -s `pwd`/django_se_src/django SITE-PACKAGES-DIR/django
+}}}
+
+Or, if you're currently running Django v0.96, run the following:
+
+{{{
+cd /<path_to_python_dir>/site-packages/django/
+wget http://kered.org/blog/wp-content/uploads/2007/07/django_schema_evolution-v096patch.txt
+patch -p1 < django_schema_evolution-v096patch.txt
+}}}
+
+The last command will produce the following output:
+
+{{{
+patching file core/management.py
+patching file db/backends/mysql/base.py
+patching file db/backends/mysql/introspection.py
+patching file db/backends/postgresql/base.py
+patching file db/backends/postgresql/introspection.py
+patching file db/backends/sqlite3/base.py
+patching file db/backends/sqlite3/introspection.py
+patching file db/models/fields/__init__.py
+patching file db/models/options.py}}}
+}}}
+
+== How To Use ==
+
+For the most part, schema evolution is designed to be automagic via introspection.  Make changes to your models, run syncdb, and you're done.  But like all schema changes, it's wise to preview what is going to be run.  To do this, run the following:
+
+{{{
+./manage sqlevolve app_name
+}}}
+
+This will output to the command line the SQL to be run to bring your database schema up to date with your model structure.
+
+However not everything can be handled through introspection.  A small amount of metadata is used in the cases of model or field renames, so that the introspection code can match up the old field to the new field. (therefore preserving your data)
+
+For renaming a column, use an "aka" attribute:
+
+{{{
+    # this field used to be called pub_date
+    publish_date = models.DateTimeField('date published', aka='pub_date')
+}}}
+
+If you have renamed this twice and still wish to support migration from both older schemas, "aka"s can be tuples:
+
+{{{
+    # this field used to be called pub_date
+    publish_date = models.DateTimeField('date published', aka=('pub_date','other_old_field_name'))
+}}}
+
+For renaming a model, add an "aka" field to the Meta section:
+
+{{{
+# the original name for this model was 'Choice'
+class Option(models.Model):
+    [...]
+    class Meta:
+        aka = 'Choice'
+}}}
+
+For further examples...
+
+== Usage Examples ==
+
+The following documentation will take you through several common model changes and show you how Django's schema evolution handles them. Each example provides the pre and post model source code, as well as the SQL output.
+
+=== Adding / Removing Fields ===
 
 Model: version 1
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -30,9 +112,11 @@ Model: version 1
         votes = models.IntegerField()
         def __str__(self):
             return self.choice
+}}}
 
 Model: version 2
-	
+
+{{{	
     from django.db import models
     
     class Poll(models.Model):
@@ -56,34 +140,37 @@ Model: version 2
         votes2 = models.IntegerField()
         hasSomething = models.BooleanField()
         creatorIp = models.IPAddressField()
+}}}
 
 Output: v1⇒v2 	
 
+{{{
     BEGIN;
     ALTER TABLE `case01_add_field_poll` ADD COLUMN `pub_date2` datetime NOT NULL;
     ALTER TABLE `case01_add_field_choice` ADD COLUMN `votes2` integer NOT NULL;
     ALTER TABLE `case01_add_field_choice` ADD COLUMN `hasSomething` bool NOT NULL;
     ALTER TABLE `case01_add_field_choice` ADD COLUMN `creatorIp` char(15) NOT NULL;
     COMMIT;
+}}}
 
 Output: v2⇒v1 	
 
+{{{
     -- warning: as the following may cause data loss, it/they must be run manually
     -- ALTER TABLE `case01_add_field_poll` DROP COLUMN `pub_date2`;
     -- end warning
     -- warning: as the following may cause data loss, it/they must be run manually
     -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `votes2`;
-    -- end warning
     -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `creatorIp`;
-    -- end warning
     -- ALTER TABLE `case01_add_field_choice` DROP COLUMN `hasSomething`;
     -- end warning
+}}}
 
-Renaming Fields
----------------
+=== Renaming Fields ===
 
 Model: version 1
 
+{{{
     from django.db import models
 
     class Poll(models.Model):
@@ -102,9 +189,11 @@ Model: version 1
         votes = models.IntegerField(aka='votes')
         def __str__(self):
             return self.choice
+}}}
 
 Model: version 2
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -123,20 +212,23 @@ Model: version 2
         number_of_votes = models.IntegerField(aka='votes')
         def __str__(self):
             return self.choice
+}}}
 
 Output: v1⇒v2 	
 
+{{{
     BEGIN;
     ALTER TABLE `case02_rename_field_poll` CHANGE COLUMN `pub_date` `published_date` datetime NOT NULL;
     ALTER TABLE `case02_rename_field_poll` CHANGE COLUMN `the_author` `author` varchar(200) NOT NULL;
     ALTER TABLE `case02_rename_field_choice` CHANGE COLUMN `votes` `number_of_votes` integer NOT NULL;
     COMMIT;
+}}}
 
-Renaming Models
----------------
+=== Renaming Models ===
 
 Model: version 1
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -155,9 +247,11 @@ Model: version 1
             return self.choice
         class Meta:
             aka = ('Choice', 'OtherBadName')
+}}}
 
 Model: version 2
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -177,19 +271,22 @@ Model: version 2
             return self.choice
         class Meta:
             aka = ('Choice', 'BadName')
+}}}
     
 Output: v1⇒v2 	
 
+{{{
     BEGIN;
     ALTER TABLE `case03_rename_model_choice` RENAME TO `case03_rename_model_option`;
     ALTER TABLE `case03_rename_model_option` CHANGE COLUMN `number_of_votes` `votes` integer NOT NULL;
     COMMIT;
+}}}
 
-Changing Flags
---------------
+=== Changing Flags ===
 
 Model: version 1
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -213,9 +310,11 @@ Model: version 1
             ('F', 'Female'),
         )
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+}}}
     
 Model: version 2
 
+{{{
     from django.db import models
     
     class Poll(models.Model):
@@ -243,9 +342,11 @@ Model: version 2
         gender = models.CharField(maxlength=1, choices=GENDER_CHOICES, db_index=True)
         gender2 = models.CharField(maxlength=1, null=True, unique=True)
             
+}}}
 
 Output: v1⇒v2 	
 
+{{{
     BEGIN;
     ALTER TABLE `case04_change_flag_poll` MODIFY COLUMN `question` varchar(100) NOT NULL;
     ALTER TABLE `case04_change_flag_foo` ADD COLUMN `gender2` varchar(1) NULL UNIQUE;
@@ -253,9 +354,9 @@ Output: v1⇒v2
     ALTER TABLE `case04_change_flag_choice` CHANGE COLUMN `choice` `option` varchar(400) NOT NULL;
     ALTER TABLE `case04_change_flag_choice` ADD COLUMN `votes2` integer NOT NULL;
     COMMIT;
+}}}
 
-Conclusion
-----------
+== Conclusion ==
 
 That's pretty much it. If you can suggest additional examples or test cases you
 think would be of value, please email me at public@kered.org.
