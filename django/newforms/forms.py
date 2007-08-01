@@ -232,16 +232,8 @@ class BoundField(StrAndUnicode):
         self.help_text = field.help_text or ''
 
     def __unicode__(self):
-        "Renders this field as an HTML widget."
-        # Use the 'widget' attribute on the field to determine which type
-        # of HTML widget to use.
-        value = self.as_widget(self.field.widget)
-        if not isinstance(value, basestring):
-            # Some Widget render() methods -- notably RadioSelect -- return a
-            # "special" object rather than a string. Call __unicode__() on that
-            # object to get its rendered value.
-            value = unicode(value)
-        return value
+        """Renders this field as an HTML widget."""
+        return self.as_widget()
 
     def _errors(self):
         """
@@ -251,7 +243,14 @@ class BoundField(StrAndUnicode):
         return self.form.errors.get(self.name, ErrorList())
     errors = property(_errors)
 
-    def as_widget(self, widget, attrs=None):
+    def as_widget(self, widget=None, attrs=None):
+        """
+        Renders the field by rendering the passed widget, adding any HTML
+        attributes passed as attrs.  If no widget is specified, then the
+        field's default widget will be used.
+        """
+        if not widget:
+            widget = self.field.widget
         attrs = attrs or {}
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:

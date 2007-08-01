@@ -4,6 +4,7 @@ from regressions import regression_tests
 
 form_tests = r"""
 >>> from django.newforms import *
+>>> from django.newforms.widgets import RadioFieldRenderer
 >>> import datetime
 >>> import time
 >>> import re
@@ -614,11 +615,11 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <li><label><input type="radio" name="num" value="5" /> 5</label></li>
 </ul>
 
-The render() method returns a RadioFieldRenderer object, whose str() is a <ul>.
+RadioSelect uses a RadioFieldRenderer to render the individual radio inputs.
 You can manipulate that object directly to customize the way the RadioSelect
 is rendered.
 >>> w = RadioSelect()
->>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 >>> for inp in r:
 ...     print inp
 <label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
@@ -644,10 +645,21 @@ beatle J P Paul False
 beatle J G George False
 beatle J R Ringo False
 
+You can create your own custom renderers for RadioSelect to use.
+>>> class MyRenderer(RadioFieldRenderer):
+...    def render(self):
+...        return u'<br />\n'.join([unicode(choice) for choice in self])
+>>> w = RadioSelect(renderer=MyRenderer)
+>>> print w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<label><input type="radio" name="beatle" value="J" /> John</label><br />
+<label><input type="radio" name="beatle" value="P" /> Paul</label><br />
+<label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>
+
 A RadioFieldRenderer object also allows index access to individual RadioInput
 objects.
 >>> w = RadioSelect()
->>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 >>> print r[1]
 <label><input type="radio" name="beatle" value="P" /> Paul</label>
 >>> print r[0]
