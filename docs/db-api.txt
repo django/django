@@ -20,7 +20,7 @@ a weblog application::
 
     class Author(models.Model):
         name = models.CharField(maxlength=50)
-        email = models.URLField()
+        email = models.EmailField()
 
         def __unicode__(self):
             return self.name
