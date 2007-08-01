@@ -282,6 +282,11 @@ def typecast_string(s):
         return s
     return smart_unicode(s)
 
+def get_change_table_name_sql( table_name, old_table_name ):
+    output = []
+    output.append('ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';')
+    return '\n'.join(output)
+
 def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
     # TODO: only supports a single primary key so far
     pk_name = None

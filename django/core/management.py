@@ -5,6 +5,7 @@ import django
 from django.core.exceptions import ImproperlyConfigured
 from optparse import OptionParser
 from django.utils import termcolors
+from django.conf import settings
 import os, re, shutil, sys, textwrap
 
 try:
@@ -591,9 +592,9 @@ def get_sql_evolution_check_for_changed_model_name(klass):
     if klass._meta.db_table in table_list:
         return [], None
     if klass._meta.aka in table_list:
-        return [ 'ALTER TABLE '+ backend.quote_name(klass._meta.aka) +' RENAME TO '+ backend.quote_name(klass._meta.db_table) + ';' ], klass._meta.aka
+        return [ backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka) ], klass._meta.aka
     elif len(set(klass._meta.aka) & set(table_list))==1:
-        return [ 'ALTER TABLE '+ backend.quote_name(klass._meta.aka[0]) +' RENAME TO '+ backend.quote_name(klass._meta.db_table) + ';' ], klass._meta.aka[0]
+        return [ backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka[0]) ], klass._meta.aka[0]
     else:
         return [], None
     
@@ -643,6 +644,7 @@ def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
         db_table = new_table_name
     for f in opts.fields:
         existing_fields = introspection.get_columns(cursor,db_table)
+#        print existing_fields
         cf = None # current field, ie what it is before any renames
         if f.column in existing_fields:
             cf = f.column
@@ -655,10 +657,11 @@ def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
         data_type = f.get_internal_type()
         if data_types.has_key(data_type):
             column_flags = introspection.get_known_column_flags(cursor, db_table, cf)
+#            print db_table, cf, column_flags
             if column_flags['allow_null']!=f.null or \
                     ( not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength) ) or \
                     ( not f.primary_key and isinstance(f, SlugField) and column_flags['maxlength']!=str(f.maxlength) ) or \
-                    column_flags['unique']!=f.unique or \
+                    ( column_flags['unique']!=f.unique and ( settings.DATABASE_ENGINE!='postgresql' or not f.primary_key ) ) or \
                     column_flags['primary_key']!=f.primary_key:
                     #column_flags['foreign_key']!=f.foreign_key:
 #                print 

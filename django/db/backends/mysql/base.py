@@ -242,6 +242,9 @@ def get_sql_sequence_reset(style, model_list):
     # No sequence reset required
     return []
 
+def get_change_table_name_sql( table_name, old_table_name ):
+    return 'ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';'
+
 def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
     # mysql doesn't support column renames (AFAIK), so we fake it
     # TODO: only supports a single primary key so far
