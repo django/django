@@ -12,7 +12,7 @@ from types import StringType, IntType, FloatType
 # Python and GEOS-related dependencies.
 import re
 from warnings import warn
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY, ISQLQuote
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY, ISQLQuote, GEOM_FUNC_PREFIX
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
 if HAS_NUMPY: from numpy import ndarray, array
@@ -87,7 +87,7 @@ class GEOSGeometry(object):
 
     def __del__(self):
         "Destroys this geometry -- only if the pointer is valid and whether or not it belongs to a parent."
-        #print 'Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
+        #print 'base: Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
         # Only calling destroy on valid pointers not spawned from a parent
         if self._ptr.valid and not self._parent: lgeos.GEOSGeom_destroy(self._ptr())
 
@@ -101,11 +101,11 @@ class GEOSGeometry(object):
     # Comparison operators
     def __eq__(self, other):
         "Equivalence testing."
-        return self.equals(other)
+        return self.equals_exact(other)
 
     def __ne__(self, other):
         "The not equals operator."
-        return not self.equals(other)
+        return not self.equals_exact(other)
 
     ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
@@ -115,9 +115,19 @@ class GEOSGeometry(object):
         "Returns the union of this Geometry and the other."
         return self.union(other)
 
+    # g1 |= g2
+    def __ior__(self, other):
+        "Reassigns this Geometry to the union of this Geometry and the other."
+        return self.union(other)
+
     # g = g1 & g2
     def __and__(self, other):
         "Returns the intersection of this Geometry and the other."
+        return self.intersection(other)
+
+    # g1 &= g2
+    def __iand__(self, other):
+        "Reassigns this Geometry to the intersection of this Geometry and the other."
         return self.intersection(other)
 
     # g = g1 - g2
@@ -125,10 +135,55 @@ class GEOSGeometry(object):
         "Return the difference this Geometry and the other."
         return self.difference(other)
 
+    # g1 -= g2
+    def __isub__(self, other):
+        "Reassigns this Geometry to the difference of this Geometry and the other."
+        return self.difference(other)
+
     # g = g1 ^ g2
     def __xor__(self, other):
         "Return the symmetric difference of this Geometry and the other."
         return self.sym_difference(other)
+
+    # g1 ^= g2
+    def __ixor__(self, other):
+        "Reassigns this Geometry to the symmetric difference of this Geometry and the other."
+        return self.sym_difference(other)
+
+    def _nullify(self):
+        """During initialization of geometries from other geometries, this routine is
+        used to nullify any parent geometries (since they will now be missing memory
+        components) and to nullify the geometry itself to prevent future access.
+        Only the address (an integer) of the current geometry is returned for use in
+        initializing the new geometry."""
+        # First getting the memory address of the geometry.
+        address = self._ptr()
+
+        # If the geometry is a child geometry, then the parent geometry pointer is
+        #  nullified.
+        if self._parent: self._parent.nullify()
+
+        # Nullifying the geometry pointer
+        self._ptr.nullify()
+
+        return address
+
+    def _reassign(self, new_geom):
+        "Internal routine for reassigning internal pointer to a new geometry."
+        # Only can re-assign when given a pointer or a geometry.
+        if not isinstance(new_geom, (GEOSPointer, GEOSGeometry)):
+            raise TypeError, 'cannot reassign geometry on given type: %s' % type(new_geom)
+        gtype = new_geom.geom_type 
+
+        # Re-assigning the internal GEOSPointer to the new geometry, nullifying
+        #  the new Geometry in the process.
+        if isinstance(new_geom, GEOSGeometry): self._ptr.set(new_geom._nullify())
+        else: self._ptr = new_geom
+        
+        # The new geometry class may be different from the original, so setting
+        #  the __class__ and populating the internal geometry or ring dictionary.
+        self.__class__ = GEOS_CLASSES[gtype]
+        if isinstance(self, (Polygon, GeometryCollection)): self._populate()
 
     #### Psycopg2 database adaptor routines ####
     def __conform__(self, proto):
@@ -140,7 +195,8 @@ class GEOSGeometry(object):
 
     def getquoted(self):
         "Returns a properly quoted string for use in PostgresSQL/PostGIS."
-        return "GeometryFromText('%s', %s)" % (self.wkt, self.srid or -1)
+        # GeometryFromText() is ST_GeometryFromText() in PostGIS >= 1.2.2
+        return "%sGeometryFromText('%s', %s)" % (GEOM_FUNC_PREFIX, self.wkt, self.srid or -1)
     
     #### Coordinate Sequence Routines ####
     @property
@@ -299,10 +355,8 @@ class GEOSGeometry(object):
     def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = lgeos.GEOSGetSRID(self._ptr())
-        if s == 0:
-            return None
-        else:
-            return s
+        if s == 0: return None
+        else: return s
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
@@ -404,7 +458,7 @@ class GEOSGeometry(object):
 
     def clone(self):
         "Clones this Geometry."
-        return GEOSGeometry(lgeos.GEOSGeom_clone(self._ptr()))
+        return GEOSGeometry(lgeos.GEOSGeom_clone(self._ptr()), srid=self.srid)
 
 # Class mapping dictionary
 from django.contrib.gis.geos.geometries import Point, Polygon, LineString, LinearRing

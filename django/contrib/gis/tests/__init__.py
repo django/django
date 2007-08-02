@@ -56,8 +56,12 @@ def run_tests(module_list, verbosity=1):
     from django.conf import settings
 
     # Getting initial values.
+    old_debug = settings.DEBUG
     old_name = copy(settings.DATABASE_NAME)
     old_installed = copy(settings.INSTALLED_APPS)
+
+    # Want DEBUG to be set to False.
+    settings.DEBUG = False
 
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     #  adding the model test suites to our suite package.
@@ -82,6 +86,7 @@ def run_tests(module_list, verbosity=1):
 
     # Cleaning up, destroying the test spatial database and resetting the INSTALLED_APPS.
     destroy_test_db(old_name, verbosity)
+    settings.DEBUG = old_debug
     settings.INSTALLED_APPS = old_installed
     
     # Returning the total failures and errors

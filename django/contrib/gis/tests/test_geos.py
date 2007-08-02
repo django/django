@@ -1,4 +1,4 @@
-import unittest
+import random, unittest
 from django.contrib.gis.geos import \
     GEOSException, GEOSGeometryIndexError, \
     GEOSGeometry, Point, LineString, LinearRing, Polygon, \
@@ -166,7 +166,7 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(lr, LinearRing(lr.tuple))
             self.assertEqual(lr, LinearRing(*lr.tuple))
             self.assertEqual(lr, LinearRing([list(tup) for tup in lr.tuple]))
-            if HAS_NUMPY: self.assertEqual(lr, LineString(array(lr.tuple)))
+            if HAS_NUMPY: self.assertEqual(lr, LinearRing(array(lr.tuple)))
     
     def test05a_polygons(self):
         "Testing Polygon objects."
@@ -200,10 +200,15 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(p.ext_ring_cs, ring.tuple)
                 self.assertEqual(p.ext_ring_cs, poly[0].tuple) # Testing __getitem__
 
-            # Testing __iter__
+            # Testing __getitem__ and __setitem__ on invalid indices
+            self.assertRaises(GEOSGeometryIndexError, poly.__getitem__, len(poly))
+            self.assertRaises(GEOSGeometryIndexError, poly.__setitem__, len(poly), False)
+            self.assertRaises(GEOSGeometryIndexError, poly.__getitem__, -1)
+
+            # Testing __iter__ 
             for r in poly:
-                self.assertEqual(ring.geom_type, 'LinearRing')
-                self.assertEqual(ring.geom_typeid, 2)
+                self.assertEqual(r.geom_type, 'LinearRing')
+                self.assertEqual(r.geom_typeid, 2)
 
             # Testing polygon construction.
             self.assertRaises(TypeError, Polygon, 0, [1, 2, 3])
@@ -224,8 +229,8 @@ class GEOSTest(unittest.TestCase):
             except TypeError:
                 pass
             poly[0][1] = newval # setting the second point in the polygon with the newvalue (based on the old)
-            self.assertEqual(newval, poly[0][1]) # The point in the polygon should be the
-            self.assertEqual(False, poly == prev) # Even different from the clone we just made
+            self.assertEqual(newval, poly[0][1]) # The point in the polygon should be the new value
+            self.assertEqual(False, poly == prev) # Should be different from the clone we just made
             
     def test05b_multipolygons(self):
         "Testing MultiPolygon objects."
@@ -426,11 +431,12 @@ class GEOSTest(unittest.TestCase):
             a = GEOSGeometry(g_tup[0].wkt)
             b = GEOSGeometry(g_tup[1].wkt)
             i1 = GEOSGeometry(intersect_geoms[i].wkt) 
-
             self.assertEqual(True, a.intersects(b))
             i2 = a.intersection(b)
             self.assertEqual(i1, i2)
-            self.assertEqual(i1, a & b)
+            self.assertEqual(i1, a & b) # __and__ is intersection operator
+            a &= b # testing __iand__
+            self.assertEqual(i1, a)
 
     def test11_union(self):
         "Testing union()."
@@ -441,7 +447,9 @@ class GEOSTest(unittest.TestCase):
             u1 = GEOSGeometry(union_geoms[i].wkt)
             u2 = a.union(b)
             self.assertEqual(u1, u2)
-            self.assertEqual(u1, a | b) # Union ('|') operator
+            self.assertEqual(u1, a | b) # __or__ is union operator
+            a |= b # testing __ior__
+            self.assertEqual(u1, a) 
 
     def test12_difference(self):
         "Testing difference()."
@@ -452,7 +460,9 @@ class GEOSTest(unittest.TestCase):
             d1 = GEOSGeometry(diff_geoms[i].wkt)
             d2 = a.difference(b)
             self.assertEqual(d1, d2)
-            self.assertEqual(d1, a - b) # Difference ('-') operator
+            self.assertEqual(d1, a - b) # __sub__ is difference operator
+            a -= b # testing __isub__
+            self.assertEqual(d1, a)
 
     def test13_symdifference(self):
         "Testing sym_difference()."
@@ -463,7 +473,9 @@ class GEOSTest(unittest.TestCase):
             d1 = GEOSGeometry(sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
             self.assertEqual(d1, d2)
-            self.assertEqual(d1, a ^ b) # Symmetric difference ('^') operator
+            self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
+            a ^= b # testing __ixor__
+            self.assertEqual(d1, a)
 
     def test14_buffer(self):
         "Testing buffer()."
@@ -491,6 +503,85 @@ class GEOSTest(unittest.TestCase):
                     # Asserting the X, Y of each point are almost equal (due to floating point imprecision)
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
+
+    def test15_srid(self):
+        "Testing the SRID property and keyword."
+        # Testing SRID keyword on Point
+        pnt = Point(5, 23, srid=4326)
+        self.assertEqual(4326, pnt.srid)
+        pnt.srid = 3084
+        self.assertEqual(3084, pnt.srid)
+        self.assertRaises(TypeError, pnt.set_srid, '4326')
+
+        # Testing SRID keyword on fromstr(), and on Polygon rings.
+        poly = fromstr(polygons[1].wkt, srid=4269)
+        self.assertEqual(4269, poly.srid)
+        for ring in poly: self.assertEqual(4269, ring.srid)
+        poly.srid = 4326
+        self.assertEqual(4326, poly.shell.srid)
+
+        # Testing SRID keyword on GeometryCollection
+        gc = GeometryCollection(Point(5, 23), LineString((0, 0), (1.5, 1.5), (3, 3)), srid=32021)
+        self.assertEqual(32021, gc.srid)
+        for i in range(len(gc)): self.assertEqual(32021, gc[i].srid)
+
+    def test16_mutable_geometries(self):
+        "Testing the mutability of Polygons and Geometry Collections."
+        ### Testing the mutability of Polygons ###
+        for p in polygons:
+            poly = fromstr(p.wkt)
+
+            # Should only be able to use __setitem__ with LinearRing geometries.
+            self.assertRaises(TypeError, poly.__setitem__, 0, LineString((1, 1), (2, 2)))
+
+            # Constructing the new shell by adding 500 to every point in the old shell.
+            shell_tup = poly.shell.tuple
+            new_coords = []
+            for point in shell_tup: new_coords.append((point[0] + 500., point[1] + 500.))
+            shell1 = LinearRing(*tuple(new_coords))
+            shell2 = shell1.clone() 
+
+            # Assigning polygon's exterior ring w/the new shell
+            poly.exterior_ring = shell1
+            self.assertRaises(GEOSException, str, shell1) # shell1 should no longer be accessible
+            self.assertEqual(poly.exterior_ring, shell2)
+            self.assertEqual(poly[0], shell2)
+            del poly, shell1, shell_tup # cleaning up
+
+        ### Testing the mutability of Geometry Collections
+        for tg in multipoints:
+            mp = fromstr(tg.wkt)
+            for i in range(len(mp)):
+                # Creating a random point.
+                pnt = mp[i].clone()
+                new = Point(random.randint(1, 100), random.randint(1, 100))
+                tmp = new.clone()
+                # Testing the assignmen
+                mp[i] = tmp
+                self.assertRaises(GEOSException, len, tmp)
+                self.assertEqual(mp[i], new)
+                self.assertEqual(mp[i].wkt, new.wkt)
+                self.assertNotEqual(pnt, mp[i])
+            del mp
+
+        # Multipolygons involve much more memory management because each
+        #  polygon w/in the collection has its own rings.
+        for tg in multipolygons:
+            mpoly = fromstr(tg.wkt)
+            for i in xrange(len(mpoly)):
+                poly = mpoly[i].clone()
+                # Offsetting the each ring in the polygon by 500.
+                tmp = poly.clone()
+                for r in tmp: 
+                    for j in xrange(len(r)): r[j] = (r[j][0] + 500., r[j][1] + 500.)
+                self.assertNotEqual(poly, tmp)
+                new = tmp.clone() # a 'reference' copy of the geometry used in assignment
+                # Testing the assignment
+                mpoly[i] = tmp
+                self.assertRaises(GEOSException, str, tmp)
+                self.assertEqual(mpoly[i], new)
+                self.assertNotEqual(poly, mpoly[i])
+            del mpoly
 
 def suite():
     s = unittest.TestSuite()

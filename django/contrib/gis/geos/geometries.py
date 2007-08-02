@@ -7,7 +7,7 @@
 from ctypes import c_double, c_int, c_uint, byref, cast
 from types import FloatType, IntType, ListType, TupleType
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, get_pointer_arr, init_from_geom, GEOM_PTR, HAS_NUMPY
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, get_pointer_arr, GEOM_PTR, HAS_NUMPY
 from django.contrib.gis.geos.base import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 if HAS_NUMPY: from numpy import ndarray, array
@@ -21,7 +21,9 @@ class Point(GEOSGeometry):
           >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
         """
 
+        # Setting-up for Point Creation
         self._ptr = GEOSPointer(0) # Initially NULL
+        self._parent = None
 
         if isinstance(x, (TupleType, ListType)):
             # Here a tuple or list was passed in under the ``x`` parameter.
@@ -132,7 +134,9 @@ class LineString(GEOSGeometry):
           ls = LineString(array([(1, 1), (2, 2)]))
           ls = LineString(Point(1, 1), Point(2, 2))
         """
+        # Setting up for LineString creation
         self._ptr = GEOSPointer(0) # Initially NULL
+        self._parent = None
 
         # If only one argument was provided, then set the coords array appropriately
         if len(args) == 1: coords = args[0]
@@ -254,6 +258,7 @@ class Polygon(GEOSGeometry):
           poly = Polygon(shell, (hole1, hole2))
         """
         self._ptr = GEOSPointer(0) # Initially NULL
+        self._parent = None
         self._rings = {} 
         if not args:
             raise TypeError, 'Must provide at list one LinearRing instance to initialize Polygon.'
@@ -277,43 +282,58 @@ class Polygon(GEOSGeometry):
         holes = get_pointer_arr(nholes)
         for i in xrange(nholes):
             # Casting to the Geometry Pointer type
-            holes[i] = cast(init_from_geom(init_holes[i]), GEOM_PTR)
+            holes[i] = cast(init_holes[i]._nullify(), GEOM_PTR)
                       
         # Getting the shell pointer address, 
-        shell = init_from_geom(ext_ring)
+        shell = ext_ring._nullify()
 
         # Calling with the GEOS createPolygon factory.
         super(Polygon, self).__init__(lgeos.GEOSGeom_createPolygon(shell, byref(holes), c_uint(nholes)), **kwargs)
 
     def __del__(self):
         "Overloaded deletion method for Polygons."
-        #print 'Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
+        #print 'polygon: Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
         # If this geometry is still valid, it hasn't been modified by others.
         if self._ptr.valid:
             # Nulling the pointers to internal rings, preventing any attempted future access
             for k in self._rings: self._rings[k].nullify()
-            super(Polygon, self).__del__()
-        else:
+        elif not self._parent: 
             # Internal memory has become part of other objects; must delete the 
             #  internal objects which are still valid individually, since calling
             #  destructor on entire geometry will result in an attempted deletion 
-            #  of NULL pointers for the missing components.
+            #  of NULL pointers for the missing components.  Not performed on
+            #  children Polygons from MultiPolygon or GeometryCollection objects.
             for k in self._rings:
                 if self._rings[k].valid:
                     lgeos.GEOSGeom_destroy(self._rings[k].address)
                     self._rings[k].nullify()
+        super(Polygon, self).__del__()
 
     def __getitem__(self, index):
         """Returns the ring at the specified index.  The first index, 0, will always
         return the exterior ring.  Indices > 0 will return the interior ring."""
-        if index < 0 or index > self.num_interior_rings:
-            raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
+        if index == 0:
+            return self.exterior_ring
         else:
-            if index == 0:
-                return self.exterior_ring
-            else:
-                # Getting the interior ring, have to subtract 1 from the index.
-                return self.get_interior_ring(index-1) 
+            # Getting the interior ring, have to subtract 1 from the index.
+            return self.get_interior_ring(index-1) 
+
+    def __setitem__(self, index, ring):
+        "Sets the ring at the specified index with the given ring."
+        # Checking the index and ring parameters.
+        self._checkindex(index)
+        if not isinstance(ring, LinearRing):
+            raise TypeError, 'must set Polygon index with a LinearRing object'
+
+        # Constructing the ring parameters
+        new_rings = []
+        for i in xrange(len(self)):
+            if index == i: new_rings.append(ring)
+            else: new_rings.append(self[i])
+
+        # Constructing the new Polygon with the ring parameters, and reassigning the internals.
+        new_poly = Polygon(*new_rings)
+        self._reassign(new_poly)
 
     def __iter__(self):
         "Iterates over each ring in the polygon."
@@ -323,6 +343,17 @@ class Polygon(GEOSGeometry):
     def __len__(self):
         "Returns the number of rings in this Polygon."
         return self.num_interior_rings + 1
+
+    def _checkindex(self, index):
+        "Internal routine for checking the given ring index."
+        if index < 0 or index >= len(self):
+            raise GEOSGeometryIndexError, 'invalid Polygon ring index: %s' % index
+
+    def _nullify(self):
+        "Overloaded from base method to nullify ring references as well."
+        # Nullifying the references to the internal rings of this Polygon.
+        for k in self._rings: self._rings[k].nullify()
+        return super(Polygon, self)._nullify()
 
     def _populate(self):
         "Populates the internal rings dictionary."
@@ -336,13 +367,9 @@ class Polygon(GEOSGeometry):
     def get_interior_ring(self, ring_i):
         """Gets the interior ring at the specified index,
         0 is for the first interior ring, not the exterior ring."""
-
-        # Making sure the ring index is within range
-        if ring_i < 0 or ring_i >= self.num_interior_rings:
-            raise IndexError, 'ring index out of range'
-
-        # Returning the ring from the internal ring dictionary (have to
-        #   add one to the index)
+        # Returning the ring from the internal ring dictionary (have to add one
+        #   to index since all internal rings come after the exterior ring)
+        self._checkindex(ring_i+1)
         return GEOSGeometry(self._rings[ring_i+1], parent=self._ptr, srid=self.srid)
                                                         
     #### Polygon Properties ####
@@ -361,14 +388,13 @@ class Polygon(GEOSGeometry):
         "Gets the exterior ring of the Polygon."
         return GEOSGeometry(self._rings[0], parent=self._ptr, srid=self.srid)
 
-    def set_ext_ring(self):
+    def set_ext_ring(self, ring):
         "Sets the exterior ring of the Polygon."
-        # Sets the exterior ring
-        raise NotImplementedError
+        self[0] = ring
 
     # properties for the exterior ring/shell
-    exterior_ring = property(get_ext_ring)
-    shell = property(get_ext_ring)
+    exterior_ring = property(get_ext_ring, set_ext_ring)
+    shell = property(get_ext_ring, set_ext_ring)
     
     @property
     def tuple(self):

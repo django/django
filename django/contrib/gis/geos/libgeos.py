@@ -18,11 +18,13 @@ try:
 except ImportError:
     HAS_NUMPY = False
 
-# Psycopg2 supported?
+# Are psycopg2 and GeoDjango models being used?
 try:
     from psycopg2.extensions import ISQLQuote
-except ImportError:
+    from django.contrib.gis.db.backend.postgis import GEOM_FUNC_PREFIX
+except (ImportError, EnvironmentError):
     ISQLQuote = None
+    GEOM_FUNC_PREFIX = None
 
 # Setting the appropriate name for the GEOS-C library, depending on which
 # OS and POSIX platform we're running.
@@ -71,21 +73,22 @@ error_h = ERRORFUNC(error_h)
 #  "extern void GEOS_DLL initGEOS(GEOSMessageHandler notice_function, GEOSMessageHandler error_function);"
 lgeos.initGEOS(notice_h, error_h)
 
-#### GEOS Geometry Pointer utilities. ####
+#### GEOS Geometry Pointer object, related C data structures, and functions. ####
 
 # Opaque GEOS geometry structure
 class GEOSGeom_t(Structure): 
     "Opaque structure used when arrays of geometries are needed as parameters."
     pass
+
 # Pointer to opaque geometry structure
 GEOM_PTR = POINTER(GEOSGeom_t)
+
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection GEOS routines
 def get_pointer_arr(n):
     "Gets a ctypes pointer array (of length `n`) for GEOSGeom_t opaque pointer."
     GeomArr = GEOM_PTR * n
     return GeomArr()
 
-#### GEOS Pointer object and routines ####
 class GEOSPointer(object):
     """The GEOSPointer provides a layer of abstraction in accessing the values returned by
     GEOS geometry creation routines.  Memory addresses (integers) are kept in a C pointer,
@@ -108,12 +111,15 @@ class GEOSPointer(object):
         if self.valid: return self.address
         else: raise GEOSException, 'GEOS pointer no longer valid (was this geometry or the parent geometry deleted or modified?)'
 
-    def __bool__(self):
+    def __nonzero__(self):
         "Returns True when the GEOSPointer is valid."
         return self.valid
 
     def __str__(self):
         return str(self.address)
+
+    def __repr__(self):
+        return 'GEOSPointer(%s)' % self.address
 
     ### GEOSPointer Properties ###
     @property
@@ -161,21 +167,3 @@ class GEOSPointer(object):
         # Nullifying both the geometry and coordinate sequence pointer.
         self.set(0)
         self.set(0, coordseq=True)
-
-def init_from_geom(geom):
-    """During initialization of geometries from other geometries, this routine is 
-    used to nullify any parent geometries (since they will now be missing memory 
-    components) and to nullify the geometry itself to prevent future access.  
-    Only the address (an integer) of the current geometry is returned for use in 
-    initializing the new geometry."""
-    # First getting the memory address of the geometry.
-    address = geom._ptr()
-
-    # If the geometry is a child geometry, then the parent geometry pointer is
-    #  nullified.
-    if geom._parent: geom._parent.nullify()
-
-    # Nullifying the geometry pointer
-    geom._ptr.nullify()
-
-    return address
