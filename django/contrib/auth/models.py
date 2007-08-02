@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 import datetime
 import urllib
 
+UNUSABLE_PASSWORD = '!' # This will never be a valid hash
+
 try:
     set
 except NameError:
@@ -83,11 +85,14 @@ class Group(models.Model):
         return self.name
 
 class UserManager(models.Manager):
-    def create_user(self, username, email, password):
+    def create_user(self, username, email, password=None):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
         user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save()
         return user
 
@@ -179,6 +184,13 @@ class User(models.Model):
             return is_correct
         return check_password(raw_password, self.password)
 
+    def set_unusable_password(self):
+        # Sets a value that will never be a valid hash
+        self.password = UNUSABLE_PASSWORD
+
+    def has_usable_password(self):
+        return self.password != UNUSABLE_PASSWORD
+
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
         if not hasattr(self, '_group_perm_cache'):
@@ -268,7 +280,8 @@ class User(models.Model):
         return self._profile_cache
 
 class Message(models.Model):
-    """The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
+    """
+    The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
     """
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))

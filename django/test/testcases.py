@@ -84,7 +84,7 @@ class TestCase(unittest.TestCase):
             "Couldn't retrieve page: Response code was %d (expected %d)'" % 
                 (response.status_code, status_code))
         real_count = response.content.count(text)
-        if count:
+        if count is not None:
             self.assertEqual(real_count, count,
                 "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
         else:

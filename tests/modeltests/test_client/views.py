@@ -84,7 +84,7 @@ def form_view(request):
             t = Template('Invalid POST data. {{ form.errors }}', name='Invalid POST Template')
             c = Context({'form': form})
     else:
-        form = TestForm()
+        form = TestForm(request.GET)
         t = Template('Viewing base form. {{ form }}.', name='Form GET Template')
         c = Context({'form': form})
     
@@ -107,7 +107,6 @@ def form_view_with_template(request):
             'message': message
         }
     )
-
         
 def login_protected_view(request):
     "A simple view that is login protected."

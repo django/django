@@ -579,28 +579,36 @@ class ValuesQuerySet(QuerySet):
         except EmptyResultSet:
             raise StopIteration
 
-        # self._fields is a list of field names to fetch.
+        # self._select is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples.
+        extra_select = self._select.items()
+
+        # Construct two objects -- fields and field_names.
+        # fields is a list of Field objects to fetch.
+        # field_names is a list of field names, which will be the keys in the
+        # resulting dictionaries.
         if self._fields:
-            if not self._select:
+            if not extra_select:
                 fields = [self.model._meta.get_field(f, many_to_many=False) for f in self._fields]
+                field_names = self._fields
             else:
                 fields = []
+                field_names = []
                 for f in self._fields:
                     if f in [field.name for field in self.model._meta.fields]:
                         fields.append(self.model._meta.get_field(f, many_to_many=False))
-                    elif not self._select.has_key( f ):
-                        raise FieldDoesNotExist, '%s has no field named %r' % ( self.model._meta.object_name, f )
-
-            field_names = self._fields
+                        field_names.append(f)
+                    elif not self._select.has_key(f):
+                        raise FieldDoesNotExist('%s has no field named %r' % (self.model._meta.object_name, f))
         else: # Default to all fields.
             fields = self.model._meta.fields
             field_names = [f.attname for f in fields]
 
         columns = [f.column for f in fields]
         select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
-        # Add any additional SELECTs.
-        if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+        if extra_select:
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in extra_select])
+            field_names.extend([f[0] for f in extra_select])
 
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)

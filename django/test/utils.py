@@ -144,6 +144,10 @@ def create_test_db(verbosity=1, autoclobber=False):
 
     management.syncdb(verbosity, interactive=False)
 
+    if settings.CACHE_BACKEND.startswith('db://'):
+        cache_name = settings.CACHE_BACKEND[len('db://'):]
+        management.createcachetable(cache_name)
+
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
     cursor = connection.cursor()

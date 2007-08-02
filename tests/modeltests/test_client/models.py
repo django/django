@@ -122,6 +122,18 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Valid POST Template")
 
+    def test_valid_form_with_hints(self):
+        "GET a form, providing hints in the GET data"
+        hints = {
+            'text': 'Hello World',
+            'multi': ('b','c','e')
+        }
+        response = self.client.get('/test_client/form_view/', data=hints)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Form GET Template")
+        # Check that the multi-value data has been rolled out ok
+        self.assertContains(response, 'Select a valid choice.', 0)
+        
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
         post_data = {

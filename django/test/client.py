@@ -195,7 +195,7 @@ class Client:
             'CONTENT_LENGTH':  None,
             'CONTENT_TYPE':    'text/html; charset=utf-8',
             'PATH_INFO':       path,
-            'QUERY_STRING':    urlencode(data),
+            'QUERY_STRING':    urlencode(data, doseq=True),
             'REQUEST_METHOD': 'GET',
         }
         r.update(extra)

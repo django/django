@@ -279,6 +279,22 @@ Please follow these coding standards when writing code for inclusion in Django:
     * Mark all strings for internationalization; see the `i18n documentation`_
       for details.
 
+    * In docstrings, use "action words," like so::
+
+          def foo():
+              """
+              Calculates something and returns the result.
+              """
+              pass
+
+      Here's an example of what not to do::
+
+          def foo():
+              """
+              Calculate something and return the result.
+              """
+              pass
+
     * Please don't put your name in the code you contribute. Our policy is to
       keep contributors' names in the ``AUTHORS`` file distributed with Django
       -- not scattered throughout the codebase itself. Feel free to include a

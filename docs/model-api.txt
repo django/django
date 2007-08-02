@@ -1052,6 +1052,44 @@ create your tables. It's not called at any other time, so it can afford to
 execute slightly complex code, such as the ``DATABASE_ENGINE`` check in the
 above example.
 
+Some database column types accept parameters, such as ``CHAR(25)``, where the
+parameter ``25`` represents the maximum column length. In cases like these,
+it's more flexible if the parameter is specified in the model rather than being
+hard-coded in the ``db_type()`` method. For example, it wouldn't make much
+sense to have a ``CharMaxlength25Field``, shown here::
+
+    # This is a silly example of hard-coded parameters.
+    class CharMaxlength25Field(models.Field):
+        def db_type(self):
+            return 'char(25)'
+
+    # In the model:
+    class MyModel(models.Model):
+        # ...
+        my_field = CharMaxlength25Field()
+
+The better way of doing this would be to make the parameter specifiable at run
+time -- i.e., when the class is instantiated. To do that, just implement
+``__init__()``, like so::
+
+    # This is a much more flexible example.
+    class BetterCharField(models.Field):
+        def __init__(self, maxlength, *args, **kwargs):
+            self.maxlength = maxlength
+            super(BetterCharField, self).__init__(*args, **kwargs)
+
+        def db_type(self):
+            return 'char(%s)' % self.maxlength
+
+    # In the model:
+    class MyModel(models.Model):
+        # ...
+        my_field = BetterCharField(25)
+
+Note that if you implement ``__init__()`` on a ``Field`` subclass, it's
+important to call ``Field.__init__()`` -- i.e., the parent class'
+``__init__()`` method.
+
 Meta options
 ============
 

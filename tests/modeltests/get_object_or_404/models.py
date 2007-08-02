@@ -3,11 +3,11 @@
 
 get_object_or_404 is a shortcut function to be used in view functions for
 performing a get() lookup and raising a Http404 exception if a DoesNotExist
-exception was rasied during the get() call.
+exception was raised during the get() call.
 
 get_list_or_404 is a shortcut function to be used in view functions for
 performing a filter() lookup and raising a Http404 exception if a DoesNotExist
-exception was rasied during the filter() call.
+exception was raised during the filter() call.
 """
 
 from django.db import models
@@ -69,11 +69,28 @@ Http404: No Article matches the given query.
 >>> get_object_or_404(Article.by_a_sir, title="Run away!")
 <Article: Run away!>
 
+# QuerySets can be used too.
+>>> get_object_or_404(Article.objects.all(), title__contains="Run")
+<Article: Run away!>
+
+# Just as when using a get() lookup, you will get an error if more than one
+# object is returned.
+>>> get_object_or_404(Author.objects.all())
+Traceback (most recent call last):
+...
+AssertionError: get() returned more than one Author -- it returned ...! Lookup parameters were {}
+
+# Using an EmptyQuerySet raises a Http404 error.
+>>> get_object_or_404(Article.objects.none(), title__contains="Run")
+Traceback (most recent call last):
+...
+Http404: No Article matches the given query.
+
 # get_list_or_404 can be used to get lists of objects
 >>> get_list_or_404(a.article_set, title__icontains='Run')
 [<Article: Run away!>]
 
-# Http404 is returned if the list is empty
+# Http404 is returned if the list is empty.
 >>> get_list_or_404(a.article_set, title__icontains='Shrubbery')
 Traceback (most recent call last):
 ...
@@ -81,6 +98,10 @@ Http404: No Article matches the given query.
 
 # Custom managers can be used too.
 >>> get_list_or_404(Article.by_a_sir, title__icontains="Run")
+[<Article: Run away!>]
+
+# QuerySets can be used too.
+>>> get_list_or_404(Article.objects.all(), title__icontains="Run")
 [<Article: Run away!>]
 
 """}
