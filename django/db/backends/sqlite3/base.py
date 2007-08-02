@@ -2,6 +2,7 @@
 SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
+from django.core import management
 from django.db.backends import util
 try:
     try:
@@ -102,6 +103,7 @@ class SQLiteCursorWrapper(Database.Cursor):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
+pk_requires_unique = True # or else the constraint is never created
 autoindexes_primary_keys = True
 needs_datetime_string_cast = True
 needs_upper_for_iops = False
@@ -227,13 +229,16 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(new_col_name) +' '+ col_def + ';' )
     output.append( 'UPDATE '+ quote_name(table_name) +' SET '+ new_col_name +' = '+ old_col_name +' WHERE '+ pk_name +'=(select '+ pk_name +' from '+ table_name +');' )
     output.append( '-- FYI: sqlite does not support deleting columns, so  '+ quote_name(old_col_name) +' remains as cruft' )
-    # use the following when sqlite gets drop support
-    #output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(old_col_name) )
     return '\n'.join(output)
 
-def get_change_column_def_sql( table_name, col_name, col_def ):
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
     # sqlite doesn't support column modifications, so we fake it
     output = []
+    col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
+    if unique or primary_key:
+        col_def += ' '+ 'UNIQUE'
+    if primary_key:
+        col_def += ' '+ 'PRIMARY KEY'
     # TODO: fake via renaming the table, building a new one and deleting the old
     output.append('-- sqlite does not support column modifications '+ quote_name(table_name) +'.'+ quote_name(col_name) +' to '+ col_def)
     return '\n'.join(output)
@@ -247,7 +252,7 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
     field_output.append(quote_name(col_name))
     field_output.append(col_type)
     field_output.append(('%sNULL' % (not null and 'NOT ' or '')))
-    if unique:
+    if unique or primary_key:
         field_output.append(('UNIQUE'))
     if primary_key:
         field_output.append(('PRIMARY KEY'))
@@ -255,11 +260,28 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
     return '\n'.join(output)
 
 def get_drop_column_sql( table_name, col_name ):
+    model = get_model_from_table_name(table_name)
     output = []
-    output.append( '-- FYI: sqlite does not support deleting columns, so  '+ quote_name(old_col_name) +' remains as cruft' )
-    # use the following when sqlite gets drop support
-    # output.append( '-- ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) )
-    return '\n'.join(output)
+    output.append( '-- FYI: sqlite does not support deleting columns, so we create a new '+ quote_name(col_name) +' and delete the old  (ie, this could take a while)' )
+    tmp_table_name = table_name + '_1337_TMP' # unlikely to produce a namespace conflict
+    output.append( get_change_table_name_sql( tmp_table_name, table_name ) )
+    output.extend( management._get_sql_model_create(model, set())[0] )
+    new_cols = []
+    for f in model._meta.fields:
+        new_cols.append( quote_name(f.column) )
+    output.append( 'INSERT INTO '+ quote_name(table_name) +' SELECT '+ ','.join(new_cols) +' FROM '+ quote_name(tmp_table_name) +';' )
+    output.append( 'DROP TABLE '+ quote_name(tmp_table_name) +';' )
+    return output
+
+def get_model_from_table_name(table_name):
+    from django.db import models
+    for app in models.get_apps():
+        app_name = app.__name__.split('.')[-2]
+        if app_name == table_name.split('_')[0] or app_name == '_'.join(table_name.split('_')[0:1]) or app_name == '_'.join(table_name.split('_')[0:2]):
+            for model in models.get_models(app):
+                if model._meta.db_table == table_name:
+                    return model
+    return None
     
 
 # SQLite requires LIKE statements to include an ESCAPE clause if the value

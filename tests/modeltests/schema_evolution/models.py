@@ -141,3 +141,69 @@ if settings.DATABASE_ENGINE == 'postgresql':
 
 """
 
+if settings.DATABASE_ENGINE == 'sqlite3':
+    __test__['API_TESTS'] += """
+# the table as it is supposed to be
+>>> create_table_sql = management.get_sql_all(app)
+>>> print create_table_sql
+['CREATE TABLE "schema_evolution_person" (\\n    "id" integer NOT NULL UNIQUE PRIMARY KEY,\\n    "name" varchar(20) NOT NULL,\\n    "gender" varchar(1) NOT NULL,\\n    "gender2" varchar(1) NOT NULL\\n)\\n;']
+
+# make sure we don't evolve an unedited table
+>>> management.get_sql_evolution(app)
+[]
+
+# delete a column, so it looks like we've recently added a field
+>>> cursor.execute( 'DROP TABLE "schema_evolution_person";' ).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute( 'CREATE TABLE "schema_evolution_person" ( "id" integer NOT NULL UNIQUE PRIMARY KEY, "name" varchar(20) NOT NULL, "gender" varchar(1) NOT NULL );' ).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_person" ADD COLUMN "gender2" varchar(1) NOT NULL;']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;').__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute(create_table_sql[0]).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+
+# add a column, so it looks like we've recently deleted a field
+>>> cursor.execute( 'DROP TABLE "schema_evolution_person";' ).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute( 'CREATE TABLE "schema_evolution_person" ( "id" integer NOT NULL UNIQUE PRIMARY KEY, "name" varchar(20) NOT NULL, "gender" varchar(1) NOT NULL, "gender2" varchar(1) NOT NULL, "gender_new" varchar(1) NOT NULL );' ).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> management.get_sql_evolution(app)
+['-- warning: the following may cause data loss', u'-- FYI: sqlite does not support deleting columns, so we create a new "gender_new" and delete the old  (ie, this could take a while)', 'ALTER TABLE "schema_evolution_person" RENAME TO "schema_evolution_person_1337_TMP";', 'CREATE TABLE "schema_evolution_person" (\\n    "id" integer NOT NULL UNIQUE PRIMARY KEY,\\n    "name" varchar(20) NOT NULL,\\n    "gender" varchar(1) NOT NULL,\\n    "gender2" varchar(1) NOT NULL\\n)\\n;', 'INSERT INTO "schema_evolution_person" SELECT "id","name","gender","gender2" FROM "schema_evolution_person_1337_TMP";', 'DROP TABLE "schema_evolution_person_1337_TMP";', '-- end warning']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;').__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute(create_table_sql[0]).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+
+"""
+
+crap = """
+
+# rename column, so it looks like we've recently renamed a field
+>>> cursor.execute( backend.get_change_column_name_sql( 'schema_evolution_person', {}, 'gender2', 'gender_old', 'varchar(1)' ) )
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_person" RENAME COLUMN "gender_old" TO "gender2";']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;'); cursor.execute(create_table_sql[0])
+
+# rename table, so it looks like we've recently renamed a model
+>>> cursor.execute( backend.get_change_table_name_sql( 'schema_evolution_personold', 'schema_evolution_person' ) )
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_personold" RENAME TO "schema_evolution_person";']
+
+# reset the db
+>>> cursor.execute(create_table_sql[0])
+
+# change column flags, so it looks like we've recently changed a column flag
+>>> cursor.execute( backend.get_change_column_def_sql( 'schema_evolution_person', 'name', 'varchar(10)', True, False, False ) )
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_person" ADD COLUMN "name_tmp" varchar(20);\\nUPDATE "schema_evolution_person" SET "name_tmp" = "name";\\nALTER TABLE "schema_evolution_person" DROP COLUMN "name";\\nALTER TABLE "schema_evolution_person" RENAME COLUMN "name_tmp" TO "name";\\nALTER TABLE "schema_evolution_person" ALTER COLUMN "name" SET NOT NULL;']
+
+"""
+

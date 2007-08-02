@@ -151,6 +151,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
+pk_requires_unique = False
 autoindexes_primary_keys = False
 needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
 needs_upper_for_iops = False

@@ -53,17 +53,38 @@ def get_columns(cursor, table_name):
 def get_known_column_flags( cursor, table_name, column_name ):
     cursor.execute("PRAGMA table_info(%s)" % quote_name(table_name))
     dict = {}
+    dict['primary_key'] = False
+    dict['foreign_key'] = False
+    dict['unique'] = False
+    dict['default'] = ''
+    dict['allow_null'] = True
+
     for row in cursor.fetchall():
+#        print row
         if row[1] == column_name:
+            col_type = row[2]
 
             # maxlength check goes here
             if row[2][0:7]=='varchar':
                 dict['maxlength'] = row[2][8:len(row[2])-1]
             
             # default flag check goes here
-            #if row[2]=='YES': dict['allow_null'] = True
-            #else: dict['allow_null'] = False
+            dict['allow_null'] = row[3]==0
             
+            # default value check goes here
+            dict['default'] = row[4]
+
+    cursor.execute("PRAGMA index_list(%s)" % quote_name(table_name))
+    index_names = []
+    for row in cursor.fetchall():
+        index_names.append(row[1])
+    for index_name in index_names:
+        cursor.execute("PRAGMA index_info(%s)" % quote_name(index_name))
+        for row in cursor.fetchall():
+            if row[2]==column_name:
+                if col_type=='integer': dict['primary_key'] = True  # sqlite3 does not distinguish between unique and pk; all 
+                else: dict['unique'] = True                         # unique integer columns are treated as part of the pk.
+
             # primary/foreign/unique key flag check goes here
             #if row[3]=='PRI': dict['primary_key'] = True
             #else: dict['primary_key'] = False
@@ -72,12 +93,8 @@ def get_known_column_flags( cursor, table_name, column_name ):
             #if row[3]=='UNI': dict['unique'] = True
             #else: dict['unique'] = False
             
-            # default value check goes here
-            # if row[4]=='NULL': dict['default'] = None
-            # else: dict['default'] = row[4]
-            #dict['default'] = row[4]
-            
-    print table_name, column_name, dict
+
+#    print dict
     return dict
     
 def _table_info(cursor, name):

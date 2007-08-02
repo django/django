@@ -170,7 +170,7 @@ def _get_sql_model_create(model, known_models=set()):
         field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
             style.SQL_COLTYPE(col_type)]
         field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-        if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
+        if (f.unique and (not f.primary_key or backend.allows_unique_and_pk)) or (f.primary_key and backend.pk_requires_unique):
             field_output.append(style.SQL_KEYWORD('UNIQUE'))
         if f.primary_key:
             field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
@@ -569,18 +569,6 @@ def get_sql_evolution_check_for_new_fields(klass, new_table_name):
             data_type = f.get_internal_type()
             col_type = data_types[data_type]
             if col_type is not None:
-#                field_output = []
-#                field_output.append('ALTER TABLE')
-#                field_output.append(db_table)
-#                field_output.append('ADD COLUMN')
-#                field_output.append(backend.quote_name(f.column))
-#                field_output.append(style.SQL_COLTYPE(col_type % rel_field.__dict__))
-#                field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-#                if f.unique:
-#                    field_output.append(style.SQL_KEYWORD('UNIQUE'))
-#                if f.primary_key:
-#                    field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-#                output.append(' '.join(field_output) + ';')
                 output.append( backend.get_add_column_sql( db_table, f.column, style.SQL_COLTYPE(col_type % rel_field.__dict__), f.null, f.unique, f.primary_key ) )
     return output
 
@@ -664,7 +652,7 @@ def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
                     ( column_flags['unique']!=f.unique and ( settings.DATABASE_ENGINE!='postgresql' or not f.primary_key ) ) or \
                     column_flags['primary_key']!=f.primary_key:
                     #column_flags['foreign_key']!=f.foreign_key:
-#                print 
+#                print 'need to change'
 #                print db_table, f.column, column_flags
 #                print "column_flags['allow_null']!=f.null", column_flags['allow_null']!=f.null
 #                print "not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength)", not f.primary_key and isinstance(f, CharField) and column_flags['maxlength']!=str(f.maxlength)
@@ -703,9 +691,9 @@ def get_sql_evolution_check_for_dead_fields(klass, new_table_name):
         suspect_fields.discard(f.aka)
         if f.aka: suspect_fields.difference_update(f.aka)
     if len(suspect_fields)>0:
-        output.append( '-- warning: as the following may cause data loss, it/they must be run manually' )
+        output.append( '-- warning: the following may cause data loss' )
         for suspect_field in suspect_fields:
-            output.append( '-- '+ backend.get_drop_column_sql( db_table, suspect_field ) )
+            output.extend( backend.get_drop_column_sql( db_table, suspect_field ) )
         output.append( '-- end warning' )
     return output
 

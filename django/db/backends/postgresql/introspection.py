@@ -81,8 +81,8 @@ def get_known_column_flags( cursor, table_name, column_name ):
     dict['foreign_key'] = False
     dict['unique'] = False
     dict['default'] = ''
-            
-#    dict['allow_null'] = False
+    dict['allow_null'] = False
+
     for row in cursor.fetchall():
         if row[0] == column_name:
 

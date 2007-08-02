@@ -117,6 +117,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
+pk_requires_unique = False
 autoindexes_primary_keys = True
 needs_datetime_string_cast = True
 needs_upper_for_iops = False
@@ -321,7 +322,7 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
 def get_drop_column_sql( table_name, col_name ):
     output = []
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) + ';' )
-    return '\n'.join(output)
+    return output
 
 # Register these custom typecasts, because Django expects dates/times to be
 # in Python's native (standard-library) datetime/time format, whereas psycopg

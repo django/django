@@ -91,6 +91,7 @@ class DatabaseWrapper(local):
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True
+pk_requires_unique = False
 autoindexes_primary_keys = True
 needs_datetime_string_cast = True
 needs_upper_for_iops = False
