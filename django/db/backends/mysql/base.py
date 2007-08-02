@@ -244,7 +244,7 @@ def get_sql_sequence_reset(style, model_list):
     return []
 
 def get_change_table_name_sql( table_name, old_table_name ):
-    return 'ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';'
+    return ['ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';']
 
 def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
     # mysql doesn't support column renames (AFAIK), so we fake it
@@ -254,7 +254,7 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
         if indexes[key]['primary_key']: pk_name = key
     output = []
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' CHANGE COLUMN '+ quote_name(old_col_name) +' '+ quote_name(new_col_name) +' '+ col_def + ';' )
-    return '\n'.join(output)
+    return output
 
 def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
     output = []
@@ -264,7 +264,7 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
     if primary_key:
         col_def += ' '+ 'PRIMARY KEY'
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' MODIFY COLUMN '+ quote_name(col_name) +' '+ col_def + ';' )
-    return '\n'.join(output)
+    return output
 
 def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
     output = []
@@ -280,7 +280,7 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
     if primary_key:
         field_output.append(('PRIMARY KEY'))
     output.append(' '.join(field_output) + ';')
-    return '\n'.join(output)
+    return output
 
 def get_drop_column_sql( table_name, col_name ):
     output = []

@@ -217,22 +217,61 @@ def _sqlite_regexp(re_pattern, re_string):
         return False
 
 def get_change_table_name_sql( table_name, old_table_name ):
-    return 'ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';'
+    return ['ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';']
 
 def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
     # sqlite doesn't support column renames, so we fake it
-    # TODO: only supports a single primary key so far
-    pk_name = None
-    for key in indexes.keys():
-        if indexes[key]['primary_key']: pk_name = key
+    model = get_model_from_table_name(table_name)
     output = []
-    output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(new_col_name) +' '+ col_def + ';' )
-    output.append( 'UPDATE '+ quote_name(table_name) +' SET '+ new_col_name +' = '+ old_col_name +' WHERE '+ pk_name +'=(select '+ pk_name +' from '+ table_name +');' )
-    output.append( '-- FYI: sqlite does not support deleting columns, so  '+ quote_name(old_col_name) +' remains as cruft' )
-    return '\n'.join(output)
+    output.append( '-- FYI: sqlite does not support renaming columns, so we create a new '+ quote_name(table_name) +' and delete the old  (ie, this could take a while)' )
+
+    tmp_table_name = table_name + '_1337_TMP' # unlikely to produce a namespace conflict
+    output.extend( get_change_table_name_sql( tmp_table_name, table_name ) )
+    output.extend( management._get_sql_model_create(model, set())[0] )
+
+    old_cols = []
+    for f in model._meta.fields:
+        if f.column != new_col_name:
+            old_cols.append( quote_name(f.column) )
+        else: 
+            old_cols.append( quote_name(old_col_name) )
+
+    output.append( 'INSERT INTO '+ quote_name(table_name) +' SELECT '+ ','.join(old_cols) +' FROM '+ quote_name(tmp_table_name) +';' )
+    output.append( 'DROP TABLE '+ quote_name(tmp_table_name) +';' )
+
+    return output
 
 def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
     # sqlite doesn't support column modifications, so we fake it
+
+    model = get_model_from_table_name(table_name)
+    if not model: return ['-- model not found']
+    output = []
+    output.append( '-- FYI: sqlite does not support changing columns, so we create a new '+ quote_name(table_name) +' and delete the old  (ie, this could take a while)' )
+
+    tmp_table_name = table_name + '_1337_TMP' # unlikely to produce a namespace conflict
+    output.extend( get_change_table_name_sql( tmp_table_name, table_name ) )
+    output.extend( management._get_sql_model_create(model, set())[0] )
+
+    old_cols = []
+    for f in model._meta.fields:
+        old_cols.append( quote_name(f.column) )
+
+    output.append( 'INSERT INTO '+ quote_name(table_name) +' SELECT '+ ','.join(old_cols) +' FROM '+ quote_name(tmp_table_name) +';' )
+    output.append( 'DROP TABLE '+ quote_name(tmp_table_name) +';' )
+
+    return output
+
+
+
+
+
+
+
+
+
+
+
     output = []
     col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
     if unique or primary_key:
@@ -241,7 +280,7 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
         col_def += ' '+ 'PRIMARY KEY'
     # TODO: fake via renaming the table, building a new one and deleting the old
     output.append('-- sqlite does not support column modifications '+ quote_name(table_name) +'.'+ quote_name(col_name) +' to '+ col_def)
-    return '\n'.join(output)
+    return output
     
 def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
     output = []
@@ -257,14 +296,14 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
     if primary_key:
         field_output.append(('PRIMARY KEY'))
     output.append(' '.join(field_output) + ';')
-    return '\n'.join(output)
+    return output
 
 def get_drop_column_sql( table_name, col_name ):
     model = get_model_from_table_name(table_name)
     output = []
     output.append( '-- FYI: sqlite does not support deleting columns, so we create a new '+ quote_name(col_name) +' and delete the old  (ie, this could take a while)' )
     tmp_table_name = table_name + '_1337_TMP' # unlikely to produce a namespace conflict
-    output.append( get_change_table_name_sql( tmp_table_name, table_name ) )
+    output.extend( get_change_table_name_sql( tmp_table_name, table_name ) )
     output.extend( management._get_sql_model_create(model, set())[0] )
     new_cols = []
     for f in model._meta.fields:

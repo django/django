@@ -286,7 +286,7 @@ def typecast_string(s):
 def get_change_table_name_sql( table_name, old_table_name ):
     output = []
     output.append('ALTER TABLE '+ quote_name(old_table_name) +' RENAME TO '+ quote_name(table_name) + ';')
-    return '\n'.join(output)
+    return output
 
 def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name, col_def ):
     # TODO: only supports a single primary key so far
@@ -295,7 +295,7 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
         if indexes[key]['primary_key']: pk_name = key
     output = []
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' RENAME COLUMN '+ quote_name(old_col_name) +' TO '+ quote_name(new_col_name) +';' )
-    return '\n'.join(output)
+    return output
 
 def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
     output = []
@@ -308,7 +308,7 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
     if unique:
         output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD CONSTRAINT '+ table_name +'_'+ col_name +'_unique_constraint UNIQUE('+ col_name +');' )
     
-    return '\n'.join(output)
+    return output
 
 def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
     output = []
@@ -317,7 +317,7 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
         output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET NOT NULL;' )
     if unique:
         output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD CONSTRAINT '+ table_name +'_'+ col_name +'_unique_constraint UNIQUE('+ col_name +');' )
-    return '\n'.join(output)
+    return output
     
 def get_drop_column_sql( table_name, col_name ):
     output = []

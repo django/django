@@ -26,9 +26,6 @@ def get_indexes(cursor, table_name):
          'unique': boolean representing whether it's a unique index}
     """
     indexes = {}
-    for info in _table_info(cursor, table_name):
-        indexes[info['name']] = {'primary_key': info['pk'] != 0,
-                                 'unique': False}
     cursor.execute('PRAGMA index_list(%s)' % quote_name(table_name))
     # seq, name, unique
     for index, unique in [(field[1], field[2]) for field in cursor.fetchall()]:
@@ -36,11 +33,16 @@ def get_indexes(cursor, table_name):
             continue
         cursor.execute('PRAGMA index_info(%s)' % quote_name(index))
         info = cursor.fetchall()
-        # Skip indexes across multiple fields
-        if len(info) != 1:
-            continue
-        name = info[0][2] # seqno, cid, name
-        indexes[name]['unique'] = True
+        for x in info:
+            name = x[2] # seqno, cid, name
+            cursor.execute('PRAGMA table_info(%s)' % quote_name(table_name))
+            for row in cursor.fetchall():
+                if row[1]==name:
+                    indexes[name] = {'primary_key': False, 'unique': False}
+                    if row[2]=='integer':
+                        indexes[name]['primary_key'] = True
+                    else:
+                        indexes[name]['unique'] = True
     return indexes
 
 def get_columns(cursor, table_name):

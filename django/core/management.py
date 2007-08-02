@@ -569,7 +569,7 @@ def get_sql_evolution_check_for_new_fields(klass, new_table_name):
             data_type = f.get_internal_type()
             col_type = data_types[data_type]
             if col_type is not None:
-                output.append( backend.get_add_column_sql( db_table, f.column, style.SQL_COLTYPE(col_type % rel_field.__dict__), f.null, f.unique, f.primary_key ) )
+                output.extend( backend.get_add_column_sql( db_table, f.column, style.SQL_COLTYPE(col_type % rel_field.__dict__), f.null, f.unique, f.primary_key ) )
     return output
 
 def get_sql_evolution_check_for_changed_model_name(klass):
@@ -580,9 +580,9 @@ def get_sql_evolution_check_for_changed_model_name(klass):
     if klass._meta.db_table in table_list:
         return [], None
     if klass._meta.aka in table_list:
-        return [ backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka) ], klass._meta.aka
+        return backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka), klass._meta.aka
     elif len(set(klass._meta.aka) & set(table_list))==1:
-        return [ backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka[0]) ], klass._meta.aka[0]
+        return backend.get_change_table_name_sql( klass._meta.db_table, klass._meta.aka[0]), klass._meta.aka[0]
     else:
         return [], None
     
@@ -608,14 +608,12 @@ def get_sql_evolution_check_for_changed_field_name(klass, new_table_name):
             data_type = f.get_internal_type()
             col_type = data_types[data_type]
             if col_type is not None:
-                field_output = []
                 col_def = style.SQL_COLTYPE(col_type % rel_field.__dict__) +' '+ style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or ''))
                 if f.unique:
                     col_def += style.SQL_KEYWORD(' UNIQUE')
                 if f.primary_key:
                     col_def += style.SQL_KEYWORD(' PRIMARY KEY')
-                field_output.append( backend.get_change_column_name_sql( klass._meta.db_table, introspection.get_indexes(cursor,db_table), backend.quote_name(old_col), backend.quote_name(f.column), col_def ) )
-                output.append(' '.join(field_output))
+                output.extend( backend.get_change_column_name_sql( klass._meta.db_table, introspection.get_indexes(cursor,db_table), old_col, f.column, col_def ) )
     return output
     
 def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
@@ -666,7 +664,7 @@ def get_sql_evolution_check_for_changed_field_flags(klass, new_table_name):
 #                    col_def += ' '+ style.SQL_KEYWORD('UNIQUE')
 #                if f.primary_key:
 #                    col_def += ' '+ style.SQL_KEYWORD('PRIMARY KEY')
-                output.append( backend.get_change_column_def_sql( db_table, cf, col_type_def, f.null, f.unique, f.primary_key ) )
+                output.extend( backend.get_change_column_def_sql( db_table, cf, col_type_def, f.null, f.unique, f.primary_key ) )
                     #print db_table, cf, f.maxlength, introspection.get_known_column_flags(cursor, db_table, cf)
     return output
 
