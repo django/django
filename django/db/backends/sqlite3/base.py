@@ -261,26 +261,6 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
     output.append( 'DROP TABLE '+ quote_name(tmp_table_name) +';' )
 
     return output
-
-
-
-
-
-
-
-
-
-
-
-    output = []
-    col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
-    if unique or primary_key:
-        col_def += ' '+ 'UNIQUE'
-    if primary_key:
-        col_def += ' '+ 'PRIMARY KEY'
-    # TODO: fake via renaming the table, building a new one and deleting the old
-    output.append('-- sqlite does not support column modifications '+ quote_name(table_name) +'.'+ quote_name(col_name) +' to '+ col_def)
-    return output
     
 def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
     output = []
