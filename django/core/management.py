@@ -496,6 +496,14 @@ def get_sql_evolution(app):
             "Edit your settings file and change DATABASE_ENGINE to something like 'postgresql' or 'mysql'.\n"))
         sys.exit(1)
 
+    try:
+        backend.get_add_column_sql
+    except:
+        # This must be an unsupported database backend
+        sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements, " +
+            "because schema evolution support isn't built into your database backend yet.  Sorry!\n"))
+        sys.exit(1)
+
     # First, try validating the models.
     _check_for_validation_errors()
 
