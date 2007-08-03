@@ -21,6 +21,11 @@ class Person(models.Model):
     class Meta:
         aka = ('PersonOld', 'OtherBadName')
 
+class Muebles(models.Model):
+    tipo = models.CharField(maxlength=40)
+    # new fields
+    fecha_publicacion = models.DateTimeField('date published')
+
 __test__ = {'API_TESTS':"""
 >>> import django
 >>> from django.core import management
@@ -34,8 +39,6 @@ if settings.DATABASE_ENGINE == 'mysql':
     __test__['API_TESTS'] += """
 # the table as it is supposed to be
 >>> create_table_sql = management.get_sql_all(app)
->>> print create_table_sql
-['CREATE TABLE `schema_evolution_person` (\\n    `id` integer AUTO_INCREMENT NOT NULL PRIMARY KEY,\\n    `name` varchar(20) NOT NULL,\\n    `gender` varchar(1) NOT NULL,\\n    `gender2` varchar(1) NOT NULL\\n)\\n;']
 
 # make sure we don't evolve an unedited table
 >>> management.get_sql_evolution(app)
@@ -89,14 +92,24 @@ if settings.DATABASE_ENGINE == 'mysql':
 0L
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE `schema_evolution_person` MODIFY COLUMN `name` varchar(20) NOT NULL;']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;'); cursor.execute(create_table_sql[0])
+0L\n0L
+
+# delete a datetime column pair, so it looks like we've recently added a datetime field
+>>> for sql in backend.get_drop_column_sql( 'schema_evolution_muebles', 'fecha_publicacion' ): print sql; cursor.execute(sql)
+ALTER TABLE `schema_evolution_muebles` DROP COLUMN `fecha_publicacion`;
+0L
+>>> management.get_sql_evolution(app)
+['ALTER TABLE `schema_evolution_muebles` ADD COLUMN `fecha_publicacion` datetime NOT NULL;']
+
 """
 
-if settings.DATABASE_ENGINE == 'postgresql':
+if settings.DATABASE_ENGINE == 'postgresql' or settings.DATABASE_ENGINE == 'postgresql_psycopg2' :
     __test__['API_TESTS'] += """
 # the table as it is supposed to be
 >>> create_table_sql = management.get_sql_all(app)
->>> print create_table_sql
-['CREATE TABLE "schema_evolution_person" (\\n    "id" serial NOT NULL PRIMARY KEY,\\n    "name" varchar(20) NOT NULL,\\n    "gender" varchar(1) NOT NULL,\\n    "gender2" varchar(1) NOT NULL\\n)\\n;']
 
 # make sure we don't evolve an unedited table
 >>> management.get_sql_evolution(app)
@@ -139,14 +152,20 @@ if settings.DATABASE_ENGINE == 'postgresql':
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE "schema_evolution_person" ADD COLUMN "name_tmp" varchar(20);', 'UPDATE "schema_evolution_person" SET "name_tmp" = "name";', 'ALTER TABLE "schema_evolution_person" DROP COLUMN "name";', 'ALTER TABLE "schema_evolution_person" RENAME COLUMN "name_tmp" TO "name";', 'ALTER TABLE "schema_evolution_person" ALTER COLUMN "name" SET NOT NULL;']
 
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;'); cursor.execute(create_table_sql[0])
+
+# delete a datetime column pair, so it looks like we've recently added a datetime field
+>>> for sql in backend.get_drop_column_sql( 'schema_evolution_muebles', 'fecha_publicacion' ): print sql; cursor.execute(sql)
+ALTER TABLE "schema_evolution_muebles" DROP COLUMN "fecha_publicacion";
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "fecha_publicacion" timestamp with time zone;', 'ALTER TABLE "schema_evolution_muebles" ALTER COLUMN "fecha_publicacion" SET NOT NULL;']
 """
 
 if settings.DATABASE_ENGINE == 'sqlite3':
     __test__['API_TESTS'] += """
 # the table as it is supposed to be
 >>> create_table_sql = management.get_sql_all(app)
->>> print create_table_sql
-['CREATE TABLE "schema_evolution_person" (\\n    "id" integer NOT NULL UNIQUE PRIMARY KEY,\\n    "name" varchar(20) NOT NULL,\\n    "gender" varchar(1) NOT NULL,\\n    "gender2" varchar(1) NOT NULL\\n)\\n;']
 
 # make sure we don't evolve an unedited table
 >>> management.get_sql_evolution(app)
@@ -243,5 +262,20 @@ if settings.DATABASE_ENGINE == 'sqlite3':
 <class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
 >>> management.get_sql_evolution(app)
 ['-- FYI: sqlite does not support changing columns, so we create a new "schema_evolution_person" and delete the old  (ie, this could take a while)', 'ALTER TABLE "schema_evolution_person" RENAME TO "schema_evolution_person_1337_TMP";', 'CREATE TABLE "schema_evolution_person" (\\n    "id" integer NOT NULL UNIQUE PRIMARY KEY,\\n    "name" varchar(20) NOT NULL,\\n    "gender" varchar(1) NOT NULL,\\n    "gender2" varchar(1) NOT NULL\\n)\\n;', 'INSERT INTO "schema_evolution_person" SELECT "id","name","gender","gender2" FROM "schema_evolution_person_1337_TMP";', 'DROP TABLE "schema_evolution_person_1337_TMP";']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_person;').__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute(create_table_sql[0]).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+
+# delete a datetime column pair, so it looks like we've recently added a datetime field
+>>> for sql in ['DROP TABLE schema_evolution_muebles;','CREATE TABLE "schema_evolution_muebles" ("id" integer NOT NULL UNIQUE PRIMARY KEY,"tipo" varchar(40) NOT NULL);']: cursor.execute(sql).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "fecha_publicacion" datetime NOT NULL;']
+
+
 """
 
