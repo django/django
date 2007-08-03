@@ -241,7 +241,7 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
 
     return output
 
-def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     # sqlite doesn't support column modifications, so we fake it
 
     model = get_model_from_table_name(table_name)
@@ -262,7 +262,7 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
 
     return output
     
-def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     output = []
     field_output = []
     field_output.append('ALTER TABLE')
@@ -275,6 +275,9 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
         field_output.append(('UNIQUE'))
     if primary_key:
         field_output.append(('PRIMARY KEY'))
+    if default and str(default) != 'django.db.models.fields.NOT_PROVIDED':
+        field_output.append(('DEFAULT'))
+        field_output.append((quote_name(str(default))))
     output.append(' '.join(field_output) + ';')
     return output
 

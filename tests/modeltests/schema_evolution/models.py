@@ -22,7 +22,7 @@ class Person(models.Model):
         aka = ('PersonOld', 'OtherBadName')
 
 class Muebles(models.Model):
-    tipo = models.CharField(maxlength=40)
+    tipo = models.CharField(maxlength=40, default="woot")
     # new fields
     fecha_publicacion = models.DateTimeField('date published')
 
@@ -97,12 +97,23 @@ if settings.DATABASE_ENGINE == 'mysql':
 >>> cursor.execute('DROP TABLE schema_evolution_person;'); cursor.execute(create_table_sql[0])
 0L\n0L
 
-# delete a datetime column pair, so it looks like we've recently added a datetime field
+# delete a datetime column, so it looks like we've recently added a datetime field
 >>> for sql in backend.get_drop_column_sql( 'schema_evolution_muebles', 'fecha_publicacion' ): print sql; cursor.execute(sql)
 ALTER TABLE `schema_evolution_muebles` DROP COLUMN `fecha_publicacion`;
 0L
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE `schema_evolution_muebles` ADD COLUMN `fecha_publicacion` datetime NOT NULL;']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_muebles;'); cursor.execute(create_table_sql[1])
+0L\n0L
+
+# delete a column with a default value, so it looks like we've recently added a column
+>>> for sql in backend.get_drop_column_sql( 'schema_evolution_muebles', 'tipo' ): print sql; cursor.execute(sql)
+ALTER TABLE `schema_evolution_muebles` DROP COLUMN `tipo`;
+0L
+>>> management.get_sql_evolution(app)
+['ALTER TABLE `schema_evolution_muebles` ADD COLUMN `tipo` varchar(40) NOT NULL DEFAULT `woot`;']
 
 """
 
@@ -124,7 +135,7 @@ if settings.DATABASE_ENGINE == 'postgresql' or settings.DATABASE_ENGINE == 'post
 >>> cursor.execute('DROP TABLE schema_evolution_person;'); cursor.execute(create_table_sql[0])
 
 # add a column, so it looks like we've recently deleted a field
->>> for sql in backend.get_add_column_sql( 'schema_evolution_person', 'gender_nothere', 'varchar(1)', True, False, False ): cursor.execute(sql)
+>>> for sql in backend.get_add_column_sql( 'schema_evolution_person', 'gender_nothere', 'varchar(1)', True, False, False, None ): cursor.execute(sql)
 >>> management.get_sql_evolution(app)
 ['-- warning: the following may cause data loss', u'ALTER TABLE "schema_evolution_person" DROP COLUMN "gender_nothere";', '-- end warning']
 
@@ -148,7 +159,7 @@ if settings.DATABASE_ENGINE == 'postgresql' or settings.DATABASE_ENGINE == 'post
 >>> cursor.execute(create_table_sql[0])
 
 # change column flags, so it looks like we've recently changed a column flag
->>> for sql in backend.get_change_column_def_sql( 'schema_evolution_person', 'name', 'varchar(10)', True, False, False ): cursor.execute(sql)
+>>> for sql in backend.get_change_column_def_sql( 'schema_evolution_person', 'name', 'varchar(10)', True, False, False, None ): cursor.execute(sql)
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE "schema_evolution_person" ADD COLUMN "name_tmp" varchar(20);', 'UPDATE "schema_evolution_person" SET "name_tmp" = "name";', 'ALTER TABLE "schema_evolution_person" DROP COLUMN "name";', 'ALTER TABLE "schema_evolution_person" RENAME COLUMN "name_tmp" TO "name";', 'ALTER TABLE "schema_evolution_person" ALTER COLUMN "name" SET NOT NULL;']
 
@@ -160,6 +171,15 @@ if settings.DATABASE_ENGINE == 'postgresql' or settings.DATABASE_ENGINE == 'post
 ALTER TABLE "schema_evolution_muebles" DROP COLUMN "fecha_publicacion";
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "fecha_publicacion" timestamp with time zone;', 'ALTER TABLE "schema_evolution_muebles" ALTER COLUMN "fecha_publicacion" SET NOT NULL;']
+
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_muebles;'); cursor.execute(create_table_sql[1])
+
+# delete a column with a default value, so it looks like we've recently added a column
+>>> for sql in backend.get_drop_column_sql( 'schema_evolution_muebles', 'tipo' ): print sql; cursor.execute(sql)
+ALTER TABLE "schema_evolution_muebles" DROP COLUMN "tipo";
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "tipo" varchar(40);', 'ALTER TABLE "schema_evolution_muebles" ALTER COLUMN "tipo" SET DEFAULT "woot";', 'ALTER TABLE "schema_evolution_muebles" ALTER COLUMN "tipo" SET NOT NULL;']
 """
 
 if settings.DATABASE_ENGINE == 'sqlite3':
@@ -276,6 +296,18 @@ if settings.DATABASE_ENGINE == 'sqlite3':
 >>> management.get_sql_evolution(app)
 ['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "fecha_publicacion" datetime NOT NULL;']
 
+# reset the db
+>>> cursor.execute('DROP TABLE schema_evolution_muebles;').__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> cursor.execute(create_table_sql[1]).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+
+# delete a column with a default value, so it looks like we've recently added a column
+>>> for sql in ['DROP TABLE schema_evolution_muebles;','CREATE TABLE "schema_evolution_muebles" ("id" integer NOT NULL UNIQUE PRIMARY KEY,"fecha_publicacion" datetime NOT NULL);']: cursor.execute(sql).__class__
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+<class 'django.db.backends.sqlite3.base.SQLiteCursorWrapper'>
+>>> management.get_sql_evolution(app)
+['ALTER TABLE "schema_evolution_muebles" ADD COLUMN "tipo" varchar(40) NOT NULL DEFAULT "woot";']
 
 """
 

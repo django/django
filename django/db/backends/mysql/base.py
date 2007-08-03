@@ -256,17 +256,19 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' CHANGE COLUMN '+ quote_name(old_col_name) +' '+ quote_name(new_col_name) +' '+ col_def + ';' )
     return output
 
-def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     output = []
     col_def = col_type +' '+ ('%sNULL' % (not null and 'NOT ' or ''))
     if unique:
         col_def += ' '+ 'UNIQUE'
     if primary_key:
         col_def += ' '+ 'PRIMARY KEY'
+    if default and str(default) != 'django.db.models.fields.NOT_PROVIDED':
+        col_def += ' '+ 'DEFAULT '+ quote_name(str(default))
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' MODIFY COLUMN '+ quote_name(col_name) +' '+ col_def + ';' )
     return output
 
-def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     output = []
     field_output = []
     field_output.append('ALTER TABLE')
@@ -279,6 +281,9 @@ def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_ke
         field_output.append(('UNIQUE'))
     if primary_key:
         field_output.append(('PRIMARY KEY'))
+    if default and str(default) != 'django.db.models.fields.NOT_PROVIDED':
+        field_output.append(('DEFAULT'))
+        field_output.append((quote_name(str(default))))
     output.append(' '.join(field_output) + ';')
     return output
 

@@ -239,12 +239,14 @@ def get_change_column_name_sql( table_name, indexes, old_col_name, new_col_name,
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' RENAME COLUMN '+ quote_name(old_col_name) +' TO '+ quote_name(new_col_name) +';' )
     return output
 
-def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key ):
+def get_change_column_def_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     output = []
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(col_name+'_tmp') +' '+ col_type + ';' )
     output.append( 'UPDATE '+ quote_name(table_name) +' SET '+ quote_name(col_name+'_tmp') +' = '+ quote_name(col_name) + ';' )
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' DROP COLUMN '+ quote_name(col_name) +';' )
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' RENAME COLUMN '+ quote_name(col_name+'_tmp') +' TO '+ quote_name(col_name) + ';' )
+    if default and str(default) != 'django.db.models.fields.NOT_PROVIDED':
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET DEFAULT '+ quote_name(str(default)) +';' )
     if not null:
         output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET NOT NULL;' )
     if unique:
@@ -252,9 +254,11 @@ def get_change_column_def_sql( table_name, col_name, col_type, null, unique, pri
     
     return output
 
-def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key  ):
+def get_add_column_sql( table_name, col_name, col_type, null, unique, primary_key, default ):
     output = []
     output.append( 'ALTER TABLE '+ quote_name(table_name) +' ADD COLUMN '+ quote_name(col_name) +' '+ col_type + ';' )
+    if default and str(default) != 'django.db.models.fields.NOT_PROVIDED':
+        output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET DEFAULT '+ quote_name(str(default)) +';' )
     if not null:
         output.append( 'ALTER TABLE '+ quote_name(table_name) +' ALTER COLUMN '+ quote_name(col_name) +' SET NOT NULL;' )
     if unique:
