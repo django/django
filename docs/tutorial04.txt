@@ -213,7 +213,7 @@ objects" and "display a detail page for a particular type of object."
       a way to refer to its URL later on (see `naming URL patterns`_ for more on
       named patterns).
       
-.. _naming URL patterns: http://www.djangoproject.com/documentation/url_dispatch/#naming-url-patterns
+.. _naming URL patterns: ../url_dispatch/#naming-url-patterns
 
 By default, the ``object_detail`` generic view uses a template called
 ``<app name>/<model name>_detail.html``. In our case, it'll use the template

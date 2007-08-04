@@ -1503,7 +1503,7 @@ precede the definition of any keyword arguments. For example::
 
 See the `OR lookups examples page`_ for more examples.
 
-.. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
+.. _OR lookups examples page: ../models/or_lookups/
 
 Related objects
 ===============
