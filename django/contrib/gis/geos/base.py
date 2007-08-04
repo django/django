@@ -7,7 +7,7 @@
 from ctypes import \
      byref, string_at, create_string_buffer, pointer, \
      c_char_p, c_double, c_int, c_size_t
-from types import StringType, IntType, FloatType
+from types import StringType, UnicodeType, IntType, FloatType
 
 # Python and GEOS-related dependencies.
 import re
@@ -17,8 +17,11 @@ from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
 if HAS_NUMPY: from numpy import ndarray, array
 
-# Regular expression for recognizing HEXEWKB.
-hex_regex = re.compile(r'^[0-9A-Fa-f]+$')
+# Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
+#  to prevent potentially malicious input from reaching the underlying C
+#  library.  Not a substitute for good web security programming practices.
+hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
+wkt_regex = re.compile(r'^(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+$', re.I)
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
@@ -38,6 +41,10 @@ class GEOSGeometry(object):
         # Initially, setting the pointer to NULL
         self._ptr = GEOSPointer(0)
 
+        if isinstance(geo_input, UnicodeType):
+            # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
+            geo_input = geo_input.encode('ascii')
+
         if isinstance(geo_input, StringType):
             if input_type: warn('input_type keyword is deprecated')
 
@@ -46,9 +53,11 @@ class GEOSGeometry(object):
                 sz = c_size_t(len(geo_input))
                 buf = create_string_buffer(geo_input)
                 g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
-            else:
+            elif wkt_regex.match(geo_input):
                 # Otherwise, the geometry is in WKT form.
                 g = lgeos.GEOSGeomFromWKT(c_char_p(geo_input))
+            else:
+                raise GEOSException, 'given string input "%s" unrecognized as WKT or HEXEWKB.' % geo_input
 
         elif isinstance(geo_input, (IntType, GEOSPointer)):
             # When the input is either a raw pointer value (an integer), or a GEOSPointer object.

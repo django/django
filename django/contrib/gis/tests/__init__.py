@@ -1,8 +1,5 @@
 from copy import copy
 from unittest import TestSuite, TextTestRunner
-from django.contrib.gis.db.backend import create_spatial_db
-from django.db import connection
-from django.test.utils import destroy_test_db
 
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = ['test_gdal_driver',
@@ -54,6 +51,9 @@ def run_tests(module_list, verbosity=1):
     The tests may be run by invoking `./manage.py test`.
     """
     from django.conf import settings
+    from django.contrib.gis.db.backend import create_spatial_db
+    from django.db import connection
+    from django.test.utils import destroy_test_db
 
     # Getting initial values.
     old_debug = settings.DEBUG
