@@ -288,10 +288,12 @@ This has been only a quick overview of Django's functionality. Some more useful
 features:
 
     * A caching framework that integrates with memcached or other backends.
-    * A syndication framework that makes creating RSS and Atom feeds as easy as
+    * A `syndication framework`_ that makes creating RSS and Atom feeds as easy as
       writing a small Python class.
     * More sexy automatically-generated admin features -- this overview barely
       scratched the surface.
+
+.. _syndication framework: ../syndication_feeds/
 
 The next obvious steps are for you to `download Django`_, read `the tutorial`_
 and join `the community`_. Thanks for your interest!

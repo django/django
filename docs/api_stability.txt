@@ -114,7 +114,7 @@ change:
 .. _sending email: ../email/
 .. _sessions: ../sessions/
 .. _settings: ../settings/
-.. _syndication: ../syndication/
+.. _syndication: ../syndication_feeds/
 .. _template language: ../templates/
 .. _transactions: ../transactions/
 .. _url dispatch: ../url_dispatch/

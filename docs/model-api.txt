@@ -1942,9 +1942,11 @@ Django uses this in its admin interface. If an object defines
 link that will jump you directly to the object's public view, according to
 ``get_absolute_url()``.
 
-Also, a couple of other bits of Django, such as the syndication-feed framework,
+Also, a couple of other bits of Django, such as the `syndication feed framework`_,
 use ``get_absolute_url()`` as a convenience to reward people who've defined the
 method.
+
+.. syndication feed framework: ../syndication_feeds/
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad::
