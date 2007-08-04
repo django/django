@@ -1222,7 +1222,7 @@ Custom form and field validation
 
 Form validation happens when the data is cleaned. If you want to customise
 this process, there are various places you can change, each one serving a
-different purpose. Thee types of cleaning methods are run during form
+different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
 method on a form. There are other things that can trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
