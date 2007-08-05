@@ -35,17 +35,23 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
         if fields and f.name not in fields:
             continue
         setattr(instance, f.name, cleaned_data[f.name])
-    if commit:
-        instance.save()
+    # Wrap up the saving of m2m data as a function
+    def save_m2m():
+        opts = instance.__class__._meta
+        cleaned_data = form.cleaned_data
         for f in opts.many_to_many:
             if fields and f.name not in fields:
                 continue
             if f.name in cleaned_data:
                 setattr(instance, f.attname, cleaned_data[f.name])
-    # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
-    # data will be lost. This happens because a many-to-many options cannot be
-    # set on an object until after it's saved. Maybe we should raise an
-    # exception in that case.
+    if commit:
+        # If we are committing, save the instance and the m2m data immediately
+        instance.save()
+        save_m2m()
+    else:
+        # We're not committing. Add a method to the form to allow deferred 
+        # saving of m2m data
+        form.save_m2m = save_m2m
     return instance
 
 def make_model_save(model, fields, fail_message):

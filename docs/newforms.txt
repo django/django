@@ -1502,6 +1502,36 @@ the database. In this case, it's up to you to call ``save()`` on the resulting
 model instance. This is useful if you want to do custom processing on the
 object before saving it. ``commit`` is ``True`` by default.
 
+Another side effect of using ``commit=False`` is seen when your model has
+a many-to-many relation with another model. If your model has a many-to-many
+relation and you specify ``commit=False`` when you save a form, Django cannot
+immediately save the form data for the many-to-many relation. This is because
+it isn't possible to save many-to-many data for an instance until the instance
+exists in the database.
+
+To work around this problem, every time you save a form using ``commit=False``,
+Django adds a ``save_m2m()`` method to the form created by ``form_for_model``.
+After you have manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create, but don't save the new author instance
+    >>> new_author = f.save(commit=False)
+
+    # Modify the author in some way
+    ...
+    # Save the new instance
+    >>> new_author.save()
+
+    # Now save the many-to-many data for the form
+    >>> f.save_m2m()
+
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
+When you use a simple ``save()`` on a form, all data - include
+many-to-many data - is saved without the need for any additional method calls.
+
 Using an alternate base class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
