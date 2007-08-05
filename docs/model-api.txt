@@ -22,7 +22,7 @@ A companion to this document is the `official repository of model examples`_.
 ``tests/modeltests`` directory.)
 
 .. _Database API reference: ../db-api/
-.. _official repository of model examples: http://www.djangoproject.com/documentation/models/
+.. _official repository of model examples: ../models/
 
 Quick example
 =============
@@ -775,7 +775,7 @@ You can, of course, call the field whatever you want. For example::
 
 See the `Many-to-one relationship model example`_ for a full example.
 
-.. _Many-to-one relationship model example: http://www.djangoproject.com/documentation/models/many_to_one/
+.. _Many-to-one relationship model example: ../models/many_to_one/
 
 ``ForeignKey`` fields take a number of extra arguments for defining how the
 relationship should work. All are optional:
@@ -902,7 +902,7 @@ set up above, the ``Pizza`` admin form would let users select the toppings.
 
 See the `Many-to-many relationship model example`_ for a full example.
 
-.. _Many-to-many relationship model example: http://www.djangoproject.com/documentation/models/many_to_many/
+.. _Many-to-many relationship model example: ../models/many_to_many/
 
 ``ManyToManyField`` objects take a number of extra arguments for defining how
 the relationship should work. All are optional:
@@ -979,7 +979,7 @@ as a read-only field when you edit an object in the admin interface:
 
 See the `One-to-one relationship model example`_ for a full example.
 
-.. _One-to-one relationship model example: http://www.djangoproject.com/documentation/models/one_to_one/
+.. _One-to-one relationship model example: ../models/one_to_one/
 
 Custom field types
 ------------------
@@ -1186,7 +1186,7 @@ See `Specifying ordering`_ for more examples.
 Note that, regardless of how many fields are in ``ordering``, the admin
 site uses only the first field.
 
-.. _Specifying ordering: http://www.djangoproject.com/documentation/models/ordering/
+.. _Specifying ordering: ../models/ordering/
 
 ``permissions``
 ---------------
