@@ -8,8 +8,8 @@ application and will focus on simple form processing and cutting down our code.
 Write a simple form
 ===================
 
-Let's update our poll detail template from the last tutorial, so that the
-template contains an HTML ``<form>`` element::
+Let's update our poll detail template ("polls/detail.html") from the last
+tutorial, so that the template contains an HTML ``<form>`` element::
 
     <h1>{{ poll.question }}</h1>
 
