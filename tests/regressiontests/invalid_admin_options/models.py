@@ -12,7 +12,7 @@ model_errors = ""
 ##This should fail gracefully but is causing a metaclass error
 #class BadAdminOption(models.Model):
 #    "Test nonexistent admin option"
-#    name = models.CharField(maxlength=30)
+#    name = models.CharField(max_length=30)
 #    
 #    class Admin:
 #        nonexistent = 'option'
@@ -22,7 +22,7 @@ model_errors = ""
         
 class ListDisplayBadOne(models.Model):
     "Test list_display, list_display must be a list or tuple"
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
 
     class Admin:
         list_display = 'first_name'
@@ -32,7 +32,7 @@ model_errors += """invalid_admin_options.listdisplaybadone: "admin.list_display"
 
 class ListDisplayBadTwo(models.Model):
     "Test list_display, list_display items must be attributes, methods or properties."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
 
     class Admin:
         list_display = ['first_name','nonexistent']
@@ -41,7 +41,7 @@ model_errors += """invalid_admin_options.listdisplaybadtwo: "admin.list_display"
 """        
 class ListDisplayBadThree(models.Model):
     "Test list_display, list_display items can not be a ManyToManyField."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     nick_names = models.ManyToManyField('ListDisplayGood')
 
     class Admin:
@@ -52,7 +52,7 @@ model_errors += """invalid_admin_options.listdisplaybadthree: "admin.list_displa
       
 class ListDisplayGood(models.Model):
     "Test list_display, Admin list_display can be a attribute, method or property."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     
     def _last_name(self):
         return self.first_name
@@ -66,8 +66,8 @@ class ListDisplayGood(models.Model):
        
 class ListDisplayLinksBadOne(models.Model):
     "Test list_display_links, item must be included in list_display."
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         list_display = ['last_name']
@@ -78,8 +78,8 @@ model_errors += """invalid_admin_options.listdisplaylinksbadone: "admin.list_dis
 
 class ListDisplayLinksBadTwo(models.Model):
     "Test list_display_links, must be a list or tuple."
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         list_display = ['first_name','last_name']
@@ -92,8 +92,8 @@ model_errors += """invalid_admin_options.listdisplaylinksbadtwo: "admin.list_dis
 ## This is failing but the validation which should fail is not.
 #class ListDisplayLinksBadThree(models.Model):
 #    "Test list_display_links, must define list_display to use list_display_links."
-#    first_name = models.CharField(maxlength=30)
-#    last_name = models.CharField(maxlength=30)
+#    first_name = models.CharField(max_length=30)
+#    last_name = models.CharField(max_length=30)
 #    
 #    class Admin:
 #        list_display_links = ('first_name',)
@@ -103,7 +103,7 @@ model_errors += """invalid_admin_options.listdisplaylinksbadtwo: "admin.list_dis
         
 class ListDisplayLinksGood(models.Model):
     "Test list_display_links, Admin list_display_list can be a attribute, method or property."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     
     def _last_name(self):
         return self.first_name
@@ -118,7 +118,7 @@ class ListDisplayLinksGood(models.Model):
 
 class ListFilterBadOne(models.Model):
     "Test list_filter, must be a list or tuple."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     
     class Admin:
         list_filter = 'first_name'     
@@ -128,7 +128,7 @@ model_errors += """invalid_admin_options.listfilterbadone: "admin.list_filter", 
 
 class ListFilterBadTwo(models.Model):
     "Test list_filter, must be a field not a property or method."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     
     def _last_name(self):
         return self.first_name
@@ -146,7 +146,7 @@ invalid_admin_options.listfilterbadtwo: "admin.list_filter" refers to 'full_name
 
 class DateHierarchyBadOne(models.Model):
     "Test date_hierarchy, must be a date or datetime field."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     birth_day = models.DateField()
     
     class Admin:
@@ -158,7 +158,7 @@ class DateHierarchyBadOne(models.Model):
 
 class DateHierarchyBadTwo(models.Model):
     "Test date_hieracrhy, must be a field."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     birth_day = models.DateField()
     
     class Admin:
@@ -169,7 +169,7 @@ model_errors += """invalid_admin_options.datehierarchybadtwo: "admin.date_hierar
 
 class DateHierarchyGood(models.Model):
     "Test date_hieracrhy, must be a field."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     birth_day = models.DateField()
     
     class Admin:
@@ -177,7 +177,7 @@ class DateHierarchyGood(models.Model):
       
 class SearchFieldsBadOne(models.Model):
     "Test search_fields, must be a list or tuple."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
     
     class Admin:
         search_fields = ('nonexistent')         
@@ -188,7 +188,7 @@ class SearchFieldsBadOne(models.Model):
       
 class SearchFieldsBadTwo(models.Model):
     "Test search_fields, must be a field."
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
 
     def _last_name(self):
         return self.first_name
@@ -203,8 +203,8 @@ class SearchFieldsBadTwo(models.Model):
 
 class SearchFieldsGood(models.Model):
     "Test search_fields, must be a list or tuple."
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         search_fields = ['first_name','last_name']
@@ -212,7 +212,7 @@ class SearchFieldsGood(models.Model):
 
 class JsBadOne(models.Model):
     "Test js, must be a list or tuple"
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     
     class Admin:
         js = 'test.js'
@@ -223,7 +223,7 @@ class JsBadOne(models.Model):
 
 class SaveAsBad(models.Model):
     "Test save_as, should be True or False"
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     
     class Admin:
         save_as = 'not True or False'
@@ -234,7 +234,7 @@ class SaveAsBad(models.Model):
 
 class SaveOnTopBad(models.Model):
     "Test save_on_top, should be True or False"
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     
     class Admin:
         save_on_top = 'not True or False'
@@ -245,7 +245,7 @@ class SaveOnTopBad(models.Model):
 
 class ListSelectRelatedBad(models.Model):
     "Test list_select_related, should be True or False"
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     
     class Admin:
         list_select_related = 'not True or False'
@@ -256,7 +256,7 @@ class ListSelectRelatedBad(models.Model):
 
 class ListPerPageBad(models.Model):
     "Test list_per_page, should be a positive integer value."
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     
     class Admin:
         list_per_page = 89.3
@@ -267,8 +267,8 @@ class ListPerPageBad(models.Model):
 
 class FieldsBadOne(models.Model):
     "Test fields, should be a tuple"
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         fields = 'not a tuple'
@@ -279,8 +279,8 @@ class FieldsBadOne(models.Model):
 
 class FieldsBadTwo(models.Model):
     """Test fields, 'fields' dict option is required."""
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         fields = ('Name', {'description': 'this fieldset needs fields'})
@@ -291,8 +291,8 @@ class FieldsBadTwo(models.Model):
 
 class FieldsBadThree(models.Model):
     """Test fields, 'classes' and 'description' are the only allowable extra dict options."""
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         fields = ('Name', {'fields': ('first_name','last_name'),'badoption': 'verybadoption'})
@@ -303,8 +303,8 @@ class FieldsBadThree(models.Model):
 
 class FieldsGood(models.Model):
     "Test fields, working example"
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     birth_day = models.DateField()
     
     class Admin:
@@ -315,8 +315,8 @@ class FieldsGood(models.Model):
                   
 class OrderingBad(models.Model):
     "Test ordering, must be a field."
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     
     class Admin:
         ordering = 'nonexistent'
@@ -328,7 +328,7 @@ class OrderingBad(models.Model):
 ## TODO: Add a manager validator, this should fail gracefully.
 #class ManagerBad(models.Model):
 #    "Test manager, must be a manager object."
-#    first_name = models.CharField(maxlength=30)
+#    first_name = models.CharField(max_length=30)
 #    
 #    class Admin:
 #        manager = 'nonexistent'

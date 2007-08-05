@@ -2,14 +2,14 @@
 from django.db import models
 
 class Foo(models.Model):
-    name = models.CharField(maxlength=50)
-    friend = models.CharField(maxlength=50, blank=True)
+    name = models.CharField(max_length=50)
+    friend = models.CharField(max_length=50, blank=True)
 
     def __unicode__(self):
         return "Foo %s" % self.name
 
 class Bar(models.Model):
-    name = models.CharField(maxlength=50)
+    name = models.CharField(max_length=50)
     normal = models.ForeignKey(Foo, related_name='normal_foo')
     fwd = models.ForeignKey("Whiz")
     back = models.ForeignKey("Foo")
@@ -18,20 +18,20 @@ class Bar(models.Model):
         return "Bar %s" % self.place.name
 
 class Whiz(models.Model):
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length = 50)
 
     def __unicode__(self):
         return "Whiz %s" % self.name
 
 class Child(models.Model):
     parent = models.OneToOneField('Base')
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length = 50)
 
     def __unicode__(self):
         return "Child %s" % self.name
 
 class Base(models.Model):
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length = 50)
 
     def __unicode__(self):
         return "Base %s" % self.name

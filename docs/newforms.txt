@@ -1372,7 +1372,7 @@ the full list of conversions:
     ``AutoField``                    Not represented in the form
     ``BooleanField``                 ``BooleanField``
     ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``maxlength``
+                                     the model field's ``max_length``
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
@@ -1452,15 +1452,15 @@ Consider this set of models::
     )
 
     class Author(models.Model):
-        name = models.CharField(maxlength=100)
-        title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
         def __unicode__(self):
             return self.name
 
     class Book(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         authors = models.ManyToManyField(Author)
 
 With these models, a call to ``form_for_model(Author)`` would return a ``Form``

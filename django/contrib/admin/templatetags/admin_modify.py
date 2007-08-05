@@ -192,7 +192,7 @@ def auto_populated_field_script(auto_pop_fields, change = False):
             t.append(u'document.getElementById("id_%s").onkeyup = function() {' \
                      ' var e = document.getElementById("id_%s");' \
                      ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
-                     f, field.name, add_values, field.maxlength))
+                     f, field.name, add_values, field.max_length))
     return u''.join(t)
 auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 

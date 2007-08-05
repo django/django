@@ -11,6 +11,7 @@ from django.utils.itercompat import tee
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
+from django.utils.maxlength import LegacyMaxlength
 import datetime, os, time
 try:
     import decimal
@@ -63,6 +64,9 @@ def manipulator_validator_unique(f, opts, self, field_data, all_data):
 #     getattr(obj, opts.pk.attname)
 
 class Field(object):
+    # Provide backwards compatibility for the maxlength attribute and
+    # argument for this class and all subclasses.
+    __metaclass__ = LegacyMaxlength
 
     # Designates whether empty strings fundamentally are allowed at the
     # database level.
@@ -72,7 +76,7 @@ class Field(object):
     creation_counter = 0
 
     def __init__(self, verbose_name=None, name=None, primary_key=False,
-        maxlength=None, unique=False, blank=False, null=False, db_index=False,
+        max_length=None, unique=False, blank=False, null=False, db_index=False,
         core=False, rel=None, default=NOT_PROVIDED, editable=True, serialize=True,
         prepopulate_from=None, unique_for_date=None, unique_for_month=None,
         unique_for_year=None, validator_list=None, choices=None, radio_admin=None,
@@ -80,7 +84,7 @@ class Field(object):
         self.name = name
         self.verbose_name = verbose_name
         self.primary_key = primary_key
-        self.maxlength, self.unique = maxlength, unique
+        self.max_length, self.unique = max_length, unique
         self.blank, self.null = blank, null
         # Oracle treats the empty string ('') as null, so coerce the null
         # option whenever '' is a possible value.
@@ -244,8 +248,8 @@ class Field(object):
 
     def prepare_field_objs_and_params(self, manipulator, name_prefix):
         params = {'validator_list': self.validator_list[:]}
-        if self.maxlength and not self.choices: # Don't give SelectFields a maxlength parameter.
-            params['maxlength'] = self.maxlength
+        if self.max_length and not self.choices: # Don't give SelectFields a max_length parameter.
+            params['max_length'] = self.max_length
 
         if self.choices:
             if self.radio_admin:
@@ -461,7 +465,7 @@ class CharField(Field):
         return smart_unicode(value)
 
     def formfield(self, **kwargs):
-        defaults = {'max_length': self.maxlength}
+        defaults = {'max_length': self.max_length}
         defaults.update(kwargs)
         return super(CharField, self).formfield(**defaults)
 
@@ -670,7 +674,7 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['maxlength'] = 75
+        kwargs['max_length'] = 75
         CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
@@ -829,7 +833,7 @@ class IntegerField(Field):
 class IPAddressField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):
-        kwargs['maxlength'] = 15
+        kwargs['max_length'] = 15
         Field.__init__(self, *args, **kwargs)
 
     def get_manipulator_field_objs(self):
@@ -877,7 +881,7 @@ class PositiveSmallIntegerField(IntegerField):
 
 class SlugField(Field):
     def __init__(self, *args, **kwargs):
-        kwargs['maxlength'] = kwargs.get('maxlength', 50)
+        kwargs['max_length'] = kwargs.get('max_length', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
         if 'db_index' not in kwargs:
@@ -963,7 +967,7 @@ class TimeField(Field):
 
 class URLField(CharField):
     def __init__(self, verbose_name=None, name=None, verify_exists=True, **kwargs):
-        kwargs['maxlength'] = kwargs.get('maxlength', 200)
+        kwargs['max_length'] = kwargs.get('max_length', 200)
         if verify_exists:
             kwargs.setdefault('validator_list', []).append(validators.isExistingURL)
         self.verify_exists = verify_exists

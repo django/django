@@ -4,6 +4,7 @@ from django.utils.html import escape
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import smart_unicode, force_unicode
+from django.utils.maxlength import LegacyMaxlength
 
 FORM_FIELD_ID_PREFIX = 'id_'
 
@@ -302,6 +303,9 @@ class FormField(object):
     Subclasses should also implement a render(data) method, which is responsible
     for rending the form field in XHTML.
     """
+    # Provide backwards compatibility for the maxlength attribute and
+    # argument for this class and all subclasses.
+    __metaclass__ = LegacyMaxlength
 
     def __str__(self):
         return unicode(self).encode('utf-8')
@@ -390,19 +394,19 @@ class FormField(object):
 
 class TextField(FormField):
     input_type = "text"
-    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=None, member_name=None):
+    def __init__(self, field_name, length=30, max_length=None, is_required=False, validator_list=None, member_name=None):
         if validator_list is None: validator_list = []
         self.field_name = field_name
-        self.length, self.maxlength = length, maxlength
+        self.length, self.max_length = length, max_length
         self.is_required = is_required
         self.validator_list = [self.isValidLength, self.hasNoNewlines] + validator_list
         if member_name != None:
             self.member_name = member_name
 
     def isValidLength(self, data, form):
-        if data and self.maxlength and len(smart_unicode(data)) > self.maxlength:
+        if data and self.max_length and len(smart_unicode(data)) > self.max_length:
             raise validators.ValidationError, ungettext("Ensure your text is less than %s character.",
-                "Ensure your text is less than %s characters.", self.maxlength) % self.maxlength
+                "Ensure your text is less than %s characters.", self.max_length) % self.max_length
 
     def hasNoNewlines(self, data, form):
         if data and '\n' in data:
@@ -411,12 +415,12 @@ class TextField(FormField):
     def render(self, data):
         if data is None:
             data = u''
-        maxlength = u''
-        if self.maxlength:
-            maxlength = u'maxlength="%s" ' % self.maxlength
+        max_length = u''
+        if self.max_length:
+            max_length = u'maxlength="%s" ' % self.max_length
         return u'<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
             (self.input_type, self.get_id(), self.__class__.__name__, self.is_required and u' required' or '',
-            self.field_name, self.length, escape(data), maxlength)
+            self.field_name, self.length, escape(data), max_length)
 
     def html2python(data):
         return data
@@ -426,14 +430,14 @@ class PasswordField(TextField):
     input_type = "password"
 
 class LargeTextField(TextField):
-    def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=None, maxlength=None):
+    def __init__(self, field_name, rows=10, cols=40, is_required=False, validator_list=None, max_length=None):
         if validator_list is None: validator_list = []
         self.field_name = field_name
         self.rows, self.cols, self.is_required = rows, cols, is_required
         self.validator_list = validator_list[:]
-        if maxlength:
+        if max_length:
             self.validator_list.append(self.isValidLength)
-            self.maxlength = maxlength
+            self.max_length = max_length
 
     def render(self, data):
         if data is None:
@@ -710,12 +714,12 @@ class ImageUploadField(FileUploadField):
 ####################
 
 class IntegerField(TextField):
-    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=None, member_name=None):
+    def __init__(self, field_name, length=10, max_length=None, is_required=False, validator_list=None, member_name=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isInteger] + validator_list
         if member_name is not None:
             self.member_name = member_name
-        TextField.__init__(self, field_name, length, maxlength, is_required, validator_list)
+        TextField.__init__(self, field_name, length, max_length, is_required, validator_list)
 
     def isInteger(self, field_data, all_data):
         try:
@@ -730,57 +734,57 @@ class IntegerField(TextField):
     html2python = staticmethod(html2python)
 
 class SmallIntegerField(IntegerField):
-    def __init__(self, field_name, length=5, maxlength=5, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=5, max_length=5, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isSmallInteger] + validator_list
-        IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
+        IntegerField.__init__(self, field_name, length, max_length, is_required, validator_list)
 
     def isSmallInteger(self, field_data, all_data):
         if not -32768 <= int(field_data) <= 32767:
             raise validators.CriticalValidationError, ugettext("Enter a whole number between -32,768 and 32,767.")
 
 class PositiveIntegerField(IntegerField):
-    def __init__(self, field_name, length=10, maxlength=None, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=10, max_length=None, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isPositive] + validator_list
-        IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
+        IntegerField.__init__(self, field_name, length, max_length, is_required, validator_list)
 
     def isPositive(self, field_data, all_data):
         if int(field_data) < 0:
             raise validators.CriticalValidationError, ugettext("Enter a positive number.")
 
 class PositiveSmallIntegerField(IntegerField):
-    def __init__(self, field_name, length=5, maxlength=None, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=5, max_length=None, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isPositiveSmall] + validator_list
-        IntegerField.__init__(self, field_name, length, maxlength, is_required, validator_list)
+        IntegerField.__init__(self, field_name, length, max_length, is_required, validator_list)
 
     def isPositiveSmall(self, field_data, all_data):
         if not 0 <= int(field_data) <= 32767:
             raise validators.CriticalValidationError, ugettext("Enter a whole number between 0 and 32,767.")
 
 class FloatField(TextField):
-    def __init__(self, field_name, is_required=False, validator_list=None): 
-        if validator_list is None: validator_list = [] 
-        validator_list = [validators.isValidFloat] + validator_list 
-        TextField.__init__(self, field_name, is_required=is_required, validator_list=validator_list) 
- 
-    def html2python(data): 
-        if data == '' or data is None: 
-            return None 
-        return float(data) 
-    html2python = staticmethod(html2python) 
- 
-class DecimalField(TextField): 
+    def __init__(self, field_name, is_required=False, validator_list=None):
+        if validator_list is None: validator_list = []
+        validator_list = [validators.isValidFloat] + validator_list
+        TextField.__init__(self, field_name, is_required=is_required, validator_list=validator_list)
+
+    def html2python(data):
+        if data == '' or data is None:
+            return None
+        return float(data)
+    html2python = staticmethod(html2python)
+
+class DecimalField(TextField):
     def __init__(self, field_name, max_digits, decimal_places, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         self.max_digits, self.decimal_places = max_digits, decimal_places
-        validator_list = [self.isValidDecimal] + validator_list 
-        # Initialise the TextField, making sure it's large enough to fit the number with a - sign and a decimal point. 
-        super(DecimalField, self).__init__(field_name, max_digits+2, max_digits+2, is_required, validator_list) 
+        validator_list = [self.isValidDecimal] + validator_list
+        # Initialise the TextField, making sure it's large enough to fit the number with a - sign and a decimal point.
+        super(DecimalField, self).__init__(field_name, max_digits+2, max_digits+2, is_required, validator_list)
 
-    def isValidDecimal(self, field_data, all_data): 
-        v = validators.IsValidDecimal(self.max_digits, self.decimal_places) 
+    def isValidDecimal(self, field_data, all_data):
+        v = validators.IsValidDecimal(self.max_digits, self.decimal_places)
         try:
             v(field_data, all_data)
         except validators.ValidationError, e:
@@ -789,14 +793,14 @@ class DecimalField(TextField):
     def html2python(data):
         if data == '' or data is None:
             return None
-        try: 
-            import decimal 
+        try:
+            import decimal
         except ImportError:
             from django.utils import _decimal as decimal
-        try: 
-            return decimal.Decimal(data) 
-        except decimal.InvalidOperation, e: 
-            raise ValueError, e 
+        try:
+            return decimal.Decimal(data)
+        except decimal.InvalidOperation, e:
+            raise ValueError, e
     html2python = staticmethod(html2python)
 
 ####################
@@ -806,10 +810,10 @@ class DecimalField(TextField):
 class DatetimeField(TextField):
     """A FormField that automatically converts its data to a datetime.datetime object.
     The data should be in the format YYYY-MM-DD HH:MM:SS."""
-    def __init__(self, field_name, length=30, maxlength=None, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=30, max_length=None, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         self.field_name = field_name
-        self.length, self.maxlength = length, maxlength
+        self.length, self.max_length = length, max_length
         self.is_required = is_required
         self.validator_list = [validators.isValidANSIDatetime] + validator_list
 
@@ -836,7 +840,7 @@ class DateField(TextField):
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidDate] + validator_list
-        TextField.__init__(self, field_name, length=10, maxlength=10,
+        TextField.__init__(self, field_name, length=10, max_length=10,
             is_required=is_required, validator_list=validator_list)
 
     def isValidDate(self, field_data, all_data):
@@ -861,7 +865,7 @@ class TimeField(TextField):
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidTime] + validator_list
-        TextField.__init__(self, field_name, length=8, maxlength=8,
+        TextField.__init__(self, field_name, length=8, max_length=8,
             is_required=is_required, validator_list=validator_list)
 
     def isValidTime(self, field_data, all_data):
@@ -893,10 +897,10 @@ class TimeField(TextField):
 
 class EmailField(TextField):
     "A convenience FormField for validating e-mail addresses"
-    def __init__(self, field_name, length=50, maxlength=75, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=50, max_length=75, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidEmail] + validator_list
-        TextField.__init__(self, field_name, length, maxlength=maxlength,
+        TextField.__init__(self, field_name, length, max_length=max_length,
             is_required=is_required, validator_list=validator_list)
 
     def isValidEmail(self, field_data, all_data):
@@ -907,10 +911,10 @@ class EmailField(TextField):
 
 class URLField(TextField):
     "A convenience FormField for validating URLs"
-    def __init__(self, field_name, length=50, maxlength=200, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=50, max_length=200, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidURL] + validator_list
-        TextField.__init__(self, field_name, length=length, maxlength=maxlength,
+        TextField.__init__(self, field_name, length=length, max_length=max_length,
             is_required=is_required, validator_list=validator_list)
 
     def isValidURL(self, field_data, all_data):
@@ -920,10 +924,10 @@ class URLField(TextField):
             raise validators.CriticalValidationError, e.messages
 
 class IPAddressField(TextField):
-    def __init__(self, field_name, length=15, maxlength=15, is_required=False, validator_list=None):
+    def __init__(self, field_name, length=15, max_length=15, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidIPAddress] + validator_list
-        TextField.__init__(self, field_name, length=length, maxlength=maxlength,
+        TextField.__init__(self, field_name, length=length, max_length=max_length,
             is_required=is_required, validator_list=validator_list)
 
     def isValidIPAddress(self, field_data, all_data):
@@ -970,7 +974,7 @@ class PhoneNumberField(TextField):
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidPhone] + validator_list
-        TextField.__init__(self, field_name, length=12, maxlength=12,
+        TextField.__init__(self, field_name, length=12, max_length=12,
             is_required=is_required, validator_list=validator_list)
 
     def isValidPhone(self, field_data, all_data):
@@ -984,7 +988,7 @@ class USStateField(TextField):
     def __init__(self, field_name, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isValidUSState] + validator_list
-        TextField.__init__(self, field_name, length=2, maxlength=2,
+        TextField.__init__(self, field_name, length=2, max_length=2,
             is_required=is_required, validator_list=validator_list)
 
     def isValidUSState(self, field_data, all_data):
@@ -1001,10 +1005,10 @@ class USStateField(TextField):
 
 class CommaSeparatedIntegerField(TextField):
     "A convenience FormField for validating comma-separated integer fields"
-    def __init__(self, field_name, maxlength=None, is_required=False, validator_list=None):
+    def __init__(self, field_name, max_length=None, is_required=False, validator_list=None):
         if validator_list is None: validator_list = []
         validator_list = [self.isCommaSeparatedIntegerList] + validator_list
-        TextField.__init__(self, field_name, length=20, maxlength=maxlength,
+        TextField.__init__(self, field_name, length=20, max_length=max_length,
             is_required=is_required, validator_list=validator_list)
 
     def isCommaSeparatedIntegerList(self, field_data, all_data):

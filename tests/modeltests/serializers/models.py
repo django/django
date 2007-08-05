@@ -8,7 +8,7 @@ to and from "flat" data (i.e. strings).
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
 
     class Meta:
        ordering = ('name',)
@@ -17,7 +17,7 @@ class Category(models.Model):
         return self.name
 
 class Author(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
 
     class Meta:
         ordering = ('name',)
@@ -27,7 +27,7 @@ class Author(models.Model):
 
 class Article(models.Model):
     author = models.ForeignKey(Author)
-    headline = models.CharField(maxlength=50)
+    headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
 

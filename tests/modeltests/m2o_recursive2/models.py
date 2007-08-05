@@ -10,7 +10,7 @@ Set ``related_name`` to designate what the reverse relationship is called.
 from django.db import models
 
 class Person(models.Model):
-    full_name = models.CharField(maxlength=20)
+    full_name = models.CharField(max_length=20)
     mother = models.ForeignKey('self', null=True, related_name='mothers_child_set')
     father = models.ForeignKey('self', null=True, related_name='fathers_child_set')
 

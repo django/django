@@ -240,7 +240,7 @@ default, provide enough fields for 3 Choices."
 
 Then change the other fields in ``Choice`` to give them ``core=True``::
 
-    choice = models.CharField(maxlength=200, core=True)
+    choice = models.CharField(max_length=200, core=True)
     votes = models.IntegerField(core=True)
 
 This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'

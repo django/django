@@ -8,8 +8,8 @@ from django.core import management
 DATA_TYPES = {
     'AutoField':                    'NUMBER(11)',
     'BooleanField':                 'NUMBER(1) CHECK (%(column)s IN (0,1))',
-    'CharField':                    'NVARCHAR2(%(maxlength)s)',
-    'CommaSeparatedIntegerField':   'VARCHAR2(%(maxlength)s)',
+    'CharField':                    'NVARCHAR2(%(max_length)s)',
+    'CommaSeparatedIntegerField':   'VARCHAR2(%(max_length)s)',
     'DateField':                    'DATE',
     'DateTimeField':                'TIMESTAMP',
     'DecimalField':                 'NUMBER(%(max_digits)s, %(decimal_places)s)',

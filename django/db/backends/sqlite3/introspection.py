@@ -81,7 +81,7 @@ class FlexibleFieldLookupDict:
             import re
             m = re.search(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$', key)
             if m:
-                return ('CharField', {'maxlength': int(m.group(1))})
+                return ('CharField', {'max_length': int(m.group(1))})
             raise KeyError
 
 DATA_TYPES_REVERSE = FlexibleFieldLookupDict()

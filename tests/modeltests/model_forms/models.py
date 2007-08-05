@@ -31,20 +31,20 @@ ARTICLE_STATUS = (
 )
 
 class Category(models.Model):
-    name = models.CharField(maxlength=20)
-    url = models.CharField('The URL', maxlength=40)
+    name = models.CharField(max_length=20)
+    url = models.CharField('The URL', max_length=40)
 
     def __unicode__(self):
         return self.name
 
 class Writer(models.Model):
-    name = models.CharField(maxlength=50, help_text='Use both first and last names.')
+    name = models.CharField(max_length=50, help_text='Use both first and last names.')
 
     def __unicode__(self):
         return self.name
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=50)
+    headline = models.CharField(max_length=50)
     pub_date = models.DateField()
     created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer)
@@ -63,7 +63,7 @@ class Article(models.Model):
 
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
-    description = models.CharField(maxlength=20)
+    description = models.CharField(max_length=20)
 
     def __unicode__(self):
         return self.phone

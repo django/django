@@ -7,8 +7,8 @@ Model inheritance isn't yet supported.
 from django.db import models
 
 class Place(models.Model):
-    name = models.CharField(maxlength=50)
-    address = models.CharField(maxlength=80)
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=80)
 
     def __unicode__(self):
         return u"%s the place" % self.name

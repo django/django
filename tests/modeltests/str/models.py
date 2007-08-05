@@ -17,7 +17,7 @@ if you prefer. You must be careful to encode the results correctly, though.
 from django.db import models
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 
     def __str__(self):
@@ -26,7 +26,7 @@ class Article(models.Model):
         return self.headline
 
 class InternationalArticle(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 
     def __unicode__(self):

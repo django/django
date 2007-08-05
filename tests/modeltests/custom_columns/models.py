@@ -18,8 +18,8 @@ ManyToMany field. This has no effect on the API for querying the database.
 from django.db import models
 
 class Author(models.Model):
-    first_name = models.CharField(maxlength=30, db_column='firstname')
-    last_name = models.CharField(maxlength=30, db_column='last')
+    first_name = models.CharField(max_length=30, db_column='firstname')
+    last_name = models.CharField(max_length=30, db_column='last')
 
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
@@ -29,7 +29,7 @@ class Author(models.Model):
         ordering = ('last_name','first_name')
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, db_table='my_m2m_table')
 
     def __unicode__(self):

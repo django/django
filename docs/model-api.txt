@@ -33,8 +33,8 @@ This example model defines a ``Person``, which has a ``first_name`` and
     from django.db import models
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=30)
-        last_name = models.CharField(maxlength=30)
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
 
 ``first_name`` and ``last_name`` are *fields* of the model. Each field is
 specified as a class attribute, and each attribute maps to a database column.
@@ -69,13 +69,13 @@ attributes.
 Example::
 
     class Musician(models.Model):
-        first_name = models.CharField(maxlength=50)
-        last_name = models.CharField(maxlength=50)
-        instrument = models.CharField(maxlength=100)
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+        instrument = models.CharField(max_length=100)
 
     class Album(models.Model):
         artist = models.ForeignKey(Musician)
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         release_date = models.DateField()
         num_stars = models.IntegerField()
 
@@ -142,14 +142,18 @@ For large amounts of text, use ``TextField``.
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
-``CharField`` has an extra required argument, ``maxlength``, the maximum length
-(in characters) of the field. The maxlength is enforced at the database level
+``CharField`` has an extra required argument, ``max_length``, the maximum length
+(in characters) of the field. The max_length is enforced at the database level
 and in Django's validation.
 
-``CommaSeparatedIntegerField``
+Django veterans: Note that the argument is now called ``max_length`` to
+provide consistency throughout Django. There is full legacy support for
+the old ``maxlength`` argument, but ``max_length`` is prefered.
+	
+ ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A field of integers separated by commas. As in ``CharField``, the ``maxlength``
+A field of integers separated by commas. As in ``CharField``, the ``max_length``
 argument is required.
 
 ``DateField``
@@ -217,7 +221,7 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``maxlength``; its ``maxlength`` is automatically set to
+This doesn't accept ``max_length``; its ``max_length`` is automatically set to
 75.
 
 ``FileField``
@@ -400,7 +404,7 @@ Like a ``PositiveIntegerField``, but only allows values under a certain
 containing only letters, numbers, underscores or hyphens. They're generally
 used in URLs.
 
-Like a CharField, you can specify ``maxlength``. If ``maxlength`` is
+Like a CharField, you can specify ``max_length``. If ``max_length`` is
 not specified, Django will use a default length of 50.
 
 Implies ``db_index=True``.
@@ -447,9 +451,9 @@ and doesn't give a 404 response).
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
-``URLField`` takes an optional argument, ``maxlength``, the maximum length (in
-characters) of the field. The maxlength is enforced at the database level and
-in Django's validation. If you don't specify ``maxlength``, a default of 200
+``URLField`` takes an optional argument, ``max_length``, the maximum length (in
+characters) of the field. The maximum length is enforced at the database level and
+in Django's validation. If you don't specify ``max_length``, a default of 200
 is used.
 
 ``USStateField``
@@ -536,7 +540,7 @@ The choices list can be defined either as part of your model class::
             ('M', 'Male'),
             ('F', 'Female'),
         )
-        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
 or outside your model class altogether::
 
@@ -545,7 +549,7 @@ or outside your model class altogether::
         ('F', 'Female'),
     )
     class Foo(models.Model):
-        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
 For each model field that has ``choices`` set, Django will add a method to
 retrieve the human-readable name for the field's current value. See
@@ -698,11 +702,11 @@ it using the field's attribute name, converting underscores to spaces.
 
 In this example, the verbose name is ``"Person's first name"``::
 
-    first_name = models.CharField("Person's first name", maxlength=30)
+    first_name = models.CharField("Person's first name", max_length=30)
 
 In this example, the verbose name is ``"first name"``::
 
-    first_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
 
 ``ForeignKey``, ``ManyToManyField`` and ``OneToOneField`` require the first
 argument to be a model class, so use the ``verbose_name`` keyword argument::
@@ -1027,8 +1031,8 @@ Once you have ``MytypeField``, you can use it in any model, just like any other
 ``Field`` type::
 
     class Person(models.Model):
-        name = models.CharField(maxlength=80)
-        gender = models.CharField(maxlength=1)
+        name = models.CharField(max_length=80)
+        gender = models.CharField(max_length=1)
         something_else = MytypeField()
 
 If you aim to build a database-agnostic application, you should account for
@@ -1074,12 +1078,12 @@ time -- i.e., when the class is instantiated. To do that, just implement
 
     # This is a much more flexible example.
     class BetterCharField(models.Field):
-        def __init__(self, maxlength, *args, **kwargs):
-            self.maxlength = maxlength
+        def __init__(self, max_length, *args, **kwargs):
+            self.max_length = max_length
             super(BetterCharField, self).__init__(*args, **kwargs)
 
         def db_type(self):
-            return 'char(%s)' % self.maxlength
+            return 'char(%s)' % self.max_length
 
     # In the model:
     class MyModel(models.Model):
@@ -1096,7 +1100,7 @@ Meta options
 Give your model metadata by using an inner ``class Meta``, like so::
 
     class Foo(models.Model):
-        bar = models.CharField(maxlength=30)
+        bar = models.CharField(max_length=30)
 
         class Meta:
             # ...
@@ -1270,8 +1274,8 @@ If you want your model to be visible to Django's admin site, give your model an
 inner ``"class Admin"``, like so::
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=30)
-        last_name = models.CharField(maxlength=30)
+        first_name = models.CharField(max_length=30)
+        last_name = models.CharField(max_length=30)
 
         class Admin:
             # Admin options go here
@@ -1430,7 +1434,7 @@ A few special cases to note about ``list_display``:
       Here's a full example model::
 
           class Person(models.Model):
-              name = models.CharField(maxlength=50)
+              name = models.CharField(max_length=50)
               birthday = models.DateField()
 
               class Admin:
@@ -1447,9 +1451,9 @@ A few special cases to note about ``list_display``:
       Here's a full example model::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=50)
-              last_name = models.CharField(maxlength=50)
-              color_code = models.CharField(maxlength=6)
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+              color_code = models.CharField(max_length=6)
 
               class Admin:
                   list_display = ('first_name', 'last_name', 'colored_name')
@@ -1465,7 +1469,7 @@ A few special cases to note about ``list_display``:
       Here's a full example model::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=50)
+              first_name = models.CharField(max_length=50)
               birthday = models.DateField()
 
               class Admin:
@@ -1493,8 +1497,8 @@ A few special cases to note about ``list_display``:
       For example::
 
         class Person(models.Model):
-            first_name = models.CharField(maxlength=50)
-            color_code = models.CharField(maxlength=6)
+            first_name = models.CharField(max_length=50)
+            color_code = models.CharField(max_length=6)
 
             class Admin:
                 list_display = ('first_name', 'colored_first_name')
@@ -1744,13 +1748,13 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
             return result_list
 
     class OpinionPoll(models.Model):
-        question = models.CharField(maxlength=200)
+        question = models.CharField(max_length=200)
         poll_date = models.DateField()
         objects = PollManager()
 
     class Response(models.Model):
         poll = models.ForeignKey(Poll)
-        person_name = models.CharField(maxlength=50)
+        person_name = models.CharField(max_length=50)
         response = models.TextField()
 
 With this example, you'd use ``OpinionPoll.objects.with_counts()`` to return
@@ -1766,8 +1770,8 @@ A ``Manager``'s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
 
     class Book(models.Model):
-        title = models.CharField(maxlength=100)
-        author = models.CharField(maxlength=50)
+        title = models.CharField(max_length=100)
+        author = models.CharField(max_length=50)
 
 ...the statement ``Book.objects.all()`` will return all books in the database.
 
@@ -1785,8 +1789,8 @@ all objects, and one that returns only the books by Roald Dahl::
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
-        title = models.CharField(maxlength=100)
-        author = models.CharField(maxlength=50)
+        title = models.CharField(max_length=100)
+        author = models.CharField(max_length=50)
 
         objects = models.Manager() # The default manager.
         dahl_objects = DahlBookManager() # The Dahl-specific manager.
@@ -1819,9 +1823,9 @@ For example::
             return super(FemaleManager, self).get_query_set().filter(sex='F')
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=50)
-        last_name = models.CharField(maxlength=50)
-        sex = models.CharField(maxlength=1, choices=(('M', 'Male'), ('F', 'Female')))
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
+        sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female')))
         people = models.Manager()
         men = MaleManager()
         women = FemaleManager()
@@ -1851,11 +1855,11 @@ model.
 For example, this model has a few custom methods::
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=50)
-        last_name = models.CharField(maxlength=50)
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
-        address = models.CharField(maxlength=100)
-        city = models.CharField(maxlength=50)
+        address = models.CharField(max_length=100)
+        city = models.CharField(max_length=50)
         state = models.USStateField() # Yes, this is America-centric...
 
         def baby_boomer_status(self):
@@ -1897,8 +1901,8 @@ Although this isn't required, it's strongly encouraged (see the description of
 For example::
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=50)
-        last_name = models.CharField(maxlength=50)
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
 
         def __str__(self):
             # Note use of django.utils.encoding.smart_str() here because
@@ -1915,8 +1919,8 @@ method for your model. The example in the previous section could be written
 more simply as::
 
     class Person(models.Model):
-        first_name = models.CharField(maxlength=50)
-        last_name = models.CharField(maxlength=50)
+        first_name = models.CharField(max_length=50)
+        last_name = models.CharField(max_length=50)
 
         def __unicode__(self):
             return u'%s %s' % (self.first_name, self.last_name)
@@ -2058,7 +2062,7 @@ A classic use-case for overriding the built-in methods is if you want something
 to happen whenever you save an object. For example::
 
     class Blog(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         tagline = models.TextField()
 
         def save(self):
@@ -2069,7 +2073,7 @@ to happen whenever you save an object. For example::
 You can also prevent saving::
 
     class Blog(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         tagline = models.TextField()
 
         def save(self):

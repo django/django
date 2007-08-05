@@ -29,7 +29,7 @@ class PublicCommentManipulator(AuthenticationForm):
             else:
                 return []
         self.fields.extend([
-            oldforms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            oldforms.LargeTextField(field_name="comment", max_length=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
             oldforms.RadioSelectField(field_name="rating1", choices=choices,
                 is_required=ratings_required and num_rating_choices > 0,
@@ -122,9 +122,9 @@ class PublicFreeCommentManipulator(oldforms.Manipulator):
     "Manipulator that handles public free (unregistered) comments"
     def __init__(self):
         self.fields = (
-            oldforms.TextField(field_name="person_name", maxlength=50, is_required=True,
+            oldforms.TextField(field_name="person_name", max_length=50, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            oldforms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            oldforms.LargeTextField(field_name="comment", max_length=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
         )
 

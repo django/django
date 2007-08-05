@@ -12,8 +12,8 @@ class SiteManager(models.Manager):
         return self.get(pk=sid)
 
 class Site(models.Model):
-    domain = models.CharField(_('domain name'), maxlength=100)
-    name = models.CharField(_('display name'), maxlength=50)
+    domain = models.CharField(_('domain name'), max_length=100)
+    name = models.CharField(_('display name'), max_length=50)
     objects = SiteManager()
     class Meta:
         db_table = 'django_site'

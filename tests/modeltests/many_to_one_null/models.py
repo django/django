@@ -8,13 +8,13 @@ To define a many-to-one relationship that can have a null foreign key, use
 from django.db import models
 
 class Reporter(models.Model):
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
 
     def __unicode__(self):
         return self.name
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     reporter = models.ForeignKey(Reporter, null=True)
 
     class Meta:

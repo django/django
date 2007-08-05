@@ -910,9 +910,9 @@ def inspectdb():
                     field_type, new_params = field_type
                     extra_params.update(new_params)
 
-                # Add maxlength for all CharFields.
+                # Add max_length for all CharFields.
                 if field_type == 'CharField' and row[3]:
-                    extra_params['maxlength'] = row[3]
+                    extra_params['max_length'] = row[3]
 
                 if field_type == 'DecimalField':
                     extra_params['max_digits'] = row[4]
@@ -987,8 +987,8 @@ def get_validation_errors(outfile, app=None):
         for f in opts.fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
-            if isinstance(f, models.CharField) and f.maxlength in (None, 0):
-                e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
+            if isinstance(f, models.CharField) and f.max_length in (None, 0):
+                e.add(opts, '"%s": CharFields require a "max_length" attribute.' % f.name)
             if isinstance(f, models.DecimalField):
                 if f.decimal_places is None:
                     e.add(opts, '"%s": DecimalFields require a "decimal_places" attribute.' % f.name)
@@ -1013,11 +1013,11 @@ def get_validation_errors(outfile, app=None):
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
-            # Check that maxlength <= 255 if using older MySQL versions.
+            # Check that max_length <= 255 if using older MySQL versions.
             if settings.DATABASE_ENGINE == 'mysql':
                 db_version = connection.get_server_version()
-                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
-                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
+                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.max_length > 255:
+                    e.add(opts, '"%s": %s cannot have a "max_length" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -1252,7 +1252,7 @@ def createcachetable(tablename):
     from django.db import backend, connection, transaction, models
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
-        models.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
+        models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
         models.TextField(name='value'),
         models.DateTimeField(name='expires', db_index=True),
     )

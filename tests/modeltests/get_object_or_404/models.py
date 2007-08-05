@@ -15,7 +15,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, get_list_or_404
 
 class Author(models.Model):
-    name = models.CharField(maxlength=50)
+    name = models.CharField(max_length=50)
     
     def __unicode__(self):
         return self.name
@@ -26,7 +26,7 @@ class ArticleManager(models.Manager):
 
 class Article(models.Model):
     authors = models.ManyToManyField(Author)
-    title = models.CharField(maxlength=50)
+    title = models.CharField(max_length=50)
     objects = models.Manager()
     by_a_sir = ArticleManager()
     

@@ -120,6 +120,7 @@ class CharField(Field):
 
     def widget_attrs(self, widget):
         if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
+            # The HTML attribute is maxlength, not max_length.
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):

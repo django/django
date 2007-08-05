@@ -291,7 +291,7 @@ def get_return_data_type(func_name):
 DATA_TYPE_MAPPING = {
     'AutoField'                 : _('Integer'),
     'BooleanField'              : _('Boolean (Either True or False)'),
-    'CharField'                 : _('String (up to %(maxlength)s)'),
+    'CharField'                 : _('String (up to %(max_length)s)'),
     'CommaSeparatedIntegerField': _('Comma-separated integers'),
     'DateField'                 : _('Date (without time)'),
     'DateTimeField'             : _('Date (with time)'),
@@ -310,7 +310,7 @@ DATA_TYPE_MAPPING = {
     'PhoneNumberField'          : _('Phone number'),
     'PositiveIntegerField'      : _('Integer'),
     'PositiveSmallIntegerField' : _('Integer'),
-    'SlugField'                 : _('String (up to %(maxlength)s)'),
+    'SlugField'                 : _('String (up to %(max_length)s)'),
     'SmallIntegerField'         : _('Integer'),
     'TextField'                 : _('Text'),
     'TimeField'                 : _('Time'),

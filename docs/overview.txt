@@ -25,14 +25,14 @@ far, it's been solving two years' worth of database-schema problems. Here's a
 quick example::
 
     class Reporter(models.Model):
-        full_name = models.CharField(maxlength=70)
+        full_name = models.CharField(max_length=70)
 
         def __unicode__(self):
             return self.full_name
 
     class Article(models.Model):
         pub_date = models.DateTimeField()
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         article = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
@@ -134,7 +134,7 @@ your model classes::
 
     class Article(models.Model):
         pub_date = models.DateTimeField()
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         article = models.TextField()
         reporter = models.ForeignKey(Reporter)
         class Admin: pass

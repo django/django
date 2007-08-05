@@ -32,9 +32,9 @@ class ContentTypeManager(models.Manager):
         CONTENT_TYPE_CACHE = {}
 
 class ContentType(models.Model):
-    name = models.CharField(maxlength=100)
-    app_label = models.CharField(maxlength=100)
-    model = models.CharField(_('python model class name'), maxlength=100)
+    name = models.CharField(max_length=100)
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(_('python model class name'), max_length=100)
     objects = ContentTypeManager()
     class Meta:
         verbose_name = _('content type')

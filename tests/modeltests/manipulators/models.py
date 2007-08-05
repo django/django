@@ -7,14 +7,14 @@ Each model gets an AddManipulator and ChangeManipulator by default.
 from django.db import models
 
 class Musician(models.Model):
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
 
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)
 
 class Album(models.Model):
-    name = models.CharField(maxlength=100)
+    name = models.CharField(max_length=100)
     musician = models.ForeignKey(Musician)
     release_date = models.DateField(blank=True, null=True)
 
