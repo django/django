@@ -624,6 +624,12 @@ Extra "help" text to be displayed under the field on the object's admin
 form. It's useful for documentation even if your object doesn't have an
 admin form.
 
+Note that this value is *not* HTML-escaped when it's displayed in the admin
+interface. This lets you include HTML in ``help_text`` if you so desire. For
+example::
+
+	help_text="Please use the following format: <em>YYYY-MM-DD</em>."
+
 ``primary_key``
 ~~~~~~~~~~~~~~~
 
