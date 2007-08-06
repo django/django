@@ -1300,6 +1300,10 @@ def run_shell(use_plain=False):
         shell.mainloop()
     except ImportError:
         import code
+        # Set up a dictionary to serve as the environment for the shell, so
+        # that tab completion works on objects that are imported at runtime.
+        # See ticket 5082.
+        imported_objects = {}
         try: # Try activating rlcompleter, because it's handy.
             import readline
         except ImportError:
@@ -1308,8 +1312,9 @@ def run_shell(use_plain=False):
             # We don't have to wrap the following import in a 'try', because
             # we already know 'readline' was imported successfully.
             import rlcompleter
+            readline.set_completer(rlcompleter.Completer(imported_objects).complete)
             readline.parse_and_bind("tab:complete")
-        code.interact()
+        code.interact(local=imported_objects)
 run_shell.args = '[--plain]'
 
 def dbshell():
@@ -1424,7 +1429,7 @@ def load_data(fixture_labels, verbosity=1):
                             print "Installing %s fixture '%s' from %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
                         try:
-                            objects =  serializers.deserialize(format, fixture)
+                            objects = serializers.deserialize(format, fixture)
                             for obj in objects:
                                 count[0] += 1
                                 models.add(obj.object.__class__)
