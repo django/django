@@ -756,6 +756,9 @@ class ManyToManyField(RelatedField, Field):
         "Returns the value of this field in the given model instance."
         return getattr(obj, self.attname).all()
 
+    def save_form_data(self, instance, data):
+        setattr(instance, self.attname, data)
+        
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ModelMultipleChoiceField, 'queryset': self.rel.to._default_manager.all()}
         defaults.update(kwargs)

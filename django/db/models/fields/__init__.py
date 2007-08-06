@@ -380,6 +380,9 @@ class Field(object):
             return self._choices
     choices = property(_get_choices)
 
+    def save_form_data(self, instance, data):
+        setattr(instance, self.name, data)
+        
     def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
@@ -696,6 +699,13 @@ class FileField(Field):
         self.upload_to = upload_to
         Field.__init__(self, verbose_name, name, **kwargs)
 
+    def get_db_prep_save(self, value):
+        "Returns field's value prepared for saving into a database."
+        # Need to convert UploadedFile objects provided via a form to unicode for database insertion
+        if value is None:
+            return None
+        return unicode(value)
+
     def get_manipulator_fields(self, opts, manipulator, change, name_prefix='', rel=False, follow=True):
         field_list = Field.get_manipulator_fields(self, opts, manipulator, change, name_prefix, rel, follow)
         if not self.blank:
@@ -772,6 +782,19 @@ class FileField(Field):
         f = os.path.join(self.get_directory_name(), get_valid_filename(os.path.basename(filename)))
         return os.path.normpath(f)
 
+    def save_form_data(self, instance, data):
+        if data:
+            getattr(instance, "save_%s_file" % self.name)(os.path.join(self.upload_to, data.filename), data.content, save=False)
+        
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.FileField}
+        # If a file has been provided previously, then the form doesn't require 
+        # that a new file is provided this time.
+        if 'initial' in kwargs:
+            defaults['required'] = False
+        defaults.update(kwargs)
+        return super(FileField, self).formfield(**defaults)
+
 class FilePathField(Field):
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
@@ -819,6 +842,10 @@ class ImageField(FileField):
             if self.height_field:
                 setattr(new_object, self.height_field, getattr(original_object, self.height_field))
             new_object.save()
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.ImageField}
+        return super(ImageField, self).formfield(**defaults)
 
 class IntegerField(Field):
     empty_strings_allowed = False

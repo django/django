@@ -7,10 +7,10 @@ import re
 import time
 
 from django.utils.translation import ugettext
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import StrAndUnicode, smart_unicode
 
 from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
 
 try:
     from decimal import Decimal, DecimalException
@@ -22,7 +22,7 @@ __all__ = (
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
     'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
-    'RegexField', 'EmailField', 'URLField', 'BooleanField',
+    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField',
@@ -348,6 +348,55 @@ except ImportError:
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
+class UploadedFile(StrAndUnicode):
+    "A wrapper for files uploaded in a FileField"
+    def __init__(self, filename, content):
+        self.filename = filename
+        self.content = content
+        
+    def __unicode__(self):
+        """
+        The unicode representation is the filename, so that the pre-database-insertion
+        logic can use UploadedFile objects
+        """
+        return self.filename
+
+class FileField(Field):
+    widget = FileInput
+    def __init__(self, *args, **kwargs):
+        super(FileField, self).__init__(*args, **kwargs)
+
+    def clean(self, data):
+        super(FileField, self).clean(data)
+        if not self.required and data in EMPTY_VALUES:
+            return None
+        try:
+            f = UploadedFile(data['filename'], data['content'])
+        except TypeError:
+            raise ValidationError(ugettext(u"No file was submitted. Check the encoding type on the form."))
+        except KeyError:
+            raise ValidationError(ugettext(u"No file was submitted."))
+        if not f.content:
+            raise ValidationError(ugettext(u"The submitted file is empty."))
+        return f
+
+class ImageField(FileField):
+    def clean(self, data):
+        """
+        Checks that the file-upload field data contains a valid image (GIF, JPG,
+        PNG, possibly others -- whatever the Python Imaging Library supports).
+        """
+        f = super(ImageField, self).clean(data)
+        if f is None:
+            return None
+        from PIL import Image
+        from cStringIO import StringIO
+        try:
+            Image.open(StringIO(f.content))
+        except IOError: # Python Imaging Library doesn't recognize it as an image
+            raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
+        return f
+        
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):

@@ -173,27 +173,29 @@ u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
 
 # FileInput Widget ############################################################
 
+FileInput widgets don't ever show the value, because the old value is of no use
+if you are updating the form or if the provided file generated an error.
 >>> w = FileInput()
 >>> w.render('email', '')
 u'<input type="file" name="email" />'
 >>> w.render('email', None)
 u'<input type="file" name="email" />'
 >>> w.render('email', 'test@example.com')
-u'<input type="file" name="email" value="test@example.com" />'
+u'<input type="file" name="email" />'
 >>> w.render('email', 'some "quoted" & ampersanded value')
-u'<input type="file" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+u'<input type="file" name="email" />'
 >>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
-u'<input type="file" name="email" value="test@example.com" class="fun" />'
+u'<input type="file" name="email" class="fun" />'
 
 You can also pass 'attrs' to the constructor:
 >>> w = FileInput(attrs={'class': 'fun'})
 >>> w.render('email', '')
 u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
-u'<input type="file" class="fun" value="foo@example.com" name="email" />'
+u'<input type="file" class="fun" name="email" />'
 
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
-u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+u'<input type="file" class="fun" name="email" />'
 
 # Textarea Widget #############################################################
 
@@ -1532,6 +1534,42 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at most 15 characters (it has 20).']
 
+# FileField ##################################################################
+
+>>> f = FileField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean({})
+Traceback (most recent call last):
+...
+ValidationError: [u'No file was submitted.']
+
+>>> f.clean('some content that is not a file')
+Traceback (most recent call last):
+...
+ValidationError: [u'No file was submitted. Check the encoding type on the form.']
+
+>>> f.clean({'filename': 'name', 'content':None})
+Traceback (most recent call last):
+...
+ValidationError: [u'The submitted file is empty.']
+
+>>> f.clean({'filename': 'name', 'content':''})
+Traceback (most recent call last):
+...
+ValidationError: [u'The submitted file is empty.']
+
+>>> type(f.clean({'filename': 'name', 'content':'Some File Content'}))
+<class 'django.newforms.fields.UploadedFile'>
+
 # URLField ##################################################################
 
 >>> f = URLField()
@@ -2573,7 +2611,7 @@ Instances of a dynamic Form do not persist fields from one Form instance to
 the next.
 >>> class MyForm(Form):
 ...     def __init__(self, data=None, auto_id=False, field_list=[]):
-...         Form.__init__(self, data, auto_id)
+...         Form.__init__(self, data, auto_id=auto_id)
 ...         for field in field_list:
 ...             self.fields[field[0]] = field[1]
 >>> field_list = [('field1', CharField()), ('field2', CharField())]
@@ -2591,7 +2629,7 @@ the next.
 ...     default_field_1 = CharField()
 ...     default_field_2 = CharField()
 ...     def __init__(self, data=None, auto_id=False, field_list=[]):
-...         Form.__init__(self, data, auto_id)
+...         Form.__init__(self, data, auto_id=auto_id)
 ...         for field in field_list:
 ...             self.fields[field[0]] = field[1]
 >>> field_list = [('field1', CharField()), ('field2', CharField())]
@@ -3245,6 +3283,35 @@ is different than its data. This is handled transparently, though.
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
 </select>
+
+# Forms with FileFields ################################################
+
+FileFields are a special case because they take their data from the request.FILES,
+not request.POST. 
+
+>>> class FileForm(Form):
+...     file1 = FileField()
+>>> f = FileForm(auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':''}}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': 'something that is not a file'}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':'some content'}}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
+>>> f.is_valid()
+True
 
 # Basic form processing in a view #############################################
 

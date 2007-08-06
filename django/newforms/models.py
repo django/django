@@ -34,7 +34,7 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
             continue
         if fields and f.name not in fields:
             continue
-        setattr(instance, f.name, cleaned_data[f.name])
+        f.save_form_data(instance, cleaned_data[f.name])        
     # Wrap up the saving of m2m data as a function
     def save_m2m():
         opts = instance.__class__._meta
@@ -43,7 +43,7 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
             if fields and f.name not in fields:
                 continue
             if f.name in cleaned_data:
-                setattr(instance, f.attname, cleaned_data[f.name])
+                f.save_form_data(instance, cleaned_data[f.name])
     if commit:
         # If we are committing, save the instance and the m2m data immediately
         instance.save()

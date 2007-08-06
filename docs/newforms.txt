@@ -710,6 +710,47 @@ For example::
     </ul>
     </form>
 
+Binding uploaded files to a form
+--------------------------------
+
+Dealing with forms that have ``FileField`` and ``ImageField`` fields
+is a little more complicated than a normal form.
+
+Firstly, in order to upload files, you'll need to make sure that your
+``<form>`` element correctly defines the ``enctype`` as
+``"multipart/form-data"``::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+Secondly, when you use the form, you need to bind the file data. File
+data is handled separately to normal form data, so when your form
+contains a ``FileField`` and ``ImageField``, you will need to specify
+a second argument when you bind your form. So if we extend our
+ContactForm to include an ``ImageField`` called ``mugshot``, we
+need to bind the file data containing the mugshot image::
+
+    # Bound form with an image field
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> file_data = {'mugshot': {'filename':'face.jpg'
+    ...                          'content': <file data>}}
+    >>> f = ContactFormWithMugshot(data, file_data)
+
+In practice, you will usually specify ``request.FILES`` as the source
+of file data (just like you use ``request.POST`` as the source of
+form data)::
+
+    # Bound form with an image field, data from the request
+    >>> f = ContactFormWithMugshot(request.POST, request.FILES)
+
+Constructing an unbound form is the same as always -- just omit both
+form data *and* file data:
+
+    # Unbound form with a image field
+    >>> f = ContactFormWithMugshot()
+
 Subclassing forms
 -----------------
 
@@ -1099,6 +1140,50 @@ Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
 given length.
 
+``FileField``
+~~~~~~~~~~~~~
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that non-empty file data has been bound to the form.
+
+An ``UploadedFile`` object has two attributes:
+
+    ======================  =====================================================
+    Argument                Description
+    ======================  =====================================================
+    ``filename``            The name of the file, provided by the uploading
+                            client.
+    ``content``             The array of bytes comprising the file content.
+    ======================  =====================================================
+
+The string representation of an ``UploadedFile`` is the same as the filename
+attribute.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``ImageField``
+~~~~~~~~~~~~~~
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that file data has been bound to the form, and that the
+      file is of an image format understood by PIL.
+
+Using an ImageField requires that the `Python Imaging Library`_ is installed.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
 
@@ -1378,11 +1463,11 @@ the full list of conversions:
     ``DateTimeField``                ``DateTimeField``
     ``DecimalField``                 ``DecimalField``
     ``EmailField``                   ``EmailField``
-    ``FileField``                    ``CharField``
+    ``FileField``                    ``FileField``
     ``FilePathField``                ``CharField``
     ``FloatField``                   ``FloatField``
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
-    ``ImageField``                   ``CharField``
+    ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
     ``IPAddressField``               ``CharField``
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see

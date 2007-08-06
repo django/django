@@ -53,7 +53,7 @@ class SelectDateWidget(Widget):
 
         return u'\n'.join(output)
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         y, m, d = data.get(self.year_field % name), data.get(self.month_field % name), data.get(self.day_field % name)
         if y and m and d:
             return '%s-%s-%s' % (y, m, d)
