@@ -1,6 +1,5 @@
 import types
 import urllib
-from django.conf import settings
 from django.utils.functional import Promise
 
 class StrAndUnicode(object):
