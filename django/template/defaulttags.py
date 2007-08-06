@@ -649,8 +649,8 @@ def do_if(parser, token):
     As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
     will be displayed if the test fails.
 
-    ``if`` tags may use ``or`` or ``not`` to test a number of variables or to
-    negate a given variable::
+    ``if`` tags may use ``or``, ``and`` or ``not`` to test a number of
+    variables or to negate a given variable::
 
         {% if not athlete_list %}
             There are no athletes.
@@ -660,19 +660,32 @@ def do_if(parser, token):
             There are some athletes or some coaches.
         {% endif %}
 
+        {% if athlete_list and coach_list %}
+            Both atheletes and coaches are available.
+        {% endif %}
+
         {% if not athlete_list or coach_list %}
             There are no athletes, or there are some coaches.
         {% endif %}
 
-    For simplicity, ``if`` tags do not allow ``and`` clauses. Use nested ``if``
-    tags instead::
-
-        {% if athlete_list %}
-            {% if coach_list %}
-                Number of athletes: {{ athlete_list|count }}.
-                Number of coaches: {{ coach_list|count }}.
-            {% endif %}
+        {% if athlete_list and not coach_list %}
+            There are some athletes and absolutely no coaches.
         {% endif %}
+
+    ``if`` tags do not allow ``and`` and ``or`` clauses with the same
+    tag, because the order of logic would be ambigous. For example,
+    this is invalid::
+
+    {% if athlete_list and coach_list or cheerleader_list %}
+
+    If you need to combine and and or to do advanced logic, just use
+    nested if tags. For example:
+
+    {% if athlete_list %}
+        {% if coach_list or cheerleader_list %}
+            We have athletes, and either coaches or cheerleaders!
+        {% endif %}
+    {% endif %}
     """
     bits = token.contents.split()
     del bits[0]
