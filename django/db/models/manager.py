@@ -43,7 +43,7 @@ class Manager(object):
 
     def get_query_set(self):
         """Returns a new QuerySet object.  Subclasses can override this method
-        to easily customise the behaviour of the Manager.
+        to easily customize the behavior of the Manager.
         """
         return QuerySet(self.model)
     
