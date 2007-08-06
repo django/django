@@ -2,29 +2,28 @@
 
 == Introduction ==
 
-Schema evolution is the function of updating an existing Django generated database schema to a newer/modified version based upon a newer/modified set of Django models.
+Schema evolution is the function of updating an existing Django generated database schema to a newer/modified version based upon a newer/modified set of Django models, and/or a set of developer written upgrade scripts.
 
-=== Limitations ===
+It's important to note that different developers wish to approach schema evolution in different ways.  As detailed in the original SchemaEvolution document (and elsewhere), there are four basic categories of developers:
 
-I feel it important to note that is an automated implementation designed to handle schema ''evolution'', not ''revolution''.  No tool, other than storing DBA written SQL scripts and auto-applying them via schema versioning or DB fingerprinting (which is a trivial solution - I have a Java implementation if anyone wants it), can handle the full scope of possible database changes.  Once you accept this fact, the following becomes self-evident:
+ 1. users who trust introspection and never want to touch/see SQL (Malcolm)
+ 1. users who mostly trust introspection but want the option of auto-applied upgrades for specific situations (Wash)
+ 1. users who use introspection-generated SQL, but don't trust it (they want it generated at development and stored for use in production - Kaylee)
+ 1. users who hate introspection and just want auto-application of their own scripts (Zoe)
 
- * There is a trade off between ease of use and the scope of coverable problems.
+who wish to perform different combinations of the two basic subtasks of schema evolution:
 
-Combine that with:
+ 1. generation of SQL via magical introspection
+ 1. storage and auto-application of upgrade SQL
 
- * The vast majority of database changes are minor, evolutionary tweaks. (*)
- * Very few people are DBAs.
-
-And I believe the ideal solution is in easing the life of common Django developer, not in appeasing the DBA's or power-developer's desire for an all-in-one-comprehensive solution.  Massive schema changes (w/ data retention) are always going to require someone with database skill, but we can empower the people to do the simple things for themselves.
-
-(*) By this I mean adding/removing/renaming tables and adding/removing/renaming/changing-attributes-of columns.
+This implementation of schema evolution should satisfy all four groups, while keeping the complexities of the parts you don't use out of sight.  Scroll down to the usage sections to see examples of how each developer would approach their jobs.
 
 == Downloading / Installing ==
 
 This functionality is not yet in Django/trunk, but in a separate schema-evolution branch.  To download this branch, run the following:
 
 {{{
-svn co http://code.djangoproject.com/svn/django/schema-evolution/ django_se_src
+svn co http://code.djangoproject.com/svn/django/branches/schema-evolution/ django_se_src
 ln -s `pwd`/django_se_src/django SITE-PACKAGES-DIR/django
 }}}
 
@@ -50,12 +49,12 @@ patching file db/models/fields/__init__.py
 patching file db/models/options.py
 }}}
 
-== How To Use ==
+== How To Use: Malcolm ==
 
-For the most part, schema evolution is designed to be automagic via introspection.  Make changes to your models, run syncdb, and you're done.  But like all schema changes, it's wise to preview what is going to be run.  To do this, run the following:
+For the most part, schema evolution can be performed via introspection, as long as you're not doing anything too radical.  If you have an established application the ''vast'' majority of changes are either additions or renames (either tables or columns).  Or if you're new to SQL, introspection keeps things very simple for you.  To use schema evolution as Malcolm just make changes to your models, run syncdb, and you're done.  But like all schema changes, it's wise to preview what is going to be run.  To do this, run the following:
 
 {{{
-./manage sqlevolve app_name
+$ ./manage sqlevolve app_name
 }}}
 
 This will output to the command line the SQL to be run to bring your database schema up to date with your model structure.
@@ -86,11 +85,68 @@ class Option(models.Model):
         aka = 'Choice'
 }}}
 
-For further examples...
+And after time you make a series of changes, run sqlevolve or syncdb and your schema changes will be either shown to you or applied for you.
 
-== Usage Examples ==
+For further examples, scroll down to the Introspection Examples section.
 
-The following documentation will take you through several common model changes and show you how Django's schema evolution handles them. Each example provides the pre and post model source code, as well as the SQL output.
+== How To Use: Wash ==
+
+Note that most Malcolm developers (likely new developers) will eventually run up against a limitation inherent in introspection.  They love their incredibly intuitive tool but it can't do everything.  But they don't want to give it up, because it's a great 90% solution.  If only they can add a simple script without having to throw away all the convenient candy, past or future.
+
+All Wash has to do is store a little bit of extra metadata.  Namely two things:
+
+ 1. a fingerprint of the known schema
+ 1. an sql script
+
+in the file 'app_name/schema_evolution.py'.  (conveniently next to models.py)
+
+This module looks as follows:
+
+{{{
+# list of all known schema fingerprints, in order
+fingerprints = [
+    'fv1:1742830097',
+    'fv1:907953071',
+    # add future fingerprints here
+]
+
+# all of your evolution scripts, mapping the from_version and to_version 
+# to a list if sql commands
+evolutions = {
+    # ('from_fingerprint','to_fingerprint'): ['-- some sql'],
+    ('fv1:1742830097','fv1:907953071'): [
+        '-- some list of sql statements, constituting an upgrade',
+        '-- some list of sql statements, constituting an upgrade',
+    ],
+}
+}}}
+
+To create this file, he would first fingerprint his schema with the following command:
+
+{{{
+$ ./manage sqlfingerprint app_name
+Notice: Current schema fingerprint for 'app_name' is 'fv1:1742830097' (unrecognized)
+}}}
+
+He would add this fingerprint to the end of the 'fingerprints' list in the schema_evolution module, and it would become an automatically recognized schema, ripe for the upgrade.  And then he would write an upgrade script, placing it in the 'evolutions' dictionary object, mapped against the current fingerprint and some fake/temporary fingerprint ('fv1:xxxxxxxx').  Finally, he would run his script (either manually or via syncdb), re-fingerprint and save it in both the fingerprints list and the 'to_fingerprint' part of the mapping.
+
+Later, when he runs sqlevolve (or syncdb) against his production database, sqlevolve will detect his current schema and attempt an upgrade using the upgrade script, and then verify it.  If it succeeds, will continue applying all available upgrade scripts until one either fails or it reaches the latest database schema version.  (more technically, syncdb will recursively apply all available scripts...sqlevolve since it simply prints to the console, only prints the next available script)
+
+'''Note:''' Manually defined upgrade scripts always are prioritized over introspected scripts.  And introspected scripts are never applied recursively.
+
+This way Wash can continue using introspections for the majority of his tasks, only stopping to define fingerprints/scripts on those rare occasions he needs them.
+
+== How To Use: Kaylee ==
+
+Kaylee, like Wash and Malcolm, likes the time-saving features of automatic introspection, but likes much more control over deployments to "her baby".  So she typically still uses introspection during development, but never in production.  What she does is instead of saving the occasional "hard" migration scripts like Wash, she saves them all.  This builds a neat chain of upgrades in her schema_evolution module which are then applied in series.  Additionally, she likes the ability to automatically back out changes as well, so she stores revert scripts (also usually automatically generated at development) in the same module.
+
+== How To Use: Zoe ==
+
+Zoe simply doesn't like the whole idea of introspection.  She's an expert SQL swinger and never wants to see it generated for her (much less have those ugly "aka" fields buggering up her otherwise pristine models.  She simply writes her own SQL scripts and stores them all in her schema_evolution module.
+
+== Introspection Examples ==
+
+The following documentation will take you through several common model changes and show you how Django's schema evolution introspection handles them. Each example provides the pre and post model source code, as well as the SQL output.
 
 === Adding / Removing Fields ===
 
@@ -367,6 +423,33 @@ We currently store all sorts of non-DB related metadata in the model that arguab
 
 Correct, however I thought this to be a highly unlikely scenario, not warranting the extra notational complexity.  But just as we support strings and tuples, there is nothing to say we can't extend it to support say a mapping of historical names to date ranges, if the need arises.
 
+''The 'aka' approach is ambiguous for all but trivial use cases. It doesn't capture the idea that database changes occur in bulk, in sequence. For example, On Monday, I add two fields, remove 1 field, rename a table. That creates v2 of the database. On Tuesday, I bring back the deleted field, and remove one of the added fields, creating v3 of the database. This approach doesn't track which state a given database is in, and doesn't apply changes in blocks appropriate to versioned changes.''
+
+It does not matter how you get from v1 => v3, as long as you get there with minimum theoretical information loss.  The following:
+
+'''v1 => v2 => v3'''
+ 1. // v1 t1:{A}
+ 1. add_field(B);
+ 1. add_field(C);
+ 1. del_field(A);
+ 1. rename_table(t1,t2);
+ 1. // v2 t2{B,C}
+ 1. add_field(A);
+ 1. del_field(C);
+ 1. // v3 t2:{A,B}
+
+is functionally equivalent to:
+
+'''v1 => v3'''
+ 1. // v1 t1:{A}
+ 1. add_field(B);
+ 1. rename_table(t1,t2);
+ 1. // v3 t2:{A,B}
+
+And this can be supported completely through introspection + metadata about what tables and columns used to be called.  If you load v2 or v3, the available information can get you there from v1, and if you load v3, the available information can get you there from v1 or v2.
+
+A more detailed breakdown of this critique is available [http://kered.org/blog/2007-08-03/schema-evolution-confusion-example-case/ here], complete with working code examples.
+
 == Future Work ==
 
 The biggest missing piece I believe to be changing column types.  For instance, say you currently have:
@@ -383,8 +466,11 @@ Which you want to change into:
 
 Schema evolution should generate SQL to add the new column, push the data from the old to the new column, then delete the old column.  Warnings should be provided for completely incompatible types or other loss-of-information scenarios.
 
+The second biggest missing piece is foreign/m2m key support.
+
+Lastly, for the migration scripts, sometimes it's easier to write python than it is to write sql.  I intend for you to be able to interleave function calls in with the sql statements and have the schema evolution code just Do The Right Thing(tm).  But this isn't coded yet.
+
 == Conclusion ==
 
-That's pretty much it. If you can suggest additional examples or test cases you
-think would be of value, please email me at public@kered.org.
+That's pretty much it. If you can suggest additional examples or test cases you think would be of value, please email me at public@kered.org.
 

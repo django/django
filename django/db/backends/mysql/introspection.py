@@ -109,6 +109,36 @@ def get_known_column_flags( cursor, table_name, column_name ):
             
     # print table_name, column_name, dict
     return dict
+
+def get_schema_fingerprint(cursor, app):
+    """it's important that the output of these methods don't change, otherwise the hashes they
+    produce will be inconsistent (and detection of existing schemas will fail.  unless you are 
+    absolutely sure the outout for ALL valid inputs will remain the same, you should bump the version by creating a new method"""
+    return get_schema_fingerprint_fv1(cursor, app)
+
+def get_schema_fingerprint_fv1(cursor, app):
+    from django.db import models
+    app_name = app.__name__.split('.')[-2]
+
+    schema = ['app_name := '+ app_name]
+
+    cursor.execute('SHOW TABLES;')
+    for table_name in [row[0] for row in cursor.fetchall()]:
+        if not table_name.startswith(app_name):
+            continue    # skip tables not in this app
+        schema.append('table_name := '+ table_name)
+        cursor.execute("describe %s" % quote_name(table_name))
+        for row in cursor.fetchall():
+            tmp = []
+            for x in row:
+                tmp.append(str(x))
+            schema.append( '\t'.join(tmp) )
+        cursor.execute("SHOW INDEX FROM %s" % quote_name(table_name))
+        for row in cursor.fetchall():
+            schema.append( '\t'.join([ str(row[0]), str(row[1]), str(row[2]), str(row[3]), str(row[4]), str(row[5]), str(row[9]), ]) )
+        
+    return 'fv1:'+ str('\n'.join(schema).__hash__())
+
     
 DATA_TYPES_REVERSE = {
     FIELD_TYPE.BLOB: 'TextField',

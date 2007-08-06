@@ -482,7 +482,36 @@ def get_sql_indexes_for_model(model):
             )
     return output
     
+def get_sql_fingerprint(app):
+    "Returns the fingerprint of the current schema, used in schema evolution."
+    from django.db import get_creation_module, models, backend, get_introspection_module, connection
+    # This should work even if a connecton isn't available
+    try:
+        cursor = connection.cursor()
+    except:
+        cursor = None
+    introspection = get_introspection_module()
+    app_name = app.__name__.split('.')[-2]
+    schema_fingerprint = introspection.get_schema_fingerprint(cursor, app)
+    try:
+        # is this a schema we recognize?
+        app_se = __import__(app_name +'.schema_evolution').schema_evolution
+        schema_recognized = schema_fingerprint in app_se.fingerprints
+        if schema_recognized:
+            sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (recognized)\n" % (app_name, schema_fingerprint)))
+        else:
+            sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (unrecognized)\n" % (app_name, schema_fingerprint)))
+    except:
+        sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (no schema_evolution module found)\n" % (app_name, schema_fingerprint)))
+    return
+get_sql_fingerprint.help_doc = "Returns the fingerprint of the current schema, used in schema evolution."
+get_sql_fingerprint.args = APP_ARGS
+
 def get_sql_evolution(app):
+    "Returns SQL to update an existing schema to match the existing models."
+    return get_sql_evolution_detailed(app)[2]
+
+def get_sql_evolution_detailed(app):
     "Returns SQL to update an existing schema to match the existing models."
     import schema_evolution
     from django.db import get_creation_module, models, backend, get_introspection_module, connection
@@ -507,7 +536,46 @@ def get_sql_evolution(app):
     # First, try validating the models.
     _check_for_validation_errors()
 
+    # This should work even if a connecton isn't available
+    try:
+        cursor = connection.cursor()
+    except:
+        cursor = None
+
+    introspection = get_introspection_module()
+    app_name = app.__name__.split('.')[-2]
+
     final_output = []
+
+    schema_fingerprint = introspection.get_schema_fingerprint(cursor, app)
+    try:
+        # is this a schema we recognize?
+        app_se = __import__(app_name +'.schema_evolution').schema_evolution
+        schema_recognized = schema_fingerprint in app_se.fingerprints
+        if schema_recognized:
+            sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (recognized)\n" % (app_name, schema_fingerprint)))
+            available_upgrades = []
+            for (vfrom, vto), upgrade in app_se.evolutions.iteritems():
+                if vfrom == schema_fingerprint:
+                    try:
+                        distance = app_se.fingerprints.index(vto)-app_se.fingerprints.index(vfrom)
+                        available_upgrades.append( ( vfrom, vto, upgrade, distance ) )
+                        sys.stderr.write(style.NOTICE("\tan upgrade from %s to %s is available (distance: %i)\n" % ( vfrom, vto, distance )))
+                    except:
+                        available_upgrades.append( ( vfrom, vto, upgrade, -1 ) )
+                        sys.stderr.write(style.NOTICE("\tan upgrade from %s to %s is available, but %s is not in schema_evolution.fingerprints\n" % ( vfrom, vto, vto )))
+            if len(available_upgrades):
+                best_upgrade = available_upgrades[0]
+                for an_upgrade in available_upgrades:
+                    if an_upgrade[3] > best_upgrade[3]:
+                        best_upgrade = an_upgrade
+                final_output.extend( best_upgrade[2] )
+                return schema_fingerprint, False, final_output
+        else:
+            sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (unrecognized)\n" % (app_name, schema_fingerprint)))
+    except:
+        # sys.stderr.write(style.NOTICE("Notice: Current schema fingerprint for '%s' is '%s' (no schema_evolution module found)\n" % (app_name, schema_fingerprint)))
+        pass # ^^^ lets not be chatty
 
     # stolen and trimmed from syncdb so that we know which models are about 
     # to be created (so we don't check them for updates)
@@ -525,13 +593,6 @@ def get_sql_evolution(app):
         seen_models.add(model)
         created_models.add(model)
         table_list.append(model._meta.db_table)
-
-    introspection = get_introspection_module()
-    # This should work even if a connecton isn't available
-    try:
-        cursor = connection.cursor()
-    except:
-        cursor = None
 
     # get the existing models, minus the models we've just created
     app_models = models.get_models(app)
@@ -556,7 +617,7 @@ def get_sql_evolution(app):
         output = schema_evolution.get_sql_evolution_check_for_dead_fields(klass, new_table_name)
         final_output.extend(output)
         
-    return final_output
+    return schema_fingerprint, True, final_output
     
 get_sql_evolution.help_doc = "Returns SQL to update an existing schema to match the existing models."
 get_sql_evolution.args = APP_ARGS
@@ -648,9 +709,18 @@ def syncdb(verbosity=1, interactive=True):
                     for statement in sql:
                         cursor.execute(statement)
 
-        for sql in get_sql_evolution(app):
-            print sql
-#            cursor.execute(sql)
+        # keep evolving until there is nothing left to do
+        schema_fingerprint, introspected_upgrade, evolution = get_sql_evolution_detailed(app)
+        last_schema_fingerprint = None
+        while evolution and schema_fingerprint!=last_schema_fingerprint:
+            for sql in evolution:
+                if introspected_upgrade:
+                    print sql
+                else: 
+                    cursor.execute(sql)
+            last_schema_fingerprint = schema_fingerprint
+            if not introspected_upgrade: # only do one round of introspection generated upgrades
+                schema_fingerprint, introspected_upgrade, evolution = get_sql_evolution_detailed(app)
 
     transaction.commit_unless_managed()
 
@@ -1602,6 +1672,7 @@ DEFAULT_ACTION_MAPPING = {
     'sqlreset': get_sql_reset,
     'sqlsequencereset': get_sql_sequence_reset,
     'sqlevolve': get_sql_evolution,
+    'sqlfingerprint': get_sql_fingerprint,
     'startapp': startapp,
     'startproject': startproject,
     'syncdb': syncdb,
