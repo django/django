@@ -1511,26 +1511,34 @@ exists in the database.
 
 To work around this problem, every time you save a form using ``commit=False``,
 Django adds a ``save_m2m()`` method to the form created by ``form_for_model``.
-After you have manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data::
+After you've manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data. For example::
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
 
-    # Create, but don't save the new author instance
+    # Create, but don't save the new author instance.
     >>> new_author = f.save(commit=False)
 
-    # Modify the author in some way
-    ...
-    # Save the new instance
+    # Modify the author in some way.
+    >>> new_author.some_field = 'some_value'
+
+    # Save the new instance.
     >>> new_author.save()
 
-    # Now save the many-to-many data for the form
+    # Now, save the many-to-many data for the form.
     >>> f.save_m2m()
 
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
-When you use a simple ``save()`` on a form, all data - include
-many-to-many data - is saved without the need for any additional method calls.
+When you use a simple ``save()`` on a form, all data -- including
+many-to-many data -- is saved without the need for any additional method calls.
+For example::
+
+	# Create a form instance with POST data.
+	>>> f = AuthorForm(request.POST)
+
+    # Create and save the new author instance. There's no need to do anything else.
+    >>> new_author = f.save()
 
 Using an alternate base class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
