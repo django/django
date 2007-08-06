@@ -10,10 +10,10 @@ class UserCreationForm(oldforms.Manipulator):
     "A form that creates a user, with no privileges, from the given username and password."
     def __init__(self):
         self.fields = (
-            oldforms.TextField(field_name='username', length=30, maxlength=30, is_required=True,
+            oldforms.TextField(field_name='username', length=30, max_length=30, is_required=True,
                 validator_list=[validators.isAlphaNumeric, self.isValidUsername]),
-            oldforms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
-            oldforms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
+            oldforms.PasswordField(field_name='password1', length=30, max_length=60, is_required=True),
+            oldforms.PasswordField(field_name='password2', length=30, max_length=60, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 
@@ -42,9 +42,9 @@ class AuthenticationForm(oldforms.Manipulator):
         """
         self.request = request
         self.fields = [
-            oldforms.TextField(field_name="username", length=15, maxlength=30, is_required=True,
+            oldforms.TextField(field_name="username", length=15, max_length=30, is_required=True,
                 validator_list=[self.isValidUser, self.hasCookiesEnabled]),
-            oldforms.PasswordField(field_name="password", length=15, maxlength=30, is_required=True),
+            oldforms.PasswordField(field_name="password", length=15, max_length=30, is_required=True),
         ]
         self.user_cache = None
 
@@ -111,11 +111,11 @@ class PasswordChangeForm(oldforms.Manipulator):
     def __init__(self, user):
         self.user = user
         self.fields = (
-            oldforms.PasswordField(field_name="old_password", length=30, maxlength=30, is_required=True,
+            oldforms.PasswordField(field_name="old_password", length=30, max_length=30, is_required=True,
                 validator_list=[self.isValidOldPassword]),
-            oldforms.PasswordField(field_name="new_password1", length=30, maxlength=30, is_required=True,
+            oldforms.PasswordField(field_name="new_password1", length=30, max_length=30, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('new_password2', _("The two 'new password' fields didn't match."))]),
-            oldforms.PasswordField(field_name="new_password2", length=30, maxlength=30, is_required=True),
+            oldforms.PasswordField(field_name="new_password2", length=30, max_length=30, is_required=True),
         )
 
     def isValidOldPassword(self, new_data, all_data):
@@ -133,8 +133,8 @@ class AdminPasswordChangeForm(oldforms.Manipulator):
     def __init__(self, user):
         self.user = user
         self.fields = (
-            oldforms.PasswordField(field_name='password1', length=30, maxlength=60, is_required=True),
-            oldforms.PasswordField(field_name='password2', length=30, maxlength=60, is_required=True,
+            oldforms.PasswordField(field_name='password1', length=30, max_length=60, is_required=True),
+            oldforms.PasswordField(field_name='password2', length=30, max_length=60, is_required=True,
                 validator_list=[validators.AlwaysMatchesOtherField('password1', _("The two password fields didn't match."))]),
         )
 

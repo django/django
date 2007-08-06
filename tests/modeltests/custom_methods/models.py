@@ -8,7 +8,7 @@ from django.db import models
 import datetime
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateField()
 
     def __unicode__(self):

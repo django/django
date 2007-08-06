@@ -28,8 +28,8 @@ class TaggedItem(models.Model):
         return self.tag
 
 class Animal(models.Model):
-    common_name = models.CharField(maxlength=150)
-    latin_name = models.CharField(maxlength=150)
+    common_name = models.CharField(max_length=150)
+    latin_name = models.CharField(max_length=150)
     
     tags = generic.GenericRelation(TaggedItem)
 
@@ -37,7 +37,7 @@ class Animal(models.Model):
         return self.common_name
         
 class Vegetable(models.Model):
-    name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
     is_yucky = models.BooleanField(default=True)
     
     tags = generic.GenericRelation(TaggedItem)
@@ -46,7 +46,7 @@ class Vegetable(models.Model):
         return self.name
     
 class Mineral(models.Model):
-    name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
     hardness = models.PositiveSmallIntegerField()
     
     # note the lack of an explicit GenericRelation here...

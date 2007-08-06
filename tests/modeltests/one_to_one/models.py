@@ -9,8 +9,8 @@ In this example, a ``Place`` optionally can be a ``Restaurant``.
 from django.db import models
 
 class Place(models.Model):
-    name = models.CharField(maxlength=50)
-    address = models.CharField(maxlength=80)
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=80)
 
     def __unicode__(self):
         return u"%s the place" % self.name
@@ -25,18 +25,18 @@ class Restaurant(models.Model):
 
 class Waiter(models.Model):
     restaurant = models.ForeignKey(Restaurant)
-    name = models.CharField(maxlength=50)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return u"%s the waiter at %s" % (self.name, self.restaurant)
 
 class ManualPrimaryKey(models.Model):
-    primary_key = models.CharField(maxlength=10, primary_key=True)
-    name = models.CharField(maxlength = 50)
+    primary_key = models.CharField(max_length=10, primary_key=True)
+    name = models.CharField(max_length = 50)
 
 class RelatedModel(models.Model):
     link = models.OneToOneField(ManualPrimaryKey)
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length = 50)
 
 __test__ = {'API_TESTS':"""
 # Create a couple of Places.

@@ -10,7 +10,7 @@ Set ``related_name`` to designate what the reverse relationship is called.
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
     class Meta:
        ordering = ('name',)
 
@@ -18,7 +18,7 @@ class Category(models.Model):
         return self.name
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=50)
+    headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
     primary_categories = models.ManyToManyField(Category, related_name='primary_article_set')
     secondary_categories = models.ManyToManyField(Category, related_name='secondary_article_set')

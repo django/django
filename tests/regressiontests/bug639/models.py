@@ -2,7 +2,7 @@ import tempfile
 from django.db import models
 
 class Photo(models.Model):
-    title = models.CharField(maxlength=30)
+    title = models.CharField(max_length=30)
     image = models.FileField(upload_to=tempfile.gettempdir())
     
     # Support code for the tests; this keeps track of how many times save() gets

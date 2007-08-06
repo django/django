@@ -124,7 +124,7 @@ Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``use_unicode``, ``init_command``, and ``sql_mode``. Consult the
 `MySQLdb documentation`_ for more details.
 
-.. _settings documentation: http://www.djangoproject.com/documentation/settings/#database-engine
+.. _settings documentation: ../settings/#database-engine
 .. _MySQL option file: http://dev.mysql.com/doc/refman/5.0/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 

@@ -340,14 +340,14 @@ Model style
       Do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
       Don't do this::
 
           class Person(models.Model):
-              FirstName = models.CharField(maxlength=20)
-              Last_Name = models.CharField(maxlength=40)
+              FirstName = models.CharField(max_length=20)
+              Last_Name = models.CharField(max_length=40)
 
     * The ``class Meta`` should appear *after* the fields are defined, with
       a single blank line separating the fields and the class definition.
@@ -355,8 +355,8 @@ Model style
       Do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
               class Meta:
                   verbose_name_plural = 'people'
@@ -364,8 +364,8 @@ Model style
       Don't do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
               class Meta:
                   verbose_name_plural = 'people'
 
@@ -375,8 +375,8 @@ Model style
               class Meta:
                   verbose_name_plural = 'people'
 
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
     * The order of model inner classes and standard methods should be as
       follows (noting that these are not all required):

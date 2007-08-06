@@ -57,9 +57,10 @@ class BaseForm(StrAndUnicode):
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
-    def __init__(self, data=None, auto_id='id_%s', prefix=None, initial=None):
-        self.is_bound = data is not None
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None):
+        self.is_bound = data is not None or files is not None
         self.data = data or {}
+        self.files = files or {}
         self.auto_id = auto_id
         self.prefix = prefix
         self.initial = initial or {}
@@ -88,7 +89,7 @@ class BaseForm(StrAndUnicode):
         return BoundField(self, field, name)
 
     def _get_errors(self):
-        "Returns an ErrorDict for self.data"
+        "Returns an ErrorDict for the data provided for the form"
         if self._errors is None:
             self.full_clean()
         return self._errors
@@ -179,10 +180,10 @@ class BaseForm(StrAndUnicode):
             return
         self.cleaned_data = {}
         for name, field in self.fields.items():
-            # value_from_datadict() gets the data from the dictionary.
+            # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, self.add_prefix(name))
+            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
                 value = field.clean(value)
                 self.cleaned_data[name] = value
@@ -283,7 +284,7 @@ class BoundField(StrAndUnicode):
         """
         Returns the data for this BoundField, or None if it wasn't given.
         """
-        return self.field.widget.value_from_datadict(self.form.data, self.html_name)
+        return self.field.widget.value_from_datadict(self.form.data, self.form.files, self.html_name)
     data = property(_data)
 
     def label_tag(self, contents=None, attrs=None):

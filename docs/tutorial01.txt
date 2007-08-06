@@ -251,12 +251,12 @@ These concepts are represented by simple Python classes. Edit the
     from django.db import models
 
     class Poll(models.Model):
-        question = models.CharField(maxlength=200)
+        question = models.CharField(max_length=200)
         pub_date = models.DateTimeField('date published')
 
     class Choice(models.Model):
         poll = models.ForeignKey(Poll)
-        choice = models.CharField(maxlength=200)
+        choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
 The code is straightforward. Each model is represented by a class that
@@ -279,7 +279,7 @@ name for ``Poll.pub_date``. For all other fields in this model, the field's
 machine-readable name will suffice as its human-readable name.
 
 Some ``Field`` classes have required elements. ``CharField``, for example,
-requires that you give it a ``maxlength``. That's used not only in the database
+requires that you give it a ``max_length``. That's used not only in the database
 schema, but in validation, as we'll soon see.
 
 Finally, note a relationship is defined, using ``models.ForeignKey``. That tells

@@ -673,7 +673,7 @@ class ChangeList(object):
                     try:
                         attr = getattr(lookup_opts.admin.manager.model, field_name)
                         order_field = attr.admin_order_field
-                    except IndexError:
+                    except AttributeError:
                         pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:

@@ -65,7 +65,7 @@ class Session(models.Model):
     the sessions documentation that is shipped with Django (also available
     on the Django website).
     """
-    session_key = models.CharField(_('session key'), maxlength=40, primary_key=True)
+    session_key = models.CharField(_('session key'), max_length=40, primary_key=True)
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'))
     objects = SessionManager()

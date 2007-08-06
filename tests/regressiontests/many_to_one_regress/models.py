@@ -12,15 +12,15 @@ class Second(models.Model):
 
 # Protect against repetition of #1839, #2415 and #2536.
 class Third(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
     third = models.ForeignKey('self', null=True, related_name='child_set')
 
 class Parent(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
     bestchild = models.ForeignKey('Child', null=True, related_name='favored_by')
 
 class Child(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
     parent = models.ForeignKey(Parent)
 
 

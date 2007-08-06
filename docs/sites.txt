@@ -46,7 +46,7 @@ that's represented by a ``ManyToManyField`` in the ``Article`` model::
     from django.contrib.sites.models import Site
 
     class Article(models.Model):
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         # ...
         sites = models.ManyToManyField(Site)
 
@@ -87,7 +87,7 @@ like this::
     from django.contrib.sites.models import Site
 
     class Article(models.Model):
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         # ...
         site = models.ForeignKey(Site)
 
@@ -229,7 +229,7 @@ Use ``CurrentSiteManager`` by adding it to your model explicitly. For example::
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
-        photographer_name = models.CharField(maxlength=100)
+        photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         site = models.ForeignKey(Site)
         objects = models.Manager()
@@ -257,7 +257,7 @@ this::
 
     class Photo(models.Model):
         photo = models.FileField(upload_to='/home/photos')
-        photographer_name = models.CharField(maxlength=100)
+        photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         publish_on = models.ForeignKey(Site)
         objects = models.Manager()
@@ -318,7 +318,7 @@ Here's how Django uses the sites framework:
 
 .. _redirects framework: ../redirects/
 .. _flatpages framework: ../flatpages/
-.. _syndication framework: ../syndication/
+.. _syndication framework: ../syndication_feeds/
 .. _authentication framework: ../authentication/
 
 ``RequestSite`` objects

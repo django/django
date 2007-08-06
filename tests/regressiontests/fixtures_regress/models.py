@@ -2,21 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Animal(models.Model):
-    name = models.CharField(maxlength=150)
-    latin_name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
+    latin_name = models.CharField(max_length=150)
 
     def __unicode__(self):
         return self.common_name
 
 class Plant(models.Model):
-    name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
 
     class Meta:
         # For testing when upper case letter in app name; regression for #4057
         db_table = "Fixtures_regress_plant"
 
 class Stuff(models.Model):
-    name = models.CharField(maxlength=20, null=True)
+    name = models.CharField(max_length=20, null=True)
     owner = models.ForeignKey(User, null=True)
     
     def __unicode__(self):

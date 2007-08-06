@@ -47,7 +47,7 @@ class Widget(object):
             attrs.update(extra_attrs)
         return attrs
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         """
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns None if it's not provided.
@@ -113,13 +113,20 @@ class MultipleHiddenInput(HiddenInput):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         return u'\n'.join([(u'<input%s />' % flatatt(dict(value=force_unicode(v), **final_attrs))) for v in value])
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
 
 class FileInput(Input):
     input_type = 'file'
+
+    def render(self, name, value, attrs=None):
+        return super(FileInput, self).render(name, None, attrs=attrs)
+        
+    def value_from_datadict(self, data, files, name):
+        "File widgets take data from FILES, not POST"
+        return files.get(name, None)
 
 class Textarea(Widget):
     def __init__(self, attrs=None):
@@ -188,7 +195,7 @@ class NullBooleanSelect(Select):
             value = u'1'
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
         return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
 
@@ -210,7 +217,7 @@ class SelectMultiple(Widget):
         output.append(u'</select>')
         return u'\n'.join(output)
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
@@ -377,8 +384,8 @@ class MultiWidget(Widget):
         return id_
     id_for_label = classmethod(id_for_label)
 
-    def value_from_datadict(self, data, name):
-        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+    def value_from_datadict(self, data, files, name):
+        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets):
         """

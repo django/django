@@ -7,7 +7,7 @@ from django.db import models
 from django.conf import settings
 
 class Donut(models.Model):
-    name = models.CharField(maxlength=100)
+    name = models.CharField(max_length=100)
     is_frosted = models.BooleanField(default=False)
     has_sprinkles = models.NullBooleanField()
     baked_date = models.DateField(null=True)

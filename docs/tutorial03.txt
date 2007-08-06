@@ -356,7 +356,8 @@ Use the template system
 =======================
 
 Back to the ``detail()`` view for our poll application. Given the context 
-variable ``poll``, here's what the template might look like::
+variable ``poll``, here's what the "polls/detail.html" template might look
+like::
 
     <h1>{{ poll.question }}</h1>
     <ul>

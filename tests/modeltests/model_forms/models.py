@@ -31,20 +31,20 @@ ARTICLE_STATUS = (
 )
 
 class Category(models.Model):
-    name = models.CharField(maxlength=20)
-    url = models.CharField('The URL', maxlength=40)
+    name = models.CharField(max_length=20)
+    url = models.CharField('The URL', max_length=40)
 
     def __unicode__(self):
         return self.name
 
 class Writer(models.Model):
-    name = models.CharField(maxlength=50, help_text='Use both first and last names.')
+    name = models.CharField(max_length=50, help_text='Use both first and last names.')
 
     def __unicode__(self):
         return self.name
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=50)
+    headline = models.CharField(max_length=50)
     pub_date = models.DateField()
     created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer)
@@ -63,7 +63,7 @@ class Article(models.Model):
 
 class PhoneNumber(models.Model):
     phone = models.PhoneNumberField()
-    description = models.CharField(maxlength=20)
+    description = models.CharField(max_length=20)
 
     def __unicode__(self):
         return self.phone
@@ -331,6 +331,28 @@ Create a new article, with no categories, via the form.
 >>> new_art = Article.objects.get(id=3)
 >>> new_art.categories.all()
 []
+
+Create a new article, with categories, via the form, but use commit=False.
+The m2m data won't be saved until save_m2m() is invoked on the form.
+>>> ArticleForm = form_for_model(Article)
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
+>>> new_art = f.save(commit=False)
+
+# Manually save the instance 
+>>> new_art.save()
+>>> new_art.id
+4
+
+# The instance doesn't have m2m data yet
+>>> new_art = Article.objects.get(id=4)
+>>> new_art.categories.all()
+[]
+
+# Save the m2m data on the form
+>>> f.save_m2m()
+>>> new_art.categories.all()
+[<Category: Entertainment>, <Category: It's a test>]
 
 Here, we define a custom Form. Because it happens to have the same fields as
 the Category model, we can use save_instance() to apply its changes to an

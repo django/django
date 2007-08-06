@@ -404,7 +404,7 @@ This technique is used in `generic views`_ and in the `syndication framework`_
 to pass metadata and options to views.
 
 .. _generic views: ../generic_views/
-.. _syndication framework: ../syndication/
+.. _syndication framework: ../syndication_feeds/
 
 .. admonition:: Dealing with conflicts
 

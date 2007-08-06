@@ -10,14 +10,14 @@ reserved-name usage.
 from django.db import models
 
 class Thing(models.Model):
-    when = models.CharField(maxlength=1, primary_key=True)
-    join = models.CharField(maxlength=1)
-    like = models.CharField(maxlength=1)
-    drop = models.CharField(maxlength=1)
-    alter = models.CharField(maxlength=1)
-    having = models.CharField(maxlength=1)
-    where = models.DateField(maxlength=1)
-    has_hyphen = models.CharField(maxlength=1, db_column='has-hyphen')
+    when = models.CharField(max_length=1, primary_key=True)
+    join = models.CharField(max_length=1)
+    like = models.CharField(max_length=1)
+    drop = models.CharField(max_length=1)
+    alter = models.CharField(max_length=1)
+    having = models.CharField(max_length=1)
+    where = models.DateField(max_length=1)
+    has_hyphen = models.CharField(max_length=1, db_column='has-hyphen')
     class Meta:
        db_table = 'select'
 

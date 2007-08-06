@@ -79,8 +79,8 @@ For example::
         'The cat says "meow"'
         """
 
-        name = models.CharField(maxlength=20)
-        sound = models.CharField(maxlength=20)
+        name = models.CharField(max_length=20)
+        sound = models.CharField(max_length=20)
 
         def speak(self):
             return 'The %s says "%s"' % (self.name, self.sound)

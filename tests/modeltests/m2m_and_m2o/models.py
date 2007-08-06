@@ -7,7 +7,7 @@ Make sure to set ``related_name`` if you use relationships to the same table.
 from django.db import models
 
 class User(models.Model):
-    username = models.CharField(maxlength=20)
+    username = models.CharField(max_length=20)
 
 class Issue(models.Model):
     num = models.IntegerField()

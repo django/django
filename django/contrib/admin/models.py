@@ -18,7 +18,7 @@ class LogEntry(models.Model):
     user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.TextField(_('object id'), blank=True, null=True)
-    object_repr = models.CharField(_('object repr'), maxlength=200)
+    object_repr = models.CharField(_('object repr'), max_length=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))
     change_message = models.TextField(_('change message'), blank=True)
     objects = LogEntryManager()

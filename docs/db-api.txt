@@ -12,14 +12,14 @@ Throughout this reference, we'll refer to the following models, which comprise
 a weblog application::
 
     class Blog(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         tagline = models.TextField()
 
         def __unicode__(self):
             return self.name
 
     class Author(models.Model):
-        name = models.CharField(maxlength=50)
+        name = models.CharField(max_length=50)
         email = models.EmailField()
 
         def __unicode__(self):
@@ -27,7 +27,7 @@ a weblog application::
 
     class Entry(models.Model):
         blog = models.ForeignKey(Blog)
-        headline = models.CharField(maxlength=255)
+        headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateTimeField()
         authors = models.ManyToManyField(Author)
@@ -1503,7 +1503,7 @@ precede the definition of any keyword arguments. For example::
 
 See the `OR lookups examples page`_ for more examples.
 
-.. _OR lookups examples page: http://www.djangoproject.com/documentation/models/or_lookups/
+.. _OR lookups examples page: ../models/or_lookups/
 
 Related objects
 ===============
@@ -1806,8 +1806,8 @@ following model::
         ('F', 'Female'),
     )
     class Person(models.Model):
-        name = models.CharField(maxlength=20)
-        gender = models.CharField(maxlength=1, choices=GENDER_CHOICES)
+        name = models.CharField(max_length=20)
+        gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
 ...each ``Person`` instance will have a ``get_gender_display()`` method. Example::
 
@@ -1834,7 +1834,7 @@ Note that in the case of identical date values, these methods will use the ID
 as a fallback check. This guarantees that no records are skipped or duplicated.
 For a full example, see the `lookup API sample model`_.
 
-.. _lookup API sample model: http://www.djangoproject.com/documentation/models/lookup/
+.. _lookup API sample model: ../models/lookup/
 
 get_FOO_filename()
 ------------------
