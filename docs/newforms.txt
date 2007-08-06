@@ -713,6 +713,8 @@ For example::
 Binding uploaded files to a form
 --------------------------------
 
+**New in Django development version**
+
 Dealing with forms that have ``FileField`` and ``ImageField`` fields
 is a little more complicated than a normal form.
 
@@ -1143,6 +1145,8 @@ given length.
 ``FileField``
 ~~~~~~~~~~~~~
 
+**New in Django development version**
+
     * Default widget: ``FileInput``
     * Empty value: ``None``
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
@@ -1169,6 +1173,8 @@ When you use a ``FileField`` on a form, you must also remember to
 
 ``ImageField``
 ~~~~~~~~~~~~~~
+
+**New in Django development version**
 
     * Default widget: ``FileInput``
     * Empty value: ``None``
