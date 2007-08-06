@@ -204,8 +204,9 @@ class GEOSGeometry(object):
 
     def getquoted(self):
         "Returns a properly quoted string for use in PostgresSQL/PostGIS."
-        # GeometryFromText() is ST_GeometryFromText() in PostGIS >= 1.2.2
-        return "%sGeometryFromText('%s', %s)" % (GEOM_FUNC_PREFIX, self.wkt, self.srid or -1)
+        # GeomFromText() is ST_GeomFromText() in PostGIS >= 1.2.2 to correspond
+        #  to SQL/MM ISO standard.
+        return "%sGeomFromText('%s', %s)" % (GEOM_FUNC_PREFIX, self.wkt, self.srid or -1)
     
     #### Coordinate Sequence Routines ####
     @property
@@ -384,6 +385,12 @@ class GEOSGeometry(object):
         sz = c_size_t()
         h = lgeos.GEOSGeomToHEX_buf(self._ptr(), byref(sz))
         return string_at(h, sz.value)
+
+    @property
+    def kml(self):
+        "Returns the KML representation of this Geometry."
+        gtype = self.geom_type
+        return '<%s>%s</%s>' % (gtype, self.coord_seq.kml, gtype)
 
     #### Topology Routines ####
     def _unary_topology(self, func, *args):

@@ -85,7 +85,7 @@ class GeometryCollection(GEOSGeometry):
 
         # Creating a new geometry collection from the list, and
         #  re-assigning the pointers.
-        new_collection = self.__class__(*new_geoms)
+        new_collection = self.__class__(*new_geoms, **{'srid':self.srid})
         self._reassign(new_collection)
         
     def __iter__(self):
@@ -113,6 +113,13 @@ class GeometryCollection(GEOSGeometry):
         self._geoms = {}
         for i in xrange(self.num_geom):
             self._geoms[i] = GEOSPointer(lgeos.GEOSGetGeometryN(self._ptr(), c_int(i)))
+
+    @property
+    def kml(self):
+        "Returns the KML for this Geometry Collection."
+        kml = '<MultiGeometry>'
+        for g in self: kml += g.kml
+        return kml + '</MultiGeometry>'
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
 class MultiPoint(GeometryCollection): 

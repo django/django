@@ -22,7 +22,14 @@ class GEOSTest(unittest.TestCase):
             geom = GEOSGeometry(g.wkt)
             self.assertEqual(g.hex, geom.hex)
 
-    def test01c_errors(self):
+    def test01c_kml(self):
+        "Testing KML output."
+        for tg in wkt_out:
+            geom = fromstr(tg.wkt)
+            kml = getattr(tg, 'kml', False)
+            if kml: self.assertEqual(kml, geom.kml)
+
+    def test01d_errors(self):
         "Testing the Error handlers."
         print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
         for err in errors:
@@ -55,12 +62,14 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(p.z, pnt.z)
                 self.assertEqual(p.z, pnt.tuple[2], 9)
                 tup_args = (p.x, p.y, p.z)
-                set_tup = (2.71, 3.14, 5.23)
+                set_tup1 = (2.71, 3.14, 5.23)
+                set_tup2 = (5.23, 2.71, 3.14)
             else:
                 self.assertEqual(False, pnt.hasz)
                 self.assertEqual(None, pnt.z)
                 tup_args = (p.x, p.y)
-                set_tup = (2.71, 3.14)
+                set_tup1 = (2.71, 3.14)
+                set_tup2 = (3.14, 2.71)
 
             # Centroid operation on point should be point itself
             self.assertEqual(p.centroid, pnt.centroid.tuple)
@@ -77,10 +86,12 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(3.14, pnt.y)
             self.assertEqual(2.71, pnt.x)
 
-            # Setting via the tuple property
-            pnt.tuple = set_tup
-            self.assertEqual(set_tup, pnt.tuple)
-
+            # Setting via the tuple/coords property
+            pnt.tuple = set_tup1
+            self.assertEqual(set_tup1, pnt.tuple)
+            pnt.coords = set_tup2
+            self.assertEqual(set_tup2, pnt.coords)
+            
             prev = pnt # setting the previous geometry
 
     def test02b_multipoints(self):
@@ -307,7 +318,7 @@ class GEOSTest(unittest.TestCase):
         del mp
         for p in pts:
             self.assertRaises(GEOSException, str, p) # tests p's geometry pointer
-            self.assertRaises(GEOSException, p.get_tuple) # tests p's coordseq pointer
+            self.assertRaises(GEOSException, p.get_coords) # tests p's coordseq pointer
 
         # Now doing this with a GeometryCollection
         polywkt = polygons[3].wkt # a 'real life' polygon.

@@ -109,16 +109,17 @@ class Point(GEOSGeometry):
     z = property(get_z, set_z)
 
     ### Tuple setting and retrieval routines. ###
-    def get_tuple(self):
+    def get_coords(self):
         "Returns a tuple of the point."
         return self._cs.tuple
 
-    def set_tuple(self, tup):
+    def set_coords(self, tup):
         "Sets the coordinates of the point with the given tuple."
         self._cs[0] = tup
     
-    # The tuple property
-    tuple = property(get_tuple, set_tuple)
+    # The tuple and coords properties
+    tuple = property(get_coords, set_coords)
+    coords = property(get_coords, set_coords)
 
 class LineString(GEOSGeometry):
 
@@ -332,7 +333,7 @@ class Polygon(GEOSGeometry):
             else: new_rings.append(self[i])
 
         # Constructing the new Polygon with the ring parameters, and reassigning the internals.
-        new_poly = Polygon(*new_rings)
+        new_poly = Polygon(*new_rings, **{'srid':self.srid})
         self._reassign(new_poly)
 
     def __iter__(self):
@@ -401,3 +402,11 @@ class Polygon(GEOSGeometry):
         "Gets the tuple for each ring in this Polygon."
         return tuple(self.__getitem__(i).tuple for i in xrange(self.__len__()))
 
+    @property
+    def kml(self):
+        "Returns the KML representation of this Polygon."
+        inner_kml = ''
+        if self.num_interior_rings > 0: 
+            for i in xrange(self.num_interior_rings):
+                inner_kml += "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
+        return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

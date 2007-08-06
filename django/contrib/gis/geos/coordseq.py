@@ -162,6 +162,18 @@ class GEOSCoordSeq(object):
         return GEOSCoordSeq(GEOSPointer(0, lgeos.GEOSCoordSeq_clone(self._ptr.coordseq())), self.hasz)
 
     @property
+    def kml(self):
+        "Returns the KML representation for the coordinates."
+        # Getting the substitution string depending on whether the coordinates have
+        #  a Z dimension.
+        if self.hasz: substr = '%s,%s,%s '
+        else: substr = '%s,%s,0 '
+        kml = '<coordinates>'
+        for i in xrange(len(self)):
+            kml += substr % self[i]
+        return kml.strip() + '</coordinates>'
+
+    @property
     def tuple(self):
         "Returns a tuple version of this coordinate sequence."
         n = self.size
