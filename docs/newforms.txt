@@ -641,7 +641,7 @@ the "Outputting forms as HTML" section above.
 The simplest way to display a form's HTML is to use the variable on its own,
 like this::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form }}</table>
     <input type="submit" />
     </form>
@@ -653,7 +653,7 @@ class' ``__str__()`` method calls its ``as_table()`` method.
 
 The following is equivalent but a bit more explicit::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form.as_table }}</table>
     <input type="submit" />
     </form>
@@ -675,7 +675,7 @@ individual fields for complete template control over the form's design.
 The easiest way is to iterate over the form's fields, with
 ``{% for field in form %}``. For example::
 
-    <form method="post">
+    <form method="post" action="">
     <dl>
     {% for field in form %}
         <dt>{{ field.label }}</dt>
@@ -696,7 +696,7 @@ Alternatively, you can arrange the form's fields explicitly, by name. Do that
 by accessing ``{{ form.fieldname }}``, where ``fieldname`` is the field's name.
 For example::
 
-    <form method="post">
+    <form method="post" action="">
     <ul class="myformclass">
         <li>{{ form.sender.label }} {{ form.sender }}</li>
         <li class="helptext">{{ form.sender.help_text }}</li>
