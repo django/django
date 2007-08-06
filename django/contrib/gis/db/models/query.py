@@ -1,9 +1,10 @@
-from django.db.models.query import Q, QuerySet
+import operator
+from django.core.exceptions import ImproperlyConfigured
 from django.db import backend
+from django.db.models.query import Q, QuerySet
+from django.db.models.fields import FieldDoesNotExist
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.backend import parse_lookup # parse_lookup depends on the spatial database backend.
-from django.db.models.fields import FieldDoesNotExist
-import operator
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
@@ -37,10 +38,21 @@ class GeoQuerySet(QuerySet):
             clone._filters = clone._filters & reduce(operator.and_, map(mapper, args))
         return clone
 
-    def kml(self, field_name):
-        field = self.model._meta.get_field(field_name)
+    def kml(self, field_name, precision=8):
+        """Returns KML representation of the given field name in a `kml` 
+        attribute on each element of the QuerySet."""
+        # Is KML output supported?
+        try:
+            from django.contrib.gis.db.backend.postgis import ASKML
+        except ImportError:
+            raise ImproperlyConfigured, 'AsKML() only available in PostGIS versions 1.2.1 and greater.'
 
+        # Is the given field name a geographic field?
+        field = self.model._meta.get_field(field_name)
+        if not isinstance(field, GeometryField):
+            raise TypeError, 'KML output only available on GeometryField fields.'
         field_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
-                            backend.quote_name(field.column))
+                               backend.quote_name(field.column))
         
-        return self.extra(select={'kml':'AsKML(%s,6)' % field_col})
+        # Adding the AsKML function call to the SELECT part of the SQL.
+        return self.extra(select={'kml':'%s(%s,%s)' % (ASKML, field_col, precision)})

@@ -268,7 +268,7 @@ class LayerMapping:
             # Creating the CoordTransform object
             ct = CoordTransform(self.source_srs, target_srs)
         except Exception, msg:
-            raise Exception, 'Could not translate between the data source and model geometry.'
+            raise Exception, 'Could not translate between the data source and model geometry: %s' % msg
 
         for feat in self.layer:
             # The keyword arguments for model construction
