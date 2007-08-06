@@ -442,7 +442,7 @@ def isValidFloat(field_data, all_data):
     try:
         float(data)
     except ValueError:
-        raise ValidationError, ugettext("Please enter a valid floating point number.")
+        raise ValidationError, _("Please enter a valid floating point number.")
 
 class HasAllowableSize(object):
     """
