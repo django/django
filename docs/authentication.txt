@@ -234,7 +234,7 @@ the setting and checking of these values behind the scenes.
 
 Previous Django versions, such as 0.90, used simple MD5 hashes without password
 salts. For backwards compatibility, those are still supported; they'll be
-converted automatically to the new style the first time ``check_password()``
+converted automatically to the new style the first time ``User.check_password()``
 works correctly for a given user.
 
 Anonymous users
