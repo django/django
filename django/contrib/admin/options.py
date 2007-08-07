@@ -417,13 +417,10 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = forms.form_for_model(model, formfield_callback=self.formfield_for_dbfield)
 
         inline_formsets = []
-        if request.POST:
-            new_data = request.POST.copy()
-            if opts.has_field_type(models.FileField):
-                new_data.update(request.FILES)
-            form = ModelForm(new_data)
+        if request.method == 'POST':
+            form = ModelForm(request.POST, request.FILES)
             for FormSet in self.get_inline_formsets():
-                inline_formset = FormSet(data=new_data)
+                inline_formset = FormSet(data=request.POST)
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
@@ -470,13 +467,10 @@ class ModelAdmin(BaseModelAdmin):
         ModelForm = forms.form_for_instance(obj, formfield_callback=self.formfield_for_dbfield)
 
         inline_formsets = []
-        if request.POST:
-            new_data = request.POST.copy()
-            if opts.has_field_type(models.FileField):
-                new_data.update(request.FILES)
-            form = ModelForm(new_data)
+        if request.method == 'POST':
+            form = ModelForm(request.POST, request.FILES)
             for FormSet in self.get_inline_formsets():
-                inline_formset = FormSet(obj, new_data)
+                inline_formset = FormSet(obj, request.POST)
                 inline_formsets.append(inline_formset)
 
             if all_valid(inline_formsets) and form.is_valid():
