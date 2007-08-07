@@ -150,7 +150,7 @@ Django veterans: Note that the argument is now called ``max_length`` to
 provide consistency throughout Django. There is full legacy support for
 the old ``maxlength`` argument, but ``max_length`` is prefered.
 	
- ``CommaSeparatedIntegerField``
+``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A field of integers separated by commas. As in ``CharField``, the ``max_length``
@@ -737,7 +737,7 @@ Many-to-one relationships
 To define a many-to-one relationship, use ``ForeignKey``. You use it just like
 any other ``Field`` type: by including it as a class attribute of your model.
 
-``ForeignKey`` requires a positional argument: The class to which the model is
+``ForeignKey`` requires a positional argument: the class to which the model is
 related.
 
 For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
@@ -872,7 +872,7 @@ To define a many-to-many relationship, use ``ManyToManyField``. You use it just
 like any other ``Field`` type: by including it as a class attribute of your
 model.
 
-``ManyToManyField`` requires a positional argument: The class to which the
+``ManyToManyField`` requires a positional argument: the class to which the
 model is related.
 
 For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
@@ -969,7 +969,7 @@ model.
 This is most useful on the primary key of an object when that object "extends"
 another object in some way.
 
-``OneToOneField`` requires a positional argument: The class to which the
+``OneToOneField`` requires a positional argument: the class to which the
 model is related.
 
 For example, if you're building a database of "places", you would build pretty
@@ -1421,8 +1421,8 @@ that displays the ``__str__()`` representation of each object.
 
 A few special cases to note about ``list_display``:
 
-    * If the field is a ``ForeignKey``, Django will display the ``__str__()``
-      of the related object.
+    * If the field is a ``ForeignKey``, Django will display the
+      ``__unicode__()`` of the related object.
 
     * ``ManyToManyField`` fields aren't supported, because that would entail
       executing a separate SQL statement for each row in the table. If you
@@ -1672,7 +1672,7 @@ with an operator:
         AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
 
     Note that the query input is split by spaces, so, following this example,
-    it's not currently not possible to search for all records in which
+    it's currently not possible to search for all records in which
     ``first_name`` is exactly ``'john winston'`` (containing a space).
 
 ``@``
@@ -1956,7 +1956,7 @@ Also, a couple of other bits of Django, such as the `syndication feed framework`
 use ``get_absolute_url()`` as a convenience to reward people who've defined the
 method.
 
-.. syndication feed framework: ../syndication_feeds/
+.. _syndication feed framework: ../syndication_feeds/
 
 It's good practice to use ``get_absolute_url()`` in templates, instead of
 hard-coding your objects' URLs. For example, this template code is bad::
@@ -2015,8 +2015,8 @@ Similarly, if you had a URLconf entry that looked like::
             'day': self.created.day})
     get_absolute_url = permalink(get_absolute_url)
 
-Notice that we specify an empty sequence for the second argument in this case,
-because we only want to pass keyword arguments, not named arguments.
+Notice that we specify an empty sequence for the second parameter in this case,
+because we only want to pass keyword parameters, not positional ones.
 
 In this way, you're tying the model's absolute URL to the view that is used
 to display it, without repeating the URL information anywhere. You can still

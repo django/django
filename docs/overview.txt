@@ -54,7 +54,7 @@ Enjoy the free API
 ==================
 
 With that, you've got a free, and rich, Python API to access your data. The API
-is created on the fly: No code generation necessary::
+is created on the fly, no code generation necessary::
 
     >>> from mysite.models import Reporter, Article
 
@@ -124,7 +124,7 @@ is created on the fly: No code generation necessary::
     # Delete an object with delete().
     >>> r.delete()
 
-A dynamic admin interface: It's not just scaffolding -- it's the whole house
+A dynamic admin interface: it's not just scaffolding -- it's the whole house
 ============================================================================
 
 Once your models are defined, Django can automatically create a professional,
@@ -250,7 +250,7 @@ Finally, Django uses the concept of "template inheritance": That's what the
 ``{% extends "base.html" %}`` does. It means "First load the template called
 'base', which has defined a bunch of blocks, and fill the blocks with the
 following blocks." In short, that lets you dramatically cut down on redundancy
-in templates: Each template has to define only what's unique to that template.
+in templates: each template has to define only what's unique to that template.
 
 Here's what the "base.html" template might look like::
 
