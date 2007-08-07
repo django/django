@@ -16,7 +16,7 @@ class BooleanData(models.Model):
     data = models.BooleanField(null=True)
 
 class CharData(models.Model):
-    data = models.CharField(maxlength=30, null=True)
+    data = models.CharField(max_length=30, null=True)
 
 class DateData(models.Model):
     data = models.DateField(null=True)
@@ -90,7 +90,7 @@ class Tag(models.Model):
         ordering = ["data"]
 
 class GenericData(models.Model):
-    data = models.CharField(maxlength=30)
+    data = models.CharField(max_length=30)
 
     tags = generic.GenericRelation(Tag)
     
@@ -102,13 +102,13 @@ class Anchor(models.Model):
     """This is a model that can be used as 
     something for other models to point at"""
     
-    data = models.CharField(maxlength=30)
+    data = models.CharField(max_length=30)
 
 class UniqueAnchor(models.Model):
     """This is a model that can be used as 
     something for other models to point at"""
 
-    data = models.CharField(unique=True, maxlength=30)
+    data = models.CharField(unique=True, max_length=30)
     
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, null=True)
@@ -117,7 +117,8 @@ class M2MData(models.Model):
     data = models.ManyToManyField(Anchor, null=True)
     
 class O2OData(models.Model):
-    data = models.OneToOneField(Anchor, null=True)
+    # One to one field can't be null, since it is a PK.
+    data = models.OneToOneField(Anchor)
 
 class FKSelfData(models.Model):
     data = models.ForeignKey('self', null=True)
@@ -143,7 +144,7 @@ class BooleanPKData(models.Model):
     data = models.BooleanField(primary_key=True)
     
 class CharPKData(models.Model):
-    data = models.CharField(maxlength=30, primary_key=True)
+    data = models.CharField(max_length=30, primary_key=True)
 
 # class DatePKData(models.Model):
 #    data = models.DateField(primary_key=True)
@@ -175,8 +176,9 @@ class IntegerPKData(models.Model):
 class IPAddressPKData(models.Model):
     data = models.IPAddressField(primary_key=True)
 
-class NullBooleanPKData(models.Model):
-    data = models.NullBooleanField(primary_key=True)
+# This is just a Boolean field with null=True, and we can't test a PK value of NULL.
+# class NullBooleanPKData(models.Model):
+#     data = models.NullBooleanField(primary_key=True)
 
 class PhonePKData(models.Model):
     data = models.PhoneNumberField(primary_key=True)
@@ -206,6 +208,19 @@ class USStatePKData(models.Model):
 #     data = models.XMLField(primary_key=True)
 
 class ComplexModel(models.Model):
-    field1 = models.CharField(maxlength=10)
-    field2 = models.CharField(maxlength=10)
-    field3 = models.CharField(maxlength=10)
+    field1 = models.CharField(max_length=10)
+    field2 = models.CharField(max_length=10)
+    field3 = models.CharField(max_length=10)
+
+# Tests for handling fields with pre_save functions, or
+# models with save functions that modify data
+class AutoNowDateTimeData(models.Model):
+    data = models.DateTimeField(null=True, auto_now=True)
+
+class ModifyingSaveData(models.Model):
+    data = models.IntegerField(null=True)
+
+    def save(self):
+        "A save method that modifies the data in the object"
+        self.data = 666
+        super(ModifyingSaveData, self).save(raw)

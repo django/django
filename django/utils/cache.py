@@ -17,7 +17,10 @@ A example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 
-import datetime, md5, re
+import md5
+import re
+import time
+from email.Utils import formatdate
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import smart_str
@@ -44,7 +47,7 @@ def patch_cache_control(response, **kwargs):
             return (t[0].lower().replace('-', '_'), True)
 
     def dictvalue(t):
-        if t[1] == True:
+        if t[1] is True:
             return t[0]
         else:
             return t[0] + '=' + smart_str(t[1])
@@ -73,16 +76,14 @@ def patch_response_headers(response, cache_timeout=None):
     """
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-    now = datetime.datetime.utcnow()
+    if cache_timeout < 0:
+        cache_timeout = 0 # Can't have max-age negative
     if not response.has_header('ETag'):
         response['ETag'] = md5.new(response.content).hexdigest()
     if not response.has_header('Last-Modified'):
-        response['Last-Modified'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response['Last-Modified'] = formatdate()[:26] + "GMT"
     if not response.has_header('Expires'):
-        expires = now + datetime.timedelta(0, cache_timeout)
-        response['Expires'] = expires.strftime('%a, %d %b %Y %H:%M:%S GMT')
-    if cache_timeout < 0:
-        cache_timeout = 0 # Can't have max-age negative
+        response['Expires'] = formatdate(time.time() + cache_timeout)[:26] + "GMT"
     patch_cache_control(response, max_age=cache_timeout)
 
 def add_never_cache_headers(response):

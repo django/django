@@ -2,6 +2,7 @@ from django.core.handlers.base import BaseHandler
 from django.core import signals
 from django.dispatch import dispatcher
 from django.utils import datastructures
+from django.utils.encoding import force_unicode
 from django import http
 from pprint import pformat
 import os
@@ -13,7 +14,7 @@ import os
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
-        self.path = req.uri
+        self.path = force_unicode(req.uri)
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very

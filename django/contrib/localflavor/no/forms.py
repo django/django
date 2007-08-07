@@ -1,4 +1,3 @@
-# -*- coding: iso-8859-1 -*-
 """
 Norwegian-specific Form helpers
 """
@@ -66,7 +65,7 @@ class NOSocialSecurityNumber(Field):
         weight_2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
 
         def multiply_reduce(aval, bval):
-            return sum((a * b) for (a, b) in zip(aval, bval))
+            return sum([(a * b) for (a, b) in zip(aval, bval)])
 
         if multiply_reduce(digits, weight_1) % 11 != 0:
             raise ValidationError(msg)

@@ -9,5 +9,7 @@ urlpatterns = patterns('',
     (r'^client/(\d+)/$', views.client),
     (r'^client/(\d+)/(?P<action>[^/]+)/$', views.client_action),
     url(r'^named-client/(\d+)/$', views.client, name="named.client"),
-    url(r'^unicode/(\d+)/$', views.client, name=u"метка_оператора"),
+
+    # Unicode strings are permitted everywhere.
+    url(ur'^Юникод/(\w+)/$', views.client, name=u"метка_оператора"),
 )

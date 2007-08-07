@@ -7,6 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 import datetime
 import urllib
 
+UNUSABLE_PASSWORD = '!' # This will never be a valid hash
+
 try:
     set
 except NameError:
@@ -48,9 +50,9 @@ class Permission(models.Model):
 
     Three basic permissions -- add, change and delete -- are automatically created for each Django model.
     """
-    name = models.CharField(_('name'), maxlength=50)
+    name = models.CharField(_('name'), max_length=50)
     content_type = models.ForeignKey(ContentType)
-    codename = models.CharField(_('codename'), maxlength=100)
+    codename = models.CharField(_('codename'), max_length=100)
 
     class Meta:
         verbose_name = _('permission')
@@ -68,7 +70,7 @@ class Group(models.Model):
 
     Beyond permissions, groups are a convenient way to categorize users to apply some label, or extended functionality, to them. For example, you could create a group 'Special users', and you could write code that would do special things to those users -- such as giving them access to a members-only portion of your site, or sending them members-only e-mail messages.
     """
-    name = models.CharField(_('name'), maxlength=80, unique=True)
+    name = models.CharField(_('name'), max_length=80, unique=True)
     permissions = models.ManyToManyField(Permission, verbose_name=_('permissions'), blank=True)
 
     class Meta:
@@ -80,11 +82,14 @@ class Group(models.Model):
         return self.name
 
 class UserManager(models.Manager):
-    def create_user(self, username, email, password):
+    def create_user(self, username, email, password=None):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
         user = self.model(None, username, '', '', email.strip().lower(), 'placeholder', False, True, False, now, now)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save()
         return user
 
@@ -100,11 +105,11 @@ class User(models.Model):
 
     Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), maxlength=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
-    first_name = models.CharField(_('first name'), maxlength=30, blank=True)
-    last_name = models.CharField(_('last name'), maxlength=30, blank=True)
+    username = models.CharField(_('username'), max_length=30, unique=True, validator_list=[validators.isAlphaNumeric], help_text=_("Required. 30 characters or fewer. Alphanumeric characters only (letters, digits and underscores)."))
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('e-mail address'), blank=True)
-    password = models.CharField(_('password'), maxlength=128, help_text=_("Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
+    password = models.CharField(_('password'), max_length=128, help_text=_("Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change password form</a>."))
     is_staff = models.BooleanField(_('staff status'), default=False, help_text=_("Designates whether the user can log into this admin site."))
     is_active = models.BooleanField(_('active'), default=True, help_text=_("Designates whether this user can log into the Django admin. Unselect this instead of deleting accounts."))
     is_superuser = models.BooleanField(_('superuser status'), default=False, help_text=_("Designates that this user has all permissions without explicitly assigning them."))
@@ -163,6 +168,13 @@ class User(models.Model):
                 self.save()
             return is_correct
         return check_password(raw_password, self.password)
+
+    def set_unusable_password(self):
+        # Sets a value that will never be a valid hash
+        self.password = UNUSABLE_PASSWORD
+
+    def has_usable_password(self):
+        return self.password != UNUSABLE_PASSWORD
 
     def get_group_permissions(self):
         "Returns a list of permission strings that this user has through his/her groups."
@@ -253,7 +265,8 @@ class User(models.Model):
         return self._profile_cache
 
 class Message(models.Model):
-    """The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
+    """
+    The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
     """
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))

@@ -5,7 +5,7 @@ Regression tests for initial SQL insertion.
 from django.db import models
 
 class Simple(models.Model):
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length = 50)
 
 __test__ = {'API_TESTS':""}
 

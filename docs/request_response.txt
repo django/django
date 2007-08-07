@@ -297,7 +297,7 @@ In contrast to ``HttpRequest`` objects, which are created automatically by
 Django, ``HttpResponse`` objects are your responsibility. Each view you write
 is responsible for instantiating, populating and returning an ``HttpResponse``.
 
-The ``HttpResponse`` class lives at ``django.http.HttpResponse``.
+The ``HttpResponse`` class lives in the ``django.http`` module.
 
 Usage
 -----

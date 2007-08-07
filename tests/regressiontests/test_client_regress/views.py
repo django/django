@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 
 def no_template_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
-    return HttpResponse("No template used")
+    return HttpResponse("No template used. Sample content: twice once twice. Content ends.")
 
 def file_upload_view(request):
     """

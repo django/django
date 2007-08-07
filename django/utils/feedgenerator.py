@@ -41,7 +41,7 @@ class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
-            feed_url=None, feed_copyright=None):
+            feed_url=None, feed_copyright=None, feed_guid=None):
         to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
             categories = [force_unicode(c) for c in categories]
@@ -57,6 +57,7 @@ class SyndicationFeed(object):
             'categories': categories or (),
             'feed_url': iri_to_uri(feed_url),
             'feed_copyright': to_unicode(feed_copyright),
+            'id': feed_guid or link,
         }
         self.items = []
 
@@ -213,7 +214,7 @@ class Atom1Feed(SyndicationFeed):
         handler.addQuickElement(u"link", "", {u"rel": u"alternate", u"href": self.feed['link']})
         if self.feed['feed_url'] is not None:
             handler.addQuickElement(u"link", "", {u"rel": u"self", u"href": self.feed['feed_url']})
-        handler.addQuickElement(u"id", self.feed['link'])
+        handler.addQuickElement(u"id", self.feed['id'])
         handler.addQuickElement(u"updated", rfc3339_date(self.latest_post_date()).decode('ascii'))
         if self.feed['author_name'] is not None:
             handler.startElement(u"author", {})

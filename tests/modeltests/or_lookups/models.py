@@ -14,7 +14,7 @@ a get_sql method).
 from django.db import models
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=50)
+    headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
 
     class Meta:

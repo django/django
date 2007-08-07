@@ -8,6 +8,9 @@ def decorator_from_middleware(middleware_class):
     lets you use middleware functionality on a per-view basis.
     """
     def _decorator_from_middleware(*args, **kwargs):
+        # For historical reasons, these "decorators" are also called as
+        # dec(func, *args) instead of dec(*args)(func). We handle both forms
+        # for backwards compatibility.
         has_func = True
         try:
             view_func = kwargs.pop('view_func')
@@ -17,9 +20,7 @@ def decorator_from_middleware(middleware_class):
             else:
                 has_func = False
         if not (has_func and isinstance(view_func, types.FunctionType)):
-            # For historical reasons, these decorators are also called as
-            # dec(func, *args) instead of dec(*args)(func). This branch handles
-            # the backwards compatibility.
+            # We are being called as a decorator.
             if has_func:
                 args = (view_func,) + args
             middleware = middleware_class(*args, **kwargs)

@@ -13,7 +13,7 @@ Set ``related_name`` to designate what the reverse relationship is called.
 from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(maxlength=20)
+    name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', null=True, related_name='child_set')
 
     def __unicode__(self):

@@ -95,19 +95,12 @@ def _get_sequence_list():
 
     return sequence_list
 
-# If the foreign key points to an AutoField, a PositiveIntegerField or a
-# PositiveSmallIntegerField, the foreign key should be an IntegerField, not the
-# referred field type. Otherwise, the foreign key should be the same type of
-# field as the field to which it points.
-get_rel_data_type = lambda f: (f.get_internal_type() in ('AutoField', 'PositiveIntegerField', 'PositiveSmallIntegerField')) and 'IntegerField' or f.get_internal_type()
-
 def get_sql_create(app):
     "Returns a list of the CREATE TABLE SQL statements for the given app."
-    from django.db import get_creation_module, models
+    from django.db import models
+    from django.conf import settings
 
-    data_types = get_creation_module().DATA_TYPES
-
-    if not data_types:
+    if settings.DATABASE_ENGINE == 'dummy':
         # This must be the "dummy" database backend, which means the user
         # hasn't set DATABASE_ENGINE.
         sys.stderr.write(style.ERROR("Error: Django doesn't know which syntax to use for your SQL statements,\n" +
@@ -159,52 +152,46 @@ def _get_sql_model_create(model, known_models=set()):
 
     Returns list_of_sql, pending_references_dict
     """
-    from django.db import backend, get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
+    from django.db import backend, models
 
     opts = model._meta
     final_output = []
     table_output = []
     pending_references = {}
     for f in opts.fields:
-        if isinstance(f, (models.ForeignKey, models.OneToOneField)):
-            rel_field = f.rel.get_related_field()
-            while isinstance(rel_field, (models.ForeignKey, models.OneToOneField)):
-                rel_field = rel_field.rel.get_related_field()
-            data_type = get_rel_data_type(rel_field)
-        else:
-            rel_field = f
-            data_type = f.get_internal_type()
-        col_type = data_types[data_type]
+        col_type = f.db_type()
         tablespace = f.db_tablespace or opts.db_tablespace
-        if col_type is not None:
-            # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
-            field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
-                style.SQL_COLTYPE(col_type % rel_field.__dict__)]
-            field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-            if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
-                field_output.append(style.SQL_KEYWORD('UNIQUE'))
-            if f.primary_key:
-                field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-            if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
-                # We must specify the index tablespace inline, because we
-                # won't be generating a CREATE INDEX statement for this field.
-                field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
-            if f.rel:
-                if f.rel.to in known_models:
-                    field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
-                        style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
-                        style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
-                        backend.get_deferrable_sql()
-                    )
-                else:
-                    # We haven't yet created the table to which this field
-                    # is related, so save it for later.
-                    pr = pending_references.setdefault(f.rel.to, []).append((model, f))
-            table_output.append(' '.join(field_output))
+        if col_type is None:
+            # Skip ManyToManyFields, because they're not represented as
+            # database columns in this table.
+            continue
+        # Make the definition (e.g. 'foo VARCHAR(30)') for this field.
+        field_output = [style.SQL_FIELD(backend.quote_name(f.column)),
+            style.SQL_COLTYPE(col_type)]
+        field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
+        if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
+            field_output.append(style.SQL_KEYWORD('UNIQUE'))
+        if f.primary_key:
+            field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
+        if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
+            # We must specify the index tablespace inline, because we
+            # won't be generating a CREATE INDEX statement for this field.
+            field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
+        if f.rel:
+            if f.rel.to in known_models:
+                field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
+                    style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
+                    style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
+                    backend.get_deferrable_sql()
+                )
+            else:
+                # We haven't yet created the table to which this field
+                # is related, so save it for later.
+                pr = pending_references.setdefault(f.rel.to, []).append((model, f))
+        table_output.append(' '.join(field_output))
     if opts.order_with_respect_to:
         table_output.append(style.SQL_FIELD(backend.quote_name('_order')) + ' ' + \
-            style.SQL_COLTYPE(data_types['IntegerField']) + ' ' + \
+            style.SQL_COLTYPE(models.IntegerField().db_type()) + ' ' + \
             style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
         table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
@@ -232,9 +219,8 @@ def _get_sql_for_pending_references(model, pending_references):
     """
     Get any ALTER TABLE statements to add constraints after the fact.
     """
-    from django.db import backend, get_creation_module
+    from django.db import backend
     from django.db.backends.util import truncate_name
-    data_types = get_creation_module().DATA_TYPES
 
     final_output = []
     if backend.supports_constraints:
@@ -257,10 +243,8 @@ def _get_sql_for_pending_references(model, pending_references):
     return final_output
 
 def _get_many_to_many_sql_for_model(model):
-    from django.db import backend, get_creation_module
+    from django.db import backend, models
     from django.contrib.contenttypes import generic
-
-    data_types = get_creation_module().DATA_TYPES
 
     opts = model._meta
     final_output = []
@@ -275,19 +259,19 @@ def _get_many_to_many_sql_for_model(model):
                 style.SQL_TABLE(backend.quote_name(f.m2m_db_table())) + ' (']
             table_output.append('    %s %s %s%s,' % \
                 (style.SQL_FIELD(backend.quote_name('id')),
-                style.SQL_COLTYPE(data_types['AutoField']),
+                style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type()),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
                 tablespace_sql))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(opts.pk)] % opts.pk.__dict__),
+                style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(opts.db_table)),
                 style.SQL_FIELD(backend.quote_name(opts.pk.column)),
                 backend.get_deferrable_sql()))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
-                style.SQL_COLTYPE(data_types[get_rel_data_type(f.rel.to._meta.pk)] % f.rel.to._meta.pk.__dict__),
+                style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
                 style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column)),
@@ -517,7 +501,7 @@ def _emit_post_sync_signal(created_models, verbosity, interactive):
 
 def syncdb(verbosity=1, interactive=True):
     "Creates the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    from django.db import backend, connection, transaction, models, get_creation_module
+    from django.db import backend, connection, transaction, models
     from django.conf import settings
 
     disable_termcolors()
@@ -532,8 +516,6 @@ def syncdb(verbosity=1, interactive=True):
             __import__(app_name + '.management', {}, {}, [''])
         except ImportError:
             pass
-
-    data_types = get_creation_module().DATA_TYPES
 
     cursor = connection.cursor()
 
@@ -928,9 +910,9 @@ def inspectdb():
                     field_type, new_params = field_type
                     extra_params.update(new_params)
 
-                # Add maxlength for all CharFields.
+                # Add max_length for all CharFields.
                 if field_type == 'CharField' and row[3]:
-                    extra_params['maxlength'] = row[3]
+                    extra_params['max_length'] = row[3]
 
                 if field_type == 'DecimalField':
                     extra_params['max_digits'] = row[4]
@@ -1005,8 +987,8 @@ def get_validation_errors(outfile, app=None):
         for f in opts.fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
-            if isinstance(f, models.CharField) and f.maxlength in (None, 0):
-                e.add(opts, '"%s": CharFields require a "maxlength" attribute.' % f.name)
+            if isinstance(f, models.CharField) and f.max_length in (None, 0):
+                e.add(opts, '"%s": CharFields require a "max_length" attribute.' % f.name)
             if isinstance(f, models.DecimalField):
                 if f.decimal_places is None:
                     e.add(opts, '"%s": DecimalFields require a "decimal_places" attribute.' % f.name)
@@ -1029,11 +1011,11 @@ def get_validation_errors(outfile, app=None):
             if f.db_index not in (None, True, False):
                 e.add(opts, '"%s": "db_index" should be either None, True or False.' % f.name)
 
-            # Check that maxlength <= 255 if using older MySQL versions.
+            # Check that max_length <= 255 if using older MySQL versions.
             if settings.DATABASE_ENGINE == 'mysql':
                 db_version = connection.get_server_version()
-                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.maxlength > 255:
-                    e.add(opts, '"%s": %s cannot have a "maxlength" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
+                if db_version < (5, 0, 3) and isinstance(f, (models.CharField, models.CommaSeparatedIntegerField, models.SlugField)) and f.max_length > 255:
+                    e.add(opts, '"%s": %s cannot have a "max_length" greater than 255 when you are using a version of MySQL prior to 5.0.3 (you are using %s).' % (f.name, f.__class__.__name__, '.'.join([str(n) for n in db_version[:3]])))
 
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
@@ -1257,7 +1239,8 @@ def runserver(addr, port, use_reloader=True, admin_media_dir=''):
             except (AttributeError, KeyError):
                 error_text = str(e)
             sys.stderr.write(style.ERROR("Error: %s" % error_text) + '\n')
-            sys.exit(1)
+            # Need to use an OS exit because sys.exit doesn't work in a thread
+            os._exit(1)
         except KeyboardInterrupt:
             sys.exit(0)
     if use_reloader:
@@ -1269,18 +1252,17 @@ runserver.args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port nu
 
 def createcachetable(tablename):
     "Creates the table needed to use the SQL cache backend"
-    from django.db import backend, connection, transaction, get_creation_module, models
-    data_types = get_creation_module().DATA_TYPES
+    from django.db import backend, connection, transaction, models
     fields = (
         # "key" is a reserved word in MySQL, so use "cache_key" instead.
-        models.CharField(name='cache_key', maxlength=255, unique=True, primary_key=True),
+        models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
         models.TextField(name='value'),
         models.DateTimeField(name='expires', db_index=True),
     )
     table_output = []
     index_output = []
     for f in fields:
-        field_output = [backend.quote_name(f.name), data_types[f.get_internal_type()] % f.__dict__]
+        field_output = [backend.quote_name(f.name), f.db_type()]
         field_output.append("%sNULL" % (not f.null and "NOT " or ""))
         if f.unique:
             field_output.append("UNIQUE")
@@ -1321,6 +1303,10 @@ def run_shell(use_plain=False):
         shell.mainloop()
     except ImportError:
         import code
+        # Set up a dictionary to serve as the environment for the shell, so
+        # that tab completion works on objects that are imported at runtime.
+        # See ticket 5082.
+        imported_objects = {}
         try: # Try activating rlcompleter, because it's handy.
             import readline
         except ImportError:
@@ -1329,8 +1315,9 @@ def run_shell(use_plain=False):
             # We don't have to wrap the following import in a 'try', because
             # we already know 'readline' was imported successfully.
             import rlcompleter
+            readline.set_completer(rlcompleter.Completer(imported_objects).complete)
             readline.parse_and_bind("tab:complete")
-        code.interact()
+        code.interact(local=imported_objects)
 run_shell.args = '[--plain]'
 
 def dbshell():
@@ -1352,16 +1339,11 @@ def runfcgi(args):
     runfastcgi(args)
 runfcgi.args = '[various KEY=val options, use `runfcgi help` for help]'
 
-def test(app_labels, verbosity=1):
+def test(test_labels, verbosity=1, interactive=True):
     "Runs the test suite for the specified applications"
     from django.conf import settings
     from django.db.models import get_app, get_apps
-
-    if len(app_labels) == 0:
-        app_list = get_apps()
-    else:
-        app_list = [get_app(app_label) for app_label in app_labels]
-
+    
     test_path = settings.TEST_RUNNER.split('.')
     # Allow for Python 2.5 relative paths
     if len(test_path) > 1:
@@ -1371,12 +1353,12 @@ def test(app_labels, verbosity=1):
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
     test_runner = getattr(test_module, test_path[-1])
 
-    failures = test_runner(app_list, verbosity)
+    failures = test_runner(test_labels, verbosity=verbosity, interactive=interactive)
     if failures:
         sys.exit(failures)
 
 test.help_doc = 'Runs the test suite for the specified applications, or the entire site if no apps are specified'
-test.args = '[--verbosity] ' + APP_ARGS
+test.args = '[--verbosity] [--noinput]' + APP_ARGS
 
 def load_data(fixture_labels, verbosity=1):
     "Installs the provided fixture file(s) as data in the database."
@@ -1450,7 +1432,7 @@ def load_data(fixture_labels, verbosity=1):
                             print "Installing %s fixture '%s' from %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
                         try:
-                            objects =  serializers.deserialize(format, fixture)
+                            objects = serializers.deserialize(format, fixture)
                             for obj in objects:
                                 count[0] += 1
                                 models.add(obj.object.__class__)
@@ -1652,7 +1634,12 @@ def execute_from_command_line(action_mapping=DEFAULT_ACTION_MAPPING, argv=None):
             action_mapping[action](args[1])
         except IndexError:
             parser.print_usage_and_exit()
-    elif action in ('test', 'loaddata'):
+    elif action == 'test':
+        try:
+            action_mapping[action](args[1:], int(options.verbosity), options.interactive)
+        except IndexError:
+            parser.print_usage_and_exit()
+    elif action == 'loaddata':
         try:
             action_mapping[action](args[1:], int(options.verbosity))
         except IndexError:
@@ -1716,14 +1703,15 @@ def setup_environ(settings_mod):
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
-    project_directory = os.path.dirname(settings_mod.__file__)
+    project_directory, settings_filename = os.path.split(settings_mod.__file__)
     project_name = os.path.basename(project_directory)
+    settings_name = os.path.splitext(settings_filename)[0]
     sys.path.append(os.path.join(project_directory, '..'))
     project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
-    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.settings' % project_name
+    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
     return project_directory
 
 def execute_manager(settings_mod, argv=None):

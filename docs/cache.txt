@@ -543,7 +543,7 @@ Order of MIDDLEWARE_CLASSES
 If you use ``CacheMiddleware``, it's important to put it in the right place
 within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
 to know which headers by which to vary the cache storage. Middleware always
-adds something the ``Vary`` response header when it can.
+adds something to the ``Vary`` response header when it can.
 
 Put the ``CacheMiddleware`` after any middlewares that might add something to
 the ``Vary`` header. The following middlewares do so:

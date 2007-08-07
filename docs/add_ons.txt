@@ -214,7 +214,7 @@ A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the `syndication documentation`_.
 
-.. _syndication documentation: ../syndication/
+.. _syndication documentation: ../syndication_feeds/
 
 Other add-ons
 =============

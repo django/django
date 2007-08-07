@@ -21,7 +21,7 @@ you express this information in Python code.
 It works much like Django's `syndication framework`_. To create a sitemap, just
 write a ``Sitemap`` class and point to it in your URLconf_.
 
-.. _syndication framework: ../syndication/
+.. _syndication framework: ../syndication_feeds/
 .. _URLconf: ../url_dispatch/
 
 Installation

@@ -556,7 +556,7 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception, e:
-        return u"Error in formatting:%s" % force_unicode(e)
+        return u"Error in formatting: %s" % force_unicode(e, errors="replace")
 
 # Syntax: register.filter(name of filter, callback)
 register.filter(add)

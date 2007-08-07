@@ -109,12 +109,11 @@ class QueryDict(MultiValueDict):
             # *Important*: do not import settings any earlier because of note
             # in core.handlers.modpython.
             from django.conf import settings
-            self.encoding = settings.DEFAULT_CHARSET
-        else:
-            self.encoding = encoding
+            encoding = settings.DEFAULT_CHARSET
+        self.encoding = encoding
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(force_unicode(key, errors='replace'), force_unicode(value, errors='replace'))
+            self.appendlist(force_unicode(key, encoding, errors='replace'), force_unicode(value, encoding, errors='replace'))
         self._mutable = mutable
 
     def _assert_mutable(self):

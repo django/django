@@ -123,7 +123,7 @@ def create_test_db(verbosity=1, autoclobber=False):
         except Exception, e:            
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
-                confirm = raw_input("It appears the test database, %s, already exists. Type 'yes' to delete it, or 'no' to cancel: " % TEST_DATABASE_NAME)
+                confirm = raw_input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % TEST_DATABASE_NAME)
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
@@ -143,6 +143,10 @@ def create_test_db(verbosity=1, autoclobber=False):
     settings.DATABASE_NAME = TEST_DATABASE_NAME
 
     management.syncdb(verbosity, interactive=False)
+
+    if settings.CACHE_BACKEND.startswith('db://'):
+        cache_name = settings.CACHE_BACKEND[len('db://'):]
+        management.createcachetable(cache_name)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.

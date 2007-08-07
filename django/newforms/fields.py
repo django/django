@@ -7,17 +7,22 @@ import re
 import time
 
 from django.utils.translation import ugettext
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import StrAndUnicode, smart_unicode
 
 from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
+
+try:
+    from decimal import Decimal, DecimalException
+except ImportError:
+    from django.utils._decimal import Decimal, DecimalException
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
     'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
-    'RegexField', 'EmailField', 'URLField', 'BooleanField',
+    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField',
@@ -106,14 +111,16 @@ class CharField(Field):
         if value in EMPTY_VALUES:
             return u''
         value = smart_unicode(value)
-        if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
-        if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
+        value_length = len(value)
+        if self.max_length is not None and value_length > self.max_length:
+            raise ValidationError(ugettext(u'Ensure this value has at most %(max)d characters (it has %(length)d).') % {'max': self.max_length, 'length': value_length})
+        if self.min_length is not None and value_length < self.min_length:
+            raise ValidationError(ugettext(u'Ensure this value has at least %(min)d characters (it has %(length)d).') % {'min': self.min_length, 'length': value_length})
         return value
 
     def widget_attrs(self, widget):
         if self.max_length is not None and isinstance(widget, (TextInput, PasswordInput)):
+            # The HTML attribute is maxlength, not max_length.
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
@@ -162,8 +169,6 @@ class FloatField(Field):
             raise ValidationError(ugettext('Ensure this value is greater than or equal to %s.') % self.min_value)
         return value
 
-decimal_re = re.compile(r'^-?(?P<digits>\d+)(\.(?P<decimals>\d+))?$')
-
 class DecimalField(Field):
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -181,13 +186,13 @@ class DecimalField(Field):
         if not self.required and value in EMPTY_VALUES:
             return None
         value = value.strip()
-        match = decimal_re.search(value)
-        if not match:
-            raise ValidationError(ugettext('Enter a number.'))
-        else:
+        try:
             value = Decimal(value)
-        digits = len(match.group('digits') or '')
-        decimals = len(match.group('decimals') or '')
+        except DecimalException:
+            raise ValidationError(ugettext('Enter a number.'))
+        pieces = str(value).split('.')
+        decimals = (len(pieces) == 2) and len(pieces[1]) or 0
+        digits = len(pieces[0])
         if self.max_value is not None and value > self.max_value:
             raise ValidationError(ugettext('Ensure this value is less than or equal to %s.') % self.max_value)
         if self.min_value is not None and value < self.min_value:
@@ -295,18 +300,17 @@ class DateTimeField(Field):
                 continue
         raise ValidationError(ugettext(u'Enter a valid date/time.'))
 
-class RegexField(Field):
+class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
         """
         regex can be either a string or a compiled regular expression object.
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
-        super(RegexField, self).__init__(*args, **kwargs)
+        super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
-        self.max_length, self.min_length = max_length, min_length
         self.error_message = error_message or ugettext(u'Enter a valid value.')
 
     def clean(self, value):
@@ -314,16 +318,9 @@ class RegexField(Field):
         Validates that the input matches the regular expression. Returns a
         Unicode object.
         """
-        super(RegexField, self).clean(value)
-        if value in EMPTY_VALUES:
-            value = u''
-        value = smart_unicode(value)
+        value = super(RegexField, self).clean(value)
         if value == u'':
             return value
-        if self.max_length is not None and len(value) > self.max_length:
-            raise ValidationError(ugettext(u'Ensure this value has at most %d characters.') % self.max_length)
-        if self.min_length is not None and len(value) < self.min_length:
-            raise ValidationError(ugettext(u'Ensure this value has at least %d characters.') % self.min_length)
         if not self.regex.search(value):
             raise ValidationError(self.error_message)
         return value
@@ -351,6 +348,55 @@ except ImportError:
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
+class UploadedFile(StrAndUnicode):
+    "A wrapper for files uploaded in a FileField"
+    def __init__(self, filename, content):
+        self.filename = filename
+        self.content = content
+        
+    def __unicode__(self):
+        """
+        The unicode representation is the filename, so that the pre-database-insertion
+        logic can use UploadedFile objects
+        """
+        return self.filename
+
+class FileField(Field):
+    widget = FileInput
+    def __init__(self, *args, **kwargs):
+        super(FileField, self).__init__(*args, **kwargs)
+
+    def clean(self, data):
+        super(FileField, self).clean(data)
+        if not self.required and data in EMPTY_VALUES:
+            return None
+        try:
+            f = UploadedFile(data['filename'], data['content'])
+        except TypeError:
+            raise ValidationError(ugettext(u"No file was submitted. Check the encoding type on the form."))
+        except KeyError:
+            raise ValidationError(ugettext(u"No file was submitted."))
+        if not f.content:
+            raise ValidationError(ugettext(u"The submitted file is empty."))
+        return f
+
+class ImageField(FileField):
+    def clean(self, data):
+        """
+        Checks that the file-upload field data contains a valid image (GIF, JPG,
+        PNG, possibly others -- whatever the Python Imaging Library supports).
+        """
+        f = super(ImageField, self).clean(data)
+        if f is None:
+            return None
+        from PIL import Image
+        from cStringIO import StringIO
+        try:
+            Image.open(StringIO(f.content))
+        except IOError: # Python Imaging Library doesn't recognize it as an image
+            raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
+        return f
+        
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
@@ -446,10 +492,7 @@ class MultipleChoiceField(ChoiceField):
             return []
         if not isinstance(value, (list, tuple)):
             raise ValidationError(ugettext(u'Enter a list of values.'))
-        new_value = []
-        for val in value:
-            val = smart_unicode(val)
-            new_value.append(val)
+        new_value = [smart_unicode(val) for val in value]
         # Validate that each value in the value list is in self.choices.
         valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:

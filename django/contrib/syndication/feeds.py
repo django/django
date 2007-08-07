@@ -1,15 +1,15 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
-        url = u'http://%s%s' % (domain, url)
+        url = iri_to_uri(u'http://%s%s' % (domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
@@ -22,9 +22,10 @@ class Feed(object):
     title_template = None
     description_template = None
 
-    def __init__(self, slug, feed_url):
+    def __init__(self, slug, request):
         self.slug = slug
-        self.feed_url = feed_url
+        self.request = request
+        self.feed_url = request.path
         self.title_template_name = self.title_template or ('feeds/%s_title.html' % slug)
         self.description_template_name = self.description_template or ('feeds/%s_description.html' % slug)
 
@@ -67,7 +68,11 @@ class Feed(object):
         else:
             obj = None
 
-        current_site = Site.objects.get_current()
+        if Site._meta.installed:
+            current_site = Site.objects.get_current()
+        else:
+            current_site = RequestSite(self.request)
+
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
@@ -83,6 +88,7 @@ class Feed(object):
             author_email = self.__get_dynamic_attr('author_email', obj),
             categories = self.__get_dynamic_attr('categories', obj),
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
+            feed_guid = self.__get_dynamic_attr('feed_guid', obj),
         )
 
         try:
@@ -114,7 +120,7 @@ class Feed(object):
                 title = title_tmp.render(Context({'obj': item, 'site': current_site})),
                 link = link,
                 description = description_tmp.render(Context({'obj': item, 'site': current_site})),
-                unique_id = link,
+                unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),
                 author_name = author_name,

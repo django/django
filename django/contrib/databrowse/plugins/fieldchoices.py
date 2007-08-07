@@ -37,9 +37,10 @@ class FieldChoicePlugin(DatabrowsePlugin):
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():
+            field_value = smart_str(easy_instance_field.raw_value)
             return [u'%s%s/%s/%s/' % (easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                urllib.quote(smart_str(easy_instance_field.raw_value)))]
+                urllib.quote(field_value, safe=''))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

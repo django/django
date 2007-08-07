@@ -25,14 +25,14 @@ far, it's been solving two years' worth of database-schema problems. Here's a
 quick example::
 
     class Reporter(models.Model):
-        full_name = models.CharField(maxlength=70)
+        full_name = models.CharField(max_length=70)
 
         def __unicode__(self):
             return self.full_name
 
     class Article(models.Model):
         pub_date = models.DateTimeField()
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         article = models.TextField()
         reporter = models.ForeignKey(Reporter)
 
@@ -54,7 +54,7 @@ Enjoy the free API
 ==================
 
 With that, you've got a free, and rich, Python API to access your data. The API
-is created on the fly: No code generation necessary::
+is created on the fly, no code generation necessary::
 
     >>> from mysite.models import Reporter, Article
 
@@ -124,7 +124,7 @@ is created on the fly: No code generation necessary::
     # Delete an object with delete().
     >>> r.delete()
 
-A dynamic admin interface: It's not just scaffolding -- it's the whole house
+A dynamic admin interface: it's not just scaffolding -- it's the whole house
 ============================================================================
 
 Once your models are defined, Django can automatically create a professional,
@@ -134,7 +134,7 @@ your model classes::
 
     class Article(models.Model):
         pub_date = models.DateTimeField()
-        headline = models.CharField(maxlength=200)
+        headline = models.CharField(max_length=200)
         article = models.TextField()
         reporter = models.ForeignKey(Reporter)
         class Admin: pass
@@ -165,9 +165,9 @@ example above::
     from django.conf.urls.defaults import *
 
     urlpatterns = patterns('',
-        (r'^/articles/(\d{4})/$', 'mysite.views.year_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
-        (r'^/articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
+        (r'^articles/(\d{4})/$', 'mysite.views.year_archive'),
+        (r'^articles/(\d{4})/(\d{2})/$', 'mysite.views.month_archive'),
+        (r'^articles/(\d{4})/(\d{2})/(\d+)/$', 'mysite.views.article_detail'),
     )
 
 The code above maps URLs, as simple regular expressions, to the location of
@@ -250,7 +250,7 @@ Finally, Django uses the concept of "template inheritance": That's what the
 ``{% extends "base.html" %}`` does. It means "First load the template called
 'base', which has defined a bunch of blocks, and fill the blocks with the
 following blocks." In short, that lets you dramatically cut down on redundancy
-in templates: Each template has to define only what's unique to that template.
+in templates: each template has to define only what's unique to that template.
 
 Here's what the "base.html" template might look like::
 
@@ -288,14 +288,16 @@ This has been only a quick overview of Django's functionality. Some more useful
 features:
 
     * A caching framework that integrates with memcached or other backends.
-    * A syndication framework that makes creating RSS and Atom feeds as easy as
+    * A `syndication framework`_ that makes creating RSS and Atom feeds as easy as
       writing a small Python class.
     * More sexy automatically-generated admin features -- this overview barely
       scratched the surface.
+
+.. _syndication framework: ../syndication_feeds/
 
 The next obvious steps are for you to `download Django`_, read `the tutorial`_
 and join `the community`_. Thanks for your interest!
 
 .. _download Django: http://www.djangoproject.com/download/
-.. _the tutorial: http://www.djangoproject.com/documentation/tutorial01/
+.. _the tutorial: ../tutorial01/
 .. _the community: http://www.djangoproject.com/community/

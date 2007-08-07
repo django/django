@@ -263,7 +263,7 @@ To pluralize, specify both the singular and plural forms with the
 Internally, all block and inline translations use the appropriate
 ``ugettext`` / ``ungettext`` call.
 
-Each ``RequestContext`` has access to two translation-specific variables:
+Each ``RequestContext`` has access to three translation-specific variables:
 
     * ``LANGUAGES`` is a list of tuples in which the first element is the
       language code and the second is the language name (in that language).

@@ -122,6 +122,18 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Valid POST Template")
 
+    def test_valid_form_with_hints(self):
+        "GET a form, providing hints in the GET data"
+        hints = {
+            'text': 'Hello World',
+            'multi': ('b','c','e')
+        }
+        response = self.client.get('/test_client/form_view/', data=hints)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Form GET Template")
+        # Check that the multi-value data has been rolled out ok
+        self.assertContains(response, 'Select a valid choice.', 0)
+        
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
         post_data = {
@@ -226,6 +238,12 @@ class ClientTest(TestCase):
         "Request a page that is protected with @login, but use bad credentials"
 
         login = self.client.login(username='otheruser', password='nopassword')
+        self.failIf(login)
+
+    def test_view_with_inactive_login(self):
+        "Request a page that is protected with @login, but use an inactive login"
+
+        login = self.client.login(username='inactive', password='password')
         self.failIf(login)
 
     def test_session_modifying_view(self):

@@ -4,9 +4,9 @@ from django.utils.translation import ugettext_lazy as _
 
 class Redirect(models.Model):
     site = models.ForeignKey(Site, radio_admin=models.VERTICAL)
-    old_path = models.CharField(_('redirect from'), maxlength=200, db_index=True,
+    old_path = models.CharField(_('redirect from'), max_length=200, db_index=True,
         help_text=_("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
-    new_path = models.CharField(_('redirect to'), maxlength=200, blank=True,
+    new_path = models.CharField(_('redirect to'), max_length=200, blank=True,
         help_text=_("This can be either an absolute path (as above) or a full URL starting with 'http://'."))
 
     class Meta:

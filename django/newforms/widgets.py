@@ -47,7 +47,7 @@ class Widget(object):
             attrs.update(extra_attrs)
         return attrs
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         """
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns None if it's not provided.
@@ -113,13 +113,20 @@ class MultipleHiddenInput(HiddenInput):
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
         return u'\n'.join([(u'<input%s />' % flatatt(dict(value=force_unicode(v), **final_attrs))) for v in value])
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
 
 class FileInput(Input):
     input_type = 'file'
+
+    def render(self, name, value, attrs=None):
+        return super(FileInput, self).render(name, None, attrs=attrs)
+        
+    def value_from_datadict(self, data, files, name):
+        "File widgets take data from FILES, not POST"
+        return files.get(name, None)
 
 class Textarea(Widget):
     def __init__(self, attrs=None):
@@ -188,7 +195,7 @@ class NullBooleanSelect(Select):
             value = u'1'
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
         return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
 
@@ -210,13 +217,17 @@ class SelectMultiple(Widget):
         output.append(u'</select>')
         return u'\n'.join(output)
 
-    def value_from_datadict(self, data, name):
+    def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
         return data.get(name, None)
 
 class RadioInput(StrAndUnicode):
-    "An object used by RadioFieldRenderer that represents a single <input type='radio'>."
+    """
+    An object used by RadioFieldRenderer that represents a single
+    <input type='radio'>.
+    """
+
     def __init__(self, name, value, attrs, choice, index):
         self.name, self.value = name, value
         self.attrs = attrs
@@ -239,7 +250,10 @@ class RadioInput(StrAndUnicode):
         return u'<input%s />' % flatatt(final_attrs)
 
 class RadioFieldRenderer(StrAndUnicode):
-    "An object used by RadioSelect to enable customization of radio widgets."
+    """
+    An object used by RadioSelect to enable customization of radio widgets.
+    """
+
     def __init__(self, name, value, attrs, choices):
         self.name, self.value, self.attrs = name, value, attrs
         self.choices = choices
@@ -253,16 +267,30 @@ class RadioFieldRenderer(StrAndUnicode):
         return RadioInput(self.name, self.value, self.attrs.copy(), choice, idx)
 
     def __unicode__(self):
-        "Outputs a <ul> for this set of radio fields."
+        return self.render()
+
+    def render(self):
+        """Outputs a <ul> for this set of radio fields."""
         return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % force_unicode(w) for w in self])
 
 class RadioSelect(Select):
-    def render(self, name, value, attrs=None, choices=()):
-        "Returns a RadioFieldRenderer instance rather than a Unicode string."
+
+    def __init__(self, *args, **kwargs):
+        self.renderer = kwargs.pop('renderer', None)
+        if not self.renderer:
+            self.renderer = RadioFieldRenderer
+        super(RadioSelect, self).__init__(*args, **kwargs)
+
+    def get_renderer(self, name, value, attrs=None, choices=()):
+        """Returns an instance of the renderer."""
         if value is None: value = ''
         str_value = force_unicode(value) # Normalize to string.
         final_attrs = self.build_attrs(attrs)
-        return RadioFieldRenderer(name, str_value, final_attrs, list(chain(self.choices, choices)))
+        choices = list(chain(self.choices, choices))
+        return self.renderer(name, str_value, final_attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        return self.get_renderer(name, value, attrs, choices).render()
 
     def id_for_label(self, id_):
         # RadioSelect is represented by multiple <input type="radio"> fields,
@@ -356,8 +384,8 @@ class MultiWidget(Widget):
         return id_
     id_for_label = classmethod(id_for_label)
 
-    def value_from_datadict(self, data, name):
-        return [widget.value_from_datadict(data, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+    def value_from_datadict(self, data, files, name):
+        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
     def format_output(self, rendered_widgets):
         """

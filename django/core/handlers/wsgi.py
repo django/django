@@ -2,6 +2,7 @@ from django.core.handlers.base import BaseHandler
 from django.core import signals
 from django.dispatch import dispatcher
 from django.utils import datastructures
+from django.utils.encoding import force_unicode
 from django import http
 from pprint import pformat
 from shutil import copyfileobj
@@ -73,7 +74,7 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
-        self.path = environ['PATH_INFO']
+        self.path = force_unicode(environ['PATH_INFO'])
         self.META = environ
         self.method = environ['REQUEST_METHOD'].upper()
 

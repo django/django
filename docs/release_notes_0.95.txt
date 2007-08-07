@@ -114,7 +114,7 @@ there's a #django channel on irc.freenode.net that is regularly populated by
 Django users and developers from around the world. Friendly people are usually
 available at any hour of the day -- to help, or just to chat.
 
-.. _online: http://www.djangoproject.com/documentation/
+.. _online: http://www.djangoproject.com/documentation/0.95/
 .. _Django website: http://www.djangoproject.com/
 .. _FAQ: http://www.djangoproject.com/documentation/faq/
 .. _django-users: http://groups.google.com/group/django-users

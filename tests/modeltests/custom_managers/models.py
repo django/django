@@ -18,8 +18,8 @@ class PersonManager(models.Manager):
         return self.filter(fun=True)
 
 class Person(models.Model):
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     fun = models.BooleanField()
     objects = PersonManager()
 
@@ -33,8 +33,8 @@ class PublishedBookManager(models.Manager):
         return super(PublishedBookManager, self).get_query_set().filter(is_published=True)
 
 class Book(models.Model):
-    title = models.CharField(maxlength=50)
-    author = models.CharField(maxlength=30)
+    title = models.CharField(max_length=50)
+    author = models.CharField(max_length=30)
     is_published = models.BooleanField()
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
@@ -49,7 +49,7 @@ class FastCarManager(models.Manager):
         return super(FastCarManager, self).get_query_set().filter(top_speed__gt=150)
 
 class Car(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     mileage = models.IntegerField()
     top_speed = models.IntegerField(help_text="In miles per hour.")
     cars = models.Manager()

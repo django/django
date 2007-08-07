@@ -8,10 +8,10 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 from django.db import models
 
 class Employee(models.Model):
-    employee_code = models.CharField(maxlength=10, primary_key=True,
+    employee_code = models.CharField(max_length=10, primary_key=True,
             db_column = 'code')
-    first_name = models.CharField(maxlength=20)
-    last_name = models.CharField(maxlength=20)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
     class Meta:
         ordering = ('last_name', 'first_name')
 
@@ -19,7 +19,7 @@ class Employee(models.Model):
         return u"%s %s" % (self.first_name, self.last_name)
 
 class Business(models.Model):
-    name = models.CharField(maxlength=20, primary_key=True)
+    name = models.CharField(max_length=20, primary_key=True)
     employees = models.ManyToManyField(Employee)
     class Meta:
         verbose_name_plural = 'businesses'

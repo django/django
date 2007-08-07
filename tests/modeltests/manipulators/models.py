@@ -7,14 +7,14 @@ Each model gets an AddManipulator and ChangeManipulator by default.
 from django.db import models
 
 class Musician(models.Model):
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
 
     def __unicode__(self):
         return u"%s %s" % (self.first_name, self.last_name)
 
 class Album(models.Model):
-    name = models.CharField(maxlength=100)
+    name = models.CharField(max_length=100)
     musician = models.ForeignKey(Musician)
     release_date = models.DateField(blank=True, null=True)
 
@@ -54,7 +54,7 @@ True
 
 # Attempt to create an Album with an invalid musician.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['foo']}))
-{'musician': [u"Select a valid choice; 'foo' is not in ['', '1']."]}
+{'musician': [u"Select a valid choice; 'foo' is not in [u'', u'1']."]}
 
 # Attempt to create an Album with an invalid release_date.
 >>> man.get_validation_errors(MultiValueDict({'name': ['Sallies Fforth'], 'musician': ['1'], 'release_date': 'today'}))

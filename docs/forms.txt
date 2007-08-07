@@ -37,11 +37,11 @@ this document, we'll be working with the following model, a "place" object::
     )
 
     class Place(models.Model):
-        name = models.CharField(maxlength=100)
-        address = models.CharField(maxlength=100, blank=True)
-        city = models.CharField(maxlength=50, blank=True)
+        name = models.CharField(max_length=100)
+        address = models.CharField(max_length=100, blank=True)
+        city = models.CharField(max_length=50, blank=True)
         state = models.USStateField()
-        zip_code = models.CharField(maxlength=5, blank=True)
+        zip_code = models.CharField(max_length=5, blank=True)
         place_type = models.IntegerField(choices=PLACE_TYPES)
 
         class Admin:
@@ -388,7 +388,7 @@ for a "contact" form on a website::
         def __init__(self):
             self.fields = (
                 forms.EmailField(field_name="from", is_required=True),
-                forms.TextField(field_name="subject", length=30, maxlength=200, is_required=True),
+                forms.TextField(field_name="subject", length=30, max_length=200, is_required=True),
                 forms.SelectField(field_name="urgency", choices=urgency_choices),
                 forms.LargeTextField(field_name="contents", is_required=True),
             )

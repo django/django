@@ -2,7 +2,9 @@ from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
+from email.Utils import formatdate
 import datetime
+import time
 
 TEST_COOKIE_NAME = 'testcookie'
 TEST_COOKIE_VALUE = 'worked'
@@ -37,7 +39,7 @@ class SessionWrapper(object):
         return self._session.get(key, default)
 
     def pop(self, key, *args):
-        self.modified = self.modified or key in self._session 
+        self.modified = self.modified or key in self._session
         return self._session.pop(key, *args)
 
     def set_test_cookie(self):
@@ -98,7 +100,11 @@ class SessionMiddleware(object):
                     expires = None
                 else:
                     max_age = settings.SESSION_COOKIE_AGE
-                    expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
+                    rfcdate = formatdate(time.time() + settings.SESSION_COOKIE_AGE)
+                    # Fixed length date must have '-' separation in the format
+                    # DD-MMM-YYYY for compliance with Netscape cookie standard
+                    expires = (rfcdate[:7] + "-" + rfcdate[8:11]
+                               + "-" + rfcdate[12:26] + "GMT")
                 new_session = Session.objects.save(session_key, request.session._session,
                     datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
                 response.set_cookie(settings.SESSION_COOKIE_NAME, session_key,

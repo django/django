@@ -171,7 +171,7 @@ class Deserializer(base.Deserializer):
             elif field.rel and isinstance(field.rel, models.ManyToOneRel):
                 data[field.attname] = self._handle_fk_field_node(field_node, field)
             else:
-                if len(field_node.childNodes) == 1 and field_node.childNodes[0].nodeName == 'None':
+                if field_node.getElementsByTagName('None'):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
@@ -185,7 +185,7 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ForeignKey
         """
         # Check if there is a child node named 'None', returning None if so.
-        if len(node.childNodes) == 1 and node.childNodes[0].nodeName == 'None':
+        if node.getElementsByTagName('None'):
             return None
         else:
             return field.rel.to._meta.get_field(field.rel.field_name).to_python(

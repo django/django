@@ -362,7 +362,7 @@ class ChangeList(object):
                     try:
                         attr = getattr(self.model, field_name)
                         order_field = attr.admin_order_field
-                    except IndexError:
+                    except AttributeError:
                         pass
                 else:
                     if not isinstance(f.rel, models.ManyToOneRel) or not f.null:

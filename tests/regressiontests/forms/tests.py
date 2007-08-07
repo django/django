@@ -5,6 +5,7 @@ from formsets import formset_tests
 
 form_tests = r"""
 >>> from django.newforms import *
+>>> from django.newforms.widgets import RadioFieldRenderer
 >>> import datetime
 >>> import time
 >>> import re
@@ -173,27 +174,29 @@ u'<input type="hidden" class="special" value="foo@example.com" name="email" />'
 
 # FileInput Widget ############################################################
 
+FileInput widgets don't ever show the value, because the old value is of no use
+if you are updating the form or if the provided file generated an error.
 >>> w = FileInput()
 >>> w.render('email', '')
 u'<input type="file" name="email" />'
 >>> w.render('email', None)
 u'<input type="file" name="email" />'
 >>> w.render('email', 'test@example.com')
-u'<input type="file" name="email" value="test@example.com" />'
+u'<input type="file" name="email" />'
 >>> w.render('email', 'some "quoted" & ampersanded value')
-u'<input type="file" name="email" value="some &quot;quoted&quot; &amp; ampersanded value" />'
+u'<input type="file" name="email" />'
 >>> w.render('email', 'test@example.com', attrs={'class': 'fun'})
-u'<input type="file" name="email" value="test@example.com" class="fun" />'
+u'<input type="file" name="email" class="fun" />'
 
 You can also pass 'attrs' to the constructor:
 >>> w = FileInput(attrs={'class': 'fun'})
 >>> w.render('email', '')
 u'<input type="file" class="fun" name="email" />'
 >>> w.render('email', 'foo@example.com')
-u'<input type="file" class="fun" value="foo@example.com" name="email" />'
+u'<input type="file" class="fun" name="email" />'
 
 >>> w.render('email', 'ŠĐĆŽćžšđ', attrs={'class': 'fun'})
-u'<input type="file" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" name="email" />'
+u'<input type="file" class="fun" name="email" />'
 
 # Textarea Widget #############################################################
 
@@ -615,11 +618,11 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <li><label><input type="radio" name="num" value="5" /> 5</label></li>
 </ul>
 
-The render() method returns a RadioFieldRenderer object, whose str() is a <ul>.
+RadioSelect uses a RadioFieldRenderer to render the individual radio inputs.
 You can manipulate that object directly to customize the way the RadioSelect
 is rendered.
 >>> w = RadioSelect()
->>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 >>> for inp in r:
 ...     print inp
 <label><input checked="checked" type="radio" name="beatle" value="J" /> John</label>
@@ -645,10 +648,21 @@ beatle J P Paul False
 beatle J G George False
 beatle J R Ringo False
 
+You can create your own custom renderers for RadioSelect to use.
+>>> class MyRenderer(RadioFieldRenderer):
+...    def render(self):
+...        return u'<br />\n'.join([unicode(choice) for choice in self])
+>>> w = RadioSelect(renderer=MyRenderer)
+>>> print w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<label><input type="radio" name="beatle" value="J" /> John</label><br />
+<label><input type="radio" name="beatle" value="P" /> Paul</label><br />
+<label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>
+
 A RadioFieldRenderer object also allows index access to individual RadioInput
 objects.
 >>> w = RadioSelect()
->>> r = w.render('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+>>> r = w.get_renderer('beatle', 'J', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
 >>> print r[1]
 <label><input type="radio" name="beatle" value="P" /> Paul</label>
 >>> print r[0]
@@ -897,7 +911,7 @@ u'1234567890'
 >>> f.clean('1234567890a')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 10 characters.']
+ValidationError: [u'Ensure this value has at most 10 characters (it has 11).']
 
 CharField accepts an optional min_length parameter:
 >>> f = CharField(min_length=10, required=False)
@@ -906,7 +920,7 @@ u''
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 5).']
 >>> f.clean('1234567890')
 u'1234567890'
 >>> f.clean('1234567890a')
@@ -920,7 +934,7 @@ ValidationError: [u'This field is required.']
 >>> f.clean('12345')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 5).']
 >>> f.clean('1234567890')
 u'1234567890'
 >>> f.clean('1234567890a')
@@ -1177,6 +1191,10 @@ ValidationError: [u'Ensure this value is greater than or equal to 0.5.']
 Decimal("1.5")
 >>> f.clean('0.5')
 Decimal("0.5")
+>>> f.clean('.5')
+Decimal("0.5")
+>>> f.clean('00.50')
+Decimal("0.50")
 
 # DateField ###################################################################
 
@@ -1440,11 +1458,11 @@ RegexField also access min_length and max_length parameters, for convenience.
 >>> f.clean('123')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 5 characters.']
+ValidationError: [u'Ensure this value has at least 5 characters (it has 3).']
 >>> f.clean('abc')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 5 characters.']
+ValidationError: [u'Ensure this value has at least 5 characters (it has 3).']
 >>> f.clean('12345')
 u'12345'
 >>> f.clean('1234567890')
@@ -1452,7 +1470,7 @@ u'1234567890'
 >>> f.clean('12345678901')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 10 characters.']
+ValidationError: [u'Ensure this value has at most 10 characters (it has 11).']
 >>> f.clean('12345a')
 Traceback (most recent call last):
 ...
@@ -1509,13 +1527,49 @@ EmailField also access min_length and max_length parameters, for convenience.
 >>> f.clean('a@foo.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 10 characters.']
+ValidationError: [u'Ensure this value has at least 10 characters (it has 9).']
 >>> f.clean('alf@foo.com')
 u'alf@foo.com'
 >>> f.clean('alf123456788@foo.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 15 characters.']
+ValidationError: [u'Ensure this value has at most 15 characters (it has 20).']
+
+# FileField ##################################################################
+
+>>> f = FileField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean({})
+Traceback (most recent call last):
+...
+ValidationError: [u'No file was submitted.']
+
+>>> f.clean('some content that is not a file')
+Traceback (most recent call last):
+...
+ValidationError: [u'No file was submitted. Check the encoding type on the form.']
+
+>>> f.clean({'filename': 'name', 'content':None})
+Traceback (most recent call last):
+...
+ValidationError: [u'The submitted file is empty.']
+
+>>> f.clean({'filename': 'name', 'content':''})
+Traceback (most recent call last):
+...
+ValidationError: [u'The submitted file is empty.']
+
+>>> type(f.clean({'filename': 'name', 'content':'Some File Content'}))
+<class 'django.newforms.fields.UploadedFile'>
 
 # URLField ##################################################################
 
@@ -1619,13 +1673,13 @@ URLField also access min_length and max_length parameters, for convenience.
 >>> f.clean('http://f.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at least 15 characters.']
+ValidationError: [u'Ensure this value has at least 15 characters (it has 12).']
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://abcdefghijklmnopqrstuvwxyz.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 37).']
 
 # BooleanField ################################################################
 
@@ -1797,7 +1851,7 @@ u'test@example.com'
 >>> f.clean('longemailaddress@example.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
 >>> f.clean('not an e-mail')
 Traceback (most recent call last):
 ...
@@ -1817,7 +1871,7 @@ u'test@example.com'
 >>> f.clean('longemailaddress@example.com')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Ensure this value has at most 20 characters.']
+ValidationError: [u'Ensure this value has at most 20 characters (it has 28).']
 >>> f.clean('not an e-mail')
 Traceback (most recent call last):
 ...
@@ -2558,7 +2612,7 @@ Instances of a dynamic Form do not persist fields from one Form instance to
 the next.
 >>> class MyForm(Form):
 ...     def __init__(self, data=None, auto_id=False, field_list=[]):
-...         Form.__init__(self, data, auto_id)
+...         Form.__init__(self, data, auto_id=auto_id)
 ...         for field in field_list:
 ...             self.fields[field[0]] = field[1]
 >>> field_list = [('field1', CharField()), ('field2', CharField())]
@@ -2576,7 +2630,7 @@ the next.
 ...     default_field_1 = CharField()
 ...     default_field_2 = CharField()
 ...     def __init__(self, data=None, auto_id=False, field_list=[]):
-...         Form.__init__(self, data, auto_id)
+...         Form.__init__(self, data, auto_id=auto_id)
 ...         for field in field_list:
 ...             self.fields[field[0]] = field[1]
 >>> field_list = [('field1', CharField()), ('field2', CharField())]
@@ -3231,6 +3285,35 @@ is different than its data. This is handled transparently, though.
 <option value="3" selected="selected">No</option>
 </select>
 
+# Forms with FileFields ################################################
+
+FileFields are a special case because they take their data from the request.FILES,
+not request.POST. 
+
+>>> class FileForm(Form):
+...     file1 = FileField()
+>>> f = FileForm(auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':''}}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>The submitted file is empty.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': 'something that is not a file'}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><ul class="errorlist"><li>No file was submitted. Check the encoding type on the form.</li></ul><input type="file" name="file1" /></td></tr>
+
+>>> f = FileForm(data={}, files={'file1': {'filename': 'name', 'content':'some content'}}, auto_id=False)
+>>> print f
+<tr><th>File1:</th><td><input type="file" name="file1" /></td></tr>
+>>> f.is_valid()
+True
+
 # Basic form processing in a view #############################################
 
 >>> from django.template import Template, Context
@@ -3268,7 +3351,7 @@ Case 2: POST with erroneous data (a redisplayed form, with errors).
 <form action="" method="post">
 <table>
 <tr><td colspan="2"><ul class="errorlist"><li>Please make sure your passwords match.</li></ul></td></tr>
-<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters.</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
+<tr><th>Username:</th><td><ul class="errorlist"><li>Ensure this value has at most 10 characters (it has 23).</li></ul><input type="text" name="username" value="this-is-a-long-username" maxlength="10" /></td></tr>
 <tr><th>Password1:</th><td><input type="password" name="password1" value="foo" /></td></tr>
 <tr><th>Password2:</th><td><input type="password" name="password2" value="bar" /></td></tr>
 </table>

@@ -240,7 +240,7 @@ default, provide enough fields for 3 Choices."
 
 Then change the other fields in ``Choice`` to give them ``core=True``::
 
-    choice = models.CharField(maxlength=200, core=True)
+    choice = models.CharField(max_length=200, core=True)
     votes = models.IntegerField(core=True)
 
 This tells Django: "When you edit a Choice on the Poll admin page, the 'choice'
@@ -362,8 +362,8 @@ think they should.
 Customize the admin look and feel
 =================================
 
-Clearly, having "Django administration" and "example.com" at the top of each
-admin page is ridiculous. It's just placeholder text.
+Clearly, having "Django administration" at the top of each admin page is
+ridiculous. It's just placeholder text.
 
 That's easy to change, though, using Django's template system. The Django admin
 is powered by Django itself, and its interfaces use Django's own template
@@ -389,7 +389,7 @@ as above, then copy ``django/contrib/admin/templates/admin/base_site.html`` to
 ``admin`` subdirectory.
 
 Then, just edit the file and replace the generic Django text with your own
-site's name and URL as you see fit.
+site's name as you see fit.
 
 Note that any of Django's default admin templates can be overridden. To
 override a template, just do the same thing you did with ``base_site.html`` --

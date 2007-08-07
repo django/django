@@ -641,7 +641,7 @@ the "Outputting forms as HTML" section above.
 The simplest way to display a form's HTML is to use the variable on its own,
 like this::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form }}</table>
     <input type="submit" />
     </form>
@@ -653,7 +653,7 @@ class' ``__str__()`` method calls its ``as_table()`` method.
 
 The following is equivalent but a bit more explicit::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form.as_table }}</table>
     <input type="submit" />
     </form>
@@ -675,7 +675,7 @@ individual fields for complete template control over the form's design.
 The easiest way is to iterate over the form's fields, with
 ``{% for field in form %}``. For example::
 
-    <form method="post">
+    <form method="post" action="">
     <dl>
     {% for field in form %}
         <dt>{{ field.label }}</dt>
@@ -696,7 +696,7 @@ Alternatively, you can arrange the form's fields explicitly, by name. Do that
 by accessing ``{{ form.fieldname }}``, where ``fieldname`` is the field's name.
 For example::
 
-    <form method="post">
+    <form method="post" action="">
     <ul class="myformclass">
         <li>{{ form.sender.label }} {{ form.sender }}</li>
         <li class="helptext">{{ form.sender.help_text }}</li>
@@ -709,6 +709,49 @@ For example::
         ...
     </ul>
     </form>
+
+Binding uploaded files to a form
+--------------------------------
+
+**New in Django development version**
+
+Dealing with forms that have ``FileField`` and ``ImageField`` fields
+is a little more complicated than a normal form.
+
+Firstly, in order to upload files, you'll need to make sure that your
+``<form>`` element correctly defines the ``enctype`` as
+``"multipart/form-data"``::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+Secondly, when you use the form, you need to bind the file data. File
+data is handled separately to normal form data, so when your form
+contains a ``FileField`` and ``ImageField``, you will need to specify
+a second argument when you bind your form. So if we extend our
+ContactForm to include an ``ImageField`` called ``mugshot``, we
+need to bind the file data containing the mugshot image::
+
+    # Bound form with an image field
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> file_data = {'mugshot': {'filename':'face.jpg'
+    ...                          'content': <file data>}}
+    >>> f = ContactFormWithMugshot(data, file_data)
+
+In practice, you will usually specify ``request.FILES`` as the source
+of file data (just like you use ``request.POST`` as the source of
+form data)::
+
+    # Bound form with an image field, data from the request
+    >>> f = ContactFormWithMugshot(request.POST, request.FILES)
+
+Constructing an unbound form is the same as always -- just omit both
+form data *and* file data::
+
+    # Unbound form with a image field
+    >>> f = ContactFormWithMugshot()
 
 Subclassing forms
 -----------------
@@ -1099,6 +1142,54 @@ Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
 given length.
 
+``FileField``
+~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that non-empty file data has been bound to the form.
+
+An ``UploadedFile`` object has two attributes:
+
+    ======================  =====================================================
+    Argument                Description
+    ======================  =====================================================
+    ``filename``            The name of the file, provided by the uploading
+                            client.
+    ``content``             The array of bytes comprising the file content.
+    ======================  =====================================================
+
+The string representation of an ``UploadedFile`` is the same as the filename
+attribute.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``ImageField``
+~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that file data has been bound to the form, and that the
+      file is of an image format understood by PIL.
+
+Using an ImageField requires that the `Python Imaging Library`_ is installed.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
 
@@ -1222,7 +1313,7 @@ Custom form and field validation
 
 Form validation happens when the data is cleaned. If you want to customise
 this process, there are various places you can change, each one serving a
-different purpose. Thee types of cleaning methods are run during form
+different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
 method on a form. There are other things that can trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
@@ -1372,17 +1463,17 @@ the full list of conversions:
     ``AutoField``                    Not represented in the form
     ``BooleanField``                 ``BooleanField``
     ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``maxlength``
+                                     the model field's ``max_length``
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
     ``DecimalField``                 ``DecimalField``
     ``EmailField``                   ``EmailField``
-    ``FileField``                    ``CharField``
+    ``FileField``                    ``FileField``
     ``FilePathField``                ``CharField``
     ``FloatField``                   ``FloatField``
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
-    ``ImageField``                   ``CharField``
+    ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
     ``IPAddressField``               ``CharField``
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
@@ -1452,15 +1543,15 @@ Consider this set of models::
     )
 
     class Author(models.Model):
-        name = models.CharField(maxlength=100)
-        title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
         def __unicode__(self):
             return self.name
 
     class Book(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         authors = models.ManyToManyField(Author)
 
 With these models, a call to ``form_for_model(Author)`` would return a ``Form``
@@ -1494,6 +1585,51 @@ example::
 
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
 doesn't validate -- i.e., ``if form.errors``.
+
+This ``save()`` method accepts an optional ``commit`` keyword argument, which
+accepts either ``True`` or ``False``. If you call ``save()`` with
+``commit=False``, then it will return an object that hasn't yet been saved to
+the database. In this case, it's up to you to call ``save()`` on the resulting
+model instance. This is useful if you want to do custom processing on the
+object before saving it. ``commit`` is ``True`` by default.
+
+Another side effect of using ``commit=False`` is seen when your model has
+a many-to-many relation with another model. If your model has a many-to-many
+relation and you specify ``commit=False`` when you save a form, Django cannot
+immediately save the form data for the many-to-many relation. This is because
+it isn't possible to save many-to-many data for an instance until the instance
+exists in the database.
+
+To work around this problem, every time you save a form using ``commit=False``,
+Django adds a ``save_m2m()`` method to the form created by ``form_for_model``.
+After you've manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data. For example::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create, but don't save the new author instance.
+    >>> new_author = f.save(commit=False)
+
+    # Modify the author in some way.
+    >>> new_author.some_field = 'some_value'
+
+    # Save the new instance.
+    >>> new_author.save()
+
+    # Now, save the many-to-many data for the form.
+    >>> f.save_m2m()
+
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
+When you use a simple ``save()`` on a form, all data -- including
+many-to-many data -- is saved without the need for any additional method calls.
+For example::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create and save the new author instance. There's no need to do anything else.
+    >>> new_author = f.save()
 
 Using an alternate base class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
