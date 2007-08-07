@@ -784,7 +784,7 @@ class FileField(Field):
 
     def save_form_data(self, instance, data):
         if data:
-            getattr(instance, "save_%s_file" % self.name)(os.path.join(self.upload_to, data.filename), data.content, save=False)
+            getattr(instance, "save_%s_file" % self.name)(data.filename, data.content, save=False)
         
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
