@@ -748,7 +748,7 @@ form data)::
     >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
 Constructing an unbound form is the same as always -- just omit both
-form data *and* file data:
+form data *and* file data::
 
     # Unbound form with a image field
     >>> f = ContactFormWithMugshot()
@@ -1625,8 +1625,8 @@ When you use a simple ``save()`` on a form, all data -- including
 many-to-many data -- is saved without the need for any additional method calls.
 For example::
 
-	# Create a form instance with POST data.
-	>>> f = AuthorForm(request.POST)
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
 
     # Create and save the new author instance. There's no need to do anything else.
     >>> new_author = f.save()
