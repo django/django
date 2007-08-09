@@ -234,9 +234,9 @@ class BaseModelFormSet(BaseFormSet):
     """
     model = None
     
-    def __init__(self, data=None, auto_id='id_%s', prefix=None, instances=None):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, instances=None):
         self.instances = instances
-        kwargs = {'data': data, 'auto_id': auto_id, 'prefix': prefix}
+        kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         if instances:
             kwargs['initial'] = [initial_data(instance) for instance in instances]
         super(BaseModelFormSet, self).__init__(**kwargs)
@@ -287,12 +287,12 @@ def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formf
 
 class InlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
-    def __init__(self, instance=None, data=None):
+    def __init__(self, instance=None, data=None, files=None):
         from django.db.models.fields.related import RelatedObject
         self.instance = instance
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        super(InlineFormset, self).__init__(data, instances=self.get_inline_objects(), prefix=self.rel_name)
+        super(InlineFormset, self).__init__(data, files, instances=self.get_inline_objects(), prefix=self.rel_name)
 
     def get_inline_objects(self):
         if self.instance is None:

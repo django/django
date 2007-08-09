@@ -20,15 +20,16 @@ class ManagementForm(Form):
 class BaseFormSet(object):
     """A collection of instances of the same Form class."""
 
-    def __init__(self, data=None, auto_id='id_%s', prefix=None, initial=None):
-        self.is_bound = data is not None
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None):
+        self.is_bound = data is not None and files is not None
         self.prefix = prefix or 'form'
         self.auto_id = auto_id
         self.data = data
+        self.files = files
         self.initial = initial
         # initialization is different depending on whether we recieved data, initial, or nothing
-        if data:
-            self.management_form = ManagementForm(data, auto_id=self.auto_id, prefix=self.prefix)
+        if data or files:
+            self.management_form = ManagementForm(data, files, auto_id=self.auto_id, prefix=self.prefix)
             if self.management_form.is_valid():
                 self.total_forms = self.management_form.cleaned_data[FORM_COUNT_FIELD_NAME]
                 self.required_forms = self.total_forms - self.num_extra
@@ -56,6 +57,8 @@ class BaseFormSet(object):
                 kwargs = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
                 if self.data:
                     kwargs['data'] = self.data
+                if self.files:
+                    kwargs['files'] = self.files
                 add_form = FormClass(**kwargs)
                 self.add_fields(add_form, i)
                 add_forms.append(add_form)
@@ -72,6 +75,8 @@ class BaseFormSet(object):
                 kwargs = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
                 if self.data:
                     kwargs['data'] = self.data
+                if self.files:
+                    kwargs['files'] = self.files
                 if self.initial:
                     kwargs['initial'] = self.initial[i]
                 change_form = FormClass(**kwargs)

@@ -420,7 +420,7 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             for FormSet in self.get_inline_formsets():
-                inline_formset = FormSet(data=request.POST)
+                inline_formset = FormSet(data=request.POST, files=request.FILES)
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
@@ -470,7 +470,7 @@ class ModelAdmin(BaseModelAdmin):
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             for FormSet in self.get_inline_formsets():
-                inline_formset = FormSet(obj, request.POST)
+                inline_formset = FormSet(obj, request.POST, request.FILES)
                 inline_formsets.append(inline_formset)
 
             if all_valid(inline_formsets) and form.is_valid():

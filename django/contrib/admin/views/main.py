@@ -124,7 +124,7 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         'change': change,
         'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
         'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
-        'has_file_field': opts.has_field_type(models.FileField),
+        'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
         'has_absolute_url': hasattr(model, 'get_absolute_url'),
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,
