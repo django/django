@@ -21,10 +21,8 @@ except ImportError:
 # Are psycopg2 and GeoDjango models being used?
 try:
     from psycopg2.extensions import ISQLQuote
-    from django.contrib.gis.db.backend.postgis import GEOM_FUNC_PREFIX
 except (ImportError, EnvironmentError):
     ISQLQuote = None
-    GEOM_FUNC_PREFIX = None
 
 # Setting the appropriate name for the GEOS-C library, depending on which
 # OS and POSIX platform we're running.

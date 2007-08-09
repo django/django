@@ -167,7 +167,7 @@ class LineString(GEOSGeometry):
             raise TypeError, 'Invalid initialization input for LineStrings.'
 
         # Creating the coordinate sequence
-        cs = GEOSCoordSeq(GEOSPointer(0, create_cs(c_uint(ncoords), c_uint(ndim))))
+        cs = GEOSCoordSeq(GEOSPointer(0, create_cs(c_uint(ncoords), c_uint(ndim))), z=bool(ndim==3))
 
         # Setting each point in the coordinate sequence
         for i in xrange(ncoords):

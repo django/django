@@ -12,7 +12,7 @@ from types import StringType, UnicodeType, IntType, FloatType
 # Python and GEOS-related dependencies.
 import re
 from warnings import warn
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY, ISQLQuote, GEOM_FUNC_PREFIX
+from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY, ISQLQuote
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
 if HAS_NUMPY: from numpy import ndarray, array
@@ -204,9 +204,8 @@ class GEOSGeometry(object):
 
     def getquoted(self):
         "Returns a properly quoted string for use in PostgresSQL/PostGIS."
-        # GeomFromText() is ST_GeomFromText() in PostGIS >= 1.2.2 to correspond
-        #  to SQL/MM ISO standard.
-        return "%sGeomFromText('%s', %s)" % (GEOM_FUNC_PREFIX, self.wkt, self.srid or -1)
+        # Using ST_GeomFromText(), corresponds to SQL/MM ISO standard.
+        return "ST_GeomFromText('%s', %s)" % (self.wkt, self.srid or -1)
     
     #### Coordinate Sequence Routines ####
     @property
