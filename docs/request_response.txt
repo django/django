@@ -38,6 +38,14 @@ All attributes except ``session`` should be considered read-only.
         elif request.method == 'POST':
             do_something_else()
 
+``encoding``
+    A string representing the current encoding used to decode form submission
+    data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
+    You can write to this attribute to change the encoding used when accessing
+    the form data. Any subsequent attribute accesses (such as reading from
+    ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if you
+    know the form data is not in the ``DEFAULT_CHARSET`` encoding.
+
 ``GET``
     A dictionary-like object containing all given HTTP GET parameters. See the
     ``QueryDict`` documentation below.
