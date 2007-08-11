@@ -1129,6 +1129,24 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
+``DecimalField``
+~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``decimal``.
+    * Validates that the given value is a decimal. Leading and trailing
+      whitespace is ignored.
+
+Takes four optional arguments: ``max_value``, ``min_value``, ``max_digits``,
+and ``decimal_places``. The first two define the limits for the fields value.
+``max_digits`` is the maximum number of digits (those before the decimal
+point plus those after the decimal point, with leading zeros stripped)
+permitted in the value, whilst ``decimal_places`` is the maximum number of
+decimal places permitted.
+
 ``EmailField``
 ~~~~~~~~~~~~~~
 
@@ -1198,6 +1216,9 @@ When you use a ``FileField`` on a form, you must also remember to
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing
       whitespace is allowed, as in Python's ``int()`` function.
+
+Takes two optional arguments for validation, ``max_value`` and ``min_value``.
+These control the range of values permitted in the field.
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
