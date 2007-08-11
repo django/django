@@ -342,13 +342,23 @@ hard-coded strings. If you use this technique, follow these guidelines:
 Methods
 -------
 
-``__init__(content='', mimetype=DEFAULT_CONTENT_TYPE)``
+``__init__(content='', mimetype=None, status=200, content_type=DEFAULT_CONTENT_TYPE)``
     Instantiates an ``HttpResponse`` object with the given page content (a
     string) and MIME type. The ``DEFAULT_CONTENT_TYPE`` is ``'text/html'``.
 
     ``content`` can be an iterator or a string. If it's an iterator, it should
     return strings, and those strings will be joined together to form the
     content of the response.
+
+    ``status`` is the `HTTP Status code`_ for the response.
+
+    **(New in Django development version)** ``content_type`` is an alias for
+    ``mimetype``. Historically, the parameter was only called ``mimetype``,
+    but since this is actually the value included in the HTTP ``Content-Type``
+    header, it can also include the character set encoding, which makes it
+    more than just a MIME type specification. If ``mimetype`` is specifiedi
+    (not None), that value is used.  Otherwise, ``content_type`` is used. If
+    neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
 
 ``__setitem__(header, value)``
     Sets the given header name to the given value. Both ``header`` and
@@ -395,6 +405,8 @@ Methods
 
 ``write(content)``, ``flush()`` and ``tell()``
     These methods make an ``HttpResponse`` instance a file-like object.
+
+.. _HTTP Status code: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10
 
 HttpResponse subclasses
 -----------------------

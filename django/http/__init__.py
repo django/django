@@ -212,18 +212,22 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None, status=None):
+    def __init__(self, content='', mimetype=None, status=None,
+            content_type=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
-        if not mimetype:
-            mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
+        if mimetype:
+            content_type = mimetype     # For backwards compatibility
+        if not content_type:
+            content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
+                    settings.DEFAULT_CHARSET)
         if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:
             self._container = [content]
             self._is_string = True
-        self.headers = {'Content-Type': mimetype}
+        self.headers = {'Content-Type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
