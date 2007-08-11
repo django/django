@@ -80,7 +80,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar")
+LANGUAGES_BIDI = ("he", "ar", "fa")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
