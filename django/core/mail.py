@@ -287,7 +287,8 @@ class EmailMessage(object):
                 mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
         basetype, subtype = mimetype.split('/', 1)
         if basetype == 'text':
-            attachment = SafeMIMEText(content, subtype, settings.DEFAULT_CHARSET)
+            attachment = SafeMIMEText(smart_str(content,
+                settings.DEFAULT_CHARSET), subtype, settings.DEFAULT_CHARSET)
         else:
             # Encode non-text attachments with base64.
             attachment = MIMEBase(basetype, subtype)
