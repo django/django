@@ -10,6 +10,7 @@ class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)
+    misc_data = models.CharField(max_length=100, blank=True)
 
     class Meta:
         ordering = ('pub_date','headline')
@@ -30,5 +31,10 @@ An empty choice field should return None for the display name.
 >>> a.save()
 >>> a.get_status_display() is None
 True
+
+Empty strings should be returned as Unicode
+>>> a2 = Article.objects.get(pk=a.id)
+>>> a2.misc_data
+u''
 """
 }
