@@ -65,7 +65,7 @@ def _get_installed_models(table_list):
         for model in models.get_models(app):
             all_models.append(model)
     if backend.uses_case_insensitive_names:
-        converter = str.upper
+        converter = lambda x: x.upper()
     else:
         converter = lambda x: x
     return set([m for m in all_models if converter(m._meta.db_table) in map(converter, table_list)])
