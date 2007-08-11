@@ -3,10 +3,10 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
-msgstr ""
-"Project-Id-Version: Django 1.0\n"
+""
+msgstr "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-09 22:42+0200\n"
+"POT-Creation-Date: 2007-07-28 12:33+0200\n"
 "PO-Revision-Date: 2007-02-05 03:19+0100\n"
 "Last-Translator: Jannis Leidel <jl@websushi.org>\n"
 "Language-Team: \n"
@@ -19,591 +19,590 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: conf/global_settings.py:39
+#:conf/global_settings.py:38
 msgid "Arabic"
 msgstr "Arabisch"
 
-#: conf/global_settings.py:40
+#:conf/global_settings.py:39
 msgid "Bengali"
 msgstr "Bengali"
 
-#: conf/global_settings.py:41
+#:conf/global_settings.py:40
+msgid "Bulgarian"
+msgstr "Bulgarisch"
+
+#:conf/global_settings.py:41
 msgid "Catalan"
 msgstr "Katalanisch"
 
-#: conf/global_settings.py:42
+#:conf/global_settings.py:42
 msgid "Czech"
 msgstr "Tschechisch"
 
-#: conf/global_settings.py:43
+#:conf/global_settings.py:43
 msgid "Welsh"
 msgstr "Walisisch"
 
-#: conf/global_settings.py:44
+#:conf/global_settings.py:44
 msgid "Danish"
 msgstr "Dänisch"
 
-#: conf/global_settings.py:45
+#:conf/global_settings.py:45
 msgid "German"
 msgstr "Deutsch"
 
-#: conf/global_settings.py:46
+#:conf/global_settings.py:46
 msgid "Greek"
 msgstr "Griechisch"
 
-#: conf/global_settings.py:47
+#:conf/global_settings.py:47
 msgid "English"
 msgstr "Englisch"
 
-#: conf/global_settings.py:48
+#:conf/global_settings.py:48
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: conf/global_settings.py:49
+#:conf/global_settings.py:49
 msgid "Argentinean Spanish"
 msgstr "Argentinisches Spanisch"
 
-#: conf/global_settings.py:50
+#:conf/global_settings.py:50
+msgid "Persian"
+msgstr "Persisch"
+
+#:conf/global_settings.py:51
 msgid "Finnish"
 msgstr "Finnisch"
 
-#: conf/global_settings.py:51
+#:conf/global_settings.py:52
 msgid "French"
 msgstr "Französisch"
 
-#: conf/global_settings.py:52
+#:conf/global_settings.py:53
 msgid "Galician"
 msgstr "Galicisch"
 
-#: conf/global_settings.py:53
+#:conf/global_settings.py:54
 msgid "Hungarian"
 msgstr "Ungarisch"
 
-#: conf/global_settings.py:54
+#:conf/global_settings.py:55
 msgid "Hebrew"
 msgstr "Hebräisch"
 
-#: conf/global_settings.py:55
+#:conf/global_settings.py:56
 msgid "Icelandic"
 msgstr "Isländisch"
 
-#: conf/global_settings.py:56
+#:conf/global_settings.py:57
 msgid "Italian"
 msgstr "Italienisch"
 
-#: conf/global_settings.py:57
+#:conf/global_settings.py:58
 msgid "Japanese"
 msgstr "Japanisch"
 
-#: conf/global_settings.py:58
+#:conf/global_settings.py:59
 msgid "Korean"
 msgstr "Koreanisch"
 
-#: conf/global_settings.py:59
+#:conf/global_settings.py:60
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:60
+#:conf/global_settings.py:61
 msgid "Latvian"
 msgstr "Lettisch"
 
-#: conf/global_settings.py:61
+#:conf/global_settings.py:62
 msgid "Macedonian"
 msgstr "Mazedonisch"
 
-#: conf/global_settings.py:62
+#:conf/global_settings.py:63
 msgid "Dutch"
 msgstr "Holländisch"
 
-#: conf/global_settings.py:63
+#:conf/global_settings.py:64
 msgid "Norwegian"
 msgstr "Norwegisch"
 
-#: conf/global_settings.py:64
+#:conf/global_settings.py:65
 msgid "Polish"
 msgstr "Polnisch"
 
-#: conf/global_settings.py:65
+#:conf/global_settings.py:66
 msgid "Portugese"
 msgstr "Portugiesisch"
 
-#: conf/global_settings.py:66
+#:conf/global_settings.py:67
 msgid "Brazilian"
 msgstr "Brasilianisches Portugiesisch"
 
-#: conf/global_settings.py:67
+#:conf/global_settings.py:68
 msgid "Romanian"
 msgstr "Rumänisch"
 
-#: conf/global_settings.py:68
+#:conf/global_settings.py:69
 msgid "Russian"
 msgstr "Russisch"
 
-#: conf/global_settings.py:69
+#:conf/global_settings.py:70
 msgid "Slovak"
 msgstr "Slowakisch"
 
-#: conf/global_settings.py:70
+#:conf/global_settings.py:71
 msgid "Slovenian"
 msgstr "Slowenisch"
 
-#: conf/global_settings.py:71
+#:conf/global_settings.py:72
 msgid "Serbian"
 msgstr "Serbisch"
 
-#: conf/global_settings.py:72
+#:conf/global_settings.py:73
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: conf/global_settings.py:73
+#:conf/global_settings.py:74
 msgid "Tamil"
 msgstr "Tamilisch"
 
-#: conf/global_settings.py:74
+#:conf/global_settings.py:75
 msgid "Telugu"
 msgstr "Telugisch"
 
-#: conf/global_settings.py:75
+#:conf/global_settings.py:76
 msgid "Turkish"
 msgstr "Türkisch"
 
-#: conf/global_settings.py:76
+#:conf/global_settings.py:77
 msgid "Ukrainian"
 msgstr "Ukrainisch"
 
-#: conf/global_settings.py:77
+#:conf/global_settings.py:78
 msgid "Simplified Chinese"
 msgstr "Vereinfachtes Chinesisch"
 
-#: conf/global_settings.py:78
+#:conf/global_settings.py:79
 msgid "Traditional Chinese"
 msgstr "Traditionelles Chinesisch"
 
-#: contrib/admin/filterspecs.py:40
-#, python-format
+#:contrib/admin/filterspecs.py:42
+#,python-format
 msgid ""
 "<h3>By %s:</h3>\n"
 "<ul>\n"
-msgstr ""
-"<h3>Nach %s:</h3>\n"
+msgstr "<h3>Nach %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+#:contrib/admin/filterspecs.py:72 contrib/admin/filterspecs.py:90
+#:contrib/admin/filterspecs.py:145 contrib/admin/filterspecs.py:171
 msgid "All"
 msgstr "Alle"
 
-#: contrib/admin/filterspecs.py:109
+#:contrib/admin/filterspecs.py:111
 msgid "Any date"
 msgstr "Alle Daten"
 
-#: contrib/admin/filterspecs.py:110
+#:contrib/admin/filterspecs.py:112
 msgid "Today"
 msgstr "Heute"
 
-#: contrib/admin/filterspecs.py:113
+#:contrib/admin/filterspecs.py:115
 msgid "Past 7 days"
 msgstr "Letzte 7 Tage"
 
-#: contrib/admin/filterspecs.py:115
+#:contrib/admin/filterspecs.py:117
 msgid "This month"
 msgstr "Diesen Monat"
 
-#: contrib/admin/filterspecs.py:117
+#:contrib/admin/filterspecs.py:119
 msgid "This year"
 msgstr "Dieses Jahr"
 
-#: contrib/admin/filterspecs.py:143 newforms/widgets.py:180
-#: oldforms/__init__.py:577
+#:contrib/admin/filterspecs.py:145 newforms/widgets.py:181
+#:oldforms/__init__.py:587
 msgid "Yes"
 msgstr "Ja"
 
-#: contrib/admin/filterspecs.py:143 newforms/widgets.py:180
-#: oldforms/__init__.py:577
+#:contrib/admin/filterspecs.py:145 newforms/widgets.py:181
+#:oldforms/__init__.py:587
 msgid "No"
 msgstr "Nein"
 
-#: contrib/admin/filterspecs.py:150 newforms/widgets.py:180
-#: oldforms/__init__.py:577
+#:contrib/admin/filterspecs.py:152 newforms/widgets.py:181
+#:oldforms/__init__.py:587
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: contrib/admin/models.py:16
+#:contrib/admin/models.py:17
 msgid "action time"
 msgstr "Zeitpunkt der Aktion"
 
-#: contrib/admin/models.py:19
+#:contrib/admin/models.py:20
 msgid "object id"
 msgstr "Objekt-ID"
 
-#: contrib/admin/models.py:20
+#:contrib/admin/models.py:21
 msgid "object repr"
 msgstr "Objekt Darst."
 
-#: contrib/admin/models.py:21
+#:contrib/admin/models.py:22
 msgid "action flag"
 msgstr "Aktionskennzeichen"
 
-#: contrib/admin/models.py:22
+#:contrib/admin/models.py:23
 msgid "change message"
 msgstr "Änderungsmeldung"
 
-#: contrib/admin/models.py:25
+#:contrib/admin/models.py:26
 msgid "log entry"
 msgstr "Logeintrag"
 
-#: contrib/admin/models.py:26
+#:contrib/admin/models.py:27
 msgid "log entries"
 msgstr "Logeinträge"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
+#:contrib/admin/templates/admin/404.html:4
+#:contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Seite nicht gefunden"
 
-#: contrib/admin/templates/admin/404.html:10
+#:contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
-"Es tut uns leid, aber die angeforderte Seite konnte nicht gefunden werden."
+msgstr "Es tut uns leid, aber die angeforderte Seite konnte nicht gefunden werden."
 
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/auth/user/change_password.html:12
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
+#:contrib/admin/templates/admin/500.html:4
+#:contrib/admin/templates/admin/base.html:30
+#:contrib/admin/templates/admin/change_form.html:13
+#:contrib/admin/templates/admin/change_list.html:6
+#:contrib/admin/templates/admin/delete_confirmation.html:6
+#:contrib/admin/templates/admin/invalid_setup.html:4
+#:contrib/admin/templates/admin/object_history.html:5
+#:contrib/admin/templates/admin/auth/user/change_password.html:12
+#:contrib/admin/templates/admin_doc/bookmarklets.html:3
+#:contrib/admin/templates/registration/logged_out.html:4
+#:contrib/admin/templates/registration/password_change_done.html:4
+#:contrib/admin/templates/registration/password_change_form.html:4
+#:contrib/admin/templates/registration/password_reset_done.html:4
+#:contrib/admin/templates/registration/password_reset_form.html:4
 msgid "Home"
 msgstr "Start"
 
-#: contrib/admin/templates/admin/500.html:4
+#:contrib/admin/templates/admin/500.html:4
 msgid "Server error"
 msgstr "Serverfehler"
 
-#: contrib/admin/templates/admin/500.html:6
+#:contrib/admin/templates/admin/500.html:6
 msgid "Server error (500)"
 msgstr "Serverfehler (500)"
 
-#: contrib/admin/templates/admin/500.html:9
+#:contrib/admin/templates/admin/500.html:9
 msgid "Server Error <em>(500)</em>"
 msgstr "Serverfehler <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:10
+#:contrib/admin/templates/admin/500.html:10
 msgid ""
 "There's been an error. It's been reported to the site administrators via e-"
 "mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Ein Fehler ist aufgetreten. Dieser Fehler wurde an die Serververwalter per E-"
+msgstr "Ein Fehler ist aufgetreten. Dieser Fehler wurde an die Serververwalter per E-"
 "Mail weitergegeben und sollte bald behoben sein. Vielen Dank für Ihr "
 "Verständnis."
 
-#: contrib/admin/templates/admin/base.html:25
+#:contrib/admin/templates/admin/base.html:25
 msgid "Welcome,"
 msgstr "Willkommen,"
 
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#:contrib/admin/templates/admin/base.html:25
+#:contrib/admin/templates/admin/change_form.html:10
+#:contrib/admin/templates/admin/change_list.html:5
+#:contrib/admin/templates/admin/delete_confirmation.html:3
+#:contrib/admin/templates/admin/object_history.html:3
+#:contrib/admin/templates/admin/auth/user/change_password.html:9
+#:contrib/admin/templates/admin_doc/bookmarklets.html:3
+#:contrib/admin/templates/registration/password_change_done.html:3
+#:contrib/admin/templates/registration/password_change_form.html:3
 msgid "Documentation"
 msgstr "Dokumentation"
 
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:15
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
+#:contrib/admin/templates/admin/base.html:25
+#:contrib/admin/templates/admin/change_form.html:10
+#:contrib/admin/templates/admin/change_list.html:5
+#:contrib/admin/templates/admin/delete_confirmation.html:3
+#:contrib/admin/templates/admin/object_history.html:3
+#:contrib/admin/templates/admin/auth/user/change_password.html:9
+#:contrib/admin/templates/admin/auth/user/change_password.html:15
+#:contrib/admin/templates/admin/auth/user/change_password.html:46
+#:contrib/admin/templates/admin_doc/bookmarklets.html:4
+#:contrib/admin/templates/admin_doc/index.html:4
+#:contrib/admin/templates/admin_doc/missing_docutils.html:4
+#:contrib/admin/templates/admin_doc/model_detail.html:3
+#:contrib/admin/templates/admin_doc/model_index.html:5
+#:contrib/admin/templates/admin_doc/template_detail.html:4
+#:contrib/admin/templates/admin_doc/template_filter_index.html:5
+#:contrib/admin/templates/admin_doc/template_tag_index.html:5
+#:contrib/admin/templates/admin_doc/view_detail.html:4
+#:contrib/admin/templates/admin_doc/view_index.html:5
+#:contrib/admin/templates/registration/password_change_done.html:3
+#:contrib/admin/templates/registration/password_change_form.html:3
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/comments/templates/comments/form.html:6
+#:contrib/admin/templates/admin/base.html:25
+#:contrib/admin/templates/admin/change_form.html:10
+#:contrib/admin/templates/admin/change_list.html:5
+#:contrib/admin/templates/admin/delete_confirmation.html:3
+#:contrib/admin/templates/admin/object_history.html:3
+#:contrib/admin/templates/admin/auth/user/change_password.html:9
+#:contrib/admin/templates/admin_doc/bookmarklets.html:4
+#:contrib/admin/templates/admin_doc/index.html:4
+#:contrib/admin/templates/admin_doc/missing_docutils.html:4
+#:contrib/admin/templates/admin_doc/model_detail.html:3
+#:contrib/admin/templates/admin_doc/model_index.html:5
+#:contrib/admin/templates/admin_doc/template_detail.html:4
+#:contrib/admin/templates/admin_doc/template_filter_index.html:5
+#:contrib/admin/templates/admin_doc/template_tag_index.html:5
+#:contrib/admin/templates/admin_doc/view_detail.html:4
+#:contrib/admin/templates/admin_doc/view_index.html:5
+#:contrib/admin/templates/registration/password_change_done.html:3
+#:contrib/admin/templates/registration/password_change_form.html:3
+#:contrib/comments/templates/comments/form.html:6
 msgid "Log out"
 msgstr "Abmelden"
 
-#: contrib/admin/templates/admin/base_site.html:4
+#:contrib/admin/templates/admin/base_site.html:4
 msgid "Django site admin"
 msgstr "Django-Systemverwaltung"
 
-#: contrib/admin/templates/admin/base_site.html:7
+#:contrib/admin/templates/admin/base_site.html:7
 msgid "Django administration"
 msgstr "Django-Verwaltung"
 
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
+#:contrib/admin/templates/admin/change_form.html:15
+#:contrib/admin/templates/admin/index.html:28
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/object_history.html:5
+#:contrib/admin/templates/admin/change_form.html:21
+#:contrib/admin/templates/admin/object_history.html:5
 msgid "History"
 msgstr "Geschichte"
 
-#: contrib/admin/templates/admin/change_form.html:22
+#:contrib/admin/templates/admin/change_form.html:22
 msgid "View on site"
 msgstr "Im Web anzeigen"
 
-#: contrib/admin/templates/admin/change_form.html:32
-#: contrib/admin/templates/admin/auth/user/change_password.html:24
+#:contrib/admin/templates/admin/change_form.html:32
+#:contrib/admin/templates/admin/auth/user/change_password.html:24
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Bitte den aufgeführten Fehler korrigieren."
 msgstr[1] "Bitte die aufgeführten Fehler korrigieren."
 
-#: contrib/admin/templates/admin/change_form.html:50
+#:contrib/admin/templates/admin/change_form.html:50
 msgid "Ordering"
 msgstr "Sortierung"
 
-#: contrib/admin/templates/admin/change_form.html:53
+#:contrib/admin/templates/admin/change_form.html:53
 msgid "Order:"
 msgstr "Reihenfolge:"
 
-#: contrib/admin/templates/admin/change_list.html:12
-#, python-format
+#:contrib/admin/templates/admin/change_list.html:12
+#,python-format
 msgid "Add %(name)s"
 msgstr "%(name)s hinzufügen"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
+#:contrib/admin/templates/admin/delete_confirmation.html:9
+#:contrib/admin/templates/admin/submit_line.html:3
 msgid "Delete"
 msgstr "Löschen"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
+#:contrib/admin/templates/admin/delete_confirmation.html:14
+#,python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
-msgstr ""
-"Die Löschung des %(object_name)s '%(escaped_object)s' hätte die Löschung von "
+msgstr "Die Löschung des %(object_name)s '%(escaped_object)s' hätte die Löschung von "
 "abhängigen Daten zur Folge, aber Sie haben nicht die nötigen Rechte um die "
 "folgenden abhängigen Daten zu löschen:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
+#:contrib/admin/templates/admin/delete_confirmation.html:21
+#,python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
-msgstr ""
-"Sind Sie sicher, dass Sie %(object_name)s \"%(escaped_object)s\" löschen "
+msgstr "Sind Sie sicher, dass Sie %(object_name)s \"%(escaped_object)s\" löschen "
 "wollen? Es werden zusätzlich die folgenden abhängigen Daten mit gelöscht:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
+#:contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
 msgstr "Ja, ich bin sicher"
 
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
+#:contrib/admin/templates/admin/filter.html:2
+#,python-format
 msgid " By %(filter_title)s "
 msgstr " Nach %(filter_title)s "
 
-#: contrib/admin/templates/admin/filters.html:4
+#:contrib/admin/templates/admin/filters.html:4
 msgid "Filter"
 msgstr "Filter"
 
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
+#:contrib/admin/templates/admin/index.html:17
+#,python-format
 msgid "Models available in the %(name)s application."
 msgstr "Modelle, die in der Anwendung %(name)s vorhanden sind."
 
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
+#:contrib/admin/templates/admin/index.html:18
+#,python-format
 msgid "%(name)s"
 msgstr "%(name)s"
 
-#: contrib/admin/templates/admin/index.html:34
+#:contrib/admin/templates/admin/index.html:34
 msgid "Change"
 msgstr "Ändern"
 
-#: contrib/admin/templates/admin/index.html:44
+#:contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
 msgstr "Sie haben keine Berechtigung irgendwas zu ändern."
 
-#: contrib/admin/templates/admin/index.html:52
+#:contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
 msgstr "Kürzliche Aktionen"
 
-#: contrib/admin/templates/admin/index.html:53
+#:contrib/admin/templates/admin/index.html:53
 msgid "My Actions"
 msgstr "Meine Aktionen"
 
-#: contrib/admin/templates/admin/index.html:57
+#:contrib/admin/templates/admin/index.html:57
 msgid "None available"
 msgstr "Keine vorhanden"
 
-#: contrib/admin/templates/admin/invalid_setup.html:8
+#:contrib/admin/templates/admin/invalid_setup.html:8
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
-msgstr ""
-"Etwas stimmt nicht mit der Datenbankkonfiguration. Bitte sicherstellen, dass "
-"die richtigen Datenbanktabellen angelegt wurden und "
-"die Datenbank vom verwendeten Datenbankbenutzer auch lesbar ist."
+msgstr "Etwas stimmt nicht mit der Datenbankkonfiguration. Bitte sicherstellen, dass "
+"die richtigen Datenbanktabellen angelegt wurden und die Datenbank vom "
+"verwendeten Datenbankbenutzer auch lesbar ist."
 
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
+#:contrib/admin/templates/admin/login.html:17
+#:contrib/comments/templates/comments/form.html:6
+#:contrib/comments/templates/comments/form.html:8
 msgid "Username:"
 msgstr "Benutzername:"
 
-#: contrib/admin/templates/admin/login.html:20
-#: contrib/comments/templates/comments/form.html:8
+#:contrib/admin/templates/admin/login.html:20
+#:contrib/comments/templates/comments/form.html:8
 msgid "Password:"
 msgstr "Passwort:"
 
-#: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:24
+#:contrib/admin/templates/admin/login.html:25
+#:contrib/admin/views/decorators.py:24
 msgid "Log in"
 msgstr "Anmelden"
 
-#: contrib/admin/templates/admin/object_history.html:18
+#:contrib/admin/templates/admin/object_history.html:18
 msgid "Date/time"
 msgstr "Datum/Zeit"
 
-#: contrib/admin/templates/admin/object_history.html:19
+#:contrib/admin/templates/admin/object_history.html:19
 msgid "User"
 msgstr "Benutzer"
 
-#: contrib/admin/templates/admin/object_history.html:20
+#:contrib/admin/templates/admin/object_history.html:20
 msgid "Action"
 msgstr "Aktion"
 
-#: contrib/admin/templates/admin/object_history.html:26
+#:contrib/admin/templates/admin/object_history.html:26
 msgid "DATE_WITH_TIME_FULL"
 msgstr "j. N Y, H:i"
 
-#: contrib/admin/templates/admin/object_history.html:36
+#:contrib/admin/templates/admin/object_history.html:36
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
-msgstr ""
-"Dieses Objekt hat keine Änderungsgeschichte. Es wurde möglicherweise nicht "
+msgstr "Dieses Objekt hat keine Änderungsgeschichte. Es wurde möglicherweise nicht "
 "über diese Verwaltungsseiten angelegt."
 
-#: contrib/admin/templates/admin/pagination.html:10
+#:contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Zeige alle"
 
-#: contrib/admin/templates/admin/search_form.html:8
+#:contrib/admin/templates/admin/search_form.html:8
 msgid "Go"
 msgstr "Los"
 
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
+#:contrib/admin/templates/admin/search_form.html:10
+#,python-format
 msgid "1 result"
 msgid_plural "%(counter)s results"
 msgstr[0] "Ein Ergebnis"
 msgstr[1] "%(counter)s Ergebnisse"
 
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
+#:contrib/admin/templates/admin/search_form.html:10
+#,python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s gesamt"
 
-#: contrib/admin/templates/admin/submit_line.html:4
+#:contrib/admin/templates/admin/submit_line.html:4
 msgid "Save as new"
 msgstr "Als neu sichern"
 
-#: contrib/admin/templates/admin/submit_line.html:5
+#:contrib/admin/templates/admin/submit_line.html:5
 msgid "Save and add another"
 msgstr "Sichern und neu hinzufügen"
 
-#: contrib/admin/templates/admin/submit_line.html:6
+#:contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
 msgstr "Sichern und weiter bearbeiten"
 
-#: contrib/admin/templates/admin/submit_line.html:7
+#:contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
 msgstr "Sichern"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
+#:contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
-msgstr ""
-"Zuerst einen Benutzer und ein Passwort eingeben. Danach können weitere "
+msgstr "Zuerst einen Benutzer und ein Passwort eingeben. Danach können weitere "
 "Optionen für den Benutzer geändert werden."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
+#:contrib/admin/templates/admin/auth/user/add_form.html:12
 msgid "Username"
 msgstr "Benutzername"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-#: contrib/admin/templates/admin/auth/user/change_password.html:34
+#:contrib/admin/templates/admin/auth/user/add_form.html:18
+#:contrib/admin/templates/admin/auth/user/change_password.html:34
 msgid "Password"
 msgstr "Passwort"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#:contrib/admin/templates/admin/auth/user/add_form.html:23
+#:contrib/admin/templates/admin/auth/user/change_password.html:39
 msgid "Password (again)"
 msgstr "Passwort (wiederholen)"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
+#:contrib/admin/templates/admin/auth/user/add_form.html:24
+#:contrib/admin/templates/admin/auth/user/change_password.html:40
 msgid "Enter the same password as above, for verification."
 msgstr "Bitte das gleiche Passwort zur Überprüfung nochmal eingeben."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:28
-#, python-format
+#:contrib/admin/templates/admin/auth/user/change_password.html:28
+#,python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr ""
-"Bitte geben Sie ein neues Passwort für den Benutzer <strong>%(username)s</"
+msgstr "Bitte geben Sie ein neues Passwort für den Benutzer <strong>%(username)s</"
 "strong> ein."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#:contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
 msgstr "Bookmarklets"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+#:contrib/admin/templates/admin_doc/bookmarklets.html:5
 msgid "Documentation bookmarklets"
 msgstr "Dokumentations-Bookmarklets"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+#:contrib/admin/templates/admin_doc/bookmarklets.html:9
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -612,9 +611,9 @@ msgid ""
 "bookmarklets require you to be viewing the site from a computer designated\n"
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
-msgstr ""
-"\n"
-"<p class=\"help\">Um Bookmarklets zu installieren, müssen diese Links in die\n"
+msgstr "\n"
+"<p class=\"help\">Um Bookmarklets zu installieren, müssen diese Links in "
+"die\n"
 "Browser-Werkzeugleiste gezogen werden, oder mittels rechter Maustaste in "
 "die\n"
 "Bookmarks gespeichert werden. Danach können die Bookmarklets von jeder "
