@@ -39,6 +39,8 @@ All attributes except ``session`` should be considered read-only.
             do_something_else()
 
 ``encoding``
+    **New in Django development version**
+
     A string representing the current encoding used to decode form submission
     data (or ``None``, which means the ``DEFAULT_CHARSET`` setting is used).
     You can write to this attribute to change the encoding used when accessing
