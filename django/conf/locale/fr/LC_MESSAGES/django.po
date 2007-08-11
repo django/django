@@ -2862,7 +2862,7 @@ msgstr "jul"
 
 #: utils/dates.py:24
 msgid "aug"
-msgstr "aout"
+msgstr "août"
 
 #: utils/dates.py:24
 msgid "sep"
@@ -2890,7 +2890,7 @@ msgstr "Fév."
 
 #: utils/dates.py:32
 msgid "Aug."
-msgstr "Aôut"
+msgstr "Août"
 
 #: utils/dates.py:32
 msgid "Sept."
