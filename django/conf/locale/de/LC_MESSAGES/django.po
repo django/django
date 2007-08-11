@@ -830,7 +830,7 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Bitte einen Benutzernamen und ein Passwort eingeben. Beide Felder "
+"Bitte einen gültigen Benutzernamen und ein Passwort eingeben. Beide Felder "
 "berücksichtigen die Groß-/Kleinschreibung."
 
 #: contrib/admin/views/decorators.py:62
