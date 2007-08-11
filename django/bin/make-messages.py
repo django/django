@@ -84,7 +84,7 @@ def make_messages():
                     thefile = '%s.py' % file
                     cmd = 'xgettext %s -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
                         os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
-                    (stdin, stdout, stderr) = os.popen3(cmd, 'b')
+                    (stdin, stdout, stderr) = os.popen3(cmd, 't')
                     msgs = stdout.read()
                     errors = stderr.read()
                     if errors:
@@ -101,12 +101,13 @@ def make_messages():
                     thefile = file
                     if file.endswith('.html'):
                         src = open(os.path.join(dirpath, file), "rb").read()
-                        open(os.path.join(dirpath, '%s.py' % file), "wb").write(templatize(src))
                         thefile = '%s.py' % file
-                    if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
+                        open(os.path.join(dirpath, thefile), "wb").write(templatize(src))
+                    if verbose:
+                        sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
                     cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
                         domain, os.path.join(dirpath, thefile))
-                    (stdin, stdout, stderr) = os.popen3(cmd, 'b')
+                    (stdin, stdout, stderr) = os.popen3(cmd, 't')
                     msgs = stdout.read()
                     errors = stderr.read()
                     if errors:
