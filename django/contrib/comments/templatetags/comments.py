@@ -112,9 +112,9 @@ class CommentListNode(template.Node):
             'site__id__exact': settings.SITE_ID,
         }
         kwargs.update(self.extra_kwargs)
-        if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
-            kwargs['select'] = {'is_hidden': 'user_id IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP}
         comment_list = get_list_function(**kwargs).order_by(self.ordering + 'submit_date').select_related()
+        if not self.free and settings.COMMENTS_BANNED_USERS_GROUP:
+            comment_list = comment_list.extra(select={'is_hidden': 'user_id IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)' % settings.COMMENTS_BANNED_USERS_GROUP})
 
         if not self.free:
             if 'user' in context and context['user'].is_authenticated():

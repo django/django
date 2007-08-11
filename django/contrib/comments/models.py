@@ -106,7 +106,10 @@ class Comment(models.Model):
         return "%s: %s..." % (self.user.username, self.comment[:100])
 
     def get_absolute_url(self):
-        return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        try:
+            return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        except AttributeError:
+            return ""
 
     def get_crossdomain_url(self):
         return "/r/%d/%d/" % (self.content_type_id, self.object_id)
@@ -191,7 +194,10 @@ class FreeComment(models.Model):
         return "%s: %s..." % (self.person_name, self.comment[:100])
 
     def get_absolute_url(self):
-        return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        try:
+            return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        except AttributeError:
+            return ""
 
     def get_content_object(self):
         """
