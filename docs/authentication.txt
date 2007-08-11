@@ -675,8 +675,6 @@ Example in Python 2.4 syntax::
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**New in Django development version**
-
 It's a relatively common task to check whether a user has a particular
 permission. For that reason, Django provides a shortcut for that case: the
 ``permission_required()`` decorator. Using this decorator, the earlier example
