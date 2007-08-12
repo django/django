@@ -80,7 +80,9 @@ class CommonMiddleware(object):
             else:
                 etag = md5.new(response.content).hexdigest()
             if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
+                cookies = response.cookies
                 response = http.HttpResponseNotModified()
+                response.cookies = cookies
             else:
                 response['ETag'] = etag
 
