@@ -269,7 +269,7 @@ def hasNoProfanities(field_data, all_data):
     words_seen = [w for w in settings.PROFANITIES_LIST if w in field_data]
     if words_seen:
         from django.utils.text import get_text_list
-        plural = len(words_seen) > 1
+        plural = len(words_seen)
         raise ValidationError, ungettext("Watch your mouth! The word %s is not allowed here.",
             "Watch your mouth! The words %s are not allowed here.", plural) % \
             get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], 'and')
