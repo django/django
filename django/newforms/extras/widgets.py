@@ -57,4 +57,4 @@ class SelectDateWidget(Widget):
         y, m, d = data.get(self.year_field % name), data.get(self.month_field % name), data.get(self.day_field % name)
         if y and m and d:
             return '%s-%s-%s' % (y, m, d)
-        return None
+        return data.get(name, None)

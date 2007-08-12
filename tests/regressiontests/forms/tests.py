@@ -3635,6 +3635,29 @@ True
 <option value="2016">2016</option>
 </select>
 
+Using a SelectDateWidget in a form:
+
+>>> class GetDate(Form):
+...     mydate = DateField(widget=SelectDateWidget)
+>>> a = GetDate({'mydate_month':'4', 'mydate_day':'1', 'mydate_year':'2008'})
+>>> print a.is_valid()
+True
+>>> print a.cleaned_data['mydate']
+2008-04-01
+
+As with any widget that implements get_value_from_datadict,
+we must be prepared to accept the input from the "as_hidden"
+rendering as well.
+
+>>> print a['mydate'].as_hidden()
+<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />
+>>> b=GetDate({'mydate':'2008-4-1'})
+>>> print b.is_valid()
+True
+>>> print b.cleaned_data['mydate']
+2008-04-01
+
+
 # MultiWidget and MultiValueField #############################################
 # MultiWidgets are widgets composed of other widgets. They are usually
 # combined with MultiValueFields - a field that is composed of other fields.
