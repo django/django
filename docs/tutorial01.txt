@@ -444,8 +444,8 @@ Once you're in the shell, explore the database API::
     []
 
     # Create a new Poll.
-    >>> from datetime import datetime
-    >>> p = Poll(question="What's up?", pub_date=datetime.now())
+    >>> import datetime
+    >>> p = Poll(question="What's up?", pub_date=datetime.datetime.now())
 
     # Save the object into the database. You have to call save() explicitly.
     >>> p.save()
@@ -464,7 +464,7 @@ Once you're in the shell, explore the database API::
     datetime.datetime(2007, 7, 15, 12, 00, 53)
 
     # Change values by changing the attributes, then calling save().
-    >>> p.pub_date = datetime(2007, 4, 1, 0, 0)
+    >>> p.pub_date = datetime.datetime(2007, 4, 1, 0, 0)
     >>> p.save()
 
     # objects.all() displays all the polls in the database.
