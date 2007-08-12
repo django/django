@@ -190,6 +190,12 @@ deleted::
     # request.session['foo'] instead of request.session.
     request.session['foo']['bar'] = 'baz'
 
+In the last case of the above example, we can tell the session object
+explicitly that it has been modified by setting the ``modified`` attribute on
+the session object::
+
+    request.session.modified = True
+
 To change this default behavior, set the ``SESSION_SAVE_EVERY_REQUEST`` setting
 to ``True``. If ``SESSION_SAVE_EVERY_REQUEST`` is ``True``, Django will save
 the session to the database on every single request.
