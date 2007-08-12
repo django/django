@@ -35,7 +35,8 @@ STATE_CHOICES = (
     'TR', 'Tripura',
     'UA', 'Uttarakhand',
     'WB', 'West Bengal',
-    #Union Territories
+
+    # Union Territories
     'AN', 'Andaman and Nicobar',
     'CH', 'Chandigarh',
     'DN', 'Dadra and Nagar Haveli',
@@ -79,6 +80,5 @@ STATES_NORMALIZED = {
     'odisa': 'OR',
     'or': 'OR',
     'ar': 'AR',
-
-    }
+}
 
