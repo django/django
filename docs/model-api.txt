@@ -415,7 +415,8 @@ form::
 
     models.SlugField(prepopulate_from=("pre_name", "name"))
 
-``prepopulate_from`` doesn't accept DateTimeFields.
+``prepopulate_from`` doesn't accept DateTimeFields, ForeignKeys nor
+ManyToManyFields.
 
 The admin represents ``SlugField`` as an ``<input type="text">`` (a
 single-line input).
