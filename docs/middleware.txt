@@ -91,6 +91,12 @@ django.middleware.gzip.GZipMiddleware
 Compresses content for browsers that understand gzip compression (all modern
 browsers).
 
+It is suggested to place this first in the middleware list, so that the
+compression of the response content is the last thing that happens. Will not
+compress content bodies less than 200 bytes long, when the response code is
+something other than 200, Javascript files (for IE compatibitility), or
+responses that have the ``Content-Encoding`` header already specified.
+
 django.middleware.http.ConditionalGetMiddleware
 -----------------------------------------------
 
