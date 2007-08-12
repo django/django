@@ -344,7 +344,7 @@ url_re = re.compile(
 try:
     from django.conf import settings
     URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
-except ImportError:
+except (ImportError, EnvironmentError):
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
