@@ -71,7 +71,7 @@ def create_object(request, model, template_name=None,
     return HttpResponse(t.render(c))
 
 def update_object(request, model, object_id=None, slug=None,
-        slug_field=None, template_name=None, template_loader=loader,
+        slug_field='slug', template_name=None, template_loader=loader,
         extra_context=None, post_save_redirect=None,
         login_required=False, follow=None, context_processors=None,
         template_object_name='object'):
@@ -146,7 +146,7 @@ def update_object(request, model, object_id=None, slug=None,
     return response
 
 def delete_object(request, model, post_delete_redirect,
-        object_id=None, slug=None, slug_field=None, template_name=None,
+        object_id=None, slug=None, slug_field='slug', template_name=None,
         template_loader=loader, extra_context=None,
         login_required=False, context_processors=None, template_object_name='object'):
     """

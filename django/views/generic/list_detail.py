@@ -87,7 +87,7 @@ def object_list(request, queryset, paginate_by=None, page=None,
     return HttpResponse(t.render(c), mimetype=mimetype)
 
 def object_detail(request, queryset, object_id=None, slug=None,
-        slug_field=None, template_name=None, template_name_field=None,
+        slug_field='slug', template_name=None, template_name_field=None,
         template_loader=loader, extra_context=None,
         context_processors=None, template_object_name='object',
         mimetype=None):
