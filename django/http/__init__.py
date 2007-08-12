@@ -84,7 +84,9 @@ def parse_file_upload(header_dict, post_data):
                 if not name_dict['filename'].strip():
                     continue
                 # IE submits the full path, so trim everything but the basename.
-                # (We can't use os.path.basename because it expects Linux paths.)
+                # (We can't use os.path.basename because that uses the server's
+                # directory separator, which may not be the same as the
+                # client's one.)
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
                 FILES.appendlist(name_dict['name'], {
                     'filename': filename,
