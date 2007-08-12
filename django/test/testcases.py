@@ -88,7 +88,7 @@ class TestCase(unittest.TestCase):
             self.assertEqual(real_count, count,
                 "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
         else:
-            self.assertTrue(real_count != 0, "Couldn't find '%s' in response" % text)
+            self.failUnless(real_count != 0, "Couldn't find '%s' in response" % text)
                 
     def assertFormError(self, response, form, field, errors):
         "Assert that a form used to render the response has a specific field error"
