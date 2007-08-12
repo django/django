@@ -64,4 +64,13 @@ True
 ['Holovaty']
 >>> d['person']['2']['firstname']
 ['Adrian']
+
+### FileDict ################################################################
+
+>>> d = FileDict({'content': 'once upon a time...'})
+>>> repr(d)
+"{'content': '<omitted>'}"
+>>> d = FileDict({'other-key': 'once upon a time...'})
+>>> repr(d)
+"{'other-key': 'once upon a time...'}"
 """

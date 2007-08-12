@@ -2,7 +2,7 @@ import os
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
-from django.utils.datastructures import MultiValueDict
+from django.utils.datastructures import MultiValueDict, FileDict
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
@@ -88,11 +88,11 @@ def parse_file_upload(header_dict, post_data):
                 # directory separator, which may not be the same as the
                 # client's one.)
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
-                FILES.appendlist(name_dict['name'], {
+                FILES.appendlist(name_dict['name'], FileDict({
                     'filename': filename,
                     'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
                     'content': submessage.get_payload(),
-                })
+                }))
             else:
                 POST.appendlist(name_dict['name'], submessage.get_payload())
     return POST, FILES
