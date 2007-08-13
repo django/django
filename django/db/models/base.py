@@ -213,11 +213,11 @@ class Model(object):
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT COUNT(*) FROM %s WHERE %s=%%s" % \
+            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s LIMIT 1" % \
                 (backend.quote_name(self._meta.db_table), backend.quote_name(self._meta.pk.column)),
                 self._meta.pk.get_db_prep_lookup('exact', pk_val))
             # If it does already exist, do an UPDATE.
-            if cursor.fetchone()[0] > 0:
+            if cursor.fetchone():
                 db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
                 if db_values:
                     cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
