@@ -53,6 +53,7 @@ LANGUAGES = (
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),
+    ('hr', gettext_noop('Croatian')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
