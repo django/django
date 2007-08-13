@@ -85,6 +85,23 @@ class GeoModelTest(unittest.TestCase):
         ptown = City.objects.kml('point', precision=9).get(name='Pueblo')
         self.assertEqual('<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>', ptown.kml)
 
+    def test04_transform(self):
+        "Testing the transform() queryset method."
+
+        # Pre-transformed points for Houston and Pueblo.
+        htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
+        ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
+
+        # Asserting the result of the transform operation with the values in
+        #  the pre-transformed points.
+        h = City.objects.transform('point', srid=htown.srid).get(name='Houston')
+        self.assertAlmostEqual(htown.x, h.point.x, 8)
+        self.assertAlmostEqual(htown.y, h.point.y, 8)
+
+        p = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
+        self.assertAlmostEqual(ptown.x, p.point.x, 8)
+        self.assertAlmostEqual(ptown.y, p.point.y, 8)
+
     def test10_contains_contained(self):
         "Testing the 'contained' and 'contains' lookup types."
 
@@ -199,6 +216,45 @@ class GeoModelTest(unittest.TestCase):
         qs = City.objects.filter(point__left=ks_border)
         self.assertEqual(2, len(qs))
         for c in qs: self.assertEqual(True, c.name in cities)
+
+    def test14_equals(self):
+        "Testing the 'same_as' and 'equals' lookup types."
+        pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
+        c1 = City.objects.get(point=pnt)
+        c2 = City.objects.get(point__same_as=pnt)
+        c3 = City.objects.get(point__equals=pnt)
+        for c in [c1, c2, c3]: self.assertEqual('Houston', c.name)
+
+    def test15_relate(self):
+        "Testing the 'relate' lookup type."
+        # To make things more interesting, we will have our Texas reference point in 
+        #  different SRIDs.
+        pnt1 = fromstr('POINT (649287.0363174345111474 4177429.4494686722755432)', srid=2847)
+        pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
+
+        # Testing bad argument tuples that should return a TypeError
+        bad_args = [(pnt1, 0), (pnt2, 'T*T***FF*', 0), (23, 'foo')]
+        for args in bad_args:
+            try:
+                qs = Country.objects.filter(mpoly__relate=args)
+                cnt = qs.count()
+            except TypeError:
+                pass
+            else:
+                self.fail('Expected a TypeError')
+
+        # 'T*T***FF*' => Contains()
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, 'T*T***FF*')).name)
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, 'T*T***FF*')).name)
+
+        # 'T*F**F***' => Within()
+        ks = State.objects.get(name='Kansas')
+        self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, 'T*F**F***')).name)
+
+        # 'T********' => Intersects()
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, 'T********')).name)
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, 'T********')).name)
+        self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, 'T********')).name)
 
 def suite():
     s = unittest.TestSuite()

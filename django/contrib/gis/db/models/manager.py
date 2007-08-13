@@ -9,3 +9,6 @@ class GeoManager(Manager):
 
     def kml(self, field_name, **kwargs):
         return self.get_query_set().kml(field_name, **kwargs)
+
+    def transform(self, field_name, **kwargs):
+        return self.get_query_set().transform(field_name, **kwargs)

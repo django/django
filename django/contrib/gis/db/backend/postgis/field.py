@@ -1,7 +1,7 @@
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry, GEOSException 
+from django.contrib.gis.db.backend.postgis.query import POSTGIS_TERMS, geo_quotename as quotename
 from types import StringType
-from query import POSTGIS_TERMS, quotename
 
 class PostGISField(Field):
     def _add_geom(self, style, db_table):
@@ -66,16 +66,18 @@ class PostGISField(Field):
         return sql
 
     def get_db_prep_lookup(self, lookup_type, value):
-        "Returns field's value prepared for database lookup, accepts WKT and GEOS Geometries for the value."
+        """Returns field's value prepared for database lookup, accepts WKT and 
+        GEOS Geometries for the value."""
         if lookup_type in POSTGIS_TERMS:
             if lookup_type == 'isnull': return [value] # special case for NULL geometries.
             if not bool(value): return [None] # If invalid value passed in.
             if isinstance(value, GEOSGeometry):
                 # GEOSGeometry instance passed in.
                 if value.srid != self._srid:
-                    # Returning a dictionary instructs the parse_lookup() to add what's in the 'where' key
-                    #  to the where parameters, since we need to transform the geometry in the query.
-                    return {'where' : "Transform(%s,%s)",
+                    # Returning a dictionary instructs the parse_lookup() to add 
+                    # what's in the 'where' key to the where parameters, since we 
+                    # need to transform the geometry in the query.
+                    return {'where' : ["ST_Transform(%s,%s)"],
                             'params' : [value, self._srid]
                             }
                 else:
@@ -102,6 +104,6 @@ class PostGISField(Field):
         "Provides a proper substitution value for "
         if isinstance(value, GEOSGeometry) and value.srid != self._srid:
             # Adding Transform() to the SQL placeholder.
-            return 'Transform(%%s, %s)' % self._srid
+            return 'ST_Transform(%%s, %s)' % self._srid
         else:
             return '%s'

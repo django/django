@@ -1,11 +1,12 @@
 """
   The PostGIS spatial database backend module.
 """
-from query import \
-    get_geo_where_clause, GEOM_FUNC_PREFIX, POSTGIS_TERMS, \
+from django.contrib.gis.db.backend.postgis.query import \
+    get_geo_where_clause, geo_quotename, \
+    GEOM_FUNC_PREFIX, POSTGIS_TERMS, \
     MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2
-from creation import create_spatial_db
-from field import PostGISField
+from django.contrib.gis.db.backend.postgis.creation import create_spatial_db
+from django.contrib.gis.db.backend.postgis.field import PostGISField
 
 # Whether PostGIS has AsKML() support.
 if MAJOR_VERSION == 1:

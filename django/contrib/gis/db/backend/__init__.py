@@ -18,10 +18,10 @@ from django.utils.datastructures import SortedDict
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
-    from postgis import \
+    from django.contrib.gis.db.backend.postgis import \
         PostGISField as GeoBackendField, \
         POSTGIS_TERMS as GIS_TERMS, \
-        create_spatial_db, get_geo_where_clause
+        create_spatial_db, geo_quotename, get_geo_where_clause
 else:
     raise NotImplementedError, 'No Geographic Backend exists for %s' % settings.DATABASE_NAME
 
@@ -249,16 +249,36 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # If the field is a geometry field, then the WHERE clause will need to be obtained
         # with the get_geo_where_clause()
         if hasattr(field, '_geom'):
+            # Do we have multiple arguments, e.g., ST_Relate, ST_DWithin lookup types
+            #  need more than argument.
+            multiple_args = isinstance(value, tuple)
+
             # Getting the geographic where clause.
             gwc = get_geo_where_clause(lookup_type, current_table + '.', column, value)
 
             # Getting the geographic parameters from the field.
-            geo_params = field.get_db_prep_lookup(lookup_type, value)
+            if multiple_args:
+                geo_params = field.get_db_prep_lookup(lookup_type, value[0])
+            else:
+                geo_params = field.get_db_prep_lookup(lookup_type, value)
      
             # If a dictionary was passed back from the field modify the where clause.
-            if isinstance(geo_params, dict):
-                gwc = gwc % geo_params['where']
-                geo_params = geo_params['params']
+            param_dict = isinstance(geo_params, dict)
+            if param_dict:
+                subst_list = geo_params['where']
+                if multiple_args: subst_list += map(geo_quotename, value[1:])
+                geo_params = geo_params['params']  
+                gwc = gwc % tuple(subst_list)
+            elif multiple_args:
+                # Modify the where clause if we have multiple arguments -- the 
+                #  first substitution will be for another placeholder (for the 
+                #  geometry) since it is already apart of geo_params.
+                subst_list = ['%s']
+                subst_list += map(geo_quotename, value[1:])
+                gwc = gwc % tuple(subst_list)
+                
+            # Finally, appending onto the WHERE clause, and extending with any 
+            #  additional parameters.
             where.append(gwc)
             params.extend(geo_params)
         else:
