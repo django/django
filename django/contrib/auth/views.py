@@ -31,7 +31,7 @@ def login(request, template_name='registration/login.html'):
     if Site._meta.installed:
         current_site = Site.objects.get_current()
     else:
-        current_site = RequestSite(self.request)
+        current_site = RequestSite(request)
 
     return render_to_response(template_name, {
         'form': oldforms.FormWrapper(manipulator, request.POST, errors),
