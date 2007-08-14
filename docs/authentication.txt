@@ -436,7 +436,10 @@ template context variables:
     * ``next``: The URL to redirect to after successful login. This may contain
       a query string, too.
     * ``site_name``: The name of the current ``Site``, according to the
-      ``SITE_ID`` setting. See the `site framework docs`_.
+      ``SITE_ID`` setting. If you're using the Django development version and
+      you don't have the site framework installed, this will be set to the
+      value of ``request.META['SERVER_NAME']``. For more on sites, see the
+      `site framework docs`_.
 
 If you'd prefer not to call the template ``registration/login.html``, you can
 pass the ``template_name`` parameter via the extra arguments to the view in

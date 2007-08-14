@@ -3,7 +3,7 @@ from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
 from django import oldforms
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, RequestSite
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -27,10 +27,16 @@ def login(request, template_name='registration/login.html'):
     else:
         errors = {}
     request.session.set_test_cookie()
+
+    if Site._meta.installed:
+        current_site = Site.objects.get_current()
+    else:
+        current_site = RequestSite(self.request)
+
     return render_to_response(template_name, {
         'form': oldforms.FormWrapper(manipulator, request.POST, errors),
         REDIRECT_FIELD_NAME: redirect_to,
-        'site_name': Site.objects.get_current().name,
+        'site_name': current_site.name,
     }, context_instance=RequestContext(request))
 
 def logout(request, next_page=None, template_name='registration/logged_out.html'):
