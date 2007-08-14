@@ -18,7 +18,6 @@ REGRESSION_TEST_DIR = os.path.join(os.path.dirname(__file__), REGRESSION_TESTS_D
 ALWAYS_INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.auth',
-    'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.redirects',
     'django.contrib.sessions',
