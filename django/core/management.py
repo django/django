@@ -25,8 +25,8 @@ MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(cha
 
 APP_ARGS = '[appname ...]'
 
-# Use django.__path__[0] because we don't know which directory django into
-# which has been installed.
+# Use django.__path__[0] because we don't know into which directory django
+# has been installed.
 PROJECT_TEMPLATE_DIR = os.path.join(django.__path__[0], 'conf', '%s_template')
 
 INVALID_PROJECT_NAMES = ('django', 'site', 'test')
@@ -1502,7 +1502,7 @@ dump_data.args = '[--format] [--indent]' + APP_ARGS
 
 DEFAULT_ACTION_MAPPING = {
     'adminindex': get_admin_index,
-    'createcachetable' : createcachetable,
+    'createcachetable': createcachetable,
     'dbshell': dbshell,
     'diffsettings': diffsettings,
     'dumpdata': dump_data,
@@ -1526,7 +1526,7 @@ DEFAULT_ACTION_MAPPING = {
     'startproject': startproject,
     'syncdb': syncdb,
     'validate': validate,
-    'test':test,
+    'test': test,
 }
 
 NO_SQL_TRANSACTION = (
