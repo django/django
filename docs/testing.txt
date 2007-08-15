@@ -213,7 +213,7 @@ For developers new to testing, however, this choice can seem confusing. Here,
 then, are a few key differences to help you decide which approach is right for
 you:
 
-   * If you've been using Python for a while, ``doctest`` will probably feel
+    * If you've been using Python for a while, ``doctest`` will probably feel
       more "pythonic". It's designed to make writing tests as easy as possible,
       so it requires no overhead of writing classes or methods. You simply put
       tests in docstrings. This has the added advantage of serving as
@@ -561,7 +561,7 @@ The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 Django views; this object is simpler and has some additional data useful for
 tests.
 
-Specifically, a ``Response`` object has the following attributes::
+Specifically, a ``Response`` object has the following attributes:
 
     ===============  ==========================================================
     Attribute        Description
