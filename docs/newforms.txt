@@ -1483,9 +1483,9 @@ just use the 'widget' argument on the field definition. For example::
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
-        comment = forms.CharField(widget=forms.TextArea)
+        comment = forms.CharField(widget=forms.Textarea)
         
-This would specify a form with a comment that uses a larger TextArea widget, 
+This would specify a form with a comment that uses a larger Textarea widget, 
 rather than the default TextInput widget.
 
 Customizing widget instances
