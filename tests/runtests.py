@@ -94,6 +94,8 @@ def django_tests(verbosity, interactive, test_labels):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.common.CommonMiddleware',
     )
+    if not hasattr(settings, 'SITE_ID'):
+        settings.SITE_ID = 1
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we
