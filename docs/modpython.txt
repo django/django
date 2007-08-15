@@ -80,7 +80,7 @@ need to write your ``PythonPath`` directive as::
 
     PythonPath "['/var/production/django-apps/', '/var/www'] + sys.path"
 
-With this path, ``import weblog`` and ``import mysite.settings`` will all
+With this path, ``import weblog`` and ``import mysite.settings`` will both
 work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
 lived under the ``weblog/`` directory, you would *also* need to add
 ``/var/production/django-apps/weblog/`` to your ``PythonPath``. Remember: the
