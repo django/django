@@ -272,7 +272,7 @@ def hasNoProfanities(field_data, all_data):
         plural = len(words_seen)
         raise ValidationError, ungettext("Watch your mouth! The word %s is not allowed here.",
             "Watch your mouth! The words %s are not allowed here.", plural) % \
-            get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], 'and')
+            get_text_list(['"%s%s%s"' % (i[0], '-'*(len(i)-2), i[-1]) for i in words_seen], _('and'))
 
 class AlwaysMatchesOtherField(object):
     def __init__(self, other_field_name, error_message=None):

@@ -2,6 +2,7 @@ import re
 from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
+from django.utils.translation import ugettext_lazy
 
 # Capitalizes the first letter of a string.
 capfirst = lambda x: x and force_unicode(x)[0].upper() + force_unicode(x)[1:]
@@ -123,7 +124,7 @@ def get_valid_filename(s):
     return re.sub(r'[^-A-Za-z0-9_.]', '', s)
 get_valid_filename = allow_lazy(get_valid_filename, unicode)
 
-def get_text_list(list_, last_word=u'or'):
+def get_text_list(list_, last_word=ugettext_lazy(u'or')):
     """
     >>> get_text_list(['a', 'b', 'c', 'd'])
     'a, b, c or d'
