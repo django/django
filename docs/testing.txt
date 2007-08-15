@@ -39,30 +39,30 @@ There are two primary ways to write tests with Django, corresponding to the
 two test frameworks that ship in the Python standard library. The two
 frameworks are:
 
-	* **Doctests** -- tests that are embedded in your functions' docstrings and
-	  are written in a way that emulates a session of the Python interactive
-	  interpreter. For example::
+    * **Doctests** -- tests that are embedded in your functions' docstrings and
+      are written in a way that emulates a session of the Python interactive
+      interpreter. For example::
 
-	      def my_func(a_list, idx):
-		      """
-		      >>> a = ['larry', 'curly', 'moe']
-		      >>> my_func(a, 0)
-			  'larry'
-			  >>> my_func(a, 1)
-			  'curly'
+          def my_func(a_list, idx):
               """
-			  return a_list[idx]
+              >>> a = ['larry', 'curly', 'moe']
+              >>> my_func(a, 0)
+              'larry'
+              >>> my_func(a, 1)
+              'curly'
+              """
+              return a_list[idx]
 
-	* **Unit tests** -- tests that are expressed as methods on a Python class
-	  that subclasses ``unittest.TestCase``. For example::
+    * **Unit tests** -- tests that are expressed as methods on a Python class
+      that subclasses ``unittest.TestCase``. For example::
 
-	      import unittest
+          import unittest
 
           class MyFuncTestCase(unittest.TestCase)
-		      def testBasic(self):
-		          a = ['larry', 'curly', 'moe']
-		          self.assertEquals(my_func(a, 0), 'larry')
-			      self.assertEquals(my_func(a, 1), 'curly')
+              def testBasic(self):
+                  a = ['larry', 'curly', 'moe']
+                  self.assertEquals(my_func(a, 0), 'larry')
+                  self.assertEquals(my_func(a, 1), 'curly')
 
 You can choose the test framework you like, depending on which syntax you
 prefer, or you can mix and match, using one framework for some of your code and
@@ -98,18 +98,18 @@ read Python's official documentation for the details.
 For a given Django application, the test runner looks for doctests in two
 places:
 
-	* The ``models.py`` file. You can define module-level doctests and/or a
-	  doctest for individual models. It's common practice to put
-	  application-level doctests in the module docstring and model-level
-	  doctests in the model docstrings.
+    * The ``models.py`` file. You can define module-level doctests and/or a
+      doctest for individual models. It's common practice to put
+      application-level doctests in the module docstring and model-level
+      doctests in the model docstrings.
 
-	* A file called ``tests.py`` in the application directory -- i.e., the
-	  directory that holds ``models.py``. This file is a hook for any and all
-	  doctests you want to write that aren't necessarily related to models.
+    * A file called ``tests.py`` in the application directory -- i.e., the
+      directory that holds ``models.py``. This file is a hook for any and all
+      doctests you want to write that aren't necessarily related to models.
 
 Here is an example model doctest::
 
-	# models.py
+    # models.py
 
     from django.db import models
 
@@ -160,12 +160,12 @@ approach.
 As with doctests, for a given Django application, the test runner looks for
 unit tests in two places:
 
-	* The ``models.py`` file. The test runner looks for any subclass of
-	  ``unittest.TestCase`` in this module.
+    * The ``models.py`` file. The test runner looks for any subclass of
+      ``unittest.TestCase`` in this module.
 
-	* A file called ``tests.py`` in the application directory -- i.e., the
-	  directory that holds ``models.py``. Again, the test runner looks for any
-	  subclass of ``unittest.TestCase`` in this module.
+    * A file called ``tests.py`` in the application directory -- i.e., the
+      directory that holds ``models.py``. Again, the test runner looks for any
+      subclass of ``unittest.TestCase`` in this module.
 
 This example ``unittest.TestCase`` subclass is equivalent to the example given
 in the doctest section above::
@@ -213,26 +213,26 @@ For developers new to testing, however, this choice can seem confusing. Here,
 then, are a few key differences to help you decide which approach is right for
 you:
 
-	* If you've been using Python for a while, ``doctest`` will probably feel
-	  more "pythonic". It's designed to make writing tests as easy as possible,
-	  so it requires no overhead of writing classes or methods. You simply put
-	  tests in docstrings. This has the added advantage of serving as
-	  documentation (and correct documentation, at that!).
+   * If you've been using Python for a while, ``doctest`` will probably feel
+      more "pythonic". It's designed to make writing tests as easy as possible,
+      so it requires no overhead of writing classes or methods. You simply put
+      tests in docstrings. This has the added advantage of serving as
+      documentation (and correct documentation, at that!).
 
       If you're just getting started with testing, using doctests will probably
       get you started faster.
 
-	* The ``unittest`` framework will probably feel very familiar to developers
+    * The ``unittest`` framework will probably feel very familiar to developers
       coming from Java. ``unittest`` is inspired by Java's JUnit, so you'll
       feel at home with this method if you've used JUnit or any test framework
       inspired by JUnit.
 
-	* If you need to write a bunch of tests that share similar code, then
-	  you'll appreciate the ``unittest`` framework's organization around
-	  classes and methods. This makes it easy to abstract common tasks into
-	  common methods. The framework also supports explicit setup and/or cleanup
-	  routines, which give you a high level of control over the environment
-	  in which your test cases are run.
+    * If you need to write a bunch of tests that share similar code, then
+      you'll appreciate the ``unittest`` framework's organization around
+      classes and methods. This makes it easy to abstract common tasks into
+      common methods. The framework also supports explicit setup and/or cleanup
+      routines, which give you a high level of control over the environment
+      in which your test cases are run.
 
 Again, remember that you can use both systems side-by-side (even in the same
 app). In the end, most projects will eventually end up using both. Each shines
@@ -251,7 +251,7 @@ application name to the command line. For example, if your ``INSTALLED_APPS``
 contains ``'myproject.polls'`` and ``'myproject.animals'``, you can run the
 ``myproject.animals`` unit tests alone with this command::
 
-	# ./manage.py test animals
+    # ./manage.py test animals
 
 Note that we used ``animals``, not ``myproject.animals``.
 
@@ -274,11 +274,11 @@ Understanding the test output
 When you run your tests, you'll see a number of messages as the test runner
 prepares itself::
 
-	Creating test database...
-	Creating table myapp_animal
-	Creating table myapp_mineral
-	Loading 'initial_data' fixtures...
-	No fixtures found.
+    Creating test database...
+    Creating table myapp_animal
+    Creating table myapp_mineral
+    Loading 'initial_data' fixtures...
+    No fixtures found.
 
 This tells you that the test runner is creating a test database -- a blank,
 from-scratch database that it will use for any tests that happen to require a
