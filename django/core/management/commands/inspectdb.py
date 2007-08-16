@@ -1,11 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import NoArgsCommand, CommandError
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = "Introspects the database tables in the given database and outputs a Django model module."
 
     requires_model_validation = False
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         try:
             for line in self.handle_inspection():
                 print line

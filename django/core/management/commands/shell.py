@@ -1,12 +1,12 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = "Runs a Python interactive interpreter. Tries to use IPython, if it's available."
     args = '[--plain]'
 
     requires_model_validation = False
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         # XXX: (Temporary) workaround for ticket #1796: force early loading of all
         # models from installed apps.
         from django.db.models.loading import get_models

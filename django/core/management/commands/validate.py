@@ -1,9 +1,9 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = "Validates all installed models."
 
     requires_model_validation = False
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         self.validate()

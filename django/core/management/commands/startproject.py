@@ -1,20 +1,21 @@
-from django.core.management.base import CopyFilesCommand, CommandError
+from django.core.management.base import copy_helper, CommandError, LabelCommand
 import os
 import re
 from random import choice
 
 INVALID_PROJECT_NAMES = ('django', 'site', 'test')
 
-class Command(CopyFilesCommand):
+class Command(LabelCommand):
     help = "Creates a Django project directory structure for the given project name in the current directory."
     args = "[projectname]"
+    label = 'project name'
 
     requires_model_validation = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
     can_import_settings = False
 
-    def handle(self, project_name, **options):
+    def handle_label(self, project_name, **options):
         # Determine the project_name a bit naively -- by looking at the name of
         # the parent directory.
         directory = os.getcwd()
@@ -22,7 +23,7 @@ class Command(CopyFilesCommand):
         if project_name in INVALID_PROJECT_NAMES:
             raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
 
-        self.copy_helper('project', project_name, directory)
+        copy_helper('project', project_name, directory)
 
         # Create a random SECRET_KEY hash, and put it in the main settings.
         main_settings_file = os.path.join(directory, project_name, 'settings.py')

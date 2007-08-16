@@ -9,10 +9,12 @@ class Command(BaseCommand):
     # Validation is called explicitly each time the server is reloaded.
     requires_model_validation = False
 
-    def handle(self, addrport='', **options):
+    def handle(self, addrport='', *args, **options):
         import django
         from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
         from django.core.handlers.wsgi import WSGIHandler
+        if len(args) != 0:
+            raise CommandError('Usage is runserver %s' % self.args)
         if not addrport:
             addr = ''
             port = '8000'

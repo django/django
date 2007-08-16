@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
 
 try:
@@ -6,15 +6,15 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
     args = '[--verbosity] [--noinput]'
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         from django.db import backend, connection, transaction, models
         from django.conf import settings
         from django.core.management.sql import table_list, installed_models, sql_model_create, sql_for_pending_references, many_to_many_sql_for_model, custom_sql_for_model, sql_indexes_for_model, emit_post_sync_signal
-
+            
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
 

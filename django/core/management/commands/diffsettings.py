@@ -1,17 +1,17 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import NoArgsCommand
 
 def module_to_dict(module, omittable=lambda k: k.startswith('_')):
     "Converts a module namespace to a Python dictionary. Used by get_settings_diff."
     return dict([(k, repr(v)) for k, v in module.__dict__.items() if not omittable(k)])
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = """Displays differences between the current settings.py and Django's
     default settings. Settings that don't appear in the defaults are
     followed by "###"."""
 
     requires_model_validation = False
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         # Inspired by Postfix's "postconf -n".
         from django.conf import settings, global_settings
 

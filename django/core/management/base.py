@@ -65,6 +65,7 @@ class BaseCommand(object):
     def handle(self, *args, **options):
         raise NotImplementedError()
 
+
 class AppCommand(BaseCommand):
     args = '[appname ...]'
 
@@ -86,46 +87,77 @@ class AppCommand(BaseCommand):
     def handle_app(self, app, **options):
         raise NotImplementedError()
 
-class CopyFilesCommand(BaseCommand):
-    requires_model_validation = False
 
-    def copy_helper(self, app_or_project, name, directory, other_name=''):
-        import django
-        import os
-        import re
-        import shutil
-        other = {'project': 'app', 'app': 'project'}[app_or_project]
-        if not re.search(r'^\w+$', name): # If it's not a valid directory name.
-            raise CommandError("%r is not a valid %s name. Please use only numbers, letters and underscores." % (name, app_or_project))
-        top_dir = os.path.join(directory, name)
-        try:
-            os.mkdir(top_dir)
-        except OSError, e:
-            raise CommandError(e)
+class LabelCommand(BaseCommand):
+    args = '[label ...]'
+    label = 'label'
+    
+    def handle(self, *labels, **options):
+        if not labels:
+            raise CommandError('Enter at least one %s.' % self.label)
 
-        # Determine where the app or project templates are. Use
-        # django.__path__[0] because we don't know into which directory
-        # django has been installed.
-        template_dir = os.path.join(django.__path__[0], 'conf', '%s_template' % app_or_project)
+        output = []
+        for label in labels:
+            label_output = self.handle_label(label, **options)
+            if label_output:
+                output.append(label_output)
+        return '\n'.join(output)
 
-        for d, subdirs, files in os.walk(template_dir):
-            relative_dir = d[len(template_dir)+1:].replace('%s_name' % app_or_project, name)
-            if relative_dir:
-                os.mkdir(os.path.join(top_dir, relative_dir))
-            for i, subdir in enumerate(subdirs):
-                if subdir.startswith('.'):
-                    del subdirs[i]
-            for f in files:
-                if f.endswith('.pyc'):
-                    continue
-                path_old = os.path.join(d, f)
-                path_new = os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name))
-                fp_old = open(path_old, 'r')
-                fp_new = open(path_new, 'w')
-                fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
-                fp_old.close()
-                fp_new.close()
-                try:
-                    shutil.copymode(path_old, path_new)
-                except OSError:
-                    sys.stderr.write(self.style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
+    def handle_label(self, label, **options):
+        raise NotImplementedError()
+
+
+class NoArgsCommand(BaseCommand):
+    args = ''
+
+    def handle(self, *args, **options):
+        from django.db import models
+        if len(args) != 0:
+            raise CommandError("Command doesn't accept any arguments")
+
+        return self.handle_noargs(**options)
+
+    def handle_noargs(self, **options):
+        raise NotImplementedError()
+
+    
+def copy_helper(app_or_project, name, directory, other_name=''):
+    import django
+    import os
+    import re
+    import shutil
+    other = {'project': 'app', 'app': 'project'}[app_or_project]
+    if not re.search(r'^\w+$', name): # If it's not a valid directory name.
+        raise CommandError("%r is not a valid %s name. Please use only numbers, letters and underscores." % (name, app_or_project))
+    top_dir = os.path.join(directory, name)
+    try:
+        os.mkdir(top_dir)
+    except OSError, e:
+        raise CommandError(e)
+
+    # Determine where the app or project templates are. Use
+    # django.__path__[0] because we don't know into which directory
+    # django has been installed.
+    template_dir = os.path.join(django.__path__[0], 'conf', '%s_template' % app_or_project)
+
+    for d, subdirs, files in os.walk(template_dir):
+        relative_dir = d[len(template_dir)+1:].replace('%s_name' % app_or_project, name)
+        if relative_dir:
+            os.mkdir(os.path.join(top_dir, relative_dir))
+        for i, subdir in enumerate(subdirs):
+            if subdir.startswith('.'):
+                del subdirs[i]
+        for f in files:
+            if f.endswith('.pyc'):
+                continue
+            path_old = os.path.join(d, f)
+            path_new = os.path.join(top_dir, relative_dir, f.replace('%s_name' % app_or_project, name))
+            fp_old = open(path_old, 'r')
+            fp_new = open(path_new, 'w')
+            fp_new.write(fp_old.read().replace('{{ %s_name }}' % app_or_project, name).replace('{{ %s_name }}' % other, other_name))
+            fp_old.close()
+            fp_new.close()
+            try:
+                shutil.copymode(path_old, path_new)
+            except OSError:
+                sys.stderr.write(self.style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))

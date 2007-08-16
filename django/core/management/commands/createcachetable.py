@@ -1,12 +1,13 @@
-from django.core.management.base import BaseCommand
+from django.core.management.base import LabelCommand
 
-class Command(BaseCommand):
+class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
     args = "[tablename]"
+    label = 'tablename'
 
     requires_model_validation = False
 
-    def handle(self, tablename, **options):
+    def handle_label(self, tablename, **options):
         from django.db import backend, connection, transaction, models
         fields = (
             # "key" is a reserved word in MySQL, so use "cache_key" instead.

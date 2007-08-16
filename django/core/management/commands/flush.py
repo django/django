@@ -1,11 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import NoArgsCommand, CommandError
 from django.core.management.color import no_style
 
-class Command(BaseCommand):
+class Command(NoArgsCommand):
     help = "Executes ``sqlflush`` on the current database."
     args = '[--verbosity] [--noinput]'
 
-    def handle(self, **options):
+    def handle_noargs(self, **options):
         from django.conf import settings
         from django.db import connection, transaction, models
         from django.dispatch import dispatcher
