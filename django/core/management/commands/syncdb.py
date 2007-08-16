@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
+import sys
 
 try:
     set
