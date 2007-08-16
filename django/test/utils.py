@@ -90,6 +90,10 @@ def get_postgresql_create_suffix():
     return ''
 
 def create_test_db(verbosity=1, autoclobber=False):
+    """
+    Creates a test database, prompting the user for confirmation if the
+    database already exists. Returns the name of the test database created.
+    """
     # If the database backend wants to create the test DB itself, let it
     creation_module = get_creation_module()
     if hasattr(creation_module, "create_test_db"):
@@ -152,6 +156,8 @@ def create_test_db(verbosity=1, autoclobber=False):
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
     cursor = connection.cursor()
+
+    return TEST_DATABASE_NAME
 
 def destroy_test_db(old_database_name, verbosity=1):
     # If the database wants to drop the test DB itself, let it

@@ -988,6 +988,9 @@ a number of utility methods in the ``django.test.utils`` module.
     ``create_test_db()`` has the side effect of modifying
     ``settings.DATABASE_NAME`` to match the name of the test database.
 
+    New in the Django development version, this function returns the name of
+    the test database that it created.
+
 ``destroy_test_db(old_database_name, verbosity=1)``
     Destroys the database whose name is in the ``DATABASE_NAME`` setting
     and restores the value of ``DATABASE_NAME`` to the provided name.
