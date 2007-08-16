@@ -109,7 +109,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     settings.DATABASE_USER = TEST_DATABASE_USER
     settings.DATABASE_PASSWORD = TEST_DATABASE_PASSWD
 
-    management.syncdb(verbosity, interactive=False)
+    management.call_command('syncdb')
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
