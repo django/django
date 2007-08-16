@@ -235,6 +235,7 @@ The ``dumpdata`` command can be used to generate input for ``loaddata``.
 
 reset [appname appname ...]
 ---------------------------
+
 Executes the equivalent of ``sqlreset`` for the given appnames.
 
 runfcgi [options]
@@ -426,7 +427,46 @@ test
 
 Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
 
-.. _testing django applications: ../testing/
+.. _testing Django applications: ../testing/
+
+testserver [fixture fixture ...]
+--------------------------------
+
+**New in Django development version**
+
+Runs a Django development server (as in ``runserver``) using data from the
+given fixture(s).
+
+For example, this command::
+
+    django-admin.py testserver mydata.json
+
+...would perform the following steps:
+
+    1. Create a test database, as described in `testing Django applications`_.
+    2. Populate the test database with fixture data from the given fixtures.
+       (For more on fixtures, see the documentation for ``loaddata`` above.)
+    3. Runs the Django development server (as in ``runserver``), pointed at
+       this newly created test database instead of your production database.
+
+This is useful in a number of ways:
+
+    * When you're writing `unit tests`_ of how your views act with certain
+      fixture data, you can use ``testserver`` to interact with the views in
+      a Web browser, manually.
+
+    * Let's say you're developing your Django application and have a "pristine"
+      copy of a database that you'd like to interact with. You can dump your
+      database to a fixture (using the ``dumpdata`` command, explained above),
+      then use ``testserver`` to run your Web application with that data. With
+      this arrangement, you have the flexibility of messing up your data
+      in any way, knowing that whatever data changes you're making are only
+      being made to a test database.
+
+Note that this server can only run on the default port on localhost; it does
+not yet accept a ``host`` or ``port`` parameter.
+
+.. _unit tests: ../testing/
 
 validate
 --------
