@@ -36,6 +36,7 @@ class TestSMTPConnection(object):
     def send_messages(self, messages):
         "Redirect messages to the dummy outbox"
         mail.outbox.extend(messages)
+        return len(messages)
 
 def setup_test_environment():
     """Perform any global pre-test setup. This involves:
