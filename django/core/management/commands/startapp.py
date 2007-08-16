@@ -29,5 +29,5 @@ class ProjectCommand(Command):
         super(ProjectCommand, self).__init__()
         self.project_directory = project_directory
 
-    def handle(self, app_name):
-        super(ProjectCommand, self).handle(app_name, self.project_directory)
+    def handle(self, app_name, **options):
+        super(ProjectCommand, self).handle(app_name, self.project_directory, **options)
