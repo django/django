@@ -481,7 +481,7 @@ Once you have a ``Client`` instance, you can call any of the following methods:
 
     ...with this POST data::
 
-        name=fred&passwd&secret
+        name=fred&passwd=secret
 
     If you provide ``content_type`` (e.g., ``text/xml`` for an XML payload),
     the contents of ``data`` will be sent as-is in the POST request, using
