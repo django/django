@@ -21,7 +21,7 @@ class Command(LabelCommand):
         project_name = os.path.basename(directory)
         if app_name == project_name:
             raise CommandError("You cannot create an app with the same name (%r) as your project." % app_name)
-        copy_helper('app', app_name, directory, parent_dir)
+        copy_helper(self.style, 'app', app_name, directory, parent_dir)
 
 class ProjectCommand(Command):
     help = "Creates a Django app directory structure for the given app name in this project's directory."

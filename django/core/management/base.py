@@ -65,7 +65,6 @@ class BaseCommand(object):
     def handle(self, *args, **options):
         raise NotImplementedError()
 
-
 class AppCommand(BaseCommand):
     args = '[appname ...]'
 
@@ -87,11 +86,10 @@ class AppCommand(BaseCommand):
     def handle_app(self, app, **options):
         raise NotImplementedError()
 
-
 class LabelCommand(BaseCommand):
     args = '[label ...]'
     label = 'label'
-    
+
     def handle(self, *labels, **options):
         if not labels:
             raise CommandError('Enter at least one %s.' % self.label)
@@ -106,7 +104,6 @@ class LabelCommand(BaseCommand):
     def handle_label(self, label, **options):
         raise NotImplementedError()
 
-
 class NoArgsCommand(BaseCommand):
     args = ''
 
@@ -120,8 +117,7 @@ class NoArgsCommand(BaseCommand):
     def handle_noargs(self, **options):
         raise NotImplementedError()
 
-    
-def copy_helper(app_or_project, name, directory, other_name=''):
+def copy_helper(style, app_or_project, name, directory, other_name=''):
     import django
     import os
     import re
@@ -160,4 +156,4 @@ def copy_helper(app_or_project, name, directory, other_name=''):
             try:
                 shutil.copymode(path_old, path_new)
             except OSError:
-                sys.stderr.write(self.style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
+                sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))

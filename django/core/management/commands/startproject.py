@@ -23,7 +23,7 @@ class Command(LabelCommand):
         if project_name in INVALID_PROJECT_NAMES:
             raise CommandError("%r conflicts with the name of an existing Python module and cannot be used as a project name. Please try another name." % project_name)
 
-        copy_helper('project', project_name, directory)
+        copy_helper(self.style, 'project', project_name, directory)
 
         # Create a random SECRET_KEY hash, and put it in the main settings.
         main_settings_file = os.path.join(directory, project_name, 'settings.py')
