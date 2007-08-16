@@ -51,7 +51,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.model_label = model_label
 
     def runTest(self):
-        from django.core import management
+        from django.core.management.validation import get_validation_errors
         from django.db.models.loading import load_app
         from cStringIO import StringIO
 
@@ -61,7 +61,7 @@ class InvalidModelTestCase(unittest.TestCase):
             self.fail('Unable to load invalid model module')
 
         s = StringIO()
-        count = management.get_validation_errors(s, module)
+        count = get_validation_errors(s, module)
         s.seek(0)
         error_log = s.read()
         actual = error_log.split('\n')

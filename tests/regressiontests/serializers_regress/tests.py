@@ -273,7 +273,7 @@ class SerializerTests(unittest.TestCase):
 
 def serializerTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     # Create all the objects defined in the test data
     objects = []
@@ -291,7 +291,7 @@ def serializerTest(format, self):
     serialized_data = serializers.serialize(format, objects, indent=2)
 
     # Flush the database and recreate from the serialized data
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
     transaction.enter_transaction_management()
     transaction.managed(True)
     for obj in serializers.deserialize(format, serialized_data):
@@ -306,7 +306,7 @@ def serializerTest(format, self):
 
 def fieldsTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
     obj.save(raw=True)
@@ -322,7 +322,7 @@ def fieldsTest(format, self):
 
 def streamTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
     obj.save(raw=True)

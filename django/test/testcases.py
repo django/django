@@ -1,7 +1,8 @@
 import re, unittest
 from urlparse import urlparse
 from django.db import transaction
-from django.core import management, mail
+from django.core import mail
+from django.core.management import call_command
 from django.db.models import get_apps
 from django.test import _doctest as doctest
 from django.test.client import Client
@@ -42,9 +43,11 @@ class TestCase(unittest.TestCase):
             * Clearing the mail test outbox.
             
         """
-        management.flush(verbosity=0, interactive=False)
+        call_command('flush', verbosity=0, interactive=False)
         if hasattr(self, 'fixtures'):
-            management.load_data(self.fixtures, verbosity=0)
+            # We have to use this slightly awkward syntax due to the fact
+            # that we're using *args and **kwargs together.
+            call_command('loaddata', *self.fixtures, **{'verbosity': 0})
         mail.outbox = []
 
     def __call__(self, result=None):
