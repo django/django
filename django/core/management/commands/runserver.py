@@ -31,6 +31,7 @@ class Command(BaseCommand):
 
         use_reloader = options.get('use_reloader', True)
         admin_media_dir = options.get('admin_media_dir', '')
+        shutdown_message = options.get('shutdown_message', '')
         quit_command = (sys.platform == 'win32') and 'CTRL-BREAK' or 'CONTROL-C'
 
         def inner_run():
@@ -59,6 +60,8 @@ class Command(BaseCommand):
                 # Need to use an OS exit because sys.exit doesn't work in a thread
                 os._exit(1)
             except KeyboardInterrupt:
+                if shutdown_message:
+                    print shutdown_message
                 sys.exit(0)
         if use_reloader:
             from django.utils import autoreload
