@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+import sys
 
 class Command(BaseCommand):
     help = 'Runs the test suite for the specified applications, or the entire site if no apps are specified.'
