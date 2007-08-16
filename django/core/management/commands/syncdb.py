@@ -15,7 +15,7 @@ class Command(NoArgsCommand):
         from django.db import backend, connection, transaction, models
         from django.conf import settings
         from django.core.management.sql import table_list, installed_models, sql_model_create, sql_for_pending_references, many_to_many_sql_for_model, custom_sql_for_model, sql_indexes_for_model, emit_post_sync_signal
-            
+
         verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
 
