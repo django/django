@@ -125,6 +125,6 @@ class Command(NoArgsCommand):
                         else:
                             transaction.commit_unless_managed()
 
-        # Install the 'initialdata' fixture, using format discovery
+        # Install the 'initial_data' fixture, using format discovery
         from django.core.management import call_command
-        call_command('loaddata', 'initial_data', **options)
+        call_command('loaddata', 'initial_data', verbosity=verbosity)
