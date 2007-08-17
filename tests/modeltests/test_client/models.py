@@ -247,6 +247,7 @@ class ClientTest(TestCase):
         self.failIf(login)
 
     def test_logout(self):
+        "Request a logout after logging in"
         # Log in
         self.client.login(username='testclient', password='password')
 
