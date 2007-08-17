@@ -60,8 +60,14 @@ class InvalidModelTestCase(unittest.TestCase):
         except Exception, e:
             self.fail('Unable to load invalid model module')
 
+        # Make sure sys.stdout is not a tty so that we get errors without
+        # coloring attached (makes matching the results easier). We restore
+        # sys.stderr afterwards.
+        orig_stdout = sys.stdout
         s = StringIO()
+        sys.stdout = s
         count = get_validation_errors(s, module)
+        sys.stdout = orig_stdout
         s.seek(0)
         error_log = s.read()
         actual = error_log.split('\n')
