@@ -247,6 +247,19 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> (s1 | s2 | s3)[::2]
 [<Article: Area woman programs in Python>, <Article: Third article>]
 
+# Slicing works with longs.
+>>> Article.objects.all()[0L]
+<Article: Area woman programs in Python>
+>>> Article.objects.all()[1L:3L]
+[<Article: Second article>, <Article: Third article>]
+>>> s3 = Article.objects.filter(id__exact=3)
+>>> (s1 | s2 | s3)[::2L]
+[<Article: Area woman programs in Python>, <Article: Third article>]
+
+# And can be mixed with ints.
+>>> Article.objects.all()[1:3L]
+[<Article: Second article>, <Article: Third article>]
+
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
 [<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>]

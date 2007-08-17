@@ -35,7 +35,7 @@ msgstr "Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi"
 #: contrib/admin/media/js/SelectFilter2.js:33 
 #, perl-format 
 msgid "Available %s" 
-msgstr "Disponible %s" 
+msgstr "%s disponible(s)" 
 
 #: contrib/admin/media/js/SelectFilter2.js:41 
 msgid "Choose all" 
@@ -52,7 +52,7 @@ msgstr "Enlever"
 #: contrib/admin/media/js/SelectFilter2.js:53 
 #, perl-format 
 msgid "Chosen %s" 
-msgstr "Choisi %s" 
+msgstr "%s choisi(es)" 
 
 #: contrib/admin/media/js/SelectFilter2.js:54 
 msgid "Select your choice(s) and click " 

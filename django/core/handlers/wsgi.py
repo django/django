@@ -6,6 +6,7 @@ from django.utils.encoding import force_unicode
 from django import http
 from pprint import pformat
 from shutil import copyfileobj
+from threading import Lock
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -176,13 +177,19 @@ class WSGIRequest(http.HttpRequest):
     raw_post_data = property(_get_raw_post_data)
 
 class WSGIHandler(BaseHandler):
+    initLock = Lock()
+
     def __call__(self, environ, start_response):
         from django.conf import settings
 
         # Set up middleware if needed. We couldn't do this earlier, because
         # settings weren't available.
         if self._request_middleware is None:
-            self.load_middleware()
+            self.initLock.acquire()
+            # Check that middleware is still uninitialised.
+            if self._request_middleware is None:
+                self.load_middleware()
+            self.initLock.release()
 
         dispatcher.send(signal=signals.request_started)
         try:

@@ -63,6 +63,30 @@ computer, you'll have to tell mod_python where your project can be found:
         **PythonPath "['/path/to/project'] + sys.path"**
     </Location>
 
+The value you use for ``PythonPath`` should include the parent directories of
+all the modules you are going to import in your application. It should also
+include the parent directory of the ``DJANGO_SETTINGS_MODULE`` location. This
+is exactly the same situation as setting the Python path for interactive
+usage. Whenever you try to import something, Python will run through all the
+directories in ``sys.path`` in turn, from first to last, and try to import
+from each directory until one succeeds.
+
+An example might make this clearer. Suppose
+you have some applications under ``/usr/local/django-apps/`` (for example,
+``/usr/local/django-apps/weblog/`` and so forth), your settings file is at
+``/var/www/mysite/settings.py`` and you have specified
+``DJANGO_SETTINGS_MODULE`` as in the above example. In this case, you would
+need to write your ``PythonPath`` directive as::
+
+    PythonPath "['/var/production/django-apps/', '/var/www'] + sys.path"
+
+With this path, ``import weblog`` and ``import mysite.settings`` will both
+work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
+lived under the ``weblog/`` directory, you would *also* need to add
+``/var/production/django-apps/weblog/`` to your ``PythonPath``. Remember: the
+**parent directories** of anything you import directly must be on the Python
+path.
+
 .. caution::
 
     If you're using Windows, remember that the path will contain backslashes.

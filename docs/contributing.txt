@@ -67,6 +67,13 @@ particular:
       likely to get lost. If a particular ticket is controversial, please move
       discussion to `django-developers`_.
 
+    * **Don't** post to django-developers just to announce that you have filed
+      a bug report. All the tickets are mailed to another list
+      (`django-updates`_), which is tracked by developers and triagers, so we
+      see them as they are filed.
+
+.. _django-updates: http://groups.google.com/group/django-updates
+
 Reporting security issues
 =========================
 

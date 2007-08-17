@@ -246,6 +246,22 @@ class ClientTest(TestCase):
         login = self.client.login(username='inactive', password='password')
         self.failIf(login)
 
+    def test_logout(self):
+        # Log in
+        self.client.login(username='testclient', password='password')
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
+        # Log out
+        self.client.logout()
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/')
+
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
         # Session value isn't set initially

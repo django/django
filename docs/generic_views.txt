@@ -40,7 +40,7 @@ simple weblog app that drives the blog on djangoproject.com::
     }
 
     urlpatterns = patterns('django.views.generic.date_based',
-       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 'object_detail', dict(info_dict, slug_field='slug')),
+       (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[-\w]+)/$', 'object_detail', info_dict),
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$',               'archive_day',   info_dict),
        (r'^(?P<year>\d{4})/(?P<month>[a-z]{3})/$',                                'archive_month', info_dict),
        (r'^(?P<year>\d{4})/$',                                                    'archive_year',  info_dict),
@@ -603,7 +603,7 @@ future, the view will throw a 404 error by default, unless you set
 
       Otherwise, ``slug`` should be the slug of the given object, and
       ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model.
+      model. By default, ``slug_field`` is ``'slug'``.
 
 **Optional arguments:**
 
@@ -804,7 +804,7 @@ A page representing an individual object.
 
       Otherwise, ``slug`` should be the slug of the given object, and
       ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model.
+      model. By default, ``slug_field`` is ``'slug'``.
 
 **Optional arguments:**
 
@@ -948,7 +948,7 @@ object. This uses the automatic manipulators that come with Django models.
 
       Otherwise, ``slug`` should be the slug of the given object, and
       ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model.
+      model. By default, ``slug_field`` is ``'slug'``.
 
 **Optional arguments:**
 
@@ -1033,7 +1033,7 @@ contain a form that POSTs to the same URL.
 
       Otherwise, ``slug`` should be the slug of the given object, and
       ``slug_field`` should be the name of the slug field in the ``QuerySet``'s
-      model.
+      model. By default, ``slug_field`` is ``'slug'``.
 
     * ``post_delete_redirect``: A URL to which the view will redirect after
       deleting the object.

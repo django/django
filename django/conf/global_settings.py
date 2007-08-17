@@ -53,6 +53,7 @@ LANGUAGES = (
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),
+    ('hr', gettext_noop('Croatian')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
@@ -80,7 +81,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar")
+LANGUAGES_BIDI = ("he", "ar", "fa")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.

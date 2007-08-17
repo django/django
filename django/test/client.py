@@ -253,3 +253,14 @@ class Client:
         else:
             return False
 
+    def logout(self):
+        """Removes the authenticated user's cookies.
+
+        Causes the authenticated user to be logged out.
+        """
+        try:
+            Session.objects.get(session_key=self.cookies['sessionid'].value).delete()
+        except KeyError:
+            pass
+
+        self.cookies = SimpleCookie()

@@ -2,7 +2,7 @@ import os
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
-from django.utils.datastructures import MultiValueDict
+from django.utils.datastructures import MultiValueDict, FileDict
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
@@ -84,13 +84,15 @@ def parse_file_upload(header_dict, post_data):
                 if not name_dict['filename'].strip():
                     continue
                 # IE submits the full path, so trim everything but the basename.
-                # (We can't use os.path.basename because it expects Linux paths.)
+                # (We can't use os.path.basename because that uses the server's
+                # directory separator, which may not be the same as the
+                # client's one.)
                 filename = name_dict['filename'][name_dict['filename'].rfind("\\")+1:]
-                FILES.appendlist(name_dict['name'], {
+                FILES.appendlist(name_dict['name'], FileDict({
                     'filename': filename,
                     'content-type': 'Content-Type' in submessage and submessage['Content-Type'] or None,
                     'content': submessage.get_payload(),
-                })
+                }))
             else:
                 POST.appendlist(name_dict['name'], submessage.get_payload())
     return POST, FILES
@@ -212,18 +214,22 @@ class HttpResponse(object):
 
     status_code = 200
 
-    def __init__(self, content='', mimetype=None, status=None):
+    def __init__(self, content='', mimetype=None, status=None,
+            content_type=None):
         from django.conf import settings
         self._charset = settings.DEFAULT_CHARSET
-        if not mimetype:
-            mimetype = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE, settings.DEFAULT_CHARSET)
+        if mimetype:
+            content_type = mimetype     # For backwards compatibility
+        if not content_type:
+            content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
+                    settings.DEFAULT_CHARSET)
         if not isinstance(content, basestring) and hasattr(content, '__iter__'):
             self._container = content
             self._is_string = False
         else:
             self._container = [content]
             self._is_string = True
-        self.headers = {'Content-Type': mimetype}
+        self.headers = {'Content-Type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status

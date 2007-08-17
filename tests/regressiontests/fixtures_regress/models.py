@@ -26,7 +26,7 @@ __test__ = {'API_TESTS':"""
 >>> from django.core import management
 
 # Load a fixture that uses PK=1
->>> management.load_data(['sequence'], verbosity=0)
+>>> management.call_command('loaddata', 'sequence', verbosity=0)
         
 # Create a new animal. Without a sequence reset, this new object
 # will take a PK of 1 (on Postgres), and the save will fail.
@@ -39,7 +39,7 @@ __test__ = {'API_TESTS':"""
 # doesn't affect parsing of None values.
 
 # Load a pretty-printed XML fixture with Nulls.
->>> management.load_data(['pretty.xml'], verbosity=0)
+>>> management.call_command('loaddata', 'pretty.xml', verbosity=0)
 >>> Stuff.objects.all()
 [<Stuff: None is owned by None>]
 

@@ -267,3 +267,16 @@ class DotExpandedDict(dict):
                 current[bits[-1]] = v
             except TypeError: # Special-case if current isn't a dict.
                 current = {bits[-1] : v}
+
+class FileDict(dict):
+    """
+    A dictionary used to hold uploaded file contents. The only special feature
+    here is that repr() of this object won't dump the entire contents of the
+    file to the output. A handy safeguard for a large file upload.
+    """
+    def __repr__(self):
+        if 'content' in self:
+            d = dict(self, content='<omitted>')
+            return dict.__repr__(d)
+        return dict.__repr__(self)
+

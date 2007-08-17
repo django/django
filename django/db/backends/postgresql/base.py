@@ -278,7 +278,7 @@ def typecast_string(s):
     """
     Cast all returned strings to unicode strings.
     """
-    if not s:
+    if not s and not isinstance(s, str):
         return s
     return smart_unicode(s)
 

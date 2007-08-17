@@ -51,7 +51,7 @@ class InvalidModelTestCase(unittest.TestCase):
         self.model_label = model_label
 
     def runTest(self):
-        from django.core import management
+        from django.core.management.validation import get_validation_errors
         from django.db.models.loading import load_app
         from cStringIO import StringIO
 
@@ -60,8 +60,14 @@ class InvalidModelTestCase(unittest.TestCase):
         except Exception, e:
             self.fail('Unable to load invalid model module')
 
+        # Make sure sys.stdout is not a tty so that we get errors without
+        # coloring attached (makes matching the results easier). We restore
+        # sys.stderr afterwards.
+        orig_stdout = sys.stdout
         s = StringIO()
-        count = management.get_validation_errors(s, module)
+        sys.stdout = s
+        count = get_validation_errors(s, module)
+        sys.stdout = orig_stdout
         s.seek(0)
         error_log = s.read()
         actual = error_log.split('\n')
@@ -94,6 +100,8 @@ def django_tests(verbosity, interactive, test_labels):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.middleware.common.CommonMiddleware',
     )
+    if not hasattr(settings, 'SITE_ID'):
+        settings.SITE_ID = 1
 
     # Load all the ALWAYS_INSTALLED_APPS.
     # (This import statement is intentionally delayed until after we

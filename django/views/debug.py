@@ -123,10 +123,20 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'function': '?',
             'lineno': '?',
         }]
+
+    unicode_hint = ''
+    if issubclass(exc_type, UnicodeError):
+        start = getattr(exc_value, 'start', None)
+        end = getattr(exc_value, 'end', None)
+        if start is not None and end is not None:
+            unicode_str = exc_value.args[1]
+            unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
         'exception_value': smart_unicode(exc_value, errors='replace'),
+        'unicode_hint': unicode_hint,
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
@@ -258,6 +268,7 @@ TECHNICAL_500_TEMPLATE = """
     #explanation { background:#eee; }
     #template, #template-not-exist { background:#f6f6f6; }
     #template-not-exist ul { margin: 0 0 0 20px; }
+    #unicode-hint { background:#eee; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
@@ -358,6 +369,12 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
   </table>
 </div>
+{% if unicode_hint %}
+<div id="unicode-hint">
+    <h2>Unicode error hint</h2>
+    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint|escape }}</strong></p>
+</div>
+{% endif %}
 {% if template_does_not_exist %}
 <div id="template-not-exist">
     <h2>Template-loader postmortem</h2>

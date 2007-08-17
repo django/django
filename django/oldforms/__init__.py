@@ -204,7 +204,7 @@ class FormFieldCollection(FormFieldWrapper):
     def __str__(self):
         return unicode(self).encode('utf-8')
 
-    def __str__(self):
+    def __unicode__(self):
         return unicode(self.formfield_dict)
 
     def __getitem__(self, template_key):
