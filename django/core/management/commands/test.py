@@ -11,7 +11,7 @@ class Command(BaseCommand):
         from django.conf import settings
         from django.db.models import get_app, get_apps
 
-        verbosity = options.get('verbosity', 1)
+        verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive', True)
     
         test_path = settings.TEST_RUNNER.split('.')

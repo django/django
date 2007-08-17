@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
         self.style = no_style()
 
-        verbosity = options.get('verbosity', 1)
+        verbosity = int(options.get('verbosity', 1))
 
         # Keep a count of the installed objects and fixtures
         count = [0, 0]
