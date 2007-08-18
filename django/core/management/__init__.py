@@ -22,7 +22,7 @@ def load_command_class(module, name):
     """
     Given a command name, returns the Command class instance. Raises
     Raises ImportError if a command module doesn't exist, or AttributeError
-    if a command module doesn't include .
+    if a command module doesn't contain a Command instance.
     """
     # Let any errors propogate.
     return getattr(__import__('%s.management.commands.%s' % (module, name), {}, {}, ['Command']), 'Command')()
