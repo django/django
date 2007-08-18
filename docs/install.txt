@@ -48,8 +48,8 @@ Get your database running
 
 If you plan to use Django's database API functionality, you'll need to
 make sure a database server is running. Django works with PostgreSQL_,
-MySQL_, Oracle_ and SQLite_ (the latter doesn't require a separate server to
-be running).
+MySQL_, Oracle_ and SQLite_ (although SQLite doesn't require a separate server
+to be running).
 
 Additionally, you'll need to make sure your Python database bindings are
 installed.
