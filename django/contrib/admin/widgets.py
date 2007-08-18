@@ -5,6 +5,7 @@ Form Widget classes specific to the Django admin site.
 from django import newforms as forms
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 class FilteredSelectMultiple(forms.SelectMultiple):
     """
@@ -28,13 +29,28 @@ class FilteredSelectMultiple(forms.SelectMultiple):
             (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), settings.ADMIN_MEDIA_PREFIX))
         return u''.join(output)
 
+class AdminDateWidget(forms.TextInput):
+    class Media:
+        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js", 
+              settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
+        
+    def __init__(self, attrs={}):
+        super(AdminDateWidget, self).__init__(attrs={'class': 'vDateField', 'size': '10'})
+
+class AdminTimeWidget(forms.TextInput):
+    class Media:
+        js = (settings.ADMIN_MEDIA_PREFIX + "js/calendar.js", 
+              settings.ADMIN_MEDIA_PREFIX + "js/admin/DateTimeShortcuts.js")
+
+    def __init__(self, attrs={}):
+        super(AdminTimeWidget, self).__init__(attrs={'class': 'vTimeField', 'size': '8'})
+    
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
     """
     def __init__(self, attrs=None):
-        widgets = [forms.TextInput(attrs={'class': 'vDateField', 'size': '10'}),
-                   forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'})]
+        widgets = [AdminDateWidget, AdminTimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
         # we want to define widgets.
         forms.MultiWidget.__init__(self, widgets, attrs)

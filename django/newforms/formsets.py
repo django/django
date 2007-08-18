@@ -1,6 +1,6 @@
 from forms import Form, ValidationError
 from fields import IntegerField, BooleanField
-from widgets import HiddenInput
+from widgets import HiddenInput, Media
 
 # special field names
 FORM_COUNT_FIELD_NAME = 'COUNT'
@@ -154,6 +154,15 @@ class BaseFormSet(object):
         self.full_clean()
         return self._is_valid
 
+    def _get_media(self):
+        # All the forms on a FormSet are the same, so you only need to 
+        # interrogate the first form for media.
+        if self.forms:
+            return self.forms[0].media
+        else:
+            return Media()
+    media = property(_get_media)
+    
 def formset_for_form(form, formset=BaseFormSet, num_extra=1, orderable=False, deletable=False):
     """Return a FormSet for the given form class."""
     attrs = {'form_class': form, 'num_extra': num_extra, 'orderable': orderable, 'deletable': deletable}

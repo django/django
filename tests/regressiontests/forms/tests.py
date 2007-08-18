@@ -2,6 +2,7 @@
 from localflavor import localflavor_tests
 from regressions import regression_tests
 from formsets import formset_tests
+from media import media_tests
 
 form_tests = r"""
 >>> from django.newforms import *
@@ -3804,6 +3805,7 @@ __test__ = {
     'localflavor': localflavor_tests,
     'regressions': regression_tests,
     'formset_tests': formset_tests,
+    'media_tests': media_tests,
 }
 
 if __name__ == "__main__":

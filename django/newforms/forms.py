@@ -9,7 +9,7 @@ from django.utils.html import escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 
 from fields import Field
-from widgets import TextInput, Textarea
+from widgets import Media, media_property, TextInput, Textarea
 from util import flatatt, ErrorDict, ErrorList, ValidationError
 
 __all__ = ('BaseForm', 'Form')
@@ -37,6 +37,7 @@ class DeclarativeFieldsMetaclass(type):
     """
     Metaclass that converts Field attributes to a dictionary called
     'base_fields', taking into account parent class 'base_fields' as well.
+    Also integrates any additional media definitions
     """
     def __new__(cls, name, bases, attrs):
         fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
@@ -50,7 +51,11 @@ class DeclarativeFieldsMetaclass(type):
                 fields = base.base_fields.items() + fields
 
         attrs['base_fields'] = SortedDictFromList(fields)
-        return type.__new__(cls, name, bases, attrs)
+
+        new_class = type.__new__(cls, name, bases, attrs)
+        if 'media' not in attrs:
+            new_class.media = media_property(new_class)
+        return new_class
 
 class BaseForm(StrAndUnicode):
     # This is the main implementation of all the Form logic. Note that this
@@ -235,6 +240,16 @@ class BaseForm(StrAndUnicode):
         self.is_bound = False
         self.__errors = None
 
+    def _get_media(self):
+        """
+        Provide a description of all media required to render the widgets on this form
+        """
+        media = Media()
+        for field in self.fields.values():
+            media = media + field.widget.media
+        return media
+    media = property(_get_media)
+    
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way

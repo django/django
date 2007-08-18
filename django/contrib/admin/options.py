@@ -2,6 +2,7 @@ from django import oldforms, template
 from django import newforms as forms
 from django.newforms.formsets import all_valid
 from django.newforms.models import inline_formset
+from django.newforms.widgets import Media, MediaDefiningClass
 from django.contrib.admin import widgets
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models
@@ -48,6 +49,13 @@ class AdminForm(object):
     def first_field(self):
         for bf in self.form:
             return bf
+            
+    def _media(self):
+        media = self.form.media
+        for fs in self.fieldsets:
+            media = media + fs.media
+        return media
+    media = property(_media)
 
 class Fieldset(object):
     def __init__(self, name=None, fields=(), classes=(), description=None):
@@ -55,6 +63,13 @@ class Fieldset(object):
         self.classes = u' '.join(classes)
         self.description = description
 
+    def _media(self):
+        from django.conf import settings
+        if 'collapse' in self.classes:
+            return Media(js=['%sjs/admin/CollapsedFieldsets.js' % settings.ADMIN_MEDIA_PREFIX])
+        return Media()
+    media = property(_media)
+    
 class BoundFieldset(object):
     def __init__(self, form, fieldset):
         self.form, self.fieldset = form, fieldset
@@ -123,12 +138,12 @@ class BaseModelAdmin(object):
 
         # For DateFields, add a custom CSS class.
         if isinstance(db_field, models.DateField):
-            kwargs['widget'] = forms.TextInput(attrs={'class': 'vDateField', 'size': '10'})
+            kwargs['widget'] = widgets.AdminDateWidget
             return db_field.formfield(**kwargs)
 
         # For TimeFields, add a custom CSS class.
         if isinstance(db_field, models.TimeField):
-            kwargs['widget'] = forms.TextInput(attrs={'class': 'vTimeField', 'size': '8'})
+            kwargs['widget'] = widgets.AdminTimeWidget
             return db_field.formfield(**kwargs)
 
         # For ForeignKey or ManyToManyFields, use a special widget.
@@ -148,7 +163,8 @@ class BaseModelAdmin(object):
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
-
+    __metaclass__ = MediaDefiningClass
+    
     list_display = ('__str__',)
     list_display_links = ()
     list_filter = ()
@@ -159,7 +175,6 @@ class ModelAdmin(BaseModelAdmin):
     save_as = False
     save_on_top = False
     ordering = None
-    js = None
     prepopulated_fields = {}
     filter_vertical = ()
     filter_horizontal = ()
@@ -194,38 +209,20 @@ class ModelAdmin(BaseModelAdmin):
         else:
             return self.change_view(request, unquote(url))
 
-    def javascript(self, request, fieldsets):
-        """
-        Returns a list of URLs to include via <script> statements.
-
-        The URLs can be absolute ('/js/admin/') or explicit
-        ('http://example.com/foo.js').
-        """
+    def _media(self):
         from django.conf import settings
+
         js = ['js/core.js', 'js/admin/RelatedObjectLookups.js']
         if self.prepopulated_fields:
             js.append('js/urlify.js')
-        if self.opts.has_field_type(models.DateTimeField) or self.opts.has_field_type(models.TimeField) or self.opts.has_field_type(models.DateField):
-            js.extend(['js/calendar.js', 'js/admin/DateTimeShortcuts.js'])
         if self.opts.get_ordered_objects():
             js.extend(['js/getElementsBySelector.js', 'js/dom-drag.js' , 'js/admin/ordering.js'])
-        if self.js:
-            js.extend(self.js)
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
-        for fs in fieldsets:
-            if 'collapse' in fs.classes:
-                js.append('js/admin/CollapsedFieldsets.js')
-                break
-        prefix = settings.ADMIN_MEDIA_PREFIX
-        return ['%s%s' % (prefix, url) for url in js]
-
-    def javascript_add(self, request):
-        return self.javascript(request, self.fieldsets_add(request))
-
-    def javascript_change(self, request, obj):
-        return self.javascript(request, self.fieldsets_change(request, obj))
-
+        
+        return Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
+    media = property(_media)
+    
     def fieldsets(self, request):
         """
         Generator that yields Fieldset objects for use on add and change admin
@@ -244,13 +241,11 @@ class ModelAdmin(BaseModelAdmin):
 
     def fieldsets_add(self, request):
         "Hook for specifying Fieldsets for the add form."
-        for fs in self.fieldsets(request):
-            yield fs
+        return list(self.fieldsets(request))
 
     def fieldsets_change(self, request, obj):
         "Hook for specifying Fieldsets for the change form."
-        for fs in self.fieldsets(request):
-            yield fs
+        return list(self.fieldsets(request))
 
     def has_add_permission(self, request):
         "Returns True if the given request has permission to add an object."
@@ -430,12 +425,17 @@ class ModelAdmin(BaseModelAdmin):
                 inline_formset = FormSet()
                 inline_formsets.append(inline_formset)
 
+        adminForm = AdminForm(form, list(self.fieldsets_add(request)), self.prepopulated_fields)
+        media = self.media + adminForm.media
+        for fs in inline_formsets:
+            media = media + fs.media
+            
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
-            'adminform': AdminForm(form, self.fieldsets_add(request), self.prepopulated_fields),
+            'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
-            'javascript_imports': self.javascript_add(request),
+            'media': media,
             'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
         })
         return render_change_form(self, model, model.AddManipulator(), c, add=True)
@@ -494,13 +494,19 @@ class ModelAdmin(BaseModelAdmin):
                         #related.get_accessor_name())
                 #orig_list = func()
                 #oldform.order_objects.extend(orig_list)
+                
+        adminForm = AdminForm(form, self.fieldsets_change(request, obj), self.prepopulated_fields)        
+        media = self.media + adminForm.media
+        for fs in inline_formsets:
+            media = media + fs.media
+            
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
-            'adminform': AdminForm(form, self.fieldsets_change(request, obj), self.prepopulated_fields),
+            'adminform': adminForm,
             'object_id': object_id,
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
-            'javascript_imports': self.javascript_change(request, obj),
+            'media': media,
             'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
         })
         return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)

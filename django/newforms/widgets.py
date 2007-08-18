@@ -8,6 +8,7 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 from itertools import chain
+from django.conf import settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import ugettext
@@ -15,14 +16,113 @@ from django.utils.encoding import StrAndUnicode, force_unicode
 from util import flatatt
 
 __all__ = (
-    'Widget', 'TextInput', 'PasswordInput',
+    'Media', 'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
     'FileInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
 )
 
+MEDIA_TYPES = ('css','js')
+
+class Media(StrAndUnicode):
+    def __init__(self, media=None, **kwargs):
+        if media:
+            media_attrs = media.__dict__
+        else:
+            media_attrs = kwargs
+            
+        self._css = {}
+        self._js = []
+        
+        for name in MEDIA_TYPES:
+            getattr(self, 'add_' + name)(media_attrs.get(name, None))
+
+        # Any leftover attributes must be invalid.
+        # if media_attrs != {}:
+        #     raise TypeError, "'class Media' has invalid attribute(s): %s" % ','.join(media_attrs.keys())
+        
+    def __unicode__(self):
+        return self.render()
+        
+    def render(self):
+        return u'\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES]))
+        
+    def render_js(self):
+        return [u'<script type="text/javascript" src="%s"></script>' % self.absolute_path(path) for path in self._js]
+        
+    def render_css(self):
+        # To keep rendering order consistent, we can't just iterate over items().
+        # We need to sort the keys, and iterate over the sorted list.
+        media = self._css.keys()
+        media.sort()
+        return chain(*[
+            [u'<link href="%s" type="text/css" media="%s" rel="stylesheet" />' % (self.absolute_path(path), medium) 
+                    for path in self._css[medium]] 
+                for medium in media])
+        
+    def absolute_path(self, path):
+        return (path.startswith(u'http://') or path.startswith(u'https://')) and path or u''.join([settings.MEDIA_URL,path])
+
+    def __getitem__(self, name):
+        "Returns a Media object that only contains media of the given type"
+        if name in MEDIA_TYPES:
+            return Media(**{name: getattr(self, '_' + name)})
+        raise KeyError('Unknown media type "%s"' % name)
+
+    def add_js(self, data):
+        if data:    
+            self._js.extend([path for path in data if path not in self._js])
+            
+    def add_css(self, data):
+        if data:
+            for medium, paths in data.items():
+                self._css.setdefault(medium, []).extend([path for path in paths if path not in self._css[medium]])
+
+    def __add__(self, other):
+        combined = Media()
+        for name in MEDIA_TYPES:
+            getattr(combined, 'add_' + name)(getattr(self, '_' + name, None))
+            getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
+        return combined
+
+def media_property(cls):
+    def _media(self):
+        # Get the media property of the superclass, if it exists
+        if hasattr(super(cls, self), 'media'):
+            base = super(cls, self).media
+        else:
+            base = Media()
+        
+        # Get the media definition for this class    
+        definition = getattr(cls, 'Media', None)
+        if definition:
+            extend = getattr(definition, 'extend', True)
+            if extend:
+                if extend == True:
+                    m = base
+                else:
+                    m = Media()
+                    for medium in extend:
+                        m = m + base[medium]
+                    m = m + Media(definition)
+                return m + Media(definition)
+            else:
+                 return Media(definition)
+        else:
+            return base
+    return property(_media)
+    
+class MediaDefiningClass(type):
+    "Metaclass for classes that can have media definitions"
+    def __new__(cls, name, bases, attrs):            
+        new_class = type.__new__(cls, name, bases, attrs)
+        if 'media' not in attrs:
+            new_class.media = media_property(new_class)
+        return new_class
+        
 class Widget(object):
+    __metaclass__ = MediaDefiningClass
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
 
     def __init__(self, attrs=None):
@@ -405,6 +505,14 @@ class MultiWidget(Widget):
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
+    def _get_media(self):
+        "Media for a multiwidget is the combination of all media of the subwidgets"
+        media = Media()
+        for w in self.widgets:
+            media = media + w.media
+        return media
+    media = property(_get_media)
+    
 class SplitDateTimeWidget(MultiWidget):
     """
     A Widget that splits datetime input into two <input type="text"> boxes.
@@ -417,3 +525,4 @@ class SplitDateTimeWidget(MultiWidget):
         if value:
             return [value.date(), value.time()]
         return [None, None]
+    
