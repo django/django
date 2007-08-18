@@ -7,13 +7,25 @@ import textwrap
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
 
-def load_command_class(name):
+def find_commands(path):
+    """
+    Given a path to a management directory, return a list of all the command names 
+    that are available. Returns an empty list if no commands are defined.
+    """
+    command_dir = os.path.join(path, 'commands')
+    try:
+        return [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
+    except OSError:
+        return []
+
+def load_command_class(module, name):
     """
     Given a command name, returns the Command class instance. Raises
-    ImportError if it doesn't exist.
+    Raises ImportError if a command module doesn't exist, or AttributeError
+    if a command module doesn't include .
     """
-    # Let the ImportError propogate.
-    return getattr(__import__('django.core.management.commands.%s' % name, {}, {}, ['Command']), 'Command')()
+    # Let any errors propogate.
+    return getattr(__import__('%s.management.commands.%s' % (module, name), {}, {}, ['Command']), 'Command')()
 
 def call_command(name, *args, **options):
     """
@@ -48,9 +60,8 @@ class ManagementUtility(object):
 
         The dictionary is in the format {name: command_instance}.
         """
-        command_dir = os.path.join(__path__[0], 'commands')
-        names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
-        return dict([(name, load_command_class(name)) for name in names])
+        return dict([(name, load_command_class('django.core',name)) 
+                        for name in find_commands(__path__[0])])
 
     def usage(self):
         """
@@ -143,6 +154,33 @@ class ProjectManagementUtility(ManagementUtility):
         # project_directory, not the current working directory (which is default).
         from django.core.management.commands.startapp import ProjectCommand
         self.commands['startapp'] = ProjectCommand(project_directory)
+
+    def default_commands(self):
+        """
+        Returns a dictionary of instances of all available Command classes.
+
+        This works by looking for and loading all Python modules in the
+        django.core.management.commands package. It also looks for a
+        management.commands package in each installed application -- if
+        a commands package exists, it loads all commands in that application.
+
+        The dictionary is in the format {name: command_instance}.
+        """
+        from django.db import models
+
+        # Base command set
+        commands = super(ProjectManagementUtility, self).default_commands()
+        
+        # Get commands from all installed apps
+        for app in models.get_apps():
+            try:
+                app_name = '.'.join(app.__name__.split('.')[:-1])
+                path = os.path.join(os.path.dirname(app.__file__),'management')
+                commands.update(dict([(name, load_command_class(app_name,name)) for name in find_commands(path)]))
+            except AttributeError:
+                sys.stderr.write("Management command '%s' in application '%s' doesn't contain a Command instance.\n" % (name, app_name))
+                sys.exit(1)
+        return commands
 
 def setup_environ(settings_mod):
     """
