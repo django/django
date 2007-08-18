@@ -676,16 +676,16 @@ def do_if(parser, token):
     tag, because the order of logic would be ambigous. For example,
     this is invalid::
 
-    {% if athlete_list and coach_list or cheerleader_list %}
+        {% if athlete_list and coach_list or cheerleader_list %}
 
-    If you need to combine and and or to do advanced logic, just use
+    If you need to combine ``and`` and ``or`` to do advanced logic, just use
     nested if tags. For example:
 
-    {% if athlete_list %}
-        {% if coach_list or cheerleader_list %}
-            We have athletes, and either coaches or cheerleaders!
+        {% if athlete_list %}
+            {% if coach_list or cheerleader_list %}
+                We have athletes, and either coaches or cheerleaders!
+            {% endif %}
         {% endif %}
-    {% endif %}
     """
     bits = token.contents.split()
     del bits[0]

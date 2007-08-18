@@ -140,7 +140,7 @@ def do_extends(parser, token):
     This tag may be used in two ways: ``{% extends "base" %}`` (with quotes)
     uses the literal value "base" as the name of the parent template to extend,
     or ``{% extends variable %}`` uses the value of ``variable`` as either the
-    name of the parent template to extend (if it evaluates to a string,) or as
+    name of the parent template to extend (if it evaluates to a string) or as
     the parent tempate itelf (if it evaluates to a Template object).
     """
     bits = token.contents.split()

@@ -277,7 +277,7 @@ Subclassing Context: RequestContext
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently than
-the normal ``django.template.Context``. The first difference is that takes
+the normal ``django.template.Context``. The first difference is that it takes
 an `HttpRequest object`_ as its first argument. For example::
 
     c = RequestContext(request, {

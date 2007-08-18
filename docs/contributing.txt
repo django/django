@@ -286,7 +286,7 @@ Please follow these coding standards when writing code for inclusion in Django:
     * Mark all strings for internationalization; see the `i18n documentation`_
       for details.
 
-    * In docstrings, use "action words," like so::
+    * In docstrings, use "action words" such as::
 
           def foo():
               """
