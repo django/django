@@ -7,9 +7,9 @@ import os
 import threading
 
 __all__ = ('get_apps', 'get_app', 'get_models', 'get_model', 'register_models',
-        'load_app', 'cache_ready')
+        'load_app', 'app_cache_ready')
 
-class Cache(object):
+class AppCache(object):
     """
     A cache that stores installed applications and their models. Used to
     provide reverse-relations and for app introspection (e.g. admin).
@@ -85,7 +85,7 @@ class Cache(object):
             self.app_store[mod.models] = len(self.app_store)
         return mod.models
 
-    def cache_ready(self):
+    def app_cache_ready(self):
         """
         Returns true if the model cache is fully populated.
 
@@ -177,7 +177,7 @@ class Cache(object):
                     continue
             model_dict[model_name] = model
 
-cache = Cache()
+cache = AppCache()
 
 # These methods were always module level, so are kept that way for backwards
 # compatibility.
@@ -188,4 +188,4 @@ get_models = cache.get_models
 get_model = cache.get_model
 register_models = cache.register_models
 load_app = cache.load_app
-cache_ready = cache.cache_ready
+app_cache_ready = cache.app_cache_ready

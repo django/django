@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.loading import get_models, cache_ready
+from django.db.models.loading import get_models, app_cache_ready
 from django.db.models.query import orderlist2sql
 from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
@@ -179,7 +179,7 @@ class Options(object):
                 for f in klass._meta.many_to_many:
                     if f.rel and self == f.rel.to._meta:
                         rel_objs.append(RelatedObject(f.rel.to, klass, f))
-            if cache_ready():
+            if app_cache_ready():
                 self._all_related_many_to_many_objects = rel_objs
             return rel_objs
 
