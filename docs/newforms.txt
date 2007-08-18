@@ -1419,12 +1419,12 @@ keep it simple and assume e-mail validation is contained in a function called
 
     class MultiEmailField(forms.Field):
         def clean(self, value):
+            if not value:
+                raise forms.ValidationError('Enter at least one e-mail address.')
             emails = value.split(',')
             for email in emails:
                 if not is_valid_email(email):
                     raise forms.ValidationError('%s is not a valid e-mail address.' % email)
-            if not emails:
-                raise forms.ValidationError('Enter at least one e-mail address.')
             return emails
 
 Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
