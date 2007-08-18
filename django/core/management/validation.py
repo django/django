@@ -48,8 +48,6 @@ def get_validation_errors(outfile, app=None):
                     from PIL import Image
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
-            if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
-                e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
                 if not hasattr(f.choices, '__iter__'):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
@@ -135,51 +133,56 @@ def get_validation_errors(outfile, app=None):
 
         # Check admin attribute.
         if opts.admin is not None:
-            if not isinstance(opts.admin, models.AdminOptions):
-                e.add(opts, '"admin" attribute, if given, must be set to a models.AdminOptions() instance.')
+            # prepopulated_fields
+            if not isinstance(opts.admin.prepopulated_fields, dict):
+                e.add(opts, '"%s": prepopulated_fields should be a dictionary.' % f.name)
             else:
-                # list_display
-                if not isinstance(opts.admin.list_display, (list, tuple)):
-                    e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_display:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            if not hasattr(cls, fn):
-                                e.add(opts, '"admin.list_display" refers to %r, which isn\'t an attribute, method or property.' % fn)
-                        else:
-                            if isinstance(f, models.ManyToManyField):
-                                e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
-                # list_display_links
-                if opts.admin.list_display_links and not opts.admin.list_display:
-                    e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
-                if not isinstance(opts.admin.list_display_links, (list, tuple)):
-                    e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_display_links:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            if not hasattr(cls, fn):
-                                e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
-                        if fn not in opts.admin.list_display:
-                            e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
-                # list_filter
-                if not isinstance(opts.admin.list_filter, (list, tuple)):
-                    e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
-                else:
-                    for fn in opts.admin.list_filter:
-                        try:
-                            f = opts.get_field(fn)
-                        except models.FieldDoesNotExist:
-                            e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
-                # date_hierarchy
-                if opts.admin.date_hierarchy:
+                for field_name, field_list in opts.admin.prepopulated_fields.items():
+                    if not isinstance(field_list, (list, tuple)):
+                        e.add(opts, '"%s": prepopulated_fields "%s" value should be a list or tuple.' % (f.name, field_name))
+
+            # list_display
+            if not isinstance(opts.admin.list_display, (list, tuple)):
+                e.add(opts, '"admin.list_display", if given, must be set to a list or tuple.')
+            else:
+                for fn in opts.admin.list_display:
                     try:
-                        f = opts.get_field(opts.admin.date_hierarchy)
+                        f = opts.get_field(fn)
                     except models.FieldDoesNotExist:
-                        e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
+                        if not hasattr(cls, fn):
+                            e.add(opts, '"admin.list_display" refers to %r, which isn\'t an attribute, method or property.' % fn)
+                    else:
+                        if isinstance(f, models.ManyToManyField):
+                            e.add(opts, '"admin.list_display" doesn\'t support ManyToManyFields (%r).' % fn)
+            # list_display_links
+            if opts.admin.list_display_links and not opts.admin.list_display:
+                e.add(opts, '"admin.list_display" must be defined for "admin.list_display_links" to be used.')
+            if not isinstance(opts.admin.list_display_links, (list, tuple)):
+                e.add(opts, '"admin.list_display_links", if given, must be set to a list or tuple.')
+            else:
+                for fn in opts.admin.list_display_links:
+                    try:
+                        f = opts.get_field(fn)
+                    except models.FieldDoesNotExist:
+                        if not hasattr(cls, fn):
+                            e.add(opts, '"admin.list_display_links" refers to %r, which isn\'t an attribute, method or property.' % fn)
+                    if fn not in opts.admin.list_display:
+                        e.add(opts, '"admin.list_display_links" refers to %r, which is not defined in "admin.list_display".' % fn)
+            # list_filter
+            if not isinstance(opts.admin.list_filter, (list, tuple)):
+                e.add(opts, '"admin.list_filter", if given, must be set to a list or tuple.')
+            else:
+                for fn in opts.admin.list_filter:
+                    try:
+                        f = opts.get_field(fn)
+                    except models.FieldDoesNotExist:
+                        e.add(opts, '"admin.list_filter" refers to %r, which isn\'t a field.' % fn)
+            # date_hierarchy
+            if opts.admin.date_hierarchy:
+                try:
+                    f = opts.get_field(opts.admin.date_hierarchy)
+                except models.FieldDoesNotExist:
+                    e.add(opts, '"admin.date_hierarchy" refers to %r, which isn\'t a field.' % opts.admin.date_hierarchy)
 
         # Check ordering attribute.
         if opts.ordering:
