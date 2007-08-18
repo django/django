@@ -21,7 +21,7 @@ class BaseFormSet(object):
     """A collection of instances of the same Form class."""
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None):
-        self.is_bound = data is not None and files is not None
+        self.is_bound = data is not None or files is not None
         self.prefix = prefix or 'form'
         self.auto_id = auto_id
         self.data = data
