@@ -52,6 +52,14 @@ class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
         return "DATEPART(%s, %s)" % (lookup_type, field_name)
 
+    def date_trunc_sql(self, lookup_type, field_name):
+        if lookup_type == 'year':
+            return "Convert(datetime, Convert(varchar, DATEPART(year, %s)) + '/01/01')" % field_name
+        if lookup_type == 'month':
+            return "Convert(datetime, Convert(varchar, DATEPART(year, %s)) + '/' + Convert(varchar, DATEPART(month, %s)) + '/01')" % (field_name, field_name)
+        if lookup_type == 'day':
+            return "Convert(datetime, Convert(varchar(12), %s))" % field_name
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -88,15 +96,6 @@ dictfetchall  = util.dictfetchall
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT %s FROM %s WHERE %s = @@IDENTITY" % (pk_name, table_name, pk_name))
     return cursor.fetchone()[0]
-
-def get_date_trunc_sql(lookup_type, field_name):
-    # lookup_type is 'year', 'month', 'day'
-    if lookup_type=='year':
-        return "Convert(datetime, Convert(varchar, DATEPART(year, %s)) + '/01/01')" % field_name
-    if lookup_type=='month':
-        return "Convert(datetime, Convert(varchar, DATEPART(year, %s)) + '/' + Convert(varchar, DATEPART(month, %s)) + '/01')" % (field_name, field_name)
-    if lookup_type=='day':
-        return "Convert(datetime, Convert(varchar(12), %s))" % field_name
 
 def get_datetime_cast_sql():
     return None

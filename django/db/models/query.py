@@ -647,11 +647,10 @@ class DateQuerySet(QuerySet):
         if backend.allows_group_by_ordinal:
             group_by = '1'
         else:
-            group_by = backend.get_date_trunc_sql(self._kind,
-                                                  '%s.%s' % (table_name, field_name))
+            group_by = connection.ops.date_trunc_sql(self._kind, '%s.%s' % (table_name, field_name))
 
         sql = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
+            (connection.ops.date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
             backend.quote_name(self._field.column))), sql, group_by, self._order)
         cursor = connection.cursor()
         cursor.execute(sql, params)

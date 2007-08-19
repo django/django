@@ -37,8 +37,13 @@ Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
-        # function _sqlite_extract that's registered in connect().
+        # function django_extract that's registered in connect().
         return 'django_extract("%s", %s)' % (lookup_type.lower(), field_name)
+
+    def date_trunc_sql(self, lookup_type, field_name):
+        # sqlite doesn't support DATE_TRUNC, so we fake it with a user-defined
+        # function django_date_trunc that's registered in connect().
+        return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -109,11 +114,6 @@ def _sqlite_extract(lookup_type, dt):
     except (ValueError, TypeError):
         return None
     return str(getattr(dt, lookup_type))
-
-def get_date_trunc_sql(lookup_type, field_name):
-    # lookup_type is 'year', 'month', 'day'
-    # sqlite doesn't support DATE_TRUNC, so we fake it as above.
-    return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
 def get_datetime_cast_sql():
     return None

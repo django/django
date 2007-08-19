@@ -60,3 +60,11 @@ class BaseDatabaseOperations(object):
         extracts a value from the given date field field_name.
         """
         raise NotImplementedError()
+
+    def date_trunc_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'year', 'month' or 'day', returns the SQL that
+        truncates the given date field field_name to a DATE object with only
+        the given specificity.
+        """
+        raise NotImplementedError()

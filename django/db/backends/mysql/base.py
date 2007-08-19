@@ -58,6 +58,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
+    def date_trunc_sql(self, lookup_type, field_name):
+        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        try:
+            i = fields.index(lookup_type) + 1
+        except ValueError:
+            sql = field_name
+        else:
+            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+        return sql
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -138,20 +151,6 @@ dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     return cursor.lastrowid
-
-def get_date_trunc_sql(lookup_type, field_name):
-    # lookup_type is 'year', 'month', 'day'
-    fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-    format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
-    format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
-    try:
-        i = fields.index(lookup_type) + 1
-    except ValueError:
-        sql = field_name
-    else:
-        format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
-        sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-    return sql
 
 def get_datetime_cast_sql():
     return None

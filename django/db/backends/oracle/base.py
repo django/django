@@ -42,6 +42,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
         return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
 
+    def date_trunc_sql(self, lookup_type, field_name):
+        # Oracle uses TRUNC() for both dates and numbers.
+        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151
+        if lookup_type == 'day':
+            sql = 'TRUNC(%s)' % field_name
+        else:
+            sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
+        return sql
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -156,16 +165,6 @@ def get_last_insert_id(cursor, table_name, pk_name):
     sq_name = util.truncate_name(table_name, get_max_name_length()-3)
     cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
     return cursor.fetchone()[0]
-
-def get_date_trunc_sql(lookup_type, field_name):
-    # lookup_type is 'year', 'month', 'day'
-    # Oracle uses TRUNC() for both dates and numbers.
-    # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions155a.htm#SQLRF06151
-    if lookup_type == 'day':
-        sql = 'TRUNC(%s)' % (field_name,)
-    else:
-        sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
-    return sql
 
 def get_datetime_cast_sql():
     return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
