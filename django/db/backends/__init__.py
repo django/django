@@ -99,3 +99,13 @@ class BaseDatabaseOperations(object):
         contain a '%s' placeholder for the value being searched against.
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
+
+    def last_insert_id(self, cursor, table_name, pk_name):
+        """
+        Given a cursor object that has just performed an INSERT statement into
+        a table that has an auto-incrementing ID, returns the newly created ID.
+
+        This method also receives the table name and the name of the primary-key
+        column.
+        """
+        return cursor.lastrowid

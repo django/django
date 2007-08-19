@@ -31,6 +31,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def last_insert_id(self, cursor, table_name, pk_name):
+        cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
+        return cursor.fetchone()[0]
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -80,10 +84,6 @@ def quote_name(name):
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall = util.dictfetchall
-
-def get_last_insert_id(cursor, table_name, pk_name):
-    cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
-    return cursor.fetchone()[0]
 
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit

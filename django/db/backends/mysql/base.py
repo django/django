@@ -155,9 +155,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
-def get_last_insert_id(cursor, table_name, pk_name):
-    return cursor.lastrowid
-
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT "
     if offset and offset != 0:

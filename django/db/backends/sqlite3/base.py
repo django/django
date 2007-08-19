@@ -108,9 +108,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
-def get_last_insert_id(cursor, table_name, pk_name):
-    return cursor.lastrowid
-
 def _sqlite_extract(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)

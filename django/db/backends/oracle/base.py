@@ -57,6 +57,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def last_insert_id(self, cursor, table_name, pk_name):
+        sq_name = util.truncate_name(table_name, get_max_name_length()-3)
+        cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
+        return cursor.fetchone()[0]
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -166,11 +171,6 @@ def quote_name(name):
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
-
-def get_last_insert_id(cursor, table_name, pk_name):
-    sq_name = util.truncate_name(table_name, get_max_name_length()-3)
-    cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
-    return cursor.fetchone()[0]
 
 def get_field_cast_sql(db_type):
     if db_type.endswith('LOB'):
