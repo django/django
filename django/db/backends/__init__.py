@@ -78,3 +78,10 @@ class BaseDatabaseOperations(object):
         method should return None if no casting is necessary.
         """
         return None
+
+    def deferrable_sql(self):
+        """
+        Returns the SQL necessary to make a constraint "initially deferred"
+        during a CREATE TABLE statement.
+        """
+        return ''

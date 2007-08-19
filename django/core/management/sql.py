@@ -243,7 +243,7 @@ def sql_model_create(model, style, known_models=set()):
                 field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                     style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)) + ' (' + \
                     style.SQL_FIELD(backend.quote_name(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
-                    backend.get_deferrable_sql()
+                    connection.ops.deferrable_sql()
                 )
             else:
                 # We haven't yet created the table to which this field
@@ -280,7 +280,7 @@ def sql_for_pending_references(model, style, pending_references):
     """
     Returns any ALTER TABLE statements to add constraints after the fact.
     """
-    from django.db import backend
+    from django.db import backend, connection
     from django.db.backends.util import truncate_name
 
     final_output = []
@@ -299,12 +299,12 @@ def sql_for_pending_references(model, style, pending_references):
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
                     (backend.quote_name(r_table), truncate_name(r_name, backend.get_max_name_length()),
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col),
-                    backend.get_deferrable_sql()))
+                    connection.ops.deferrable_sql()))
             del pending_references[model]
     return final_output
 
 def many_to_many_sql_for_model(model, style):
-    from django.db import backend, models
+    from django.db import backend, connection, models
     from django.contrib.contenttypes import generic
 
     opts = model._meta
@@ -329,14 +329,14 @@ def many_to_many_sql_for_model(model, style):
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(opts.db_table)),
                 style.SQL_FIELD(backend.quote_name(opts.pk.column)),
-                backend.get_deferrable_sql()))
+                connection.ops.deferrable_sql()))
             table_output.append('    %s %s %s %s (%s)%s,' % \
                 (style.SQL_FIELD(backend.quote_name(f.m2m_reverse_name())),
                 style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
                 style.SQL_KEYWORD('NOT NULL REFERENCES'),
                 style.SQL_TABLE(backend.quote_name(f.rel.to._meta.db_table)),
                 style.SQL_FIELD(backend.quote_name(f.rel.to._meta.pk.column)),
-                backend.get_deferrable_sql()))
+                connection.ops.deferrable_sql()))
             table_output.append('    %s (%s, %s)%s' % \
                 (style.SQL_KEYWORD('UNIQUE'),
                 style.SQL_FIELD(backend.quote_name(f.m2m_column_name())),

@@ -54,6 +54,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def datetime_cast_sql(self):
         return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
+    def deferrable_sql(self):
+        return " DEFERRABLE INITIALLY DEFERRED"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -182,9 +185,6 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"
-
-def get_deferrable_sql():
-    return " DEFERRABLE INITIALLY DEFERRED"
 
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError

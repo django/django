@@ -28,6 +28,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+    def deferrable_sql(self):
+        return " DEFERRABLE INITIALLY DEFERRED"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -90,9 +93,6 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "RANDOM()"
-
-def get_deferrable_sql():
-    return " DEFERRABLE INITIALLY DEFERRED"
 
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError

@@ -60,6 +60,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if lookup_type == 'day':
             return "Convert(datetime, Convert(varchar(12), %s))" % field_name
 
+    def deferrable_sql(self):
+        return " DEFERRABLE INITIALLY DEFERRED"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -106,9 +109,6 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "RAND()"
-
-def get_deferrable_sql():
-    return " DEFERRABLE INITIALLY DEFERRED"
 
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
