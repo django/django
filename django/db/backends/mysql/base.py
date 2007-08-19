@@ -4,7 +4,7 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 try:
     import MySQLdb as Database
 except ImportError, e:
@@ -53,7 +53,12 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # standard util.CursorDebugWrapper can be used. Also, using sql_mode
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
@@ -180,9 +185,6 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from

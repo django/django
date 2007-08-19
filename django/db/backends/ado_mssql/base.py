@@ -4,7 +4,7 @@ ADO MSSQL database backend for Django.
 Requires adodbapi 2.0.1: http://adodbapi.sourceforge.net/
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 try:
     import adodbapi as Database
 except ImportError, e:
@@ -48,7 +48,12 @@ def variantToPython(variant, adType):
     return res
 Database.convertVariantToPython = variantToPython
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def _cursor(self, settings):
         if self.connection is None:
             if settings.DATABASE_NAME == '' or settings.DATABASE_USER == '':
@@ -129,9 +134,6 @@ def get_start_transaction_sql():
 
 def get_tablespace_sql(tablespace, inline=False):
     return "ON %s" % quote_name(tablespace)
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from

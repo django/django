@@ -21,7 +21,12 @@ class DatabaseError(Exception):
 class IntegrityError(DatabaseError):
     pass
 
-class DatabaseWrapper:
+class DatabaseOperations(object):
+    def __getattr__(self, *args, **kwargs):
+        complain()
+
+class DatabaseWrapper(object):
+    ops = DatabaseOperations()
     cursor = complain
     _commit = complain
     _rollback = ignore
@@ -50,7 +55,6 @@ get_drop_foreignkey_sql = complain
 get_pk_default_value = complain
 get_max_name_length = ignore
 get_start_transaction_sql = complain
-get_autoinc_sql = complain
 get_sql_flush = complain
 get_sql_sequence_reset = complain
 

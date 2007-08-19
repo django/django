@@ -4,7 +4,7 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 import datetime
@@ -21,7 +21,26 @@ except ImportError, e:
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
 
+class DatabaseOperations(BaseDatabaseOperations):
+    def autoinc_sql(self, table):
+        # To simulate auto-incrementing primary keys in Oracle, we have to
+        # create a sequence and a trigger.
+        sq_name = get_sequence_name(table)
+        tr_name = get_trigger_name(table)
+        sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
+        trigger_sql = """
+            CREATE OR REPLACE TRIGGER %s
+            BEFORE INSERT ON %s
+            FOR EACH ROW
+            WHEN (new.id IS NULL)
+                BEGIN
+                    SELECT %s.nextval INTO :new.id FROM dual;
+                END;/""" % (tr_name, quote_name(table), sq_name)
+        return sequence_sql, trigger_sql
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def _valid_connection(self):
         return self.connection is not None
 
@@ -186,22 +205,6 @@ def get_start_transaction_sql():
 
 def get_tablespace_sql(tablespace, inline=False):
     return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))
-
-def get_autoinc_sql(table):
-    # To simulate auto-incrementing primary keys in Oracle, we have to
-    # create a sequence and a trigger.
-    sq_name = get_sequence_name(table)
-    tr_name = get_trigger_name(table)
-    sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
-    trigger_sql = """CREATE OR REPLACE TRIGGER %s
-  BEFORE INSERT ON %s
-  FOR EACH ROW
-  WHEN (new.id IS NULL)
-    BEGIN
-      SELECT %s.nextval INTO :new.id FROM dual;
-    END;
-    /""" % (tr_name, quote_name(table), sq_name)
-    return sequence_sql, trigger_sql
 
 def get_drop_sequence(table):
     return "DROP SEQUENCE %s;" % quote_name(get_sequence_name(table))

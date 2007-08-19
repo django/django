@@ -5,7 +5,7 @@ Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
 from django.utils.encoding import smart_str, smart_unicode
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 try:
     import psycopg as Database
 except ImportError, e:
@@ -57,7 +57,12 @@ class UnicodeCursorWrapper(object):
 
 postgres_version = None
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def _cursor(self, settings):
         set_tz = False
         if self.connection is None:
@@ -156,9 +161,6 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from

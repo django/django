@@ -213,7 +213,7 @@ def sql_model_create(model, style, known_models=set()):
     Returns the SQL required to create a single model, as a tuple of:
         (list_of_sql, pending_references_dict)
     """
-    from django.db import backend, models
+    from django.db import backend, connection, models
 
     opts = model._meta
     final_output = []
@@ -267,9 +267,9 @@ def sql_model_create(model, style, known_models=set()):
     full_statement.append(';')
     final_output.append('\n'.join(full_statement))
 
-    if opts.has_auto_field and hasattr(backend, 'get_autoinc_sql'):
-        # Add any extra SQL needed to support auto-incrementing primary keys
-        autoinc_sql = backend.get_autoinc_sql(opts.db_table)
+    if opts.has_auto_field:
+        # Add any extra SQL needed to support auto-incrementing primary keys.
+        autoinc_sql = connection.ops.autoinc_sql(opts.db_table)
         if autoinc_sql:
             for stmt in autoinc_sql:
                 final_output.append(stmt)

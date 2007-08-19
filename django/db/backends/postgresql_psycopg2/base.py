@@ -4,7 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 try:
     import psycopg2 as Database
     import psycopg2.extensions
@@ -19,7 +19,12 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
 postgres_version = None
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def _cursor(self, settings):
         set_tz = False
         if self.connection is None:
@@ -110,9 +115,6 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from

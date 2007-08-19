@@ -2,7 +2,7 @@
 SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 try:
     try:
         from sqlite3 import dbapi2 as Database
@@ -34,7 +34,12 @@ Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def _cursor(self, settings):
         if self.connection is None:
             kwargs = {
@@ -142,9 +147,6 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """

@@ -4,7 +4,7 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
 from django.utils.encoding import force_unicode
 try:
     import MySQLdb as Database
@@ -63,7 +63,12 @@ class MysqlDebugWrapper:
         else:
             return getattr(self.cursor, attr)
 
+class DatabaseOperations(BaseDatabaseOperations):
+    pass
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    ops = DatabaseOperations()
+
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
@@ -199,9 +204,6 @@ def get_max_name_length():
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
 
 def get_sql_flush(style, tables, sequences):
     """Return a list of SQL statements required to remove all data from
