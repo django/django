@@ -1326,11 +1326,16 @@ urlize
 
 Converts URLs in plain text into clickable links.
 
+Note that if ``urlize`` is applied to text that already contains HTML markup,
+things won't work as expected. Apply this filter only to *plain* text.
+
 urlizetrunc
 ~~~~~~~~~~~
 
 Converts URLs into clickable links, truncating URLs longer than the given
 character limit.
+
+As with urlize_, this filter should only be applied to *plain* text.
 
 **Argument:** Length to truncate URLs to
 
