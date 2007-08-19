@@ -512,7 +512,7 @@ view::
 
 This is completely valid, but it leads to problems when you try to do reverse
 URL matching (through the ``permalink()`` decorator or the ``{% url %}``
-template tag). Continuing this example, if you wanted to retrieve the URL for
+`template tag`_). Continuing this example, if you wanted to retrieve the URL for
 the ``archive`` view, Django's reverse URL matcher would get confused, because
 *two* URLpatterns point at that view.
 
@@ -552,14 +552,16 @@ not restricted to valid Python names.
     name, will decrease the chances of collision. We recommend something like
     ``myapp-comment`` instead of ``comment``.
 
+.. _template tag: ../templates/#url
+
 Utility methods
 ===============
 
 reverse()
 ---------
 
-If you need to use something similar to the ``{% url %}`` template tag in your
-code, Django provides the ``django.core.urlresolvers.reverse()``. The
+If you need to use something similar to the ``{% url %}`` `template tag`_ in
+your code, Django provides the ``django.core.urlresolvers.reverse()``. The
 ``reverse()`` function has the following signature::
 
     reverse(viewname, urlconf=None, args=None, kwargs=None)
