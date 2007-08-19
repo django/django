@@ -808,7 +808,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     elif lookup_type in ('range', 'year'):
         return '%s BETWEEN %%s AND %%s' % field_sql
     elif lookup_type in ('month', 'day'):
-        return "%s = %%s" % backend.get_date_extract_sql(lookup_type, field_sql)
+        return "%s = %%s" % connection.ops.date_extract_sql(lookup_type, field_sql)
     elif lookup_type == 'isnull':
         return "%s IS %sNULL" % (field_sql, (not value and 'NOT ' or ''))
     elif lookup_type == 'search':

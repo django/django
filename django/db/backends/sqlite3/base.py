@@ -35,7 +35,10 @@ Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
 class DatabaseOperations(BaseDatabaseOperations):
-    pass
+    def date_extract_sql(self, lookup_type, field_name):
+        # sqlite doesn't support extract, so we fake it with the user-defined
+        # function _sqlite_extract that's registered in connect().
+        return 'django_extract("%s", %s)' % (lookup_type.lower(), field_name)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -99,12 +102,6 @@ dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     return cursor.lastrowid
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    # sqlite doesn't support extract, so we fake it with the user-defined
-    # function _sqlite_extract that's registered in connect(), above.
-    return 'django_extract("%s", %s)' % (lookup_type.lower(), table_name)
 
 def _sqlite_extract(lookup_type, dt):
     try:

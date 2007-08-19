@@ -49,7 +49,8 @@ def variantToPython(variant, adType):
 Database.convertVariantToPython = variantToPython
 
 class DatabaseOperations(BaseDatabaseOperations):
-    pass
+    def date_extract_sql(self, lookup_type, field_name):
+        return "DATEPART(%s, %s)" % (lookup_type, field_name)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -87,10 +88,6 @@ dictfetchall  = util.dictfetchall
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT %s FROM %s WHERE %s = @@IDENTITY" % (pk_name, table_name, pk_name))
     return cursor.fetchone()[0]
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    return "DATEPART(%s, %s)" % (lookup_type, table_name)
 
 def get_date_trunc_sql(lookup_type, field_name):
     # lookup_type is 'year', 'month', 'day'

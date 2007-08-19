@@ -54,7 +54,9 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
 
 class DatabaseOperations(BaseDatabaseOperations):
-    pass
+    def date_extract_sql(self, lookup_type, field_name):
+        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -136,11 +138,6 @@ dictfetchall  = util.dictfetchall
 
 def get_last_insert_id(cursor, table_name, pk_name):
     return cursor.lastrowid
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-    return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), table_name)
 
 def get_date_trunc_sql(lookup_type, field_name):
     # lookup_type is 'year', 'month', 'day'

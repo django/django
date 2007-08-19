@@ -58,7 +58,9 @@ class UnicodeCursorWrapper(object):
 postgres_version = None
 
 class DatabaseOperations(BaseDatabaseOperations):
-    pass
+    def date_extract_sql(self, lookup_type, field_name):
+        # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -121,11 +123,6 @@ def dictfetchall(cursor):
 def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
     return cursor.fetchone()[0]
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
-    return "EXTRACT('%s' FROM %s)" % (lookup_type, table_name)
 
 def get_date_trunc_sql(lookup_type, field_name):
     # lookup_type is 'year', 'month', 'day'

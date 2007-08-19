@@ -38,6 +38,10 @@ class DatabaseOperations(BaseDatabaseOperations):
                 END;/""" % (tr_name, quote_name(table), sq_name)
         return sequence_sql, trigger_sql
 
+    def date_extract_sql(self, lookup_type, field_name):
+        # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
+        return "EXTRACT(%s FROM %s)" % (lookup_type, field_name)
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -152,11 +156,6 @@ def get_last_insert_id(cursor, table_name, pk_name):
     sq_name = util.truncate_name(table_name, get_max_name_length()-3)
     cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
     return cursor.fetchone()[0]
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    # http://download-east.oracle.com/docs/cd/B10501_01/server.920/a96540/functions42a.htm#1017163
-    return "EXTRACT(%s FROM %s)" % (lookup_type, table_name)
 
 def get_date_trunc_sql(lookup_type, field_name):
     # lookup_type is 'year', 'month', 'day'
