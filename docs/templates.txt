@@ -937,9 +937,9 @@ such as this::
 
 The template tag will output the string ``/clients/client/123/``.
 
-**New in development version.**
-If you are using `named URL patterns`_, you can refer to the name of the
-pattern in the ``url`` tag instead of using the path to the view.
+**New in development version:** If you're using `named URL patterns`_,
+you can refer to the name of the pattern in the ``url`` tag instead of
+using the path to the view.
 
 .. _named URL patterns: ../url_dispatch/#naming-url-patterns
 
