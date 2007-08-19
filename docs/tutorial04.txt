@@ -193,7 +193,7 @@ Change it like so::
     urlpatterns = patterns('',
         (r'^$', 'django.views.generic.list_detail.object_list', info_dict),
         (r'^(?P<object_id>\d+)/$', 'django.views.generic.list_detail.object_detail', info_dict),
-        (r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html'), 'poll_results'),
+        url(r'^(?P<object_id>\d+)/results/$', 'django.views.generic.list_detail.object_detail', dict(info_dict, template_name='polls/results.html'), 'poll_results'),
         (r'^(?P<poll_id>\d+)/vote/$', 'mysite.polls.views.vote'),
     )
 
@@ -209,11 +209,14 @@ objects" and "display a detail page for a particular type of object."
       from the URL to be called ``"object_id"``, so we've changed ``poll_id`` to
       ``object_id`` for the generic views.
 
-    * We've added a name, ``poll_results``, to the results view so that we have
-      a way to refer to its URL later on (see `naming URL patterns`_ for more on
-      named patterns).
-      
+    * We've added a name, ``poll_results``, to the results view so that we
+      have a way to refer to its URL later on (see the documentation about
+      `naming URL patterns`_ for information). We're also using the `url()`_
+      function from ``django.conf.urls.defaults`` here. It's a good habit to
+      use ``url()`` when you are providing a pattern name like this.
+
 .. _naming URL patterns: ../url_dispatch/#naming-url-patterns
+.. _url(): ../url_dispatch/#url
 
 By default, the ``object_detail`` generic view uses a template called
 ``<app name>/<model name>_detail.html``. In our case, it'll use the template
