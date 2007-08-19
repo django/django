@@ -64,22 +64,22 @@ class CalendarPlugin(DatabrowsePlugin):
 
     def calendar_view(self, request, field, year=None, month=None, day=None):
         easy_model = EasyModel(self.site, self.model)
+        queryset = easy_model.get_query_set()
         extra_context = {'root_url': self.site.root_url, 'model': easy_model, 'field': field}
         if day is not None:
-            # TODO: The objects in this template should be EasyInstances
-            return date_based.archive_day(request, year, month, day, self.model.objects.all(), field.name,
+            return date_based.archive_day(request, year, month, day, queryset, field.name,
                 template_name='databrowse/calendar_day.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         elif month is not None:
-            return date_based.archive_month(request, year, month, self.model.objects.all(), field.name,
+            return date_based.archive_month(request, year, month, queryset, field.name,
                 template_name='databrowse/calendar_month.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         elif year is not None:
-            return date_based.archive_year(request, year, self.model.objects.all(), field.name,
+            return date_based.archive_year(request, year, queryset, field.name,
                 template_name='databrowse/calendar_year.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         else:
-            return date_based.archive_index(request, self.model.objects.all(), field.name,
+            return date_based.archive_index(request, queryset, field.name,
                 template_name='databrowse/calendar_main.html', allow_empty=True, allow_future=True,
                 extra_context=extra_context)
         assert False, ('%s, %s, %s, %s' % (field, year, month, day))

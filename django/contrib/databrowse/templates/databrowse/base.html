@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
 <title>{% block title %}{% endblock %}</title>
+{% block style %}
 <style type="text/css">
 * { margin:0; padding:0; }
 body { background:#eee; color:#333; font:76%/1.6 "Lucida Grande","Bitstream Vera Sans",Verdana,sans-serif; }
@@ -48,9 +49,11 @@ p { margin:0.5em 0 1em 0; }
 /* CONTENT */
 #content { background:#fff; border-bottom:1px solid #ddd; padding:0 20px; }
 </style>
+{% endblock %}
+{% block extrahead %}{% endblock %}
 </head>
 <body id="{% block bodyid %}page{% endblock %}">
-<div id="header"><a href="{{ root_url }}">Databrowse</a></div>
+<div id="header"><a href="{{ root_url }}">{% block databrowse_title %}Databrowse{% endblock %}</a></div>
 <div id="content">
 {% block content %}{% endblock %}
 </div>

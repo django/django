@@ -8,6 +8,7 @@ from django.utils import dateformat
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.utils.encoding import smart_unicode, smart_str, iri_to_uri
+from django.db.models.query import QuerySet
 
 EMPTY_VALUE = '(None)'
 
@@ -30,8 +31,12 @@ class EasyModel(object):
         return '%s%s/%s/' % (self.site.root_url, self.model._meta.app_label, self.model._meta.module_name)
 
     def objects(self, **kwargs):
-        for obj in self.model._default_manager.filter(**kwargs):
-            yield EasyInstance(self, obj)
+        return self.get_query_set().filter(**kwargs)
+
+    def get_query_set(self):
+        easy_qs = self.model._default_manager.get_query_set()._clone(klass=EasyQuerySet)
+        easy_qs._easymodel = self
+        return easy_qs
 
     def object_by_pk(self, pk):
         return EasyInstance(self, self.model._default_manager.get(pk=pk))
@@ -194,3 +199,17 @@ class EasyInstanceField(object):
         else:
             lst = [(self.values()[0], None)]
         return lst
+
+class EasyQuerySet(QuerySet):
+    """
+    When creating (or cloning to) an `EasyQuerySet`, make sure to set the
+    `_easymodel` variable to the related `EasyModel`.
+    """
+    def iterator(self, *args, **kwargs):
+        for obj in super(EasyQuerySet, self).iterator(*args, **kwargs):
+            yield EasyInstance(self._easymodel, obj)
+
+    def _clone(self, *args, **kwargs):
+        c = super(EasyQuerySet, self)._clone(*args, **kwargs)
+        c._easymodel = self._easymodel
+        return c

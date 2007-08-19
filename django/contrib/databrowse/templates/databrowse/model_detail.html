@@ -1,4 +1,4 @@
-{% extends "databrowse/base.html" %}
+{% extends "databrowse/base_site.html" %}
 
 {% block title %}{{ model.verbose_name_plural|capfirst }}{% endblock %}
 
@@ -6,7 +6,7 @@
 
 <div id="breadcrumbs"><a href="{{ root_url }}">Home</a> / {{ model.verbose_name_plural|capfirst }}</div>
 
-<h1>{{ model.verbose_name_plural|capfirst }}</h1>
+<h1>{{ model.objects.count }} {% if model.objects.count|pluralize %}{{ model.verbose_name_plural }}{% else %}{{ model.verbose_name }}{% endif %}</h1>
 
 {{ plugin_html }}
 
