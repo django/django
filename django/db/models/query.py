@@ -780,8 +780,8 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
-    if type(value) == datetime.datetime and backend.get_datetime_cast_sql():
-        cast_sql = backend.get_datetime_cast_sql()
+    if type(value) == datetime.datetime and connection.ops.datetime_cast_sql():
+        cast_sql = connection.ops.datetime_cast_sql()
     else:
         cast_sql = '%s'
     if db_type and hasattr(backend, 'get_field_cast_sql'):
@@ -794,8 +794,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     else:
         format = '%s %s'
     try:
-        return format % (field_sql,
-                         backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
+        return format % (field_sql, backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':

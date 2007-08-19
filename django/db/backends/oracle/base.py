@@ -51,6 +51,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "TRUNC(%s, '%s')" % (field_name, lookup_type)
         return sql
 
+    def datetime_cast_sql(self):
+        return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -165,9 +168,6 @@ def get_last_insert_id(cursor, table_name, pk_name):
     sq_name = util.truncate_name(table_name, get_max_name_length()-3)
     cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
     return cursor.fetchone()[0]
-
-def get_datetime_cast_sql():
-    return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
 def get_field_cast_sql(db_type):
     if db_type.endswith('LOB'):

@@ -128,9 +128,6 @@ def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
     return cursor.fetchone()[0]
 
-def get_datetime_cast_sql():
-    return None
-
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:

@@ -115,9 +115,6 @@ def _sqlite_extract(lookup_type, dt):
         return None
     return str(getattr(dt, lookup_type))
 
-def get_datetime_cast_sql():
-    return None
-
 def get_limit_offset_sql(limit, offset=None):
     sql = "LIMIT %s" % limit
     if offset and offset != 0:

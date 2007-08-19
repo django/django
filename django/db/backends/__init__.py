@@ -68,3 +68,10 @@ class BaseDatabaseOperations(object):
         the given specificity.
         """
         raise NotImplementedError()
+
+    def datetime_cast_sql(self):
+        """
+        Returns the SQL necessary to cast a datetime value so that it will be
+        retrieved as a Python datetime object instead of a string.
+        """
+        return None

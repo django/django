@@ -97,9 +97,6 @@ def get_last_insert_id(cursor, table_name, pk_name):
     cursor.execute("SELECT %s FROM %s WHERE %s = @@IDENTITY" % (pk_name, table_name, pk_name))
     return cursor.fetchone()[0]
 
-def get_datetime_cast_sql():
-    return None
-
 def get_limit_offset_sql(limit, offset=None):
     # TODO: This is a guess. Make sure this is correct.
     sql = "LIMIT %s" % limit
