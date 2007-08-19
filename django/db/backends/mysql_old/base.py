@@ -84,6 +84,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
 
+    def fulltext_search_sql(self, field_name):
+        return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -182,9 +185,6 @@ def get_limit_offset_sql(limit, offset=None):
 
 def get_random_function_sql():
     return "RAND()"
-
-def get_fulltext_search_sql(field_name):
-    return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
 def get_pk_default_value():
     return "DEFAULT"

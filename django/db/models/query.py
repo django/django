@@ -810,7 +810,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     elif lookup_type == 'isnull':
         return "%s IS %sNULL" % (field_sql, (not value and 'NOT ' or ''))
     elif lookup_type == 'search':
-        return backend.get_fulltext_search_sql(field_sql)
+        return connection.ops.fulltext_search_sql(field_sql)
     elif lookup_type in ('regex', 'iregex'):
         if settings.DATABASE_ENGINE == 'oracle':
             if lookup_type == 'regex':
