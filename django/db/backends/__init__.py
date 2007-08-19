@@ -126,3 +126,10 @@ class BaseDatabaseOperations(object):
         is no limit.
         """
         return None
+
+    def pk_default_value(self):
+        """
+        Returns the value to use during an INSERT statement to specify that
+        the field should use its default value.
+        """
+        return 'DEFAULT'

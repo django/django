@@ -48,6 +48,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def drop_foreignkey_sql(self):
         return ""
 
+    def pk_default_value(self):
+        return 'NULL'
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -117,9 +120,6 @@ def _sqlite_extract(lookup_type, dt):
 
 def get_random_function_sql():
     return "RANDOM()"
-
-def get_pk_default_value():
-    return "NULL"
 
 def get_start_transaction_sql():
     return "BEGIN;"

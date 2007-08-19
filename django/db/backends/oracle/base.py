@@ -189,9 +189,6 @@ def get_field_cast_sql(db_type):
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"
 
-def get_pk_default_value():
-    return "DEFAULT"
-
 def get_start_transaction_sql():
     return None
 
