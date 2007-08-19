@@ -181,6 +181,12 @@ def get_date_trunc_sql(lookup_type, field_name):
 def get_datetime_cast_sql():
     return "TO_TIMESTAMP(%s, 'YYYY-MM-DD HH24:MI:SS.FF')"
 
+def get_field_cast_sql(db_type):
+    if db_type.endswith('LOB'):
+        return "DBMS_LOB.SUBSTR(%s%s)"
+    else:
+        return "%s%s"
+
 def get_limit_offset_sql(limit, offset=None):
     # Limits and offset are too complicated to be handled here.
     # Instead, they are handled in django/db/backends/oracle/query.py.

@@ -777,7 +777,7 @@ class QNot(Q):
             return SortedDict(), [], []
         return joins, where2, params
 
-def get_where_clause(lookup_type, table_prefix, field_name, value):
+def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     if table_prefix.endswith('.'):
         table_prefix = backend.quote_name(table_prefix[:-1])+'.'
     field_name = backend.quote_name(field_name)
@@ -785,36 +785,41 @@ def get_where_clause(lookup_type, table_prefix, field_name, value):
         cast_sql = backend.get_datetime_cast_sql()
     else:
         cast_sql = '%s'
-    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
-        format = 'UPPER(%s%s) %s'
+    if db_type and hasattr(backend, 'get_field_cast_sql'):
+        field_cast_sql = backend.get_field_cast_sql(db_type)
     else:
-        format = '%s%s %s'
+        field_cast_sql = '%s%s'
+    field_sql = field_cast_sql % (table_prefix, field_name)
+    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
+        format = 'UPPER(%s) %s'
+    else:
+        format = '%s %s'
     try:
-        return format % (table_prefix, field_name,
+        return format % (field_sql,
                          backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':
         in_string = ','.join(['%s' for id in value])
         if in_string:
-            return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
+            return '%s IN (%s)' % (field_sql, in_string)
         else:
             raise EmptyResultSet
     elif lookup_type in ('range', 'year'):
-        return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
+        return '%s BETWEEN %%s AND %%s' % field_sql
     elif lookup_type in ('month', 'day'):
-        return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
+        return "%s = %%s" % backend.get_date_extract_sql(lookup_type, field_sql)
     elif lookup_type == 'isnull':
-        return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (field_sql, (not value and 'NOT ' or ''))
     elif lookup_type == 'search':
-        return backend.get_fulltext_search_sql(table_prefix + field_name)
+        return backend.get_fulltext_search_sql(field_sql)
     elif lookup_type in ('regex', 'iregex'):
         if settings.DATABASE_ENGINE == 'oracle':
             if lookup_type == 'regex':
                 match_option = 'c'
             else:
                 match_option = 'i'
-            return "REGEXP_LIKE(%s%s, %s, '%s')" % (table_prefix, field_name, cast_sql, match_option)
+            return "REGEXP_LIKE(%s, %s, '%s')" % (field_sql, cast_sql, match_option)
         else:
             raise NotImplementedError
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
@@ -1071,6 +1076,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     else:
         # No elements left in path. Current element is the element on which
         # the search is being performed.
+        db_type = None
 
         if join_required:
             # Last query term is a RelatedObject
@@ -1100,8 +1106,9 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         else:
             # Last query term was a normal field.
             column = field.column
+            db_type = field.db_type()
 
-        where.append(get_where_clause(lookup_type, current_table + '.', column, value))
+        where.append(get_where_clause(lookup_type, current_table + '.', column, value, db_type))
         params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params
