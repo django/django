@@ -204,7 +204,15 @@ optional extra arguments dictionary. For example::
         ...
     )
 
+This function takes five arguments, most of which are optional::
+
+    url(regex, view, kwargs=None, name=None, prefix='')
+
 See `Naming URL patterns`_ for why the ``name`` parameter is useful.
+
+The ``prefix`` parameter has the same meaning as the first argument to
+``patterns()`` and is only relevant when you're passing a string as the
+``view`` parameter.
 
 handler404
 ----------
