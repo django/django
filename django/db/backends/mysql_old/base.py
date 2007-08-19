@@ -87,6 +87,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def fulltext_search_sql(self, field_name):
         return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
 
+    def limit_offset_sql(self, limit, offset=None):
+        # 'LIMIT 20,40'
+        sql = "LIMIT "
+        if offset and offset != 0:
+            sql += "%s," % offset
+        return sql + str(limit)
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -173,12 +180,6 @@ def quote_name(name):
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
-
-def get_limit_offset_sql(limit, offset=None):
-    sql = "LIMIT "
-    if offset and offset != 0:
-        sql += "%s," % offset
-    return sql + str(limit)
 
 def get_random_function_sql():
     return "RAND()"

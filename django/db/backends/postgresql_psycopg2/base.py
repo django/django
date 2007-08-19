@@ -85,12 +85,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall = util.dictfetchall
 
-def get_limit_offset_sql(limit, offset=None):
-    sql = "LIMIT %s" % limit
-    if offset and offset != 0:
-        sql += " OFFSET %s" % offset
-    return sql
-
 def get_random_function_sql():
     return "RANDOM()"
 

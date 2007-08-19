@@ -109,3 +109,13 @@ class BaseDatabaseOperations(object):
         column.
         """
         return cursor.lastrowid
+
+    def limit_offset_sql(self, limit, offset=None):
+        """
+        Returns a LIMIT/OFFSET SQL clause, given a limit and optional offset.
+        """
+        # 'LIMIT 40 OFFSET 20'
+        sql = "LIMIT %s" % limit
+        if offset and offset != 0:
+            sql += " OFFSET %s" % offset
+        return sql

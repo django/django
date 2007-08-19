@@ -555,7 +555,7 @@ class _QuerySet(object):
 
         # LIMIT and OFFSET clauses
         if self._limit is not None:
-            sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
+            sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 

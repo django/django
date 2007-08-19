@@ -131,12 +131,6 @@ def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
     return cursor.dictfetchall()
 
-def get_limit_offset_sql(limit, offset=None):
-    sql = "LIMIT %s" % limit
-    if offset and offset != 0:
-        sql += " OFFSET %s" % offset
-    return sql
-
 def get_random_function_sql():
     return "RANDOM()"
 

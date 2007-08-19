@@ -62,6 +62,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
+    def limit_offset_sql(self, limit, offset=None):
+        # Limits and offset are too complicated to be handled here.
+        # Instead, they are handled in django/db/backends/oracle/query.py.
+        return ""
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -177,11 +182,6 @@ def get_field_cast_sql(db_type):
         return "DBMS_LOB.SUBSTR(%s%s)"
     else:
         return "%s%s"
-
-def get_limit_offset_sql(limit, offset=None):
-    # Limits and offset are too complicated to be handled here.
-    # Instead, they are handled in django/db/backends/oracle/query.py.
-    return ""
 
 def get_random_function_sql():
     return "DBMS_RANDOM.RANDOM"

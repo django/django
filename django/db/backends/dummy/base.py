@@ -43,7 +43,6 @@ quote_name = complain
 dictfetchone = complain
 dictfetchmany = complain
 dictfetchall = complain
-get_limit_offset_sql = complain
 get_random_function_sql = complain
 get_pk_default_value = complain
 get_max_name_length = ignore
