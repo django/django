@@ -209,7 +209,9 @@ class Model(object):
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val()
-        pk_set = pk_val is not None
+        # Note: the comparison with '' is required for compatibility with
+        # oldforms-style model creation.
+        pk_set = pk_val is not None and pk_val != u''
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
