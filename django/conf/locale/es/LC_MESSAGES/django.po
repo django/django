@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-13 11:29-0400\n"
+"POT-Creation-Date: 2007-08-17 15:35-0400\n"
 "PO-Revision-Date: 2007-07-14 13:00-0500\n"
 "Last-Translator: Mario Gonzalez <gonzalemario @t gmail.com>\n"
 "Language-Team: Castellano <Django-I18N@googlegroups.com>\n"
@@ -22,6 +22,7 @@ msgstr "%(object)s de este %(type)s ya existen en este %(field)s."
 
 #: db/models/manipulators.py:310 contrib/admin/views/main.py:342
 #: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
+#: core/validators.py:275
 msgid "and"
 msgstr "y"
 
@@ -510,6 +511,10 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
+#: utils/text.py:127
+msgid "or"
+msgstr "o"
+
 #: utils/dateformat.py:41
 msgid "p.m."
 msgstr "p.m"
@@ -765,7 +770,7 @@ msgstr "ocho"
 msgid "nine"
 msgstr "nueve"
 
-#: contrib/auth/views.py:41
+#: contrib/auth/views.py:47
 msgid "Logged out"
 msgstr "Sesión terminada"
 
