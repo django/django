@@ -147,7 +147,7 @@ def sql_delete(app, style):
                     output.append('%s %s %s %s;' % \
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
-                        style.SQL_KEYWORD(backend.get_drop_foreignkey_sql()),
+                        style.SQL_KEYWORD(connection.ops.drop_foreignkey_sql()),
                         style.SQL_FIELD(truncate_name(r_name, backend.get_max_name_length()))))
                 del references_to_delete[model]
             if model._meta.has_auto_field and hasattr(backend, 'get_drop_sequence'):

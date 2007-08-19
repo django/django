@@ -97,9 +97,6 @@ def get_random_function_sql():
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
 
-def get_drop_foreignkey_sql():
-    return "DROP CONSTRAINT"
-
 def get_pk_default_value():
     return "DEFAULT"
 

@@ -45,6 +45,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function django_date_trunc that's registered in connect().
         return 'django_date_trunc("%s", %s)' % (lookup_type.lower(), field_name)
 
+    def drop_foreignkey_sql(self):
+        return ""
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -126,9 +129,6 @@ def get_random_function_sql():
 
 def get_fulltext_search_sql(field_name):
     raise NotImplementedError
-
-def get_drop_foreignkey_sql():
-    return ""
 
 def get_pk_default_value():
     return "NULL"

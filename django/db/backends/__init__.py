@@ -85,3 +85,9 @@ class BaseDatabaseOperations(object):
         during a CREATE TABLE statement.
         """
         return ''
+
+    def drop_foreignkey_sql(self):
+        """
+        Returns the SQL command that drops a foreign key.
+        """
+        return "DROP CONSTRAINT"

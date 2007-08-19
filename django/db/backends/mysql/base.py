@@ -71,6 +71,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
+    def drop_foreignkey_sql(self):
+        return "DROP FOREIGN KEY"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -163,9 +166,6 @@ def get_random_function_sql():
 
 def get_fulltext_search_sql(field_name):
     return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
-
-def get_drop_foreignkey_sql():
-    return "DROP FOREIGN KEY"
 
 def get_pk_default_value():
     return "DEFAULT"
