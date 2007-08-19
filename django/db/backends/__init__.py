@@ -73,5 +73,8 @@ class BaseDatabaseOperations(object):
         """
         Returns the SQL necessary to cast a datetime value so that it will be
         retrieved as a Python datetime object instead of a string.
+
+        This SQL should include a '%s' in place of the field's name. This
+        method should return None if no casting is necessary.
         """
         return None
