@@ -121,9 +121,6 @@ def get_random_function_sql():
 def get_pk_default_value():
     return "NULL"
 
-def get_max_name_length():
-    return None
-
 def get_start_transaction_sql():
     return "BEGIN;"
 

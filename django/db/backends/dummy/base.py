@@ -45,7 +45,6 @@ dictfetchmany = complain
 dictfetchall = complain
 get_random_function_sql = complain
 get_pk_default_value = complain
-get_max_name_length = ignore
 get_start_transaction_sql = complain
 get_sql_flush = complain
 get_sql_sequence_reset = complain

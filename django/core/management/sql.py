@@ -148,7 +148,7 @@ def sql_delete(app, style):
                         (style.SQL_KEYWORD('ALTER TABLE'),
                         style.SQL_TABLE(backend.quote_name(table)),
                         style.SQL_KEYWORD(connection.ops.drop_foreignkey_sql()),
-                        style.SQL_FIELD(truncate_name(r_name, backend.get_max_name_length()))))
+                        style.SQL_FIELD(truncate_name(r_name, connection.ops.max_name_length()))))
                 del references_to_delete[model]
             if model._meta.has_auto_field and hasattr(backend, 'get_drop_sequence'):
                 output.append(backend.get_drop_sequence(model._meta.db_table))
@@ -297,7 +297,7 @@ def sql_for_pending_references(model, style, pending_references):
                 # So we are careful with character usage here.
                 r_name = '%s_refs_%s_%x' % (r_col, col, abs(hash((r_table, table))))
                 final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % \
-                    (backend.quote_name(r_table), truncate_name(r_name, backend.get_max_name_length()),
+                    (backend.quote_name(r_table), truncate_name(r_name, connection.ops.max_name_length()),
                     backend.quote_name(r_col), backend.quote_name(table), backend.quote_name(col),
                     connection.ops.deferrable_sql()))
             del pending_references[model]

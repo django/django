@@ -119,3 +119,10 @@ class BaseDatabaseOperations(object):
         if offset and offset != 0:
             sql += " OFFSET %s" % offset
         return sql
+
+    def max_name_length(self):
+        """
+        Returns the maximum length of table and column names, or None if there
+        is no limit.
+        """
+        return None

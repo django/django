@@ -58,7 +58,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def last_insert_id(self, cursor, table_name, pk_name):
-        sq_name = util.truncate_name(table_name, get_max_name_length()-3)
+        sq_name = util.truncate_name(table_name, self.max_name_length() - 3)
         cursor.execute('SELECT %s_sq.currval FROM dual' % sq_name)
         return cursor.fetchone()[0]
 
@@ -66,6 +66,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Limits and offset are too complicated to be handled here.
         # Instead, they are handled in django/db/backends/oracle/query.py.
         return ""
+
+    def max_name_length(self):
+        return 30
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -170,7 +173,7 @@ def quote_name(name):
     # always defaults to uppercase.
     # We simplify things by making Oracle identifiers always uppercase.
     if not name.startswith('"') and not name.endswith('"'):
-        name = '"%s"' % util.truncate_name(name.upper(), get_max_name_length())
+        name = '"%s"' % util.truncate_name(name.upper(), DatabaseOperations().max_name_length())
     return name.upper()
 
 dictfetchone = util.dictfetchone
@@ -188,9 +191,6 @@ def get_random_function_sql():
 
 def get_pk_default_value():
     return "DEFAULT"
-
-def get_max_name_length():
-    return 30
 
 def get_start_transaction_sql():
     return None
@@ -249,7 +249,7 @@ def get_sql_flush(style, tables, sequences):
         return []
 
 def get_sequence_name(table):
-    name_length = get_max_name_length() - 3
+    name_length = DatabaseOperations().max_name_length() - 3
     return '%s_SQ' % util.truncate_name(table, name_length).upper()
 
 def get_sql_sequence_reset(style, model_list):
@@ -271,7 +271,7 @@ def get_sql_sequence_reset(style, model_list):
     return output
 
 def get_trigger_name(table):
-    name_length = get_max_name_length() - 3
+    name_length = DatabaseOperations().max_name_length() - 3
     return '%s_TR' % util.truncate_name(table, name_length).upper()
 
 def get_query_set_class(DefaultQuerySet):
