@@ -4,7 +4,7 @@ ADO MSSQL database backend for Django.
 Requires adodbapi 2.0.1: http://adodbapi.sourceforge.net/
 """
 
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, util
 try:
     import adodbapi as Database
 except ImportError, e:
@@ -48,46 +48,18 @@ def variantToPython(variant, adType):
     return res
 Database.convertVariantToPython = variantToPython
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
-    def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
-
-    def cursor(self):
-        from django.conf import settings
+class DatabaseWrapper(BaseDatabaseWrapper):
+    def _cursor(self, settings):
         if self.connection is None:
             if settings.DATABASE_NAME == '' or settings.DATABASE_USER == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "You need to specify both DATABASE_NAME and DATABASE_USER in your Django settings file."
+                raise ImproperlyConfigured("You need to specify both DATABASE_NAME and DATABASE_USER in your Django settings file.")
             if not settings.DATABASE_HOST:
                 settings.DATABASE_HOST = "127.0.0.1"
             # TODO: Handle DATABASE_PORT.
             conn_string = "PROVIDER=SQLOLEDB;DATA SOURCE=%s;UID=%s;PWD=%s;DATABASE=%s" % (settings.DATABASE_HOST, settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
             self.connection = Database.connect(conn_string)
-        cursor = self.connection.cursor()
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(cursor, self)
-        return cursor
-
-    def _commit(self):
-        if self.connection is not None:
-            return self.connection.commit()
-
-    def _rollback(self):
-        if self.connection is not None:
-            return self.connection.rollback()
-
-    def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
+        return self.connection.cursor()
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True

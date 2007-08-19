@@ -4,7 +4,7 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, util
 from django.utils.encoding import force_unicode
 try:
     import MySQLdb as Database
@@ -63,19 +63,10 @@ class MysqlDebugWrapper:
         else:
             return getattr(self.cursor, attr)
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
+class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
+        super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
-        self.options = kwargs
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -87,8 +78,7 @@ class DatabaseWrapper(local):
                 self.connection = None
         return False
 
-    def cursor(self):
-        from django.conf import settings
+    def _cursor(self, settings):
         if not self._valid_connection():
             kwargs = {
                 # Note: use_unicode intentonally not set to work around some
@@ -119,25 +109,16 @@ class DatabaseWrapper(local):
                     self.connection.set_character_set('utf8')
         else:
             cursor = self.connection.cursor()
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
-    def _commit(self):
-        if self.connection is not None:
-            self.connection.commit()
+    def make_debug_cursor(self, cursor):
+        return BaseDatabaseWrapper.make_debug_cursor(self, MysqlDebugWrapper(cursor))
 
     def _rollback(self):
-        if self.connection is not None:
-            try:
-                self.connection.rollback()
-            except Database.NotSupportedError:
-                pass
-
-    def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
+        try:
+            BaseDatabaseWrapper._rollback(self)
+        except Database.NotSupportedError:
+            pass
 
     def get_server_version(self):
         if not self.server_version:

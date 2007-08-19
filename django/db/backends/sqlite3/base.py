@@ -2,7 +2,7 @@
 SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, util
 try:
     try:
         from sqlite3 import dbapi2 as Database
@@ -34,21 +34,8 @@ Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
-    def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
-        self.options = kwargs
-
-    def cursor(self):
-        from django.conf import settings
+class DatabaseWrapper(BaseDatabaseWrapper):
+    def _cursor(self, settings):
         if self.connection is None:
             kwargs = {
                 'database': settings.DATABASE_NAME,
@@ -60,28 +47,15 @@ class DatabaseWrapper(local):
             self.connection.create_function("django_extract", 2, _sqlite_extract)
             self.connection.create_function("django_date_trunc", 2, _sqlite_date_trunc)
             self.connection.create_function("regexp", 2, _sqlite_regexp)
-        cursor = self.connection.cursor(factory=SQLiteCursorWrapper)
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(cursor, self)
-        else:
-            return cursor
-
-    def _commit(self):
-        if self.connection is not None:
-            self.connection.commit()
-
-    def _rollback(self):
-        if self.connection is not None:
-            self.connection.rollback()
+        return self.connection.cursor(factory=SQLiteCursorWrapper)
 
     def close(self):
         from django.conf import settings
         # If database is in memory, closing the connection destroys the
-        # database.  To prevent accidental data loss, ignore close requests on
+        # database. To prevent accidental data loss, ignore close requests on
         # an in-memory db.
-        if self.connection is not None and settings.DATABASE_NAME != ":memory:":
-            self.connection.close()
-            self.connection = None
+        if settings.DATABASE_NAME != ":memory:":
+            BaseDatabaseWrapper.close(self)
 
 class SQLiteCursorWrapper(Database.Cursor):
     """

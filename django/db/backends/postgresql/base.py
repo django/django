@@ -5,7 +5,7 @@ Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
 from django.utils.encoding import smart_str, smart_unicode
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, util
 try:
     import psycopg as Database
 except ImportError, e:
@@ -14,13 +14,6 @@ except ImportError, e:
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
-
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
 
 class UnicodeCursorWrapper(object):
     """
@@ -64,14 +57,8 @@ class UnicodeCursorWrapper(object):
 
 postgres_version = None
 
-class DatabaseWrapper(local):
-    def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
-        self.options = kwargs
-
-    def cursor(self):
-        from django.conf import settings
+class DatabaseWrapper(BaseDatabaseWrapper):
+    def _cursor(self, settings):
         set_tz = False
         if self.connection is None:
             set_tz = True
@@ -98,22 +85,7 @@ class DatabaseWrapper(local):
         if not postgres_version:
             cursor.execute("SELECT version()")
             postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(cursor, self)
         return cursor
-
-    def _commit(self):
-        if self.connection is not None:
-            return self.connection.commit()
-
-    def _rollback(self):
-        if self.connection is not None:
-            return self.connection.rollback()
-
-    def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
 
 allows_group_by_ordinal = True
 allows_unique_and_pk = True

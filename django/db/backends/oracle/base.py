@@ -4,8 +4,7 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
-from django.conf import settings
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, util
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 import datetime
@@ -19,27 +18,14 @@ except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
     raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
 
-
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
-
-class DatabaseWrapper(local):
-    def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
-        self.options = kwargs
-
+class DatabaseWrapper(BaseDatabaseWrapper):
     def _valid_connection(self):
         return self.connection is not None
 
-    def cursor(self):
+    def _cursor(self, settings):
         if not self._valid_connection():
             if len(settings.DATABASE_HOST.strip()) == 0:
                 settings.DATABASE_HOST = 'localhost'
@@ -55,22 +41,7 @@ class DatabaseWrapper(local):
         # Set oracle date to ansi date format.
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
         cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(cursor, self)
         return cursor
-
-    def _commit(self):
-        if self.connection is not None:
-            return self.connection.commit()
-
-    def _rollback(self):
-        if self.connection is not None:
-            return self.connection.rollback()
-
-    def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
 
 allows_group_by_ordinal = False
 allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
