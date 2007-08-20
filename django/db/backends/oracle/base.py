@@ -112,6 +112,9 @@ class DatabaseOperations(BaseDatabaseOperations):
                                        'table':f.m2m_db_table()})
         return output
 
+    def start_transaction_sql(self):
+        return ''
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -227,9 +230,6 @@ def get_field_cast_sql(db_type):
         return "DBMS_LOB.SUBSTR(%s%s)"
     else:
         return "%s%s"
-
-def get_start_transaction_sql():
-    return None
 
 def get_tablespace_sql(tablespace, inline=False):
     return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))

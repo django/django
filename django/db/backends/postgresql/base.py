@@ -211,9 +211,6 @@ def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
     return cursor.dictfetchall()
 
-def get_start_transaction_sql():
-    return "BEGIN;"
-
 def typecast_string(s):
     """
     Cast all returned strings to unicode strings.

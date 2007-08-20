@@ -160,3 +160,9 @@ class BaseDatabaseOperations(object):
         color_style() or no_style() in django.core.management.color.
         """
         return [] # No sequence reset required by default.
+
+    def start_transaction_sql(self):
+        """
+        Returns the SQL statement required to start a transaction.
+        """
+        return "BEGIN;"

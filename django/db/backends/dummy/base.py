@@ -43,6 +43,5 @@ quote_name = complain
 dictfetchone = complain
 dictfetchmany = complain
 dictfetchall = complain
-get_start_transaction_sql = complain
 
 OPERATOR_MAPPING = {}

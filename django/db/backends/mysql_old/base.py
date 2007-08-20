@@ -207,9 +207,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
-def get_start_transaction_sql():
-    return "BEGIN;"
-
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',

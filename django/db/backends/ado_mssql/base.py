@@ -103,9 +103,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
-def get_start_transaction_sql():
-    return "BEGIN;"
-
 def get_tablespace_sql(tablespace, inline=False):
     return "ON %s" % quote_name(tablespace)
 

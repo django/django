@@ -131,9 +131,6 @@ def _sqlite_extract(lookup_type, dt):
         return None
     return str(getattr(dt, lookup_type))
 
-def get_start_transaction_sql():
-    return "BEGIN;"
-
 def _sqlite_date_trunc(lookup_type, dt):
     try:
         dt = util.typecast_timestamp(dt)
