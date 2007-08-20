@@ -124,11 +124,3 @@ def truncate_name(name, length=None):
     hash = md5.md5(name).hexdigest()[:4]
 
     return '%s%s' % (name[:length-4], hash)
-
-##################################################################################
-# Helper functions for dictfetch* for databases that don't natively support them #
-##################################################################################
-
-def _dict_helper(desc, row):
-    "Returns a dictionary for the given cursor.description and result row."
-    return dict(zip([col[0] for col in desc], row))
