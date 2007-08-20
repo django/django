@@ -214,7 +214,7 @@ def sql_model_create(model, style, known_models=set()):
     Returns the SQL required to create a single model, as a tuple of:
         (list_of_sql, pending_references_dict)
     """
-    from django.db import backend, connection, models
+    from django.db import connection, models
 
     opts = model._meta
     final_output = []
@@ -282,7 +282,7 @@ def sql_for_pending_references(model, style, pending_references):
     """
     Returns any ALTER TABLE statements to add constraints after the fact.
     """
-    from django.db import backend, connection
+    from django.db import connection
     from django.db.backends.util import truncate_name
 
     qn = connection.ops.quote_name
@@ -307,7 +307,7 @@ def sql_for_pending_references(model, style, pending_references):
     return final_output
 
 def many_to_many_sql_for_model(model, style):
-    from django.db import backend, connection, models
+    from django.db import connection, models
     from django.contrib.contenttypes import generic
 
     opts = model._meta
@@ -390,7 +390,7 @@ def custom_sql_for_model(model):
 
 def sql_indexes_for_model(model, style):
     "Returns the CREATE INDEX SQL statements for a single model"
-    from django.db import backend, connection
+    from django.db import connection
     output = []
 
     qn = connection.ops.quote_name

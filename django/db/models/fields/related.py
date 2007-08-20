@@ -1,4 +1,4 @@
-from django.db import backend, connection, transaction
+from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
 from django.db.models.related import RelatedObject

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from django.core import validators
-from django.db import backend, connection
+from django.db import connection
 from django.db.models.loading import get_apps, get_app, get_models, get_model, register_models
 from django.db.models.query import Q
 from django.db.models.manager import Manager

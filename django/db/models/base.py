@@ -6,7 +6,7 @@ from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
 from django.db.models.query import delete_objects
 from django.db.models.options import Options, AdminOptions
-from django.db import connection, backend, transaction
+from django.db import connection, transaction
 from django.db.models import signals
 from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
