@@ -4,13 +4,13 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.utils.encoding import force_unicode
 try:
     import MySQLdb as Database
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
@@ -48,14 +48,14 @@ class MysqlDebugWrapper:
             return self.cursor.execute(sql, params)
         except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+            raise Database.Warning("%s: %s" % (w, self.cursor.fetchall()))
 
     def executemany(self, sql, param_list):
         try:
             return self.cursor.executemany(sql, param_list)
         except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+            raise Database.Warning("%s: %s" % (w, self.cursor.fetchall()))
 
     def __getattr__(self, attr):
         if attr in self.__dict__:
@@ -63,19 +63,94 @@ class MysqlDebugWrapper:
         else:
             return getattr(self.cursor, attr)
 
-try:
-    # Only exists in Python 2.4+
-    from threading import local
-except ImportError:
-    # Import copy of _thread_local.py from Python 2.4
-    from django.utils._threading_local import local
+class DatabaseFeatures(BaseDatabaseFeatures):
+    autoindexes_primary_keys = False
 
-class DatabaseWrapper(local):
+class DatabaseOperations(BaseDatabaseOperations):
+    def date_extract_sql(self, lookup_type, field_name):
+        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
+
+    def date_trunc_sql(self, lookup_type, field_name):
+        fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
+        format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
+        format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
+        try:
+            i = fields.index(lookup_type) + 1
+        except ValueError:
+            sql = field_name
+        else:
+            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
+        return sql
+
+    def drop_foreignkey_sql(self):
+        return "DROP FOREIGN KEY"
+
+    def fulltext_search_sql(self, field_name):
+        return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
+
+    def limit_offset_sql(self, limit, offset=None):
+        # 'LIMIT 20,40'
+        sql = "LIMIT "
+        if offset and offset != 0:
+            sql += "%s," % offset
+        return sql + str(limit)
+
+    def quote_name(self, name):
+        if name.startswith("`") and name.endswith("`"):
+            return name # Quoting once is enough.
+        return "`%s`" % name
+
+    def random_function_sql(self):
+        return 'RAND()'
+
+    def sql_flush(self, style, tables, sequences):
+        # NB: The generated SQL below is specific to MySQL
+        # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
+        # to clear all tables of all data
+        if tables:
+            sql = ['SET FOREIGN_KEY_CHECKS = 0;']
+            for table in tables:
+                sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(self.quote_name(table))))
+            sql.append('SET FOREIGN_KEY_CHECKS = 1;')
+
+            # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
+            # to reset sequence indices
+            sql.extend(["%s %s %s %s %s;" % \
+                (style.SQL_KEYWORD('ALTER'),
+                 style.SQL_KEYWORD('TABLE'),
+                 style.SQL_TABLE(self.quote_name(sequence['table'])),
+                 style.SQL_KEYWORD('AUTO_INCREMENT'),
+                 style.SQL_FIELD('= 1'),
+                ) for sequence in sequences])
+            return sql
+        else:
+            return []
+
+class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
+    ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': 'LIKE %s',
+        'contains': 'LIKE BINARY %s',
+        'icontains': 'LIKE %s',
+        'regex': 'REGEXP BINARY %s',
+        'iregex': 'REGEXP %s',
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': 'LIKE BINARY %s',
+        'endswith': 'LIKE BINARY %s',
+        'istartswith': 'LIKE %s',
+        'iendswith': 'LIKE %s',
+    }
+
     def __init__(self, **kwargs):
-        self.connection = None
-        self.queries = []
+        super(DatabaseWrapper, self).__init__(**kwargs)
         self.server_version = None
-        self.options = kwargs
 
     def _valid_connection(self):
         if self.connection is not None:
@@ -87,8 +162,7 @@ class DatabaseWrapper(local):
                 self.connection = None
         return False
 
-    def cursor(self):
-        from django.conf import settings
+    def _cursor(self, settings):
         if not self._valid_connection():
             kwargs = {
                 # Note: use_unicode intentonally not set to work around some
@@ -119,25 +193,16 @@ class DatabaseWrapper(local):
                     self.connection.set_character_set('utf8')
         else:
             cursor = self.connection.cursor()
-        if settings.DEBUG:
-            return util.CursorDebugWrapper(MysqlDebugWrapper(cursor), self)
         return cursor
 
-    def _commit(self):
-        if self.connection is not None:
-            self.connection.commit()
+    def make_debug_cursor(self, cursor):
+        return BaseDatabaseWrapper.make_debug_cursor(self, MysqlDebugWrapper(cursor))
 
     def _rollback(self):
-        if self.connection is not None:
-            try:
-                self.connection.rollback()
-            except Database.NotSupportedError:
-                pass
-
-    def close(self):
-        if self.connection is not None:
-            self.connection.close()
-            self.connection = None
+        try:
+            BaseDatabaseWrapper._rollback(self)
+        except Database.NotSupportedError:
+            pass
 
     def get_server_version(self):
         if not self.server_version:
@@ -148,128 +213,3 @@ class DatabaseWrapper(local):
                 raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = False
-needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
-needs_upper_for_iops = False
-supports_constraints = True
-supports_tablespaces = False
-uses_case_insensitive_names = False
-
-def quote_name(name):
-    if name.startswith("`") and name.endswith("`"):
-        return name # Quoting once is enough.
-    return "`%s`" % name
-
-dictfetchone = util.dictfetchone
-dictfetchmany = util.dictfetchmany
-dictfetchall  = util.dictfetchall
-
-def get_last_insert_id(cursor, table_name, pk_name):
-    return cursor.lastrowid
-
-def get_date_extract_sql(lookup_type, table_name):
-    # lookup_type is 'year', 'month', 'day'
-    # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
-    return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), table_name)
-
-def get_date_trunc_sql(lookup_type, field_name):
-    # lookup_type is 'year', 'month', 'day'
-    fields = ['year', 'month', 'day', 'hour', 'minute', 'second']
-    format = ('%%Y-', '%%m', '-%%d', ' %%H:', '%%i', ':%%s') # Use double percents to escape.
-    format_def = ('0000-', '01', '-01', ' 00:', '00', ':00')
-    try:
-        i = fields.index(lookup_type) + 1
-    except ValueError:
-        sql = field_name
-    else:
-        format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
-        sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
-    return sql
-
-def get_datetime_cast_sql():
-    return None
-
-def get_limit_offset_sql(limit, offset=None):
-    sql = "LIMIT "
-    if offset and offset != 0:
-        sql += "%s," % offset
-    return sql + str(limit)
-
-def get_random_function_sql():
-    return "RAND()"
-
-def get_deferrable_sql():
-    return ""
-
-def get_fulltext_search_sql(field_name):
-    return 'MATCH (%s) AGAINST (%%s IN BOOLEAN MODE)' % field_name
-
-def get_drop_foreignkey_sql():
-    return "DROP FOREIGN KEY"
-
-def get_pk_default_value():
-    return "DEFAULT"
-
-def get_max_name_length():
-    return None;
-
-def get_start_transaction_sql():
-    return "BEGIN;"
-
-def get_autoinc_sql(table):
-    return None
-
-def get_sql_flush(style, tables, sequences):
-    """Return a list of SQL statements required to remove all data from
-    all tables in the database (without actually removing the tables
-    themselves) and put the database in an empty 'initial' state
-
-    """
-    # NB: The generated SQL below is specific to MySQL
-    # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
-    # to clear all tables of all data
-    if tables:
-        sql = ['SET FOREIGN_KEY_CHECKS = 0;'] + \
-              ['%s %s;' % \
-                (style.SQL_KEYWORD('TRUNCATE'),
-                 style.SQL_FIELD(quote_name(table))
-                )  for table in tables] + \
-              ['SET FOREIGN_KEY_CHECKS = 1;']
-
-        # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
-        # to reset sequence indices
-        sql.extend(["%s %s %s %s %s;" % \
-            (style.SQL_KEYWORD('ALTER'),
-             style.SQL_KEYWORD('TABLE'),
-             style.SQL_TABLE(quote_name(sequence['table'])),
-             style.SQL_KEYWORD('AUTO_INCREMENT'),
-             style.SQL_FIELD('= 1'),
-            ) for sequence in sequences])
-        return sql
-    else:
-        return []
-
-def get_sql_sequence_reset(style, model_list):
-    "Returns a list of the SQL statements to reset sequences for the given models."
-    # No sequence reset required
-    return []
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': 'LIKE %s',
-    'contains': 'LIKE BINARY %s',
-    'icontains': 'LIKE %s',
-    'regex': 'REGEXP BINARY %s',
-    'iregex': 'REGEXP %s',
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': 'LIKE BINARY %s',
-    'endswith': 'LIKE BINARY %s',
-    'istartswith': 'LIKE %s',
-    'iendswith': 'LIKE %s',
-}

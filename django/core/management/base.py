@@ -34,9 +34,9 @@ class BaseCommand(object):
             if output:
                 if self.output_transaction:
                     # This needs to be imported here, because it relies on settings.
-                    from django.db import backend
-                    if backend.get_start_transaction_sql():
-                        print self.style.SQL_KEYWORD(backend.get_start_transaction_sql())
+                    from django.db import connection
+                    if connection.ops.start_transaction_sql():
+                        print self.style.SQL_KEYWORD(connection.ops.start_transaction_sql())
                 print output
                 if self.output_transaction:
                     print self.style.SQL_KEYWORD("COMMIT;")

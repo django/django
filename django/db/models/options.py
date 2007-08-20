@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
-from django.db.models.loading import get_models
+from django.db.models.loading import get_models, app_cache_ready
 from django.db.models.query import orderlist2sql
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from django.utils.encoding import force_unicode, smart_str
@@ -62,7 +62,7 @@ class Options(object):
         del self.meta
 
     def _prepare(self, model):
-        from django.db import backend
+        from django.db import connection
         from django.db.backends.util import truncate_name
         if self.order_with_respect_to:
             self.order_with_respect_to = self.get_field(self.order_with_respect_to)
@@ -78,8 +78,7 @@ class Options(object):
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.module_name)
-            self.db_table = truncate_name(self.db_table,
-                                          backend.get_max_name_length())
+            self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
 
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
@@ -178,7 +177,8 @@ class Options(object):
                 for f in klass._meta.many_to_many:
                     if f.rel and self == f.rel.to._meta:
                         rel_objs.append(RelatedObject(f.rel.to, klass, f))
-            self._all_related_many_to_many_objects = rel_objs
+            if app_cache_ready():
+                self._all_related_many_to_many_objects = rel_objs
             return rel_objs
 
     def get_ordered_objects(self):

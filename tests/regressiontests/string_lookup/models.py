@@ -36,6 +36,13 @@ class Base(models.Model):
     def __unicode__(self):
         return "Base %s" % self.name
 
+class Article(models.Model):
+    name = models.CharField(maxlength = 50)
+    text = models.TextField()
+
+    def __str__(self):
+        return "Article %s" % self.name
+
 __test__ = {'API_TESTS': ur"""
 # Regression test for #1661 and #1662: Check that string form referencing of
 # models works, both as pre and post reference, on all RelatedField types.
@@ -82,4 +89,13 @@ __test__ = {'API_TESTS': ur"""
 # We can also do the above query using UTF-8 strings.
 >>> Foo.objects.get(friend__contains='\xc3\xa7')
 <Foo: Foo Bjorn>
+
+# Regression tests for #5087: make sure we can perform queries on TextFields.
+>>> a = Article(name='Test', text='The quick brown fox jumps over the lazy dog.')
+>>> a.save()
+>>> Article.objects.get(text__exact='The quick brown fox jumps over the lazy dog.')
+<Article: Article Test>
+
+>>> Article.objects.get(text__contains='quick brown fox')
+<Article: Article Test>
 """}

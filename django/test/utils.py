@@ -1,6 +1,6 @@
 import sys, time
 from django.conf import settings
-from django.db import connection, backend, get_creation_module
+from django.db import connection, get_creation_module
 from django.core import mail
 from django.core.management import call_command
 from django.dispatch import dispatcher
@@ -97,7 +97,7 @@ def create_test_db(verbosity=1, autoclobber=False):
     # If the database backend wants to create the test DB itself, let it
     creation_module = get_creation_module()
     if hasattr(creation_module, "create_test_db"):
-        creation_module.create_test_db(settings, connection, backend, verbosity, autoclobber)
+        creation_module.create_test_db(settings, connection, verbosity, autoclobber)
         return
 
     if verbosity >= 1:
@@ -118,13 +118,15 @@ def create_test_db(verbosity=1, autoclobber=False):
         else:
             TEST_DATABASE_NAME = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
 
+        qn = connection.ops.quote_name
+
         # Create the test database and connect to it. We need to autocommit
         # if the database supports it because PostgreSQL doesn't allow
         # CREATE/DROP DATABASE statements within transactions.
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
+            cursor.execute("CREATE DATABASE %s %s" % (qn(TEST_DATABASE_NAME), suffix))
         except Exception, e:
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -133,10 +135,10 @@ def create_test_db(verbosity=1, autoclobber=False):
                 try:
                     if verbosity >= 1:
                         print "Destroying old test database..."
-                    cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+                    cursor.execute("DROP DATABASE %s" % qn(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
+                    cursor.execute("CREATE DATABASE %s %s" % (qn(TEST_DATABASE_NAME), suffix))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
@@ -163,7 +165,7 @@ def destroy_test_db(old_database_name, verbosity=1):
     # If the database wants to drop the test DB itself, let it
     creation_module = get_creation_module()
     if hasattr(creation_module, "destroy_test_db"):
-        creation_module.destroy_test_db(settings, connection, backend, old_database_name, verbosity)
+        creation_module.destroy_test_db(settings, connection, old_database_name, verbosity)
         return
 
     # Unless we're using SQLite, remove the test database to clean up after
@@ -180,5 +182,5 @@ def destroy_test_db(old_database_name, verbosity=1):
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
-        cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+        cursor.execute("DROP DATABASE %s" % connection.ops.quote_name(TEST_DATABASE_NAME))
         connection.close()

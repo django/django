@@ -12,7 +12,7 @@ class Command(NoArgsCommand):
     args = '[--verbosity] [--noinput]'
 
     def handle_noargs(self, **options):
-        from django.db import backend, connection, transaction, models
+        from django.db import connection, transaction, models
         from django.conf import settings
         from django.core.management.sql import table_list, installed_models, sql_model_create, sql_for_pending_references, many_to_many_sql_for_model, custom_sql_for_model, sql_indexes_for_model, emit_post_sync_signal
 
@@ -34,7 +34,7 @@ class Command(NoArgsCommand):
         # Get a list of all existing database tables,
         # so we know what needs to be added.
         table_list = table_list()
-        if backend.uses_case_insensitive_names:
+        if connection.features.uses_case_insensitive_names:
             table_name_converter = str.upper
         else:
             table_name_converter = lambda x: x
@@ -125,6 +125,6 @@ class Command(NoArgsCommand):
                         else:
                             transaction.commit_unless_managed()
 
-        # Install the 'initialdata' fixture, using format discovery
+        # Install the 'initial_data' fixture, using format discovery
         from django.core.management import call_command
-        call_command('loaddata', 'initial_data', **options)
+        call_command('loaddata', 'initial_data', verbosity=verbosity)

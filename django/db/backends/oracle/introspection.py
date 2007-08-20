@@ -1,8 +1,8 @@
-from django.db.backends.oracle.base import quote_name
+from django.db.backends.oracle.base import DatabaseOperations
 import re
 import cx_Oracle
 
-
+quote_name = DatabaseOperations().quote_name
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
 def get_table_list(cursor):

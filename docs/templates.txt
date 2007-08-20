@@ -937,6 +937,12 @@ such as this::
 
 The template tag will output the string ``/clients/client/123/``.
 
+**New in development version:** If you're using `named URL patterns`_,
+you can refer to the name of the pattern in the ``url`` tag instead of
+using the path to the view.
+
+.. _named URL patterns: ../url_dispatch/#naming-url-patterns
+
 widthratio
 ~~~~~~~~~~
 
@@ -1326,11 +1332,16 @@ urlize
 
 Converts URLs in plain text into clickable links.
 
+Note that if ``urlize`` is applied to text that already contains HTML markup,
+things won't work as expected. Apply this filter only to *plain* text.
+
 urlizetrunc
 ~~~~~~~~~~~
 
 Converts URLs into clickable links, truncating URLs longer than the given
 character limit.
+
+As with urlize_, this filter should only be applied to *plain* text.
 
 **Argument:** Length to truncate URLs to
 

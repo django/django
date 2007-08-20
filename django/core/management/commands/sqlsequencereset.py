@@ -5,5 +5,5 @@ class Command(AppCommand):
     output_transaction = True
 
     def handle_app(self, app, **options):
-        from django.db import backend, models
-        return '\n'.join(backend.get_sql_sequence_reset(self.style, models.get_models(app)))
+        from django.db import connection, models
+        return '\n'.join(connection.ops.sequence_reset_sql(self.style, models.get_models(app)))

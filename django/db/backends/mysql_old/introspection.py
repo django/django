@@ -1,8 +1,9 @@
-from django.db.backends.mysql_old.base import quote_name
+from django.db.backends.mysql_old.base import DatabaseOperations
 from MySQLdb import ProgrammingError, OperationalError
 from MySQLdb.constants import FIELD_TYPE
 import re
 
+quote_name = DatabaseOperations().quote_name
 foreign_key_re = re.compile(r"\sCONSTRAINT `[^`]*` FOREIGN KEY \(`([^`]*)`\) REFERENCES `([^`]*)` \(`([^`]*)`\)")
 
 def get_table_list(cursor):

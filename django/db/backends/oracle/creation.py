@@ -36,9 +36,7 @@ TEST_DATABASE_PREFIX = 'test_'
 PASSWORD = 'Im_a_lumberjack'
 REMEMBER = {}
 
-
-def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False):
-
+def create_test_db(settings, connection, verbosity=1, autoclobber=False):
     TEST_DATABASE_NAME = _test_database_name(settings)
     TEST_DATABASE_USER = _test_database_user(settings)
     TEST_DATABASE_PASSWD = _test_database_passwd(settings)
@@ -115,8 +113,7 @@ def create_test_db(settings, connection, backend, verbosity=1, autoclobber=False
     # the side effect of initializing the test database.
     cursor = connection.cursor()
 
-
-def destroy_test_db(settings, connection, backend, old_database_name, verbosity=1):
+def destroy_test_db(settings, connection, old_database_name, verbosity=1):
     connection.close()
 
     TEST_DATABASE_NAME = _test_database_name(settings)
@@ -152,7 +149,6 @@ def destroy_test_db(settings, connection, backend, old_database_name, verbosity=
         _destroy_test_db(cursor, parameters, verbosity)
     connection.close()
 
-
 def _create_test_db(cursor, parameters, verbosity):
     if verbosity >= 2:
         print "_create_test_db(): dbname = %s" % parameters['dbname']
@@ -168,7 +164,6 @@ def _create_test_db(cursor, parameters, verbosity):
     ]
     _execute_statements(cursor, statements, parameters, verbosity)
 
-
 def _create_test_user(cursor, parameters, verbosity):
     if verbosity >= 2:
         print "_create_test_user(): username = %s" % parameters['user']
@@ -182,7 +177,6 @@ def _create_test_user(cursor, parameters, verbosity):
     ]
     _execute_statements(cursor, statements, parameters, verbosity)
 
-
 def _destroy_test_db(cursor, parameters, verbosity):
     if verbosity >= 2:
         print "_destroy_test_db(): dbname=%s" % parameters['dbname']
@@ -192,7 +186,6 @@ def _destroy_test_db(cursor, parameters, verbosity):
         ]
     _execute_statements(cursor, statements, parameters, verbosity)
 
-
 def _destroy_test_user(cursor, parameters, verbosity):
     if verbosity >= 2:
         print "_destroy_test_user(): user=%s" % parameters['user']
@@ -201,7 +194,6 @@ def _destroy_test_user(cursor, parameters, verbosity):
         'DROP USER %(user)s CASCADE',
     ]
     _execute_statements(cursor, statements, parameters, verbosity)
-
 
 def _execute_statements(cursor, statements, parameters, verbosity):
     for template in statements:
@@ -214,7 +206,6 @@ def _execute_statements(cursor, statements, parameters, verbosity):
             sys.stderr.write("Failed (%s)\n" % (err))
             raise
 
-
 def _test_database_name(settings):
     name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
     try:
@@ -225,7 +216,6 @@ def _test_database_name(settings):
     except:
         raise
     return name
-
 
 def _test_database_create(settings):
     name = True
@@ -240,7 +230,6 @@ def _test_database_create(settings):
         raise
     return name
 
-
 def _test_user_create(settings):
     name = True
     try:
@@ -254,7 +243,6 @@ def _test_user_create(settings):
         raise
     return name
 
-
 def _test_database_user(settings):
     name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
     try:
@@ -265,7 +253,6 @@ def _test_database_user(settings):
     except:
         raise
     return name
-
 
 def _test_database_passwd(settings):
     name = PASSWORD
@@ -278,7 +265,6 @@ def _test_database_passwd(settings):
         raise
     return name
 
-
 def _test_database_tblspace(settings):
     name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
     try:
@@ -289,7 +275,6 @@ def _test_database_tblspace(settings):
     except:
         raise
     return name
-
 
 def _test_database_tblspace_tmp(settings):
     name = TEST_DATABASE_PREFIX + settings.DATABASE_NAME + '_temp'

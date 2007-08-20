@@ -1,0 +1,62 @@
+.TH "make-messages.py" "1" "August 2007" "Django Project" ""
+.SH "NAME"
+make-messages.py \- Internationalization utility for the Django
+web framework
+.SH "SYNOPSIS"
+.B make-messages.py\fR [\-a] [\-v] [\-l <locale>] [\-d <domain>]
+
+.SH "DESCRIPTION"
+This script creates or updates one or more message files for a Django app,
+a Django project or the Django framework itself.  It should be run from one
+of three places: the root directory of a Django app; the root directory
+of a Django project; or the root django directory (the one in your PYTHONPATH,
+not the root of a Subversion checkout).
+.sp
+The script will run over the source tree of an application, project or Django
+itself (depending on where it is invoked), pulling out all strings marked for
+translation and creating or updating a standard PO-format message file for the
+specified language. Refer to Django's internationalization documentation for
+details of where this file is created.
+.sp
+The \fI\-a\fR and \fI\-l\fR options are used to control whether message
+catalogs are created for all locales, or just a single one.
+
+.SH "OPTIONS"
+.TP
+.I \-a
+Run make-messages for all locales specified in the Django settings file. Cannot
+be used in conjuntion with \fI\-l\fR.
+.TP
+.I \-d <domain>
+Specifies the translation domain to use. Valid domains are \fIdjango\fR or
+\fIdjangojs\fR, depending on whether you wish to generate translation strings
+for the Python or JavaScript components of your app, your project or the
+framework itself.  The default domain is \fIdjango\fR.
+.TP
+.I \-l <locale>
+Extract messages for a particular locale.
+.TP
+.I \-v
+Run verbosely.
+
+.SH "ENVIRONMENT"
+.TP
+.I DJANGO_SETTINGS_MODULE
+This environment variable defines the settings module to be read.
+It should be in Python-import form, e.g. "myproject.settings".
+
+.SH "SEE ALSO"
+The Django internationalization documentation:
+.sp
+.I http://www.djangoproject.com/documentation/i18n/
+.sp
+The PO file format is documented in the GNU gettext documentation.
+
+.SH "AUTHORS/CREDITS"
+Originally developed at World Online in Lawrence, Kansas, USA. Refer to the
+AUTHORS file in the Django distribution for contributors.
+
+.SH "LICENSE"
+New BSD license. For the full license text refer to the LICENSE file in the
+Django distribution.
+
