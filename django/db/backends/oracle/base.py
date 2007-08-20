@@ -331,7 +331,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
         if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % util.truncate_name(name.upper(), DatabaseOperations().max_name_length())
+            name = '"%s"' % util.truncate_name(name.upper(), self.max_name_length())
         return name.upper()
 
     def random_function_sql(self):
