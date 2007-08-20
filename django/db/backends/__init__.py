@@ -48,6 +48,7 @@ class BaseDatabaseFeatures(object):
     supports_constraints = True
     supports_tablespaces = False
     uses_case_insensitive_names = False
+    uses_custom_queryset = False
 
 class BaseDatabaseOperations(object):
     """
@@ -143,6 +144,15 @@ class BaseDatabaseOperations(object):
         the field should use its default value.
         """
         return 'DEFAULT'
+
+    def query_set_class(self, DefaultQuerySet):
+        """
+        Given the default QuerySet class, returns a custom QuerySet class
+        to use for this backend. Returns None if a custom QuerySet isn't used.
+        See also BaseDatabaseFeatures.uses_custom_queryset, which regulates
+        whether this method is called at all.
+        """
+        return None
 
     def quote_name(self, name):
         """

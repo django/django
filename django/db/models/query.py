@@ -564,9 +564,9 @@ class _QuerySet(object):
 
         return select, " ".join(sql), params
 
-# Use the backend's QuerySet class if it defines one, otherwise use _QuerySet.
-if hasattr(backend, 'get_query_set_class'):
-    QuerySet = backend.get_query_set_class(_QuerySet)
+# Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
+if connection.features.uses_custom_queryset:
+    QuerySet = connection.ops.query_set_class(_QuerySet)
 else:
     QuerySet = _QuerySet
 
