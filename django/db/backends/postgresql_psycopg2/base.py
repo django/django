@@ -4,7 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper
 from django.db.backends.postgresql.operations import DatabaseOperations
 try:
     import psycopg2 as Database
