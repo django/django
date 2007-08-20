@@ -11,7 +11,7 @@ try:
     import psycopg2.extensions
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading psycopg2 module: %s" % e
+    raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -47,7 +47,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             set_tz = True
             if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "You need to specify DATABASE_NAME in your Django settings file."
+                raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
             conn_string = "dbname=%s" % settings.DATABASE_NAME
             if settings.DATABASE_USER:
                 conn_string = "user=%s %s" % (settings.DATABASE_USER, conn_string)

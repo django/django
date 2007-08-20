@@ -37,4 +37,4 @@ class DatabaseWrapper(object):
         pass
 
     def close(self):
-        pass # close()
+        pass

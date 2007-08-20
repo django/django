@@ -10,7 +10,7 @@ try:
     import MySQLdb as Database
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading MySQLdb module: %s" % e
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
 import types
@@ -48,14 +48,14 @@ class MysqlDebugWrapper:
             return self.cursor.execute(sql, params)
         except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+            raise Database.Warning("%s: %s" % (w, self.cursor.fetchall()))
 
     def executemany(self, sql, param_list):
         try:
             return self.cursor.executemany(sql, param_list)
         except Database.Warning, w:
             self.cursor.execute("SHOW WARNINGS")
-            raise Database.Warning, "%s: %s" % (w, self.cursor.fetchall())
+            raise Database.Warning("%s: %s" % (w, self.cursor.fetchall()))
 
     def __getattr__(self, attr):
         if attr in self.__dict__:

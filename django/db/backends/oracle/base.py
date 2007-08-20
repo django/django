@@ -16,7 +16,7 @@ try:
     import cx_Oracle as Database
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading cx_Oracle module: %s" % e
+    raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
 
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
@@ -113,9 +113,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 except EmptyResultSet:
                     raise StopIteration
                 if not full_query:
-                    full_query = "SELECT %s%s\n%s" % \
-                                 ((self._distinct and "DISTINCT " or ""),
-                                  ', '.join(select), sql)
+                    full_query = "SELECT %s%s\n%s" % ((self._distinct and "DISTINCT " or ""), ', '.join(select), sql)
 
                 cursor = connection.cursor()
                 cursor.execute(full_query, params)

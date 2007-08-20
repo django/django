@@ -11,7 +11,7 @@ try:
     import psycopg as Database
 except ImportError, e:
     from django.core.exceptions import ImproperlyConfigured
-    raise ImproperlyConfigured, "Error loading psycopg module: %s" % e
+    raise ImproperlyConfigured("Error loading psycopg module: %s" % e)
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -85,7 +85,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             set_tz = True
             if settings.DATABASE_NAME == '':
                 from django.core.exceptions import ImproperlyConfigured
-                raise ImproperlyConfigured, "You need to specify DATABASE_NAME in your Django settings file."
+                raise ImproperlyConfigured("You need to specify DATABASE_NAME in your Django settings file.")
             conn_string = "dbname=%s" % settings.DATABASE_NAME
             if settings.DATABASE_USER:
                 conn_string = "user=%s %s" % (settings.DATABASE_USER, conn_string)
@@ -121,7 +121,7 @@ def typecast_string(s):
 try:
     Database.register_type(Database.new_type((1082,), "DATE", util.typecast_date))
 except AttributeError:
-    raise Exception, "You appear to be using psycopg version 2. Set your DATABASE_ENGINE to 'postgresql_psycopg2' instead of 'postgresql'."
+    raise Exception("You appear to be using psycopg version 2. Set your DATABASE_ENGINE to 'postgresql_psycopg2' instead of 'postgresql'.")
 Database.register_type(Database.new_type((1083,1266), "TIME", util.typecast_time))
 Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast_timestamp))
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
