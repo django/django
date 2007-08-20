@@ -121,6 +121,22 @@ class DatabaseOperations(BaseDatabaseOperations):
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': 'LIKE %s',
+        'contains': 'LIKE BINARY %s',
+        'icontains': 'LIKE %s',
+        'regex': 'REGEXP BINARY %s',
+        'iregex': 'REGEXP %s',
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': 'LIKE BINARY %s',
+        'endswith': 'LIKE BINARY %s',
+        'istartswith': 'LIKE %s',
+        'iendswith': 'LIKE %s',
+    }
 
     def __init__(self, **kwargs):
         super(DatabaseWrapper, self).__init__(**kwargs)
@@ -178,20 +194,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': 'LIKE %s',
-    'contains': 'LIKE BINARY %s',
-    'icontains': 'LIKE %s',
-    'regex': 'REGEXP BINARY %s',
-    'iregex': 'REGEXP %s',
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': 'LIKE BINARY %s',
-    'endswith': 'LIKE BINARY %s',
-    'istartswith': 'LIKE %s',
-    'iendswith': 'LIKE %s',
-}

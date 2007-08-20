@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import backend, connection, transaction
+from django.db import connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals, loading
 from django.dispatch import dispatcher
@@ -797,7 +797,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     else:
         format = '%s %s'
     try:
-        return format % (field_sql, backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
+        return format % (field_sql, connection.operators[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':

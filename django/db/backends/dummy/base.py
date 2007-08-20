@@ -26,8 +26,9 @@ class ComplainOnGetattr(object):
         complain()
 
 class DatabaseWrapper(object):
-    ops = ComplainOnGetattr()
     features = ComplainOnGetattr()
+    ops = ComplainOnGetattr()
+    operators = {}
     cursor = complain
     _commit = complain
     _rollback = ignore
@@ -37,5 +38,3 @@ class DatabaseWrapper(object):
 
     def close(self):
         pass # close()
-
-OPERATOR_MAPPING = {}

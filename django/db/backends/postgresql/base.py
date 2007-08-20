@@ -62,6 +62,22 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': 'ILIKE %s',
+        'contains': 'LIKE %s',
+        'icontains': 'ILIKE %s',
+        'regex': '~ %s',
+        'iregex': '~* %s',
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': 'LIKE %s',
+        'endswith': 'LIKE %s',
+        'istartswith': 'ILIKE %s',
+        'iendswith': 'ILIKE %s',
+    }
 
     def _cursor(self, settings):
         set_tz = False
@@ -111,20 +127,3 @@ Database.register_type(Database.new_type((1114,1184), "TIMESTAMP", util.typecast
 Database.register_type(Database.new_type((16,), "BOOLEAN", util.typecast_boolean))
 Database.register_type(Database.new_type((1700,), "NUMERIC", util.typecast_decimal))
 Database.register_type(Database.new_type(Database.types[1043].values, 'STRING', typecast_string))
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': 'ILIKE %s',
-    'contains': 'LIKE %s',
-    'icontains': 'ILIKE %s',
-    'regex': '~ %s',
-    'iregex': '~* %s',
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': 'LIKE %s',
-    'endswith': 'LIKE %s',
-    'istartswith': 'ILIKE %s',
-    'iendswith': 'ILIKE %s',
-}

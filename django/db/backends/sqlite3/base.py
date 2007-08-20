@@ -76,6 +76,26 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
 
+    # SQLite requires LIKE statements to include an ESCAPE clause if the value
+    # being escaped has a percent or underscore in it.
+    # See http://www.sqlite.org/lang_expr.html for an explanation.
+    operators = {
+        'exact': '= %s',
+        'iexact': "LIKE %s ESCAPE '\\'",
+        'contains': "LIKE %s ESCAPE '\\'",
+        'icontains': "LIKE %s ESCAPE '\\'",
+        'regex': 'REGEXP %s',
+        'iregex': "REGEXP '(?i)' || %s",
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': "LIKE %s ESCAPE '\\'",
+        'endswith': "LIKE %s ESCAPE '\\'",
+        'istartswith': "LIKE %s ESCAPE '\\'",
+        'iendswith': "LIKE %s ESCAPE '\\'",
+    }
+
     def _cursor(self, settings):
         if self.connection is None:
             kwargs = {
@@ -140,24 +160,3 @@ def _sqlite_regexp(re_pattern, re_string):
         return bool(re.search(re_pattern, re_string))
     except:
         return False
-
-# SQLite requires LIKE statements to include an ESCAPE clause if the value
-# being escaped has a percent or underscore in it.
-# See http://www.sqlite.org/lang_expr.html for an explanation.
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': "LIKE %s ESCAPE '\\'",
-    'contains': "LIKE %s ESCAPE '\\'",
-    'icontains': "LIKE %s ESCAPE '\\'",
-    'regex': 'REGEXP %s',
-    'iregex': "REGEXP '(?i)' || %s",
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': "LIKE %s ESCAPE '\\'",
-    'endswith': "LIKE %s ESCAPE '\\'",
-    'istartswith': "LIKE %s ESCAPE '\\'",
-    'iendswith': "LIKE %s ESCAPE '\\'",
-}
-

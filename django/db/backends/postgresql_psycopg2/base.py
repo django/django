@@ -24,6 +24,22 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': 'ILIKE %s',
+        'contains': 'LIKE %s',
+        'icontains': 'ILIKE %s',
+        'regex': '~ %s',
+        'iregex': '~* %s',
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': 'LIKE %s',
+        'endswith': 'LIKE %s',
+        'istartswith': 'ILIKE %s',
+        'iendswith': 'ILIKE %s',
+    }
 
     def _cursor(self, settings):
         set_tz = False
@@ -52,20 +68,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SELECT version()")
             self.ops.postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         return cursor
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': 'ILIKE %s',
-    'contains': 'LIKE %s',
-    'icontains': 'ILIKE %s',
-    'regex': '~ %s',
-    'iregex': '~* %s',
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': 'LIKE %s',
-    'endswith': 'LIKE %s',
-    'istartswith': 'ILIKE %s',
-    'iendswith': 'ILIKE %s',
-}

@@ -385,6 +385,20 @@ class DatabaseOperations(BaseDatabaseOperations):
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': '= UPPER(%s)',
+        'contains': "LIKE %s ESCAPE '\\'",
+        'icontains': "LIKE UPPER(%s) ESCAPE '\\'",
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': "LIKE %s ESCAPE '\\'",
+        'endswith': "LIKE %s ESCAPE '\\'",
+        'istartswith': "LIKE UPPER(%s) ESCAPE '\\'",
+        'iendswith': "LIKE UPPER(%s) ESCAPE '\\'",
+    }
 
     def _valid_connection(self):
         return self.connection is not None
@@ -498,18 +512,3 @@ def get_sequence_name(table):
 def get_trigger_name(table):
     name_length = DatabaseOperations().max_name_length() - 3
     return '%s_TR' % util.truncate_name(table, name_length).upper()
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': '= UPPER(%s)',
-    'contains': "LIKE %s ESCAPE '\\'",
-    'icontains': "LIKE UPPER(%s) ESCAPE '\\'",
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': "LIKE %s ESCAPE '\\'",
-    'endswith': "LIKE %s ESCAPE '\\'",
-    'istartswith': "LIKE UPPER(%s) ESCAPE '\\'",
-    'iendswith': "LIKE UPPER(%s) ESCAPE '\\'",
-}

@@ -84,6 +84,20 @@ class DatabaseOperations(BaseDatabaseOperations):
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()
     ops = DatabaseOperations()
+    operators = {
+        'exact': '= %s',
+        'iexact': 'LIKE %s',
+        'contains': 'LIKE %s',
+        'icontains': 'LIKE %s',
+        'gt': '> %s',
+        'gte': '>= %s',
+        'lt': '< %s',
+        'lte': '<= %s',
+        'startswith': 'LIKE %s',
+        'endswith': 'LIKE %s',
+        'istartswith': 'LIKE %s',
+        'iendswith': 'LIKE %s',
+    }
 
     def _cursor(self, settings):
         if self.connection is None:
@@ -96,18 +110,3 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_string = "PROVIDER=SQLOLEDB;DATA SOURCE=%s;UID=%s;PWD=%s;DATABASE=%s" % (settings.DATABASE_HOST, settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
             self.connection = Database.connect(conn_string)
         return self.connection.cursor()
-
-OPERATOR_MAPPING = {
-    'exact': '= %s',
-    'iexact': 'LIKE %s',
-    'contains': 'LIKE %s',
-    'icontains': 'LIKE %s',
-    'gt': '> %s',
-    'gte': '>= %s',
-    'lt': '< %s',
-    'lte': '<= %s',
-    'startswith': 'LIKE %s',
-    'endswith': 'LIKE %s',
-    'istartswith': 'LIKE %s',
-    'iendswith': 'LIKE %s',
-}
