@@ -70,6 +70,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def random_function_sql(self):
         return 'RAND()'
 
+    def tablespace_sql(self, tablespace, inline=False):
+        return "ON %s" % quote_name(tablespace)
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -102,9 +105,6 @@ def quote_name(name):
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
-
-def get_tablespace_sql(tablespace, inline=False):
-    return "ON %s" % quote_name(tablespace)
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

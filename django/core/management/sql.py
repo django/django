@@ -237,7 +237,7 @@ def sql_model_create(model, style, known_models=set()):
         if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
             # We must specify the index tablespace inline, because we
             # won't be generating a CREATE INDEX statement for this field.
-            field_output.append(backend.get_tablespace_sql(tablespace, inline=True))
+            field_output.append(connection.ops.tablespace_sql(tablespace, inline=True))
         if f.rel:
             if f.rel.to in known_models:
                 field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
@@ -263,7 +263,7 @@ def sql_model_create(model, style, known_models=set()):
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(')')
     if opts.db_tablespace and backend.supports_tablespaces:
-        full_statement.append(backend.get_tablespace_sql(opts.db_tablespace))
+        full_statement.append(connection.ops.tablespace_sql(opts.db_tablespace))
     full_statement.append(';')
     final_output.append('\n'.join(full_statement))
 
@@ -313,7 +313,7 @@ def many_to_many_sql_for_model(model, style):
         if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
             if tablespace and backend.supports_tablespaces and backend.autoindexes_primary_keys:
-                tablespace_sql = ' ' + backend.get_tablespace_sql(tablespace, inline=True)
+                tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace, inline=True)
             else:
                 tablespace_sql = ''
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
@@ -345,7 +345,7 @@ def many_to_many_sql_for_model(model, style):
             table_output.append(')')
             if opts.db_tablespace and backend.supports_tablespaces:
                 # f.db_tablespace is only for indices, so ignore its value here.
-                table_output.append(backend.get_tablespace_sql(opts.db_tablespace))
+                table_output.append(connection.ops.tablespace_sql(opts.db_tablespace))
             table_output.append(';')
             final_output.append('\n'.join(table_output))
 
@@ -386,7 +386,7 @@ def custom_sql_for_model(model):
 
 def sql_indexes_for_model(model, style):
     "Returns the CREATE INDEX SQL statements for a single model"
-    from django.db import backend
+    from django.db import backend, connection
     output = []
 
     for f in model._meta.fields:
@@ -394,7 +394,7 @@ def sql_indexes_for_model(model, style):
             unique = f.unique and 'UNIQUE ' or ''
             tablespace = f.db_tablespace or model._meta.db_tablespace
             if tablespace and backend.supports_tablespaces:
-                tablespace_sql = ' ' + backend.get_tablespace_sql(tablespace)
+                tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace)
             else:
                 tablespace_sql = ''
             output.append(

@@ -115,6 +115,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def start_transaction_sql(self):
         return ''
 
+    def tablespace_sql(self, tablespace, inline=False):
+        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -230,9 +233,6 @@ def get_field_cast_sql(db_type):
         return "DBMS_LOB.SUBSTR(%s%s)"
     else:
         return "%s%s"
-
-def get_tablespace_sql(tablespace, inline=False):
-    return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))
 
 def get_drop_sequence(table):
     return "DROP SEQUENCE %s;" % quote_name(get_sequence_name(table))

@@ -166,3 +166,10 @@ class BaseDatabaseOperations(object):
         Returns the SQL statement required to start a transaction.
         """
         return "BEGIN;"
+
+    def tablespace_sql(self, tablespace, inline=False):
+        """
+        Returns the tablespace SQL, or None if the backend doesn't use
+        tablespaces.
+        """
+        return None
