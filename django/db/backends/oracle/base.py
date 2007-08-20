@@ -95,6 +95,23 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return []
 
+    def sequence_reset_sql(self, style, model_list):
+        from django.db import models
+        output = []
+        query = _get_sequence_reset_sql()
+        for model in model_list:
+            for f in model._meta.fields:
+                if isinstance(f, models.AutoField):
+                    sequence_name = get_sequence_name(model._meta.db_table)
+                    output.append(query % {'sequence':sequence_name,
+                                           'table':model._meta.db_table})
+                    break # Only one AutoField is allowed per model, so don't bother continuing.
+            for f in model._meta.many_to_many:
+                sequence_name = get_sequence_name(f.m2m_db_table())
+                output.append(query % {'sequence':sequence_name,
+                                       'table':f.m2m_db_table()})
+        return output
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -243,24 +260,6 @@ def _get_sequence_reset_sql():
 def get_sequence_name(table):
     name_length = DatabaseOperations().max_name_length() - 3
     return '%s_SQ' % util.truncate_name(table, name_length).upper()
-
-def get_sql_sequence_reset(style, model_list):
-    "Returns a list of the SQL statements to reset sequences for the given models."
-    from django.db import models
-    output = []
-    query = _get_sequence_reset_sql()
-    for model in model_list:
-        for f in model._meta.fields:
-            if isinstance(f, models.AutoField):
-                sequence_name = get_sequence_name(model._meta.db_table)
-                output.append(query % {'sequence':sequence_name,
-                                       'table':model._meta.db_table})
-                break # Only one AutoField is allowed per model, so don't bother continuing.
-        for f in model._meta.many_to_many:
-            sequence_name = get_sequence_name(f.m2m_db_table())
-            output.append(query % {'sequence':sequence_name,
-                                   'table':f.m2m_db_table()})
-    return output
 
 def get_trigger_name(table):
     name_length = DatabaseOperations().max_name_length() - 3

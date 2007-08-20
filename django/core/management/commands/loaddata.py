@@ -15,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *fixture_labels, **options):
         from django.db.models import get_apps
         from django.core import serializers
-        from django.db import connection, transaction, backend
+        from django.db import connection, transaction
         from django.conf import settings
 
         self.style = no_style()
@@ -105,7 +105,7 @@ class Command(BaseCommand):
                                 (format, fixture_name, humanize(fixture_dir))
 
         if count[0] > 0:
-            sequence_sql = backend.get_sql_sequence_reset(self.style, models)
+            sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
             if sequence_sql:
                 if verbosity > 1:
                     print "Resetting sequences"

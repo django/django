@@ -150,3 +150,13 @@ class BaseDatabaseOperations(object):
         color_style() or no_style() in django.core.management.color.
         """
         raise NotImplementedError()
+
+    def sequence_reset_sql(self, style, model_list):
+        """
+        Returns a list of the SQL statements required to reset sequences for
+        the given models.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return [] # No sequence reset required by default.

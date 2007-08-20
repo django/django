@@ -109,11 +109,6 @@ def get_start_transaction_sql():
 def get_tablespace_sql(tablespace, inline=False):
     return "ON %s" % quote_name(tablespace)
 
-def get_sql_sequence_reset(style, model_list):
-    "Returns a list of the SQL statements to reset sequences for the given models."
-    # No sequence reset required
-    return []
-
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'LIKE %s',
