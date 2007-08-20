@@ -102,7 +102,6 @@ supports_constraints = True
 supports_tablespaces = True
 uses_case_insensitive_names = False
 
-dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 OPERATOR_MAPPING = {

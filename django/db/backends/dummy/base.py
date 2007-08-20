@@ -39,7 +39,6 @@ class DatabaseWrapper(object):
 
 supports_constraints = False
 supports_tablespaces = False
-dictfetchmany = complain
 dictfetchall = complain
 
 OPERATOR_MAPPING = {}

@@ -224,7 +224,6 @@ def to_unicode(s):
         return force_unicode(s)
     return s
 
-dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 def get_field_cast_sql(db_type):

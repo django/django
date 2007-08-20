@@ -133,12 +133,6 @@ def _dict_helper(desc, row):
     "Returns a dictionary for the given cursor.description and result row."
     return dict(zip([col[0] for col in desc], row))
 
-def dictfetchmany(cursor, number):
-    "Returns a certain number of rows from a cursor as a dict"
-    desc = cursor.description
-    for row in cursor.fetchmany(number):
-        yield _dict_helper(desc, row)
-
 def dictfetchall(cursor):
     "Returns all rows from a cursor as a dict"
     desc = cursor.description

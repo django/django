@@ -120,7 +120,6 @@ supports_constraints = False
 supports_tablespaces = False
 uses_case_insensitive_names = False
 
-dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 
 def _sqlite_extract(lookup_type, dt):
