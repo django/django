@@ -1459,10 +1459,10 @@ commonly used groups of widgets:
     ``Textarea``                  ``<textarea>...</textarea>``
     ``CheckboxInput``             ``<input type='checkbox' ...``
     ``Select``                    ``<select><option ...``
-    ``NullBooleanSelect``         Select widget with options 'Unknown', 
+    ``NullBooleanSelect``         Select widget with options 'Unknown',
                                   'Yes' and 'No'
     ``SelectMultiple``            ``<select multiple='multiple'><option ...``
-    ``RadioSelect``               ``<ul><li><input type='radio' ...`` 
+    ``RadioSelect``               ``<ul><li><input type='radio' ...``
     ``CheckboxSelectMultiple``    ``<ul><li><input type='checkbox' ...``
     ``MultiWidget``               Wrapper around multiple other widgets
     ``SplitDateTimeWidget``       Wrapper around two ``TextInput`` widgets:
@@ -1473,19 +1473,19 @@ Specifying widgets
 ------------------
 
 Whenever you specify a field on a form, Django will use a default widget
-that is appropriate to the type of data that is to be displayed. To find 
+that is appropriate to the type of data that is to be displayed. To find
 which widget is used on which field, see the documentation for the
 built-in Field classes.
 
-However, if you want to use a different widget for a field, you can - 
+However, if you want to use a different widget for a field, you can -
 just use the 'widget' argument on the field definition. For example::
 
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
         comment = forms.CharField(widget=forms.Textarea)
-        
-This would specify a form with a comment that uses a larger Textarea widget, 
+
+This would specify a form with a comment that uses a larger Textarea widget,
 rather than the default TextInput widget.
 
 Customizing widget instances
@@ -1496,8 +1496,8 @@ HTML - Django doesn't add a class definition, or any other widget-specific
 attributes. This means that all 'TextInput' widgets will appear the same
 on your web page.
 
-If you want to make one widget look different to another, you need to 
-specify additional attributes for each widget. When you specify a 
+If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
 widget, you can provide a list of attributes that will be added to the
 rendered HTML for the widget.
 
@@ -1519,13 +1519,13 @@ each widget will be rendered exactly the same::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 On a real web page, you probably don't want every widget to look the same. You
-might want a larger input element for the comment, and you might want the 
-'name' widget to have some special CSS class. To do this, you specify a 
-custom widget for your fields, and specify some attributes to use 
+might want a larger input element for the comment, and you might want the
+'name' widget to have some special CSS class. To do this, you specify a
+custom widget for your fields, and specify some attributes to use
 when rendering those widgets::
 
     class CommentForm(forms.Form):
-        name = forms.CharField(                   
+        name = forms.CharField(
                     widget=forms.TextInput(attrs={'class':'special'}))
         url = forms.URLField()
         comment = forms.CharField(
@@ -1543,19 +1543,19 @@ Custom Widgets
 --------------
 
 When you start to write a lot of forms, you will probably find that you will
-reuse certain sets of widget attributes over and over again. Rather than 
-repeat these attribute definitions every time you need them, Django allows 
+reuse certain sets of widget attributes over and over again. Rather than
+repeat these attribute definitions every time you need them, Django allows
 you to capture those definitions as a custom widget.
 
 For example, if you find that you are including a lot of comment fields on forms,
-you could capture the idea of a ``TextInput`` with a specific ``size`` attribute 
+you could capture the idea of a ``TextInput`` with a specific ``size`` attribute
 as a custom extension to the ``TextInput`` widget::
 
     class CommentWidget(forms.TextInput):
         def __init__(self, *args, **kwargs):
             kwargs.setdefault('attrs',{}).update({'size': '40'})
             super(forms.TextInput, self).__init__(*args, **kwargs)
-            
+
 Then you can use this widget in your forms::
 
     class CommentForm(forms.Form):
@@ -1563,8 +1563,8 @@ Then you can use this widget in your forms::
         url = forms.URLField()
         comment = forms.CharField(widget=CommentWidget)
 
-You can even customize your custom widget, in the same way as you would 
-any other widget. Adding a once-off class to your ``CommentWidget`` is as 
+You can even customize your custom widget, in the same way as you would
+any other widget. Adding a once-off class to your ``CommentWidget`` is as
 simple as adding an attribute definition::
 
     class CommentForm(forms.Form):
@@ -1579,14 +1579,14 @@ by defining::
 
     class CommentInput(forms.CharField):
         widget = CommentWidget
-        
+
 You can then use this field whenever you have a form that requires a comment::
 
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
         comment = CommentInput()
-        
+
 Generating forms for models
 ===========================
 
@@ -1930,6 +1930,42 @@ will raise ``ValueError`` if the data doesn't validate.
 
 ``form_for_instance()`` has ``form``, ``fields`` and ``formfield_callback``
 arguments that behave the same way as they do for ``form_for_model()``.
+
+Let's modify the earlier `contact form`_ view example a little bit. Suppose we
+have a ``Message`` model that holds each contact submission. Something like::
+
+    class Message(models.Model):
+        subject = models.CharField(max_length=100)
+        message = models.TextField()
+        sender = models.EmailField()
+        cc_myself = models.BooleanField()
+
+You could use this model to create a form (using ``form_for_model()``). You
+could also use existing ``Message`` instances to create a form for editing
+messages. The earlier_ view can be changed slightly to accept the ``id`` value
+of an existing ``Message`` and present it for editing::
+
+    def contact_edit(request, msg_id):
+        # Create the form from the message id.
+        message = get_object_or_404(Message, id=msg_id)
+        ContactForm = form_for_instance(message)
+
+        if request.method == 'POST':
+            form = ContactForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
+        return render_to_response('contact.html', {'form': form})
+
+Aside from how we create the ``ContactForm`` class here, the main point to
+note is that the form display in the ``GET`` branch of the function
+will use the values from the ``message`` instance as initial values for the
+form field.
+
+.. _contact form: `Simple view example`_
+.. _earlier: `Simple view example`_
 
 When should you use ``form_for_model()`` and ``form_for_instance()``?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
