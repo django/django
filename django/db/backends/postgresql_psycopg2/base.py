@@ -163,8 +163,6 @@ supports_constraints = True
 supports_tablespaces = False
 uses_case_insensitive_names = False
 
-dictfetchall = util.dictfetchall
-
 OPERATOR_MAPPING = {
     'exact': '= %s',
     'iexact': 'ILIKE %s',

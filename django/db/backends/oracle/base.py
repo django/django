@@ -224,8 +224,6 @@ def to_unicode(s):
         return force_unicode(s)
     return s
 
-dictfetchall  = util.dictfetchall
-
 def get_field_cast_sql(db_type):
     if db_type.endswith('LOB'):
         return "DBMS_LOB.SUBSTR(%s%s)"

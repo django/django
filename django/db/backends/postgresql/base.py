@@ -200,10 +200,6 @@ supports_constraints = True
 supports_tablespaces = False
 uses_case_insensitive_names = False
 
-def dictfetchall(cursor):
-    "Returns all rows from a cursor as a dict"
-    return cursor.dictfetchall()
-
 def typecast_string(s):
     """
     Cast all returned strings to unicode strings.
