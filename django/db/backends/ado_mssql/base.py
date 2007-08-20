@@ -109,19 +109,6 @@ def get_start_transaction_sql():
 def get_tablespace_sql(tablespace, inline=False):
     return "ON %s" % quote_name(tablespace)
 
-def get_sql_flush(style, tables, sequences):
-    """Return a list of SQL statements required to remove all data from
-    all tables in the database (without actually removing the tables
-    themselves) and put the database in an empty 'initial' state
-    """
-    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
-    # TODO - SQL not actually tested against ADO MSSQL yet!
-    # TODO - autoincrement indices reset required? See other get_sql_flush() implementations
-    sql_list = ['%s %s;' % \
-                (style.SQL_KEYWORD('TRUNCATE'),
-                 style.SQL_FIELD(quote_name(table))
-                 )  for table in tables]
-
 def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."
     # No sequence reset required

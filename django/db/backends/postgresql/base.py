@@ -73,6 +73,57 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
         return cursor.fetchone()[0]
 
+    def sql_flush(self, style, tables, sequences):
+        if tables:
+            if postgres_version[0] >= 8 and postgres_version[1] >= 1:
+                # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to*
+                # in order to be able to truncate tables referenced by a foreign
+                # key in any other table. The result is a single SQL TRUNCATE
+                # statement.
+                sql = ['%s %s;' % \
+                    (style.SQL_KEYWORD('TRUNCATE'),
+                     style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
+                )]
+            else:
+                # Older versions of Postgres can't do TRUNCATE in a single call, so
+                # they must use a simple delete.
+                sql = ['%s %s %s;' % \
+                        (style.SQL_KEYWORD('DELETE'),
+                         style.SQL_KEYWORD('FROM'),
+                         style.SQL_FIELD(quote_name(table))
+                         ) for table in tables]
+
+            # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
+            # to reset sequence indices
+            for sequence_info in sequences:
+                table_name = sequence_info['table']
+                column_name = sequence_info['column']
+                if column_name and len(column_name)>0:
+                    # sequence name in this case will be <table>_<column>_seq
+                    sql.append("%s %s %s %s %s %s;" % \
+                        (style.SQL_KEYWORD('ALTER'),
+                        style.SQL_KEYWORD('SEQUENCE'),
+                        style.SQL_FIELD(quote_name('%s_%s_seq' % (table_name, column_name))),
+                        style.SQL_KEYWORD('RESTART'),
+                        style.SQL_KEYWORD('WITH'),
+                        style.SQL_FIELD('1')
+                        )
+                    )
+                else:
+                    # sequence name in this case will be <table>_id_seq
+                    sql.append("%s %s %s %s %s %s;" % \
+                        (style.SQL_KEYWORD('ALTER'),
+                         style.SQL_KEYWORD('SEQUENCE'),
+                         style.SQL_FIELD(quote_name('%s_id_seq' % table_name)),
+                         style.SQL_KEYWORD('RESTART'),
+                         style.SQL_KEYWORD('WITH'),
+                         style.SQL_FIELD('1')
+                         )
+                    )
+            return sql
+        else:
+            return []
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -133,62 +184,6 @@ def dictfetchall(cursor):
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_sql_flush(style, tables, sequences):
-    """Return a list of SQL statements required to remove all data from
-    all tables in the database (without actually removing the tables
-    themselves) and put the database in an empty 'initial' state
-
-    """
-    if tables:
-        if postgres_version[0] >= 8 and postgres_version[1] >= 1:
-            # Postgres 8.1+ can do 'TRUNCATE x, y, z...;'. In fact, it *has to*
-            # in order to be able to truncate tables referenced by a foreign
-            # key in any other table. The result is a single SQL TRUNCATE
-            # statement.
-            sql = ['%s %s;' % \
-                (style.SQL_KEYWORD('TRUNCATE'),
-                 style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
-            )]
-        else:
-            # Older versions of Postgres can't do TRUNCATE in a single call, so
-            # they must use a simple delete.
-            sql = ['%s %s %s;' % \
-                    (style.SQL_KEYWORD('DELETE'),
-                     style.SQL_KEYWORD('FROM'),
-                     style.SQL_FIELD(quote_name(table))
-                     ) for table in tables]
-
-        # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
-        # to reset sequence indices
-        for sequence_info in sequences:
-            table_name = sequence_info['table']
-            column_name = sequence_info['column']
-            if column_name and len(column_name)>0:
-                # sequence name in this case will be <table>_<column>_seq
-                sql.append("%s %s %s %s %s %s;" % \
-                    (style.SQL_KEYWORD('ALTER'),
-                    style.SQL_KEYWORD('SEQUENCE'),
-                    style.SQL_FIELD(quote_name('%s_%s_seq' % (table_name, column_name))),
-                    style.SQL_KEYWORD('RESTART'),
-                    style.SQL_KEYWORD('WITH'),
-                    style.SQL_FIELD('1')
-                    )
-                )
-            else:
-                # sequence name in this case will be <table>_id_seq
-                sql.append("%s %s %s %s %s %s;" % \
-                    (style.SQL_KEYWORD('ALTER'),
-                     style.SQL_KEYWORD('SEQUENCE'),
-                     style.SQL_FIELD(quote_name('%s_id_seq' % table_name)),
-                     style.SQL_KEYWORD('RESTART'),
-                     style.SQL_KEYWORD('WITH'),
-                     style.SQL_FIELD('1')
-                     )
-                )
-        return sql
-    else:
-        return []
 
 def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."

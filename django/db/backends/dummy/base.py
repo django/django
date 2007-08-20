@@ -44,7 +44,6 @@ dictfetchone = complain
 dictfetchmany = complain
 dictfetchall = complain
 get_start_transaction_sql = complain
-get_sql_flush = complain
 get_sql_sequence_reset = complain
 
 OPERATOR_MAPPING = {}

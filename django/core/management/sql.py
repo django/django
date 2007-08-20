@@ -178,9 +178,9 @@ def sql_reset(app, style):
     return sql_delete(app, style) + sql_all(app, style)
 
 def sql_flush(style):
-    "Returns a list of the SQL statements used to flush the database"
-    from django.db import backend
-    statements = backend.get_sql_flush(style, table_list(), sequence_list())
+    "Returns a list of the SQL statements used to flush the database."
+    from django.db import connection
+    statements = connection.ops.sql_flush(style, table_list(), sequence_list())
     return statements
 
 def sql_custom(app):

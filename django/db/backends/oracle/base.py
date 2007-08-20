@@ -73,6 +73,28 @@ class DatabaseOperations(BaseDatabaseOperations):
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
+    def sql_flush(self, style, tables, sequences):
+        # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
+        # 'TRUNCATE z;'... style SQL statements
+        if tables:
+            # Oracle does support TRUNCATE, but it seems to get us into
+            # FK referential trouble, whereas DELETE FROM table works.
+            sql = ['%s %s %s;' % \
+                    (style.SQL_KEYWORD('DELETE'),
+                     style.SQL_KEYWORD('FROM'),
+                     style.SQL_FIELD(quote_name(table))
+                     ) for table in tables]
+            # Since we've just deleted all the rows, running our sequence
+            # ALTER code will reset the sequence to 0.
+            for sequence_info in sequences:
+                table_name = sequence_info['table']
+                seq_name = get_sequence_name(table_name)
+                query = _get_sequence_reset_sql() % {'sequence':seq_name, 'table':quote_name(table_name)}
+                sql.append(query)
+            return sql
+        else:
+            return []
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -217,33 +239,6 @@ def _get_sequence_reset_sql():
             COMMIT;
         END;
         /"""
-
-def get_sql_flush(style, tables, sequences):
-    """Return a list of SQL statements required to remove all data from
-    all tables in the database (without actually removing the tables
-    themselves) and put the database in an empty 'initial' state
-    """
-    # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
-    # 'TRUNCATE z;'... style SQL statements
-    if tables:
-        # Oracle does support TRUNCATE, but it seems to get us into
-        # FK referential trouble, whereas DELETE FROM table works.
-        sql = ['%s %s %s;' % \
-                (style.SQL_KEYWORD('DELETE'),
-                 style.SQL_KEYWORD('FROM'),
-                 style.SQL_FIELD(quote_name(table))
-                 ) for table in tables]
-        # Since we've just deleted all the rows, running our sequence
-        # ALTER code will reset the sequence to 0.
-        for sequence_info in sequences:
-            table_name = sequence_info['table']
-            seq_name = get_sequence_name(table_name)
-            query = _get_sequence_reset_sql() % {'sequence':seq_name,
-                                                 'table':quote_name(table_name)}
-            sql.append(query)
-        return sql
-    else:
-        return []
 
 def get_sequence_name(table):
     name_length = DatabaseOperations().max_name_length() - 3

@@ -51,6 +51,19 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return 'NULL'
 
+    def sql_flush(self, style, tables, sequences):
+        # NB: The generated SQL below is specific to SQLite
+        # Note: The DELETE FROM... SQL generated below works for SQLite databases
+        # because constraints don't exist
+        sql = ['%s %s %s;' % \
+                (style.SQL_KEYWORD('DELETE'),
+                 style.SQL_KEYWORD('FROM'),
+                 style.SQL_FIELD(quote_name(table))
+                 ) for table in tables]
+        # Note: No requirement for reset of auto-incremented indices (cf. other
+        # sql_flush() implementations). Just return SQL at this point
+        return sql
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -120,24 +133,6 @@ def _sqlite_extract(lookup_type, dt):
 
 def get_start_transaction_sql():
     return "BEGIN;"
-
-def get_sql_flush(style, tables, sequences):
-    """
-    Return a list of SQL statements required to remove all data from
-    all tables in the database (without actually removing the tables
-    themselves) and put the database in an empty 'initial' state
-    """
-    # NB: The generated SQL below is specific to SQLite
-    # Note: The DELETE FROM... SQL generated below works for SQLite databases
-    # because constraints don't exist
-    sql = ['%s %s %s;' % \
-            (style.SQL_KEYWORD('DELETE'),
-             style.SQL_KEYWORD('FROM'),
-             style.SQL_FIELD(quote_name(table))
-             ) for table in tables]
-    # Note: No requirement for reset of auto-incremented indices (cf. other
-    # get_sql_flush() implementations). Just return SQL at this point
-    return sql
 
 def get_sql_sequence_reset(style, model_list):
     "Returns a list of the SQL statements to reset sequences for the given models."

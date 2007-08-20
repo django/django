@@ -139,3 +139,14 @@ class BaseDatabaseOperations(object):
         Returns a SQL expression that returns a random value.
         """
         return 'RANDOM()'
+
+    def sql_flush(self, style, tables, sequences):
+        """
+        Returns a list of SQL statements required to remove all data from
+        the given database tables (without actually removing the tables
+        themselves).
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        raise NotImplementedError()
