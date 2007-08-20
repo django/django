@@ -14,6 +14,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from util import flatatt
+from urlparse import urljoin
 
 __all__ = (
     'Media', 'Widget', 'TextInput', 'PasswordInput',
@@ -62,7 +63,9 @@ class Media(StrAndUnicode):
                 for medium in media])
         
     def absolute_path(self, path):
-        return (path.startswith(u'http://') or path.startswith(u'https://')) and path or u''.join([settings.MEDIA_URL,path])
+        if path.startswith(u'http://') or path.startswith(u'https://') or path.startswith(u'/'):
+            return path
+        return urljoin(settings.MEDIA_URL,path)
 
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"

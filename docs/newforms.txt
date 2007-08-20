@@ -2139,17 +2139,21 @@ Paths in media definitions
 --------------------------
 
 Paths used to specify media can be either relative or absolute. If a path 
-starts with 'http://' or 'https://', it will be interpreted as an absolute
+starts with '/', 'http://' or 'https://', it will be interpreted as an absolute
 path, and left as-is. All other paths will be prepended with the value of
 ``settings.MEDIA_URL``. For example, if the MEDIA_URL for your site was
 ``http://media.example.com/``::
 
     class CalendarWidget(forms.TextInput):
         class Media:
+            css = {
+                'all': ('/css/pretty.css',),
+            }
             js = ('animations.js', 'http://othersite.com/actions.js')
 
     >>> w = CalendarWidget()
     >>> print w.media
+    <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="http://media.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 

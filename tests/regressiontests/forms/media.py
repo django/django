@@ -4,35 +4,35 @@
 media_tests = r"""
 >>> from django.newforms import TextInput, Media, TextInput, CharField, Form, MultiWidget
 >>> from django.conf import settings
->>> settings.MEDIA_URL = 'http://media.example.com'
+>>> settings.MEDIA_URL = 'http://media.example.com/media/'
 
 # Check construction of media objects
->>> m = Media(css={'all': ('/path/to/css1','/path/to/css2')}, js=('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3'))
+>>> m = Media(css={'all': ('path/to/css1','/path/to/css2')}, js=('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3'))
 >>> print m
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
 >>> class Foo:
 ...     css = {
-...        'all': ('/path/to/css1','/path/to/css2')
+...        'all': ('path/to/css1','/path/to/css2')
 ...     }
 ...     js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 >>> m3 = Media(Foo)
 >>> print m3
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
 >>> m3 = Media(Foo)
 >>> print m3
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
@@ -54,25 +54,25 @@ media_tests = r"""
 >>> class MyWidget1(TextInput):
 ...     class Media:
 ...         css = {
-...            'all': ('/path/to/css1','/path/to/css2')
+...            'all': ('path/to/css1','/path/to/css2')
 ...         }
 ...         js = ('/path/to/js1','http://media.other.com/path/to/js2','https://secure.other.com/path/to/js3')
 
 >>> w1 = MyWidget1()
 >>> print w1.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
 # Media objects can be interrogated by media type
 >>> print w1.media['css']
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
 
 >>> print w1.media['js']
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
@@ -88,26 +88,26 @@ media_tests = r"""
 >>> class MyWidget3(TextInput):
 ...     class Media:
 ...         css = {
-...            'all': ('/path/to/css3','/path/to/css1')
+...            'all': ('/path/to/css3','path/to/css1')
 ...         }
 ...         js = ('/path/to/js1','/path/to/js4')
 
 >>> w2 = MyWidget2()
 >>> w3 = MyWidget3()
 >>> print w1.media + w2.media + w3.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # Check that media addition hasn't affected the original objects
 >>> print w1.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
@@ -123,8 +123,8 @@ media_tests = r"""
 
 >>> w4 = MyWidget4()
 >>> print w4.media
-<link href="http://media.example.com/some/path" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/some/js"></script>
+<link href="/some/path" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/some/js"></script>
 
 # Media properties can reference the media of their parents
 >>> class MyWidget5(MyWidget4):
@@ -134,10 +134,10 @@ media_tests = r"""
 
 >>> w5 = MyWidget5()
 >>> print w5.media
-<link href="http://media.example.com/some/path" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/other/path" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/some/js"></script>
-<script type="text/javascript" src="http://media.example.com/other/js"></script>
+<link href="/some/path" type="text/css" media="all" rel="stylesheet" />
+<link href="/other/path" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/some/js"></script>
+<script type="text/javascript" src="/other/js"></script>
 
 # Media properties can reference the media of their parents,
 # even if the parent media was defined using a class
@@ -148,13 +148,13 @@ media_tests = r"""
 
 >>> w6 = MyWidget6()
 >>> print w6.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/other/path" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/other/path" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/other/js"></script>
+<script type="text/javascript" src="/other/js"></script>
 
 ###############################################################
 # Inheritance of media
@@ -166,9 +166,9 @@ media_tests = r"""
 
 >>> w7 = MyWidget7()
 >>> print w7.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
 
@@ -176,19 +176,19 @@ media_tests = r"""
 >>> class MyWidget8(MyWidget1):
 ...     class Media:
 ...         css = {
-...            'all': ('/path/to/css3','/path/to/css1')
+...            'all': ('/path/to/css3','path/to/css1')
 ...         }
 ...         js = ('/path/to/js1','/path/to/js4')
 
 >>> w8 = MyWidget8()
 >>> print w8.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # If a widget extends another but defines media, it extends the parents widget's media,
 # even if the parent defined media using a property.
@@ -201,62 +201,62 @@ media_tests = r"""
 
 >>> w9 = MyWidget9()
 >>> print w9.media
-<link href="http://media.example.com/some/path" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/other/path" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/some/js"></script>
-<script type="text/javascript" src="http://media.example.com/other/js"></script>
+<link href="/some/path" type="text/css" media="all" rel="stylesheet" />
+<link href="/other/path" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/some/js"></script>
+<script type="text/javascript" src="/other/js"></script>
 
 # A widget can disable media inheritance by specifying 'extend=False'
 >>> class MyWidget10(MyWidget1):
 ...     class Media:
 ...         extend = False
 ...         css = {
-...            'all': ('/path/to/css3','/path/to/css1')
+...            'all': ('/path/to/css3','path/to/css1')
 ...         }
 ...         js = ('/path/to/js1','/path/to/js4')
 
 >>> w10 = MyWidget10()
 >>> print w10.media
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # A widget can explicitly enable full media inheritance by specifying 'extend=True'
 >>> class MyWidget11(MyWidget1):
 ...     class Media:
 ...         extend = True
 ...         css = {
-...            'all': ('/path/to/css3','/path/to/css1')
+...            'all': ('/path/to/css3','path/to/css1')
 ...         }
 ...         js = ('/path/to/js1','/path/to/js4')
 
 >>> w11 = MyWidget11()
 >>> print w11.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # A widget can enable inheritance of one media type by specifying extend as a tuple
 >>> class MyWidget12(MyWidget1):
 ...     class Media:
 ...         extend = ('css',)
 ...         css = {
-...            'all': ('/path/to/css3','/path/to/css1')
+...            'all': ('/path/to/css3','path/to/css1')
 ...         }
 ...         js = ('/path/to/js1','/path/to/js4')
 
 >>> w12 = MyWidget12()
 >>> print w12.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 ###############################################################
 # Multi-media handling for CSS
@@ -274,12 +274,12 @@ media_tests = r"""
 
 >>> multimedia = MultimediaWidget()
 >>> print multimedia.media
-<link href="http://media.example.com/file4" type="text/css" media="print" rel="stylesheet" />
-<link href="http://media.example.com/file3" type="text/css" media="screen" rel="stylesheet" />
-<link href="http://media.example.com/file1" type="text/css" media="screen, print" rel="stylesheet" />
-<link href="http://media.example.com/file2" type="text/css" media="screen, print" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<link href="/file4" type="text/css" media="print" rel="stylesheet" />
+<link href="/file3" type="text/css" media="screen" rel="stylesheet" />
+<link href="/file1" type="text/css" media="screen, print" rel="stylesheet" />
+<link href="/file2" type="text/css" media="screen, print" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 ###############################################################
 # Multiwidget media handling
@@ -294,13 +294,13 @@ media_tests = r"""
             
 >>> mymulti = MyMultiWidget()
 >>> print mymulti.media   
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 ###############################################################
 # Media processing for forms
@@ -312,26 +312,26 @@ media_tests = r"""
 ...     field2 = CharField(max_length=20, widget=MyWidget2())
 >>> f1 = MyForm()
 >>> print f1.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # Form media can be combined to produce a single media definition.
 >>> class AnotherForm(Form):
 ...     field3 = CharField(max_length=20, widget=MyWidget3())
 >>> f2 = AnotherForm()
 >>> print f1.media + f2.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
 
 # Forms can also define media, following the same rules as widgets.
 >>> class FormWithMedia(Form):
@@ -344,14 +344,14 @@ media_tests = r"""
 ...         }
 >>> f3 = FormWithMedia()
 >>> print f3.media
-<link href="http://media.example.com/path/to/css1" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css2" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/path/to/css3" type="text/css" media="all" rel="stylesheet" />
-<link href="http://media.example.com/some/form/css" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="http://media.example.com/path/to/js1"></script>
+<link href="http://media.example.com/media/path/to/css1" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css2" type="text/css" media="all" rel="stylesheet" />
+<link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
+<link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/path/to/js1"></script>
 <script type="text/javascript" src="http://media.other.com/path/to/js2"></script>
 <script type="text/javascript" src="https://secure.other.com/path/to/js3"></script>
-<script type="text/javascript" src="http://media.example.com/path/to/js4"></script>
-<script type="text/javascript" src="http://media.example.com/some/form/javascript"></script>
+<script type="text/javascript" src="/path/to/js4"></script>
+<script type="text/javascript" src="/some/form/javascript"></script>
 
 """
