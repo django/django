@@ -120,7 +120,6 @@ supports_constraints = False
 supports_tablespaces = False
 uses_case_insensitive_names = False
 
-dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 

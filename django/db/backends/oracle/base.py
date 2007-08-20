@@ -224,7 +224,6 @@ def to_unicode(s):
         return force_unicode(s)
     return s
 
-dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
 

@@ -5,6 +5,10 @@ except ImportError:
     # Import copy of _thread_local.py from Python 2.4
     from django.utils._threading_local import local
 
+def _dict_helper(desc, row):
+    "Returns a dictionary for the given cursor.description and result row."
+    return dict(zip([col[0] for col in desc], row))
+
 class BaseDatabaseWrapper(local):
     """
     Represents a database connection.

@@ -200,10 +200,6 @@ supports_constraints = True
 supports_tablespaces = False
 uses_case_insensitive_names = False
 
-def dictfetchone(cursor):
-    "Returns a row from the cursor as a dict"
-    return cursor.dictfetchone()
-
 def dictfetchmany(cursor, number):
     "Returns a certain number of rows from a cursor as a dict"
     return cursor.dictfetchmany(number)
