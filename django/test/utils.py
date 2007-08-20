@@ -118,13 +118,15 @@ def create_test_db(verbosity=1, autoclobber=False):
         else:
             TEST_DATABASE_NAME = TEST_DATABASE_PREFIX + settings.DATABASE_NAME
 
+        qn = connection.ops.quote_name
+
         # Create the test database and connect to it. We need to autocommit
         # if the database supports it because PostgreSQL doesn't allow
         # CREATE/DROP DATABASE statements within transactions.
         cursor = connection.cursor()
         _set_autocommit(connection)
         try:
-            cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
+            cursor.execute("CREATE DATABASE %s %s" % (qn(TEST_DATABASE_NAME), suffix))
         except Exception, e:
             sys.stderr.write("Got an error creating the test database: %s\n" % e)
             if not autoclobber:
@@ -133,10 +135,10 @@ def create_test_db(verbosity=1, autoclobber=False):
                 try:
                     if verbosity >= 1:
                         print "Destroying old test database..."
-                    cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+                    cursor.execute("DROP DATABASE %s" % qn(TEST_DATABASE_NAME))
                     if verbosity >= 1:
                         print "Creating test database..."
-                    cursor.execute("CREATE DATABASE %s %s" % (backend.quote_name(TEST_DATABASE_NAME), suffix))
+                    cursor.execute("CREATE DATABASE %s %s" % (qn(TEST_DATABASE_NAME), suffix))
                 except Exception, e:
                     sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                     sys.exit(2)
@@ -180,5 +182,5 @@ def destroy_test_db(old_database_name, verbosity=1):
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
-        cursor.execute("DROP DATABASE %s" % backend.quote_name(TEST_DATABASE_NAME))
+        cursor.execute("DROP DATABASE %s" % connection.ops.quote_name(TEST_DATABASE_NAME))
         connection.close()

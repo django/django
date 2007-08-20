@@ -134,6 +134,13 @@ class BaseDatabaseOperations(object):
         """
         return 'DEFAULT'
 
+    def quote_name(self, name):
+        """
+        Returns a quoted version of the given table, index or column name. Does
+        not quote the given name if it's already been quoted.
+        """
+        raise NotImplementedError()
+
     def random_function_sql(self):
         """
         Returns a SQL expression that returns a random value.

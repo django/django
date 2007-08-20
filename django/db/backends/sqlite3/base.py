@@ -51,6 +51,11 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return 'NULL'
 
+    def quote_name(self, name):
+        if name.startswith('"') and name.endswith('"'):
+            return name # Quoting once is enough.
+        return '"%s"' % name
+
     def sql_flush(self, style, tables, sequences):
         # NB: The generated SQL below is specific to SQLite
         # Note: The DELETE FROM... SQL generated below works for SQLite databases
@@ -58,7 +63,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         sql = ['%s %s %s;' % \
                 (style.SQL_KEYWORD('DELETE'),
                  style.SQL_KEYWORD('FROM'),
-                 style.SQL_FIELD(quote_name(table))
+                 style.SQL_FIELD(self.quote_name(table))
                  ) for table in tables]
         # Note: No requirement for reset of auto-incremented indices (cf. other
         # sql_flush() implementations). Just return SQL at this point
@@ -114,11 +119,6 @@ needs_upper_for_iops = False
 supports_constraints = False
 supports_tablespaces = False
 uses_case_insensitive_names = False
-
-def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-    return '"%s"' % name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany

@@ -67,11 +67,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute("SELECT %s FROM %s WHERE %s = @@IDENTITY" % (pk_name, table_name, pk_name))
         return cursor.fetchone()[0]
 
+    def quote_name(self, name):
+        if name.startswith('[') and name.endswith(']'):
+            return name # Quoting once is enough.
+        return '[%s]' % name
+
     def random_function_sql(self):
         return 'RAND()'
 
     def tablespace_sql(self, tablespace, inline=False):
-        return "ON %s" % quote_name(tablespace)
+        return "ON %s" % self.quote_name(tablespace)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -96,11 +101,6 @@ needs_upper_for_iops = False
 supports_constraints = True
 supports_tablespaces = True
 uses_case_insensitive_names = False
-
-def quote_name(name):
-    if name.startswith('[') and name.endswith(']'):
-        return name # Quoting once is enough.
-    return '[%s]' % name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany

@@ -4,7 +4,7 @@ Classes allowing "generic" relations through ContentType and object-id fields.
 
 from django import oldforms
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import backend
+from django.db import connection
 from django.db.models import signals
 from django.db.models.fields.related import RelatedField, Field, ManyToManyRel
 from django.db.models.loading import get_model
@@ -163,13 +163,15 @@ class ReverseGenericRelatedObjectsDescriptor(object):
         superclass = rel_model._default_manager.__class__
         RelatedManager = create_generic_related_manager(superclass)
 
+        qn = connection.ops.quote_name
+
         manager = RelatedManager(
             model = rel_model,
             instance = instance,
             symmetrical = (self.field.rel.symmetrical and instance.__class__ == rel_model),
-            join_table = backend.quote_name(self.field.m2m_db_table()),
-            source_col_name = backend.quote_name(self.field.m2m_column_name()),
-            target_col_name = backend.quote_name(self.field.m2m_reverse_name()),
+            join_table = qn(self.field.m2m_db_table()),
+            source_col_name = qn(self.field.m2m_column_name()),
+            target_col_name = qn(self.field.m2m_reverse_name()),
             content_type = ContentType.objects.get_for_model(self.field.model),
             content_type_field_name = self.field.content_type_field_name,
             object_id_field_name = self.field.object_id_field_name

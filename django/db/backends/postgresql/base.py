@@ -73,6 +73,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
         return cursor.fetchone()[0]
 
+    def quote_name(self, name):
+        if name.startswith('"') and name.endswith('"'):
+            return name # Quoting once is enough.
+        return '"%s"' % name
+
     def sql_flush(self, style, tables, sequences):
         if tables:
             if postgres_version[0] >= 8 and postgres_version[1] >= 1:
@@ -82,7 +87,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 # statement.
                 sql = ['%s %s;' % \
                     (style.SQL_KEYWORD('TRUNCATE'),
-                     style.SQL_FIELD(', '.join([quote_name(table) for table in tables]))
+                     style.SQL_FIELD(', '.join([self.quote_name(table) for table in tables]))
                 )]
             else:
                 # Older versions of Postgres can't do TRUNCATE in a single call, so
@@ -90,7 +95,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 sql = ['%s %s %s;' % \
                         (style.SQL_KEYWORD('DELETE'),
                          style.SQL_KEYWORD('FROM'),
-                         style.SQL_FIELD(quote_name(table))
+                         style.SQL_FIELD(self.quote_name(table))
                          ) for table in tables]
 
             # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
@@ -103,7 +108,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     sql.append("%s %s %s %s %s %s;" % \
                         (style.SQL_KEYWORD('ALTER'),
                         style.SQL_KEYWORD('SEQUENCE'),
-                        style.SQL_FIELD(quote_name('%s_%s_seq' % (table_name, column_name))),
+                        style.SQL_FIELD(self.quote_name('%s_%s_seq' % (table_name, column_name))),
                         style.SQL_KEYWORD('RESTART'),
                         style.SQL_KEYWORD('WITH'),
                         style.SQL_FIELD('1')
@@ -114,7 +119,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     sql.append("%s %s %s %s %s %s;" % \
                         (style.SQL_KEYWORD('ALTER'),
                          style.SQL_KEYWORD('SEQUENCE'),
-                         style.SQL_FIELD(quote_name('%s_id_seq' % table_name)),
+                         style.SQL_FIELD(self.quote_name('%s_id_seq' % table_name)),
                          style.SQL_KEYWORD('RESTART'),
                          style.SQL_KEYWORD('WITH'),
                          style.SQL_FIELD('1')
@@ -127,6 +132,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def sequence_reset_sql(self, style, model_list):
         from django.db import models
         output = []
+        qn = self.quote_name
         for model in model_list:
             # Use `coalesce` to set the sequence for each model to the max pk value if there are records,
             # or 1 if there are none. Set the `is_called` property (the third argument to `setval`) to true
@@ -135,19 +141,19 @@ class DatabaseOperations(BaseDatabaseOperations):
                 if isinstance(f, models.AutoField):
                     output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                         (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_FIELD(quote_name('%s_%s_seq' % (model._meta.db_table, f.column))),
-                        style.SQL_FIELD(quote_name(f.column)),
-                        style.SQL_FIELD(quote_name(f.column)),
+                        style.SQL_FIELD(qn('%s_%s_seq' % (model._meta.db_table, f.column))),
+                        style.SQL_FIELD(qn(f.column)),
+                        style.SQL_FIELD(qn(f.column)),
                         style.SQL_KEYWORD('IS NOT'),
                         style.SQL_KEYWORD('FROM'),
-                        style.SQL_TABLE(quote_name(model._meta.db_table))))
+                        style.SQL_TABLE(qn(model._meta.db_table))))
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 output.append("%s setval('%s', coalesce(max(%s), 1), max(%s) %s null) %s %s;" % \
                     (style.SQL_KEYWORD('SELECT'),
-                    style.SQL_FIELD(quote_name('%s_id_seq' % f.m2m_db_table())),
-                    style.SQL_FIELD(quote_name('id')),
-                    style.SQL_FIELD(quote_name('id')),
+                    style.SQL_FIELD(qn('%s_id_seq' % f.m2m_db_table())),
+                    style.SQL_FIELD(qn('id')),
+                    style.SQL_FIELD(qn('id')),
                     style.SQL_KEYWORD('IS NOT'),
                     style.SQL_KEYWORD('FROM'),
                     style.SQL_TABLE(f.m2m_db_table())))
@@ -193,11 +199,6 @@ needs_upper_for_iops = False
 supports_constraints = True
 supports_tablespaces = False
 uses_case_insensitive_names = False
-
-def quote_name(name):
-    if name.startswith('"') and name.endswith('"'):
-        return name # Quoting once is enough.
-    return '"%s"' % name
 
 def dictfetchone(cursor):
     "Returns a row from the cursor as a dict"

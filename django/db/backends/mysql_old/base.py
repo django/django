@@ -94,6 +94,11 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql += "%s," % offset
         return sql + str(limit)
 
+    def quote_name(self, name):
+        if name.startswith("`") and name.endswith("`"):
+            return name # Quoting once is enough.
+        return "`%s`" % name
+
     def random_function_sql(self):
         return 'RAND()'
 
@@ -104,7 +109,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if tables:
             sql = ['SET FOREIGN_KEY_CHECKS = 0;']
             for table in tables:
-                sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(quote_name(table))))
+                sql.append('%s %s;' % (style.SQL_KEYWORD('TRUNCATE'), style.SQL_FIELD(self.quote_name(table))))
             sql.append('SET FOREIGN_KEY_CHECKS = 1;')
 
             # 'ALTER TABLE table AUTO_INCREMENT = 1;'... style SQL statements
@@ -112,7 +117,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql.extend(["%s %s %s %s %s;" % \
                 (style.SQL_KEYWORD('ALTER'),
                  style.SQL_KEYWORD('TABLE'),
-                 style.SQL_TABLE(quote_name(sequence['table'])),
+                 style.SQL_TABLE(self.quote_name(sequence['table'])),
                  style.SQL_KEYWORD('AUTO_INCREMENT'),
                  style.SQL_FIELD('= 1'),
                 ) for sequence in sequences])
@@ -197,11 +202,6 @@ needs_upper_for_iops = False
 supports_constraints = True
 supports_tablespaces = False
 uses_case_insensitive_names = False
-
-def quote_name(name):
-    if name.startswith("`") and name.endswith("`"):
-        return name # Quoting once is enough.
-    return "`%s`" % name
 
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany

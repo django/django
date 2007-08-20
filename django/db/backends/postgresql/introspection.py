@@ -1,4 +1,6 @@
-from django.db.backends.postgresql.base import quote_name
+from django.db.backends.postgresql.base import DatabaseOperations
+
+quote_name = DatabaseOperations().quote_name
 
 def get_table_list(cursor):
     "Returns a list of table names in the current database."

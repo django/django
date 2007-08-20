@@ -1,6 +1,6 @@
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
-from django.db import backend, connection, models
+from django.db import connection, models
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -203,6 +203,7 @@ class User(models.Model):
             #         AND gp."group_id" = ug."group_id"
             #         AND ct."id" = p."content_type_id"
             #         AND ug."user_id" = %s, [self.id])
+            qn = connection.ops.quote_name
             sql = """
                 SELECT ct.%s, p.%s
                 FROM %s p, %s gp, %s ug, %s ct
@@ -210,13 +211,13 @@ class User(models.Model):
                     AND gp.%s = ug.%s
                     AND ct.%s = p.%s
                     AND ug.%s = %%s""" % (
-                backend.quote_name('app_label'), backend.quote_name('codename'),
-                backend.quote_name('auth_permission'), backend.quote_name('auth_group_permissions'),
-                backend.quote_name('auth_user_groups'), backend.quote_name('django_content_type'),
-                backend.quote_name('id'), backend.quote_name('permission_id'),
-                backend.quote_name('group_id'), backend.quote_name('group_id'),
-                backend.quote_name('id'), backend.quote_name('content_type_id'),
-                backend.quote_name('user_id'),)
+                qn('app_label'), qn('codename'),
+                qn('auth_permission'), qn('auth_group_permissions'),
+                qn('auth_user_groups'), qn('django_content_type'),
+                qn('id'), qn('permission_id'),
+                qn('group_id'), qn('group_id'),
+                qn('id'), qn('content_type_id'),
+                qn('user_id'),)
             cursor.execute(sql, [self.id])
             self._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
         return self._group_perm_cache

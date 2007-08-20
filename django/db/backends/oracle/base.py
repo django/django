@@ -35,7 +35,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             WHEN (new.id IS NULL)
                 BEGIN
                     SELECT %s.nextval INTO :new.id FROM dual;
-                END;/""" % (tr_name, quote_name(table), sq_name)
+                END;/""" % (tr_name, self.quote_name(table), sq_name)
         return sequence_sql, trigger_sql
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -70,6 +70,15 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 30
 
+    def quote_name(self, name):
+        # SQL92 requires delimited (quoted) names to be case-sensitive.  When
+        # not quoted, Oracle has case-insensitive behavior for identifiers, but
+        # always defaults to uppercase.
+        # We simplify things by making Oracle identifiers always uppercase.
+        if not name.startswith('"') and not name.endswith('"'):
+            name = '"%s"' % util.truncate_name(name.upper(), DatabaseOperations().max_name_length())
+        return name.upper()
+
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
@@ -82,14 +91,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql = ['%s %s %s;' % \
                     (style.SQL_KEYWORD('DELETE'),
                      style.SQL_KEYWORD('FROM'),
-                     style.SQL_FIELD(quote_name(table))
+                     style.SQL_FIELD(self.quote_name(table))
                      ) for table in tables]
             # Since we've just deleted all the rows, running our sequence
             # ALTER code will reset the sequence to 0.
             for sequence_info in sequences:
                 table_name = sequence_info['table']
                 seq_name = get_sequence_name(table_name)
-                query = _get_sequence_reset_sql() % {'sequence':seq_name, 'table':quote_name(table_name)}
+                query = _get_sequence_reset_sql() % {'sequence': seq_name, 'table': self.quote_name(table_name)}
                 sql.append(query)
             return sql
         else:
@@ -116,7 +125,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return ''
 
     def tablespace_sql(self, tablespace, inline=False):
-        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), quote_name(tablespace))
+        return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), self.quote_name(tablespace))
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
@@ -215,15 +224,6 @@ def to_unicode(s):
         return force_unicode(s)
     return s
 
-def quote_name(name):
-    # SQL92 requires delimited (quoted) names to be case-sensitive.  When
-    # not quoted, Oracle has case-insensitive behavior for identifiers, but
-    # always defaults to uppercase.
-    # We simplify things by making Oracle identifiers always uppercase.
-    if not name.startswith('"') and not name.endswith('"'):
-        name = '"%s"' % util.truncate_name(name.upper(), DatabaseOperations().max_name_length())
-    return name.upper()
-
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
@@ -235,7 +235,7 @@ def get_field_cast_sql(db_type):
         return "%s%s"
 
 def get_drop_sequence(table):
-    return "DROP SEQUENCE %s;" % quote_name(get_sequence_name(table))
+    return "DROP SEQUENCE %s;" % DatabaseOperations().quote_name(get_sequence_name(table))
 
 def _get_sequence_reset_sql():
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
@@ -328,9 +328,10 @@ def get_query_set_class(DefaultQuerySet):
                 handle_legacy_orderlist, orderfield2column
 
             opts = self.model._meta
+            qn = connection.ops.quote_name
 
             # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-            select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
+            select = ["%s.%s" % (qn(opts.db_table), qn(f.column)) for f in opts.fields]
             tables = [quote_only_if_word(t) for t in self._tables]
             joins = SortedDict()
             where = self._where[:]
@@ -348,10 +349,10 @@ def get_query_set_class(DefaultQuerySet):
 
             # Add any additional SELECTs.
             if self._select:
-                select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+                select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in self._select.items()])
 
             # Start composing the body of the SQL statement.
-            sql = [" FROM", backend.quote_name(opts.db_table)]
+            sql = [" FROM", qn(opts.db_table)]
 
             # Compose the join dictionary into SQL describing the joins.
             if joins:
@@ -384,15 +385,15 @@ def get_query_set_class(DefaultQuerySet):
                         order = "ASC"
                     if "." in col_name:
                         table_prefix, col_name = col_name.split('.', 1)
-                        table_prefix = backend.quote_name(table_prefix) + '.'
+                        table_prefix = qn(table_prefix) + '.'
                     else:
                         # Use the database table as a column prefix if it wasn't given,
                         # and if the requested column isn't a custom SELECT.
                         if "." not in col_name and col_name not in (self._select or ()):
-                            table_prefix = backend.quote_name(opts.db_table) + '.'
+                            table_prefix = qn(opts.db_table) + '.'
                         else:
                             table_prefix = ''
-                    order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
+                    order_by.append('%s%s %s' % (table_prefix, qn(orderfield2column(col_name, opts)), order))
             if order_by:
                 sql.append("ORDER BY " + ", ".join(order_by))
 
@@ -417,8 +418,7 @@ def get_query_set_class(DefaultQuerySet):
                 #Oracle's row_number() function always requires an order-by clause.
                 #So we need to define a default order-by, since none was provided.
                 order_by_clause = " OVER (ORDER BY %s.%s)" % \
-                    (backend.quote_name(opts.db_table),
-                    backend.quote_name(opts.fields[0].db_column or opts.fields[0].column))
+                    (qn(opts.db_table), qn(opts.fields[0].db_column or opts.fields[0].column))
             # limit_and_offset_clause
             if self._limit is None:
                 assert self._offset is None, "'offset' is not allowed without 'limit'"
