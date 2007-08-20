@@ -70,6 +70,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def max_name_length(self):
         return 30
 
+    def random_function_sql(self):
+        return "DBMS_RANDOM.RANDOM"
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -185,9 +188,6 @@ def get_field_cast_sql(db_type):
         return "DBMS_LOB.SUBSTR(%s%s)"
     else:
         return "%s%s"
-
-def get_random_function_sql():
-    return "DBMS_RANDOM.RANDOM"
 
 def get_start_transaction_sql():
     return None
@@ -380,7 +380,7 @@ def get_query_set_class(DefaultQuerySet):
                 ordering_to_use = opts.ordering
             for f in handle_legacy_orderlist(ordering_to_use):
                 if f == '?': # Special case.
-                    order_by.append(backend.get_random_function_sql())
+                    order_by.append(DatabaseOperations().random_function_sql())
                 else:
                     if f.startswith('-'):
                         col_name = f[1:]

@@ -118,9 +118,6 @@ def _sqlite_extract(lookup_type, dt):
         return None
     return str(getattr(dt, lookup_type))
 
-def get_random_function_sql():
-    return "RANDOM()"
-
 def get_start_transaction_sql():
     return "BEGIN;"
 

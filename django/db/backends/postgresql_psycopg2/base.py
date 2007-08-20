@@ -85,9 +85,6 @@ dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall = util.dictfetchall
 
-def get_random_function_sql():
-    return "RANDOM()"
-
 def get_start_transaction_sql():
     return "BEGIN;"
 

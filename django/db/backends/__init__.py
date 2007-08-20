@@ -133,3 +133,9 @@ class BaseDatabaseOperations(object):
         the field should use its default value.
         """
         return 'DEFAULT'
+
+    def random_function_sql(self):
+        """
+        Returns a SQL expression that returns a random value.
+        """
+        return 'RANDOM()'

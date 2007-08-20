@@ -71,7 +71,7 @@ def orderlist2sql(order_list, opts, prefix=''):
         if f.startswith('-'):
             output.append('%s%s DESC' % (prefix, backend.quote_name(orderfield2column(f[1:], opts))))
         elif f == '?':
-            output.append(backend.get_random_function_sql())
+            output.append(connection.ops.random_function_sql())
         else:
             output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
     return ', '.join(output)
@@ -531,7 +531,7 @@ class _QuerySet(object):
             ordering_to_use = opts.ordering
         for f in handle_legacy_orderlist(ordering_to_use):
             if f == '?': # Special case.
-                order_by.append(backend.get_random_function_sql())
+                order_by.append(connection.ops.random_function_sql())
             else:
                 if f.startswith('-'):
                     col_name = f[1:]

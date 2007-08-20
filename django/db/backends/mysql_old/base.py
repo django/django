@@ -94,6 +94,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             sql += "%s," % offset
         return sql + str(limit)
 
+    def random_function_sql(self):
+        return 'RAND()'
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     ops = DatabaseOperations()
 
@@ -180,9 +183,6 @@ def quote_name(name):
 dictfetchone = util.dictfetchone
 dictfetchmany = util.dictfetchmany
 dictfetchall  = util.dictfetchall
-
-def get_random_function_sql():
-    return "RAND()"
 
 def get_start_transaction_sql():
     return "BEGIN;"
