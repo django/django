@@ -103,6 +103,13 @@ class BaseDatabaseOperations(object):
         """
         return "DROP CONSTRAINT"
 
+    def drop_sequence_sql(self, table):
+        """
+        Returns any SQL necessary to drop the sequence for the given table.
+        Returns None if no SQL is necessary.
+        """
+        return None
+
     def field_cast_sql(self, db_type):
         """
         Given a column type (e.g. 'BLOB', 'VARCHAR'), returns the SQL necessary

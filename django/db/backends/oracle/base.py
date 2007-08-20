@@ -66,6 +66,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
+    def drop_sequence_sql(self, table):
+        return "DROP SEQUENCE %s;" % self.quote_name(get_sequence_name(table))
+
     def field_cast_sql(self, db_type):
         if db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
@@ -467,9 +470,6 @@ def to_unicode(s):
     if isinstance(s, basestring):
         return force_unicode(s)
     return s
-
-def get_drop_sequence(table):
-    return "DROP SEQUENCE %s;" % DatabaseOperations().quote_name(get_sequence_name(table))
 
 def _get_sequence_reset_sql():
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.

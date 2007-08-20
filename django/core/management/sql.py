@@ -151,8 +151,10 @@ def sql_delete(app, style):
                         style.SQL_KEYWORD(connection.ops.drop_foreignkey_sql()),
                         style.SQL_FIELD(truncate_name(r_name, connection.ops.max_name_length()))))
                 del references_to_delete[model]
-            if model._meta.has_auto_field and hasattr(backend, 'get_drop_sequence'):
-                output.append(backend.get_drop_sequence(model._meta.db_table))
+            if model._meta.has_auto_field:
+                ds = connection.ops.drop_sequence_sql(model._meta.db_table)
+                if ds:
+                    output.append(ds)
 
     # Output DROP TABLE statements for many-to-many tables.
     for model in app_models:
@@ -161,8 +163,9 @@ def sql_delete(app, style):
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
                     style.SQL_TABLE(qn(f.m2m_db_table()))))
-                if hasattr(backend, 'get_drop_sequence'):
-                    output.append(backend.get_drop_sequence("%s_%s" % (model._meta.db_table, f.column)))
+                ds = connection.ops.drop_sequence_sql("%s_%s" % (model._meta.db_table, f.column))
+                if ds:
+                    output.append(ds)
 
     app_label = app_models[0]._meta.app_label
 
