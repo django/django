@@ -4,7 +4,7 @@ ADO MSSQL database backend for Django.
 Requires adodbapi 2.0.1: http://adodbapi.sourceforge.net/
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 try:
     import adodbapi as Database
 except ImportError, e:
@@ -48,6 +48,9 @@ def variantToPython(variant, adType):
     return res
 Database.convertVariantToPython = variantToPython
 
+class DatabaseFeatures(BaseDatabaseFeatures):
+    supports_tablespaces = True
+
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
         return "DATEPART(%s, %s)" % (lookup_type, field_name)
@@ -79,6 +82,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "ON %s" % self.quote_name(tablespace)
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def _cursor(self, settings):
@@ -92,15 +96,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_string = "PROVIDER=SQLOLEDB;DATA SOURCE=%s;UID=%s;PWD=%s;DATABASE=%s" % (settings.DATABASE_HOST, settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
             self.connection = Database.connect(conn_string)
         return self.connection.cursor()
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = True
-needs_datetime_string_cast = True
-needs_upper_for_iops = False
-supports_constraints = True
-supports_tablespaces = True
-uses_case_insensitive_names = False
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

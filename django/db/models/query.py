@@ -651,7 +651,7 @@ class DateQuerySet(QuerySet):
         table_name = qn(self.model._meta.db_table)
         field_name = qn(self._field.column)
 
-        if backend.allows_group_by_ordinal:
+        if connection.features.allows_group_by_ordinal:
             group_by = '1'
         else:
             group_by = connection.ops.date_trunc_sql(self._kind, '%s.%s' % (table_name, field_name))
@@ -663,7 +663,7 @@ class DateQuerySet(QuerySet):
         cursor.execute(sql, params)
 
         has_resolve_columns = hasattr(self, 'resolve_columns')
-        needs_datetime_string_cast = backend.needs_datetime_string_cast
+        needs_datetime_string_cast = connection.features.needs_datetime_string_cast
         dates = []
         # It would be better to use self._field here instead of DateTimeField(),
         # but in Oracle that will result in a list of datetime.date instead of
@@ -796,7 +796,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     else:
         field_cast_sql = '%s%s'
     field_sql = field_cast_sql % (table_prefix, field_name)
-    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
+    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and connection.features.needs_upper_for_iops:
         format = 'UPPER(%s) %s'
     else:
         format = '%s %s'

@@ -15,12 +15,12 @@ def table_list():
 
 def installed_models(table_list):
     "Returns a set of all models that are installed, given a list of existing table names."
-    from django.db import backend, models
+    from django.db import connection, models
     all_models = []
     for app in models.get_apps():
         for model in models.get_models(app):
             all_models.append(model)
-    if backend.uses_case_insensitive_names:
+    if connection.features.uses_case_insensitive_names:
         converter = lambda x: x.upper()
     else:
         converter = lambda x: x
@@ -110,7 +110,7 @@ def sql_delete(app, style):
         table_names = introspection.get_table_list(cursor)
     else:
         table_names = []
-    if backend.uses_case_insensitive_names:
+    if connection.features.uses_case_insensitive_names:
         table_name_converter = str.upper
     else:
         table_name_converter = lambda x: x
@@ -138,7 +138,7 @@ def sql_delete(app, style):
             # Drop the table now
             output.append('%s %s;' % (style.SQL_KEYWORD('DROP TABLE'),
                 style.SQL_TABLE(qn(model._meta.db_table))))
-            if backend.supports_constraints and model in references_to_delete:
+            if connection.features.supports_constraints and model in references_to_delete:
                 for rel_class, f in references_to_delete[model]:
                     table = rel_class._meta.db_table
                     col = f.column
@@ -232,11 +232,11 @@ def sql_model_create(model, style, known_models=set()):
         field_output = [style.SQL_FIELD(qn(f.column)),
             style.SQL_COLTYPE(col_type)]
         field_output.append(style.SQL_KEYWORD('%sNULL' % (not f.null and 'NOT ' or '')))
-        if f.unique and (not f.primary_key or backend.allows_unique_and_pk):
+        if f.unique and (not f.primary_key or connection.features.allows_unique_and_pk):
             field_output.append(style.SQL_KEYWORD('UNIQUE'))
         if f.primary_key:
             field_output.append(style.SQL_KEYWORD('PRIMARY KEY'))
-        if tablespace and backend.supports_tablespaces and (f.unique or f.primary_key) and backend.autoindexes_primary_keys:
+        if tablespace and connection.features.supports_tablespaces and (f.unique or f.primary_key) and connection.features.autoindexes_primary_keys:
             # We must specify the index tablespace inline, because we
             # won't be generating a CREATE INDEX statement for this field.
             field_output.append(connection.ops.tablespace_sql(tablespace, inline=True))
@@ -264,7 +264,7 @@ def sql_model_create(model, style, known_models=set()):
     for i, line in enumerate(table_output): # Combine and add commas.
         full_statement.append('    %s%s' % (line, i < len(table_output)-1 and ',' or ''))
     full_statement.append(')')
-    if opts.db_tablespace and backend.supports_tablespaces:
+    if opts.db_tablespace and connection.features.supports_tablespaces:
         full_statement.append(connection.ops.tablespace_sql(opts.db_tablespace))
     full_statement.append(';')
     final_output.append('\n'.join(full_statement))
@@ -287,7 +287,7 @@ def sql_for_pending_references(model, style, pending_references):
 
     qn = connection.ops.quote_name
     final_output = []
-    if backend.supports_constraints:
+    if connection.features.supports_constraints:
         opts = model._meta
         if model in pending_references:
             for rel_class, f in pending_references[model]:
@@ -316,7 +316,7 @@ def many_to_many_sql_for_model(model, style):
     for f in opts.many_to_many:
         if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
-            if tablespace and backend.supports_tablespaces and backend.autoindexes_primary_keys:
+            if tablespace and connection.features.supports_tablespaces and connection.features.autoindexes_primary_keys:
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace, inline=True)
             else:
                 tablespace_sql = ''
@@ -347,7 +347,7 @@ def many_to_many_sql_for_model(model, style):
                 style.SQL_FIELD(qn(f.m2m_reverse_name())),
                 tablespace_sql))
             table_output.append(')')
-            if opts.db_tablespace and backend.supports_tablespaces:
+            if opts.db_tablespace and connection.features.supports_tablespaces:
                 # f.db_tablespace is only for indices, so ignore its value here.
                 table_output.append(connection.ops.tablespace_sql(opts.db_tablespace))
             table_output.append(';')
@@ -395,10 +395,10 @@ def sql_indexes_for_model(model, style):
 
     qn = connection.ops.quote_name
     for f in model._meta.fields:
-        if f.db_index and not ((f.primary_key or f.unique) and backend.autoindexes_primary_keys):
+        if f.db_index and not ((f.primary_key or f.unique) and connection.features.autoindexes_primary_keys):
             unique = f.unique and 'UNIQUE ' or ''
             tablespace = f.db_tablespace or model._meta.db_tablespace
-            if tablespace and backend.supports_tablespaces:
+            if tablespace and connection.features.supports_tablespaces:
                 tablespace_sql = ' ' + connection.ops.tablespace_sql(tablespace)
             else:
                 tablespace_sql = ''

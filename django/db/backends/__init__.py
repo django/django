@@ -39,6 +39,16 @@ class BaseDatabaseWrapper(local):
         from django.db.backends import util
         return util.CursorDebugWrapper(cursor, self)
 
+class BaseDatabaseFeatures(object):
+    allows_group_by_ordinal = True
+    allows_unique_and_pk = True
+    autoindexes_primary_keys = True
+    needs_datetime_string_cast = True
+    needs_upper_for_iops = False
+    supports_constraints = True
+    supports_tablespaces = False
+    uses_case_insensitive_names = False
+
 class BaseDatabaseOperations(object):
     """
     This class encapsulates all backend-specific differences, such as the way

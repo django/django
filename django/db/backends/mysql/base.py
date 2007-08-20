@@ -4,7 +4,7 @@ MySQL database backend for Django.
 Requires MySQLdb: http://sourceforge.net/projects/mysql-python
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 try:
     import MySQLdb as Database
 except ImportError, e:
@@ -52,6 +52,9 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 # warning module, and this is setup when the connection is created, and the
 # standard util.CursorDebugWrapper can be used. Also, using sql_mode
 # TRADITIONAL will automatically cause most warnings to be treated as errors.
+
+class DatabaseFeatures(BaseDatabaseFeatures):
+    autoindexes_primary_keys = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -116,6 +119,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return []
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def __init__(self, **kwargs):
@@ -174,15 +178,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 raise Exception('Unable to determine MySQL version from version string %r' % self.connection.get_server_info())
             self.server_version = tuple([int(x) for x in m.groups()])
         return self.server_version
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = False
-needs_datetime_string_cast = True     # MySQLdb requires a typecast for dates
-needs_upper_for_iops = False
-supports_constraints = True
-supports_tablespaces = False
-uses_case_insensitive_names = False
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

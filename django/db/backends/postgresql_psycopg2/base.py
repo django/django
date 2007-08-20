@@ -4,7 +4,7 @@ PostgreSQL database backend for Django.
 Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
-from django.db.backends import BaseDatabaseWrapper
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures
 from django.db.backends.postgresql.operations import DatabaseOperations
 try:
     import psycopg2 as Database
@@ -18,7 +18,11 @@ IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
+class DatabaseFeatures(BaseDatabaseFeatures):
+    needs_datetime_string_cast = False
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def _cursor(self, settings):
@@ -48,15 +52,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SELECT version()")
             self.ops.postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         return cursor
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = True
-needs_datetime_string_cast = False
-needs_upper_for_iops = False
-supports_constraints = True
-supports_tablespaces = False
-uses_case_insensitive_names = False
 
 OPERATOR_MAPPING = {
     'exact': '= %s',

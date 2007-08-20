@@ -2,7 +2,7 @@
 SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 try:
     try:
         from sqlite3 import dbapi2 as Database
@@ -33,6 +33,9 @@ Database.register_converter("timestamp", util.typecast_timestamp)
 Database.register_converter("TIMESTAMP", util.typecast_timestamp)
 Database.register_converter("decimal", util.typecast_decimal)
 Database.register_adapter(decimal.Decimal, util.rev_typecast_decimal)
+
+class DatabaseFeatures(BaseDatabaseFeatures):
+    supports_constraints = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
@@ -70,6 +73,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return sql
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def _cursor(self, settings):
@@ -110,15 +114,6 @@ class SQLiteCursorWrapper(Database.Cursor):
 
     def convert_query(self, query, num_params):
         return query % tuple("?" * num_params)
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = True
-needs_datetime_string_cast = True
-needs_upper_for_iops = False
-supports_constraints = False
-supports_tablespaces = False
-uses_case_insensitive_names = False
 
 def _sqlite_extract(lookup_type, dt):
     try:

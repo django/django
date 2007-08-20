@@ -5,7 +5,7 @@ Requires psycopg 1: http://initd.org/projects/psycopg1
 """
 
 from django.utils.encoding import smart_str, smart_unicode
-from django.db.backends import BaseDatabaseWrapper, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, util
 from django.db.backends.postgresql.operations import DatabaseOperations
 try:
     import psycopg as Database
@@ -56,7 +56,11 @@ class UnicodeCursorWrapper(object):
         else:
             return getattr(self.cursor, attr)
 
+class DatabaseFeatures(BaseDatabaseFeatures):
+    pass # This backend uses all the defaults.
+
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def _cursor(self, settings):
@@ -86,15 +90,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor.execute("SELECT version()")
             self.ops.postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         return cursor
-
-allows_group_by_ordinal = True
-allows_unique_and_pk = True
-autoindexes_primary_keys = True
-needs_datetime_string_cast = True
-needs_upper_for_iops = False
-supports_constraints = True
-supports_tablespaces = False
-uses_case_insensitive_names = False
 
 def typecast_string(s):
     """

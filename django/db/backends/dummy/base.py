@@ -21,12 +21,13 @@ class DatabaseError(Exception):
 class IntegrityError(DatabaseError):
     pass
 
-class DatabaseOperations(object):
+class ComplainOnGetattr(object):
     def __getattr__(self, *args, **kwargs):
         complain()
 
 class DatabaseWrapper(object):
-    ops = DatabaseOperations()
+    ops = ComplainOnGetattr()
+    features = ComplainOnGetattr()
     cursor = complain
     _commit = complain
     _rollback = ignore
@@ -36,8 +37,5 @@ class DatabaseWrapper(object):
 
     def close(self):
         pass # close()
-
-supports_constraints = False
-supports_tablespaces = False
 
 OPERATOR_MAPPING = {}

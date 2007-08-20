@@ -34,7 +34,7 @@ class Command(NoArgsCommand):
         # Get a list of all existing database tables,
         # so we know what needs to be added.
         table_list = table_list()
-        if backend.uses_case_insensitive_names:
+        if connection.features.uses_case_insensitive_names:
             table_name_converter = str.upper
         else:
             table_name_converter = lambda x: x

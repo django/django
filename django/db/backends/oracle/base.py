@@ -4,7 +4,7 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
-from django.db.backends import BaseDatabaseWrapper, BaseDatabaseOperations, util
+from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
 import datetime
@@ -20,6 +20,14 @@ except ImportError, e:
 
 DatabaseError = Database.Error
 IntegrityError = Database.IntegrityError
+
+class DatabaseFeatures(BaseDatabaseFeatures):
+    allows_group_by_ordinal = False
+    allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
+    needs_datetime_string_cast = False
+    needs_upper_for_iops = True
+    supports_tablespaces = True
+    uses_case_insensitive_names = True
 
 class DatabaseOperations(BaseDatabaseOperations):
     def autoinc_sql(self, table):
@@ -128,6 +136,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "%sTABLESPACE %s" % ((inline and "USING INDEX " or ""), self.quote_name(tablespace))
 
 class DatabaseWrapper(BaseDatabaseWrapper):
+    features = DatabaseFeatures()
     ops = DatabaseOperations()
 
     def _valid_connection(self):
@@ -150,15 +159,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
         cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
         return cursor
-
-allows_group_by_ordinal = False
-allows_unique_and_pk = False        # Suppress UNIQUE/PK for Oracle (ORA-02259)
-autoindexes_primary_keys = True
-needs_datetime_string_cast = False
-needs_upper_for_iops = True
-supports_constraints = True
-supports_tablespaces = True
-uses_case_insensitive_names = True
 
 class FormatStylePlaceholderCursor(Database.Cursor):
     """
