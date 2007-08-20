@@ -103,6 +103,15 @@ class BaseDatabaseOperations(object):
         """
         return "DROP CONSTRAINT"
 
+    def field_cast_sql(self, db_type):
+        """
+        Given a column type (e.g. 'BLOB', 'VARCHAR'), returns the SQL necessary
+        to cast it before using it in a WHERE statement. Note that the
+        resulting string should contain a '%s' placeholder for the column being
+        searched against.
+        """
+        return '%s'
+
     def fulltext_search_sql(self, field_name):
         """
         Returns the SQL WHERE clause to use in order to perform a full-text

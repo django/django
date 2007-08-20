@@ -791,11 +791,7 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
         cast_sql = connection.ops.datetime_cast_sql()
     else:
         cast_sql = '%s'
-    if db_type and hasattr(backend, 'get_field_cast_sql'):
-        field_cast_sql = backend.get_field_cast_sql(db_type)
-    else:
-        field_cast_sql = '%s%s'
-    field_sql = field_cast_sql % (table_prefix, field_name)
+    field_sql = connection.ops.field_cast_sql(db_type) % (table_prefix + field_name)
     if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and connection.features.needs_upper_for_iops:
         format = 'UPPER(%s) %s'
     else:
