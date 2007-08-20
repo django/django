@@ -95,7 +95,7 @@ def sql_create(app, style):
 
 def sql_delete(app, style):
     "Returns a list of the DROP TABLE SQL statements for the given app."
-    from django.db import backend, connection, models, get_introspection_module
+    from django.db import connection, models, get_introspection_module
     from django.db.backends.util import truncate_name
     introspection = get_introspection_module()
 
