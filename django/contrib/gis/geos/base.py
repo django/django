@@ -272,14 +272,16 @@ class GEOSGeometry(object):
 
     ## Internal for GEOS unary & binary predicate functions ##
     def _unary_predicate(self, func):
-        "Returns the result, or raises an exception for the given unary predicate function."
+        """Returns the result, or raises an exception for the given unary 
+        predicate function."""
         val = func(self._ptr())
         if val == 0: return False
         elif val == 1: return True
         else: raise GEOSException, '%s: exception occurred.' % func.__name__
 
     def _binary_predicate(self, func, other, *args):
-        "Returns the result, or raises an exception for the given binary predicate function."
+        """Returns the result, or raises an exception for the given binary 
+        predicate function."""
         if not isinstance(other, GEOSGeometry):
             raise TypeError, 'Binary predicate operation ("%s") requires another GEOSGeometry instance.' % func.__name__
         val = func(self._ptr(), other._ptr(), *args)
@@ -322,11 +324,13 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSRelatePattern, other, c_char_p(pattern))
 
     def disjoint(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometries is FF*FF****."
+        """Returns true if the DE-9IM intersection matrix for the two Geometries 
+        is FF*FF****."""
         return self._binary_predicate(lgeos.GEOSDisjoint, other)
 
     def touches(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometries is FT*******, F**T***** or F***T****."
+        """Returns true if the DE-9IM intersection matrix for the two Geometries 
+        is FT*******, F**T***** or F***T****."""
         return self._binary_predicate(lgeos.GEOSTouches, other)
 
     def intersects(self, other):
@@ -334,12 +338,14 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSIntersects, other)
 
     def crosses(self, other):
-        """Returns true if the DE-9IM intersection matrix for the two Geometries is T*T****** (for a point and a curve,
-        a point and an area or a line and an area) 0******** (for two curves)."""
+        """Returns true if the DE-9IM intersection matrix for the two Geometries
+        is T*T****** (for a point and a curve,a point and an area or a line and 
+        an area) 0******** (for two curves)."""
         return self._binary_predicate(lgeos.GEOSCrosses, other)
 
     def within(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometries is T*F**F***."
+        """Returns true if the DE-9IM intersection matrix for the two Geometries 
+        is T*F**F***."""
         return self._binary_predicate(lgeos.GEOSWithin, other)
 
     def contains(self, other):
@@ -347,18 +353,20 @@ class GEOSGeometry(object):
         return self._binary_predicate(lgeos.GEOSContains, other)
 
     def overlaps(self, other):
-        """Returns true if the DE-9IM intersection matrix for the two Geometries is T*T***T** (for two points
-        or two surfaces) 1*T***T** (for two curves)."""
+        """Returns true if the DE-9IM intersection matrix for the two Geometries 
+        is T*T***T** (for two points or two surfaces) 1*T***T** (for two curves)."""
         return self._binary_predicate(lgeos.GEOSOverlaps, other)
 
     def equals(self, other):
-        "Returns true if the DE-9IM intersection matrix for the two Geometries is T*F**FFF*."
+        """Returns true if the DE-9IM intersection matrix for the two Geometries 
+        is T*F**FFF*."""
         return self._binary_predicate(lgeos.GEOSEquals, other)
 
     def equals_exact(self, other, tolerance=0):
-        "Returns true if the two Geometries are exactly equal, up to a specified tolerance."
-        tol = c_double(tolerance)
-        return self._binary_predicate(lgeos.GEOSEqualsExact, other, tol)
+        """Returns true if the two Geometries are exactly equal, up to a 
+        specified tolerance."""
+        return self._binary_predicate(lgeos.GEOSEqualsExact, other, 
+                                      c_double(tolerance))
 
     #### SRID Routines ####
     def get_srid(self):
@@ -393,12 +401,14 @@ class GEOSGeometry(object):
 
     #### Topology Routines ####
     def _unary_topology(self, func, *args):
-        "Returns a GEOSGeometry for the given unary (only takes one geomtry as a paramter) topological operation."
-        return GEOSGeometry(func(self._ptr(), *args))
+        """Returns a GEOSGeometry for the given unary (takes only one Geomtery 
+        as a paramter) topological operation."""
+        return GEOSGeometry(func(self._ptr(), *args), srid=self.srid)
 
     def _binary_topology(self, func, other, *args):
-        "Returns a GEOSGeometry for the given binary (takes two geometries as parameters) topological operation."
-        return GEOSGeometry(func(self._ptr(), other._ptr(), *args))
+        """Returns a GEOSGeometry for the given binary (takes two Geometries 
+        as parameters) topological operation."""
+        return GEOSGeometry(func(self._ptr(), other._ptr(), *args), srid=self.srid)
 
     def buffer(self, width, quadsegs=8):
         """Returns a geometry that represents all points whose distance from this
@@ -432,7 +442,8 @@ class GEOSGeometry(object):
 
     @property
     def convex_hull(self):
-        "Returns the smallest convex Polygon that contains all the points in the Geometry."
+        """Returns the smallest convex Polygon that contains all the points 
+        in the Geometry."""
         return self._unary_topology(lgeos.GEOSConvexHull)
 
     @property
@@ -468,9 +479,29 @@ class GEOSGeometry(object):
         "Returns the area of the Geometry."
         a = c_double()
         status = lgeos.GEOSArea(self._ptr(), byref(a))
-        if not status: return None
+        if status != 1: return None
         else: return a.value
 
+    def distance(self, other):
+        """Returns the distance between the closest points on this Geometry
+        and the other. Units will be in those of the coordinate system. of
+        the Geometry."""
+        if not isinstance(other, GEOSGeometry): 
+            raise TypeError, 'distance() works only on other GEOS Geometries.'
+        dist = c_double()
+        status = lgeos.GEOSDistance(self._ptr(), other._ptr(), byref(dist))
+        if status != 1: return None
+        else: return dist.value
+
+    @property
+    def length(self):
+        """Returns the length of this Geometry (e.g., 0 for point, or the
+        circumfrence of a Polygon)."""
+        l = c_double()
+        status = lgeos.GEOSLength(self._ptr(), byref(l))
+        if status != 1: return None
+        else: return l.value
+    
     def clone(self):
         "Clones this Geometry."
         return GEOSGeometry(lgeos.GEOSGeom_clone(self._ptr()), srid=self.srid)
