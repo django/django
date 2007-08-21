@@ -70,7 +70,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "DROP SEQUENCE %s;" % self.quote_name(get_sequence_name(table))
 
     def field_cast_sql(self, db_type):
-        if db_type.endswith('LOB'):
+        if db_type and db_type.endswith('LOB'):
             return "DBMS_LOB.SUBSTR(%s)"
         else:
             return "%s"
