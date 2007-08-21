@@ -473,7 +473,7 @@ Once you have a ``Client`` instance, you can call any of the following methods:
     data. For example::
 
         >>> c = Client()
-        >>> c.get('/login/', {'name': 'fred', 'passwd': 'secret'})
+        >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
 
     ...will result in the evaluation of a POST request to this URL::
 
