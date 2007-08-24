@@ -2,16 +2,22 @@ import django
 import os.path
 import re
 
-def get_svn_revision():
+def get_svn_revision(path=None):
     """
     Returns the SVN revision in the form SVN-XXXX,
     where XXXX is the revision number.
 
     Returns SVN-unknown if anything goes wrong, such as an unexpected
     format of internal SVN files.
+
+    If path is provided, it should be a directory whose SVN info you want to
+    inspect. If it's not provided, this will use the root django/ package
+    directory.
     """
     rev = None
-    entries_path = '%s/.svn/entries' % django.__path__[0]
+    if path is None:
+        path = django.__path__[0]
+    entries_path = '%s/.svn/entries' % path
 
     if os.path.exists(entries_path):
         entries = open(entries_path, 'r').read()
