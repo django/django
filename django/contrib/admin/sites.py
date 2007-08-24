@@ -1,7 +1,7 @@
 from django import http, template
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
-from django.db.models import Model
+from django.db.models.base import ModelBase
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
@@ -72,7 +72,7 @@ class AdminSite(object):
         """
         admin_class = admin_class or ModelAdmin
         # TODO: Handle options
-        if type(model_or_iterable) not in (list, tuple):
+        if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
@@ -85,7 +85,7 @@ class AdminSite(object):
 
         If a model isn't already registered, this will raise NotRegistered.
         """
-        if type(model_or_iterable) not in (list, tuple):
+        if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model not in self._registry:
