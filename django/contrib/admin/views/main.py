@@ -4,16 +4,13 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import ObjectPaginator, InvalidPage
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import render_to_response
 from django.db import models
 from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404
-from django.utils.html import escape
-from django.utils.text import capfirst
 from django.utils.encoding import force_unicode, smart_str
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext
 import operator
 
 try:
@@ -140,99 +137,9 @@ def render_change_form(model_admin, model, manipulator, context, add=False, chan
         "admin/change_form.html"], context_instance=context)
 
 def index(request):
-    return render_to_response('admin/index.html', {'title': _('Site administration')}, context_instance=template.RequestContext(request))
+    return render_to_response('admin/index.html', {'title': ugettext('Site administration')}, context_instance=template.RequestContext(request))
 index = staff_member_required(never_cache(index))
 
-def _nest_help(obj, depth, val):
-    current = obj
-    for i in range(depth):
-        current = current[-1]
-    current.append(val)
-
-def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_depth):
-    "Helper function that recursively populates deleted_objects."
-    nh = _nest_help # Bind to local variable for performance
-    if current_depth > 16:
-        return # Avoid recursing too deep.
-    opts_seen = []
-    for related in opts.get_all_related_objects():
-        if related.opts in opts_seen:
-            continue
-        opts_seen.append(related.opts)
-        rel_opts_name = related.get_accessor_name()
-        if isinstance(related.field.rel, models.OneToOneRel):
-            try:
-                sub_obj = getattr(obj, rel_opts_name)
-            except ObjectDoesNotExist:
-                pass
-            else:
-                if related.opts.admin:
-                    p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                    if not user.has_perm(p):
-                        perms_needed.add(related.opts.verbose_name)
-                        # We don't care about populating deleted_objects now.
-                        continue
-                if related.field.rel.edit_inline or not related.opts.admin:
-                    # Don't display link to edit, because it either has no
-                    # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
-                else:
-                    # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
-                        sub_obj._get_pk_val(), sub_obj), []])
-                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
-        else:
-            has_related_objs = False
-            for sub_obj in getattr(obj, rel_opts_name).all():
-                has_related_objs = True
-                if related.field.rel.edit_inline or not related.opts.admin:
-                    # Don't display link to edit, because it either has no
-                    # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
-                else:
-                    # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
-                _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
-            # If there were related objects, and the user doesn't have
-            # permission to delete them, add the missing perm to perms_needed.
-            if related.opts.admin and has_related_objs:
-                p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
-                if not user.has_perm(p):
-                    perms_needed.add(related.opts.verbose_name)
-    for related in opts.get_all_related_many_to_many_objects():
-        if related.opts in opts_seen:
-            continue
-        opts_seen.append(related.opts)
-        rel_opts_name = related.get_accessor_name()
-        has_related_objs = False
-
-        # related.get_accessor_name() could return None for symmetrical relationships
-        if rel_opts_name:
-            rel_objs = getattr(obj, rel_opts_name, None)
-            if rel_objs:
-                has_related_objs = True
-
-        if has_related_objs:
-            for sub_obj in rel_objs.all():
-                if related.field.rel.edit_inline or not related.opts.admin:
-                    # Don't display link to edit, because it either has no
-                    # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
-                        {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name), 'obj': escape(sub_obj)}, []])
-                else:
-                    # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [
-                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name)}) + \
-                        (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
-        # If there were related objects, and the user doesn't have
-        # permission to change them, add the missing perm to perms_needed.
-        if related.opts.admin and has_related_objs:
-            p = u'%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
-            if not user.has_perm(p):
-                perms_needed.add(related.opts.verbose_name)
 
 class ChangeList(object):
     def __init__(self, request, model, list_display, list_display_links, list_filter, date_hierarchy, search_fields, list_select_related, list_per_page, model_admin):
@@ -266,7 +173,7 @@ class ChangeList(object):
         self.query = request.GET.get(SEARCH_VAR, '')
         self.query_set = self.get_query_set()
         self.get_results(request)
-        self.title = (self.is_popup and _('Select %s') % force_unicode(self.opts.verbose_name) or _('Select %s to change') % force_unicode(self.opts.verbose_name))
+        self.title = (self.is_popup and ugettext('Select %s') % force_unicode(self.opts.verbose_name) or ugettext('Select %s to change') % force_unicode(self.opts.verbose_name))
         self.filter_specs, self.has_filters = self.get_filters(request)
         self.pk_attname = self.lookup_opts.pk.attname
 

@@ -4,6 +4,7 @@ from django.newforms.formsets import all_valid
 from django.newforms.models import inline_formset
 from django.newforms.widgets import Media, MediaDefiningClass
 from django.contrib.admin import widgets
+from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import models
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -565,7 +566,7 @@ class ModelAdmin(BaseModelAdmin):
         # will also be deleted.
         deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), object_id, escape(str(obj))), []]
         perms_needed = sets.Set()
-        _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
+        get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
         if request.POST: # The user has already confirmed the deletion.
             if perms_needed:
