@@ -9,9 +9,12 @@ import base64
 import cPickle as pickle
 import datetime
 import md5
+import re
 
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
+
+USER_CHANGE_PASSWORD_URL_RE = re.compile('auth/user/(\d+)/password')
 
 class AlreadyRegistered(Exception):
     pass
@@ -111,6 +114,7 @@ class AdminSite(object):
         if not self.has_permission(request):
             return self.login(request)
 
+
         if url == '':
             return self.index(request)
         elif url == 'password_change':
@@ -119,8 +123,13 @@ class AdminSite(object):
             return self.password_change_done(request)
         elif url == 'jsi18n':
             return self.i18n_javascript(request)
-        elif '/' in url:
-            return self.model_page(request, *url.split('/', 2))
+        else:
+            match = USER_CHANGE_PASSWORD_URL_RE.match(url)
+            if match:
+                return self.user_change_password(request, match.group(1))
+                
+            if '/' in url:
+                return self.model_page(request, *url.split('/', 2))
 
         raise http.Http404('The requested admin page does not exist.')
 
@@ -152,6 +161,13 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import password_change_done
         return password_change_done(request)
+
+    def user_change_password(self, request, id):
+        """
+        Handles the "user change password" task
+        """
+        from django.contrib.admin.views.auth import user_change_password
+        return user_change_password(request, id)
 
     def i18n_javascript(self, request):
         """
