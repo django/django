@@ -72,7 +72,7 @@ class AdminSite(object):
         """
         admin_class = admin_class or ModelAdmin
         # TODO: Handle options
-        if issubclass(model_or_iterable, Model):
+        if type(model_or_iterable) not in (list, tuple):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model in self._registry:
@@ -85,7 +85,7 @@ class AdminSite(object):
 
         If a model isn't already registered, this will raise NotRegistered.
         """
-        if issubclass(model_or_iterable, Model):
+        if type(model_or_iterable) not in (list, tuple):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model not in self._registry:
