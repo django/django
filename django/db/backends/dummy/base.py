@@ -8,6 +8,7 @@ ImproperlyConfigured.
 """
 
 from django.core.exceptions import ImproperlyConfigured
+from django.db.backends import BaseDatabaseFeatures, BaseDatabaseOperations
 
 def complain(*args, **kwargs):
     raise ImproperlyConfigured, "You haven't set the DATABASE_ENGINE setting yet."
@@ -21,13 +22,12 @@ class DatabaseError(Exception):
 class IntegrityError(DatabaseError):
     pass
 
-class ComplainOnGetattr(object):
-    def __getattr__(self, *args, **kwargs):
-        complain()
+class DatabaseOperations(BaseDatabaseOperations):
+    quote_name = complain
 
 class DatabaseWrapper(object):
-    features = ComplainOnGetattr()
-    ops = ComplainOnGetattr()
+    features = BaseDatabaseFeatures()
+    ops = DatabaseOperations()
     operators = {}
     cursor = complain
     _commit = complain
