@@ -1554,7 +1554,7 @@ as a custom extension to the ``TextInput`` widget::
     class CommentWidget(forms.TextInput):
         def __init__(self, *args, **kwargs):
             kwargs.setdefault('attrs',{}).update({'size': '40'})
-            super(forms.TextInput, self).__init__(*args, **kwargs)
+            super(CommentWidget, self).__init__(*args, **kwargs)
 
 Then you can use this widget in your forms::
 
