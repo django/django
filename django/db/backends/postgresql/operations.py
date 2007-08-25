@@ -4,8 +4,17 @@ from django.db.backends import BaseDatabaseOperations
 # used by both the 'postgresql' and 'postgresql_psycopg2' backends.
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self, postgres_version=None):
-        self.postgres_version = postgres_version
+    def __init__(self):
+        self._postgres_version = None
+
+    def _get_postgres_version(self):
+        if self._postgres_version is None:
+            from django.db import connection
+            cursor = connection.cursor()
+            cursor.execute("SELECT version()")
+            self._postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
+        return self._postgres_version
+    postgres_version = property(_get_postgres_version)
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
