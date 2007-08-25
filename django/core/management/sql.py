@@ -13,6 +13,25 @@ def table_list():
     cursor = connection.cursor()
     return get_introspection_module().get_table_list(cursor)
 
+def django_table_list(only_existing=False):
+    """
+    Returns a list of all table names that have associated Django models and
+    are in INSTALLED_APPS.
+
+    If only_existing is True, the resulting list will only include the tables
+    that actually exist in the database.
+    """
+    from django.db import models
+    tables = []
+    for app in models.get_apps():
+        for model in models.get_models(app):
+            tables.append(model._meta.db_table)
+            tables.extend([f.m2m_db_table() for f in model._meta.many_to_many])
+    if only_existing:
+        existing = table_list()
+        tables = [t for t in tables if t in existing]
+    return tables
+
 def installed_models(table_list):
     "Returns a set of all models that are installed, given a list of existing table names."
     from django.db import connection, models
@@ -181,10 +200,19 @@ def sql_reset(app, style):
     "Returns a list of the DROP TABLE SQL, then the CREATE TABLE SQL, for the given module."
     return sql_delete(app, style) + sql_all(app, style)
 
-def sql_flush(style):
-    "Returns a list of the SQL statements used to flush the database."
+def sql_flush(style, only_django=False):
+    """
+    Returns a list of the SQL statements used to flush the database.
+    
+    If only_django is True, then only table names that have associated Django
+    models and are in INSTALLED_APPS will be included.
+    """
     from django.db import connection
-    statements = connection.ops.sql_flush(style, table_list(), sequence_list())
+    if only_django:
+        tables = django_table_list()
+    else:
+        tables = table_list()
+    statements = connection.ops.sql_flush(style, tables, sequence_list())
     return statements
 
 def sql_custom(app):
