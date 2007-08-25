@@ -24,7 +24,7 @@ class Command(NoArgsCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style)
+        sql_list = sql_flush(self.style, only_django=True)
 
         if interactive:
             confirm = raw_input("""You have requested a flush of the database.

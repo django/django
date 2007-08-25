@@ -17,7 +17,7 @@ def login(request, template_name='registration/login.html'):
         errors = manipulator.get_validation_errors(request.POST)
         if not errors:
             # Light security check -- make sure redirect_to isn't garbage.
-            if not redirect_to or '://' in redirect_to or ' ' in redirect_to:
+            if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
                 from django.conf import settings
                 redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login

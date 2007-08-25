@@ -7,4 +7,4 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         from django.core.management.sql import sql_flush
-        return '\n'.join(sql_flush(self.style))
+        return '\n'.join(sql_flush(self.style, only_django=True))

@@ -1101,10 +1101,11 @@ To disable this behavior, just remove all entries from the ``ADMINS`` setting.
 404 errors
 ----------
 
-When ``DEBUG`` is ``False`` and your ``MIDDLEWARE_CLASSES`` setting includes
-``CommonMiddleware``, Django will e-mail the users listed in the ``MANAGERS``
-setting whenever your code raises a 404 and the request has a referer.
-(It doesn't bother to e-mail for 404s that don't have a referer.)
+When ``DEBUG`` is ``False``, ``SEND_BROKEN_LINK_EMAILS`` is ``True`` and your
+``MIDDLEWARE_CLASSES`` setting includes ``CommonMiddleware``, Django will
+e-mail the users listed in the ``MANAGERS`` setting whenever your code raises
+a 404 and the request has a referer. (It doesn't bother to e-mail for 404s
+that don't have a referer.)
 
 You can tell Django to stop reporting particular 404s by tweaking the
 ``IGNORABLE_404_ENDS`` and ``IGNORABLE_404_STARTS`` settings. Both should be a

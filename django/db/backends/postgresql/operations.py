@@ -4,8 +4,17 @@ from django.db.backends import BaseDatabaseOperations
 # used by both the 'postgresql' and 'postgresql_psycopg2' backends.
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self, postgres_version=None):
-        self.postgres_version = postgres_version
+    def __init__(self):
+        self._postgres_version = None
+
+    def _get_postgres_version(self):
+        if self._postgres_version is None:
+            from django.db import connection
+            cursor = connection.cursor()
+            cursor.execute("SELECT version()")
+            self._postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
+        return self._postgres_version
+    postgres_version = property(_get_postgres_version)
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/8.0/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
@@ -52,28 +61,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             for sequence_info in sequences:
                 table_name = sequence_info['table']
                 column_name = sequence_info['column']
-                if column_name and len(column_name)>0:
-                    # sequence name in this case will be <table>_<column>_seq
-                    sql.append("%s %s %s %s %s %s;" % \
-                        (style.SQL_KEYWORD('ALTER'),
-                        style.SQL_KEYWORD('SEQUENCE'),
-                        style.SQL_FIELD(self.quote_name('%s_%s_seq' % (table_name, column_name))),
-                        style.SQL_KEYWORD('RESTART'),
-                        style.SQL_KEYWORD('WITH'),
-                        style.SQL_FIELD('1')
-                        )
-                    )
+                if column_name and len(column_name) > 0:
+                    sequence_name = '%s_%s_seq' % (table_name, column_name)
                 else:
-                    # sequence name in this case will be <table>_id_seq
-                    sql.append("%s %s %s %s %s %s;" % \
-                        (style.SQL_KEYWORD('ALTER'),
-                         style.SQL_KEYWORD('SEQUENCE'),
-                         style.SQL_FIELD(self.quote_name('%s_id_seq' % table_name)),
-                         style.SQL_KEYWORD('RESTART'),
-                         style.SQL_KEYWORD('WITH'),
-                         style.SQL_FIELD('1')
-                         )
-                    )
+                    sequence_name = '%s_id_seq' % table_name
+                sql.append("%s setval('%s', 1, false);" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(self.quote_name(sequence_name)))
+                )
             return sql
         else:
             return []

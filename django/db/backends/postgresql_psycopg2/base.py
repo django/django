@@ -64,7 +64,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         cursor.tzinfo_factory = None
         if set_tz:
             cursor.execute("SET TIME ZONE %s", [settings.TIME_ZONE])
-        if self.ops.postgres_version is None:
-            cursor.execute("SELECT version()")
-            self.ops.postgres_version = [int(val) for val in cursor.fetchone()[0].split()[1].split('.')]
         return cursor
