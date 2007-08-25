@@ -52,28 +52,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             for sequence_info in sequences:
                 table_name = sequence_info['table']
                 column_name = sequence_info['column']
-                if column_name and len(column_name)>0:
-                    # sequence name in this case will be <table>_<column>_seq
-                    sql.append("%s %s %s %s %s %s;" % \
-                        (style.SQL_KEYWORD('ALTER'),
-                        style.SQL_KEYWORD('SEQUENCE'),
-                        style.SQL_FIELD(self.quote_name('%s_%s_seq' % (table_name, column_name))),
-                        style.SQL_KEYWORD('RESTART'),
-                        style.SQL_KEYWORD('WITH'),
-                        style.SQL_FIELD('1')
-                        )
-                    )
+                if column_name and len(column_name) > 0:
+                    sequence_name = '%s_%s_seq' % (table_name, column_name)
                 else:
-                    # sequence name in this case will be <table>_id_seq
-                    sql.append("%s %s %s %s %s %s;" % \
-                        (style.SQL_KEYWORD('ALTER'),
-                         style.SQL_KEYWORD('SEQUENCE'),
-                         style.SQL_FIELD(self.quote_name('%s_id_seq' % table_name)),
-                         style.SQL_KEYWORD('RESTART'),
-                         style.SQL_KEYWORD('WITH'),
-                         style.SQL_FIELD('1')
-                         )
-                    )
+                    sequence_name = '%s_id_seq' % table_name
+                sql.append("%s setval('%s', 1, false);" % \
+                    (style.SQL_KEYWORD('SELECT'),
+                    style.SQL_FIELD(self.quote_name(sequence_name)))
+                )
             return sql
         else:
             return []
