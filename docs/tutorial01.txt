@@ -259,6 +259,22 @@ These concepts are represented by simple Python classes. Edit the
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
+.. adminition:: Errors about ``max_length``
+
+   If Django gives you an error message saying that ``max_length`` is
+   not a valid argument, you're most likely using an old version of
+   Django. (This version of the tutorial is written for the latest
+   development version of Django.) If you're using a Subversion checkout
+   of Django's development version (see `the installation docs`_ for
+   more information), you shouldn't have any problems.
+
+   If you want to stick with an older version of Django, you'll want to
+   switch to `the Django 0.96 tutorial`_, because this tutorial covers
+   several features that only exist in the Django development version.
+
+.. _the installation docs: ../install/
+.. _the Django 0.96 tutorial: ../0.96/tutorial01/
+
 The code is straightforward. Each model is represented by a class that
 subclasses ``django.db.models.Model``. Each model has a number of class
 variables, each of which represents a database field in the model.
@@ -486,6 +502,23 @@ the ``polls/models.py`` file) and adding a ``__unicode__()`` method to both
         # ...
         def __unicode__(self):
             return self.choice
+
+.. admonition:: If ``__unicode__()`` doesn't seem to work
+
+   If you add the ``__unicode__()`` method to your models and don't
+   see any change in how they're represented, you're most likely using
+   an old version of Django. (This version of the tutorial is written
+   for the latest development version of Django.) If you're using a
+   Subversion checkout of of Django's development version (see `the
+   installation docs`_ for more information), you shouldn't have any
+   problems.
+
+   If you want to stick with an older version of Django, you'll want to
+   switch to `the Django 0.96 tutorial`_, because this tutorial covers
+   several features that only exist in the Django development version.
+
+.. _the installation docs: ../install/
+.. _the Django 0.96 tutorial: ../0.96/tutorial01/
 
 It's important to add ``__unicode__()`` methods to your models, not only for
 your own sanity when dealing with the interactive prompt, but also because
