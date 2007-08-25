@@ -224,7 +224,6 @@ method on the field to add a record to the relation::
     entry.authors.add(joe)
 
 Django will complain if you try to assign or add an object of the wrong type.
-You can find out more about `Queries over related objects`_ below.
 
 How Django knows to UPDATE vs. INSERT
 -------------------------------------
