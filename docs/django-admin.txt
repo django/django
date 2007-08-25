@@ -479,6 +479,9 @@ This is useful in a number of ways:
 Note that this server can only run on the default port on localhost; it does
 not yet accept a ``host`` or ``port`` parameter.
 
+Also note that it does *not* automatically detect changes to your Python source
+code (as ``runserver`` does). It does, however, detect changes to templates.
+
 .. _unit tests: ../testing/
 
 validate
