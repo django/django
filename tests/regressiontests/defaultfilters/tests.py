@@ -266,6 +266,22 @@ u'bc'
 >>> slice_(u'abcdefg', u'0::2')
 u'aceg'
 
+>>> unordered_list([u'item 1', u'item 2'])
+u'\t<li>item 1</li>\n\t<li>item 2</li>'
+
+>>> unordered_list([u'item 1', [u'item 1.1']])
+u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>'
+
+>>> unordered_list([u'item 1', [u'item 1.1', u'item1.2'], u'item 2'])
+u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>'
+
+>>> unordered_list([u'item 1', [u'item 1.1', [u'item 1.1.1', [u'item 1.1.1.1']]]])
+u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1\n\t\t<ul>\n\t\t\t<li>item 1.1.1\n\t\t\t<ul>\n\t\t\t\t<li>item 1.1.1.1</li>\n\t\t\t</ul>\n\t\t\t</li>\n\t\t</ul>\n\t\t</li>\n\t</ul>\n\t</li>'
+
+>>> unordered_list(['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']])
+u'\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>'
+
+# Old format for unordered lists should still work
 >>> unordered_list([u'item 1', []])
 u'\t<li>item 1</li>'
 
@@ -274,6 +290,9 @@ u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t</ul>\n\t</li>'
 
 >>> unordered_list([u'item 1', [[u'item 1.1', []], [u'item 1.2', []]]])
 u'\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item 1.2</li>\n\t</ul>\n\t</li>'
+
+>>> unordered_list(['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]])
+u'\t<li>States\n\t<ul>\n\t\t<li>Kansas\n\t\t<ul>\n\t\t\t<li>Lawrence</li>\n\t\t\t<li>Topeka</li>\n\t\t</ul>\n\t\t</li>\n\t\t<li>Illinois</li>\n\t</ul>\n\t</li>'
 
 >>> add(u'1', u'2')
 3

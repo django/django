@@ -6,7 +6,7 @@ var SelectBox = {
         SelectBox.cache[id] = new Array();
         var cache = SelectBox.cache[id];
         for (var i = 0; (node = box.options[i]); i++) {
-            cache.push({ value: node.value, text: node.text, displayed: 1 });
+            cache.push({value: node.value, text: node.text, displayed: 1});
         }
     },
     redisplay: function(id) {
@@ -50,7 +50,7 @@ var SelectBox = {
         SelectBox.cache[id].length--;
     },
     add_to_cache: function(id, option) {
-        SelectBox.cache[id].push({ value: option.value, text: option.text, displayed: 1 });
+        SelectBox.cache[id].push({value: option.value, text: option.text, displayed: 1});
     },
     cache_contains: function(id, value) {
         // Check if an item is contained in the cache
@@ -68,7 +68,7 @@ var SelectBox = {
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (option.selected && SelectBox.cache_contains(from, option.value)) {
-                SelectBox.add_to_cache(to, { value: option.value, text: option.text, displayed: 1 });
+                SelectBox.add_to_cache(to, {value: option.value, text: option.text, displayed: 1});
                 SelectBox.delete_from_cache(from, option.value);
             }
         }
@@ -80,8 +80,10 @@ var SelectBox = {
         var to_box = document.getElementById(to);
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
-            SelectBox.add_to_cache(to, { value: option.value, text: option.text, displayed: 1 });
-            SelectBox.delete_from_cache(from, option.value);
+            if (SelectBox.cache_contains(from, option.value)) {
+                SelectBox.add_to_cache(to, {value: option.value, text: option.text, displayed: 1});
+                SelectBox.delete_from_cache(from, option.value);
+            }
         }
         SelectBox.redisplay(from);
         SelectBox.redisplay(to);

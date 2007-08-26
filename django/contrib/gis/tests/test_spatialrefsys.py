@@ -51,7 +51,6 @@ class SpatialRefSysTest(unittest.TestCase):
 
     def test03_ellipsoid(self):
         "Testing the ellipsoid property."
-        return
         for sd in test_srs:
             # Getting the ellipsoid and precision parameters.
             ellps1 = sd['ellipsoid']
