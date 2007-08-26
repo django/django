@@ -259,7 +259,7 @@ These concepts are represented by simple Python classes. Edit the
         choice = models.CharField(max_length=200)
         votes = models.IntegerField()
 
-.. adminition:: Errors about ``max_length``
+.. admonition:: Errors about ``max_length``
 
    If Django gives you an error message saying that ``max_length`` is
    not a valid argument, you're most likely using an old version of
