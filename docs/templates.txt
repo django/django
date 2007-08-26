@@ -1301,9 +1301,14 @@ unordered_list
 Recursively takes a self-nested list and returns an HTML unordered list --
 WITHOUT opening and closing <ul> tags.
 
+**Changed in Django development version**
+
+The format accepted by ``unordered_list`` has changed to an easier to
+understand format.
+
 The list is assumed to be in the proper format. For example, if ``var`` contains
-``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
-then ``{{ var|unordered_list }}`` would return::
+``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
+``{{ var|unordered_list }}`` would return::
 
     <li>States
     <ul>
@@ -1316,6 +1321,9 @@ then ``{{ var|unordered_list }}`` would return::
             <li>Illinois</li>
     </ul>
     </li>
+
+Note: the previous more restrictive and verbose format is still supported:
+``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``,
 
 upper
 ~~~~~
