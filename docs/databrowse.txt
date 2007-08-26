@@ -35,6 +35,7 @@ How to use Databrowse
     2. Register a number of models with the Databrowse site::
 
            from django.contrib import databrowse
+           from myapp.models import SomeModel, SomeOtherModel
 
            databrowse.site.register(SomeModel)
            databrowse.site.register(SomeOtherModel)

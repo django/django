@@ -4,6 +4,7 @@ from django.template import Node, NodeList, Template, Context, resolve_variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
+from django.utils.encoding import smart_str, smart_unicode
 from django.utils.itercompat import groupby
 import sys
 import re
@@ -64,8 +65,8 @@ class FirstOfNode(Node):
             except VariableDoesNotExist:
                 continue
             if value:
-                return str(value)
-        return ''
+                return smart_unicode(value)
+        return u''
 
 class ForNode(Node):
     def __init__(self, loopvars, sequence, reversed, nodelist_loop):
@@ -337,7 +338,7 @@ class URLNode(Node):
     def render(self, context):
         from django.core.urlresolvers import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
-        kwargs = dict([(k, v.resolve(context)) for k, v in self.kwargs.items()])
+        kwargs = dict([(smart_str(k,'ascii'), v.resolve(context)) for k, v in self.kwargs.items()])
         try:
             return reverse(self.view_name, args=args, kwargs=kwargs)
         except NoReverseMatch:
@@ -648,8 +649,8 @@ def do_if(parser, token):
     As you can see, the ``if`` tag can take an option ``{% else %}`` clause that
     will be displayed if the test fails.
 
-    ``if`` tags may use ``or`` or ``not`` to test a number of variables or to
-    negate a given variable::
+    ``if`` tags may use ``or``, ``and`` or ``not`` to test a number of
+    variables or to negate a given variable::
 
         {% if not athlete_list %}
             There are no athletes.
@@ -659,17 +660,30 @@ def do_if(parser, token):
             There are some athletes or some coaches.
         {% endif %}
 
+        {% if athlete_list and coach_list %}
+            Both atheletes and coaches are available.
+        {% endif %}
+
         {% if not athlete_list or coach_list %}
             There are no athletes, or there are some coaches.
         {% endif %}
 
-    For simplicity, ``if`` tags do not allow ``and`` clauses. Use nested ``if``
-    tags instead::
+        {% if athlete_list and not coach_list %}
+            There are some athletes and absolutely no coaches.
+        {% endif %}
+
+    ``if`` tags do not allow ``and`` and ``or`` clauses with the same
+    tag, because the order of logic would be ambigous. For example,
+    this is invalid::
+
+        {% if athlete_list and coach_list or cheerleader_list %}
+
+    If you need to combine ``and`` and ``or`` to do advanced logic, just use
+    nested if tags. For example:
 
         {% if athlete_list %}
-            {% if coach_list %}
-                Number of athletes: {{ athlete_list|count }}.
-                Number of coaches: {{ coach_list|count }}.
+            {% if coach_list or cheerleader_list %}
+                We have athletes, and either coaches or cheerleaders!
             {% endif %}
         {% endif %}
     """

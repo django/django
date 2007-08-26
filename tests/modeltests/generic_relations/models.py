@@ -24,34 +24,34 @@ class TaggedItem(models.Model):
     class Meta:
         ordering = ["tag"]
     
-    def __str__(self):
+    def __unicode__(self):
         return self.tag
 
 class Animal(models.Model):
-    common_name = models.CharField(maxlength=150)
-    latin_name = models.CharField(maxlength=150)
+    common_name = models.CharField(max_length=150)
+    latin_name = models.CharField(max_length=150)
     
     tags = generic.GenericRelation(TaggedItem)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.common_name
         
 class Vegetable(models.Model):
-    name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
     is_yucky = models.BooleanField(default=True)
     
     tags = generic.GenericRelation(TaggedItem)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
     
 class Mineral(models.Model):
-    name = models.CharField(maxlength=150)
+    name = models.CharField(max_length=150)
     hardness = models.PositiveSmallIntegerField()
     
     # note the lack of an explicit GenericRelation here...
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
         
 __test__ = {'API_TESTS':"""
@@ -111,17 +111,17 @@ __test__ = {'API_TESTS':"""
 # objects are deleted when the source object is deleted.
 # Original list of tags:
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('hairy', <ContentType: animal>, 1), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2), ('yellow', <ContentType: animal>, 1)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'hairy', <ContentType: animal>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2), (u'yellow', <ContentType: animal>, 1)]
 
 >>> lion.delete()
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
 
 # If Generic Relation is not explicitly defined, any related objects 
 # remain after deletion of the source object.
 >>> quartz.delete()
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[('clearish', <ContentType: mineral>, 1), ('fatty', <ContentType: vegetable>, 2), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
 
 # If you delete a tag, the objects using the tag are unaffected 
 # (other than losing a tag)
@@ -130,6 +130,6 @@ __test__ = {'API_TESTS':"""
 >>> bacon.tags.all()
 [<TaggedItem: salty>]
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
-[('clearish', <ContentType: mineral>, 1), ('salty', <ContentType: vegetable>, 2), ('shiny', <ContentType: animal>, 2)]
+[(u'clearish', <ContentType: mineral>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
 
 """}

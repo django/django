@@ -237,7 +237,7 @@ msgstr "Coreà"
 
 #: conf/global_settings.py:61
 msgid "Kannada"
-msgstr ""
+msgstr "Canès"
 
 #: conf/global_settings.py:62
 msgid "Latvian"
@@ -1230,7 +1230,7 @@ msgstr "Pot editar-lo de nou abaix."
 
 #: contrib/admin/views/auth.py:30
 msgid "Add user"
-msgstr "Agregar usuari"
+msgstr "Afegir usuari"
 
 #: contrib/admin/views/auth.py:57
 msgid "Password changed successfully."
@@ -1248,12 +1248,12 @@ msgstr "Lloc administratiu"
 #: contrib/admin/views/main.py:276 contrib/admin/views/main.py:361
 #, python-format
 msgid "You may add another %s below."
-msgstr "Pot agregar un altre %s abaix."
+msgstr "Pot afegir un altre %s a baix."
 
 #: contrib/admin/views/main.py:294
 #, python-format
 msgid "Add %s"
-msgstr "Agregar %s"
+msgstr "Afegir %s"
 
 #: contrib/admin/views/main.py:340
 #, python-format

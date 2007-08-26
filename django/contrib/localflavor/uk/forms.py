@@ -3,7 +3,7 @@ UK-specific Form helpers
 """
 
 from django.newforms.fields import RegexField
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 
 class UKPostcodeField(RegexField):
     """
@@ -15,5 +15,5 @@ class UKPostcodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(UKPostcodeField, self).__init__(r'^(GIR 0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HIK-Y][0-9](|[0-9]|[ABEHMNPRVWXY]))|[0-9][A-HJKSTUW]) [0-9][ABD-HJLNP-UW-Z]{2})$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a postcode. A space is required between the two postcode parts.'),
+            error_message=ugettext(u'Enter a postcode. A space is required between the two postcode parts.'),
             *args, **kwargs)

@@ -1,17 +1,17 @@
 from django.db import models
 
 class Poll(models.Model):
-    question = models.CharField(maxlength=200)
+    question = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "Q: %s " % self.question
+    def __unicode__(self):
+        return u"Q: %s " % self.question
 
 class Choice(models.Model):
     poll = models.ForeignKey(Poll)
-    choice = models.CharField(maxlength=200)
+    choice = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "Choice: %s in poll %s" % (self.choice, self.poll)
+    def __unicode__(self):
+        return u"Choice: %s in poll %s" % (self.choice, self.poll)
 
 __test__ = {'API_TESTS':"""
 # Regression test for the use of None as a query value. None is interpreted as 

@@ -25,7 +25,7 @@ def run(verbosity=1):
     "Runs the tests that do not require geographic (GEOS, GDAL, etc.) models."
     TextTestRunner(verbosity=verbosity).run(suite())
 
-def run_tests(module_list, verbosity=1):
+def run_tests(module_list, verbosity=1, interactive=True):
     """Run the tests that require creation of a spatial database.  Does not
       yet work on Windows platforms.
     

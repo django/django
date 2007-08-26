@@ -1,6 +1,6 @@
 # Getting what we need from ctypes
 import re
-from types import StringType, TupleType
+from types import StringType, UnicodeType, TupleType
 from ctypes import \
      c_char_p, c_int, c_double, c_void_p, POINTER, \
      byref, string_at, create_string_buffer
@@ -84,6 +84,9 @@ class SpatialReference(object):
         # Creating an initial empty string buffer.
         buf = c_char_p('')
 
+        if isinstance(input, UnicodeType):
+            input = input.encode('ascii')
+
         if isinstance(input, StringType):
             # Is this an EPSG well known name?
             m = self._epsg_regex.match(input)
@@ -113,7 +116,7 @@ class SpatialReference(object):
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException, 'Could not create spatial reference from WKT!'
+            raise SRSException, 'Could not create spatial reference from WKT! (%s)' % input
         else:
             self._srs = srs
 
@@ -304,6 +307,7 @@ class SpatialReference(object):
         check_err(lgdal.OSRExportToProj4(self._srs, byref(w)))
         return string_at(w)
 
+    @property
     def proj4(self):
         "Alias for proj()."
         return self.proj

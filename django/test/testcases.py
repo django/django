@@ -1,7 +1,8 @@
 import re, unittest
 from urlparse import urlparse
 from django.db import transaction
-from django.core import management, mail
+from django.core import mail
+from django.core.management import call_command
 from django.db.models import get_apps
 from django.test import _doctest as doctest
 from django.test.client import Client
@@ -42,9 +43,11 @@ class TestCase(unittest.TestCase):
             * Clearing the mail test outbox.
             
         """
-        management.flush(verbosity=0, interactive=False)
+        call_command('flush', verbosity=0, interactive=False)
         if hasattr(self, 'fixtures'):
-            management.load_data(self.fixtures, verbosity=0)
+            # We have to use this slightly awkward syntax due to the fact
+            # that we're using *args and **kwargs together.
+            call_command('loaddata', *self.fixtures, **{'verbosity': 0})
         mail.outbox = []
 
     def __call__(self, result=None):
@@ -63,7 +66,7 @@ class TestCase(unittest.TestCase):
         
         """
         self.assertEqual(response.status_code, status_code, 
-            "Response didn't redirect as expected: Reponse code was %d (expected %d)" % 
+            "Response didn't redirect as expected: Response code was %d (expected %d)" % 
                 (response.status_code, status_code))
         scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
         self.assertEqual(path, expected_path, 
@@ -73,19 +76,23 @@ class TestCase(unittest.TestCase):
             "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
                 (path, redirect_response.status_code, target_status_code))
     
-    def assertContains(self, response, text, count=1, status_code=200):
+    def assertContains(self, response, text, count=None, status_code=200):
         """Assert that a response indicates that a page was retreived successfully,
         (i.e., the HTTP status code was as expected), and that ``text`` occurs ``count``
-        times in the content of the response.
+        times in the content of the response. If ``count`` is None, the count doesn't
+        matter - the assertion is true if the text occurs at least once in the response.
         
         """
         self.assertEqual(response.status_code, status_code,
             "Couldn't retrieve page: Response code was %d (expected %d)'" % 
                 (response.status_code, status_code))
         real_count = response.content.count(text)
-        self.assertEqual(real_count, count,
-            "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
-    
+        if count is not None:
+            self.assertEqual(real_count, count,
+                "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
+        else:
+            self.failUnless(real_count != 0, "Couldn't find '%s' in response" % text)
+                
     def assertFormError(self, response, form, field, errors):
         "Assert that a form used to render the response has a specific field error"
         if not response.context:
@@ -129,11 +136,11 @@ class TestCase(unittest.TestCase):
         if isinstance(response.template, list):
             template_names = [t.name for t in response.template]
             self.failUnless(template_name in template_names,
-                "Template '%s' was not one of the templates used to render the response. Templates used: %s" %
-                    (template_name, template_names))
+                u"Template '%s' was not one of the templates used to render the response. Templates used: %s" %
+                    (template_name, u', '.join(template_names)))
         elif response.template:
             self.assertEqual(template_name, response.template.name,
-                "Template '%s' was not used to render the response. Actual template was '%s'" %
+                u"Template '%s' was not used to render the response. Actual template was '%s'" %
                     (template_name, response.template.name))
         else:
             self.fail('No templates used to render the response')
@@ -142,8 +149,8 @@ class TestCase(unittest.TestCase):
         "Assert that the template with the provided name was NOT used in rendering the response"
         if isinstance(response.template, list):            
             self.failIf(template_name in [t.name for t in response.template],
-                "Template '%s' was used unexpectedly in rendering the response" % template_name)
+                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
         elif response.template:
             self.assertNotEqual(template_name, response.template.name,
-                "Template '%s' was used unexpectedly in rendering the response" % template_name)
-        
+                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
+

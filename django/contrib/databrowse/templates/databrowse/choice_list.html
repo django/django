@@ -1,4 +1,4 @@
-{% extends "databrowse/base.html" %}
+{% extends "databrowse/base_site.html" %}
 
 {% block title %}{{ model.verbose_name_plural|capfirst }} by {{ field.field.verbose_name }}{% endblock %}
 
@@ -10,7 +10,7 @@
 
 <ul class="objectlist">
 {% for choice in field.choices %}
-<li class="{% cycle odd,even %}"><a href="{{ choice.url }}">{{ choice.label }}</a></li>
+<li class="{% cycle odd,even %}"><a href="{{ choice.url }}">{{ choice.label|escape }}</a></li>
 {% endfor %}
 </ul>
 

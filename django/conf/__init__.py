@@ -37,6 +37,8 @@ class LazySettings(object):
             # __setattr__(), which would be an infinite loop.
             self.__dict__['_target'] = value
         else:
+            if self._target is None:
+                self._import_settings()
             setattr(self._target, name, value)
 
     def _import_settings(self):

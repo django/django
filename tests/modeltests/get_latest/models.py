@@ -11,22 +11,22 @@ into the future."
 from django.db import models
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateField()
     expire_date = models.DateField()
     class Meta:
         get_latest_by = 'pub_date'
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 class Person(models.Model):
-    name = models.CharField(maxlength=30)
+    name = models.CharField(max_length=30)
     birthday = models.DateField()
 
     # Note that this model doesn't have "get_latest_by" set.
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

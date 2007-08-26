@@ -1,4 +1,3 @@
-# -*- coding: iso-8859-1 -*-
 """
 Norwegian-specific Form helpers
 """
@@ -6,14 +5,14 @@ Norwegian-specific Form helpers
 import re, datetime
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
 
 class NOZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(NOZipCodeField, self).__init__(r'^\d{4}$',
             max_length=None, min_length=None,
-            error_message=gettext(u'Enter a zip code in the format XXXX.'),
-            *args, **kwargs)
+            error_message=ugettext('Enter a zip code in the format XXXX.'),
+                    *args, **kwargs)
 
 class NOMunicipalitySelect(Select):
     """
@@ -33,7 +32,7 @@ class NOSocialSecurityNumber(Field):
         if value in EMPTY_VALUES:
             return u''
 
-        msg = gettext(u'Enter a valid Norwegian social security number.')
+        msg = ugettext(u'Enter a valid Norwegian social security number.')
         if not re.match(r'^\d{11}$', value):
             raise ValidationError(msg)
 
@@ -60,13 +59,13 @@ class NOSocialSecurityNumber(Field):
             self.gender = 'F'
         else:
             self.gender = 'M'
-        
+
         digits = map(int, list(value))
         weight_1 = [3, 7, 6, 1, 8, 9, 4, 5, 2, 1, 0]
         weight_2 = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2, 1]
 
         def multiply_reduce(aval, bval):
-            return sum((a * b) for (a, b) in zip(aval, bval))
+            return sum([(a * b) for (a, b) in zip(aval, bval)])
 
         if multiply_reduce(digits, weight_1) % 11 != 0:
             raise ValidationError(msg)
@@ -74,4 +73,4 @@ class NOSocialSecurityNumber(Field):
             raise ValidationError(msg)
 
         return value
-    
+

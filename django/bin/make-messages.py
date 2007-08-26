@@ -9,6 +9,7 @@ import re
 import os
 import sys
 import getopt
+from itertools import dropwhile
 
 pythonize_re = re.compile(r'\n\s*//')
 
@@ -83,7 +84,7 @@ def make_messages():
                     thefile = '%s.py' % file
                     cmd = 'xgettext %s -d %s -L Perl --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
                         os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
-                    (stdin, stdout, stderr) = os.popen3(cmd, 'b')
+                    (stdin, stdout, stderr) = os.popen3(cmd, 't')
                     msgs = stdout.read()
                     errors = stderr.read()
                     if errors:
@@ -100,12 +101,13 @@ def make_messages():
                     thefile = file
                     if file.endswith('.html'):
                         src = open(os.path.join(dirpath, file), "rb").read()
-                        open(os.path.join(dirpath, '%s.py' % file), "wb").write(templatize(src))
                         thefile = '%s.py' % file
-                    if verbose: sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
-                    cmd = 'xgettext %s -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
-                        os.path.exists(potfile) and '--omit-header' or '', domain, os.path.join(dirpath, thefile))
-                    (stdin, stdout, stderr) = os.popen3(cmd, 'b')
+                        open(os.path.join(dirpath, thefile), "wb").write(templatize(src))
+                    if verbose:
+                        sys.stdout.write('processing file %s in %s\n' % (file, dirpath))
+                    cmd = 'xgettext -d %s -L Python --keyword=gettext_noop --keyword=gettext_lazy --keyword=ngettext_lazy:1,2 --keyword=ugettext_noop --keyword=ugettext_lazy --keyword=ungettext_lazy:1,2 --from-code UTF-8 -o - "%s"' % (
+                        domain, os.path.join(dirpath, thefile))
+                    (stdin, stdout, stderr) = os.popen3(cmd, 't')
                     msgs = stdout.read()
                     errors = stderr.read()
                     if errors:
@@ -116,13 +118,18 @@ def make_messages():
                         old = '#: '+os.path.join(dirpath, thefile)[2:]
                         new = '#: '+os.path.join(dirpath, file)[2:]
                         msgs = msgs.replace(old, new)
+                    if os.path.exists(potfile):
+                        # Strip the header
+                        msgs = '\n'.join(dropwhile(len, msgs.split('\n')))
+                    else:
+                        msgs = msgs.replace('charset=CHARSET', 'charset=UTF-8')
                     if msgs:
                         open(potfile, 'ab').write(msgs)
                     if thefile != file:
                         os.unlink(os.path.join(dirpath, thefile))
 
         if os.path.exists(potfile):
-            (stdin, stdout, stderr) = os.popen3('msguniq "%s"' % potfile, 'b')
+            (stdin, stdout, stderr) = os.popen3('msguniq --to-code=utf-8 "%s"' % potfile, 'b')
             msgs = stdout.read()
             errors = stderr.read()
             if errors:

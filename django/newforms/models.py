@@ -3,7 +3,9 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.translation import gettext
+from django.utils.translation import ugettext
+from django.utils.encoding import smart_unicode
+
 
 from util import ValidationError
 from forms import BaseForm, SortedDictFromList
@@ -32,18 +34,24 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
             continue
         if fields and f.name not in fields:
             continue
-        setattr(instance, f.name, cleaned_data[f.name])
-    if commit:
-        instance.save()
+        f.save_form_data(instance, cleaned_data[f.name])        
+    # Wrap up the saving of m2m data as a function
+    def save_m2m():
+        opts = instance.__class__._meta
+        cleaned_data = form.cleaned_data
         for f in opts.many_to_many:
             if fields and f.name not in fields:
                 continue
             if f.name in cleaned_data:
-                setattr(instance, f.attname, cleaned_data[f.name])
-    # GOTCHA: If many-to-many data is given and commit=False, the many-to-many
-    # data will be lost. This happens because a many-to-many options cannot be
-    # set on an object until after it's saved. Maybe we should raise an
-    # exception in that case.
+                f.save_form_data(instance, cleaned_data[f.name])
+    if commit:
+        # If we are committing, save the instance and the m2m data immediately
+        instance.save()
+        save_m2m()
+    else:
+        # We're not committing. Add a method to the form to allow deferred 
+        # saving of m2m data
+        form.save_m2m = save_m2m
     return instance
 
 def make_model_save(model, fields, fail_message):
@@ -122,7 +130,7 @@ class QuerySetIterator(object):
         if self.empty_label is not None:
             yield (u"", self.empty_label)
         for obj in self.queryset:
-            yield (obj._get_pk_val(), str(obj))
+            yield (obj._get_pk_val(), smart_unicode(obj))
         # Clear the QuerySet cache if required.
         if not self.cache_choices:
             self.queryset._result_cache = None
@@ -169,7 +177,7 @@ class ModelChoiceField(ChoiceField):
         try:
             value = self.queryset.model._default_manager.get(pk=value)
         except self.queryset.model.DoesNotExist:
-            raise ValidationError(gettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
         return value
 
 class ModelMultipleChoiceField(ModelChoiceField):
@@ -182,17 +190,17 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
     def clean(self, value):
         if self.required and not value:
-            raise ValidationError(gettext(u'This field is required.'))
+            raise ValidationError(ugettext(u'This field is required.'))
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(gettext(u'Enter a list of values.'))
+            raise ValidationError(ugettext(u'Enter a list of values.'))
         final_values = []
         for val in value:
             try:
                 obj = self.queryset.model._default_manager.get(pk=val)
             except self.queryset.model.DoesNotExist:
-                raise ValidationError(gettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
             else:
                 final_values.append(obj)
         return final_values

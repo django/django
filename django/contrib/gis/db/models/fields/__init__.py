@@ -45,6 +45,11 @@ class GeometryField(GeoBackendField):
         
     def get_internal_type(self):
         return "NoField"
+
+    def db_type(self):
+        # Geometry columns are added by stored procedures, and thus should
+        #  be None.
+        return None
                                                                 
     def get_manipulator_field_objs(self):
         "Using the WKTField (defined above) to be our manipulator."

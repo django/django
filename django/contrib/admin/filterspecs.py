@@ -7,6 +7,8 @@ certain test -- e.g. being a DateField or ForeignKey.
 """
 
 from django.db import models
+from django.utils.encoding import smart_unicode, iri_to_uri
+from django.utils.translation import ugettext as _
 import datetime
 
 class FilterSpec(object):
@@ -37,12 +39,12 @@ class FilterSpec(object):
     def output(self, cl):
         t = []
         if self.has_output():
-            t.append(_('<h3>By %s:</h3>\n<ul>\n') % self.title())
+            t.append(_(u'<h3>By %s:</h3>\n<ul>\n') % self.title())
 
             for choice in self.choices(cl):
-                t.append('<li%s><a href="%s">%s</a></li>\n' % \
+                t.append(u'<li%s><a href="%s">%s</a></li>\n' % \
                     ((choice['selected'] and ' class="selected"' or ''),
-                     choice['query_string'] ,
+                     iri_to_uri(choice['query_string']),
                      choice['display']))
             t.append('</ul>\n\n')
         return "".join(t)
@@ -70,7 +72,7 @@ class RelatedFilterSpec(FilterSpec):
                'display': _('All')}
         for val in self.lookup_choices:
             pk_val = getattr(val, self.field.rel.to._meta.pk.attname)
-            yield {'selected': self.lookup_val == str(pk_val),
+            yield {'selected': self.lookup_val == smart_unicode(pk_val),
                    'query_string': cl.get_query_string({self.lookup_kwarg: pk_val}),
                    'display': val}
 
@@ -87,7 +89,7 @@ class ChoicesFilterSpec(FilterSpec):
                'query_string': cl.get_query_string({}, [self.lookup_kwarg]),
                'display': _('All')}
         for k, v in self.field.choices:
-            yield {'selected': str(k) == self.lookup_val,
+            yield {'selected': smart_unicode(k) == self.lookup_val,
                     'query_string': cl.get_query_string({self.lookup_kwarg: k}),
                     'display': v}
 
@@ -168,7 +170,7 @@ class AllValuesFilterSpec(FilterSpec):
                'query_string': cl.get_query_string({}, [self.field.name]),
                'display': _('All')}
         for val in self.lookup_choices:
-            val = str(val[self.field.name])
+            val = smart_unicode(val[self.field.name])
             yield {'selected': self.lookup_val == val,
                    'query_string': cl.get_query_string({self.field.name: val}),
                    'display': val}

@@ -11,6 +11,11 @@ class GZipMiddleware(object):
     on the Accept-Encoding header.
     """
     def process_response(self, request, response):
+        if response.status_code != 200 or len(response.content) < 200:
+            # Not worth compressing really short responses or 304 status
+            # responses, etc.
+            return response
+
         patch_vary_headers(response, ('Accept-Encoding',))
         
         # Avoid gzipping if we've already got a content-encoding or if the

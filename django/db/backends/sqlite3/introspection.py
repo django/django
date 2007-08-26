@@ -1,4 +1,6 @@
-from django.db.backends.sqlite3.base import quote_name
+from django.db.backends.sqlite3.base import DatabaseOperations
+
+quote_name = DatabaseOperations().quote_name
 
 def get_table_list(cursor):
     "Returns a list of table names in the current database."
@@ -81,7 +83,7 @@ class FlexibleFieldLookupDict:
             import re
             m = re.search(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$', key)
             if m:
-                return ('CharField', {'maxlength': int(m.group(1))})
+                return ('CharField', {'max_length': int(m.group(1))})
             raise KeyError
 
 DATA_TYPES_REVERSE = FlexibleFieldLookupDict()

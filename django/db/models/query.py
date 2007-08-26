@@ -1,9 +1,10 @@
 from django.conf import settings
-from django.db import backend, connection, transaction
+from django.db import connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models import signals, loading
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
+from django.utils.encoding import smart_unicode
 from django.contrib.contenttypes import generic
 import datetime
 import operator
@@ -52,7 +53,7 @@ def handle_legacy_orderlist(order_list):
         return order_list
     else:
         import warnings
-        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', str(i)) for i, j in order_list]
+        new_order_list = [LEGACY_ORDERING_MAPPING[j.upper()].replace('_', smart_unicode(i)) for i, j in order_list]
         warnings.warn("%r ordering syntax is deprecated. Use %r instead." % (order_list, new_order_list), DeprecationWarning)
         return new_order_list
 
@@ -63,23 +64,24 @@ def orderfield2column(f, opts):
         return f
 
 def orderlist2sql(order_list, opts, prefix=''):
+    qn = connection.ops.quote_name
     if prefix.endswith('.'):
-        prefix = backend.quote_name(prefix[:-1]) + '.'
+        prefix = qn(prefix[:-1]) + '.'
     output = []
     for f in handle_legacy_orderlist(order_list):
         if f.startswith('-'):
-            output.append('%s%s DESC' % (prefix, backend.quote_name(orderfield2column(f[1:], opts))))
+            output.append('%s%s DESC' % (prefix, qn(orderfield2column(f[1:], opts))))
         elif f == '?':
-            output.append(backend.get_random_function_sql())
+            output.append(connection.ops.random_function_sql())
         else:
-            output.append('%s%s ASC' % (prefix, backend.quote_name(orderfield2column(f, opts))))
+            output.append('%s%s ASC' % (prefix, qn(orderfield2column(f, opts))))
     return ', '.join(output)
 
 def quote_only_if_word(word):
     if re.search('\W', word): # Don't quote if there are spaces or non-word chars.
         return word
     else:
-        return backend.quote_name(word)
+        return connection.ops.quote_name(word)
 
 class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
@@ -113,7 +115,7 @@ class _QuerySet(object):
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
-        if not isinstance(k, (slice, int)):
+        if not isinstance(k, (slice, int, long)):
             raise TypeError
         assert (not isinstance(k, slice) and (k >= 0)) \
             or (isinstance(k, slice) and (k.start is None or k.start >= 0) and (k.stop is None or k.stop >= 0)), \
@@ -234,8 +236,8 @@ class _QuerySet(object):
 
         cursor = connection.cursor()
         if self._distinct:
-            id_col = "%s.%s" % (backend.quote_name(self.model._meta.db_table),
-                    backend.quote_name(self.model._meta.pk.column))
+            id_col = "%s.%s" % (connection.ops.quote_name(self.model._meta.db_table),
+                    connection.ops.quote_name(self.model._meta.pk.column))
             cursor.execute("SELECT COUNT(DISTINCT(%s))" % id_col + sql, params)
         else:
             cursor.execute("SELECT COUNT(*)" + sql, params)
@@ -307,11 +309,12 @@ class _QuerySet(object):
         assert self._limit is None and self._offset is None, \
                 "Cannot use 'limit' or 'offset' with in_bulk"
         assert isinstance(id_list, (tuple,  list)), "in_bulk() must be provided with a list of IDs."
+        qn = connection.ops.quote_name
         id_list = list(id_list)
         if id_list == []:
             return {}
         qs = self._clone()
-        qs._where.append("%s.%s IN (%s)" % (backend.quote_name(self.model._meta.db_table), backend.quote_name(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
+        qs._where.append("%s.%s IN (%s)" % (qn(self.model._meta.db_table), qn(self.model._meta.pk.column), ",".join(['%s'] * len(id_list))))
         qs._params.extend(id_list)
         return dict([(obj._get_pk_val(), obj) for obj in qs.iterator()])
 
@@ -480,10 +483,11 @@ class _QuerySet(object):
         return self._result_cache
 
     def _get_sql_clause(self):
+        qn = connection.ops.quote_name
         opts = self.model._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
-        select = ["%s.%s" % (backend.quote_name(opts.db_table), backend.quote_name(f.column)) for f in opts.fields]
+        select = ["%s.%s" % (qn(opts.db_table), qn(f.column)) for f in opts.fields]
         tables = [quote_only_if_word(t) for t in self._tables]
         joins = SortedDict()
         where = self._where[:]
@@ -504,10 +508,10 @@ class _QuerySet(object):
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in self._select.items()])
 
         # Start composing the body of the SQL statement.
-        sql = [" FROM", backend.quote_name(opts.db_table)]
+        sql = [" FROM", qn(opts.db_table)]
 
         # Compose the join dictionary into SQL describing the joins.
         if joins:
@@ -530,7 +534,7 @@ class _QuerySet(object):
             ordering_to_use = opts.ordering
         for f in handle_legacy_orderlist(ordering_to_use):
             if f == '?': # Special case.
-                order_by.append(backend.get_random_function_sql())
+                order_by.append(connection.ops.random_function_sql())
             else:
                 if f.startswith('-'):
                     col_name = f[1:]
@@ -540,29 +544,29 @@ class _QuerySet(object):
                     order = "ASC"
                 if "." in col_name:
                     table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = backend.quote_name(table_prefix) + '.'
+                    table_prefix = qn(table_prefix) + '.'
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
                     if "." not in col_name and col_name not in (self._select or ()):
-                        table_prefix = backend.quote_name(opts.db_table) + '.'
+                        table_prefix = qn(opts.db_table) + '.'
                     else:
                         table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
+                order_by.append('%s%s %s' % (table_prefix, qn(orderfield2column(col_name, opts)), order))
         if order_by:
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
         if self._limit is not None:
-            sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
+            sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
         return select, " ".join(sql), params
 
-# Use the backend's QuerySet class if it defines one, otherwise use _QuerySet.
-if hasattr(backend, 'get_query_set_class'):
-    QuerySet = backend.get_query_set_class(_QuerySet)
+# Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
+if connection.features.uses_custom_queryset:
+    QuerySet = connection.ops.query_set_class(_QuerySet)
 else:
     QuerySet = _QuerySet
 
@@ -578,28 +582,38 @@ class ValuesQuerySet(QuerySet):
         except EmptyResultSet:
             raise StopIteration
 
-        # self._fields is a list of field names to fetch.
+        qn = connection.ops.quote_name
+
+        # self._select is a dictionary, and dictionaries' key order is
+        # undefined, so we convert it to a list of tuples.
+        extra_select = self._select.items()
+
+        # Construct two objects -- fields and field_names.
+        # fields is a list of Field objects to fetch.
+        # field_names is a list of field names, which will be the keys in the
+        # resulting dictionaries.
         if self._fields:
-            if not self._select:
+            if not extra_select:
                 fields = [self.model._meta.get_field(f, many_to_many=False) for f in self._fields]
+                field_names = self._fields
             else:
                 fields = []
+                field_names = []
                 for f in self._fields:
                     if f in [field.name for field in self.model._meta.fields]:
                         fields.append(self.model._meta.get_field(f, many_to_many=False))
-                    elif not self._select.has_key( f ):
-                        raise FieldDoesNotExist, '%s has no field named %r' % ( self.model._meta.object_name, f )
-
-            field_names = self._fields
+                        field_names.append(f)
+                    elif not self._select.has_key(f):
+                        raise FieldDoesNotExist('%s has no field named %r' % (self.model._meta.object_name, f))
         else: # Default to all fields.
             fields = self.model._meta.fields
             field_names = [f.attname for f in fields]
 
         columns = [f.column for f in fields]
-        select = ['%s.%s' % (backend.quote_name(self.model._meta.db_table), backend.quote_name(c)) for c in columns]
-        # Add any additional SELECTs.
-        if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+        select = ['%s.%s' % (qn(self.model._meta.db_table), qn(c)) for c in columns]
+        if extra_select:
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in extra_select])
+            field_names.extend([f[0] for f in extra_select])
 
         cursor = connection.cursor()
         cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
@@ -623,32 +637,33 @@ class DateQuerySet(QuerySet):
     def iterator(self):
         from django.db.backends.util import typecast_timestamp
         from django.db.models.fields import DateTimeField
+
+        qn = connection.ops.quote_name
         self._order_by = () # Clear this because it'll mess things up otherwise.
         if self._field.null:
             self._where.append('%s.%s IS NOT NULL' % \
-                (backend.quote_name(self.model._meta.db_table), backend.quote_name(self._field.column)))
+                (qn(self.model._meta.db_table), qn(self._field.column)))
         try:
             select, sql, params = self._get_sql_clause()
         except EmptyResultSet:
             raise StopIteration
 
-        table_name = backend.quote_name(self.model._meta.db_table)
-        field_name = backend.quote_name(self._field.column)
+        table_name = qn(self.model._meta.db_table)
+        field_name = qn(self._field.column)
 
-        if backend.allows_group_by_ordinal:
+        if connection.features.allows_group_by_ordinal:
             group_by = '1'
         else:
-            group_by = backend.get_date_trunc_sql(self._kind,
-                                                  '%s.%s' % (table_name, field_name))
+            group_by = connection.ops.date_trunc_sql(self._kind, '%s.%s' % (table_name, field_name))
 
         sql = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s' % \
-            (backend.get_date_trunc_sql(self._kind, '%s.%s' % (backend.quote_name(self.model._meta.db_table),
-            backend.quote_name(self._field.column))), sql, group_by, self._order)
+            (connection.ops.date_trunc_sql(self._kind, '%s.%s' % (qn(self.model._meta.db_table),
+            qn(self._field.column))), sql, group_by, self._order)
         cursor = connection.cursor()
         cursor.execute(sql, params)
 
         has_resolve_columns = hasattr(self, 'resolve_columns')
-        needs_datetime_string_cast = backend.needs_datetime_string_cast
+        needs_datetime_string_cast = connection.features.needs_datetime_string_cast
         dates = []
         # It would be better to use self._field here instead of DateTimeField(),
         # but in Oracle that will result in a list of datetime.date instead of
@@ -768,44 +783,44 @@ class QNot(Q):
             return SortedDict(), [], []
         return joins, where2, params
 
-def get_where_clause(lookup_type, table_prefix, field_name, value):
+def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
     if table_prefix.endswith('.'):
-        table_prefix = backend.quote_name(table_prefix[:-1])+'.'
-    field_name = backend.quote_name(field_name)
-    if type(value) == datetime.datetime and backend.get_datetime_cast_sql():
-        cast_sql = backend.get_datetime_cast_sql()
+        table_prefix = connection.ops.quote_name(table_prefix[:-1])+'.'
+    field_name = connection.ops.quote_name(field_name)
+    if type(value) == datetime.datetime and connection.ops.datetime_cast_sql():
+        cast_sql = connection.ops.datetime_cast_sql()
     else:
         cast_sql = '%s'
-    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and backend.needs_upper_for_iops:
-        format = 'UPPER(%s%s) %s'
+    field_sql = connection.ops.field_cast_sql(db_type) % (table_prefix + field_name)
+    if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith') and connection.features.needs_upper_for_iops:
+        format = 'UPPER(%s) %s'
     else:
-        format = '%s%s %s'
+        format = '%s %s'
     try:
-        return format % (table_prefix, field_name,
-                         backend.OPERATOR_MAPPING[lookup_type] % cast_sql)
+        return format % (field_sql, connection.operators[lookup_type] % cast_sql)
     except KeyError:
         pass
     if lookup_type == 'in':
         in_string = ','.join(['%s' for id in value])
         if in_string:
-            return '%s%s IN (%s)' % (table_prefix, field_name, in_string)
+            return '%s IN (%s)' % (field_sql, in_string)
         else:
             raise EmptyResultSet
     elif lookup_type in ('range', 'year'):
-        return '%s%s BETWEEN %%s AND %%s' % (table_prefix, field_name)
+        return '%s BETWEEN %%s AND %%s' % field_sql
     elif lookup_type in ('month', 'day'):
-        return "%s = %%s" % backend.get_date_extract_sql(lookup_type, table_prefix + field_name)
+        return "%s = %%s" % connection.ops.date_extract_sql(lookup_type, field_sql)
     elif lookup_type == 'isnull':
-        return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (field_sql, (not value and 'NOT ' or ''))
     elif lookup_type == 'search':
-        return backend.get_fulltext_search_sql(table_prefix + field_name)
+        return connection.ops.fulltext_search_sql(field_sql)
     elif lookup_type in ('regex', 'iregex'):
         if settings.DATABASE_ENGINE == 'oracle':
             if lookup_type == 'regex':
                 match_option = 'c'
             else:
                 match_option = 'i'
-            return "REGEXP_LIKE(%s%s, %s, '%s')" % (table_prefix, field_name, cast_sql, match_option)
+            return "REGEXP_LIKE(%s, %s, '%s')" % (field_sql, cast_sql, match_option)
         else:
             raise NotImplementedError
     raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
@@ -837,7 +852,7 @@ def fill_table_cache(opts, select, tables, where, old_prefix, cache_tables_seen,
     if max_depth and cur_depth > max_depth:
         return None
 
-    qn = backend.quote_name
+    qn = connection.ops.quote_name
     for f in opts.fields:
         if f.rel and not f.null:
             db_table = f.rel.to._meta.db_table
@@ -935,7 +950,7 @@ def field_choices(field_list, related_query):
     return choices
 
 def lookup_inner(path, lookup_type, value, opts, table, column):
-    qn = backend.quote_name
+    qn = connection.ops.quote_name
     joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
@@ -1062,6 +1077,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     else:
         # No elements left in path. Current element is the element on which
         # the search is being performed.
+        db_type = None
 
         if join_required:
             # Last query term is a RelatedObject
@@ -1091,15 +1107,16 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         else:
             # Last query term was a normal field.
             column = field.column
+            db_type = field.db_type()
 
-        where.append(get_where_clause(lookup_type, current_table + '.', column, value))
+        where.append(get_where_clause(lookup_type, current_table + '.', column, value, db_type))
         params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params
 
 def delete_objects(seen_objs):
     "Iterate through a list of seen classes, and remove any instances that are referred to"
-    qn = backend.quote_name
+    qn = connection.ops.quote_name
     ordered_classes = seen_objs.keys()
     ordered_classes.reverse()
 

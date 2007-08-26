@@ -2,6 +2,7 @@ from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
+from django.utils.encoding import smart_unicode
 import os, re, sys
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
@@ -122,10 +123,20 @@ def technical_500_response(request, exc_type, exc_value, tb):
             'function': '?',
             'lineno': '?',
         }]
+
+    unicode_hint = ''
+    if issubclass(exc_type, UnicodeError):
+        start = getattr(exc_value, 'start', None)
+        end = getattr(exc_value, 'end', None)
+        if start is not None and end is not None:
+            unicode_str = exc_value.args[1]
+            unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
+
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
-        'exception_value': exc_value,
+        'exception_value': smart_unicode(exc_value, errors='replace'),
+        'unicode_hint': unicode_hint,
         'frames': frames,
         'lastframe': frames[-1],
         'request': request,
@@ -190,6 +201,17 @@ def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_na
     if source is None:
         return None, [], None, []
 
+    encoding=None
+    for line in source[:2]:
+        # File coding may be specified (and may not be UTF-8). Match
+        # pattern from PEP-263 (http://www.python.org/dev/peps/pep-0263/)
+        match = re.search(r'coding[:=]\s*([-\w.]+)', line)
+        if match:
+            encoding = match.group(1)
+            break
+    if encoding:
+        source = [unicode(sline, encoding) for sline in source]
+
     lower_bound = max(0, lineno - context_lines)
     upper_bound = lineno + context_lines
 
@@ -246,6 +268,7 @@ TECHNICAL_500_TEMPLATE = """
     #explanation { background:#eee; }
     #template, #template-not-exist { background:#f6f6f6; }
     #template-not-exist ul { margin: 0 0 0 20px; }
+    #unicode-hint { background:#eee; }
     #traceback { background:#eee; }
     #requestinfo { background:#f6f6f6; padding-left:120px; }
     #summary table { border:none; background:transparent; }
@@ -346,6 +369,12 @@ TECHNICAL_500_TEMPLATE = """
     </tr>
   </table>
 </div>
+{% if unicode_hint %}
+<div id="unicode-hint">
+    <h2>Unicode error hint</h2>
+    <p>The string that could not be encoded/decoded was: <strong>{{ unicode_hint|escape }}</strong></p>
+</div>
+{% endif %}
 {% if template_does_not_exist %}
 <div id="template-not-exist">
     <h2>Template-loader postmortem</h2>

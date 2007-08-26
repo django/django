@@ -1,5 +1,6 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import smart_unicode
 
 CONTENT_TYPE_CACHE = {}
 class ContentTypeManager(models.Manager):
@@ -13,13 +14,13 @@ class ContentTypeManager(models.Manager):
         try:
             ct = CONTENT_TYPE_CACHE[key]
         except KeyError:
-            # The str() is needed around opts.verbose_name because it's a
-            # django.utils.functional.__proxy__ object.
+            # The smart_unicode() is needed around opts.verbose_name_raw because it might
+            # be a django.utils.functional.__proxy__ object.
             ct, created = self.model._default_manager.get_or_create(app_label=key[0],
-                model=key[1], defaults={'name': str(opts.verbose_name)})
+                model=key[1], defaults={'name': smart_unicode(opts.verbose_name_raw)})
             CONTENT_TYPE_CACHE[key] = ct
         return ct
-        
+
     def clear_cache(self):
         """
         Clear out the content-type cache. This needs to happen during database
@@ -31,9 +32,9 @@ class ContentTypeManager(models.Manager):
         CONTENT_TYPE_CACHE = {}
 
 class ContentType(models.Model):
-    name = models.CharField(maxlength=100)
-    app_label = models.CharField(maxlength=100)
-    model = models.CharField(_('python model class name'), maxlength=100)
+    name = models.CharField(max_length=100)
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(_('python model class name'), max_length=100)
     objects = ContentTypeManager()
     class Meta:
         verbose_name = _('content type')
@@ -42,7 +43,7 @@ class ContentType(models.Model):
         ordering = ('name',)
         unique_together = (('app_label', 'model'),)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def model_class(self):

@@ -9,6 +9,7 @@ a string) and returns a tuple in this format:
 
 from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.utils.encoding import iri_to_uri, force_unicode, smart_str
 from django.utils.functional import memoize
 import re
 
@@ -38,22 +39,26 @@ def get_callable(lookup_view, can_fail=False):
     during the import fail and the string is returned.
     """
     if not callable(lookup_view):
-        mod_name, func_name = get_mod_func(lookup_view)
         try:
+            # Bail early for non-ASCII strings (they can't be functions).
+            lookup_view = lookup_view.encode('ascii')
+            mod_name, func_name = get_mod_func(lookup_view)
             if func_name != '':
                 lookup_view = getattr(__import__(mod_name, {}, {}, ['']), func_name)
         except (ImportError, AttributeError):
             if not can_fail:
                 raise
+        except UnicodeEncodeError:
+            pass
     return lookup_view
-get_callable = memoize(get_callable, _callable_cache)
+get_callable = memoize(get_callable, _callable_cache, 1)
 
 def get_resolver(urlconf):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return RegexURLResolver(r'^/', urlconf)
-get_resolver = memoize(get_resolver, _resolver_cache)
+get_resolver = memoize(get_resolver, _resolver_cache, 1)
 
 def get_mod_func(callback):
     # Converts 'django.views.news.stories.story_detail' to
@@ -94,7 +99,7 @@ class MatchChecker(object):
         # First we need to figure out whether it's a named or unnamed group.
         #
         grouped = match_obj.group(1)
-        m = re.search(r'^\?P<(\w+)>(.*?)$', grouped)
+        m = re.search(r'^\?P<(\w+)>(.*?)$', grouped, re.UNICODE)
         if m: # If this was a named group...
             # m.group(1) is the name of the group
             # m.group(2) is the regex.
@@ -120,9 +125,9 @@ class MatchChecker(object):
             test_regex = grouped
         # Note we're using re.match here on purpose because the start of
         # to string needs to match.
-        if not re.match(test_regex + '$', str(value)): # TODO: Unicode?
+        if not re.match(test_regex + '$', force_unicode(value), re.UNICODE):
             raise NoReverseMatch("Value %r didn't match regular expression %r" % (value, test_regex))
-        return str(value) # TODO: Unicode?
+        return force_unicode(value)
 
 class RegexURLPattern(object):
     def __init__(self, regex, callback, default_args=None, name=None):
@@ -130,7 +135,7 @@ class RegexURLPattern(object):
         # callback is either a string like 'foo.views.news.stories.story_detail'
         # which represents the path to a module and a view function name, or a
         # callable object (view).
-        self.regex = re.compile(regex)
+        self.regex = re.compile(regex, re.UNICODE)
         if callable(callback):
             self._callback = callback
         else:
@@ -138,6 +143,9 @@ class RegexURLPattern(object):
             self._callback_str = callback
         self.default_args = default_args or {}
         self.name = name
+
+    def __repr__(self):
+        return '<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern)
 
     def add_prefix(self, prefix):
         """
@@ -194,11 +202,14 @@ class RegexURLResolver(object):
     def __init__(self, regex, urlconf_name, default_kwargs=None):
         # regex is a string representing a regular expression.
         # urlconf_name is a string representing the module containing urlconfs.
-        self.regex = re.compile(regex)
+        self.regex = re.compile(regex, re.UNICODE)
         self.urlconf_name = urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
         self._reverse_dict = {}
+
+    def __repr__(self):
+        return '<%s %s %s>' % (self.__class__.__name__, self.urlconf_name, self.regex.pattern)
 
     def _get_reverse_dict(self):
         if not self._reverse_dict and hasattr(self.urlconf_module, 'urlpatterns'):
@@ -224,8 +235,11 @@ class RegexURLResolver(object):
                     tried.extend([(pattern.regex.pattern + '   ' + t) for t in e.args[0]['tried']])
                 else:
                     if sub_match:
-                        sub_match_dict = dict(self.default_kwargs, **sub_match[2])
-                        return sub_match[0], sub_match[1], dict(match.groupdict(), **sub_match_dict)
+                        sub_match_dict = dict([(smart_str(k), v) for k, v in match.groupdict().items()])
+                        sub_match_dict.update(self.default_kwargs)
+                        for k, v in sub_match[2].iteritems():
+                            sub_match_dict[smart_str(k)] = v
+                        return sub_match[0], sub_match[1], sub_match_dict
                     tried.append(pattern.regex.pattern)
             raise Resolver404, {'tried': tried, 'path': new_path}
 
@@ -265,7 +279,7 @@ class RegexURLResolver(object):
         except (ImportError, AttributeError):
             raise NoReverseMatch
         if lookup_view in self.reverse_dict:
-            return ''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
+            return u''.join([reverse_helper(part.regex, *args, **kwargs) for part in self.reverse_dict[lookup_view]])
         raise NoReverseMatch
 
     def reverse_helper(self, lookup_view, *args, **kwargs):
@@ -279,5 +293,5 @@ def resolve(path, urlconf=None):
 def reverse(viewname, urlconf=None, args=None, kwargs=None):
     args = args or []
     kwargs = kwargs or {}
-    return '/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs)
+    return iri_to_uri(u'/' + get_resolver(urlconf).reverse(viewname, *args, **kwargs))
 

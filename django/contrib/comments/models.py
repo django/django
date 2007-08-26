@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 import datetime
 
@@ -65,8 +65,8 @@ class Comment(models.Model):
     user = models.ForeignKey(User, raw_id_admin=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
-    headline = models.CharField(_('headline'), maxlength=255, blank=True)
-    comment = models.TextField(_('comment'), maxlength=3000)
+    headline = models.CharField(_('headline'), max_length=255, blank=True)
+    comment = models.TextField(_('comment'), max_length=3000)
     rating1 = models.PositiveSmallIntegerField(_('rating #1'), blank=True, null=True)
     rating2 = models.PositiveSmallIntegerField(_('rating #2'), blank=True, null=True)
     rating3 = models.PositiveSmallIntegerField(_('rating #3'), blank=True, null=True)
@@ -106,7 +106,10 @@ class Comment(models.Model):
         return "%s: %s..." % (self.user.username, self.comment[:100])
 
     def get_absolute_url(self):
-        return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        try:
+            return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        except AttributeError:
+            return ""
 
     def get_crossdomain_url(self):
         return "/r/%d/%d/" % (self.content_type_id, self.object_id)
@@ -164,8 +167,8 @@ class FreeComment(models.Model):
     # A FreeComment is a comment by a non-registered user.
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
-    comment = models.TextField(_('comment'), maxlength=3000)
-    person_name = models.CharField(_("person's name"), maxlength=50)
+    comment = models.TextField(_('comment'), max_length=3000)
+    person_name = models.CharField(_("person's name"), max_length=50)
     submit_date = models.DateTimeField(_('date/time submitted'), auto_now_add=True)
     is_public = models.BooleanField(_('is public'))
     ip_address = models.IPAddressField(_('ip address'))
@@ -191,7 +194,10 @@ class FreeComment(models.Model):
         return "%s: %s..." % (self.person_name, self.comment[:100])
 
     def get_absolute_url(self):
-        return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        try:
+            return self.get_content_object().get_absolute_url() + "#c" + str(self.id)
+        except AttributeError:
+            return ""
 
     def get_content_object(self):
         """

@@ -24,17 +24,20 @@ except ImportError:
     from django.utils import _decimal as decimal
 
 # A set of functions that can be used to recreate
-# test data objects of various kinds
+# test data objects of various kinds.
+# The save method is a raw base model save, to make
+# sure that the data in the database matches the
+# exact test case.
 def data_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data
-    instance.save()
+    models.Model.save(instance, raw=True)
     return instance
 
 def generic_create(pk, klass, data):
     instance = klass(id=pk)
     instance.data = data[0]
-    instance.save()
+    models.Model.save(instance, raw=True)
     for tag in data[1:]:
         instance.tags.create(data=tag)
     return instance
@@ -42,25 +45,25 @@ def generic_create(pk, klass, data):
 def fk_create(pk, klass, data):
     instance = klass(id=pk)
     setattr(instance, 'data_id', data)
-    instance.save()
+    models.Model.save(instance, raw=True)
     return instance
 
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
-    instance.save()
+    models.Model.save(instance, raw=True)
     instance.data = data
     return instance
 
 def o2o_create(pk, klass, data):
     instance = klass()
     instance.data_id = data
-    instance.save()
+    models.Model.save(instance, raw=True)
     return instance
 
 def pk_create(pk, klass, data):
     instance = klass()
     instance.data = data
-    instance.save()
+    models.Model.save(instance, raw=True)
     return instance
 
 # A set of functions that can be used to compare
@@ -111,6 +114,9 @@ test_data = [
     (data_obj, 13, CharData, "null"),
     (data_obj, 14, CharData, "NULL"),
     (data_obj, 15, CharData, None),
+    # (We use something that will fit into a latin1 database encoding here,
+    # because that is still the default used on many system setups.)
+    (data_obj, 16, CharData, u'\xa5'),
     (data_obj, 20, DateData, datetime.date(2006,6,16)),
     (data_obj, 21, DateData, None),
     (data_obj, 30, DateTimeData, datetime.datetime(2006,6,16,10,42,37)),
@@ -230,8 +236,8 @@ The end."""),
     (pk_obj, 682, IntegerPKData, 0),
 #     (XX, ImagePKData
     (pk_obj, 690, IPAddressPKData, "127.0.0.1"),
-    (pk_obj, 700, NullBooleanPKData, True),
-    (pk_obj, 701, NullBooleanPKData, False),
+    # (pk_obj, 700, NullBooleanPKData, True),
+    # (pk_obj, 701, NullBooleanPKData, False),
     (pk_obj, 710, PhonePKData, "212-634-5789"),
     (pk_obj, 720, PositiveIntegerPKData, 123456789),
     (pk_obj, 730, PositiveSmallIntegerPKData, 12),
@@ -246,6 +252,9 @@ The end."""),
 #    (pk_obj, 770, TimePKData, datetime.time(10,42,37)),
     (pk_obj, 780, USStatePKData, "MA"),
 #     (pk_obj, 790, XMLPKData, "<foo></foo>"),
+
+    (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006,6,16,10,42,37)),
+    (data_obj, 810, ModifyingSaveData, 42),
 ]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
@@ -264,7 +273,7 @@ class SerializerTests(unittest.TestCase):
 
 def serializerTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     # Create all the objects defined in the test data
     objects = []
@@ -282,7 +291,7 @@ def serializerTest(format, self):
     serialized_data = serializers.serialize(format, objects, indent=2)
 
     # Flush the database and recreate from the serialized data
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
     transaction.enter_transaction_management()
     transaction.managed(True)
     for obj in serializers.deserialize(format, serialized_data):
@@ -297,10 +306,10 @@ def serializerTest(format, self):
 
 def fieldsTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
-    obj.save()
+    obj.save(raw=True)
 
     # Serialize then deserialize the test database
     serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1','field3'))
@@ -313,10 +322,10 @@ def fieldsTest(format, self):
 
 def streamTest(format, self):
     # Clear the database first
-    management.flush(verbosity=0, interactive=False)
+    management.call_command('flush', verbosity=0, interactive=False)
 
     obj = ComplexModel(field1='first',field2='second',field3='third')
-    obj.save()
+    obj.save(raw=True)
 
     # Serialize the test database to a stream
     stream = StringIO()

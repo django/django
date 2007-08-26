@@ -16,12 +16,12 @@ undefined -- not random, just undefined.
 from django.db import models
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':"""

@@ -50,8 +50,8 @@ directive. The latter is used for pointing at places on your filesystem,
 whereas ``<Location>`` points at places in the URL structure of a Web site.
 ``<Directory>`` would be meaningless here.
 
-Also, if you've manually altered your ``PYTHONPATH`` to put your Django project
-on it, you'll need to tell mod_python:
+Also, if your Django project is not on the default ``PYTHONPATH`` for your
+computer, you'll have to tell mod_python where your project can be found:
 
 .. parsed-literal::
 
@@ -62,6 +62,30 @@ on it, you'll need to tell mod_python:
         PythonDebug On
         **PythonPath "['/path/to/project'] + sys.path"**
     </Location>
+
+The value you use for ``PythonPath`` should include the parent directories of
+all the modules you are going to import in your application. It should also
+include the parent directory of the ``DJANGO_SETTINGS_MODULE`` location. This
+is exactly the same situation as setting the Python path for interactive
+usage. Whenever you try to import something, Python will run through all the
+directories in ``sys.path`` in turn, from first to last, and try to import
+from each directory until one succeeds.
+
+An example might make this clearer. Suppose
+you have some applications under ``/usr/local/django-apps/`` (for example,
+``/usr/local/django-apps/weblog/`` and so forth), your settings file is at
+``/var/www/mysite/settings.py`` and you have specified
+``DJANGO_SETTINGS_MODULE`` as in the above example. In this case, you would
+need to write your ``PythonPath`` directive as::
+
+    PythonPath "['/var/production/django-apps/', '/var/www'] + sys.path"
+
+With this path, ``import weblog`` and ``import mysite.settings`` will both
+work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
+lived under the ``weblog/`` directory, you would *also* need to add
+``/var/production/django-apps/weblog/`` to your ``PythonPath``. Remember: the
+**parent directories** of anything you import directly must be on the Python
+path.
 
 .. caution::
 

@@ -1,0 +1,34 @@
+.TH "daily_cleanup.py" "1" "August 2007" "Django Project" ""
+.SH "NAME"
+daily_cleanup.py \- Database clean-up for the Django web framework
+.SH "SYNOPSIS"
+.B daily_cleanup.py
+
+.SH "DESCRIPTION"
+Removes stale session data from a Django database. This means, any session data
+which has an expiry date prior to the date the script is run.
+.sp
+The script can be run manually or can be scheduled to run at regular
+intervals as a
+.BI cron
+job.
+
+.SH "ENVIRONMENT"
+.TP
+.I DJANGO_SETTINGS_MODULE
+This environment variable defines the settings module to be read.
+It should be in Python-import form, e.g. "myproject.settings".
+
+.SH "SEE ALSO"
+The sessions documentation:
+.sp
+.I http://www.djangoproject.com/documentation/sessions/
+
+.SH "AUTHORS/CREDITS"
+Originally developed at World Online in Lawrence, Kansas, USA. Refer to the
+AUTHORS file in the Django distribution for contributors.
+
+.SH "LICENSE"
+New BSD license. For the full license text refer to the LICENSE file in the
+Django distribution.
+

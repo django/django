@@ -1,5 +1,8 @@
 import unittest
+from datetime import timedelta, date
 from django.template import Template, Context, add_to_builtins
+from django.utils.dateformat import DateFormat
+from django.utils.translation import ugettext as _
 
 add_to_builtins('django.contrib.humanize.templatetags.humanize')
 
@@ -8,14 +11,13 @@ class HumanizeTests(unittest.TestCase):
     def humanize_tester(self, test_list, result_list, method):
         # Using max below ensures we go through both lists
         # However, if the lists are not equal length, this raises an exception
-        for index in xrange(len(max(test_list,result_list))):
+        for index in xrange(max(len(test_list), len(result_list))):
             test_content = test_list[index]
             t = Template('{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
             self.assertEqual(rendered, result_list[index],
-                             msg="""%s test failed, produced %s,
-should've produced %s""" % (method, rendered, result_list[index]))
-    
+                             msg="%s test failed, produced %s, should've produced %s" % (method, rendered, result_list[index]))
+
     def test_ordinal(self):
         test_list = ('1','2','3','4','11','12',
                      '13','101','102','103','111',
@@ -43,12 +45,26 @@ should've produced %s""" % (method, rendered, result_list[index]))
         self.humanize_tester(test_list, result_list, 'intword')
 
     def test_apnumber(self):
-        test_list = [str(x) for x in xrange(1,11)]
-        result_list = ('one', 'two', 'three', 'four', 'five', 'six',
-                       'seven', 'eight', 'nine', '10')
+        test_list = [str(x) for x in range(1, 11)]
+        result_list = (u'one', u'two', u'three', u'four', u'five', u'six',
+                       u'seven', u'eight', u'nine', u'10')
 
         self.humanize_tester(test_list, result_list, 'apnumber')
 
+    def test_naturalday(self):
+        from django.template import defaultfilters
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        tomorrow = today + timedelta(days=1)
+        someday = today - timedelta(days=10)
+        notdate = u"I'm not a date value"
+
+        test_list = (today, yesterday, tomorrow, someday, notdate)
+        someday_result = defaultfilters.date(someday)
+        result_list = (_(u'today'), _(u'yesterday'), _(u'tomorrow'),
+                       someday_result, u"I'm not a date value")
+        self.humanize_tester(test_list, result_list, 'naturalday')
+
 if __name__ == '__main__':
     unittest.main()
-    
+

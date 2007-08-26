@@ -277,7 +277,7 @@ Subclassing Context: RequestContext
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently than
-the normal ``django.template.Context``. The first difference is that takes
+the normal ``django.template.Context``. The first difference is that it takes
 an `HttpRequest object`_ as its first argument. For example::
 
     c = RequestContext(request, {
@@ -311,9 +311,10 @@ optional, third positional argument, ``processors``. In this example, the
 
     def some_view(request):
         # ...
-        return RequestContext(request, {
+        c = RequestContext(request, {
             'foo': 'bar',
         }, [ip_address_processor])
+        return t.render(c)
 
 Note::
     If you're using Django's ``render_to_response()`` shortcut to populate a
@@ -673,11 +674,11 @@ If you are writing a template filter which only expects a string as the first
 argument, you should use the included decorator ``stringfilter`` which will convert
 an object to it's string value before being passed to your function::
 
-    from django import template
+    from django.template.defaultfilters import stringfilter
 
-    @template.stringfilter
+    @stringfilter
     def lower(value):
-    	return value.lower()
+        return value.lower()
 
 Writing custom template tags
 ----------------------------

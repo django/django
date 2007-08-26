@@ -33,7 +33,7 @@ PROVINCE_CHOICES = (
     ('KR', 'Crotone'),
     ('CN', 'Cuneo'),
     ('EN', 'Enna'),
-#    ('FM', 'Fermo'), # active starting from 2009    
+#    ('FM', 'Fermo'), # active starting from 2009
     ('FE', 'Ferrara'),
     ('FI', 'Firenze'),
     ('FG', 'Foggia'),

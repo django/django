@@ -18,13 +18,13 @@ class PersonManager(models.Manager):
         return self.filter(fun=True)
 
 class Person(models.Model):
-    first_name = models.CharField(maxlength=30)
-    last_name = models.CharField(maxlength=30)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
     fun = models.BooleanField()
     objects = PersonManager()
 
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+    def __unicode__(self):
+        return u"%s %s" % (self.first_name, self.last_name)
 
 # An example of a custom manager that sets get_query_set().
 
@@ -33,13 +33,13 @@ class PublishedBookManager(models.Manager):
         return super(PublishedBookManager, self).get_query_set().filter(is_published=True)
 
 class Book(models.Model):
-    title = models.CharField(maxlength=50)
-    author = models.CharField(maxlength=30)
+    title = models.CharField(max_length=50)
+    author = models.CharField(max_length=30)
     is_published = models.BooleanField()
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
 # An example of providing multiple custom managers.
@@ -49,13 +49,13 @@ class FastCarManager(models.Manager):
         return super(FastCarManager, self).get_query_set().filter(top_speed__gt=150)
 
 class Car(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     mileage = models.IntegerField()
     top_speed = models.IntegerField(help_text="In miles per hour.")
     cars = models.Manager()
     fast_cars = FastCarManager()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 __test__ = {'API_TESTS':"""

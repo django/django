@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 1. Bare-bones model
 
@@ -7,13 +8,13 @@ This is a basic model with only two non-primary-key fields.
 from django.db import models
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100, default='Default headline')
+    headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
 
     class Meta:
         ordering = ('pub_date','headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS': """
@@ -246,6 +247,19 @@ datetime.datetime(2005, 7, 28, 0, 0)
 >>> (s1 | s2 | s3)[::2]
 [<Article: Area woman programs in Python>, <Article: Third article>]
 
+# Slicing works with longs.
+>>> Article.objects.all()[0L]
+<Article: Area woman programs in Python>
+>>> Article.objects.all()[1L:3L]
+[<Article: Second article>, <Article: Third article>]
+>>> s3 = Article.objects.filter(id__exact=3)
+>>> (s1 | s2 | s3)[::2L]
+[<Article: Area woman programs in Python>, <Article: Third article>]
+
+# And can be mixed with ints.
+>>> Article.objects.all()[1:3L]
+[<Article: Second article>, <Article: Third article>]
+
 # Slices (without step) are lazy:
 >>> Article.objects.all()[0:5].filter()
 [<Article: Area woman programs in Python>, <Article: Second article>, <Article: Third article>, <Article: Article 6>, <Article: Default headline>]
@@ -351,7 +365,7 @@ __test__['API_TESTS'] += """
 >>> a101.save()
 >>> a101 = Article.objects.get(pk=101)
 >>> a101.headline
-'Article 101'
+u'Article 101'
 
 # You can create saved objects in a single step
 >>> a10 = Article.objects.create(headline="Article 10", pub_date=datetime(2005, 7, 31, 12, 30, 45))
@@ -364,4 +378,10 @@ year, including Jan. 1 and Dec. 31.
 >>> a12 = Article.objects.create(headline='Article 12', pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999))
 >>> Article.objects.filter(pub_date__year=2008)
 [<Article: Article 11>, <Article: Article 12>]
+
+# Unicode data works, too.
+>>> a = Article(headline=u'\u6797\u539f \u3081\u3050\u307f', pub_date=datetime(2005, 7, 28))
+>>> a.save()
+>>> Article.objects.get(pk=a.id).headline
+u'\u6797\u539f \u3081\u3050\u307f'
 """

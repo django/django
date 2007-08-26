@@ -12,9 +12,10 @@
    additional spatial databases.
 """
 from django.conf import settings
-from django.db import backend
+from django.db import connection
 from django.db.models.query import LOOKUP_SEPARATOR, field_choices, find_field, FieldFound, QUERY_TERMS, get_where_clause
 from django.utils.datastructures import SortedDict
+qn = connection.ops.quote_name
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
@@ -89,7 +90,6 @@ def parse_lookup(kwarg_items, opts):
     return joins, where, params
 
 def lookup_inner(path, lookup_type, value, opts, table, column):
-    qn = backend.quote_name
     joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
@@ -216,6 +216,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
     else:
         # No elements left in path. Current element is the element on which
         # the search is being performed.
+        db_type = None
 
         if join_required:
             # Last query term is a RelatedObject
@@ -282,7 +283,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
             where.append(gwc)
             params.extend(geo_params)
         else:
-            where.append(get_where_clause(lookup_type, current_table + '.', column, value))
+            where.append(get_where_clause(lookup_type, current_table + '.', column, value, db_type))
             params.extend(field.get_db_prep_lookup(lookup_type, value))
 
     return joins, where, params

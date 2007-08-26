@@ -2,9 +2,10 @@
   This module contains the spatial lookup types, and the get_geo_where_clause()
   routine for PostGIS.
 """
-from django.db import backend
+from django.db import connection
 from django.contrib.gis.db.backend.postgis.management import postgis_version_tuple
 from types import StringType, UnicodeType
+quote_name = connection.ops.quote_name
 
 # Getting the PostGIS version information
 POSTGIS_VERSION, MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2 = postgis_version_tuple()
@@ -120,8 +121,8 @@ def get_geom_func(lookup_type):
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
     if table_prefix.endswith('.'):
-        table_prefix = backend.quote_name(table_prefix[:-1])+'.'
-    field_name = backend.quote_name(field_name)
+        table_prefix = quote_name(table_prefix[:-1])+'.'
+    field_name = quote_name(field_name)
 
     # See if a PostGIS operator matches the lookup type first
     try:

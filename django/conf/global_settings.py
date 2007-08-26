@@ -25,12 +25,12 @@ ADMINS = ()
 INTERNAL_IPS = ()
 
 # Local time zone for this installation. All choices can be found here:
-# http://www.postgresql.org/docs/8.1/static/datetime-keywords.html#DATETIME-TIMEZONE-SET-TABLE
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
+# systems may support all possibilities).
 TIME_ZONE = 'America/Chicago'
 
 # Language code for this installation. All choices can be found here:
 # http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
-# http://blogs.law.harvard.edu/tech/stories/storyReader$15
 LANGUAGE_CODE = 'en-us'
 
 # Languages we provide translations for, out of the box. The language name
@@ -54,6 +54,7 @@ LANGUAGES = (
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),
+    ('hr', gettext_noop('Croatian')),
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
@@ -81,7 +82,7 @@ LANGUAGES = (
 )
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ("he", "ar")
+LANGUAGES_BIDI = ("he", "ar", "fa")
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -96,6 +97,9 @@ MANAGERS = ADMINS
 # Content-Type header.
 DEFAULT_CONTENT_TYPE = 'text/html'
 DEFAULT_CHARSET = 'utf-8'
+
+# Encoding of files read from disk (template and initial SQL files).
+FILE_CHARSET = 'utf-8'
 
 # E-mail address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
@@ -280,6 +284,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # Whether sessions expire when a user 
 # possible values.
 CACHE_BACKEND = 'simple://'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_SECONDS = 600
 
 ####################
 # COMMENTS         #

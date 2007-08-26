@@ -10,9 +10,11 @@ from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
 from django.dispatch import dispatcher
-from django.http import urlencode, SimpleCookie, HttpRequest
+from django.http import SimpleCookie, HttpRequest
 from django.test import signals
 from django.utils.functional import curry
+from django.utils.encoding import smart_str
+from django.utils.http import urlencode
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -61,29 +63,30 @@ def encode_multipart(boundary, data):
     as an application/octet-stream; otherwise, str(value) will be sent.
     """
     lines = []
+    to_str = lambda s: smart_str(s, settings.DEFAULT_CHARSET)
     for (key, value) in data.items():
         if isinstance(value, file):
             lines.extend([
                 '--' + boundary,
-                'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value.name),
+                'Content-Disposition: form-data; name="%s"; filename="%s"' % (to_str(key), to_str(value.name)),
                 'Content-Type: application/octet-stream',
                 '',
                 value.read()
             ])
-        elif hasattr(value, '__iter__'): 
+        elif hasattr(value, '__iter__'):
             for item in value:
-                lines.extend([ 
-                    '--' + boundary, 
-                    'Content-Disposition: form-data; name="%s"' % key, 
-                    '', 
-                    str(item) 
+                lines.extend([
+                    '--' + boundary,
+                    'Content-Disposition: form-data; name="%s"' % to_str(key),
+                    '',
+                    to_str(item)
                 ])
         else:
             lines.extend([
                 '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % key,
+                'Content-Disposition: form-data; name="%s"' % to_str(key),
                 '',
-                str(value)
+                to_str(value)
             ])
 
     lines.extend([
@@ -115,7 +118,7 @@ class Client:
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.exc_info = None
-        
+
     def store_exc_info(self, *args, **kwargs):
         """
         Utility method that can be used to store exceptions when they are
@@ -131,7 +134,7 @@ class Client:
                 return SessionWrapper(cookie.value)
         return {}
     session = property(_session)
-    
+
     def request(self, **request):
         """
         The master request method. Composes the environment dictionary
@@ -179,7 +182,7 @@ class Client:
         # Look for a signalled exception and reraise it
         if self.exc_info:
             raise self.exc_info[1], None, self.exc_info[2]
-        
+
         # Update persistent cookie data
         if response.cookies:
             self.cookies.update(response.cookies)
@@ -192,7 +195,7 @@ class Client:
             'CONTENT_LENGTH':  None,
             'CONTENT_TYPE':    'text/html; charset=utf-8',
             'PATH_INFO':       path,
-            'QUERY_STRING':    urlencode(data),
+            'QUERY_STRING':    urlencode(data, doseq=True),
             'REQUEST_METHOD': 'GET',
         }
         r.update(extra)
@@ -222,10 +225,11 @@ class Client:
         """Set the Client to appear as if it has sucessfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or if the Sessions framework is not available.
+        are incorrect, or the user is inactive, or if the sessions framework is
+        not available.
         """
         user = authenticate(**credentials)
-        if user and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+        if user and user.is_active and 'django.contrib.sessions' in settings.INSTALLED_APPS:
             obj = Session.objects.get_new_session_object()
 
             # Create a fake request to store login details
@@ -243,9 +247,20 @@ class Client:
 
             # Set the session values
             Session.objects.save(obj.session_key, request.session._session,
-                datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))        
+                datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
 
             return True
         else:
             return False
-            
+
+    def logout(self):
+        """Removes the authenticated user's cookies.
+
+        Causes the authenticated user to be logged out.
+        """
+        try:
+            Session.objects.get(session_key=self.cookies['sessionid'].value).delete()
+        except KeyError:
+            pass
+
+        self.cookies = SimpleCookie()

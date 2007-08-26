@@ -641,7 +641,7 @@ the "Outputting forms as HTML" section above.
 The simplest way to display a form's HTML is to use the variable on its own,
 like this::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form }}</table>
     <input type="submit" />
     </form>
@@ -653,7 +653,7 @@ class' ``__str__()`` method calls its ``as_table()`` method.
 
 The following is equivalent but a bit more explicit::
 
-    <form method="post">
+    <form method="post" action="">
     <table>{{ form.as_table }}</table>
     <input type="submit" />
     </form>
@@ -675,10 +675,10 @@ individual fields for complete template control over the form's design.
 The easiest way is to iterate over the form's fields, with
 ``{% for field in form %}``. For example::
 
-    <form method="post">
+    <form method="post" action="">
     <dl>
     {% for field in form %}
-        <dt>{{ field.label }}</dt>
+        <dt>{{ field.label_tag }}</dt>
         <dd>{{ field }}</dd>
         {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
         {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
@@ -696,19 +696,62 @@ Alternatively, you can arrange the form's fields explicitly, by name. Do that
 by accessing ``{{ form.fieldname }}``, where ``fieldname`` is the field's name.
 For example::
 
-    <form method="post">
+    <form method="post" action="">
     <ul class="myformclass">
-        <li>{{ form.sender.label }} {{ form.sender }}</li>
+        <li>{{ form.sender.label_tag }} {{ form.sender }}</li>
         <li class="helptext">{{ form.sender.help_text }}</li>
         {% if form.sender.errors %}<ul class="errorlist">{{ form.sender.errors }}</ul>{% endif %}
 
-        <li>{{ form.subject.label }} {{ form.subject }}</li>
+        <li>{{ form.subject.label_tag }} {{ form.subject }}</li>
         <li class="helptext">{{ form.subject.help_text }}</li>
         {% if form.subject.errors %}<ul class="errorlist">{{ form.subject.errors }}</ul>{% endif %}
 
         ...
     </ul>
     </form>
+
+Binding uploaded files to a form
+--------------------------------
+
+**New in Django development version**
+
+Dealing with forms that have ``FileField`` and ``ImageField`` fields
+is a little more complicated than a normal form.
+
+Firstly, in order to upload files, you'll need to make sure that your
+``<form>`` element correctly defines the ``enctype`` as
+``"multipart/form-data"``::
+
+  <form enctype="multipart/form-data" method="post" action="/foo/">
+
+Secondly, when you use the form, you need to bind the file data. File
+data is handled separately to normal form data, so when your form
+contains a ``FileField`` and ``ImageField``, you will need to specify
+a second argument when you bind your form. So if we extend our
+ContactForm to include an ``ImageField`` called ``mugshot``, we
+need to bind the file data containing the mugshot image::
+
+    # Bound form with an image field
+    >>> data = {'subject': 'hello',
+    ...         'message': 'Hi there',
+    ...         'sender': 'foo@example.com',
+    ...         'cc_myself': True}
+    >>> file_data = {'mugshot': {'filename':'face.jpg'
+    ...                          'content': <file data>}}
+    >>> f = ContactFormWithMugshot(data, file_data)
+
+In practice, you will usually specify ``request.FILES`` as the source
+of file data (just like you use ``request.POST`` as the source of
+form data)::
+
+    # Bound form with an image field, data from the request
+    >>> f = ContactFormWithMugshot(request.POST, request.FILES)
+
+Constructing an unbound form is the same as always -- just omit both
+form data *and* file data::
+
+    # Unbound form with a image field
+    >>> f = ContactFormWithMugshot()
 
 Subclassing forms
 -----------------
@@ -919,7 +962,7 @@ validation if a particular field's value is not given. ``initial`` values are
 ~~~~~~~~~~
 
 The ``widget`` argument lets you specify a ``Widget`` class to use when
-rendering this ``Field``. See "Widgets" below for more information.
+rendering this ``Field``. See "Widgets"_ below for more information.
 
 ``help_text``
 ~~~~~~~~~~~~~
@@ -1086,6 +1129,24 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
 
+``DecimalField``
+~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``TextInput``
+    * Empty value: ``None``
+    * Normalizes to: A Python ``decimal``.
+    * Validates that the given value is a decimal. Leading and trailing
+      whitespace is ignored.
+
+Takes four optional arguments: ``max_value``, ``min_value``, ``max_digits``,
+and ``decimal_places``. The first two define the limits for the fields value.
+``max_digits`` is the maximum number of digits (those before the decimal
+point plus those after the decimal point, with leading zeros stripped)
+permitted in the value, whilst ``decimal_places`` is the maximum number of
+decimal places permitted.
+
 ``EmailField``
 ~~~~~~~~~~~~~~
 
@@ -1099,6 +1160,54 @@ Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
 given length.
 
+``FileField``
+~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that non-empty file data has been bound to the form.
+
+An ``UploadedFile`` object has two attributes:
+
+    ======================  =====================================================
+    Argument                Description
+    ======================  =====================================================
+    ``filename``            The name of the file, provided by the uploading
+                            client.
+    ``content``             The array of bytes comprising the file content.
+    ======================  =====================================================
+
+The string representation of an ``UploadedFile`` is the same as the filename
+attribute.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _`bind the file data to the form`: `Binding uploaded files to a form`_
+
+``ImageField``
+~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+    * Default widget: ``FileInput``
+    * Empty value: ``None``
+    * Normalizes to: An ``UploadedFile`` object that wraps the file content
+      and file name into a single object.
+    * Validates that file data has been bound to the form, and that the
+      file is of an image format understood by PIL.
+
+Using an ImageField requires that the `Python Imaging Library`_ is installed.
+
+When you use a ``FileField`` on a form, you must also remember to
+`bind the file data to the form`_.
+
+.. _Python Imaging Library: http://www.pythonware.com/products/pil/
+
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
 
@@ -1107,6 +1216,9 @@ given length.
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing
       whitespace is allowed, as in Python's ``int()`` function.
+
+Takes two optional arguments for validation, ``max_value`` and ``min_value``.
+These control the range of values permitted in the field.
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1222,7 +1334,7 @@ Custom form and field validation
 
 Form validation happens when the data is cleaned. If you want to customise
 this process, there are various places you can change, each one serving a
-different purpose. Thee types of cleaning methods are run during form
+different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
 method on a form. There are other things that can trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
@@ -1307,12 +1419,12 @@ keep it simple and assume e-mail validation is contained in a function called
 
     class MultiEmailField(forms.Field):
         def clean(self, value):
+            if not value:
+                raise forms.ValidationError('Enter at least one e-mail address.')
             emails = value.split(',')
             for email in emails:
                 if not is_valid_email(email):
                     raise forms.ValidationError('%s is not a valid e-mail address.' % email)
-            if not emails:
-                raise forms.ValidationError('Enter at least one e-mail address.')
             return emails
 
 Let's alter the ongoing ``ContactForm`` example to demonstrate how you'd use
@@ -1324,6 +1436,156 @@ like so::
         message = forms.CharField()
         senders = MultiEmailField()
         cc_myself = forms.BooleanField()
+
+Widgets
+=======
+
+A widget is Django's representation of a HTML input element. The widget
+handles the rendering of the HTML, and the extraction of data from a GET/POST
+dictionary that corresponds to the widget.
+
+Django provides a representation of all the basic HTML widgets, plus some
+commonly used groups of widgets:
+
+    ============================  ===========================================
+    Widget                        HTML Equivalent
+    ============================  ===========================================
+    ``TextInput``                 ``<input type='text' ...``
+    ``PasswordInput``             ``<input type='password' ...``
+    ``HiddenInput``               ``<input type='hidden' ...``
+    ``MultipleHiddenInput``       Multiple ``<input type='hidden' ...``
+                                  instances.
+    ``FileInput``                 ``<input type='file' ...``
+    ``Textarea``                  ``<textarea>...</textarea>``
+    ``CheckboxInput``             ``<input type='checkbox' ...``
+    ``Select``                    ``<select><option ...``
+    ``NullBooleanSelect``         Select widget with options 'Unknown',
+                                  'Yes' and 'No'
+    ``SelectMultiple``            ``<select multiple='multiple'><option ...``
+    ``RadioSelect``               ``<ul><li><input type='radio' ...``
+    ``CheckboxSelectMultiple``    ``<ul><li><input type='checkbox' ...``
+    ``MultiWidget``               Wrapper around multiple other widgets
+    ``SplitDateTimeWidget``       Wrapper around two ``TextInput`` widgets:
+                                  one for the Date, and one for the Time.
+    ============================  ===========================================
+
+Specifying widgets
+------------------
+
+Whenever you specify a field on a form, Django will use a default widget
+that is appropriate to the type of data that is to be displayed. To find
+which widget is used on which field, see the documentation for the
+built-in Field classes.
+
+However, if you want to use a different widget for a field, you can -
+just use the 'widget' argument on the field definition. For example::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=forms.Textarea)
+
+This would specify a form with a comment that uses a larger Textarea widget,
+rather than the default TextInput widget.
+
+Customizing widget instances
+----------------------------
+
+When Django renders a widget as HTML, it only renders the bare minimum
+HTML - Django doesn't add a class definition, or any other widget-specific
+attributes. This means that all 'TextInput' widgets will appear the same
+on your web page.
+
+If you want to make one widget look different to another, you need to
+specify additional attributes for each widget. When you specify a
+widget, you can provide a list of attributes that will be added to the
+rendered HTML for the widget.
+
+For example, take the following simple form::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField()
+
+This form will include three default TextInput widgets, with default rendering -
+no CSS class, no extra attributes. This means that the inputs boxes provided for
+each widget will be rendered exactly the same::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" /></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
+
+On a real web page, you probably don't want every widget to look the same. You
+might want a larger input element for the comment, and you might want the
+'name' widget to have some special CSS class. To do this, you specify a
+custom widget for your fields, and specify some attributes to use
+when rendering those widgets::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(
+                    widget=forms.TextInput(attrs={'class':'special'}))
+        url = forms.URLField()
+        comment = forms.CharField(
+                   widget=forms.TextInput(attrs={'size':'40'}))
+
+Django will then include the extra attributes in the rendered output::
+
+    >>> f = CommentForm(auto_id=False)
+    >>> f.as_table()
+    <tr><th>Name:</th><td><input type="text" name="name" class="special"/></td></tr>
+    <tr><th>Url:</th><td><input type="text" name="url"/></td></tr>
+    <tr><th>Comment:</th><td><input type="text" name="comment" size="40"/></td></tr>
+
+Custom Widgets
+--------------
+
+When you start to write a lot of forms, you will probably find that you will
+reuse certain sets of widget attributes over and over again. Rather than
+repeat these attribute definitions every time you need them, Django allows
+you to capture those definitions as a custom widget.
+
+For example, if you find that you are including a lot of comment fields on forms,
+you could capture the idea of a ``TextInput`` with a specific ``size`` attribute
+as a custom extension to the ``TextInput`` widget::
+
+    class CommentWidget(forms.TextInput):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault('attrs',{}).update({'size': '40'})
+            super(forms.TextInput, self).__init__(*args, **kwargs)
+
+Then you can use this widget in your forms::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = forms.CharField(widget=CommentWidget)
+
+You can even customize your custom widget, in the same way as you would
+any other widget. Adding a once-off class to your ``CommentWidget`` is as
+simple as adding an attribute definition::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField(max_length=20)
+        url = forms.URLField()
+        comment = forms.CharField(
+                    widget=CommentWidget(attrs={'class': 'special'}))
+
+Django also makes it easy to specify a custom field type that uses your custom
+widget. For example, you could define a customized field type for comments
+by defining::
+
+    class CommentInput(forms.CharField):
+        widget = CommentWidget
+
+You can then use this field whenever you have a form that requires a comment::
+
+    class CommentForm(forms.Form):
+        name = forms.CharField()
+        url = forms.URLField()
+        comment = CommentInput()
 
 Generating forms for models
 ===========================
@@ -1372,17 +1634,17 @@ the full list of conversions:
     ``AutoField``                    Not represented in the form
     ``BooleanField``                 ``BooleanField``
     ``CharField``                    ``CharField`` with ``max_length`` set to
-                                     the model field's ``maxlength``
+                                     the model field's ``max_length``
     ``CommaSeparatedIntegerField``   ``CharField``
     ``DateField``                    ``DateField``
     ``DateTimeField``                ``DateTimeField``
     ``DecimalField``                 ``DecimalField``
     ``EmailField``                   ``EmailField``
-    ``FileField``                    ``CharField``
+    ``FileField``                    ``FileField``
     ``FilePathField``                ``CharField``
     ``FloatField``                   ``FloatField``
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
-    ``ImageField``                   ``CharField``
+    ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
     ``IPAddressField``               ``CharField``
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
@@ -1452,15 +1714,15 @@ Consider this set of models::
     )
 
     class Author(models.Model):
-        name = models.CharField(maxlength=100)
-        title = models.CharField(maxlength=3, choices=TITLE_CHOICES)
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
-        def __str__(self):
+        def __unicode__(self):
             return self.name
 
     class Book(models.Model):
-        name = models.CharField(maxlength=100)
+        name = models.CharField(max_length=100)
         authors = models.ManyToManyField(Author)
 
 With these models, a call to ``form_for_model(Author)`` would return a ``Form``
@@ -1494,6 +1756,51 @@ example::
 
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
 doesn't validate -- i.e., ``if form.errors``.
+
+This ``save()`` method accepts an optional ``commit`` keyword argument, which
+accepts either ``True`` or ``False``. If you call ``save()`` with
+``commit=False``, then it will return an object that hasn't yet been saved to
+the database. In this case, it's up to you to call ``save()`` on the resulting
+model instance. This is useful if you want to do custom processing on the
+object before saving it. ``commit`` is ``True`` by default.
+
+Another side effect of using ``commit=False`` is seen when your model has
+a many-to-many relation with another model. If your model has a many-to-many
+relation and you specify ``commit=False`` when you save a form, Django cannot
+immediately save the form data for the many-to-many relation. This is because
+it isn't possible to save many-to-many data for an instance until the instance
+exists in the database.
+
+To work around this problem, every time you save a form using ``commit=False``,
+Django adds a ``save_m2m()`` method to the form created by ``form_for_model``.
+After you've manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data. For example::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create, but don't save the new author instance.
+    >>> new_author = f.save(commit=False)
+
+    # Modify the author in some way.
+    >>> new_author.some_field = 'some_value'
+
+    # Save the new instance.
+    >>> new_author.save()
+
+    # Now, save the many-to-many data for the form.
+    >>> f.save_m2m()
+
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
+When you use a simple ``save()`` on a form, all data -- including
+many-to-many data -- is saved without the need for any additional method calls.
+For example::
+
+    # Create a form instance with POST data.
+    >>> f = AuthorForm(request.POST)
+
+    # Create and save the new author instance. There's no need to do anything else.
+    >>> new_author = f.save()
 
 Using an alternate base class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1623,6 +1930,42 @@ will raise ``ValueError`` if the data doesn't validate.
 
 ``form_for_instance()`` has ``form``, ``fields`` and ``formfield_callback``
 arguments that behave the same way as they do for ``form_for_model()``.
+
+Let's modify the earlier `contact form`_ view example a little bit. Suppose we
+have a ``Message`` model that holds each contact submission. Something like::
+
+    class Message(models.Model):
+        subject = models.CharField(max_length=100)
+        message = models.TextField()
+        sender = models.EmailField()
+        cc_myself = models.BooleanField()
+
+You could use this model to create a form (using ``form_for_model()``). You
+could also use existing ``Message`` instances to create a form for editing
+messages. The earlier_ view can be changed slightly to accept the ``id`` value
+of an existing ``Message`` and present it for editing::
+
+    def contact_edit(request, msg_id):
+        # Create the form from the message id.
+        message = get_object_or_404(Message, id=msg_id)
+        ContactForm = form_for_instance(message)
+
+        if request.method == 'POST':
+            form = ContactForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('/url/on_success/')
+        else:
+            form = ContactForm()
+        return render_to_response('contact.html', {'form': form})
+
+Aside from how we create the ``ContactForm`` class here, the main point to
+note is that the form display in the ``GET`` branch of the function
+will use the values from the ``message`` instance as initial values for the
+form field.
+
+.. _contact form: `Simple view example`_
+.. _earlier: `Simple view example`_
 
 When should you use ``form_for_model()`` and ``form_for_instance()``?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

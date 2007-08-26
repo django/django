@@ -1,7 +1,7 @@
 import base64, md5, random, sys, datetime, os, time
 import cPickle as pickle
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 class SessionManager(models.Manager):
@@ -65,7 +65,7 @@ class Session(models.Model):
     the sessions documentation that is shipped with Django (also available
     on the Django website).
     """
-    session_key = models.CharField(_('session key'), maxlength=40, primary_key=True)
+    session_key = models.CharField(_('session key'), max_length=40, primary_key=True)
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'))
     objects = SessionManager()

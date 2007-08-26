@@ -138,6 +138,29 @@ Examples:
 
 You can pass in either an integer or a string representation of an integer.
 
+naturalday
+----------
+
+**New in Django development version**
+
+For dates that are the current day or within one day, return "today",
+"tomorrow" or "yesterday", as appropriate. Otherwise, format the date using
+the passed in format string.
+
+**Argument:** Date formatting string as described in default tag now_.
+
+.. _now: ../templates/#now
+
+Examples (when 'today' is 17 Feb 2007):
+
+    * ``16 Feb 2007`` becomes ``yesterday``.
+    * ``17 Feb 2007`` becomes ``today``.
+    * ``18 Feb 2007`` becomes ``tomorrow``.
+    * Any other day is formatted according to given argument or the
+      `DATE_FORMAT`_ setting if no argument is given.
+
+.. _DATE_FORMAT: ../settings/#date_format
+
 flatpages
 =========
 
@@ -214,7 +237,7 @@ A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the `syndication documentation`_.
 
-.. _syndication documentation: ../syndication/
+.. _syndication documentation: ../syndication_feeds/
 
 Other add-ons
 =============

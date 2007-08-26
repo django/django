@@ -31,6 +31,12 @@ To create a feed, just write a ``Feed`` class and point to it in your URLconf_.
 Initialization
 --------------
 
+If you're not using the latest Django development version, you'll need to make
+sure Django's sites framework is installed -- including its database table.
+(See the `sites framework documentation`_ for more information.) This has
+changed in the Django development version; the syndication feed framework no
+longer requires the sites framework.
+
 To activate syndication feeds on your Django site, add this line to your
 URLconf_::
 
@@ -72,6 +78,7 @@ The above example registers two feeds:
 
 Once that's set up, you just need to define the ``Feed`` classes themselves.
 
+.. _sites framework documentation: ../sites/
 .. _URLconf: ../url_dispatch/
 .. _settings file: ../settings/
 
@@ -131,9 +138,14 @@ put into those elements.
 
           * ``{{ obj }}`` -- The current object (one of whichever objects you
             returned in ``items()``).
-          * ``{{ site }}`` -- A ``django.models.core.sites.Site`` object
+          * ``{{ site }}`` -- A ``django.contrib.sites.models.Site`` object
             representing the current site. This is useful for
-            ``{{ site.domain }}`` or ``{{ site.name }}``.
+            ``{{ site.domain }}`` or ``{{ site.name }}``. Note that if you're
+            using the latest Django development version and do *not* have the
+            Django sites framework installed, this will be set to a
+            ``django.contrib.sites.models.RequestSite`` object. See the
+            `RequestSite section of the sites framework documentation`_ for
+            more.
 
       If you don't create a template for either the title or description, the
       framework will use the template ``"{{ obj }}"`` by default -- that is,
@@ -164,6 +176,7 @@ put into those elements.
 .. _chicagocrime.org: http://www.chicagocrime.org/
 .. _object-relational mapper: ../db-api/
 .. _Django templates: ../templates/
+.. _RequestSite section of the sites framework documentation: ../sites/#requestsite-objects
 
 A complex example
 -----------------
@@ -416,6 +429,26 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
 
         link = '/foo/bar/' # Hard-coded link.
 
+        # GUID -- One of the following three is optional. The framework looks
+        # for them in this order. This property is only used for Atom feeds
+        # (where it is the feed-level ID element). If not provided, the feed
+        # link is used as the ID.
+        #
+        # (New in Django development version)
+
+        def feed_guid(self, obj):
+            """
+            Takes the object returned by get_object() and returns the globally
+            unique ID for the feed as a normal Python string.
+            """
+
+        def feed_guid(self):
+            """
+            Returns the feed's globally unique ID as a normal Python string.
+            """
+
+        feed_guid = '/foo/bar/1234' # Hard-coded guid.
+
         # DESCRIPTION -- One of the following three is required. The framework
         # looks for them in this order.
 
@@ -556,7 +589,18 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
             Returns the URL for every item in the feed.
             """
 
-        # ITEM AUTHOR NAME --One of the following three is optional. The
+        # ITEM_GUID -- The following method is optional. This property is
+        # only used for Atom feeds (it is the ID element for an item in an
+        # Atom feed). If not provided, the item's link is used by default.
+        #
+        # (New in Django development version)
+
+        def item_guid(self, obj):
+            """
+            Takes an item, as return by items(), and returns the item's ID.
+            """
+
+        # ITEM AUTHOR NAME -- One of the following three is optional. The
         # framework looks for them in this order.
 
         def item_author_name(self, item):

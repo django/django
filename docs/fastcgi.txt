@@ -93,7 +93,7 @@ protocol by using the ``protocol=<protocol_name>`` option with
 ``./manage.py runfcgi`` -- where ``<protocol_name>`` may be one of: ``fcgi``
 (the default), ``scgi`` or ``ajp``. For example::
 
-    ./manage.py runfcgi --protocol=scgi
+    ./manage.py runfcgi protocol=scgi
 
 .. _flup: http://www.saddi.com/software/flup/
 .. _fastcgi: http://www.fastcgi.com/

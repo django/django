@@ -1,6 +1,6 @@
 from django.conf import settings
-from django.core.management import syncdb
-from django.db import connection, backend
+from django.core.management import call_command
+from django.db import connection
 from django.test.utils import _set_autocommit, TEST_DATABASE_PREFIX
 from commands import getstatusoutput
 import os, re, sys
@@ -22,14 +22,13 @@ def create_lang(db_name, verbosity=1):
     # Checking the status of the command, 0 => execution successful
     if status != 0:
         raise Exception, "Error executing 'plpgsql' command: %s\n" % output
-        
 
 def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
     "Creates database with psycopg2 cursor."
 
     # Constructing the necessary SQL to create the database (the DATABASE_USER
     #  must possess the privileges to create a database)
-    create_sql = 'CREATE DATABASE %s OWNER %s' % (backend.quote_name(db_name),
+    create_sql = 'CREATE DATABASE %s OWNER %s' % (connection.ops.quote_name(db_name),
                                                   settings.DATABASE_USER)
     cursor = connection.cursor()
     _set_autocommit(connection)
@@ -113,7 +112,7 @@ def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=Fa
     settings.DATABASE_NAME = db_name
 
     # Syncing the database
-    syncdb(verbosity, interactive=interactive)
+    call_command('syncdb', verbosity=verbosity, interactive=interactive)
 
     # Get a cursor (even though we don't need one yet). This has
     # the side effect of initializing the test database.
@@ -123,7 +122,7 @@ def drop_db(db_name=False, test=False):
     "Using the cursor, drops the given database.  All exceptions will be propagated up."
     if not db_name: db_name = get_spatial_db(test=test)
     cursor = connection.cursor()
-    cursor.execute("DROP DATABASE %s" % backend.quote_name(db_name))
+    cursor.execute("DROP DATABASE %s" % connection.ops.quote_name(db_name))
 
 def get_cmd_options(db_name):
     "Obtains the command-line PostgreSQL connection options for shell commands."

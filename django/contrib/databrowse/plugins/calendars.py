@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
 from django.views.generic import date_based
+from django.utils.encoding import force_unicode
 import datetime
 import time
 
@@ -27,13 +28,13 @@ class CalendarPlugin(DatabrowsePlugin):
     def model_index_html(self, request, model, site):
         fields = self.field_dict(model)
         if not fields:
-            return ''
-        return '<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
-            ', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, capfirst(f.verbose_name)) for f in fields.values()])
+            return u''
+        return u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
+            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()])
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
-            return ['%s%s/%s/%s/%s/%s/' % (easy_instance_field.model.url(),
+            return [u'%s%s/%s/%s/%s/%s/' % (easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 easy_instance_field.raw_value.year,
                 easy_instance_field.raw_value.strftime('%b').lower(),
@@ -63,22 +64,22 @@ class CalendarPlugin(DatabrowsePlugin):
 
     def calendar_view(self, request, field, year=None, month=None, day=None):
         easy_model = EasyModel(self.site, self.model)
+        queryset = easy_model.get_query_set()
         extra_context = {'root_url': self.site.root_url, 'model': easy_model, 'field': field}
         if day is not None:
-            # TODO: The objects in this template should be EasyInstances
-            return date_based.archive_day(request, year, month, day, self.model.objects.all(), field.name,
+            return date_based.archive_day(request, year, month, day, queryset, field.name,
                 template_name='databrowse/calendar_day.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         elif month is not None:
-            return date_based.archive_month(request, year, month, self.model.objects.all(), field.name,
+            return date_based.archive_month(request, year, month, queryset, field.name,
                 template_name='databrowse/calendar_month.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         elif year is not None:
-            return date_based.archive_year(request, year, self.model.objects.all(), field.name,
+            return date_based.archive_year(request, year, queryset, field.name,
                 template_name='databrowse/calendar_year.html', allow_empty=False, allow_future=True,
                 extra_context=extra_context)
         else:
-            return date_based.archive_index(request, self.model.objects.all(), field.name,
+            return date_based.archive_index(request, queryset, field.name,
                 template_name='databrowse/calendar_main.html', allow_empty=True, allow_future=True,
                 extra_context=extra_context)
         assert False, ('%s, %s, %s, %s' % (field, year, month, day))

@@ -39,7 +39,7 @@ class CommonMiddleware(object):
             new_url[0] = 'www.' + old_url[0]
         # Append a slash if append_slash is set and the URL doesn't have a
         # trailing slash or a file extension.
-        if settings.APPEND_SLASH and (old_url[1][-1] != '/') and ('.' not in old_url[1].split('/')[-1]):
+        if settings.APPEND_SLASH and (not old_url[1].endswith('/')) and ('.' not in old_url[1].split('/')[-1]):
             new_url[1] = new_url[1] + '/'
             if settings.DEBUG and request.method == 'POST':
                 raise RuntimeError, "You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to %s%s (note the trailing slash), or set APPEND_SLASH=False in your Django settings." % (new_url[0], new_url[1])
@@ -80,7 +80,9 @@ class CommonMiddleware(object):
             else:
                 etag = md5.new(response.content).hexdigest()
             if response.status_code >= 200 and response.status_code < 300 and request.META.get('HTTP_IF_NONE_MATCH') == etag:
+                cookies = response.cookies
                 response = http.HttpResponseNotModified()
+                response.cookies = cookies
             else:
                 response['ETag'] = etag
 

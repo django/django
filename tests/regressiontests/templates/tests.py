@@ -6,12 +6,22 @@ if __name__ == '__main__':
     # before importing 'template'.
     settings.configure()
 
+import os
+import unittest
+from datetime import datetime, timedelta
+
 from django import template
 from django.template import loader
-from django.utils.translation import activate, deactivate, install
+from django.template.loaders import app_directories, filesystem
+from django.utils.translation import activate, deactivate, install, ugettext as _
 from django.utils.tzinfo import LocalTimezone
-from datetime import datetime, timedelta
-import unittest
+
+from unicode import unicode_tests
+
+# Some other tests we would like to run
+__test__ = {
+        'unicode': unicode_tests,
+}
 
 #################################
 # Custom template tag for tests #
@@ -63,12 +73,52 @@ class OtherClass:
     def method(self):
         return "OtherClass.method"
 
-class UnicodeInStrClass:
-    "Class whose __str__ returns a Unicode object."
+class UTF8Class:
+    "Class whose __str__ returns non-ASCII data"
     def __str__(self):
-        return u'ŠĐĆŽćžšđ'
+        return u'ŠĐĆŽćžšđ'.encode('utf-8')
 
 class Templates(unittest.TestCase):
+    def test_loaders_security(self):
+        def test_template_sources(path, template_dirs, expected_sources):
+            # Fix expected sources so they are normcased and abspathed
+            expected_sources = [os.path.normcase(os.path.abspath(s)) for s in expected_sources]
+            # Test app_directories loader
+            sources = app_directories.get_template_sources(path, template_dirs)
+            self.assertEqual(list(sources), expected_sources)
+            # Test filesystem loader
+            sources = filesystem.get_template_sources(path, template_dirs)
+            self.assertEqual(list(sources), expected_sources)
+
+        template_dirs = ['/dir1', '/dir2']
+        test_template_sources('index.html', template_dirs,
+                              ['/dir1/index.html', '/dir2/index.html'])
+        test_template_sources('/etc/passwd', template_dirs,
+                              [])
+        test_template_sources('etc/passwd', template_dirs,
+                              ['/dir1/etc/passwd', '/dir2/etc/passwd'])
+        test_template_sources('../etc/passwd', template_dirs,
+                              [])
+        test_template_sources('../../../etc/passwd', template_dirs,
+                              [])
+        test_template_sources('/dir1/index.html', template_dirs,
+                              ['/dir1/index.html'])
+        test_template_sources('../dir2/index.html', template_dirs,
+                              ['/dir2/index.html'])
+        test_template_sources('/dir1blah', template_dirs,
+                              [])
+        test_template_sources('../dir1blah', template_dirs,
+                              [])
+
+        # Case insensitive tests (for win32). Not run unless we're on
+        # a case insensitive operating system.
+        if os.path.normcase('/TEST') == os.path.normpath('/test'):
+            template_dirs = ['/dir1', '/DIR2']
+            test_template_sources('index.html', template_dirs,
+                                  ['/dir1/index.html', '/dir2/index.html'])
+            test_template_sources('/DIR1/index.HTML', template_dirs,
+                                  ['/dir1/index.html'])
+
     def test_templates(self):
         # NOW and NOW_tz are used by timesince tag tests.
         NOW = datetime.now()
@@ -215,9 +265,9 @@ class Templates(unittest.TestCase):
             # Empty strings can be passed as arguments to filters
             'filter-syntax17': (r'{{ var|join:"" }}', {'var': ['a', 'b', 'c']}, 'abc'),
 
-            # If a variable has a __str__() that returns a Unicode object, the
-            # value will be converted to a bytestring.
-            'filter-syntax18': (r'{{ var }}', {'var': UnicodeInStrClass()}, '\xc5\xa0\xc4\x90\xc4\x86\xc5\xbd\xc4\x87\xc5\xbe\xc5\xa1\xc4\x91'),
+            # Make sure that any unicode strings are converted to bytestrings
+            # in the final output.
+            'filter-syntax18': (r'{{ var }}', {'var': UTF8Class()}, u'\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111'),
 
             # Numbers as filter arguments should work
             'filter-syntax19': ('{{ var|truncatewords:1 }}', {"var": "hello world"}, "hello ..."),
@@ -596,7 +646,7 @@ class Templates(unittest.TestCase):
             # translation of a constant string
             'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
 
-            ### HANDLING OF TEMPLATE_TAG_IF_INVALID ###################################
+            ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
             'invalidstr01': ('{{ var|default:"Foo" }}', {}, ('Foo','INVALID')),
             'invalidstr02': ('{{ var|default_if_none:"Foo" }}', {}, ('','INVALID')),
@@ -729,6 +779,8 @@ class Templates(unittest.TestCase):
             'url02' : ('{% url regressiontests.templates.views.client_action client.id, action="update" %}', {'client': {'id': 1}}, '/url_tag/client/1/update/'),
             'url03' : ('{% url regressiontests.templates.views.index %}', {}, '/url_tag/'),
             'url04' : ('{% url named.client client.id %}', {'client': {'id': 1}}, '/url_tag/named-client/1/'),
+            'url05' : (u'{% url метка_оператора v %}', {'v': u'Ω'},
+                    '/url_tag/%D0%AE%D0%BD%D0%B8%D0%BA%D0%BE%D0%B4/%CE%A9/'),
 
             # Failures
             'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),

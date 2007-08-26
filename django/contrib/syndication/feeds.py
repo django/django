@@ -1,12 +1,15 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.template import Context, loader, Template, TemplateDoesNotExist
-from django.contrib.sites.models import Site
+from django.contrib.sites.models import Site, RequestSite
 from django.utils import feedgenerator
+from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
 
 def add_domain(domain, url):
     if not url.startswith('http://'):
-        url = u'http://%s%s' % (domain, url)
+        # 'url' must already be ASCII and URL-quoted, so no need for encoding
+        # conversions here.
+        url = iri_to_uri(u'http://%s%s' % (domain, url))
     return url
 
 class FeedDoesNotExist(ObjectDoesNotExist):
@@ -19,9 +22,10 @@ class Feed(object):
     title_template = None
     description_template = None
 
-    def __init__(self, slug, feed_url):
+    def __init__(self, slug, request):
         self.slug = slug
-        self.feed_url = feed_url
+        self.request = request
+        self.feed_url = request.path
         self.title_template_name = self.title_template or ('feeds/%s_title.html' % slug)
         self.description_template_name = self.description_template or ('feeds/%s_description.html' % slug)
 
@@ -64,7 +68,11 @@ class Feed(object):
         else:
             obj = None
 
-        current_site = Site.objects.get_current()
+        if Site._meta.installed:
+            current_site = Site.objects.get_current()
+        else:
+            current_site = RequestSite(self.request)
+
         link = self.__get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link)
 
@@ -80,6 +88,7 @@ class Feed(object):
             author_email = self.__get_dynamic_attr('author_email', obj),
             categories = self.__get_dynamic_attr('categories', obj),
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
+            feed_guid = self.__get_dynamic_attr('feed_guid', obj),
         )
 
         try:
@@ -97,9 +106,9 @@ class Feed(object):
             enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
             if enc_url:
                 enc = feedgenerator.Enclosure(
-                    url = enc_url.decode('utf-8'),
-                    length = str(self.__get_dynamic_attr('item_enclosure_length', item)).decode('utf-8'),
-                    mime_type = self.__get_dynamic_attr('item_enclosure_mime_type', item).decode('utf-8'),
+                    url = smart_unicode(enc_url),
+                    length = smart_unicode(self.__get_dynamic_attr('item_enclosure_length', item)),
+                    mime_type = smart_unicode(self.__get_dynamic_attr('item_enclosure_mime_type', item))
                 )
             author_name = self.__get_dynamic_attr('item_author_name', item)
             if author_name is not None:
@@ -108,10 +117,10 @@ class Feed(object):
             else:
                 author_email = author_link = None
             feed.add_item(
-                title = title_tmp.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
+                title = title_tmp.render(Context({'obj': item, 'site': current_site})),
                 link = link,
-                description = description_tmp.render(Context({'obj': item, 'site': current_site})).decode('utf-8'),
-                unique_id = link,
+                description = description_tmp.render(Context({'obj': item, 'site': current_site})),
+                unique_id = self.__get_dynamic_attr('item_guid', item, link),
                 enclosure = enc,
                 pubdate = self.__get_dynamic_attr('item_pubdate', item),
                 author_name = author_name,

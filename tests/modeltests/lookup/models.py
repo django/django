@@ -8,12 +8,12 @@ from django.db import models
 from django.conf import settings
 
 class Article(models.Model):
-    headline = models.CharField(maxlength=100)
+    headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
     class Meta:
         ordering = ('-pub_date', 'headline')
 
-    def __str__(self):
+    def __unicode__(self):
         return self.headline
 
 __test__ = {'API_TESTS':r"""
@@ -100,7 +100,7 @@ TypeError: in_bulk() got an unexpected keyword argument 'headline__startswith'
 # values() returns a list of dictionaries instead of object instances -- and
 # you can specify which fields you want to retrieve.
 >>> Article.objects.values('headline')
-[{'headline': 'Article 5'}, {'headline': 'Article 6'}, {'headline': 'Article 4'}, {'headline': 'Article 2'}, {'headline': 'Article 3'}, {'headline': 'Article 7'}, {'headline': 'Article 1'}]
+[{'headline': u'Article 5'}, {'headline': u'Article 6'}, {'headline': u'Article 4'}, {'headline': u'Article 2'}, {'headline': u'Article 3'}, {'headline': u'Article 7'}, {'headline': u'Article 1'}]
 >>> Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id')
 [{'id': 2}, {'id': 3}, {'id': 7}]
 >>> list(Article.objects.values('id', 'headline')) == [{'id': 5, 'headline': 'Article 5'}, {'id': 6, 'headline': 'Article 6'}, {'id': 4, 'headline': 'Article 4'}, {'id': 2, 'headline': 'Article 2'}, {'id': 3, 'headline': 'Article 3'}, {'id': 7, 'headline': 'Article 7'}, {'id': 1, 'headline': 'Article 1'}]
@@ -110,13 +110,13 @@ True
 ...     i = d.items()
 ...     i.sort()
 ...     i
-[('headline', 'Article 5'), ('id', 5)]
-[('headline', 'Article 6'), ('id', 6)]
-[('headline', 'Article 4'), ('id', 4)]
-[('headline', 'Article 2'), ('id', 2)]
-[('headline', 'Article 3'), ('id', 3)]
-[('headline', 'Article 7'), ('id', 7)]
-[('headline', 'Article 1'), ('id', 1)]
+[('headline', u'Article 5'), ('id', 5)]
+[('headline', u'Article 6'), ('id', 6)]
+[('headline', u'Article 4'), ('id', 4)]
+[('headline', u'Article 2'), ('id', 2)]
+[('headline', u'Article 3'), ('id', 3)]
+[('headline', u'Article 7'), ('id', 7)]
+[('headline', u'Article 1'), ('id', 1)]
 
 # You can use values() with iterator() for memory savings, because iterator()
 # uses database-level iteration.
@@ -124,17 +124,16 @@ True
 ...     i = d.items()
 ...     i.sort()
 ...     i
-[('headline', 'Article 5'), ('id', 5)]
-[('headline', 'Article 6'), ('id', 6)]
-[('headline', 'Article 4'), ('id', 4)]
-[('headline', 'Article 2'), ('id', 2)]
-[('headline', 'Article 3'), ('id', 3)]
-[('headline', 'Article 7'), ('id', 7)]
-[('headline', 'Article 1'), ('id', 1)]
+[('headline', u'Article 5'), ('id', 5)]
+[('headline', u'Article 6'), ('id', 6)]
+[('headline', u'Article 4'), ('id', 4)]
+[('headline', u'Article 2'), ('id', 2)]
+[('headline', u'Article 3'), ('id', 3)]
+[('headline', u'Article 7'), ('id', 7)]
+[('headline', u'Article 1'), ('id', 1)]
 
-
-# you can use values() even on extra fields
->>> for d in Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_one'):
+# The values() method works with "extra" fields specified in extra(select).
+>>> for d in Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_one'):
 ...     i = d.items()
 ...     i.sort()
 ...     i
@@ -145,15 +144,24 @@ True
 [('id', 3), ('id_plus_one', 4)]
 [('id', 7), ('id_plus_one', 8)]
 [('id', 1), ('id_plus_one', 2)]
+>>> data = {'id_plus_one': 'id+1', 'id_plus_two': 'id+2', 'id_plus_three': 'id+3',
+...         'id_plus_four': 'id+4', 'id_plus_five': 'id+5', 'id_plus_six': 'id+6',
+...         'id_plus_seven': 'id+7', 'id_plus_eight': 'id+8'}
+>>> result = list(Article.objects.filter(id=1).extra(select=data).values(*data.keys()))[0]
+>>> result = result.items()
+>>> result.sort()
+>>> result
+[('id_plus_eight', 9), ('id_plus_five', 6), ('id_plus_four', 5), ('id_plus_one', 2), ('id_plus_seven', 8), ('id_plus_six', 7), ('id_plus_three', 4), ('id_plus_two', 3)]
 
-# however, an exception FieldDoesNotExist will still be thrown 
-# if you try to access non-existent field (field that is neither on the model nor extra)
->>> Article.objects.extra( select={'id_plus_one' : 'id + 1'} ).values('id', 'id_plus_two')
+# However, an exception FieldDoesNotExist will be thrown if you specify a
+# non-existent field name in values() (a field that is neither in the model
+# nor in extra(select)).
+>>> Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
 Traceback (most recent call last):
     ...
 FieldDoesNotExist: Article has no field named 'id_plus_two'
 
-# if you don't specify which fields, all are returned
+# If you don't specify field names to values(), all are returned.
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
 True
 

@@ -1,4 +1,4 @@
-import datetime
+from email.Utils import formatdate
 
 class ConditionalGetMiddleware(object):
     """
@@ -11,8 +11,7 @@ class ConditionalGetMiddleware(object):
     Also sets the Date and Content-Length response-headers.
     """
     def process_response(self, request, response):
-        now = datetime.datetime.utcnow()
-        response['Date'] = now.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        response['Date'] = formatdate()[:26] + "GMT"
         if not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 

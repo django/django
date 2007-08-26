@@ -42,7 +42,7 @@ class SpatialRefSys(models.Model):
     auth_name = models.CharField(maxlength=256)
     auth_srid = models.IntegerField()
     srtext = models.CharField(maxlength=2048)
-    proj4 = models.CharField(maxlength=2048, db_column='proj4text')
+    proj4text = models.CharField(maxlength=2048)
 
     class Meta:
         db_table = 'spatial_ref_sys'
@@ -55,17 +55,17 @@ class SpatialRefSys(models.Model):
                 try:
                     self._srs = SpatialReference(self.srtext, 'wkt')
                     return
-                except:
+                except Exception, msg:
                     pass
 
                 # Trying the proj4 text next
                 try:
-                    self._srs = SpatialReference(self.proj4, 'proj4')
+                    self._srs = SpatialReference(self.proj4text, 'proj4')
                     return
-                except:
+                except Exception, msg:
                     pass
 
-                raise Exception, 'Could not get a OSR Spatial Reference.'
+                raise Exception, 'Could not get a OSR Spatial Reference: %s' % msg
         else:
             raise Exception, 'GDAL is not installed!'
 

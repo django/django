@@ -11,7 +11,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.utils.text import normalize_newlines
 from django.conf import settings
-from django.utils.translation import ngettext
+from django.utils.translation import ungettext, ugettext as _
+from django.utils.encoding import smart_unicode
 import base64, datetime
 
 COMMENTS_PER_PAGE = 20
@@ -28,7 +29,7 @@ class PublicCommentManipulator(AuthenticationForm):
             else:
                 return []
         self.fields.extend([
-            oldforms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            oldforms.LargeTextField(field_name="comment", max_length=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
             oldforms.RadioSelectField(field_name="rating1", choices=choices,
                 is_required=ratings_required and num_rating_choices > 0,
@@ -108,11 +109,11 @@ class PublicCommentManipulator(AuthenticationForm):
         # If the commentor has posted fewer than COMMENTS_FIRST_FEW comments,
         # send the comment to the managers.
         if self.user_cache.comment_set.count() <= settings.COMMENTS_FIRST_FEW:
-            message = ngettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
+            message = ungettext('This comment was posted by a user who has posted fewer than %(count)s comment:\n\n%(text)s',
                 'This comment was posted by a user who has posted fewer than %(count)s comments:\n\n%(text)s', settings.COMMENTS_FIRST_FEW) % \
                 {'count': settings.COMMENTS_FIRST_FEW, 'text': c.get_as_text()}
             mail_managers("Comment posted by rookie user", message)
-        if settings.COMMENTS_SKETCHY_USERS_GROUP and settings.COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.get_group_list()]:
+        if settings.COMMENTS_SKETCHY_USERS_GROUP and settings.COMMENTS_SKETCHY_USERS_GROUP in [g.id for g in self.user_cache.groups.all()]:
             message = _('This comment was posted by a sketchy user:\n\n%(text)s') % {'text': c.get_as_text()}
             mail_managers("Comment posted by sketchy user (%s)" % self.user_cache.username, c.get_as_text())
         return c
@@ -121,9 +122,9 @@ class PublicFreeCommentManipulator(oldforms.Manipulator):
     "Manipulator that handles public free (unregistered) comments"
     def __init__(self):
         self.fields = (
-            oldforms.TextField(field_name="person_name", maxlength=50, is_required=True,
+            oldforms.TextField(field_name="person_name", max_length=50, is_required=True,
                 validator_list=[self.hasNoProfanities]),
-            oldforms.LargeTextField(field_name="comment", maxlength=3000, is_required=True,
+            oldforms.LargeTextField(field_name="comment", max_length=3000, is_required=True,
                 validator_list=[self.hasNoProfanities]),
         )
 
@@ -248,7 +249,7 @@ def post_comment(request):
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
-            mail_admins("Banned IP attempted to post comment", str(request.POST) + "\n\n" + str(request.META))
+            mail_admins("Banned IP attempted to post comment", smart_unicode(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)
@@ -312,7 +313,7 @@ def post_free_comment(request):
         # serve up the "Thanks for posting" page as if the comment WAS posted.
         if request.META['REMOTE_ADDR'] in settings.BANNED_IPS:
             from django.core.mail import mail_admins
-            mail_admins("Practical joker", str(request.POST) + "\n\n" + str(request.META))
+            mail_admins("Practical joker", smart_unicode(request.POST) + "\n\n" + str(request.META))
         else:
             manipulator.do_html2python(new_data)
             comment = manipulator.save(new_data)

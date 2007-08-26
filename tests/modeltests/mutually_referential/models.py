@@ -7,11 +7,11 @@ To define a many-to-one relationship, use ``ForeignKey()`` .
 from django.db.models import *
 
 class Parent(Model):
-    name = CharField(maxlength=100, core=True)
+    name = CharField(max_length=100, core=True)
     bestchild = ForeignKey("Child", null=True, related_name="favoured_by")
 
 class Child(Model):
-    name = CharField(maxlength=100)
+    name = CharField(max_length=100)
     parent = ForeignKey(Parent)
 
 __test__ = {'API_TESTS':"""

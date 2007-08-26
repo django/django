@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 38. Testing using the Test Client
 
@@ -27,11 +28,14 @@ class ClientTest(TestCase):
     
     def test_get_view(self):
         "GET a view"
-        response = self.client.get('/test_client/get_view/')
+        # The data is ignored, but let's check it doesn't crash the system
+        # anyway.
+        data = {'var': u'\xf2'}
+        response = self.client.get('/test_client/get_view/', data)
         
         # Check some response details
         self.assertContains(response, 'This is a test')
-        self.assertEqual(response.context['var'], 42)
+        self.assertEqual(response.context['var'], u'\xf2')
         self.assertEqual(response.template.name, 'GET Template')
 
     def test_get_post_view(self):
@@ -118,6 +122,18 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "Valid POST Template")
 
+    def test_valid_form_with_hints(self):
+        "GET a form, providing hints in the GET data"
+        hints = {
+            'text': 'Hello World',
+            'multi': ('b','c','e')
+        }
+        response = self.client.get('/test_client/form_view/', data=hints)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Form GET Template")
+        # Check that the multi-value data has been rolled out ok
+        self.assertContains(response, 'Select a valid choice.', 0)
+        
     def test_incomplete_data_form(self):
         "POST incomplete data to a form"
         post_data = {
@@ -223,6 +239,29 @@ class ClientTest(TestCase):
 
         login = self.client.login(username='otheruser', password='nopassword')
         self.failIf(login)
+
+    def test_view_with_inactive_login(self):
+        "Request a page that is protected with @login, but use an inactive login"
+
+        login = self.client.login(username='inactive', password='password')
+        self.failIf(login)
+
+    def test_logout(self):
+        "Request a logout after logging in"
+        # Log in
+        self.client.login(username='testclient', password='password')
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
+        # Log out
+        self.client.logout()
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/')
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"

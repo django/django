@@ -67,6 +67,13 @@ particular:
       likely to get lost. If a particular ticket is controversial, please move
       discussion to `django-developers`_.
 
+    * **Don't** post to django-developers just to announce that you have filed
+      a bug report. All the tickets are mailed to another list
+      (`django-updates`_), which is tracked by developers and triagers, so we
+      see them as they are filed.
+
+.. _django-updates: http://groups.google.com/group/django-updates
+
 Reporting security issues
 =========================
 
@@ -279,6 +286,22 @@ Please follow these coding standards when writing code for inclusion in Django:
     * Mark all strings for internationalization; see the `i18n documentation`_
       for details.
 
+    * In docstrings, use "action words" such as::
+
+          def foo():
+              """
+              Calculates something and returns the result.
+              """
+              pass
+
+      Here's an example of what not to do::
+
+          def foo():
+              """
+              Calculate something and return the result.
+              """
+              pass
+
     * Please don't put your name in the code you contribute. Our policy is to
       keep contributors' names in the ``AUTHORS`` file distributed with Django
       -- not scattered throughout the codebase itself. Feel free to include a
@@ -324,14 +347,14 @@ Model style
       Do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
       Don't do this::
 
           class Person(models.Model):
-              FirstName = models.CharField(maxlength=20)
-              Last_Name = models.CharField(maxlength=40)
+              FirstName = models.CharField(max_length=20)
+              Last_Name = models.CharField(max_length=40)
 
     * The ``class Meta`` should appear *after* the fields are defined, with
       a single blank line separating the fields and the class definition.
@@ -339,8 +362,8 @@ Model style
       Do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
               class Meta:
                   verbose_name_plural = 'people'
@@ -348,8 +371,8 @@ Model style
       Don't do this::
 
           class Person(models.Model):
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
               class Meta:
                   verbose_name_plural = 'people'
 
@@ -359,8 +382,8 @@ Model style
               class Meta:
                   verbose_name_plural = 'people'
 
-              first_name = models.CharField(maxlength=20)
-              last_name = models.CharField(maxlength=40)
+              first_name = models.CharField(max_length=20)
+              last_name = models.CharField(max_length=40)
 
     * The order of model inner classes and standard methods should be as
       follows (noting that these are not all required):
@@ -368,6 +391,7 @@ Model style
         * All database fields
         * ``class Meta``
         * ``class Admin``
+        * ``def __unicode__()``
         * ``def __str__()``
         * ``def save()``
         * ``def get_absolute_url()``
@@ -393,11 +417,11 @@ Guidelines for ReST files
 
 These guidelines regulate the format of our ReST documentation:
 
-	* In section titles, capitalize only initial words and proper nouns.
+    * In section titles, capitalize only initial words and proper nouns.
 
-	* Wrap the documentation at 80 characters wide, unless a code example
-	  is significantly less readable when split over two lines, or for another
-	  good reason.
+    * Wrap the documentation at 80 characters wide, unless a code example
+      is significantly less readable when split over two lines, or for another
+      good reason.
 
 Commonly used terms
 -------------------
@@ -405,41 +429,41 @@ Commonly used terms
 Here are some style guidelines on commonly used terms throughout the
 documentation:
 
-	* **Django** -- when referring to the framework, capitalize Django. It is
-	  lowercase only in Python code and in the djangoproject.com logo.
+    * **Django** -- when referring to the framework, capitalize Django. It is
+      lowercase only in Python code and in the djangoproject.com logo.
 
-	* **e-mail** -- it has a hyphen.
+    * **e-mail** -- it has a hyphen.
 
-	* **MySQL**
+    * **MySQL**
 
-	* **PostgreSQL**
+    * **PostgreSQL**
 
-	* **Python** -- when referring to the language, capitalize Python.
+    * **Python** -- when referring to the language, capitalize Python.
 
-	* **realize**, **customize**, **initialize**, etc. -- use the American
-	  "ize" suffix, not "ise."
+    * **realize**, **customize**, **initialize**, etc. -- use the American
+      "ize" suffix, not "ise."
 
-	* **SQLite**
+    * **SQLite**
 
-	* **subclass** -- it's a single word without a hyphen, both as a verb
-	  ("subclass that model") and as a noun ("create a subclass").
+    * **subclass** -- it's a single word without a hyphen, both as a verb
+      ("subclass that model") and as a noun ("create a subclass").
 
-	* **Web**, **World Wide Web**, **the Web** -- note Web is always
-	  capitalized when referring to the World Wide Web.
+    * **Web**, **World Wide Web**, **the Web** -- note Web is always
+      capitalized when referring to the World Wide Web.
 
     * **Web site** -- use two words, with Web capitalized.
 
 Django-specific terminology
 ---------------------------
 
-	* **model** -- it's not capitalized.
+    * **model** -- it's not capitalized.
 
-	* **template** -- it's not capitalized.
+    * **template** -- it's not capitalized.
 
-	* **URLconf** -- use three capitalized letters, with no space before
-	  "conf."
+    * **URLconf** -- use three capitalized letters, with no space before
+      "conf."
 
-	* **view** -- it's not capitalized.
+    * **view** -- it's not capitalized.
 
 Committing code
 ===============
@@ -528,11 +552,9 @@ To run the tests, ``cd`` to the ``tests/`` directory and type::
     ./runtests.py --settings=path.to.django.settings
 
 Yes, the unit tests need a settings module, but only for database connection
-info -- the ``DATABASE_NAME`` (required, but will be ignored),
-``DATABASE_ENGINE``, ``DATABASE_USER`` and ``DATABASE_PASSWORD`` settings. You
-will also need a ``ROOT_URLCONF`` setting (its value is ignored; it just needs
-to be present) and a ``SITE_ID`` setting (any integer value will do) in order
-for all the tests to pass.
+info, with the ``DATABASE_ENGINE`` setting. You will also need a ``ROOT_URLCONF``
+setting (its value is ignored; it just needs to be present) and a ``SITE_ID``
+setting (any non-zero integer value will do) in order for all the tests to pass.
 
 The unit tests will not touch your existing databases; they create a new
 database, called ``django_test_db``, which is deleted when the tests are

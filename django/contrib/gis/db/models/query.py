@@ -1,6 +1,6 @@
 import operator
 from django.core.exceptions import ImproperlyConfigured
-from django.db import backend
+from django.db import connection
 from django.db.models.query import Q, QuerySet, handle_legacy_orderlist, quote_only_if_word
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
@@ -16,6 +16,8 @@ class GeoQ(Q):
 
 class GeoQuerySet(QuerySet):
     "Geographical-enabled QuerySet object."
+    
+    quote_name = connection.ops.quote_name
 
     #### Overloaded QuerySet Routines ####
     def __init__(self, model=None):
@@ -79,10 +81,10 @@ class GeoQuerySet(QuerySet):
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), backend.quote_name(s[0])) for s in self._select.items()])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), self.quote_name(s[0])) for s in self._select.items()])
 
         # Start composing the body of the SQL statement.
-        sql = [" FROM", backend.quote_name(opts.db_table)]
+        sql = [" FROM", self.quote_name(opts.db_table)]
 
         # Compose the join dictionary into SQL describing the joins.
         if joins:
@@ -115,15 +117,15 @@ class GeoQuerySet(QuerySet):
                     order = "ASC"
                 if "." in col_name:
                     table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = backend.quote_name(table_prefix) + '.'
+                    table_prefix = self.quote_name(table_prefix) + '.'
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
                     if "." not in col_name and col_name not in (self._select or ()):
-                        table_prefix = backend.quote_name(opts.db_table) + '.'
+                        table_prefix = self.quote_name(opts.db_table) + '.'
                     else:
                         table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, backend.quote_name(orderfield2column(col_name, opts)), order))
+                order_by.append('%s%s %s' % (table_prefix, self.quote_name(orderfield2column(col_name, opts)), order))
         if order_by:
             sql.append("ORDER BY " + ", ".join(order_by))
 
@@ -142,8 +144,8 @@ class GeoQuerySet(QuerySet):
 
     #### Methods specific to the GeoQuerySet ####
     def _field_column(self, field):
-        return "%s.%s" % (backend.quote_name(self.model._meta.db_table),
-                          backend.quote_name(field.column))
+        return "%s.%s" % (self.quote_name(self.model._meta.db_table),
+                          self.quote_name(field.column))
     
     def kml(self, field_name, precision=8):
         """Returns KML representation of the given field name in a `kml` 
@@ -174,7 +176,7 @@ class GeoQuerySet(QuerySet):
         #  override the geometry column returned from the database.
         self._custom_select[field.column] = \
             '(ST_Transform(%s, %s)) AS %s' % (self._field_column(field), srid, 
-                                              backend.quote_name(field.column))
+                                              self.quote_name(field.column))
         return self._clone()
 
     

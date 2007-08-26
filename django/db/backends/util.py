@@ -1,6 +1,7 @@
 import datetime
 import md5
 from time import time
+from django.utils.encoding import smart_unicode, force_unicode
 
 try:
     import decimal
@@ -18,12 +19,8 @@ class CursorDebugWrapper(object):
             return self.cursor.execute(sql, params)
         finally:
             stop = time()
-            # If params was a list, convert it to a tuple, because string
-            # formatting with '%' only works with tuples or dicts.
-            if not isinstance(params, (tuple, dict)):
-                params = tuple(params)
             self.db.queries.append({
-                'sql': sql % params,
+                'sql': smart_unicode(sql) % convert_args(params),
                 'time': "%.3f" % (stop - start),
             })
 
@@ -34,7 +31,7 @@ class CursorDebugWrapper(object):
         finally:
             stop = time()
             self.db.queries.append({
-                'sql': 'MANY: ' + sql + ' ' + str(tuple(param_list)),
+                'sql': 'MANY: ' + sql + ' ' + smart_unicode(tuple(param_list)),
                 'time': "%.3f" % (stop - start),
             })
 
@@ -43,6 +40,16 @@ class CursorDebugWrapper(object):
             return self.__dict__[attr]
         else:
             return getattr(self.cursor, attr)
+
+def convert_args(args):
+    """
+    Convert sequence or dictionary to contain unicode values.
+    """
+    to_unicode = lambda s: force_unicode(s, strings_only=True)
+    if isinstance(args, (list, tuple)):
+        return tuple([to_unicode(val) for val in args])
+    else:
+        return dict([(to_unicode(k), to_unicode(v)) for k, v in args.items()])
 
 ###############################################
 # Converters from database (string) to Python #
@@ -117,30 +124,3 @@ def truncate_name(name, length=None):
     hash = md5.md5(name).hexdigest()[:4]
 
     return '%s%s' % (name[:length-4], hash)
-
-##################################################################################
-# Helper functions for dictfetch* for databases that don't natively support them #
-##################################################################################
-
-def _dict_helper(desc, row):
-    "Returns a dictionary for the given cursor.description and result row."
-    return dict(zip([col[0] for col in desc], row))
-
-def dictfetchone(cursor):
-    "Returns a row from the cursor as a dict"
-    row = cursor.fetchone()
-    if not row:
-        return None
-    return _dict_helper(cursor.description, row)
-
-def dictfetchmany(cursor, number):
-    "Returns a certain number of rows from a cursor as a dict"
-    desc = cursor.description
-    for row in cursor.fetchmany(number):
-        yield _dict_helper(desc, row)
-
-def dictfetchall(cursor):
-    "Returns all rows from a cursor as a dict"
-    desc = cursor.description
-    for row in cursor.fetchall():
-        yield _dict_helper(desc, row)
