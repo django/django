@@ -44,7 +44,7 @@ class BaseCommand(object):
             sys.stderr.write(self.style.ERROR(str('Error: %s\n' % e)))
             sys.exit(1)
 
-    def validate(self, app=None):
+    def validate(self, app=None, display_num_errors=False):
         """
         Validates the given app, raising CommandError for any errors.
 
@@ -61,6 +61,8 @@ class BaseCommand(object):
             s.seek(0)
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
+        if display_num_errors:
+            print "%s error%s found" % (num_errors, num_errors != 1 and 's' or '')
 
     def handle(self, *args, **options):
         raise NotImplementedError()

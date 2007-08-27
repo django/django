@@ -37,7 +37,7 @@ class Command(BaseCommand):
         def inner_run():
             from django.conf import settings
             print "Validating models..."
-            self.validate()
+            self.validate(display_num_errors=True)
             print "\nDjango version %s, using settings %r" % (django.get_version(), settings.SETTINGS_MODULE)
             print "Development server is running at http://%s:%s/" % (addr, port)
             print "Quit the server with %s." % quit_command
