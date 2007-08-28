@@ -11,6 +11,7 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
 from django.dispatch import dispatcher
 from django.http import SimpleCookie, HttpRequest
+from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import smart_str
@@ -165,7 +166,21 @@ class Client:
         # Capture exceptions created by the handler
         dispatcher.connect(self.store_exc_info, signal=got_request_exception)
 
-        response = self.handler(environ)
+        try:
+            response = self.handler(environ)
+        except TemplateDoesNotExist, e:
+            # If the view raises an exception, Django will attempt to show
+            # the 500.html template. If that template is not available,
+            # we should ignore the error in favor of re-raising the
+            # underlying exception that caused the 500 error. Any other
+            # template found to be missing during view error handling
+            # should be reported as-is.
+            if e.args != ('500.html',):
+                raise
+
+        # Look for a signalled exception and reraise it
+        if self.exc_info:
+            raise self.exc_info[1], None, self.exc_info[2]
 
         # Add any rendered template detail to the response
         # If there was only one template rendered (the most likely case),
@@ -178,10 +193,6 @@ class Client:
                     setattr(response, detail, data[detail])
             else:
                 setattr(response, detail, None)
-
-        # Look for a signalled exception and reraise it
-        if self.exc_info:
-            raise self.exc_info[1], None, self.exc_info[2]
 
         # Update persistent cookie data
         if response.cookies:
