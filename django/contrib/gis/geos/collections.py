@@ -1,13 +1,14 @@
 """
-   This module houses the Geometry Collection objects:
-     GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
+  This module houses the Geometry Collection objects:
+   GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
 from ctypes import c_int, c_uint, byref, cast
 from types import TupleType, ListType
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, get_pointer_arr, GEOM_PTR
 from django.contrib.gis.geos.base import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.geometries import Point, LineString, LinearRing, Polygon
+from django.contrib.gis.geos.libgeos import lgeos, get_pointer_arr, GEOM_PTR
+from django.contrib.gis.geos.pointer import GEOSPointer
 
 class GeometryCollection(GEOSGeometry):
     _allowed = (Point, LineString, LinearRing, Polygon)
@@ -15,16 +16,14 @@ class GeometryCollection(GEOSGeometry):
 
     def __init__(self, *args, **kwargs):
         "Initializes a Geometry Collection from a sequence of Geometry objects."
-        # Setting up the collection for creation
-        self._ptr = GEOSPointer(0) # Initially NULL
-        self._geoms = {}
-        self._parent = None
 
         # Checking the arguments
         if not args:
             raise TypeError, 'Must provide at least one Geometry to initialize %s.' % self.__class__.__name__
 
-        if len(args) == 1: # If only one geometry provided or a list of geometries is provided
+        if len(args) == 1: 
+            # If only one geometry provided or a list of geometries is provided
+            #  in the first argument.
             if isinstance(args[0], (TupleType, ListType)):
                 init_geoms = args[0]
             else:
@@ -36,40 +35,47 @@ class GeometryCollection(GEOSGeometry):
         if False in [isinstance(geom, self._allowed) for geom in init_geoms]:
             raise TypeError, 'Invalid Geometry type encountered in the arguments.'
 
-        # Creating the geometry pointer array
+        # Creating the geometry pointer array, and populating each element in
+        #  the array with the address of the Geometry returned by _nullify().
         ngeom = len(init_geoms)
         geoms = get_pointer_arr(ngeom)
-
-        # Incrementing through each input geometry.
         for i in xrange(ngeom):
             geoms[i] = cast(init_geoms[i]._nullify(), GEOM_PTR)
         
-        # Calling the parent class, using the pointer returned from GEOS createCollection()
-        super(GeometryCollection, self).__init__(lgeos.GEOSGeom_createCollection(c_int(self._typeid), byref(geoms), c_uint(ngeom)), **kwargs)
+        # Calling the parent class, using the pointer returned from the 
+        #  GEOS createCollection() factory.
+        addr = lgeos.GEOSGeom_createCollection(c_int(self._typeid), 
+                                               byref(geoms), c_uint(ngeom))
+        super(GeometryCollection, self).__init__(addr, **kwargs)
 
     def __del__(self):
         "Overloaded deletion method for Geometry Collections."
-        #print 'collection: Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._parent, self._ptr.valid)
+        #print 'collection: Deleting %s (parent=%s, valid=%s)' % (self.__class__.__name__, self._ptr.parent, self._ptr.valid)
         # If this geometry is still valid, it hasn't been modified by others.
         if self._ptr.valid:
-            # Nullifying pointers to internal geometries, preventing any attempted future access.
-            for k in self._geoms: self._geoms[k].nullify()
+            # Nullifying pointers to internal Geometries, preventing any 
+            #  attempted future access.
+            for g in self._ptr: g.nullify()
         else:
-            # Internal memory has become part of other Geometry objects, must delete the
-            #  internal objects which are still valid individually, since calling destructor
-            #  on entire geometry will result in an attempted deletion of NULL pointers for
-            #  the missing components.
-            for k in self._geoms:
-                if self._geoms[k].valid:
-                    lgeos.GEOSGeom_destroy(self._geoms[k].address)
-                    self._geoms[k].nullify()
+            # Internal memory has become part of other Geometry objects; must 
+            #  delete the internal objects which are still valid individually, 
+            #  because calling the destructor on the entire geometry will result 
+            #  in an attempted deletion of NULL pointers for the missing 
+            #  components (which may crash Python).
+            for g in self._ptr:
+                if len(g) > 0:
+                    # The collection geometry is a Polygon, destroy any leftover
+                    #  LinearRings.
+                    for r in g: r.destroy()
+                g.destroy()
+                    
         super(GeometryCollection, self).__del__()
             
     def __getitem__(self, index):
         "Returns the Geometry from this Collection at the given index (0-based)."
         # Checking the index and returning the corresponding GEOS geometry.
         self._checkindex(index)
-        return GEOSGeometry(self._geoms[index], parent=self._ptr, srid=self.srid)
+        return GEOSGeometry(self._ptr[index], srid=self.srid)
 
     def __setitem__(self, index, geom):
         "Sets the Geometry at the specified index."
@@ -105,14 +111,23 @@ class GeometryCollection(GEOSGeometry):
     def _nullify(self):
         "Overloaded from base method to nullify geometry references in this Collection."
         # Nullifying the references to the internal Geometry objects from this Collection.
-        for k in self._geoms: self._geoms[k].nullify()
+        for g in self._ptr: g.nullify()
         return super(GeometryCollection, self)._nullify()
 
     def _populate(self):
-        "Populates the internal child geometry dictionary."
-        self._geoms = {}
-        for i in xrange(self.num_geom):
-            self._geoms[i] = GEOSPointer(lgeos.GEOSGetGeometryN(self._ptr(), c_int(i)))
+        "Internal routine that populates the internal children geometries list."
+        ptr_list = []
+        for i in xrange(len(self)):
+            # Getting the geometry pointer for the geometry at the index.
+            geom_ptr = lgeos.GEOSGetGeometryN(self._ptr(), c_int(i))
+
+            # Adding the coordinate sequence to the list, or using None if the
+            #  collection Geometry doesn't support coordinate sequences.
+            if lgeos.GEOSGeomTypeId(geom_ptr) in (0, 1, 2):
+                ptr_list.append((geom_ptr, lgeos.GEOSGeom_getCoordSeq(geom_ptr)))
+            else:
+                ptr_list.append((geom_ptr, None))
+        self._ptr.set_children(ptr_list)
 
     @property
     def kml(self):

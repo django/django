@@ -13,13 +13,13 @@ class GEOSTest(unittest.TestCase):
     def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
-            geom = GEOSGeometry(g.wkt)
+            geom = fromstr(g.wkt)
             self.assertEqual(g.ewkt, geom.wkt)
 
     def test01b_hex(self):
         "Testing HEX output."
         for g in hex_wkt:
-            geom = GEOSGeometry(g.wkt)
+            geom = fromstr(g.wkt)
             self.assertEqual(g.hex, geom.hex)
 
     def test01c_kml(self):
@@ -34,22 +34,22 @@ class GEOSTest(unittest.TestCase):
         print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
         for err in errors:
             if err.hex:
-                self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
+                self.assertRaises(GEOSException, fromstr, err.wkt)
             else:
-                self.assertRaises(GEOSException, GEOSGeometry, err.wkt)
+                self.assertRaises(GEOSException, fromstr, err.wkt)
         print "\nEND - expecting GEOS_ERROR; safe to ignore.\n"
                 
     def test02a_points(self):
         "Testing Point objects."
-        prev = GEOSGeometry('POINT(0 0)')
+        prev = fromstr('POINT(0 0)')
         for p in points:
             # Creating the point from the WKT
-            pnt = GEOSGeometry(p.wkt)
+            pnt = fromstr(p.wkt)
             self.assertEqual(pnt.geom_type, 'Point')
             self.assertEqual(pnt.geom_typeid, 0)
             self.assertEqual(p.x, pnt.x)
             self.assertEqual(p.y, pnt.y)
-            self.assertEqual(True, pnt == GEOSGeometry(p.wkt))
+            self.assertEqual(True, pnt == fromstr(p.wkt))
             self.assertEqual(False, pnt == prev)
 
             # Making sure that the point's X, Y components are what we expect
@@ -97,7 +97,7 @@ class GEOSTest(unittest.TestCase):
     def test02b_multipoints(self):
         "Testing MultiPoint objects."
         for mp in multipoints:
-            mpnt = GEOSGeometry(mp.wkt)
+            mpnt = fromstr(mp.wkt)
             self.assertEqual(mpnt.geom_type, 'MultiPoint')
             self.assertEqual(mpnt.geom_typeid, 4)
 
@@ -115,9 +115,9 @@ class GEOSTest(unittest.TestCase):
 
     def test03a_linestring(self):
         "Testing LineString objects."
-        prev = GEOSGeometry('POINT(0 0)')
+        prev = fromstr('POINT(0 0)')
         for l in linestrings:
-            ls = GEOSGeometry(l.wkt)
+            ls = fromstr(l.wkt)
             self.assertEqual(ls.geom_type, 'LineString')
             self.assertEqual(ls.geom_typeid, 1)
             self.assertEqual(ls.empty, False)
@@ -127,7 +127,7 @@ class GEOSTest(unittest.TestCase):
             if hasattr(l, 'tup'):
                 self.assertEqual(l.tup, ls.tuple)
                 
-            self.assertEqual(True, ls == GEOSGeometry(l.wkt))
+            self.assertEqual(True, ls == fromstr(l.wkt))
             self.assertEqual(False, ls == prev)
             self.assertRaises(GEOSGeometryIndexError, ls.__getitem__, len(ls))
             prev = ls
@@ -141,16 +141,16 @@ class GEOSTest(unittest.TestCase):
 
     def test03b_multilinestring(self):
         "Testing MultiLineString objects."
-        prev = GEOSGeometry('POINT(0 0)')
+        prev = fromstr('POINT(0 0)')
         for l in multilinestrings:
-            ml = GEOSGeometry(l.wkt)
+            ml = fromstr(l.wkt)
             self.assertEqual(ml.geom_type, 'MultiLineString')
             self.assertEqual(ml.geom_typeid, 5)
 
             self.assertAlmostEqual(l.centroid[0], ml.centroid.x, 9)
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
 
-            self.assertEqual(True, ml == GEOSGeometry(l.wkt))
+            self.assertEqual(True, ml == fromstr(l.wkt))
             self.assertEqual(False, ml == prev)
             prev = ml
 
@@ -166,7 +166,7 @@ class GEOSTest(unittest.TestCase):
     def test04_linearring(self):
         "Testing LinearRing objects."
         for rr in linearrings:
-            lr = GEOSGeometry(rr.wkt)
+            lr = fromstr(rr.wkt)
             self.assertEqual(lr.geom_type, 'LinearRing')
             self.assertEqual(lr.geom_typeid, 2)
             self.assertEqual(rr.n_p, len(lr))
@@ -181,10 +181,10 @@ class GEOSTest(unittest.TestCase):
     
     def test05a_polygons(self):
         "Testing Polygon objects."
-        prev = GEOSGeometry('POINT(0 0)')
+        prev = fromstr('POINT(0 0)')
         for p in polygons:
             # Creating the Polygon, testing its properties.
-            poly = GEOSGeometry(p.wkt)
+            poly = fromstr(p.wkt)
             self.assertEqual(poly.geom_type, 'Polygon')
             self.assertEqual(poly.geom_typeid, 3)
             self.assertEqual(poly.empty, False)
@@ -199,7 +199,7 @@ class GEOSTest(unittest.TestCase):
             self.assertAlmostEqual(p.centroid[1], poly.centroid.tuple[1], 9)
 
             # Testing the geometry equivalence
-            self.assertEqual(True, poly == GEOSGeometry(p.wkt))
+            self.assertEqual(True, poly == fromstr(p.wkt))
             self.assertEqual(False, poly == prev) # Should not be equal to previous geometry
             self.assertEqual(True, poly != prev)
 
@@ -222,9 +222,8 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(r.geom_typeid, 2)
 
             # Testing polygon construction.
-            self.assertRaises(TypeError, Polygon, 0, [1, 2, 3])
-            self.assertRaises(TypeError, Polygon, 'foo')
-
+            self.assertRaises(TypeError, Polygon.__init__, 0, [1, 2, 3])
+            self.assertRaises(TypeError, Polygon.__init__, 'foo')
             rings = tuple(r.clone() for r in poly)
             self.assertEqual(poly, Polygon(rings[0], rings[1:]))
             self.assertEqual(poly.wkt, Polygon(*tuple(r.clone() for r in poly)).wkt)
@@ -246,9 +245,9 @@ class GEOSTest(unittest.TestCase):
     def test05b_multipolygons(self):
         "Testing MultiPolygon objects."
         print "\nBEGIN - expecting GEOS_NOTICE; safe to ignore.\n"
-        prev = GEOSGeometry('POINT (0 0)')
+        prev = fromstr('POINT (0 0)')
         for mp in multipolygons:
-            mpoly = GEOSGeometry(mp.wkt)
+            mpoly = fromstr(mp.wkt)
             self.assertEqual(mpoly.geom_type, 'MultiPolygon')
             self.assertEqual(mpoly.geom_typeid, 6)
             self.assertEqual(mp.valid, mpoly.valid)
@@ -266,14 +265,14 @@ class GEOSTest(unittest.TestCase):
 
         print "\nEND - expecting GEOS_NOTICE; safe to ignore.\n"  
 
-    def test06_memory_hijinks(self):
-        "Testing Geometry __del__() in different scenarios"
+    def test06a_memory_hijinks(self):
+        "Testing Geometry __del__() on rings and polygons."
         #### Memory issues with rings and polygons
 
         # These tests are needed to ensure sanity with writable geometries.
 
         # Getting a polygon with interior rings, and pulling out the interior rings
-        poly = GEOSGeometry(polygons[1].wkt)
+        poly = fromstr(polygons[1].wkt)
         ring1 = poly[0]
         ring2 = poly[1]
 
@@ -292,6 +291,8 @@ class GEOSTest(unittest.TestCase):
         self.assertRaises(GEOSException, str, ring1)
         self.assertRaises(GEOSException, str, ring2)
 
+    def test06b_memory_hijinks(self):
+        "Testing Geometry __del__() on collections."
         #### Memory issues with geometries from Geometry Collections
         mp = fromstr('MULTIPOINT(85 715, 235 1400, 4620 1711)')
         
@@ -315,16 +316,17 @@ class GEOSTest(unittest.TestCase):
 
         # Should raise GEOSException when trying to get geometries from the multipoint
         #  after it has been deleted.
+        parr1 = [ptr for ptr in mp._ptr]
+        parr2 = [p._ptr for p in mp]
         del mp
+
         for p in pts:
             self.assertRaises(GEOSException, str, p) # tests p's geometry pointer
             self.assertRaises(GEOSException, p.get_coords) # tests p's coordseq pointer
 
         # Now doing this with a GeometryCollection
-        polywkt = polygons[3].wkt # a 'real life' polygon.
-        lrwkt = linearrings[0].wkt # a 'real life' linear ring
-        poly = fromstr(polywkt)
-        linring = fromstr(lrwkt)
+        poly = fromstr(polygons[3].wkt) # a 'real life' polygon.
+        linring = fromstr(linearrings[0].wkt) # a 'real life' linear ring
 
         # Pulling out the shell and cloning our initial geometries for later comparison.
         shell = poly.shell
@@ -338,33 +340,42 @@ class GEOSTest(unittest.TestCase):
         self.assertRaises(GEOSException, str, shell)
         self.assertRaises(GEOSException, str, linring)
 
-        r1 = gc[1] # pulling out the ring
+        # Deep-indexing delete should be 'harmless.'
+        tmpr1 = gc[0][0]
+        del tmpr1
+
+        r1 = gc[0][0] # pulling out shell from polygon -- deep indexing
+        r2 = gc[1] # pulling out the ring
         pnt = gc[2] # pulling the point from the geometry collection
 
         # Now lets create a MultiPolygon from the geometry collection components
         mpoly = MultiPolygon(gc[0], Polygon(gc[1]))
         self.assertEqual(polyc.wkt, mpoly[0].wkt)
+        self.assertEqual(linringc.wkt, mpoly[1][0].wkt) # deep-indexed ring
 
         # Should no longer be able to access the geometry collection directly
         self.assertRaises(GEOSException, len, gc)
         
-        # BUT, should still be able to access the Point we obtained earlier, but
-        #  not the linear ring (since it is now part of the MultiPolygon.
+        # BUT, should still be able to access the Point we obtained earlier, 
+        #  however, not the linear ring (since it is now part of the 
+        #  MultiPolygon).
         self.assertEqual(5, pnt.x)
         self.assertEqual(23, pnt.y)
-
-        # __len__ is called on the coordinate sequence pointer -- make sure its nullified as well
-        self.assertRaises(GEOSException, len, r1)
-        self.assertRaises(GEOSException, str, r1)
+        for tmpr in [r1, r2]:
+            # __len__ is called on the coordinate sequence pointer -- 
+            #  making sure its nullified as well
+            self.assertRaises(GEOSException, len, tmpr)
+            self.assertRaises(GEOSException, str, tmpr)
 
         # Can't access point after deletion of parent geometry.
         del gc
         self.assertRaises(GEOSException, str, pnt)
 
         # Cleaning up.
-        del polyc
-        del mpoly
+        del polyc, mpoly
 
+    def test06c_memory_hijinks(self):
+        "Testing __init__ using other Geometries as parameters."
         #### Memory issues with creating geometries from coordinate sequences within other geometries
 
         # Creating the initial polygon from the following tuples, and then pulling out
@@ -388,18 +399,42 @@ class GEOSTest(unittest.TestCase):
 
         # BUT, the second hole is still accessible.
         self.assertEqual(itup2, hole2.tuple)
-        
+
         # Deleting the first polygon, and ensuring that
         #  the second hole is now gone for good.
-        del poly1
+        del poly1, poly2
         self.assertRaises(GEOSException, str, hole2)
+
+        #### Testing creating Geometries w/"deep-indexed" rings ####
+        mpoly = MultiPolygon(Polygon(LinearRing(ext_tup), LinearRing(itup1), LinearRing(itup2)),
+                             Polygon(LinearRing(itup1)))
+
+        r0 = mpoly[0][1] # itup1, left alone
+        r1 = mpoly[0][0] # ext_tup
+        r2 = mpoly[1][0] # itup1
+        r3 = mpoly[0][2] # itup2
+
+        # Using the rings of the multipolygon to create a new Polygon, should
+        #  no longer be able to access the MultiPolygon or the ring objects 
+        #  used in initialization.
+        p1 = Polygon(r1, r2, r3)
+        for g in [mpoly, r1, r2, r3]:
+            self.assertRaises(GEOSException, len, g) 
+            self.assertRaises(GEOSException, str, g)
         
+        # However, the middle ring of the first Polygon was not used.
+        self.assertEqual(r0.tuple, itup1)
+        self.assertEqual(r0, p1[1])
+
+        # This deletes the leftover ring (or whenever mpoly is garbage collected)
+        del mpoly
+
     def test08_coord_seq(self):
         "Testing Coordinate Sequence objects."
         for p in polygons:
             if p.ext_ring_cs:
                 # Constructing the polygon and getting the coordinate sequence
-                poly = GEOSGeometry(p.wkt)
+                poly = fromstr(p.wkt)
                 cs = poly.exterior_ring.coord_seq
 
                 self.assertEqual(p.ext_ring_cs, cs.tuple) # done in the Polygon test too.
@@ -423,13 +458,13 @@ class GEOSTest(unittest.TestCase):
 
     def test09_relate_pattern(self):
         "Testing relate() and relate_pattern()."
-        g = GEOSGeometry('POINT (0 0)')
+        g = fromstr('POINT (0 0)')
         self.assertRaises(GEOSException, g.relate_pattern, 0, 'invalid pattern, yo')
 
         for i in xrange(len(relate_geoms)):
             g_tup = relate_geoms[i]
-            a = GEOSGeometry(g_tup[0].wkt)
-            b = GEOSGeometry(g_tup[1].wkt)
+            a = fromstr(g_tup[0].wkt)
+            b = fromstr(g_tup[1].wkt)
             pat = g_tup[2]
             result = g_tup[3]
             self.assertEqual(result, a.relate_pattern(b, pat))
@@ -439,9 +474,9 @@ class GEOSTest(unittest.TestCase):
         "Testing intersects() and intersection()."
         for i in xrange(len(topology_geoms)):
             g_tup = topology_geoms[i]
-            a = GEOSGeometry(g_tup[0].wkt)
-            b = GEOSGeometry(g_tup[1].wkt)
-            i1 = GEOSGeometry(intersect_geoms[i].wkt) 
+            a = fromstr(g_tup[0].wkt)
+            b = fromstr(g_tup[1].wkt)
+            i1 = fromstr(intersect_geoms[i].wkt) 
             self.assertEqual(True, a.intersects(b))
             i2 = a.intersection(b)
             self.assertEqual(i1, i2)
@@ -453,9 +488,9 @@ class GEOSTest(unittest.TestCase):
         "Testing union()."
         for i in xrange(len(topology_geoms)):
             g_tup = topology_geoms[i]
-            a = GEOSGeometry(g_tup[0].wkt)
-            b = GEOSGeometry(g_tup[1].wkt)
-            u1 = GEOSGeometry(union_geoms[i].wkt)
+            a = fromstr(g_tup[0].wkt)
+            b = fromstr(g_tup[1].wkt)
+            u1 = fromstr(union_geoms[i].wkt)
             u2 = a.union(b)
             self.assertEqual(u1, u2)
             self.assertEqual(u1, a | b) # __or__ is union operator
@@ -466,9 +501,9 @@ class GEOSTest(unittest.TestCase):
         "Testing difference()."
         for i in xrange(len(topology_geoms)):
             g_tup = topology_geoms[i]
-            a = GEOSGeometry(g_tup[0].wkt)
-            b = GEOSGeometry(g_tup[1].wkt)
-            d1 = GEOSGeometry(diff_geoms[i].wkt)
+            a = fromstr(g_tup[0].wkt)
+            b = fromstr(g_tup[1].wkt)
+            d1 = fromstr(diff_geoms[i].wkt)
             d2 = a.difference(b)
             self.assertEqual(d1, d2)
             self.assertEqual(d1, a - b) # __sub__ is difference operator
@@ -479,9 +514,9 @@ class GEOSTest(unittest.TestCase):
         "Testing sym_difference()."
         for i in xrange(len(topology_geoms)):
             g_tup = topology_geoms[i]
-            a = GEOSGeometry(g_tup[0].wkt)
-            b = GEOSGeometry(g_tup[1].wkt)
-            d1 = GEOSGeometry(sdiff_geoms[i].wkt)
+            a = fromstr(g_tup[0].wkt)
+            b = fromstr(g_tup[1].wkt)
+            d1 = fromstr(sdiff_geoms[i].wkt)
             d2 = a.sym_difference(b)
             self.assertEqual(d1, d2)
             self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
@@ -492,10 +527,10 @@ class GEOSTest(unittest.TestCase):
         "Testing buffer()."
         for i in xrange(len(buffer_geoms)):
             g_tup = buffer_geoms[i]
-            g = GEOSGeometry(g_tup[0].wkt)
+            g = fromstr(g_tup[0].wkt)
 
             # The buffer we expect
-            exp_buf = GEOSGeometry(g_tup[1].wkt)
+            exp_buf = fromstr(g_tup[1].wkt)
 
             # Can't use a floating-point for the number of quadsegs.
             self.assertRaises(TypeError, g.buffer, g_tup[2], float(g_tup[3]))
@@ -575,8 +610,8 @@ class GEOSTest(unittest.TestCase):
                 self.assertNotEqual(pnt, mp[i])
             del mp
 
-        # Multipolygons involve much more memory management because each
-        #  polygon w/in the collection has its own rings.
+        # MultiPolygons involve much more memory management because each
+        #  Polygon w/in the collection has its own rings.
         for tg in multipolygons:
             mpoly = fromstr(tg.wkt)
             for i in xrange(len(mpoly)):
@@ -592,12 +627,17 @@ class GEOSTest(unittest.TestCase):
                 self.assertRaises(GEOSException, str, tmp)
                 self.assertEqual(mpoly[i], new)
                 self.assertNotEqual(poly, mpoly[i])
-            del mpoly
+        
+            # Extreme (!!) __setitem__
+            mpoly[0][0][0] = (3.14, 2.71)
+            self.assertEqual((3.14, 2.71), mpoly[0][0][0])
+            # Doing it more slowly..
+            self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
 
+            del mpoly
     
     def test17_threed(self):
         "Testing three-dimensional geometries."
-        
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
         self.assertEqual((2.,3.,8.), pnt.coords)
@@ -632,7 +672,6 @@ class GEOSTest(unittest.TestCase):
 
     def test19_length(self):
         "Testing the length property."
-
         # Points have 0 length.
         pnt = Point(0, 0)
         self.assertEqual(0.0, pnt.length)

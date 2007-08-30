@@ -33,6 +33,7 @@ from django.contrib.gis.geos.base import GEOSGeometry
 from django.contrib.gis.geos.geometries import Point, LineString, LinearRing, Polygon, HAS_NUMPY
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.libgeos import geos_version
 
 def fromstr(wkt_or_hex, **kwargs):
     "Given a string value (wkt or hex), returns a GEOSGeometry object."

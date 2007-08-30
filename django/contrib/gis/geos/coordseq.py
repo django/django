@@ -1,14 +1,14 @@
-from django.contrib.gis.geos.libgeos import lgeos, GEOSPointer, HAS_NUMPY
+"""
+  This module houses the GEOSCoordSeq object, and is used internally
+   by GEOSGeometry to house the actual coordinates of the Point,
+   LineString, and LinearRing geometries.
+"""
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.libgeos import lgeos, HAS_NUMPY
+from django.contrib.gis.geos.pointer import GEOSPointer
 from ctypes import c_double, c_int, c_uint, byref
 from types import ListType, TupleType
 if HAS_NUMPY: from numpy import ndarray
-
-"""
-  This module houses the GEOSCoordSeq object, and is used internally
-  by GEOSGeometry to house the actual coordinates of the Point,
-  LineString, and LinearRing geometries.
-"""
 
 class GEOSCoordSeq(object):
     "The internal representation of a list of coordinates inside a Geometry."
@@ -31,18 +31,18 @@ class GEOSCoordSeq(object):
         return int(self.size)
 
     def __str__(self):
-        "The string representation of the coordinate sequence."
+        "Returns the string representation of the coordinate sequence."
         return str(self.tuple)
 
     def __getitem__(self, index):
-        "Can use the index [] operator to get coordinate sequence at an index."
+        "Returns the coordinate sequence value at the given index."
         coords = [self.getX(index), self.getY(index)]
         if self.dims == 3 and self._z:
             coords.append(self.getZ(index))
         return tuple(coords)
 
     def __setitem__(self, index, value):
-        "Can use the index [] operator to set coordinate sequence at an index."
+        "Sets the coordinate sequence value at the given index."
         # Checking the input value
         if isinstance(value, (ListType, TupleType)):
             pass
@@ -66,7 +66,7 @@ class GEOSCoordSeq(object):
 
     #### Internal Routines ####
     def _checkindex(self, index):
-        "Checks the index."
+        "Checks the given index."
         sz = self.size
         if (sz < 1) or (index < 0) or (index >= sz):
             raise GEOSGeometryIndexError, 'invalid GEOS Geometry index: %s' % str(index)
@@ -78,7 +78,7 @@ class GEOSCoordSeq(object):
 
     #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
-        "Gets the value for the given dimension and index."
+        "Returns the value for the given dimension and index."
         self._checkindex(index)
         self._checkdim(dimension)
 
@@ -152,7 +152,10 @@ class GEOSCoordSeq(object):
 
     @property
     def hasz(self):
-        "Inherits this from the parent geometry."
+        """
+        Returns whether this coordinate sequence is 3D.  This property value is
+         inherited from the parent Geometry.
+        """
         return self._z
 
     ### Other Methods ###
