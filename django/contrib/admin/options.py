@@ -118,7 +118,8 @@ class BaseModelAdmin(object):
     """Functionality common to both ModelAdmin and InlineAdmin."""
     raw_id_fields = ()
     fields = None
-
+    filter_vertical = ()
+    filter_horizontal = ()
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
@@ -177,8 +178,6 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     ordering = None
     prepopulated_fields = {}
-    filter_vertical = ()
-    filter_horizontal = ()
     inlines = []
 
     def __init__(self, model):
