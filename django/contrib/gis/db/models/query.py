@@ -17,8 +17,6 @@ class GeoQ(Q):
 class GeoQuerySet(QuerySet):
     "Geographical-enabled QuerySet object."
     
-    quote_name = connection.ops.quote_name
-
     #### Overloaded QuerySet Routines ####
     def __init__(self, model=None):
         super(GeoQuerySet, self).__init__(model=model)
@@ -47,6 +45,7 @@ class GeoQuerySet(QuerySet):
         return clone
 
     def _get_sql_clause(self):
+        qn = connection.ops.quote_name
         opts = self.model._meta
 
         # Construct the fundamental parts of the query: SELECT X FROM Y WHERE Z.
@@ -81,10 +80,10 @@ class GeoQuerySet(QuerySet):
 
         # Add any additional SELECTs.
         if self._select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), self.quote_name(s[0])) for s in self._select.items()])
+            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in self._select.items()])
 
         # Start composing the body of the SQL statement.
-        sql = [" FROM", self.quote_name(opts.db_table)]
+        sql = [" FROM", qn(opts.db_table)]
 
         # Compose the join dictionary into SQL describing the joins.
         if joins:
@@ -107,7 +106,7 @@ class GeoQuerySet(QuerySet):
             ordering_to_use = opts.ordering
         for f in handle_legacy_orderlist(ordering_to_use):
             if f == '?': # Special case.
-                order_by.append(backend.get_random_function_sql())
+                order_by.append(connection.ops.random_function_sql())
             else:
                 if f.startswith('-'):
                     col_name = f[1:]
@@ -117,21 +116,21 @@ class GeoQuerySet(QuerySet):
                     order = "ASC"
                 if "." in col_name:
                     table_prefix, col_name = col_name.split('.', 1)
-                    table_prefix = self.quote_name(table_prefix) + '.'
+                    table_prefix = qn(table_prefix) + '.'
                 else:
                     # Use the database table as a column prefix if it wasn't given,
                     # and if the requested column isn't a custom SELECT.
                     if "." not in col_name and col_name not in (self._select or ()):
-                        table_prefix = self.quote_name(opts.db_table) + '.'
+                        table_prefix = qn(opts.db_table) + '.'
                     else:
                         table_prefix = ''
-                order_by.append('%s%s %s' % (table_prefix, self.quote_name(orderfield2column(col_name, opts)), order))
+                order_by.append('%s%s %s' % (table_prefix, qn(orderfield2column(col_name, opts)), order))
         if order_by:
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
         if self._limit is not None:
-            sql.append("%s " % backend.get_limit_offset_sql(self._limit, self._offset))
+            sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
         else:
             assert self._offset is None, "'offset' is not allowed without 'limit'"
 
@@ -144,8 +143,9 @@ class GeoQuerySet(QuerySet):
 
     #### Methods specific to the GeoQuerySet ####
     def _field_column(self, field):
-        return "%s.%s" % (self.quote_name(self.model._meta.db_table),
-                          self.quote_name(field.column))
+        qn = connection.ops.quote_name
+        return "%s.%s" % (qn(self.model._meta.db_table),
+                          qn(field.column))
     
     def kml(self, field_name, precision=8):
         """Returns KML representation of the given field name in a `kml` 
@@ -176,7 +176,7 @@ class GeoQuerySet(QuerySet):
         #  override the geometry column returned from the database.
         self._custom_select[field.column] = \
             '(ST_Transform(%s, %s)) AS %s' % (self._field_column(field), srid, 
-                                              self.quote_name(field.column))
+                                              connection.ops.quote_name(field.column))
         return self._clone()
 
     

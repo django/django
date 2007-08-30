@@ -6,7 +6,7 @@ from commands import getstatusoutput
 import os, re, sys
 
 def create_lang(db_name, verbosity=1):
-    "This sets up the pl/pgsql language on the given database."
+    "Sets up the pl/pgsql language on the given database."
 
     # Getting the command-line options for the shell command
     options = get_cmd_options(db_name)
@@ -50,8 +50,11 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
     
 created_regex = re.compile(r'^createdb: database creation failed: ERROR:  database ".+" already exists')
 def _create_with_shell(db_name, verbosity=1, autoclobber=False):
-    """If no spatial database already exists, then using a cursor will not work.  Thus, a
-    `createdb` command will be issued through the shell to bootstrap the database."""
+    """
+    If no spatial database already exists, then using a cursor will not work.  
+     Thus, a `createdb` command will be issued through the shell to bootstrap 
+     creation of the spatial database.
+    """
 
     # Getting the command-line options for the shell command
     options = get_cmd_options(False)
@@ -80,7 +83,7 @@ def _create_with_shell(db_name, verbosity=1, autoclobber=False):
             raise Exception, 'Unknown error occurred in creating database: %s' % output
 
 def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=False):
-    "This Python routine creates a spatial database based on settings.py."
+    "Creates a spatial database based on the settings."
 
     # Making sure we're using PostgreSQL and psycopg2
     if settings.DATABASE_ENGINE != 'postgresql_psycopg2':
@@ -119,7 +122,10 @@ def create_spatial_db(test=False, verbosity=1, autoclobber=False, interactive=Fa
     cursor = connection.cursor()
     
 def drop_db(db_name=False, test=False):
-    "Using the cursor, drops the given database.  All exceptions will be propagated up."
+    """
+    Drops the given database (defaults to what is returned from get_spatial_db().
+     All exceptions are propagated up to the caller.
+    """
     if not db_name: db_name = get_spatial_db(test=test)
     cursor = connection.cursor()
     cursor.execute("DROP DATABASE %s" % connection.ops.quote_name(db_name))
@@ -138,8 +144,10 @@ def get_cmd_options(db_name):
     return options
 
 def get_spatial_db(test=False):
-    """This routine returns the name of the spatial database.
-    Set the 'test' keyword for the test spatial database name."""
+    """
+    Returns the name of the spatial database.  The 'test' keyword may be set 
+     to return the test spatial database name.
+    """
     if test:
         if settings.TEST_DATABASE_NAME:
             test_db_name = settings.TEST_DATABASE_NAME
@@ -152,7 +160,10 @@ def get_spatial_db(test=False):
         return settings.DATABASE_NAME
 
 def load_postgis_sql(db_name, verbosity=1):
-    "This routine loads up the PostGIS SQL files lwpostgis.sql and spatial_ref_sys.sql."
+    """"
+    This routine loads up the PostGIS SQL files lwpostgis.sql and 
+     spatial_ref_sys.sql.
+    """
 
     # Getting the path to the PostGIS SQL
     try:
@@ -160,7 +171,9 @@ def load_postgis_sql(db_name, verbosity=1):
         #   PostGIS SQL files are located
         sql_path = settings.POSTGIS_SQL_PATH
     except AttributeError:
-        sql_path = '/usr/local/share'
+        status, sql_path = getstatusoutput('pg_config --sharedir')
+        if status != 0:
+            sql_path = '/usr/local/share'
 
     # The PostGIS SQL post-creation files.
     lwpostgis_file = os.path.join(sql_path, 'lwpostgis.sql')

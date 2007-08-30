@@ -13,9 +13,9 @@
 """
 from django.conf import settings
 from django.db import connection
-from django.db.models.query import LOOKUP_SEPARATOR, field_choices, find_field, FieldFound, QUERY_TERMS, get_where_clause
+from django.db.models.query import field_choices, find_field, get_where_clause, \
+    FieldFound, LOOKUP_SEPARATOR, QUERY_TERMS
 from django.utils.datastructures import SortedDict
-qn = connection.ops.quote_name
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
@@ -30,7 +30,7 @@ else:
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py
 #  counterparts to support constructing SQL for geographic queries.
 #
-# Status: Synced with r5609.
+# Status: Synced with r5982.
 #
 def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
@@ -90,6 +90,7 @@ def parse_lookup(kwarg_items, opts):
     return joins, where, params
 
 def lookup_inner(path, lookup_type, value, opts, table, column):
+    qn = connection.ops.quote_name
     joins, where, params = SortedDict(), [], []
     current_opts = opts
     current_table = table
@@ -246,6 +247,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         else:
             # Last query term was a normal field.
             column = field.column
+            db_type = field.db_type()
 
         # If the field is a geometry field, then the WHERE clause will need to be obtained
         # with the get_geo_where_clause()
