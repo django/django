@@ -1,8 +1,6 @@
 from django import oldforms, template
 from django import newforms as forms
 from django.newforms.formsets import all_valid
-from django.newforms.models import inline_formset
-from django.newforms.widgets import Media, MediaDefiningClass
 from django.contrib.admin import widgets
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -67,8 +65,8 @@ class Fieldset(object):
     def _media(self):
         from django.conf import settings
         if 'collapse' in self.classes:
-            return Media(js=['%sjs/admin/CollapsedFieldsets.js' % settings.ADMIN_MEDIA_PREFIX])
-        return Media()
+            return forms.Media(js=['%sjs/admin/CollapsedFieldsets.js' % settings.ADMIN_MEDIA_PREFIX])
+        return forms.Media()
     media = property(_media)
     
 class BoundFieldset(object):
@@ -165,7 +163,7 @@ class BaseModelAdmin(object):
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
-    __metaclass__ = MediaDefiningClass
+    __metaclass__ = forms.MediaDefiningClass
     
     list_display = ('__str__',)
     list_display_links = ()
@@ -220,7 +218,7 @@ class ModelAdmin(BaseModelAdmin):
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['js/SelectBox.js' , 'js/SelectFilter2.js'])
         
-        return Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
+        return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
     
     def fieldsets(self, request):
@@ -613,7 +611,7 @@ class ModelAdmin(BaseModelAdmin):
     def get_inline_formsets(self):
         inline_formset_classes = []
         for opts in self.inlines:
-            inline = inline_formset(self.model, opts.model, formfield_callback=opts.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
+            inline = forms.inline_formset(self.model, opts.model, formfield_callback=opts.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
             inline_formset_classes.append(inline)
         return inline_formset_classes
 

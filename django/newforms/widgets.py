@@ -17,7 +17,7 @@ from util import flatatt
 from urlparse import urljoin
 
 __all__ = (
-    'Media', 'Widget', 'TextInput', 'PasswordInput',
+    'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
     'FileInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',

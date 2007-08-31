@@ -2,6 +2,8 @@ from forms import Form, ValidationError
 from fields import IntegerField, BooleanField
 from widgets import HiddenInput, Media
 
+__all__ = ('BaseFormSet', 'formset_for_form', 'all_valid')
+
 # special field names
 FORM_COUNT_FIELD_NAME = 'COUNT'
 ORDERING_FIELD_NAME = 'ORDER'

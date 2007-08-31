@@ -15,7 +15,7 @@ from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 
 __all__ = (
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
-    'ModelChoiceField', 'ModelMultipleChoiceField'
+    'ModelChoiceField', 'ModelMultipleChoiceField', 'inline_formset'
 )
 
 def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
