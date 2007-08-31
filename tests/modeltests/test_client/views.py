@@ -48,7 +48,12 @@ def raw_post_view(request):
 
 def redirect_view(request):
     "A view that redirects all requests to the GET view"
-    return HttpResponseRedirect('/test_client/get_view/')
+    if request.GET:
+        from urllib import urlencode
+        query = '?' + urlencode(request.GET, True)
+    else:
+        query = ''
+    return HttpResponseRedirect('/test_client/get_view/' + query)
 
 def double_redirect_view(request):
     "A view that redirects all requests to a redirection view"

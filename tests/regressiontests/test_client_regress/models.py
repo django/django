@@ -112,6 +112,14 @@ class AssertRedirectsTests(TestCase):
             self.assertRedirects(response, '/test_client/get_view/')
         except AssertionError, e:
             self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
+    
+    def test_lost_query(self):
+        "An assertion is raised if the redirect location doesn't preserve GET parameters"
+        response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
+        try:
+            self.assertRedirects(response, '/test_client/get_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response redirected to '/test_client/get_view/?var=value', expected '/test_client/get_view/'")
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"

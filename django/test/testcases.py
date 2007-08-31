@@ -1,5 +1,6 @@
 import re, unittest
-from urlparse import urlparse
+from urlparse import urlsplit
+from django.http import QueryDict
 from django.db import transaction
 from django.core import mail
 from django.core.management import call_command
@@ -60,18 +61,26 @@ class TestCase(unittest.TestCase):
         self._pre_setup()
         super(TestCase, self).__call__(result)
 
-    def assertRedirects(self, response, expected_path, status_code=302, target_status_code=200):
+    def assertRedirects(self, response, expected_url, status_code=302, target_status_code=200):
         """Assert that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
         
+        Note that assertRedirects won't work for external links since it uses 
+        TestClient to do a request.
         """
         self.assertEqual(response.status_code, status_code, 
             "Response didn't redirect as expected: Response code was %d (expected %d)" % 
                 (response.status_code, status_code))
-        scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
-        self.assertEqual(path, expected_path, 
-            "Response redirected to '%s', expected '%s'" % (path, expected_path))
-        redirect_response = self.client.get(path)
+        scheme, netloc, path, query, fragment = urlsplit(response['Location'])
+        url = path
+        if query:
+            url += '?' + query
+        if fragment:
+            url += '#' + fragment
+        self.assertEqual(url, expected_url, 
+            "Response redirected to '%s', expected '%s'" % (url, expected_url))
+        
+        redirect_response = self.client.get(path, QueryDict(query))
         self.assertEqual(redirect_response.status_code, target_status_code, 
             "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
                 (path, redirect_response.status_code, target_status_code))

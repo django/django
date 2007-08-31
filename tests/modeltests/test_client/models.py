@@ -86,6 +86,13 @@ class ClientTest(TestCase):
         
         # Check that the response was a 302 (redirect)
         self.assertRedirects(response, '/test_client/get_view/')
+    
+    def test_redirect_with_query(self):
+        "GET a URL that redirects with given GET parameters"
+        response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
+        
+        # Check if parameters are intact
+        self.assertRedirects(response, '/test_client/get_view/?var=value')
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
@@ -224,7 +231,7 @@ class ClientTest(TestCase):
         
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, '/accounts/login/')
+        self.assertRedirects(response, '/accounts/login/?next=/test_client/login_protected_view/')
         
         # Log in
         self.client.login(username='testclient', password='password')
@@ -261,7 +268,7 @@ class ClientTest(TestCase):
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, '/accounts/login/')
+        self.assertRedirects(response, '/accounts/login/?next=/test_client/login_protected_view/')
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
