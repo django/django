@@ -160,7 +160,7 @@ When you save an object, Django performs the following steps:
        is used to provide notification that an object has been successfully
        saved. (These signals are not yet documented.)
 
-Raw Saves
+Raw saves
 ~~~~~~~~~
 
 **New in Django development version**
