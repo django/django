@@ -15,7 +15,8 @@ from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 
 __all__ = (
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
-    'ModelChoiceField', 'ModelMultipleChoiceField', 'inline_formset'
+    'ModelChoiceField', 'ModelMultipleChoiceField', 'formset_for_model',
+    'inline_formset'
 )
 
 def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
@@ -304,7 +305,7 @@ class InlineFormset(BaseModelFormSet):
         new_obj = self.model(**kwargs)
         return save_instance(form, new_obj, commit=commit)
 
-def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, formfield_callback=lambda f: f.formfield()):
+def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orderable=False, deletable=True, formfield_callback=lambda f: f.formfield()):
     """
     Returns an ``InlineFormset`` for the given kwargs.
     
@@ -323,7 +324,10 @@ def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, form
         else:
             raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
     # let the formset handle object deletion by default
-    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields, formfield_callback=formfield_callback, extra=extra, deletable=True)
+    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields, 
+                                formfield_callback=formfield_callback, 
+                                extra=extra, orderable=orderable, 
+                                deletable=deletable)
     # HACK: remove the ForeignKey to the parent from every form
     # This should be done a line above before we pass 'fields' to formset_for_model
     # an 'omit' argument would be very handy here
