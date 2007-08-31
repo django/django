@@ -1,6 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
 import sys
+import os
 
 class CommandError(Exception):
     pass
@@ -121,7 +122,6 @@ class NoArgsCommand(BaseCommand):
 
 def copy_helper(style, app_or_project, name, directory, other_name=''):
     import django
-    import os
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -157,5 +157,15 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
             fp_new.close()
             try:
                 shutil.copymode(path_old, path_new)
+                _make_writeable(path_new)
             except OSError:
                 sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
+
+def _make_writeable(filename):
+    "Makes sure that the file is writeable. Useful if our source is read-only."
+    import stat
+    if not os.access(filename, os.W_OK):
+      st = os.stat(filename)
+      new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
+      os.chmod(filename, new_permissions)
+
