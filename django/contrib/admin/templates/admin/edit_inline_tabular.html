@@ -1,9 +1,10 @@
+{% load i18n %}
 {{ bound_inline.formset.management_form }}
 <fieldset class="module">
    <h2>{{ bound_inline.verbose_name_plural|capfirst|escape }}</h2>
    <table>
      <thead><tr>
-     {% if bound_inline.formset.deletable %}<th>Delete?</th>{% endif %}
+     {% if bound_inline.formset.deletable %}<th>{% trans "Delete" %}?</th>{% endif %}
      {% for field in bound_inline.fields %}
        {% if not field.is_hidden %}
          <th>{{ field.label|capfirst|escape }}</th>
