@@ -45,7 +45,7 @@ PROVINCE_CHOICES = (
     ('IM', 'Imperia'),
     ('IS', 'Isernia'),
     ('SP', 'La Spezia'),
-    ('AQ', u'L’Acquila'),
+    ('AQ', u'L’Aquila'),
     ('LT', 'Latina'),
     ('LE', 'Lecce'),
     ('LC', 'Lecco'),
