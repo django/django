@@ -234,7 +234,8 @@ class ClientTest(TestCase):
         self.assertRedirects(response, '/accounts/login/?next=/test_client/login_protected_view/')
         
         # Log in
-        self.client.login(username='testclient', password='password')
+        login = self.client.login(username='testclient', password='password')
+        self.assertTrue(login, 'Could not log in')
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')

@@ -182,6 +182,10 @@ class Client:
         if self.exc_info:
             raise self.exc_info[1], None, self.exc_info[2]
 
+        # Save the client and request that stimulated the response
+        response.client = self
+        response.request = request
+
         # Add any rendered template detail to the response
         # If there was only one template rendered (the most likely case),
         # flatten the list to a single element

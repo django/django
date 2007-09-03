@@ -212,7 +212,7 @@ class AssertFormErrorTests(TestCase):
         except AssertionError, e:
             self.assertEqual(str(e), "The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [u'Enter a valid e-mail address.'])")
 
-class AssertFileUploadTests(TestCase):
+class FileUploadTests(TestCase):
     def test_simple_upload(self):
         fd = open(os.path.join(os.path.dirname(__file__), "views.py"))
         post_data = {
@@ -221,3 +221,22 @@ class AssertFileUploadTests(TestCase):
         }
         response = self.client.post('/test_client_regress/file_upload/', post_data)
         self.assertEqual(response.status_code, 200)
+
+class LoginTests(TestCase):
+    fixtures = ['testdata']
+
+    def test_login_different_client(self):
+        "Check that using a different test client doesn't violate authentication"
+
+        # Create a second client, and log in.
+        c = Client()
+        login = c.login(username='testclient', password='password')
+        self.assertTrue(login, 'Could not log in')
+
+        # Get a redirection page with the second client.
+        response = c.get("/test_client_regress/login_protected_redirect_view/")
+        
+        # At this points, the self.client isn't logged in. 
+        # Check that assertRedirects uses the original client, not the 
+        # default client.
+        self.assertRedirects(response, "/test_client_regress/get_view/")

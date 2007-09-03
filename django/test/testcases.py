@@ -80,7 +80,9 @@ class TestCase(unittest.TestCase):
         self.assertEqual(url, expected_url, 
             "Response redirected to '%s', expected '%s'" % (url, expected_url))
         
-        redirect_response = self.client.get(path, QueryDict(query))
+        # Get the redirection page, using the same client that was used
+        # to obtain the original response.
+        redirect_response = response.client.get(path, QueryDict(query))
         self.assertEqual(redirect_response.status_code, target_status_code, 
             "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
                 (path, redirect_response.status_code, target_status_code))
