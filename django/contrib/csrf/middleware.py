@@ -40,7 +40,7 @@ class CsrfMiddleware(object):
     """
     
     def process_request(self, request):
-        if request.POST:
+        if request.method == 'POST':
             try:
                 session_id = request.COOKIES[settings.SESSION_COOKIE_NAME]
             except KeyError:
