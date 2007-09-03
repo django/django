@@ -383,7 +383,7 @@ Note the following:
       the SQL to the database.
 
 If you're interested, also run the following commands:
-    * ``python manage.py validate polls`` -- Checks for any errors in the
+    * ``python manage.py validate`` -- Checks for any errors in the
       construction of your models.
 
     * ``python manage.py sqlcustom polls`` -- Outputs any custom SQL statements
