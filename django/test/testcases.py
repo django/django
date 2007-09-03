@@ -10,6 +10,18 @@ from django.test.client import Client
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
 
+def to_list(value):
+    """
+    Puts value into a list if it's not already one.
+    Returns an empty list if value is None.
+    """
+    if value is None:
+        value = []
+    elif not isinstance(value, list):
+        value = [value]
+    return value
+
+
 class OutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         ok = doctest.OutputChecker.check_output(self, want, got, optionflags)
@@ -106,18 +118,14 @@ class TestCase(unittest.TestCase):
                 
     def assertFormError(self, response, form, field, errors):
         "Assert that a form used to render the response has a specific field error"
-        if not response.context:
-            self.fail('Response did not use any contexts to render the response')
+        # Put context(s) into a list to simplify processing.
+        contexts = to_list(response.context) 
+        if not contexts:
+            self.fail('Response did not use any contexts to render the'
+                      ' response')
 
-        # If there is a single context, put it into a list to simplify processing
-        if not isinstance(response.context, list):
-            contexts = [response.context]
-        else:
-            contexts = response.context
-
-        # If a single error string is provided, make it a list to simplify processing
-        if not isinstance(errors, list):
-            errors = [errors]
+        # Put error(s) into a list to simplify processing.
+        errors = to_list(errors)
         
         # Search all contexts for the error.
         found_form = False
@@ -144,24 +152,17 @@ class TestCase(unittest.TestCase):
             
     def assertTemplateUsed(self, response, template_name):
         "Assert that the template with the provided name was used in rendering the response"
-        if isinstance(response.template, list):
-            template_names = [t.name for t in response.template]
-            self.failUnless(template_name in template_names,
-                u"Template '%s' was not one of the templates used to render the response. Templates used: %s" %
-                    (template_name, u', '.join(template_names)))
-        elif response.template:
-            self.assertEqual(template_name, response.template.name,
-                u"Template '%s' was not used to render the response. Actual template was '%s'" %
-                    (template_name, response.template.name))
-        else:
+        template_names = [t.name for t in to_list(response.template)]
+        if not template_names:
             self.fail('No templates used to render the response')
+        self.failUnless(template_name in template_names,
+            (u"Template '%s' was not a template used to render the response."
+              " Actual template(s) used: %s") % (template_name,
+                                                 u', '.join(template_names)))
 
     def assertTemplateNotUsed(self, response, template_name):
         "Assert that the template with the provided name was NOT used in rendering the response"
-        if isinstance(response.template, list):            
-            self.failIf(template_name in [t.name for t in response.template],
-                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
-        elif response.template:
-            self.assertNotEqual(template_name, response.template.name,
-                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
-
+        template_names = [t.name for t in to_list(response.template)]
+        self.failIf(template_name in template_names,
+            (u"Template '%s' was used unexpectedly in rendering the"
+              " response") % template_name)

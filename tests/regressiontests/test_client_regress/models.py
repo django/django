@@ -75,7 +75,7 @@ class AssertTemplateUsedTests(TestCase):
         try:
             self.assertTemplateUsed(response, 'Empty POST Template')        
         except AssertionError, e:
-            self.assertEquals(str(e), "Template 'Empty POST Template' was not used to render the response. Actual template was 'Empty GET Template'")
+            self.assertEquals(str(e), "Template 'Empty POST Template' was not a template used to render the response. Actual template(s) used: Empty GET Template")
     
     def test_multiple_context(self):
         "Template assertions work when there are multiple contexts"
@@ -101,7 +101,7 @@ class AssertTemplateUsedTests(TestCase):
         try:
             self.assertTemplateUsed(response, "Valid POST Template")        
         except AssertionError, e:
-            self.assertEquals(str(e), "Template 'Valid POST Template' was not one of the templates used to render the response. Templates used: form_view.html, base.html")
+            self.assertEquals(str(e), "Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html")
 
 class AssertRedirectsTests(TestCase):
     def test_redirect_page(self):
