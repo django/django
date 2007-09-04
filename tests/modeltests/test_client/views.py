@@ -12,7 +12,7 @@ def get_view(request):
     "A simple view that expects a GET request, and returns a rendered template"
     t = Template('This is a test. {{ var }} is the value.', name='GET Template')
     c = Context({'var': request.GET.get('var', 42)})
-    
+
     return HttpResponse(t.render(c))
 
 def post_view(request):
@@ -29,9 +29,9 @@ def post_view(request):
     else:
         t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()
-    
+
     return HttpResponse(t.render(c))
-    
+
 def raw_post_view(request):
     """A view which expects raw XML to be posted and returns content extracted
     from the XML"""
@@ -78,7 +78,7 @@ class TestForm(Form):
     value = fields.IntegerField()
     single = fields.ChoiceField(choices=TestChoices)
     multi = fields.MultipleChoiceField(choices=TestChoices)
-    
+
 def form_view(request):
     "A view that tests a simple form"
     if request.method == 'POST':
@@ -93,7 +93,7 @@ def form_view(request):
         form = TestForm(request.GET)
         t = Template('Viewing base form. {{ form }}.', name='Form GET Template')
         c = Context({'form': form})
-    
+
     return HttpResponse(t.render(c))
 
 def form_view_with_template(request):
@@ -107,26 +107,26 @@ def form_view_with_template(request):
     else:
         form = TestForm()
         message = 'GET form page'
-    return render_to_response('form_view.html', 
-        { 
+    return render_to_response('form_view.html',
+        {
             'form': form,
             'message': message
         }
     )
-        
+
 def login_protected_view(request):
     "A simple view that is login protected."
     t = Template('This is a login protected test. Username is {{ user.username }}.', name='Login Template')
     c = Context({'user': request.user})
-    
+
     return HttpResponse(t.render(c))
 login_protected_view = login_required(login_protected_view)
 
 def session_view(request):
     "A view that modifies the session"
     request.session['tobacconist'] = 'hovercraft'
-    
-    t = Template('This is a view that modifies the session.', 
+
+    t = Template('This is a view that modifies the session.',
                  name='Session Modifying View Template')
     c = Context()
     return HttpResponse(t.render(c))
@@ -137,25 +137,25 @@ def broken_view(request):
 
 def mail_sending_view(request):
     EmailMessage(
-        "Test message", 
-        "This is a test email", 
-        "from@example.com", 
+        "Test message",
+        "This is a test email",
+        "from@example.com",
         ['first@example.com', 'second@example.com']).send()
     return HttpResponse("Mail sent")
 
 def mass_mail_sending_view(request):
     m1 = EmailMessage(
-        'First Test message', 
-        'This is the first test email', 
-        'from@example.com', 
+        'First Test message',
+        'This is the first test email',
+        'from@example.com',
         ['first@example.com', 'second@example.com'])
     m2 = EmailMessage(
-        'Second Test message', 
-        'This is the second test email', 
-        'from@example.com', 
+        'Second Test message',
+        'This is the second test email',
+        'from@example.com',
         ['second@example.com', 'third@example.com'])
-    
+
     c = SMTPConnection()
     c.send_messages([m1,m2])
-    
+
     return HttpResponse("Mail sent")
