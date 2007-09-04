@@ -211,6 +211,27 @@ class AssertFormErrorTests(TestCase):
             self.assertFormError(response, 'form', 'email', 'Some error.')
         except AssertionError, e:
             self.assertEqual(str(e), "The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [u'Enter a valid e-mail address.'])")
+    
+    def test_unknown_nonfield_error(self):
+        """
+        Checks that an assertion is raised if the form's non field errors
+        doesn't contain the provided error.
+        """
+        post_data = {
+            'text': 'Hello World',
+            'email': 'not an email address',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Invalid POST Template")
+
+        try:
+            self.assertFormError(response, 'form', None, 'Some error.')
+        except AssertionError, e:
+            self.assertEqual(str(e), "The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )")        
 
 class FileUploadTests(TestCase):
     def test_simple_upload(self):
