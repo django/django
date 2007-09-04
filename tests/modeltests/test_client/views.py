@@ -1,10 +1,11 @@
 from xml.dom.minidom import parseString
+
 from django.core.mail import EmailMessage, SMTPConnection
 from django.template import Context, Template
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.newforms.forms import Form
-from django.newforms import fields
+from django.newforms import fields, ValidationError
 from django.shortcuts import render_to_response
 
 def get_view(request):
