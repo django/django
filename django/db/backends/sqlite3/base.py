@@ -1,5 +1,9 @@
 """
-SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
+SQLite3 backend for django.
+
+Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
+
+Python 2.5 and later use the sqlite3 module in the standard library.
 """
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util

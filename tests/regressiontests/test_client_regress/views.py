@@ -1,5 +1,6 @@
+from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage, SMTPConnection
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
 
 def no_template_view(request):
@@ -18,3 +19,12 @@ def file_upload_view(request):
     else:
         return HttpResponseServerError()
 
+def get_view(request):
+    "A simple login protected view"    
+    return HttpResponse("Hello world")
+get_view = login_required(get_view)
+
+def login_protected_redirect_view(request):
+    "A view that redirects all requests to the GET view"
+    return HttpResponseRedirect('/test_client_regress/get_view/')
+login_protected_redirect_view = login_required(login_protected_redirect_view)
