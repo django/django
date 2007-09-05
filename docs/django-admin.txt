@@ -619,32 +619,3 @@ distribution. It enables tab-completion of ``django-admin.py`` and
     * Press [TAB] to see all available options.
     * Type ``sql``, then [TAB], to see all available options whose names start
       with ``sql``.
-
-Customized actions
-==================
-
-**New in Django development version**
-
-If you want to add an action of your own to ``manage.py``, you can.
-Simply add a ``management/commands`` directory to your application.
-Each python module in that directory will be discovered and registered as
-a command that can be executed as an action when you run ``manage.py``::
-
-    /fancy_blog
-        __init__.py
-        models.py
-        /management
-            __init__.py
-            /commands
-                __init__.py
-                explode.py
-        views.py
-        
-In this example, ``explode`` command will be made available to any project
-that includes the ``fancy_blog`` application in ``settings.INSTALLED_APPS``.
-
-The ``explode.py`` module has only one requirement -- it must define a class
-called ``Command`` that extends ``django.core.management.base.BaseCommand``.
-
-For more details on how to define your own commands, look at the code for the
-existing ``django-admin.py`` commands, in ``/django/core/management/commands``.

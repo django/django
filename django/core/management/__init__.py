@@ -1,5 +1,4 @@
 import django
-from django.core.management.base import CommandError
 from optparse import OptionParser
 import os
 import sys
@@ -8,61 +7,13 @@ import textwrap
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
 
-# A cache of loaded commands, so that call_command 
-# doesn't have to reload every time it is called
-_commands = None
-    
-def find_commands(path):
-    """
-    Given a path to a management directory, return a list of all the command names 
-    that are available. Returns an empty list if no commands are defined.
-    """
-    command_dir = os.path.join(path, 'commands')
-    try:
-        return [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
-    except OSError:
-        return []
-
-def load_command_class(module, name):
+def load_command_class(name):
     """
     Given a command name, returns the Command class instance. Raises
-    Raises ImportError if a command module doesn't exist, or AttributeError
-    if a command module doesn't contain a Command instance.
+    ImportError if it doesn't exist.
     """
-    # Let any errors propogate.
-    return getattr(__import__('%s.management.commands.%s' % (module, name), {}, {}, ['Command']), 'Command')()
-
-def get_commands(load_user_commands=True):
-    """
-    Returns a dictionary of instances of all available Command classes.
-    Core commands are always included; user-register commands will also
-    be included if ``load_user_commands`` is True.
-
-    This works by looking for a management.commands package in 
-    django.core, and in each installed application -- if a commands 
-    package exists, it loads all commands in that application.
-
-    The dictionary is in the format {name: command_instance}.
-    
-    The dictionary is cached on the first call, and reused on subsequent
-    calls.
-    """
-    global _commands
-    if _commands is None:
-        _commands = dict([(name, load_command_class('django.core',name)) 
-                            for name in find_commands(__path__[0])])
-        if load_user_commands:
-            # Get commands from all installed apps
-            from django.db import models
-            for app in models.get_apps():
-                try:
-                    app_name = '.'.join(app.__name__.split('.')[:-1])
-                    path = os.path.join(os.path.dirname(app.__file__),'management')
-                    _commands.update(dict([(name, load_command_class(app_name,name)) 
-                                                    for name in find_commands(path)]))
-                except AttributeError:
-                    raise CommandError, "Management command '%s' in application '%s' doesn't contain a Command instance.\n" % (name, app_name)
-    return _commands
+    # Let the ImportError propogate.
+    return getattr(__import__('django.core.management.commands.%s' % name, {}, {}, ['Command']), 'Command')()
 
 def call_command(name, *args, **options):
     """
@@ -75,12 +26,9 @@ def call_command(name, *args, **options):
         call_command('shell', plain=True)
         call_command('sqlall', 'myapp')
     """
-    try:
-        command = get_commands()[name]
-    except KeyError:
-        raise CommandError, "Unknown command: %r\n" % name
-    return command.execute(*args, **options)
-    
+    klass = load_command_class(name)
+    return klass.execute(*args, **options)
+
 class ManagementUtility(object):
     """
     Encapsulates the logic of the django-admin.py and manage.py utilities.
@@ -89,12 +37,20 @@ class ManagementUtility(object):
     by editing the self.commands dictionary.
     """
     def __init__(self):
-        # The base management utility doesn't expose any user-defined commands
-        try:
-            self.commands = get_commands(load_user_commands=False)
-        except CommandError, e:
-            sys.stderr.write(str(e))
-            sys.exit(1)
+        self.commands = self.default_commands()
+
+    def default_commands(self):
+        """
+        Returns a dictionary of instances of all available Command classes.
+
+        This works by looking for and loading all Python modules in the
+        django.core.management.commands package.
+
+        The dictionary is in the format {name: command_instance}.
+        """
+        command_dir = os.path.join(__path__[0], 'commands')
+        names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
+        return dict([(name, load_command_class(name)) for name in names])
 
     def usage(self):
         """
@@ -177,11 +133,7 @@ class ProjectManagementUtility(ManagementUtility):
     represents django-admin.py.
     """
     def __init__(self, project_directory):
-        try:
-            self.commands = get_commands()
-        except CommandError, e:
-            sys.stderr.write(str(e))
-            sys.exit(1)
+        super(ProjectManagementUtility, self).__init__()
 
         # Remove the "startproject" command from self.commands, because
         # that's a django-admin.py command, not a manage.py command.
