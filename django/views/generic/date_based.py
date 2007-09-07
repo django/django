@@ -76,7 +76,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     if not date_list and not allow_empty:
         raise Http404
     if make_object_list:
-        object_list = queryset.filter(**lookup_kwargs).order_by(date_field)
+        object_list = queryset.filter(**lookup_kwargs)
     else:
         object_list = []
     if not template_name:
