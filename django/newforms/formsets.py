@@ -71,7 +71,7 @@ class BaseFormSet(object):
     def _get_change_forms(self):
         """Return a list of all the change forms in this ``FormSet``."""
         FormClass = self.form_class
-        if not hasattr(self, '_add_forms'):
+        if not hasattr(self, '_change_forms'):
             change_forms = []
             for i in range(0, self.change_form_count):
                 kwargs = {'auto_id': self.auto_id, 'prefix': self.add_prefix(i)}
