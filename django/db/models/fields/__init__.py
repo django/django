@@ -909,7 +909,7 @@ class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveSmallIntegerField]
 
-class SlugField(Field):
+class SlugField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
