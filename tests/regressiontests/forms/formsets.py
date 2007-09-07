@@ -48,6 +48,10 @@ True
 >>> formset.cleaned_data
 [{'votes': 100, 'choice': u'Calexico'}]
 
+If a FormSet was not passed any data, its is_valid method should return False.
+>>> formset = ChoiceFormSet()
+>>> formset.is_valid()
+False
 
 FormSet instances can also have an error attribute if validation failed for
 any of the forms.

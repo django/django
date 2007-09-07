@@ -153,6 +153,8 @@ class BaseFormSet(object):
         return '%s-%s' % (self.prefix, index)
 
     def is_valid(self):
+        if not self.is_bound:
+            return False
         self.full_clean()
         return self._is_valid
 
