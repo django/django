@@ -112,3 +112,19 @@ class Layer(object):
         return [ string_at(lgdal.OGR_Fld_GetNameRef(lgdal.OGR_FD_GetFieldDefn(self._ldefn, i)))
                  for i in xrange(self.num_fields) ]
     
+    #### Layer Methods ####
+    def get_fields(self, field_name):
+        """Returns a list containing the given field name for every Feature
+        in the Layer."""
+        if not field_name in self.fields:
+            raise OGRException, 'invalid field name: %s' % field_name
+        return [feat.get(field_name) for feat in self]
+
+    def get_geoms(self, geos=False):
+        """Returns a list containing the OGRGeometry for every Feature in
+        the Layer."""
+        if geos:
+            from django.contrib.gis.geos import fromstr
+            return [fromstr(feat.geom.wkt) for feat in self]
+        else:
+            return [feat.geom for feat in self]

@@ -1,35 +1,31 @@
-# OGR Error Codes
-OGRERR_NONE = 0
-OGRERR_NOT_ENOUGH_DATA = 1
-OGRERR_NOT_ENOUGH_MEMORY = 2
-OGRERR_UNSUPPORTED_GEOMETRY_TYPE = 3
-OGRERR_UNSUPPORTED_OPERATION = 4
-OGRERR_CORRUPT_DATA = 5
-OGRERR_FAILURE = 6
-OGRERR_UNSUPPORTED_SRS = 7
+"""
+  This module houses the OGR & SRS Exception objects, and the
+   check_err() routine which checks the status code returned by
+   OGR methods.
+"""
 
 # OGR & SRS Exceptions
 class OGRException(Exception): pass
 class SRSException(Exception): pass
 
-def check_err(code, msg=False):
-    "Checks the given OGRERR, and raises an exception where appropriate."
+# OGR Error Codes
+OGRERR_DICT = { 1 : (OGRException, 'Not enough data.'),
+                2 : (OGRException, 'Not enough memory.'),
+                3 : (OGRException, 'Unsupported geometry type.'),
+                4 : (OGRException, 'Unsupported operation.'),
+                5 : (OGRException, 'Corrupt data.'),
+                6 : (OGRException, 'OGR failure.'),
+                7 : (SRSException, 'Unsupported SRS.'),
+                }
+OGRERR_NONE = 0
 
+def check_err(code):
+    "Checks the given OGRERR, and raises an exception where appropriate."
+    
     if code == OGRERR_NONE:
         return
-    elif code == OGRERR_NOT_ENOUGH_DATA:
-        raise OGRException, 'Not enough data!'
-    elif code == OGRERR_NOT_ENOUGH_MEMORY:
-        raise OGRException, 'Not enough memory!'
-    elif code == OGRERR_UNSUPPORTED_GEOMETRY_TYPE:
-        raise OGRException, 'Unsupported Geometry Type!'
-    elif code == OGRERR_UNSUPPORTED_OPERATION:
-        raise OGRException, 'Unsupported Operation!'
-    elif code == OGRERR_CORRUPT_DATA:
-        raise OGRException, 'Corrupt Data!'
-    elif code == OGRERR_FAILURE:
-        raise OGRException, 'OGR Failure!'
-    elif code == OGRERR_UNSUPPORTED_SRS:
-        raise SRSException, 'Unsupported SRS!'
+    elif code in OGRERR_DICT:
+        e, msg = OGRERR_DICT[code]
+        raise e, msg
     else:
-        raise OGRException, 'Unknown error code: "%s"' % str(code)
+        raise OGRException, 'Unknown error code: "%s"' % code
