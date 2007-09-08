@@ -423,7 +423,7 @@ class IsValidDecimal(object):
         except DecimalException:
             raise ValidationError, _("Please enter a valid decimal number.")
 
-        pieces = str(val).split('.')
+        pieces = str(val).lstrip("-").split('.')
         decimals = (len(pieces) == 2) and len(pieces[1]) or 0
         digits = len(pieces[0])
 

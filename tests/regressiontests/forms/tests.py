@@ -1167,6 +1167,31 @@ ValidationError: [u'Ensure that there are no more than 2 decimal places.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure that there are no more than 2 digits before the decimal point.']
+>>> f.clean('-12.34')
+Decimal("-12.34")
+>>> f.clean('-123.45')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 4 digits in total.']
+>>> f.clean('-.12')
+Decimal("-0.12")
+>>> f.clean('-00.12')
+Decimal("-0.12")
+>>> f.clean('-000.12')
+Decimal("-0.12")
+>>> f.clean('-000.123')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 2 decimal places.']
+>>> f.clean('-000.1234')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure that there are no more than 4 digits in total.']
+>>> f.clean('--0.12')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
+
 >>> f = DecimalField(max_digits=4, decimal_places=2, required=False)
 >>> f.clean('')
 

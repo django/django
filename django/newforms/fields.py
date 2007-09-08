@@ -190,7 +190,7 @@ class DecimalField(Field):
             value = Decimal(value)
         except DecimalException:
             raise ValidationError(ugettext('Enter a number.'))
-        pieces = str(value).split('.')
+        pieces = str(value).lstrip("-").split('.')
         decimals = (len(pieces) == 2) and len(pieces[1]) or 0
         digits = len(pieces[0])
         if self.max_value is not None and value > self.max_value:
