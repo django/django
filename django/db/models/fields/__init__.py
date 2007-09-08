@@ -906,17 +906,14 @@ class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveSmallIntegerField]
 
-class SlugField(Field):
+class SlugField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
-        Field.__init__(self, *args, **kwargs)
-
-    def get_manipulator_field_objs(self):
-        return [oldforms.TextField]
+        super(SlugField, self).__init__(*args, **kwargs)
 
 class SmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
