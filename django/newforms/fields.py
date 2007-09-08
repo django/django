@@ -353,7 +353,7 @@ class UploadedFile(StrAndUnicode):
     def __init__(self, filename, content):
         self.filename = filename
         self.content = content
-        
+
     def __unicode__(self):
         """
         The unicode representation is the filename, so that the pre-database-insertion
@@ -396,7 +396,7 @@ class ImageField(FileField):
         except IOError: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
         return f
-        
+
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
@@ -526,7 +526,7 @@ class ComboField(Field):
 class MultiValueField(Field):
     """
     A Field that aggregates the logic of multiple Fields.
-    
+
     Its clean() method takes a "decompressed" list of values, which are then
     cleaned into a single value according to self.fields. Each value in
     this list is cleaned by the corresponding field -- the first value is
