@@ -308,7 +308,7 @@ on the filesystem. Has three special arguments, of which the first is
                             ``FilePathField`` will use to filter filenames.
                             Note that the regex will be applied to the
                             base filename, not the full path. Example:
-                            ``"foo.*\.txt^"``, which will match a file called
+                            ``"foo.*\.txt$"``, which will match a file called
                             ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
 
     ``recursive``           Optional. Either ``True`` or ``False``. Default is
@@ -1903,7 +1903,7 @@ as the value displayed to render an object in the Django admin site and as the
 value inserted into a template when it displays an object. Thus, you should
 always return a nice, human-readable string for the object's ``__str__``.
 Although this isn't required, it's strongly encouraged (see the description of
-``__unicode__``, below, before putting ``_str__`` methods everywhere).
+``__unicode__``, below, before putting ``__str__`` methods everywhere).
 
 For example::
 
