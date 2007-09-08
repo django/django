@@ -1,3 +1,11 @@
+import datetime
+import os
+import time
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
+
 from django.db import get_creation_module
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -12,11 +20,6 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.maxlength import LegacyMaxlength
-import datetime, os, time
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal    # for Python 2.3
 
 class NOT_PROVIDED:
     pass
@@ -382,7 +385,7 @@ class Field(object):
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
-        
+
     def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
@@ -785,10 +788,10 @@ class FileField(Field):
     def save_form_data(self, instance, data):
         if data:
             getattr(instance, "save_%s_file" % self.name)(data.filename, data.content, save=False)
-        
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
-        # If a file has been provided previously, then the form doesn't require 
+        # If a file has been provided previously, then the form doesn't require
         # that a new file is provided this time.
         if 'initial' in kwargs:
             defaults['required'] = False
