@@ -105,20 +105,3 @@ def field_widget(parser, token):
         raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
     return FieldWidgetNode(bits[1])
 field_widget = register.tag(field_widget)
-
-class InlineNode(template.Node):
-    def __init__(self, inline_var):
-        self.inline_var = inline_var
-
-    def render(self, context):
-        inline = context[self.inline_var]
-        t = loader.get_template(inline.template)
-        output = t.render(context)
-        return output
-
-def render_inline(parser, token):
-    bits = token.contents.split()
-    if len(bits) != 2:
-        raise template.TemplateSyntaxError, "%s takes 1 argument" % bits[0]
-    return InlineNode(bits[1])
-render_inline = register.tag(render_inline)

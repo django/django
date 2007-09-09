@@ -62,8 +62,8 @@
 
 {% block after_field_sets %}{% endblock %}
 
-{% for bound_inline in bound_inlines %}
-    {% render_inline bound_inline %}
+{% for inline_admin_formset in inline_admin_formsets %}
+    {% include inline_admin_formset.opts.template %}
 {% endfor %}
 
 {% block after_related_objects %}{% endblock %}
