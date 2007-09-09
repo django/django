@@ -122,6 +122,11 @@ Patch style
       English than in code. Indentation is the most common example; it's hard to
       read patches when the only difference in code is that it's indented.
 
+	* When creating patches, always run ``svn diff`` from the top-level
+	  ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
+	  ``tests``, ``AUTHORS``, etc. This makes it easy for other people to apply
+	  your patches.
+
     * Attach patches to a ticket in the `ticket tracker`_, using the "attach file"
       button. Please *don't* put the patch in the ticket description or comment
       unless it's a single line patch.
