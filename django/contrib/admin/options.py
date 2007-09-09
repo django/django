@@ -157,7 +157,7 @@ class BaseModelAdmin(object):
                 # Wrap the widget's render() method with a method that adds
                 # extra HTML to the end of the rendered output.
                 formfield = db_field.formfield(**kwargs)
-                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel)
+                formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel, self.admin_site)
                 return formfield
 
         # For any other type of field, just call its formfield() method.

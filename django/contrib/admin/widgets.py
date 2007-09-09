@@ -91,15 +91,17 @@ class RelatedFieldWidgetWrapper(object):
     This class is a wrapper whose __call__() method mimics the interface of a
     Widget's render() method.
     """
-    def __init__(self, render_func, rel):
+    def __init__(self, render_func, rel, admin_site):
         self.render_func, self.rel = render_func, rel
+        # so we can check if the related object is registered with this AdminSite
+        self.admin_site = admin_site
 
     def __call__(self, name, value, *args, **kwargs):
         from django.conf import settings
         rel_to = self.rel.to
         related_url = '../../../%s/%s/' % (rel_to._meta.app_label, rel_to._meta.object_name.lower())
         output = [self.render_func(name, value, *args, **kwargs)]
-        if rel_to._meta.admin: # If the related object has an admin interface:
+        if rel_to in self.admin_site._registry: # If the related object has an admin interface:
             # TODO: "id_" is hard-coded here. This should instead use the correct
             # API to determine the ID dynamically.
             output.append(u'<a href="%sadd/" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
