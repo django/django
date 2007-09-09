@@ -2,7 +2,7 @@ from django.core.management.base import LabelCommand
 
 class Command(LabelCommand):
     help = "Creates the table needed to use the SQL cache backend."
-    args = "[tablename]"
+    args = "<tablename>"
     label = 'tablename'
 
     requires_model_validation = False

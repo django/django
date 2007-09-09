@@ -1,8 +1,16 @@
 from django.core.management.base import BaseCommand, CommandError
 
+from optparse import make_option
+
 class Command(BaseCommand):
+    option_list = (
+        make_option('--format', default='json', dest='format',
+            help='Specifies the output serialization format for fixtures'),
+        make_option('--indent', default=None, dest='indent', type='int',
+            help='Specifies the indent level to use when pretty-printing output'),
+    )
     help = 'Output the contents of the database as a fixture of the given format.'
-    args = '[--format] [--indent] [appname ...]'
+    args = '[appname ...]'
 
     def handle(self, *app_labels, **options):
         from django.db.models import get_app, get_apps, get_models
