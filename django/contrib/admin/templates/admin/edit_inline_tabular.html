@@ -1,31 +1,31 @@
 {% load i18n %}
-{{ bound_inline.formset.management_form }}
+{{ inline_admin_formset.formset.management_form }}
 <fieldset class="module">
-   <h2>{{ bound_inline.verbose_name_plural|capfirst|escape }}</h2>
+   <h2>{{ inline_admin_formset.opts.get_label|capfirst|escape }}</h2>
    <table>
      <thead><tr>
-     {% if bound_inline.formset.deletable %}<th>{% trans "Delete" %}?</th>{% endif %}
-     {% for field in bound_inline.fields %}
+     {% if inline_admin_formset.formset.deletable %}<th>{% trans "Delete" %}?</th>{% endif %}
+     {% for field in inline_admin_formset.fields %}
        {% if not field.is_hidden %}
          <th>{{ field.label|capfirst|escape }}</th>
         {% endif %}
      {% endfor %}
      </tr></thead>
    
-     {% for bound_inline_object in bound_inline %}
+     {% for inline_admin_form in inline_admin_formset %}
    
         <!-- still need optional original object -->
         
-        {% if bound_inline_object.form.form.errors %}
+        {% if inline_admin_form.form.errors %}
            <tr class="errorlist"><td colspan="{{ bound_inline.fields|length }}">
-              {{ bound_inline_object.form.form.errors }}
+              {{ inline_admin_form.form.errors }}
            </tr>
         {% endif %}
         
         <tr class="{% cycle row1,row2 %}">
-        {{ bound_inline_object.pk_field.field }}
-        {% if bound_inline.formset.deletable %}<td>{{ bound_inline_object.deletion_field.field }}</td>{% endif %}
-        {% for bfset in bound_inline_object.form %}
+        {{ inline_admin_form.pk_field.field }}
+        {% if inline_admin_formset.formset.deletable %}<td>{{ inline_admin_form.deletion_field.field }}</td>{% endif %}
+        {% for bfset in inline_admin_form %}
           {% for line in bfset %}
             {% for field in line %}
               <td>{{ field.field }}</td>

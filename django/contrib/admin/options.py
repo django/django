@@ -118,6 +118,8 @@ class BaseModelAdmin(object):
     fields = None
     filter_vertical = ()
     filter_horizontal = ()
+    prepopulated_fields = {}
+
     def formfield_for_dbfield(self, db_field, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
@@ -161,6 +163,22 @@ class BaseModelAdmin(object):
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
 
+    def fieldsets(self, request):
+        """
+        Generator that yields Fieldset objects for use on add and change admin
+        form pages.
+
+        This default implementation looks at self.fields, but subclasses can
+        override this implementation and do something special based on the
+        given HttpRequest object.
+        """
+        if self.fields is None:
+            default_fields = [f.name for f in self.opts.fields + self.opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]
+            yield Fieldset(fields=default_fields)
+        else:
+            for name, options in self.fields:
+                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
+
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
     __metaclass__ = forms.MediaDefiningClass
@@ -175,12 +193,16 @@ class ModelAdmin(BaseModelAdmin):
     save_as = False
     save_on_top = False
     ordering = None
-    prepopulated_fields = {}
     inlines = []
 
-    def __init__(self, model):
+    def __init__(self, model, admin_site):
         self.model = model
         self.opts = model._meta
+        self.admin_site = admin_site
+        self.inline_instances = []
+        for inline_class in self.inlines:
+            inline_instance = inline_class(self.model, self.admin_site)
+            self.inline_instances.append(inline_instance)
 
     def __call__(self, request, url):
         # Check that LogEntry, ContentType and the auth context processor are installed.
@@ -221,22 +243,6 @@ class ModelAdmin(BaseModelAdmin):
         return forms.Media(js=['%s%s' % (settings.ADMIN_MEDIA_PREFIX, url) for url in js])
     media = property(_media)
     
-    def fieldsets(self, request):
-        """
-        Generator that yields Fieldset objects for use on add and change admin
-        form pages.
-
-        This default implementation looks at self.fields, but subclasses can
-        override this implementation and do something special based on the
-        given HttpRequest object.
-        """
-        if self.fields is None:
-            default_fields = [f.name for f in self.opts.fields + self.opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]
-            yield Fieldset(fields=default_fields)
-        else:
-            for name, options in self.fields:
-                yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
-
     def fieldsets_add(self, request):
         "Hook for specifying Fieldsets for the add form."
         return list(self.fieldsets(request))
@@ -427,14 +433,20 @@ class ModelAdmin(BaseModelAdmin):
         media = self.media + adminForm.media
         for fs in inline_formsets:
             media = media + fs.media
-            
+
+        inline_admin_formsets = []
+        for inline, formset in zip(self.inline_instances, inline_formsets):
+            fieldsets = list(inline.fieldsets(request))
+            inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
+            inline_admin_formsets.append(inline_admin_formset)
+
         c = template.RequestContext(request, {
             'title': _('Add %s') % opts.verbose_name,
             'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
             'media': media,
-            'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
+            'inline_admin_formsets': inline_admin_formsets,
         })
         return render_change_form(self, model, model.AddManipulator(), c, add=True)
 
@@ -497,7 +509,13 @@ class ModelAdmin(BaseModelAdmin):
         media = self.media + adminForm.media
         for fs in inline_formsets:
             media = media + fs.media
-            
+
+        inline_admin_formsets = []
+        for inline, formset in zip(self.inline_instances, inline_formsets):
+            fieldsets = list(inline.fieldsets(request))
+            inline_admin_formset = InlineAdminFormSet(inline, formset, fieldsets)
+            inline_admin_formsets.append(inline_admin_formset)
+
         c = template.RequestContext(request, {
             'title': _('Change %s') % opts.verbose_name,
             'adminform': adminForm,
@@ -505,7 +523,7 @@ class ModelAdmin(BaseModelAdmin):
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
             'media': media,
-            'bound_inlines': [BoundInline(i, fs) for i, fs in zip(self.inlines, inline_formsets)],
+            'inline_admin_formsets': inline_admin_formsets,
         })
         return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
 
@@ -609,11 +627,8 @@ class ModelAdmin(BaseModelAdmin):
         return render_to_response(template_list, extra_context, context_instance=template.RequestContext(request))
 
     def get_inline_formsets(self):
-        inline_formset_classes = []
-        for opts in self.inlines:
-            inline = forms.inline_formset(self.model, opts.model, formfield_callback=opts.formfield_for_dbfield, fields=opts.fields, extra=opts.extra)
-            inline_formset_classes.append(inline)
-        return inline_formset_classes
+        for inline in self.inline_instances:
+            yield inline.formset_class
 
 class InlineModelAdmin(BaseModelAdmin):
     """
@@ -623,54 +638,20 @@ class InlineModelAdmin(BaseModelAdmin):
     ``model`` to its parent. This is required if ``model`` has more than one
     ``ForeignKey`` to its parent.
     """
-    def __init__(self, model, name=None, extra=3, fields=None, template=None, raw_id_fields=None):
-        self.model = model
-        self.opts = model._meta
-        self.name = name
-        self.extra = extra
-        self.fields = fields
-        self.template = template or self.default_template
-        self.verbose_name = model._meta.verbose_name
-        self.verbose_name_plural = model._meta.verbose_name_plural
-        self.prepopulated_fields = {}
-        self.raw_id_fields = raw_id_fields or ()
+    model = None
+    fk_name = None
+    extra = 3
+    template = None
+    label = None
 
-class StackedInline(InlineModelAdmin):
-    default_template = 'admin/edit_inline_stacked.html'
+    def __init__(self, parent_model, admin_site):
+        self.admin_site = admin_site
+        self.parent_model = parent_model
+        self.opts = self.model._meta
+        # TODO: pass a fields arg into forms.inline_formset if/when we have one
+        self.formset_class = forms.inline_formset(parent_model, self.model, fk_name=self.fk_name, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
-class TabularInline(InlineModelAdmin):
-    default_template = 'admin/edit_inline_tabular.html'
-
-class BoundInline(object):
-    def __init__(self, inline_admin, formset):
-        self.inline_admin = inline_admin
-        self.formset = formset
-        self.template = inline_admin.template
-
-    def __iter__(self):
-        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
-            yield BoundInlineObject(self.formset, form, original, self.inline_admin)
-        for form in self.formset.add_forms:
-            yield BoundInlineObject(self.formset, form, None, self.inline_admin)
-
-    def fields(self):
-        return self.formset.form_class.base_fields.values()
-
-    def verbose_name(self):
-        return self.inline_admin.verbose_name
-
-    def verbose_name_plural(self):
-        return self.inline_admin.verbose_name_plural
-
-class BoundInlineObject(object):
-    def __init__(self, formset, form, original, inline_admin):
-        self.formset = formset
-        self.inline_admin = inline_admin
-        self.base_form = form
-        self.form = AdminForm(form, self.fieldsets(), inline_admin.prepopulated_fields)
-        self.original = original
-
-    def fieldsets(self):
+    def fieldsets(self, request):
         """
         Generator that yields Fieldset objects for use on add and change admin
         form pages.
@@ -679,20 +660,59 @@ class BoundInlineObject(object):
         override this implementation and do something special based on the
         given HttpRequest object.
         """
-        if self.inline_admin.fields is None:
-            default_fields = [f for f in self.base_form.base_fields]
-            yield Fieldset(fields=default_fields)
+        if self.fields is None:
+            yield Fieldset(fields=self.formset_class.form_class.base_fields)
         else:
-            for name, options in self.opts.fields:
+            for name, options in self.fields:
                 yield Fieldset(name, options['fields'], classes=options.get('classes', '').split(' '), description=options.get('description'))
 
+class StackedInline(InlineModelAdmin):
+    template = 'admin/edit_inline_stacked.html'
+
+    def get_label(self):
+        return self.label or self.model._meta.verbose_name
+
+class TabularInline(InlineModelAdmin):
+    template = 'admin/edit_inline_tabular.html'
+
+    def get_label(self):
+        return self.label or self.model._meta.verbose_name_plural
+
+class InlineAdminFormSet(object):
+    """
+    A wrapper around an inline formset for use in the admin system.
+    """
+    def __init__(self, inline, formset, fieldsets):
+        self.opts = inline
+        self.formset = formset
+        self.fieldsets = fieldsets
+
+    def __iter__(self):
+        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
+            yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, original)
+        for form in self.formset.add_forms:
+            yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, None)
+
+    def fields(self):
+        # TODO: this needs to respect the field order of self.fieldsets
+        return self.formset.form_class.base_fields.values()
+
+class InlineAdminForm(AdminForm):
+    """
+    A wrapper around an inline form for use in the admin system.
+    """
+    def __init__(self, formset, form, fieldsets, prepopulated_fields, original):
+        self.formset = formset
+        self.original = original
+        super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
+
     def pk_field(self):
-        return BoundField(self.base_form, self.formset._pk_field_name, False)
+        return BoundField(self.form, self.formset._pk_field_name, False)
 
     def deletion_field(self):
         from django.newforms.formsets import DELETION_FIELD_NAME
-        return BoundField(self.base_form, DELETION_FIELD_NAME, False)
+        return BoundField(self.form, DELETION_FIELD_NAME, False)
 
     def ordering_field(self):
         from django.newforms.formsets import ORDERING_FIELD_NAME
-        return BoundField(self.base_form, ORDERING_FIELD_NAME, False)
+        return BoundField(self.form, ORDERING_FIELD_NAME, False)

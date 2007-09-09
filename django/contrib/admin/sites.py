@@ -77,7 +77,7 @@ class AdminSite(object):
         for model in model_or_iterable:
             if model in self._registry:
                 raise AlreadyRegistered('The model %s is already registered' % model.__name__)
-            self._registry[model] = admin_class(model)
+            self._registry[model] = admin_class(model, self)
 
     def unregister(self, model_or_iterable):
         """

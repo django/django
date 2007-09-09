@@ -1,10 +1,12 @@
-{{ bound_inline.formset.management_form }}
-{% for bound_inline_object in bound_inline %}
+{{ inline_admin_formset.formset.management_form }}
+{% for inline_admin_form in inline_admin_formset %}
 <fieldset class="module aligned {{ bfset.fieldset.classes }}">
-  <h2>{{ bound_inline.verbose_name|title }}&nbsp;#{{ forloop.counter }}</h2>
-  {% for bfset in bound_inline_object.form %}
-      {% if bfset.fieldset.name %}<h2>{{ bfset.fieldset.name }}</h2>{% endif %}
-      {% if bfset.fieldset.description %}<div class="description">{{ bfset.fieldset.description }}</div>{% endif %}
+  <h2>{{ inline_admin_formset.opts.get_label|title }}&nbsp;#{{ forloop.counter }}</h2>
+  {% for bfset in inline_admin_form %}
+    <!-- fieldsets, headers, and descriptions are commented out until we have decent styles for them -->
+    <!--<fieldset>-->
+      <!--{% if bfset.fieldset.name %}<h2>{{ bfset.fieldset.name }}</h2>{% endif %}-->
+      <!--{% if bfset.fieldset.description %}<div class="description">{{ bfset.fieldset.description }}</div>{% endif %}-->
       {% for line in bfset %}
           <div class="form-row{% if line.errors %} errors{% endif %}">
           {{ line.errors }}
@@ -18,9 +20,10 @@
           {% endfor %}
           </div>
       {% endfor %}
-      {{ bound_inline_object.pk_field.field }}
-      {% if bound_inline.formset.deletable %}<div class="form-row">{{ bound_inline_object.deletion_field.field }} {{ bound_inline_object.deletion_field.label_tag }}</div>{% endif %}
+    <!--</fieldset>-->
   {% endfor %}
+  {{ inline_admin_form.pk_field.field }}
+  {% if inline_admin_formset.formset.deletable %}<div class="form-row">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</div>{% endif %}
 </fieldset>
 {% endfor %}
 
