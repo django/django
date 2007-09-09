@@ -143,7 +143,7 @@ Example usage::
 
     django-admin.py dumpdata --format=xml
 
-.. _Serialization formats: ../serialization/#Serialization-formats
+.. _Serialization formats: ../serialization/#serialization-formats
 
 --indent
 ~~~~~~~~
