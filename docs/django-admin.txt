@@ -390,8 +390,16 @@ means any Python code changes you make while the server is running will *not*
 take effect if the particular Python modules have already been loaded into
 memory.
 
-Examples:
-~~~~~~~~~
+Examples of using different ports and addresses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Port 8000 on IP address 127.0.0.1::
+
+	django-admin.py runserver
+
+Port 8000 on IP address 1.2.3.4::
+
+	django-admin.py runserver 1.2.3.4:8000
 
 Port 7000 on IP address 127.0.0.1::
 
