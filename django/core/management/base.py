@@ -1,13 +1,23 @@
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
+import itertools
+from optparse import make_option, OptionParser
 import sys
 import os
+from traceback import print_exc
 
 class CommandError(Exception):
     pass
 
 class BaseCommand(object):
     # Metadata about this command.
+    option_list = (
+        make_option('--settings',
+            help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
+        make_option('--pythonpath',
+            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
+    )
     help = ''
     args = ''
 
@@ -18,6 +28,43 @@ class BaseCommand(object):
 
     def __init__(self):
         self.style = color_style()
+
+    def get_version(self):
+        """
+        Returns the Django version, which should be correct for all built-in
+        Django commands. User-supplied commands should override this method.
+        """
+        return django.get_version()
+
+    def usage(self):
+        usage = '%prog [options] ' + self.args
+        if self.help:
+            return '%s\n\n%s' % (usage, self.help)
+        else:
+            return usage
+
+    def create_parser(self, prog_name):
+        return OptionParser(prog=prog_name,
+                            usage=self.usage(),
+                            version=self.get_version(),
+                            option_list=self.option_list)
+
+    def print_help(self, args):
+        parser = self.create_parser(args[0])
+        parser.print_help()
+
+    def run(self, args):
+        parser = self.create_parser(args[0])
+        (options, args) = parser.parse_args(args[1:])
+        if options.settings:
+            os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
+        if options.pythonpath:
+            sys.path.insert(0, options.pythonpath)
+        try:
+            self.execute(*args, **options.__dict__)
+        except Exception, e:
+            print_exc()
+            parser.print_usage()
 
     def execute(self, *args, **options):
         # Switch to English, because django-admin.py creates database content
@@ -69,7 +116,7 @@ class BaseCommand(object):
         raise NotImplementedError()
 
 class AppCommand(BaseCommand):
-    args = '[appname ...]'
+    args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
         from django.db import models
@@ -90,7 +137,7 @@ class AppCommand(BaseCommand):
         raise NotImplementedError()
 
 class LabelCommand(BaseCommand):
-    args = '[label ...]'
+    args = '<label label ...>'
     label = 'label'
 
     def handle(self, *labels, **options):
@@ -168,4 +215,3 @@ def _make_writeable(filename):
       st = os.stat(filename)
       new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
       os.chmod(filename, new_permissions)
-

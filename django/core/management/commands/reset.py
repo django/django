@@ -1,9 +1,14 @@
 from django.core.management.base import AppCommand, CommandError
 from django.core.management.color import no_style
+from optparse import make_option
 
 class Command(AppCommand):
+    option_list = AppCommand.option_list + (
+        make_option('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.'),
+    )
     help = "Executes ``sqlreset`` for the given app(s) in the current database."
-    args = '[--noinput] [appname ...]'
+    args = '[appname ...]'
 
     output_transaction = True
 

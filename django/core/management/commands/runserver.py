@@ -1,10 +1,17 @@
 from django.core.management.base import BaseCommand, CommandError
+from optparse import make_option
 import os
 import sys
 
 class Command(BaseCommand):
+    option_list = BaseCommand.option_list + (
+        make_option('--noreload', action='store_false', dest='use_reloader', default=True,
+            help='Tells Django to NOT use the auto-reloader.'),
+        make_option('--adminmedia', dest='admin_media_path', default='',
+            help='Specifies the directory from which to serve admin media.'),
+    )
     help = "Starts a lightweight Web server for development."
-    args = '[--noreload] [--adminmedia=ADMIN_MEDIA_PATH] [optional port number, or ipaddr:port]'
+    args = '[optional port number, or ipaddr:port]'
 
     # Validation is called explicitly each time the server is reloaded.
     requires_model_validation = False

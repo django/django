@@ -1,9 +1,11 @@
+import datetime
+import time
+
 from django.template import loader, RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.xheaders import populate_xheaders
 from django.db.models.fields import DateTimeField
 from django.http import Http404, HttpResponse
-import datetime, time
 
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
@@ -76,7 +78,7 @@ def archive_year(request, year, queryset, date_field, template_name=None,
     if not date_list and not allow_empty:
         raise Http404
     if make_object_list:
-        object_list = queryset.filter(**lookup_kwargs).order_by(date_field)
+        object_list = queryset.filter(**lookup_kwargs)
     else:
         object_list = []
     if not template_name:

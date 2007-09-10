@@ -32,6 +32,7 @@ ARTICLE_STATUS = (
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
+    slug = models.SlugField(max_length=20)
     url = models.CharField('The URL', max_length=40)
 
     def __unicode__(self):
@@ -45,6 +46,7 @@ class Writer(models.Model):
 
 class Article(models.Model):
     headline = models.CharField(max_length=50)
+    slug = models.SlugField()
     pub_date = models.DateField()
     created = models.DateField(editable=False)
     writer = models.ForeignKey(Writer)
@@ -79,9 +81,11 @@ __test__ = {'API_TESTS': """
 >>> f = CategoryForm()
 >>> print f
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
+<tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
 <tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
 >>> print f.as_ul()
 <li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" maxlength="20" /></li>
+<li><label for="id_slug">Slug:</label> <input id="id_slug" type="text" name="slug" maxlength="20" /></li>
 <li><label for="id_url">The URL:</label> <input id="id_url" type="text" name="url" maxlength="40" /></li>
 >>> print f['name']
 <input id="id_name" type="text" name="name" maxlength="20" />
@@ -89,24 +93,25 @@ __test__ = {'API_TESTS': """
 >>> f = CategoryForm(auto_id=False)
 >>> print f.as_ul()
 <li>Name: <input type="text" name="name" maxlength="20" /></li>
+<li>Slug: <input type="text" name="slug" maxlength="20" /></li>
 <li>The URL: <input type="text" name="url" maxlength="40" /></li>
 
->>> f = CategoryForm({'name': 'Entertainment', 'url': 'entertainment'})
+>>> f = CategoryForm({'name': 'Entertainment', 'slug': 'entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
-{'url': u'entertainment', 'name': u'Entertainment'}
+{'url': u'entertainment', 'name': u'Entertainment', 'slug': u'entertainment'}
 >>> obj = f.save()
 >>> obj
 <Category: Entertainment>
 >>> Category.objects.all()
 [<Category: Entertainment>]
 
->>> f = CategoryForm({'name': "It's a test", 'url': 'test'})
+>>> f = CategoryForm({'name': "It's a test", 'slug': 'its-test', 'url': 'test'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
-{'url': u'test', 'name': u"It's a test"}
+{'url': u'test', 'name': u"It's a test", 'slug': u'its-test'}
 >>> obj = f.save()
 >>> obj
 <Category: It's a test>
@@ -116,11 +121,11 @@ True
 If you call save() with commit=False, then it will return an object that
 hasn't yet been saved to the database. In this case, it's up to you to call
 save() on the resulting model instance.
->>> f = CategoryForm({'name': 'Third test', 'url': 'third'})
+>>> f = CategoryForm({'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
-{'url': u'third', 'name': u'Third test'}
+{'url': u'third', 'name': u'Third test', 'slug': u'third-test'}
 >>> obj = f.save(commit=False)
 >>> obj
 <Category: Third test>
@@ -131,9 +136,9 @@ True
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
 If you call save() with invalid data, you'll get a ValueError.
->>> f = CategoryForm({'name': '', 'url': 'foo'})
+>>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
 >>> f.errors
-{'name': [u'This field is required.']}
+{'name': [u'This field is required.'], 'slug': [u'This field is required.']}
 >>> f.cleaned_data
 Traceback (most recent call last):
 ...
@@ -142,7 +147,7 @@ AttributeError: 'CategoryForm' object has no attribute 'cleaned_data'
 Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
->>> f = CategoryForm({'name': '', 'url': 'foo'})
+>>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
 >>> f.save()
 Traceback (most recent call last):
 ...
@@ -160,6 +165,7 @@ fields with the 'choices' attribute are represented by a ChoiceField.
 >>> f = ArticleForm(auto_id=False)
 >>> print f
 <tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
+<tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
 <tr><th>Writer:</th><td><select name="writer">
 <option value="" selected="selected">---------</option>
@@ -210,7 +216,7 @@ current values are inserted as 'initial' data in each Field.
 >>> print f
 <tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br />Use both first and last names.</td></tr>
 
->>> art = Article(headline='Test article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
+>>> art = Article(headline='Test article', slug='test-article', pub_date=datetime.date(1988, 1, 4), writer=w, article='Hello.')
 >>> art.save()
 >>> art.id
 1
@@ -218,6 +224,7 @@ current values are inserted as 'initial' data in each Field.
 >>> f = TestArticleForm(auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
@@ -236,7 +243,7 @@ current values are inserted as 'initial' data in each Field.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
->>> f = TestArticleForm({'headline': u'Test headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
+>>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
 >>> f.is_valid()
 True
 >>> test_art = f.save()
@@ -248,10 +255,11 @@ u'Test headline'
 
 You can create a form over a subset of the available fields
 by specifying a 'fields' argument to form_for_instance.
->>> PartialArticleForm = form_for_instance(art, fields=('headline','pub_date'))
->>> f = PartialArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04'}, auto_id=False)
+>>> PartialArticleForm = form_for_instance(art, fields=('headline', 'slug', 'pub_date'))
+>>> f = PartialArticleForm({'headline': u'New headline', 'slug': 'new-headline', 'pub_date': u'1988-01-04'}, auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 >>> f.is_valid()
 True
@@ -272,6 +280,7 @@ Add some categories and test the many-to-many form output.
 >>> f = TestArticleForm(auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" value="1988-01-04" /></li>
 <li>Writer: <select name="writer">
 <option value="">---------</option>
@@ -291,7 +300,7 @@ Add some categories and test the many-to-many form output.
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 
->>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04',
+>>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']})
 >>> new_art = f.save()
 >>> new_art.id
@@ -301,7 +310,7 @@ Add some categories and test the many-to-many form output.
 [<Category: Entertainment>, <Category: It's a test>]
 
 Now, submit form data with no categories. This deletes the existing categories.
->>> f = TestArticleForm({'headline': u'New headline', 'pub_date': u'1988-01-04',
+>>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.'})
 >>> new_art = f.save()
 >>> new_art.id
@@ -312,7 +321,7 @@ Now, submit form data with no categories. This deletes the existing categories.
 
 Create a new article, with categories, via the form.
 >>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save()
 >>> new_art.id
@@ -323,7 +332,7 @@ Create a new article, with categories, via the form.
 
 Create a new article, with no categories, via the form.
 >>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.'})
 >>> new_art = f.save()
 >>> new_art.id
@@ -335,7 +344,7 @@ Create a new article, with no categories, via the form.
 Create a new article, with categories, via the form, but use commit=False.
 The m2m data won't be saved until save_m2m() is invoked on the form.
 >>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'pub_date': u'1967-11-01',
+>>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save(commit=False)
 
@@ -359,13 +368,14 @@ the Category model, we can use save_instance() to apply its changes to an
 existing Category instance.
 >>> class ShortCategory(Form):
 ...     name = CharField(max_length=5)
+...     slug = CharField(max_length=5)
 ...     url = CharField(max_length=3)
 >>> cat = Category.objects.get(name='Third test')
 >>> cat
 <Category: Third test>
 >>> cat.id
 3
->>> sc = ShortCategory({'name': 'Third', 'url': '3rd'})
+>>> sc = ShortCategory({'name': 'Third', 'slug': 'third', 'url': '3rd'})
 >>> save_instance(sc, cat)
 <Category: Third>
 >>> Category.objects.get(id=3)
@@ -378,6 +388,7 @@ the data in the database when the form is instantiated.
 >>> f = ArticleForm(auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>
@@ -402,6 +413,7 @@ the data in the database when the form is instantiated.
 <Writer: Carl Bernstein>
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" maxlength="50" /></li>
+<li>Slug: <input type="text" name="slug" maxlength="50" /></li>
 <li>Pub date: <input type="text" name="pub_date" /></li>
 <li>Writer: <select name="writer">
 <option value="" selected="selected">---------</option>

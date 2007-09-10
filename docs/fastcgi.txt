@@ -113,7 +113,7 @@ Running a preforked server on a Unix domain socket::
 
 Run without daemonizing (backgrounding) the process (good for debugging)::
 
-    ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock
+    ./manage.py runfcgi daemonize=false socket=/tmp/mysite.sock maxrequests=1
 
 Stopping the FastCGI daemon
 ---------------------------

@@ -78,7 +78,7 @@ you have some applications under ``/usr/local/django-apps/`` (for example,
 ``DJANGO_SETTINGS_MODULE`` as in the above example. In this case, you would
 need to write your ``PythonPath`` directive as::
 
-    PythonPath "['/var/production/django-apps/', '/var/www'] + sys.path"
+	PythonPath "['/usr/local/django-apps/', '/var/www'] + sys.path"
 
 With this path, ``import weblog`` and ``import mysite.settings`` will both
 work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
