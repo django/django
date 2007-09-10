@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
 class Command(BaseCommand):
-    option_list = (
+    option_list = BaseCommand.option_list + (
         make_option('--format', default='json', dest='format',
             help='Specifies the output serialization format for fixtures'),
         make_option('--indent', default=None, dest='indent', type='int',
