@@ -87,12 +87,12 @@ class ManagementUtility(object):
         if argv is None:
             argv = sys.argv
         try:
-            command_name = argv[1]
+            subcommand = argv[1]
         except IndexError:
             sys.stderr.write("Type '%s help' for usage.\n" % os.path.basename(argv[0]))
             sys.exit(1)
 
-        if command_name == 'help':
+        if subcommand == 'help':
             if len(argv) > 2:
                 self.fetch_command(argv[2], argv[0]).print_help(argv[2:])
             else:
@@ -104,7 +104,7 @@ class ManagementUtility(object):
         elif argv[1:] == ['--help']:
             self.print_help(argv)
         else:
-            self.fetch_command(command_name, argv[0]).run(argv[1:])
+            self.fetch_command(subcommand, argv[0]).run(argv[1:])
 
 class ProjectManagementUtility(ManagementUtility):
     """
