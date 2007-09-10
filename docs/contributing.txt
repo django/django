@@ -446,9 +446,7 @@ latest release. Thus, our policy is:
 
     **All documentation of new features should be written in a way that clearly
     designates the features are only available in the Django development
-    version.**
-
-    **Assume documentation readers are using the latest release, not the
+    version. Assume documentation readers are using the latest release, not the
     development version.**
 
 Our traditional way of marking new features is by prefacing the features'
