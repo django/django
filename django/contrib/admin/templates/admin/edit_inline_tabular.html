@@ -25,8 +25,8 @@
         <tr class="{% cycle row1,row2 %}">
         {{ inline_admin_form.pk_field.field }}
         {% if inline_admin_formset.formset.deletable %}<td>{{ inline_admin_form.deletion_field.field }}</td>{% endif %}
-        {% for bfset in inline_admin_form %}
-          {% for line in bfset %}
+        {% for fieldset in inline_admin_form %}
+          {% for line in fieldset %}
             {% for field in line %}
               <td>{{ field.field }}</td>
             {% endfor %}

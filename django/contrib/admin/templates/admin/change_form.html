@@ -40,11 +40,11 @@
     </p>
 {% endif %}
 
-{% for bfset in adminform %}
-    <fieldset class="module aligned {{ bfset.fieldset.classes }}">
-    {% if bfset.fieldset.name %}<h2>{{ bfset.fieldset.name }}</h2>{% endif %}
-    {% if bfset.fieldset.description %}<div class="description">{{ bfset.fieldset.description }}</div>{% endif %}
-    {% for line in bfset %}
+{% for fieldset in adminform %}
+    <fieldset class="module aligned {{ fieldset.classes }}">
+    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.description %}<div class="description">{{ fieldset.description }}</div>{% endif %}
+    {% for line in fieldset %}
         <div class="form-row{% if line.errors %} errors{% endif %}">
         {{ line.errors }}
         {% for field in line %}
