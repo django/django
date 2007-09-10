@@ -444,12 +444,12 @@ any documentation of *new* features will be seen by Django users who don't
 necessarily have access to those features yet, because they're only using the
 latest release. Thus, our policy is:
 
-    All documentation of new features should be written in a way that clearly
+    **All documentation of new features should be written in a way that clearly
     designates the features are only available in the Django development
-    version.
+    version.**
 
-    Assume documentation readers are using the latest release, not the
-    development version.
+    **Assume documentation readers are using the latest release, not the
+    development version.**
 
 Our traditional way of marking new features is by prefacing the features'
 documentation with: "New in Django development version." Changes aren't
