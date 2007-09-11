@@ -52,11 +52,7 @@ class AppCache(object):
             for app_name in settings.INSTALLED_APPS:
                 if app_name in self.handled:
                     continue
-                try:
-                    self.load_app(app_name, True)
-                except Exception, e:
-                    # Problem importing the app
-                    self.app_errors[app_name] = e
+                self.load_app(app_name, True)
             if not self.nesting_level:
                 for app_name in self.postponed:
                     self.load_app(app_name)

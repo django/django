@@ -73,18 +73,4 @@ doesn't come back.
 True
 >>> f.cleaned_data
 {'data': u'xyzzy'}
-
-#######################
-# Miscellaneous Tests #
-#######################
-
-There once was a problem with Form fields called "data". Let's make sure that
-doesn't come back.
->>> class DataForm(Form):
-...     data = CharField(max_length=10)
->>> f = DataForm({'data': 'xyzzy'})
->>> f.is_valid()
-True
->>> f.cleaned_data
-{'data': u'xyzzy'}
 """

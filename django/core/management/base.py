@@ -5,7 +5,6 @@ import itertools
 from optparse import make_option, OptionParser
 import sys
 import os
-from traceback import print_exc
 
 class CommandError(Exception):
     pass
@@ -36,35 +35,31 @@ class BaseCommand(object):
         """
         return django.get_version()
 
-    def usage(self):
-        usage = '%prog [options] ' + self.args
+    def usage(self, subcommand):
+        usage = '%%prog %s [options] %s' % (subcommand, self.args)
         if self.help:
             return '%s\n\n%s' % (usage, self.help)
         else:
             return usage
 
-    def create_parser(self, prog_name):
+    def create_parser(self, prog_name, subcommand):
         return OptionParser(prog=prog_name,
-                            usage=self.usage(),
+                            usage=self.usage(subcommand),
                             version=self.get_version(),
                             option_list=self.option_list)
 
-    def print_help(self, args):
-        parser = self.create_parser(args[0])
+    def print_help(self, prog_name, subcommand):
+        parser = self.create_parser(prog_name, subcommand)
         parser.print_help()
 
-    def run(self, args):
-        parser = self.create_parser(args[0])
-        (options, args) = parser.parse_args(args[1:])
+    def run_from_argv(self, argv):
+        parser = self.create_parser(argv[0], argv[1])
+        options, args = parser.parse_args(argv[2:])
         if options.settings:
             os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
         if options.pythonpath:
             sys.path.insert(0, options.pythonpath)
-        try:
-            self.execute(*args, **options.__dict__)
-        except Exception, e:
-            print_exc()
-            parser.print_usage()
+        self.execute(*args, **options.__dict__)
 
     def execute(self, *args, **options):
         # Switch to English, because django-admin.py creates database content

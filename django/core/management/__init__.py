@@ -2,7 +2,6 @@ import django
 from optparse import OptionParser
 import os
 import sys
-import textwrap
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
@@ -36,7 +35,9 @@ class ManagementUtility(object):
     A ManagementUtility has a number of commands, which can be manipulated
     by editing the self.commands dictionary.
     """
-    def __init__(self):
+    def __init__(self, argv=None):
+        self.argv = argv or sys.argv[:]
+        self.prog_name = os.path.basename(self.argv[0])
         self.commands = self.default_commands()
 
     def default_commands(self):
@@ -52,22 +53,21 @@ class ManagementUtility(object):
         names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
         return dict([(name, load_command_class(name)) for name in names])
 
-    def print_help(self, argv):
+    def main_help_text(self):
         """
-        Returns the help message, as a string.
+        Returns the script's main help text, as a string.
         """
-        prog_name = os.path.basename(argv[0])
-        usage = ['%s <subcommand> [options] [args]' % prog_name]
+        usage = ['%s <subcommand> [options] [args]' % self.prog_name]
         usage.append('Django command line tool, version %s' % django.get_version())
-        usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % prog_name)
+        usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
         usage.append('Available subcommands:')
         commands = self.commands.keys()
         commands.sort()
         for cmd in commands:
             usage.append('  %s' % cmd)
-        print '\n'.join(usage)
+        return '\n'.join(usage)
 
-    def fetch_command(self, subcommand, command_name):
+    def fetch_command(self, subcommand):
         """
         Tries to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
@@ -76,35 +76,34 @@ class ManagementUtility(object):
         try:
             return self.commands[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, command_name))
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, self.prog_name))
             sys.exit(1)
 
-    def execute(self, argv=None):
+    def execute(self):
         """
-        Figures out which command is being run (the first arg), creates a parser
-        appropriate to that command, and runs it.
+        Given the command-line arguments, this figures out which subcommand is
+        being run, creates a parser appropriate to that command, and runs it.
         """
-        if argv is None:
-            argv = sys.argv
         try:
-            command_name = argv[1]
+            subcommand = self.argv[1]
         except IndexError:
-            sys.stderr.write("Type '%s help' for usage.\n" % os.path.basename(argv[0]))
+            sys.stderr.write("Type '%s help' for usage.\n" % self.prog_name)
             sys.exit(1)
 
-        if command_name == 'help':
-            if len(argv) > 2:
-                self.fetch_command(argv[2], argv[0]).print_help(argv[2:])
+        if subcommand == 'help':
+            if len(self.argv) > 2:
+                self.fetch_command(self.argv[2]).print_help(self.prog_name, self.argv[2])
             else:
-                self.print_help(argv)
+                sys.stderr.write(self.main_help_text() + '\n')
+                sys.exit(1)
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
-        elif argv[1:] == ['--version']:
+        elif self.argv[1:] == ['--version']:
             print django.get_version()
-        elif argv[1:] == ['--help']:
-            self.print_help(argv)
+        elif self.argv[1:] == ['--help']:
+            sys.stderr.write(self.main_help_text() + '\n')
         else:
-            self.fetch_command(command_name, argv[0]).run(argv[1:])
+            self.fetch_command(subcommand).run_from_argv(self.argv)
 
 class ProjectManagementUtility(ManagementUtility):
     """
@@ -115,8 +114,8 @@ class ProjectManagementUtility(ManagementUtility):
     In practice, this class represents manage.py, whereas ManagementUtility
     represents django-admin.py.
     """
-    def __init__(self, project_directory):
-        super(ProjectManagementUtility, self).__init__()
+    def __init__(self, argv, project_directory):
+        super(ProjectManagementUtility, self).__init__(argv)
 
         # Remove the "startproject" command from self.commands, because
         # that's a django-admin.py command, not a manage.py command.
@@ -150,8 +149,8 @@ def execute_from_command_line(argv=None):
     """
     A simple method that runs a ManagementUtility.
     """
-    utility = ManagementUtility()
-    utility.execute(argv)
+    utility = ManagementUtility(argv)
+    utility.execute()
 
 def execute_manager(settings_mod, argv=None):
     """
@@ -159,5 +158,5 @@ def execute_manager(settings_mod, argv=None):
     project-specific django-admin.py utility.
     """
     project_directory = setup_environ(settings_mod)
-    utility = ProjectManagementUtility(project_directory)
-    utility.execute(argv)
+    utility = ProjectManagementUtility(argv, project_directory)
+    utility.execute()
