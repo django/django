@@ -14,9 +14,6 @@ class MergeDict(object):
                 pass
         raise KeyError
 
-    def __contains__(self, key):
-        return self.has_key(key)
-
     def __copy__(self):
         return self.__class__(*self.dicts)
 
@@ -45,6 +42,8 @@ class MergeDict(object):
             if key in dict:
                 return True
         return False
+    
+    __contains__ = has_key
 
     def copy(self):
         """ returns a copy of this object"""

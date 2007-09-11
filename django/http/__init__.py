@@ -38,11 +38,10 @@ class HttpRequest(object):
                 return d[key]
         raise KeyError, "%s not found in either POST or GET" % key
 
-    def __contains__(self, key):
+    def has_key(self, key):
         return key in self.GET or key in self.POST
 
-    def has_key(self, key):
-        return key in self
+    __contains__ = has_key
         
     def get_full_path(self):
         return ''
