@@ -36,26 +36,26 @@ class BaseCommand(object):
         """
         return django.get_version()
 
-    def usage(self):
-        usage = '%prog [options] ' + self.args
+    def usage(self, subcommand):
+        usage = '%%prog %s [options] %s' % (subcommand, self.args)
         if self.help:
             return '%s\n\n%s' % (usage, self.help)
         else:
             return usage
 
-    def create_parser(self, prog_name):
+    def create_parser(self, prog_name, subcommand):
         return OptionParser(prog=prog_name,
-                            usage=self.usage(),
+                            usage=self.usage(subcommand),
                             version=self.get_version(),
                             option_list=self.option_list)
 
-    def print_help(self, prog_name):
-        parser = self.create_parser(prog_name)
+    def print_help(self, prog_name, subcommand):
+        parser = self.create_parser(prog_name, subcommand)
         parser.print_help()
 
     def run_from_argv(self, argv):
-        parser = self.create_parser(argv[0])
-        options, args = parser.parse_args(argv[1:])
+        parser = self.create_parser(argv[0], argv[1])
+        options, args = parser.parse_args(argv[2:])
         if options.settings:
             os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
         if options.pythonpath:
