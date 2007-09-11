@@ -15,6 +15,6 @@ class Command(BaseCommand):
         from django.core.servers.fastcgi import runfastcgi
         runfastcgi(args)
         
-    def usage(self):
+    def usage(self, subcommand):
         from django.core.servers.fastcgi import FASTCGI_HELP
         return FASTCGI_HELP
