@@ -101,7 +101,7 @@ class ManagementUtility(object):
         elif self.argv[1:] == ['--version']:
             print django.get_version()
         elif self.argv[1:] == ['--help']:
-            self.main_help_text()
+            sys.stderr.write(self.main_help_text() + '\n')
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 
