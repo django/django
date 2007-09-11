@@ -51,11 +51,11 @@ class ManagementUtility(object):
         names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
         return dict([(name, load_command_class(name)) for name in names])
 
-    def print_help(self, argv):
+    def print_help(self, prog_name):
         """
         Returns the help message, as a string.
         """
-        prog_name = os.path.basename(argv[0])
+        prog_name = os.path.basename(prog_name)
         usage = ['%s <subcommand> [options] [args]' % prog_name]
         usage.append('Django command line tool, version %s' % django.get_version())
         usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % prog_name)
@@ -66,7 +66,7 @@ class ManagementUtility(object):
             usage.append('  %s' % cmd)
         print '\n'.join(usage)
 
-    def fetch_command(self, subcommand, command_name):
+    def fetch_command(self, subcommand, prog_name):
         """
         Tries to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
@@ -75,13 +75,13 @@ class ManagementUtility(object):
         try:
             return self.commands[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, command_name))
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, prog_name))
             sys.exit(1)
 
     def execute(self, argv=None):
         """
-        Figures out which command is being run (the first arg), creates a parser
-        appropriate to that command, and runs it.
+        Given the command-line arguments, this figures out which subcommand is
+        being run, creates a parser appropriate to that command, and runs it.
         """
         if argv is None:
             argv = sys.argv
@@ -93,17 +93,17 @@ class ManagementUtility(object):
 
         if subcommand == 'help':
             if len(argv) > 2:
-                self.fetch_command(argv[2], argv[0]).print_help(argv[2:])
+                self.fetch_command(argv[2], argv[0]).print_help(argv[0])
             else:
-                self.print_help(argv)
+                self.print_help(argv[0])
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
         elif argv[1:] == ['--version']:
             print django.get_version()
         elif argv[1:] == ['--help']:
-            self.print_help(argv)
+            self.print_help(argv[0])
         else:
-            self.fetch_command(subcommand, argv[0]).run(argv[1:])
+            self.fetch_command(subcommand, argv[0]).run_from_argv(argv[1:])
 
 class ProjectManagementUtility(ManagementUtility):
     """

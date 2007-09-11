@@ -49,11 +49,11 @@ class BaseCommand(object):
                             version=self.get_version(),
                             option_list=self.option_list)
 
-    def print_help(self, argv):
-        parser = self.create_parser(argv[0])
+    def print_help(self, prog_name):
+        parser = self.create_parser(prog_name)
         parser.print_help()
 
-    def run(self, argv):
+    def run_from_argv(self, argv):
         parser = self.create_parser(argv[0])
         options, args = parser.parse_args(argv[1:])
         if options.settings:
