@@ -2,7 +2,6 @@ import django
 from optparse import OptionParser
 import os
 import sys
-import textwrap
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version

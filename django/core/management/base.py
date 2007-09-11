@@ -49,13 +49,13 @@ class BaseCommand(object):
                             version=self.get_version(),
                             option_list=self.option_list)
 
-    def print_help(self, args):
-        parser = self.create_parser(args[0])
+    def print_help(self, argv):
+        parser = self.create_parser(argv[0])
         parser.print_help()
 
-    def run(self, args):
-        parser = self.create_parser(args[0])
-        (options, args) = parser.parse_args(args[1:])
+    def run(self, argv):
+        parser = self.create_parser(argv[0])
+        options, args = parser.parse_args(argv[1:])
         if options.settings:
             os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
         if options.pythonpath:
