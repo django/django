@@ -182,7 +182,9 @@ def isValidImage(field_data, all_data):
         raise ValidationError, _("No file was submitted. Check the encoding type on the form.")
     try:
         Image.open(StringIO(content))
-    except IOError: # Python Imaging Library doesn't recognize it as an image
+    except (IOError, OverflowError): # Python Imaging Library doesn't recognize it as an image
+        # OverflowError is due to a bug in PIL with Python 2.4+ which can cause 
+        # it to gag on OLE files. 
         raise ValidationError, _("Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
 
 def isValidImageURL(field_data, all_data):

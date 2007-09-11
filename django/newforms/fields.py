@@ -393,7 +393,9 @@ class ImageField(FileField):
         from cStringIO import StringIO
         try:
             Image.open(StringIO(f.content))
-        except IOError: # Python Imaging Library doesn't recognize it as an image
+        except (IOError, OverflowError): # Python Imaging Library doesn't recognize it as an image
+            # OverflowError is due to a bug in PIL with Python 2.4+ which can cause 
+            # it to gag on OLE files. 
             raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
         return f
 
