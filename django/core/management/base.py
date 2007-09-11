@@ -5,7 +5,6 @@ import itertools
 from optparse import make_option, OptionParser
 import sys
 import os
-from traceback import print_exc
 
 class CommandError(Exception):
     pass
@@ -60,11 +59,7 @@ class BaseCommand(object):
             os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
         if options.pythonpath:
             sys.path.insert(0, options.pythonpath)
-        try:
-            self.execute(*args, **options.__dict__)
-        except Exception, e:
-            print_exc()
-            parser.print_usage()
+        self.execute(*args, **options.__dict__)
 
     def execute(self, *args, **options):
         # Switch to English, because django-admin.py creates database content
