@@ -112,6 +112,61 @@ Submitting patches
 We're always grateful for patches to Django's code. Indeed, bug reports with
 associated patches will get fixed *far* more quickly than those without patches.
 
+"Claiming" tickets
+------------------
+
+In an open-source project with hundreds of contributors around the world, it's
+important to manage communication efficiently so that work doesn't get
+duplicated and contributors can be as effective as possible. Hence, our policy
+is for contributors to "claim" tickets in order to let other developers know
+that a particular bug or feature is being worked on.
+
+If you have identified a contribution you want to make and you're capable of
+fixing it (as measured by your coding ability, knowledge of Django internals
+and time availability), claim it by following these steps:
+
+    * `Create an account`_ to use in our ticket system.
+    * If a ticket for this issue doesn't exist yet, create one in our
+      `ticket tracker`_.
+    * If a ticket for this issue already exists, make sure nobody else has
+      claimed it. To do this, look at the "Assigned to" section of the ticket.
+      If it's assigned to "nobody," then it's available to be claimed.
+      Otherwise, somebody else is working on this ticket, and you either find
+      another bug/feature to work on, or contact the developer working on the
+      ticket to offer your help.
+    * Log into your account, if you haven't already, by clicking "Login" in the
+      upper right of the ticket page.
+    * Claim the ticket by clicking the radio button next to "Accept ticket"
+      near the bottom of the page, then clicking "Submit changes."
+
+.. _Create an account: http://www.djangoproject.com/accounts/register/
+
+Ticket claimers' responsibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've claimed a ticket, you have a responsibility to work on that ticket
+in a reasonably timely fashion. If you don't have time to work on it, either
+unclaim it or don't claim it in the first place!
+
+Core Django developers go through the list of claimed tickets from time to
+time, checking whether any progress has been made. If there's no sign of
+progress on a particular claimed ticket for a week or two after it's been
+claimed, we will unclaim it for you so that it's no longer monopolized and
+somebody else can claim it.
+
+If you've claimed a ticket and it's taking a long time (days or weeks) to code,
+keep everybody updated by posting comments on the ticket. That way, we'll know
+not to unclaim it. More communication is better than less communication!
+
+Which tickets should be claimed?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Of course, going through the steps of claiming tickets is overkill in some
+cases. In the case of small changes, such as typos in the documentation or
+small bugs that will only take a few minutes to fix, you don't need to jump
+through the hoops of claiming tickets. Just submit your patch and be done with
+it.
+
 Patch style
 -----------
 
