@@ -309,6 +309,20 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self.queryset(request)
 
+    def form_add(self, request):
+        """
+        Returns a Form class for use in the admin add view.
+        """
+        fields = flatten_fieldsets(self.fieldsets_add(request))
+        return forms.form_for_model(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
+
+    def form_change(self, request, obj):
+        """
+        Returns a Form class for use in the admin change view.
+        """
+        fields = flatten_fieldsets(self.fieldsets_change(request, obj))
+        return forms.form_for_instance(obj, fields=fields, formfield_callback=self.formfield_for_dbfield)
+
     def save_add(self, request, model, form, formsets, post_url_continue):
         """
         Saves the object in the "add" stage and returns an HttpResponseRedirect.
@@ -423,9 +437,7 @@ class ModelAdmin(BaseModelAdmin):
             # Object list will give 'Permission Denied', so go back to admin home
             post_url = '../../../'
 
-        fields = flatten_fieldsets(self.fieldsets_add(request))
-        ModelForm = forms.form_for_model(model, fields=fields, formfield_callback=self.formfield_for_dbfield)
-
+        ModelForm = self.form_add(request)
         inline_formsets = []
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
@@ -485,9 +497,7 @@ class ModelAdmin(BaseModelAdmin):
         if request.POST and request.POST.has_key("_saveasnew"):
             return self.add_view(request, form_url='../../add/')
 
-        fields = flatten_fieldsets(self.fieldsets_change(request, obj))
-        ModelForm = forms.form_for_instance(obj, fields=fields, formfield_callback=self.formfield_for_dbfield)
-
+        ModelForm = self.form_change(request, obj)
         inline_formsets = []
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
