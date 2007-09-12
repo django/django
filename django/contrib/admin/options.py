@@ -687,13 +687,18 @@ class InlineModelAdmin(BaseModelAdmin):
     fk_name = None
     extra = 3
     template = None
-    label = None
+    verbose_name = None
+    verbose_name_plural = None
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
         self.parent_model = parent_model
         self.opts = self.model._meta
         super(InlineModelAdmin, self).__init__()
+        if self.verbose_name is None:
+            self.verbose_name = self.model._meta.verbose_name
+        if self.verbose_name_plural is None:
+            self.verbose_name_plural = self.model._meta.verbose_name_plural
 
     def formset_add(self, request):
         """Returns an InlineFormSet class for use in admin add views."""
@@ -726,14 +731,8 @@ class InlineModelAdmin(BaseModelAdmin):
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline_stacked.html'
 
-    def get_label(self):
-        return self.label or self.model._meta.verbose_name
-
 class TabularInline(InlineModelAdmin):
     template = 'admin/edit_inline_tabular.html'
-
-    def get_label(self):
-        return self.label or self.model._meta.verbose_name_plural
 
 class InlineAdminFormSet(object):
     """

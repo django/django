@@ -1,7 +1,7 @@
 {{ inline_admin_formset.formset.management_form }}
 {% for inline_admin_form in inline_admin_formset %}
 <fieldset class="module aligned {{ bfset.fieldset.classes }}">
-  <h2>{{ inline_admin_formset.opts.get_label|title }}&nbsp;#{{ forloop.counter }}</h2>
+  <h2>{{ inline_admin_formset.opts.verbose_name|title }}&nbsp;#{{ forloop.counter }}</h2>
   {% for bfset in inline_admin_form %}
     <!-- fieldsets, headers, and descriptions are commented out until we have decent styles for them -->
     <!--<fieldset>-->
