@@ -174,7 +174,8 @@ def formset_for_form(form, formset=BaseFormSet, num_extra=1, orderable=False, de
 
 def all_valid(formsets):
     """Returns true if every formset in formsets is valid."""
+    valid = True
     for formset in formsets:
         if not formset.is_valid():
-            return False
-    return True
+            valid = False
+    return valid
