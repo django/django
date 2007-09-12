@@ -179,22 +179,21 @@ class BaseModelAdmin(object):
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
 
-    def _fieldsets(self, request):
+    def _declared_fieldsets(self):
         if self.fieldsets:
             return self.fieldsets
-        if self.fields:
+        elif self.fields:
             return [(None, {'fields': self.fields})]
-        # TODO: switch this to pull from the form, not the model
-        fields = [f.name for f in self.opts.fields + self.opts.many_to_many if f.editable and not isinstance(f, models.AutoField)]
-        return [(None, {'fields': fields})]
+        return None
+    declared_fieldsets = property(_declared_fieldsets)
 
     def fieldsets_add(self, request):
         "Hook for specifying fieldsets for the add form."
-        return list(self._fieldsets(request))
-
+        raise NotImplementedError
+    
     def fieldsets_change(self, request, obj):
         "Hook for specifying fieldsets for the change form."
-        return list(self._fieldsets(request))
+        raise NotImplementedError
 
 class ModelAdmin(BaseModelAdmin):
     "Encapsulates all admin options and functionality for a given model."
@@ -309,18 +308,38 @@ class ModelAdmin(BaseModelAdmin):
         """
         return self.queryset(request)
 
+    def fieldsets_add(self, request):
+        "Hook for specifying fieldsets for the add form."
+        if self.declared_fieldsets:
+            return self.declared_fieldsets
+        form = self.form_add(request)
+        return [(None, {'fields': form.base_fields.keys()})]
+
+    def fieldsets_change(self, request, obj):
+        "Hook for specifying fieldsets for the change form."
+        if self.declared_fieldsets:
+            return self.declared_fieldsets
+        form = self.form_change(request, obj)
+        return [(None, {'fields': form.base_fields.keys()})]
+
     def form_add(self, request):
         """
         Returns a Form class for use in the admin add view.
         """
-        fields = flatten_fieldsets(self.fieldsets_add(request))
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            fields = None
         return forms.form_for_model(self.model, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
     def form_change(self, request, obj):
         """
         Returns a Form class for use in the admin change view.
         """
-        fields = flatten_fieldsets(self.fieldsets_change(request, obj))
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            fields = None
         return forms.form_for_instance(obj, fields=fields, formfield_callback=self.formfield_for_dbfield)
 
     def save_add(self, request, model, form, formsets, post_url_continue):
@@ -678,21 +697,31 @@ class InlineModelAdmin(BaseModelAdmin):
 
     def formset_add(self, request):
         """Returns an InlineFormSet class for use in admin add views."""
-        fields = flatten_fieldsets(self.fieldsets_add(request))
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            fields = None
         return forms.inline_formset(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
     def formset_change(self, request, obj):
         """Returns an InlineFormSet class for use in admin change views."""
-        fields = flatten_fieldsets(self.fieldsets_change(request, obj))
+        if self.declared_fieldsets:
+            fields = flatten_fieldsets(self.declared_fieldsets)
+        else:
+            fields = None
         return forms.inline_formset(self.parent_model, self.model, fk_name=self.fk_name, fields=fields, formfield_callback=self.formfield_for_dbfield, extra=self.extra)
 
-    def _fieldsets(self, request):
-        if self.fieldsets:
-            return self.fieldsets
-        if self.fields:
-            return [(None, {'fields': self.fields})]
-        fields = [f for f in self.formset_class(request).form_class.base_fields.keys()]
-        return [(None, {'fields': fields})]
+    def fieldsets_add(self, request):
+        if self.declared_fieldsets:
+            return self.declared_fieldsets
+        form = self.formset_add(request).form_class
+        return [(None, {'fields': form.base_fields.keys()})]
+
+    def fieldsets_change(self, request, obj):
+        if self.declared_fieldsets:
+            return self.declared_fieldsets
+        form = self.formset_change(request, obj).form_class
+        return [(None, {'fields': form.base_fields.keys()})]
 
 class StackedInline(InlineModelAdmin):
     template = 'admin/edit_inline_stacked.html'
