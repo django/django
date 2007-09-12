@@ -281,7 +281,7 @@ class ModeratorDeletion(models.Model):
 from django.contrib import admin
 
 class CommentAdmin(admin.ModelAdmin):
-    fields = (
+    fieldsets = (
         (None, {'fields': ('content_type', 'object_id', 'site')}),
         ('Content', {'fields': ('user', 'headline', 'comment')}),
         ('Ratings', {'fields': ('rating1', 'rating2', 'rating3', 'rating4', 'rating5', 'rating6', 'rating7', 'rating8', 'valid_rating')}),
@@ -294,7 +294,7 @@ class CommentAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
 
 class FreeCommentAdmin(admin.ModelAdmin):
-    fields = (
+    fieldsets = (
         (None, {'fields': ('content_type', 'object_id', 'site')}),
         ('Content', {'fields': ('person_name', 'comment')}),
         ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),

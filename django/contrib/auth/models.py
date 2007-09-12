@@ -343,7 +343,7 @@ class GroupAdmin(admin.ModelAdmin):
     filter_horizontal = ('permissions',)
 
 class UserAdmin(admin.ModelAdmin):
-    fields = (
+    fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
         (_('Permissions'), {'fields': ('is_staff', 'is_active', 'is_superuser', 'user_permissions')}),
