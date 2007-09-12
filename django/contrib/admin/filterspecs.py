@@ -160,7 +160,7 @@ class AllValuesFilterSpec(FilterSpec):
     def __init__(self, f, request, params, model):
         super(AllValuesFilterSpec, self).__init__(f, request, params, model)
         self.lookup_val = request.GET.get(f.name, None)
-        self.lookup_choices = model._meta.admin.manager.distinct().order_by(f.name).values(f.name)
+        self.lookup_choices = model._default_manager.distinct().order_by(f.name).values(f.name)
 
     def title(self):
         return self.field.verbose_name
