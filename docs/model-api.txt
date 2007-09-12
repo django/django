@@ -148,7 +148,7 @@ and in Django's validation.
 
 Django veterans: Note that the argument is now called ``max_length`` to
 provide consistency throughout Django. There is full legacy support for
-the old ``maxlength`` argument, but ``max_length`` is prefered.
+the old ``maxlength`` argument, but ``max_length`` is preferred.
 	
 ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
