@@ -19,7 +19,7 @@
         {% if inline_admin_form.form.errors %}
            <tr class="errorlist"><td colspan="{{ bound_inline.fields|length }}">
               {{ inline_admin_form.form.errors }}
-           </tr>
+           </td></tr>
         {% endif %}
         
         <tr class="{% cycle row1,row2 %}">
