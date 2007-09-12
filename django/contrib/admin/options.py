@@ -761,6 +761,7 @@ class InlineAdminForm(AdminForm):
     def __init__(self, formset, form, fieldsets, prepopulated_fields, original):
         self.formset = formset
         self.original = original
+        self.show_url = original and hasattr(original, 'get_absolute_url')
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields)
 
     def pk_field(self):
