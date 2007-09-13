@@ -528,7 +528,8 @@ class Query(object):
         self.where.add([alias, col, orig_field, lookup_type, value],
                 connection)
         if negate:
-            self.alias_map[last[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+            if last:
+                self.alias_map[last[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
             self.where.negate()
 
     def add_q(self, q_object):
@@ -770,7 +771,7 @@ class DeleteQuery(Query):
                         ContentType.objects.get_for_model(cls).id), AND)
             for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                 where = WhereNode(self)
-                where.add((None, f.m2m_column_name(), None, 'in',
+                where.add((None, f.m2m_column_name(), f, 'in',
                         pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                         AND)
                 if w1:

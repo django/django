@@ -87,7 +87,8 @@ class WhereNode(tree.Node):
             lhs = '%s.%s' % (table_alias, conn.ops.quote_name(name))
         else:
             lhs = conn.ops.quote_name(name)
-        field_sql = conn.ops.field_cast_sql(field.db_type()) % lhs
+        db_type = field and field.db_type() or None
+        field_sql = conn.ops.field_cast_sql(db_type) % lhs
 
         if isinstance(value, datetime.datetime):
             # FIXME datetime_cast_sql() should return '%s' by default.
