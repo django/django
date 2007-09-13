@@ -208,7 +208,7 @@ class Query(object):
             if self.high_mark:
                 result.append('LIMIT %d' % (self.high_mark - self.low_mark))
             if self.low_mark:
-                assert self.high_mark, "OFFSET not allowed without LIMIT."
+                assert self.high_mark, "'offset' is not allowed without 'limit'"
                 result.append('OFFSET %d' % self.low_mark)
 
         params.extend(self.extra_params)
@@ -632,10 +632,15 @@ class Query(object):
         clamped to any existing high value.
         """
         if high:
-            # None (high_mark's default) is less than any number, so this works.
-            self.high_mark = max(self.high_mark, high)
+            if self.high_mark:
+                self.high_mark = min(self.high_mark, self.low_mark + high)
+            else:
+                self.high_mark = self.low_mark + high
         if low:
-            self.low_mark = max(self.high_mark, self.low_mark + low)
+            if self.high_mark:
+                self.low_mark = min(self.high_mark, self.low_mark + low)
+            else:
+                self.low_mark = self.low_mark + low
 
     def clear_limits(self):
         """
