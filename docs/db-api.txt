@@ -1348,6 +1348,11 @@ equivalent::
     Entry.objects.filter(blog__id=3) # __exact is implied
     Entry.objects.filter(blog__pk=3) # __pk implies __id__exact
 
+.. note::
+    Because of this shortcut, you cannot have a field in your model called
+    ``pk`` that is not the primary key of the model. It will always be
+    replaced by the name of the model's primary key in queries.
+
 Lookups that span relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
