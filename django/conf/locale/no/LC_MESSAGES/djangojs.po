@@ -1,6 +1,6 @@
-# translation of djangojs.po to
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# translation of djangojs.po to norwegian
+# Copyright (C) 2005 and beyond
+# This file is distributed under the same license as the Django package.
 # Espen Grindhaug <espen.grindhaug@mail.com>, 2006.
 #
 msgid ""
@@ -8,16 +8,14 @@ msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2007-04-27 06:51+0200\n"
-"Last-Translator: \n"
-"Language-Team:  <en@li.org>\n"
+"PO-Revision-Date: 2007-08-29 18:22+0200\n"
+"Last-Translator: jonklo\n"
+"Language-Team: Norsk <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
-#, perl-format
 msgid "Available %s"
 msgstr "%s er tilgjengelige"
 
@@ -34,13 +32,12 @@ msgid "Remove"
 msgstr "Slett"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
-#, perl-format
 msgid "Chosen %s"
 msgstr "%s er valgt"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Velg ditt svaralternativ(er) og klikk"
+msgstr "Velg ditt svaralternativ(er) og klikk "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
@@ -85,15 +82,15 @@ msgstr "Velg et klokkeslett"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Midnight"
-msgstr "24.00"
+msgstr "Midnatt"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "6 a.m."
-msgstr "06.00"
+msgstr "06:00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "Noon"
-msgstr "12.00"
+msgstr "12:00"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:87
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:168

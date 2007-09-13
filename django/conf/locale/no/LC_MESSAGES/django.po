@@ -1,1306 +1,593 @@
-# translation of django.po to
+# translation of django.po to norwegian
 # Copyright (C) 2005 and beyond
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the Django package.
 # Espen Grindhaug <espen@grindhaug.org>, Nov 2005.
-#
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-05-16 10:12+0200\n"
-"PO-Revision-Date: 2007-04-27 06:48+0200\n"
-"Last-Translator: \n"
-"Language-Team:  <en@li.org>\n"
+"PO-Revision-Date: 2007-08-29 18:22+0200\n"
+"Last-Translator: jonklo\n"
+"Language-Team: Norsk <no@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.11.4\n"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "objekt ID"
-
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "overskrift"
-
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "kommentar"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "rangering #1 "
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "rangering #2"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "rangering #3"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "rangering #4"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "rangering #5"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "rangering #6"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "rangering #7"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "rangering #8"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "er gyldig rangering"
-
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "dato/tid for innsendelse"
-
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "er tilgjengelig for alle"
-
-#: contrib/comments/models.py:85 contrib/admin/views/doc.py:289
-msgid "IP address"
-msgstr "IP adresse"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "er fjernet"
-
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
-msgstr "Aktiver denne avkryssningsboksen hvis kommentaren er upasende. Beskjeden \"Denne kommentaren er blitt fjernet\" vil bli vist istedet."
-
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "kommentarer"
-
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "innholdsobjekt"
-
-#: contrib/comments/models.py:159
+#: db/models/manipulators.py:309
 #, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-msgstr ""
-"Sendt av %(user)s på %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
-
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "personens navn"
-
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "IP adresse"
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "godkjent av moderator"
-
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "åpen kommentar"
-
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "åpne kommentarer"
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "poeng"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "poeng dato"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "karma poeng"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "karma poeng"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d rangering av %(user)s"
-
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Denne kommentaren er flagget av %(user)s:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "flagg dato"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "brukerflag"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "brukerflag"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "Flagg med %r"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "fjernet dato"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "fjernet av  moderator"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "fjernet av moderator"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Fjernet av moderator med %r"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "Anonyme brukere kan ikke stemme"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "Ikke gyldig kommentar ID"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "Du kan ikke stemme på deg selv"
-
-#: contrib/comments/views/comments.py:28
-msgid "This rating is required because you've entered at least one other rating."
-msgstr "Denne rangeringen er påkrevd fordi du har rangert en eller flere ting fra før "
-
-#: contrib/comments/views/comments.py:112
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
-"(count)s kommentarer:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
-"(count)s kommentarer:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:117
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
-msgstr ""
-"Denne kommentaren er skrevet av en upålitelig bruker:\n"
-"\n"
-"%(text)s"
-
-#: contrib/comments/views/comments.py:189
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "Bare POST er tillatt"
-
-#: contrib/comments/views/comments.py:193
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "En eller flere av feltene som er påkrevd ble ikke sendt."
-
-#: contrib/comments/views/comments.py:197
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Noen har endret på komentar feltene (sikkerhets advarsel)"
-
-#: contrib/comments/views/comments.py:207
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "Skjemaet hadde en ugyldig verdi - objekt IDen var ugyldig"
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Kommentar skjemaet returnerte ikke et 'forhåndsvisning' eller 'post' objekt"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/login.html:17
-msgid "Username:"
-msgstr "Brukernavn:"
-
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/admin/templates/admin/login.html:20
-msgid "Password:"
-msgstr "Passord:"
-
-#: contrib/comments/templates/comments/form.html:6
-msgid "Forgotten your password?"
-msgstr "Har du glemt passordet ditt ?"
-
-#: contrib/comments/templates/comments/form.html:8
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Log out"
-msgstr "Log ut"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Rangeringer"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Påkrevd"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Valgfri"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Send et foto"
-
-#: contrib/comments/templates/comments/form.html:27
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Kommentar:"
-
-#: contrib/comments/templates/comments/form.html:32
-#: contrib/comments/templates/comments/freeform.html:9
-msgid "Preview comment"
-msgstr "Forhåndvis kommentar"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Ditt navn:"
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>Av %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143
-msgid "All"
-msgstr "Alle"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "Når som helst"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "I dag"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "Siste 7 dager"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "Denne måneden"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "I år"
-
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "Ja"
-
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "Nei"
-
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "Ukjent"
-
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "tid for handling"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "objekt id"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "objekt repr"
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "handlingsflagg"
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "endre melding"
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "logg post"
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "logg poster"
-
-#: contrib/admin/templatetags/admin_list.py:228
-msgid "All dates"
-msgstr "Alle datoer"
-
-#: contrib/admin/views/decorators.py:9 contrib/auth/forms.py:36
-#: contrib/auth/forms.py:41
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-"Vennligst angi korrekt brukernavn og passord. Merk at små og "
-"store bokstaver er betraktet ulikt."
-
-#: contrib/admin/views/decorators.py:23
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "Logg inn"
-
-#: contrib/admin/views/decorators.py:61
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "Du må logge inn igjen, fordi økten din har gått ut, men innlegget ditt ble lagret."
-
-#: contrib/admin/views/decorators.py:68
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-"Det ser ut som om nettleseren din ikke støtter informasjonskapsler "
-"('cookies'). Vennligst konfigurer nettleseren din, og prøv igjen."
-
-#: contrib/admin/views/decorators.py:82
-msgid "Usernames cannot contain the '@' character."
-msgstr "Brukernavnet kan ikke inneholde '@'"
-
-#: contrib/admin/views/decorators.py:84
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "E-post adressen din er ikke brukernavnet ditt, prøv '%s' i stede."
-
-#: contrib/admin/views/main.py:226
-msgid "Site administration"
-msgstr "Nettsted administrasjon"
-
-#: contrib/admin/views/main.py:260
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
-
-#: contrib/admin/views/main.py:264 contrib/admin/views/main.py:348
-msgid "You may edit it again below."
-msgstr "Du kan endre under"
-
-#: contrib/admin/views/main.py:272 contrib/admin/views/main.py:357
-#, python-format
-msgid "You may add another %s below."
-msgstr "Du kan legge til en ny %s under."
-
-#: contrib/admin/views/main.py:290
-#, python-format
-msgid "Add %s"
-msgstr "Ny %s"
-
-#: contrib/admin/views/main.py:336
-#, python-format
-msgid "Added %s."
-msgstr "La til %s"
-
-#: contrib/admin/views/main.py:336 contrib/admin/views/main.py:338
-#: contrib/admin/views/main.py:340
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(object)s med %(type)s finnes allerede for angitt %(field)s."
+
+#: db/models/manipulators.py:310 core/validators.py:275
+#: contrib/admin/views/main.py:342 contrib/admin/views/main.py:344
+#: contrib/admin/views/main.py:346
 msgid "and"
 msgstr "og"
 
-#: contrib/admin/views/main.py:338
+#: db/models/fields/__init__.py:49
 #, python-format
-msgid "Changed %s."
-msgstr "Endret %s."
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(optname)s med %(fieldname)s finnes allerede."
 
-#: contrib/admin/views/main.py:340
+#: db/models/fields/__init__.py:156 db/models/fields/__init__.py:313
+#: db/models/fields/__init__.py:721 db/models/fields/__init__.py:732
+#: oldforms/__init__.py:373 newforms/models.py:193 newforms/fields.py:92
+#: newforms/fields.py:490 newforms/fields.py:566 newforms/fields.py:577
+msgid "This field is required."
+msgstr "Dette feltet er påkrevd."
+
+#: db/models/fields/__init__.py:411
+msgid "This value must be an integer."
+msgstr "Denne verdien må være et heltall."
+
+#: db/models/fields/__init__.py:446
+msgid "This value must be either True or False."
+msgstr "Denne verdien må være enten \"True\" eller \"False\"."
+
+#: db/models/fields/__init__.py:467
+msgid "This field cannot be null."
+msgstr "Dette feltet kan ikke være null/tom."
+
+#: db/models/fields/__init__.py:501 core/validators.py:155
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Skriv inn en dato i ÅÅÅÅ-MM-DD format."
+
+#: db/models/fields/__init__.py:570 core/validators.py:164
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "Skriv inn dato og tid i ÅÅÅÅ-MM-DD TT:MM format."
+
+#: db/models/fields/__init__.py:631
+msgid "This value must be a decimal number."
+msgstr "Denne verdien må være et desimaltall."
+
+#: db/models/fields/__init__.py:741
+msgid "Enter a valid filename."
+msgstr "Skriv inn et godkjent filnavn."
+
+#: db/models/fields/__init__.py:883
+msgid "This value must be either None, True or False."
+msgstr "Denne verdien må være enten None, True eller False."
+
+#: db/models/fields/related.py:55
 #, python-format
-msgid "Deleted %s."
-msgstr "Slettet %s."
+msgid "Please enter a valid %s."
+msgstr "Vennligst skriv inn en/et gyldig %s."
 
-#: contrib/admin/views/main.py:343
-msgid "No fields changed."
-msgstr "Ingen felt endret."
+#: db/models/fields/related.py:658
+msgid "Separate multiple IDs with commas."
+msgstr "Separer flere ID-er med komma."
 
-#: contrib/admin/views/main.py:346
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" ble endret."
-
-#: contrib/admin/views/main.py:354
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
-
-#: contrib/admin/views/main.py:392
-#, python-format
-msgid "Change %s"
-msgstr "Endre %s"
-
-#: contrib/admin/views/main.py:470
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:475
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "En eller flere %(fieldname)s i %(name)s:"
-
-#: contrib/admin/views/main.py:508
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" ble slettet."
-
-#: contrib/admin/views/main.py:511
-msgid "Are you sure?"
-msgstr "Er du sikker?"
-
-#: contrib/admin/views/main.py:533
-#, python-format
-msgid "Change history: %s"
-msgstr "Endre historien: %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s"
-msgstr "Velg %s"
-
-#: contrib/admin/views/main.py:565
-#, python-format
-msgid "Select %s to change"
-msgstr "Velg %s for å endre"
-
-#: contrib/admin/views/doc.py:277 contrib/admin/views/doc.py:286
-#: contrib/admin/views/doc.py:288 contrib/admin/views/doc.py:294
-#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:297
-msgid "Integer"
-msgstr "Heltall"
-
-#: contrib/admin/views/doc.py:278
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (Enten \"True\" eller \"False\")"
-
-#: contrib/admin/views/doc.py:279 contrib/admin/views/doc.py:296
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "Tekst (opp til %(maxlength)s tegn)"
-
-#: contrib/admin/views/doc.py:280
-msgid "Comma-separated integers"
-msgstr "Heltall skilt med kommaer"
-
-#: contrib/admin/views/doc.py:281
-msgid "Date (without time)"
-msgstr "Dato (uten tid)"
-
-#: contrib/admin/views/doc.py:282
-msgid "Date (with time)"
-msgstr "Dato/tid"
-
-#: contrib/admin/views/doc.py:283
-msgid "E-mail address"
-msgstr "E-post adresse"
-
-#: contrib/admin/views/doc.py:284 contrib/admin/views/doc.py:287
-msgid "File path"
-msgstr "Sti til fil"
-
-#: contrib/admin/views/doc.py:285
-msgid "Decimal number"
-msgstr "Desimal tall"
-
-#: contrib/admin/views/doc.py:291
-msgid "Boolean (Either True, False or None)"
-msgstr "Boolean (enten \"True\", \"False\" eller \"None\")"
-
-#: contrib/admin/views/doc.py:292
-msgid "Relation to parent model"
-msgstr "Relasjon til forelder modell"
-
-#: contrib/admin/views/doc.py:293
-msgid "Phone number"
-msgstr "Telefonnummer"
-
-#: contrib/admin/views/doc.py:298
-msgid "Text"
-msgstr "Tekst"
-
-#: contrib/admin/views/doc.py:299
-msgid "Time"
-msgstr "Tid"
-
-#: contrib/admin/views/doc.py:300 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL"
-
-#: contrib/admin/views/doc.py:301
-msgid "U.S. state (two uppercase letters)"
-msgstr "Stat (i USA, to store bokstaver)"
-
-#: contrib/admin/views/doc.py:302
-msgid "XML text"
-msgstr "XML tekst"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Documentation"
-msgstr "Dokumentasjon"
-
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:23
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-msgid "Change password"
-msgstr "Endre passord"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/base.html:28
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Home"
-msgstr "Hjem"
-
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/change_form.html:20
-msgid "History"
-msgstr "Historie"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Dato/tid"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "Bruker"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Funksjon"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "j. M U - h:i"
-
-#: contrib/admin/templates/admin/object_history.html:36
+#: db/models/fields/related.py:660
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Dette objektet har ingen endrings historie. Den var sannsynligvis ikke laget "
-"via denne siden"
+"Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mer enn en."
 
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django administrasjonsside"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Django administrasjon"
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Tjener feil"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Tjener feil (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Tjener feil <em>(500)</em>"
-
-#: contrib/admin/templates/admin/500.html:10
-msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
-msgstr ""
-"Det har oppstått en feil. Feilen er blitt rapportert til administrator via e-"
-"post, og vil bli fikset snart. Takk for din tålmodighet."
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Fant ikke siden"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Beklager, men siden du spør etter finnes ikke."
-
-#: contrib/admin/templates/admin/index.html:17
+#: db/models/fields/related.py:707
 #, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Modeller fra applikasjonen %(name)s."
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Skriv inn gyldige %(self)s ID-er. Verdien %(value)r er ikke gyldig."
+msgstr[1] ""
+"Skriv inn gyldige %(self)s ID-er. Verdiene %(value)r er ikke gyldige."
 
-#: contrib/admin/templates/admin/index.html:28
-#: contrib/admin/templates/admin/change_form.html:15
-msgid "Add"
-msgstr "Legg til"
+#: conf/global_settings.py:39
+msgid "Arabic"
+msgstr "Arabisk"
 
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "Endre"
+#: conf/global_settings.py:40
+msgid "Bengali"
+msgstr "Bengalsk"
 
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikke rettigheter til å endre."
+#: conf/global_settings.py:41
+msgid "Bulgarian"
+msgstr "Bulgarsk"
 
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "Siste handlinger"
+#: conf/global_settings.py:42
+msgid "Catalan"
+msgstr "Katalansk"
 
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "Mine handlinger"
+#: conf/global_settings.py:43
+msgid "Czech"
+msgstr "Tsjekkisk"
 
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "Ingen tilgjengelige"
+#: conf/global_settings.py:44
+msgid "Welsh"
+msgstr "Walisisk"
 
-#: contrib/admin/templates/admin/change_list.html:11
+#: conf/global_settings.py:45
+msgid "Danish"
+msgstr "Dansk"
+
+#: conf/global_settings.py:46
+msgid "German"
+msgstr "Tysk"
+
+#: conf/global_settings.py:47
+msgid "Greek"
+msgstr "Gresk"
+
+#: conf/global_settings.py:48
+msgid "English"
+msgstr "Engelsk"
+
+#: conf/global_settings.py:49
+msgid "Spanish"
+msgstr "Spansk"
+
+#: conf/global_settings.py:50
+msgid "Argentinean Spanish"
+msgstr "Argentinsk spansk"
+
+#: conf/global_settings.py:51
+msgid "Persian"
+msgstr "Persisk"
+
+#: conf/global_settings.py:52
+msgid "Finnish"
+msgstr "Finsk"
+
+#: conf/global_settings.py:53
+msgid "French"
+msgstr "Fransk"
+
+#: conf/global_settings.py:54
+msgid "Galician"
+msgstr "Galisisk"
+
+#: conf/global_settings.py:55
+msgid "Hungarian"
+msgstr "Ungarsk"
+
+#: conf/global_settings.py:56
+msgid "Hebrew"
+msgstr "Hebraiske"
+
+#: conf/global_settings.py:57
+msgid "Croatian"
+msgstr "Kroatisk"
+
+#: conf/global_settings.py:58
+msgid "Icelandic"
+msgstr "Islandsk"
+
+#: conf/global_settings.py:59
+msgid "Italian"
+msgstr "Italiensk"
+
+#: conf/global_settings.py:60
+msgid "Japanese"
+msgstr "Japansk"
+
+#: conf/global_settings.py:61
+msgid "Korean"
+msgstr "Koreansk"
+
+#: conf/global_settings.py:62
+msgid "Kannada"
+msgstr ""
+
+#: conf/global_settings.py:63
+msgid "Latvian"
+msgstr "Latvisk"
+
+#: conf/global_settings.py:64
+msgid "Macedonian"
+msgstr "Makedonsk"
+
+#: conf/global_settings.py:65
+msgid "Dutch"
+msgstr "Nederlandsk"
+
+#: conf/global_settings.py:66
+msgid "Norwegian"
+msgstr "Norsk"
+
+#: conf/global_settings.py:67
+msgid "Polish"
+msgstr "Polsk"
+
+#: conf/global_settings.py:68
+msgid "Portugese"
+msgstr "Portugisisk"
+
+#: conf/global_settings.py:69
+msgid "Brazilian"
+msgstr "Brasiliansk"
+
+#: conf/global_settings.py:70
+msgid "Romanian"
+msgstr "Rumensk"
+
+#: conf/global_settings.py:71
+msgid "Russian"
+msgstr "Russisk"
+
+#: conf/global_settings.py:72
+msgid "Slovak"
+msgstr "Slovakisk"
+
+#: conf/global_settings.py:73
+msgid "Slovenian"
+msgstr "Slovensk"
+
+#: conf/global_settings.py:74
+msgid "Serbian"
+msgstr "Serbisk"
+
+#: conf/global_settings.py:75
+msgid "Swedish"
+msgstr "Svensk"
+
+#: conf/global_settings.py:76
+msgid "Tamil"
+msgstr ""
+
+#: conf/global_settings.py:77
+msgid "Telugu"
+msgstr ""
+
+#: conf/global_settings.py:78
+msgid "Turkish"
+msgstr "Tyrkisk"
+
+#: conf/global_settings.py:79
+msgid "Ukrainian"
+msgstr "Ukrainsk"
+
+#: conf/global_settings.py:80
+msgid "Simplified Chinese"
+msgstr "Simplifisert kinesisk"
+
+#: conf/global_settings.py:81
+msgid "Traditional Chinese"
+msgstr "Tradisjonell kinesisk"
+
+#: core/validators.py:71
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "Dette feltet kan bare inneholde bokstaver, nummer eller understreker."
+
+#: core/validators.py:75
+msgid ""
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
+msgstr ""
+"Dette feltet kan bare inneholde bokstaver, nummer, understreker, bindestreker"
+" eller skråstreker."
+
+#: core/validators.py:79
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr "Dette feltet kan bare inneholde bokstaver, nummer, understreker eller "
+"bindestreker."
+
+#: core/validators.py:83
+msgid "Uppercase letters are not allowed here."
+msgstr "Store bokstaver er ikke tillatt her."
+
+#: core/validators.py:87
+msgid "Lowercase letters are not allowed here."
+msgstr "Små bokstaver er ikke tillatt her."
+
+#: core/validators.py:94
+msgid "Enter only digits separated by commas."
+msgstr "Skriv inn bare tall, adskilt med komma."
+
+#: core/validators.py:106
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "Skriv inn e-postadresser, adskilt med komma."
+
+#: core/validators.py:110
+msgid "Please enter a valid IP address."
+msgstr "Vennligst skriv inn en gyldig IP-adresse."
+
+#: core/validators.py:114
+msgid "Empty values are not allowed here."
+msgstr "Dette felte kan ikke være tomt."
+
+#: core/validators.py:118
+msgid "Non-numeric characters aren't allowed here."
+msgstr "Dette feltet kan kun bestå av tall."
+
+#: core/validators.py:122
+msgid "This value can't be comprised solely of digits."
+msgstr "Dette feltet kan ikke bare bestå av nummer."
+
+#: core/validators.py:127 newforms/fields.py:142
+msgid "Enter a whole number."
+msgstr "Skriv inn et helt nummer."
+
+#: core/validators.py:131
+msgid "Only alphabetical characters are allowed here."
+msgstr "Bare alfabetiske tegn er tillatt her."
+
+#: core/validators.py:146
+msgid "Year must be 1900 or later."
+msgstr "År må være 1900 eller senere."
+
+#: core/validators.py:150
 #, python-format
-msgid "Add %(name)s"
-msgstr "Legg til %(name)s"
+msgid "Invalid date: %s"
+msgstr "Ugyldig dato: %s"
 
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Har du <a href=\"/password_reset/\">glemt passordet ditt</a>?"
+#: core/validators.py:160
+msgid "Enter a valid time in HH:MM format."
+msgstr "Skriv inn tiden i TT:MM format."
 
-#: contrib/admin/templates/admin/base.html:23
-msgid "Welcome,"
-msgstr "Velkommen"
+#: core/validators.py:169 newforms/fields.py:336
+msgid "Enter a valid e-mail address."
+msgstr "Skriv inn en godkjent e-postadresse."
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Delete"
-msgstr "Slett"
+#: core/validators.py:181 core/validators.py:461 oldforms/__init__.py:686
+#: newforms/fields.py:376
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "Ingen fil ble "
 
-#: contrib/admin/templates/admin/delete_confirmation.html:14
+#: core/validators.py:185 newforms/fields.py:397
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Last opp et gyldig bilde. Filen du lastet opp var ikke et bilde, eller så var"
+" det det ødelagt."
+
+#: core/validators.py:192
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr "Internettadressen %s peker ikke til et gyldig bilde."
+
+#: core/validators.py:196
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr ""
+"Telefonnummeret må være i XXX-XXX-XXXX format. \"%s\" er ugyldig."
+
+#: core/validators.py:204
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr "Internettadressen %s peker ikke til en gyldig QuickTime-video."
+
+#: core/validators.py:208
+msgid "A valid URL is required."
+msgstr "En gyldig internettadresse er påkrevd."
+
+#: core/validators.py:222
 #, python-format
 msgid ""
-"Deleting the %(object_name)s '%(object)s' would result in deleting related "
-"objects, but your account doesn't have permission to delete the following "
-"types of objects:"
+"Valid HTML is required. Specific errors are:\n"
+"%s"
 msgstr ""
-"Hivs du sletter %(object_name)s '%(object)s' vil du også slette relaterte "
-"objekter, men du har ikke tillatelse til å slette de følgende objektene:"
+"Gyldig HTML er påkrevd. Feilene var:\n"
+"%s"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
+#: core/validators.py:229
+#, python-format
+msgid "Badly formed XML: %s"
+msgstr "Ikke velformet XML: %s"
+
+#: core/validators.py:246
+#, python-format
+msgid "Invalid URL: %s"
+msgstr "Ugyldig URL: %s"
+
+#: core/validators.py:251 core/validators.py:253
+#, python-format
+msgid "The URL %s is a broken link."
+msgstr "Internettadresse %s fører til en side som ikke eksisterer."
+
+#: core/validators.py:259
+msgid "Enter a valid U.S. state abbreviation."
+msgstr "Skriv inn en godkjent amerikansk delstatsforkortelse."
+
+#: core/validators.py:273
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pass munnen din! Ordet %s er ikke tillatt her."
+msgstr[1] "Pass munnen din! Ordene %s er ikke tillatt her."
+
+#: core/validators.py:280
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "Dette feltet må være det samme som i '%s'-feltet."
+
+#: core/validators.py:299
+msgid "Please enter something for at least one field."
+msgstr "Vennligst skriv inn noe i minst et felt."
+
+#: core/validators.py:308 core/validators.py:319
+msgid "Please enter both fields or leave them both empty."
+msgstr "Vennligst skriv inn noe i begge felta, eller la dem stå blanke."
+
+#: core/validators.py:327
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
+msgstr "Dette feltet må bare brukes hvis %(field)s er lik %(value)s"
+
+#: core/validators.py:340
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "Dette feltet må bare brukes hvis %(field)s ikke er lik %(value)s"
+
+#: core/validators.py:359
+msgid "Duplicate values are not allowed."
+msgstr "Like verdier er ikke tillatt."
+
+#: core/validators.py:374
+#, python-format
+msgid "This value must be between %(lower)s and %(upper)s."
+msgstr "Denne verdien må være mellom %(lower)s og %(upper)s."
+
+#: core/validators.py:376
+#, python-format
+msgid "This value must be at least %s."
+msgstr "Denne verdien må minst være %s."
+
+#: core/validators.py:378
+#, python-format
+msgid "This value must be no more than %s."
+msgstr "Denne verdien kan ikke være mer enn %s."
+
+#: core/validators.py:414
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "Denne verdien må være et kvadrat av %s."
+
+#: core/validators.py:424
+msgid "Please enter a valid decimal number."
+msgstr "Vennligst skriv inn et gyldig desimaltall."
+
+#: core/validators.py:431
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s total digits."
+msgstr[0] "Skriv inn et desimaltall med maks %s siffer."
+msgstr[1] "Skriv inn et desimaltall med maks %s siffer."
+
+#: core/validators.py:434
 #, python-format
 msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(object)s\"? All of "
-"the following related items will be deleted:"
-msgstr ""
-"Er du sikker på at du vill slette %(object_name)s \"%(object)s\"? Alle de "
-"følgende relaterte objektene vill bli slettet:"
+"Please enter a valid decimal number with a whole part of at most %s digit."
+msgid_plural ""
+"Please enter a valid decimal number with a whole part of at most %s digits."
+msgstr[0] "Skriv inn et desimaltall hvor heltallsdelen er maks %s siffer."
+msgstr[1] "Skriv inn et desimaltall hvor heltallsdelen er maks %s siffer."
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "Ja, jeg er sikker"
-
-#: contrib/admin/templates/admin/filter.html:2
+#: core/validators.py:437
 #, python-format
-msgid " By %(title)s "
-msgstr "Av %(title)s "
+msgid "Please enter a valid decimal number with at most %s decimal place."
+msgid_plural ""
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr[0] "Skriv inn et desimaltall med maks %s siffer bak komma."
+msgstr[1] "Skriv inn et desimaltall med maks %s siffer bak komma."
 
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Gå"
+#: core/validators.py:445
+msgid "Please enter a valid floating point number."
+msgstr "Vennligst skriv inn et gyldig flyttall."
 
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "Vis på nettsted"
-
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Vennligst fiks feilen under."
-msgstr[1] "Vennligst fiks feilene under."
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "Rekkefølge"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "Rekkefølge:"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "Lagre som ny"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "Lagre og legg til en ny"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "Lagre og fortsett å endre"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Lagre"
-
-#: contrib/admin/templates/registration/password_change_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-msgid "Password change"
-msgstr "Endre passord"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "Passordet er endret"
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "Ditt passord er endret."
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "Tilbakestill passord"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Har du glemt passordet ditt? Skriv inn e-post adressen din under, så sender "
-"vi deg et nytt passord via e-post."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "E-post adresse:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Tilbakestill mitt passord"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Takk for at du valgte å bruke kvalitetstid på nettstedet idag."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Logg inn igjen"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "Passordet ble tilbakestilt"
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr ""
-"Vi sender deg et nytt passord til e-post adressen du oppgav. Du villmotta det "
-"snart."
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr ""
-"Venligst skriv inn ditt gamle passord, for sikkerthets grunner, så skriv inn "
-"ditt nye passord to ganger slik at vi kan kontrollere at det er rett."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "Gammelt passord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "Nytt passord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "Gjenta nytt passord:"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "Endre passord"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Du har mottatt denne e-posten fordi du ba om å tilbakestille passordet ditt"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
+#: core/validators.py:454
 #, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "for din konto hos %(site_name)s"
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr "Vær sikker på at fila du prøver å laste opp minst er %s bytes stor."
 
-#: contrib/admin/templates/registration/password_reset_email.html:5
+#: core/validators.py:455
 #, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Ditt nye passord er: %(new_password)s"
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr "Vær sikker på at fila du prøver å laste opp ikke er mer enn %s bytes"
+" stor."
 
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Du kan endre dette passordet ved å gå til denne siden:"
+#: core/validators.py:472
+msgid "The format for this field is wrong."
+msgstr "Formatet i dette feltet er feil."
 
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "I tilfellet du har glemt brukernavnet ditt, så er det:"
+#: core/validators.py:487
+msgid "This field is invalid."
+msgstr "Dette feltet er ugyldig."
 
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Takk for at du bruker vår side!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
+#: core/validators.py:523
 #, python-format
-msgid "The %(site_name)s team"
-msgstr "Hilsen %(site_name)s"
+msgid "Could not retrieve anything from %s."
+msgstr "Klarte ikke å hente noe fra %s."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
-msgstr "Bokmerker"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr "Dokumentasjon bokmerker"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+#: core/validators.py:526
+#, python-format
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
-"\n"
-"<p class=\"help\">For å installere bokmerker, dra linken til verktøylinja\n"
-"for bokmerker, eller høyreklikk og legg til i bokmerker. Nå kan du du velge\n"
-"bokmerket fra hvilken som helst side på nettstedet. Noen av disse\n"
-"bokmerkene krever at datamaskinen du bruker er markert som \"intern\"\n"
-"(kontakt din systemadministrator hvis du er usikker på om maskinen din er \"intern\").</p>\n"
+"Internettadressen %(url)s returnerte den ugyldige Content-Type-headeren "
+"'%(contenttype)s'."
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr "Dokumentasjon for denne siden"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+#: core/validators.py:559
+#, python-format
 msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
 msgstr ""
-"Hopp fra hvilken som helst side til dokumentasjonen for visnings funksjonen "
-"som laget siden."
+"Vennligst lukk taggen %(tag)s på linje %(line)s. (Linjen starer med "
+"\"%(start)s\".)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr "Vis objekt ID"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+#: core/validators.py:563
+#, python-format
 msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
 msgstr ""
-"Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
-"objekt."
+"Noe av teksten som starter på linje %(line)s er ikke tillatt. (Linjen "
+"starter med \"%(start)s\".)"
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr "Endre dette objektet (åpnes i dette vinduet)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Hopp til administrasjonsiden for sidene som representerer et enkelt objekt."
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr "Endre dette objektet (åpnes i et nytt vindu)"
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr "Samme som over, men åpner administrasjonsiden i et nytt vindu."
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Dato:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Tid:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Nå:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Endre:"
-
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "omadresser fra"
-
-#: contrib/redirects/models.py:8
+#: core/validators.py:568
+#, python-format
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
 msgstr ""
-"Dette burde vært en fullstendig sti, uten domene navnet. Foreksempel: '/"
-"nyheter/les/"
+"\"%(attr)s\" på linje %(line)s er et ugyldig attributt. (Linjen starter "
+"med \"%(start)s\".)"
 
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "omadresser til"
-
-#: contrib/redirects/models.py:10
+#: core/validators.py:573
+#, python-format
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
 msgstr ""
-"Dette kan enten være en fullstendig sti (som over), eller en hel "
-"internettadresse som starter med 'http://'"
+"\"<%(tag)s>\" på linje %(line)s er et ugyldig element. (Linjen starter med "
+"\"%(start)s\".)"
 
-#: contrib/redirects/models.py:12
-msgid "redirect"
-msgstr "omadressering"
-
-#: contrib/redirects/models.py:13
-msgid "redirects"
-msgstr "omadresserelser"
-
-#: contrib/flatpages/models.py:8
-msgid "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Eksempel: '/om/kontakt/'. Vær sikker på at du har en skråstrek forran og bak."
-
-#: contrib/flatpages/models.py:9
-msgid "title"
-msgstr "tittel"
-
-#: contrib/flatpages/models.py:10
-msgid "content"
-msgstr "innhold"
-
-#: contrib/flatpages/models.py:11
-msgid "enable comments"
-msgstr "tillat kommentarer"
-
-#: contrib/flatpages/models.py:12
-msgid "template name"
-msgstr "mal navn"
-
-#: contrib/flatpages/models.py:13
+#: core/validators.py:577
+#, python-format
 msgid ""
-"Example: 'flatpages/contact_page'. If this isn't provided, the system will "
-"use 'flatpages/default'."
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
 msgstr ""
-"Eksempel: 'flatfiler/kontakt_side'. Hvis denne ikke denne er gitt, vill "
-"'flatfiles/default' bli brukt."
+"Et element på linje %(line)s mangler et av de påkrevde attributtene. (Linjen "
+"starter med \"%(start)s\".)"
 
-#: contrib/flatpages/models.py:14
-msgid "registration required"
-msgstr "registrering kreves"
-
-#: contrib/flatpages/models.py:14
-msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
-"Hvis denne er krysset av er det bare brukere som er logget inn som kan se "
-"siden."
-
-#: contrib/flatpages/models.py:18
-msgid "flat page"
-msgstr "flatside"
-
-#: contrib/flatpages/models.py:19
-msgid "flat pages"
-msgstr "flatsider"
-
-#: contrib/auth/models.py:13 contrib/auth/models.py:26
-msgid "name"
-msgstr "navn"
-
-#: contrib/auth/models.py:15
-msgid "codename"
-msgstr "kodenavn"
-
-#: contrib/auth/models.py:17
-msgid "permission"
-msgstr "rettighet"
-
-#: contrib/auth/models.py:18 contrib/auth/models.py:27
-msgid "permissions"
-msgstr "rettigheter"
-
-#: contrib/auth/models.py:29
-msgid "group"
-msgstr "gruppe"
-
-#: contrib/auth/models.py:30 contrib/auth/models.py:65
-msgid "groups"
-msgstr "grupper"
-
-#: contrib/auth/models.py:55
-msgid "username"
-msgstr "brukernavn"
-
-#: contrib/auth/models.py:56
-msgid "first name"
-msgstr "fornavn"
-
-#: contrib/auth/models.py:57
-msgid "last name"
-msgstr "etternavn"
-
-#: contrib/auth/models.py:58
-msgid "e-mail address"
-msgstr "e-post adresse"
-
-#: contrib/auth/models.py:59
-msgid "password"
-msgstr "passord"
-
-#: contrib/auth/models.py:59
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "Bruk '[algo]$[salt]$[hexdigest]'"
-
-#: contrib/auth/models.py:60
-msgid "staff status"
-msgstr "administrasjons status"
-
-#: contrib/auth/models.py:60
-msgid "Designates whether the user can log into this admin site."
-msgstr "Bestemmer om brukeren kan logge inn på dette administrasjons sted."
-
-#: contrib/auth/models.py:61
-msgid "active"
-msgstr "aktiv"
-
-#: contrib/auth/models.py:62
-msgid "superuser status"
-msgstr "super bruker"
-
-#: contrib/auth/models.py:63
-msgid "last login"
-msgstr "siste logg inn"
-
-#: contrib/auth/models.py:64
-msgid "date joined"
-msgstr "registrerings dato"
-
-#: contrib/auth/models.py:66
+#: core/validators.py:582
+#, python-format
 msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
 msgstr ""
-"I tillegg til rettighetene som blir gitt manuelt, får også brukeren full "
-"tilgang til gruppene han/hun er i."
+"\"%(attr)s\"-attributtet på linje %(line)s har en ugyldig verdi. (Linjen "
+"starter med \"%(start)s\".)"
 
-#: contrib/auth/models.py:67
-msgid "user permissions"
-msgstr "Rettigheter"
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "%(verbose_name)s ble opprettet."
 
-#: contrib/auth/models.py:70
-msgid "user"
-msgstr "bruker"
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "%(verbose_name)s ble oppdatert."
 
-#: contrib/auth/models.py:71
-msgid "users"
-msgstr "brukere"
-
-#: contrib/auth/models.py:76
-msgid "Personal info"
-msgstr "Personlig informasjon"
-
-#: contrib/auth/models.py:77
-msgid "Permissions"
-msgstr "Rettigheter"
-
-#: contrib/auth/models.py:78
-msgid "Important dates"
-msgstr "Viktige datoer"
-
-#: contrib/auth/models.py:79
-msgid "Groups"
-msgstr "Grupper"
-
-#: contrib/auth/models.py:219
-msgid "message"
-msgstr "Melding"
-
-#: contrib/auth/forms.py:30
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "Din nettleser ser ikkeut til å støtte informasjonskapsler (cookies). Informasjonskapsler er påkrevd for å logge inn."
-
-#: contrib/contenttypes/models.py:25
-msgid "python model class name"
-msgstr "python modell klasse navn"
-
-#: contrib/contenttypes/models.py:28
-msgid "content type"
-msgstr "innholds type"
-
-#: contrib/contenttypes/models.py:29
-msgid "content types"
-msgstr "innholds typer"
-
-#: contrib/sessions/models.py:35
-msgid "session key"
-msgstr "sesjon nøkkel"
-
-#: contrib/sessions/models.py:36
-msgid "session data"
-msgstr "sesjon data"
-
-#: contrib/sessions/models.py:37
-msgid "expire date"
-msgstr "utløpsdato"
-
-#: contrib/sessions/models.py:41
-msgid "session"
-msgstr "sesjon"
-
-#: contrib/sessions/models.py:42
-msgid "sessions"
-msgstr "sesjoner"
-
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "domene navn"
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "vise navn"
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "nettsted"
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "nettsteder"
-
-#: utils/translation.py:360
-msgid "DATE_FORMAT"
-msgstr "j. M Y"
-
-#: utils/translation.py:361
-msgid "DATETIME_FORMAT"
-msgstr "j. M Y - h:i"
-
-#: utils/translation.py:362
-msgid "TIME_FORMAT"
-msgstr "h:i"
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "%(verbose_name)s ble slettet."
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1330,127 +617,155 @@ msgstr "Lørdag"
 msgid "Sunday"
 msgstr "Søndag"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Man"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Tirs"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Ons"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Tors"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Fre"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Lør"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Søn"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "Januar"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "Februar"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "Mars"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "April"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "Mai"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "Juni"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "Juli"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "August"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "September"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "Oktober"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "November"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "Desember"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "jan"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "feb"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "mar"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "apr"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "mai"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "jun"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "jul"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "aug"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "sep"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "okt"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "nov"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "des"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "Jan."
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "Feb."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "Aug."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "Sept."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "Okt."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "Nov."
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "Des."
 
@@ -1490,488 +805,1783 @@ msgid_plural "minutes"
 msgstr[0] "minutt"
 msgstr[1] "minutter"
 
-#: conf/global_settings.py:37
-msgid "Bengali"
-msgstr "Bengalsk"
+#: utils/timesince.py:39
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
 
-#: conf/global_settings.py:38
-msgid "Czech"
-msgstr "Tsjekkisk"
+#: utils/timesince.py:45
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
 
-#: conf/global_settings.py:39
-msgid "Welsh"
-msgstr "Walisisk"
+#: utils/text.py:127
+msgid "or"
+msgstr "eller"
 
-#: conf/global_settings.py:40
-msgid "Danish"
-msgstr "Dansk"
+#: utils/dateformat.py:41
+msgid "p.m."
+msgstr ""
 
-#: conf/global_settings.py:41
-msgid "German"
-msgstr "Tysk"
+#: utils/dateformat.py:42
+msgid "a.m."
+msgstr ""
 
-#: conf/global_settings.py:42
-msgid "Greek"
-msgstr "Gresk"
+#: utils/dateformat.py:47
+msgid "PM"
+msgstr ""
 
-#: conf/global_settings.py:43
-msgid "English"
-msgstr "Engelsk"
+#: utils/dateformat.py:48
+msgid "AM"
+msgstr ""
 
-#: conf/global_settings.py:44
-msgid "Spanish"
-msgstr "Spansk"
+#: utils/dateformat.py:97
+msgid "midnight"
+msgstr "midnatt"
 
-#: conf/global_settings.py:45
-msgid "French"
-msgstr "Fransk"
+#: utils/dateformat.py:99
+msgid "noon"
+msgstr "middag"
 
-#: conf/global_settings.py:46
-msgid "Galician"
-msgstr "Galisisk"
+#: utils/translation/trans_real.py:391
+msgid "DATE_FORMAT"
+msgstr "j. M Y"
 
-#: conf/global_settings.py:47
-msgid "Hungarian"
-msgstr "Ungarsk"
+#: utils/translation/trans_real.py:392
+msgid "DATETIME_FORMAT"
+msgstr "h:i, j. M Y"
 
-#: conf/global_settings.py:48
-msgid "Hebrew"
-msgstr "Hebraiske"
+#: utils/translation/trans_real.py:393
+msgid "TIME_FORMAT"
+msgstr "h:i"
 
-#: conf/global_settings.py:49
-msgid "Icelandic"
-msgstr "Islandsk"
+#: utils/translation/trans_real.py:409
+msgid "YEAR_MONTH_FORMAT"
+msgstr "Y M"
 
-#: conf/global_settings.py:50
-msgid "Italian"
-msgstr "Italiensk"
+#: utils/translation/trans_real.py:410
+msgid "MONTH_DAY_FORMAT"
+msgstr "j. M"
 
-#: conf/global_settings.py:51
-msgid "Japanese"
-msgstr "Japansk"
+#: contrib/contenttypes/models.py:37
+msgid "python model class name"
+msgstr "python modell klasse navn"
 
-#: conf/global_settings.py:52
-msgid "Dutch"
-msgstr "Nederlandsk"
+#: contrib/contenttypes/models.py:40
+msgid "content type"
+msgstr "innholdstype"
 
-#: conf/global_settings.py:53
-msgid "Norwegian"
-msgstr "Norsk"
+#: contrib/contenttypes/models.py:41
+msgid "content types"
+msgstr "innholdstyper"
 
-#: conf/global_settings.py:54
-msgid "Brazilian"
-msgstr "Brasiliansk"
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "th"
+msgstr ""
 
-#: conf/global_settings.py:55
-msgid "Romanian"
-msgstr "Rumensk"
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "st"
+msgstr ""
 
-#: conf/global_settings.py:56
-msgid "Russian"
-msgstr "Russisk"
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "nd"
+msgstr ""
 
-#: conf/global_settings.py:57
-msgid "Slovak"
-msgstr "Slovakisk"
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "rd"
+msgstr ""
 
-#: conf/global_settings.py:58
-msgid "Slovenian"
-msgstr "Slovensk"
+#: contrib/humanize/templatetags/humanize.py:50
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f million"
+msgstr[1] "%(value).1f millioner"
 
-#: conf/global_settings.py:59
-msgid "Serbian"
-msgstr "Serbisk"
+#: contrib/humanize/templatetags/humanize.py:53
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f milliard"
+msgstr[1] "%(value).1f milliarder"
 
-#: conf/global_settings.py:60
-msgid "Swedish"
-msgstr "Svensk"
+#: contrib/humanize/templatetags/humanize.py:56
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f billion"
+msgstr[1] "%(value).1f billioner"
 
-#: conf/global_settings.py:61
-msgid "Ukrainian"
-msgstr "Ukrainsk"
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "one"
+msgstr "en"
 
-#: conf/global_settings.py:62
-msgid "Simplified Chinese"
-msgstr "Simplifisert Kinesisk"
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "two"
+msgstr "to"
 
-#: conf/global_settings.py:63
-msgid "Traditional Chinese"
-msgstr "Tradisjonell Kinesisk"
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "three"
+msgstr "tre"
 
-#: core/validators.py:60
-msgid "This value must contain only letters, numbers and underscores."
-msgstr "Dette feltet må bare inneholde bokstaver, nummer og understreker."
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "four"
+msgstr "fire"
 
-#: core/validators.py:64
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "five"
+msgstr "fem"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "six"
+msgstr "seks"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "seven"
+msgstr "sju"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "eight"
+msgstr "åtte"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "nine"
+msgstr "ni"
+
+#: contrib/humanize/templatetags/humanize.py:90
+msgid "today"
+msgstr "i dag"
+
+#: contrib/humanize/templatetags/humanize.py:92
+msgid "tomorrow"
+msgstr "i morgen"
+
+#: contrib/humanize/templatetags/humanize.py:94
+msgid "yesterday"
+msgstr "i går"
+
+#: contrib/auth/views.py:47
+msgid "Logged out"
+msgstr "Logget ut"
+
+#: contrib/auth/models.py:53 contrib/auth/models.py:73
+msgid "name"
+msgstr "navn"
+
+#: contrib/auth/models.py:55
+msgid "codename"
+msgstr "kodenavn"
+
+#: contrib/auth/models.py:58
+msgid "permission"
+msgstr "rettighet"
+
+#: contrib/auth/models.py:59 contrib/auth/models.py:74
+msgid "permissions"
+msgstr "rettigheter"
+
+#: contrib/auth/models.py:77
+msgid "group"
+msgstr "gruppe"
+
+#: contrib/auth/models.py:78 contrib/auth/models.py:121
+msgid "groups"
+msgstr "grupper"
+
+#: contrib/auth/models.py:111
+msgid "username"
+msgstr "brukernavn"
+
+#: contrib/auth/models.py:111
 msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-"Dette feltet må bare inneholde bokstaver, nummer, understreker og "
-"skråstreker."
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr "Påkrevd. 30 tegn eller færre. Kun alfanumeriske tegn (bokstaver, "
+"tall og understreker)."
 
-#: core/validators.py:72
-msgid "Uppercase letters are not allowed here."
-msgstr "Stor bokstaver er ikke tillatt her."
+#: contrib/auth/models.py:112
+msgid "first name"
+msgstr "fornavn"
 
-#: core/validators.py:76
-msgid "Lowercase letters are not allowed here."
-msgstr "Små bokstaver er ikke tillatt her."
+#: contrib/auth/models.py:113
+msgid "last name"
+msgstr "etternavn"
 
-#: core/validators.py:83
-msgid "Enter only digits separated by commas."
-msgstr "Skriv inn bare tall, skilt med kommaer."
+#: contrib/auth/models.py:114
+msgid "e-mail address"
+msgstr "e-postadresse"
 
-#: core/validators.py:95
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr "Skriv inn e-post adresser skilt med kommaer."
+#: contrib/auth/models.py:115
+msgid "password"
+msgstr "passord"
 
-#: core/validators.py:99
-msgid "Please enter a valid IP address."
-msgstr "Vennligst skriv inn en godkjent IP adresse."
-
-#: core/validators.py:103
-msgid "Empty values are not allowed here."
-msgstr "Dette felte kan ikke være tomt."
-
-#: core/validators.py:107
-msgid "Non-numeric characters aren't allowed here."
-msgstr "Det er bare tall som kan stå i dette feltet."
-
-#: core/validators.py:111
-msgid "This value can't be comprised solely of digits."
-msgstr "Dette feltet kan ikke bare bestå av nummer."
-
-#: core/validators.py:116
-msgid "Enter a whole number."
-msgstr "Skriv inn et helt nummer."
-
-#: core/validators.py:120
-msgid "Only alphabetical characters are allowed here."
-msgstr "Bare alfabetiske bokstaver er tillatt her."
-
-#: core/validators.py:124
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Skriv inn en dato i ÅÅÅÅ-MM-DD format."
-
-#: core/validators.py:128
-msgid "Enter a valid time in HH:MM format."
-msgstr "Skriv inn tiden i TT:MM format."
-
-#: core/validators.py:132 db/models/fields/__init__.py:468
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Skriv inn dato og tid i ÅÅÅÅ-MM-DD TT:MM format."
-
-#: core/validators.py:136
-msgid "Enter a valid e-mail address."
-msgstr "Skriv inn en godkjent e-post adresse."
-
-#: core/validators.py:148
+#: contrib/auth/models.py:115
 msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr "Bruk '[algo]$[salt]$[hexdigest]' eller <a href=\"password/\">endre "
+"passord-skjemaet</a>."
+
+#: contrib/auth/models.py:116
+msgid "staff status"
+msgstr "administrasjonsstatus"
+
+#: contrib/auth/models.py:116
+msgid "Designates whether the user can log into this admin site."
+msgstr "Bestemmer om brukeren kan logge inn på disse administrasjonssidene."
+
+#: contrib/auth/models.py:117
+msgid "active"
+msgstr "aktiv"
+
+#: contrib/auth/models.py:117
+msgid ""
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr "Bestemmer om brukeren kan logge inn på disse sidene. Huk av denne "
+"i stedet for å slette kontoen."
+
+#: contrib/auth/models.py:118
+msgid "superuser status"
+msgstr "superbruker"
+
+#: contrib/auth/models.py:118
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "Bestemmer om denne brukeren har alle rettigheter, uten å sette de "
+"eksplisitt."
+
+#: contrib/auth/models.py:119
+msgid "last login"
+msgstr "siste innlogging"
+
+#: contrib/auth/models.py:120
+msgid "date joined"
+msgstr "registreringsdato"
+
+#: contrib/auth/models.py:122
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
 msgstr ""
-"Lastopp et bilde. Filen du lastet opp var ikke et bilde, eller så var det et "
-"ødelagt bilde"
+"I tillegg til rettighetene som blir gitt manuelt, får brukeren også full "
+"tilgang til rettighetene til gruppene han/hun er i."
 
-#: core/validators.py:155
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr "Internettadressen %s peker ikke til et godkjent bilde."
+#: contrib/auth/models.py:123
+msgid "user permissions"
+msgstr "Brukerrettigheter"
 
-#: core/validators.py:159
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr "Telefon nummeret må være i XXX-XXX-XXXX format. \"%s\" er ikke godkjent."
+#: contrib/auth/models.py:127
+msgid "user"
+msgstr "bruker"
 
-#: core/validators.py:167
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "Internettadressen %s peker ikke til en godkjent QuickTime film."
+#: contrib/auth/models.py:128
+msgid "users"
+msgstr "brukere"
 
-#: core/validators.py:171
-msgid "A valid URL is required."
-msgstr "En godkjent internettadresse er påkrevd."
+#: contrib/auth/models.py:134
+msgid "Personal info"
+msgstr "Personlig informasjon"
 
-#: core/validators.py:185
+#: contrib/auth/models.py:135
+msgid "Permissions"
+msgstr "Rettigheter"
+
+#: contrib/auth/models.py:136
+msgid "Important dates"
+msgstr "Viktige datoer"
+
+#: contrib/auth/models.py:137
+msgid "Groups"
+msgstr "Grupper"
+
+#: contrib/auth/models.py:288
+msgid "message"
+msgstr "melding"
+
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+msgid "The two password fields didn't match."
+msgstr "De to passordfeltene er ikke like."
+
+#: contrib/auth/forms.py:25
+msgid "A user with that username already exists."
+msgstr "Det eksisterer en bruker med dette brukernavnet."
+
+#: contrib/auth/forms.py:53
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr ""
+"Din nettleser ser ikke ut til å støtte informasjonskapsler (cookies). "
+"Informasjonskapsler er påkrevd for å logge inn."
+
+#: contrib/auth/forms.py:60 contrib/admin/views/decorators.py:10
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Vennligst angi korrekt brukernavn og passord. Merk at det er forskjell på "
+"små og store bokstaver."
+
+#: contrib/auth/forms.py:62
+msgid "This account is inactive."
+msgstr "Denne kontoen er inaktiv."
+
+#: contrib/auth/forms.py:84
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "Den oppgitte e-postadressen er ikke registrert hos oss. Er du sikker"
+"på at du har en konto her?"
+
+#: contrib/auth/forms.py:117
+msgid "The two 'new password' fields didn't match."
+msgstr "De to feltene for nytt passord er ikke like."
+
+#: contrib/auth/forms.py:124
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Ditt gamle passord er feil. Vennligst prøv igjen."
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr "omadresser fra"
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Dette burde vært en fullstendig sti, uten domenenavnet. Eksempel: '/"
+"nyheter/les/"
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr "omadresser til"
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Dette kan enten være en fullstendig sti (som over), eller en hel "
+"internettadresse som starter med 'http://'"
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr "omadressering"
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr "omadresserelser"
+
+#: contrib/comments/models.py:67 contrib/comments/models.py:169
+msgid "object ID"
+msgstr "objekt-ID"
+
+#: contrib/comments/models.py:68
+msgid "headline"
+msgstr "overskrift"
+
+#: contrib/comments/models.py:69 contrib/comments/models.py:90
+#: contrib/comments/models.py:170
+msgid "comment"
+msgstr "kommentar"
+
+#: contrib/comments/models.py:70
+msgid "rating #1"
+msgstr "rangering #1 "
+
+#: contrib/comments/models.py:71
+msgid "rating #2"
+msgstr "rangering #2"
+
+#: contrib/comments/models.py:72
+msgid "rating #3"
+msgstr "rangering #3"
+
+#: contrib/comments/models.py:73
+msgid "rating #4"
+msgstr "rangering #4"
+
+#: contrib/comments/models.py:74
+msgid "rating #5"
+msgstr "rangering #5"
+
+#: contrib/comments/models.py:75
+msgid "rating #6"
+msgstr "rangering #6"
+
+#: contrib/comments/models.py:76
+msgid "rating #7"
+msgstr "rangering #7"
+
+#: contrib/comments/models.py:77
+msgid "rating #8"
+msgstr "rangering #8"
+
+#: contrib/comments/models.py:82
+msgid "is valid rating"
+msgstr "er gyldig rangering"
+
+#: contrib/comments/models.py:83 contrib/comments/models.py:172
+msgid "date/time submitted"
+msgstr "dato/tid for innsendelse"
+
+#: contrib/comments/models.py:84 contrib/comments/models.py:173
+msgid "is public"
+msgstr "er tilgjengelig for alle"
+
+#: contrib/comments/models.py:85 contrib/admin/views/doc.py:306
+msgid "IP address"
+msgstr "IP-adresse"
+
+#: contrib/comments/models.py:86
+msgid "is removed"
+msgstr "er fjernet"
+
+#: contrib/comments/models.py:86
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Huk av denne avkryssningsboksen hvis kommentaren er upasende. Beskjeden "
+"\"Denne kommentaren er blitt fjernet\" vil bli vist istedet."
+
+#: contrib/comments/models.py:91
+msgid "comments"
+msgstr "kommentarer"
+
+#: contrib/comments/models.py:134 contrib/comments/models.py:213
+msgid "Content object"
+msgstr "innholdsobjekt"
+
+#: contrib/comments/models.py:162
 #, python-format
 msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 msgstr ""
-"Godkjent HTML er påkrevd. Feilene var:\n"
-"%s"
+"Sendt av %(user)s på %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
-#: core/validators.py:192
+#: contrib/comments/models.py:171
+msgid "person's name"
+msgstr "personens navn"
+
+#: contrib/comments/models.py:174
+msgid "ip address"
+msgstr "IP-adresse"
+
+#: contrib/comments/models.py:176
+msgid "approved by staff"
+msgstr "godkjent av moderator"
+
+#: contrib/comments/models.py:179
+msgid "free comment"
+msgstr "åpen kommentar"
+
+#: contrib/comments/models.py:180
+msgid "free comments"
+msgstr "åpne kommentarer"
+
+#: contrib/comments/models.py:239
+msgid "score"
+msgstr "poeng"
+
+#: contrib/comments/models.py:240
+msgid "score date"
+msgstr "poengdato"
+
+#: contrib/comments/models.py:243
+msgid "karma score"
+msgstr "karmapoeng"
+
+#: contrib/comments/models.py:244
+msgid "karma scores"
+msgstr "karmapoeng"
+
+#: contrib/comments/models.py:248
 #, python-format
-msgid "Badly formed XML: %s"
-msgstr "Ikke godkjent XML: %s"
+msgid "%(score)d rating by %(user)s"
+msgstr "%(score)d rangering av %(user)s"
 
-#: core/validators.py:202
-#, python-format
-msgid "Invalid URL: %s"
-msgstr "Ikke godkjent URL: %s"
-
-#: core/validators.py:206 core/validators.py:208
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr "Internettadresse %s fører til en side som ikke virker."
-
-#: core/validators.py:214
-msgid "Enter a valid U.S. state abbreviation."
-msgstr "Skriv inn en godkjent amerikansk delstat forkortelse."
-
-#: core/validators.py:229
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgid_plural "Watch your mouth! The words %s are not allowed here."
-msgstr[0] "Pass munnen din! Ordet %s er ikke tillatt her."
-msgstr[1] "Pass munnen din! Ordene %s er ikke tillatt her."
-
-#: core/validators.py:236
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr "Dette feltet må være det samme som i '%s' feltet."
-
-#: core/validators.py:255
-msgid "Please enter something for at least one field."
-msgstr "Vennligst skriv inn noe i minst et felt."
-
-#: core/validators.py:264 core/validators.py:275
-msgid "Please enter both fields or leave them both empty."
-msgstr "Vennligst skriv inn noe i begge felta, eller la dem stå blanke."
-
-#: core/validators.py:282
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Dette feltet må bare brukes hvis %(field)s er lik %(value)s"
-
-#: core/validators.py:294
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Dette feltet må bare brukes hvis %(field)s ikke er lik %(value)s"
-
-#: core/validators.py:313
-msgid "Duplicate values are not allowed."
-msgstr "Like verdier er ikke tillatt."
-
-#: core/validators.py:336
-#, python-format
-msgid "This value must be a power of %s."
-msgstr "Denne verdien må være 'power' av %s."
-
-#: core/validators.py:347
-msgid "Please enter a valid decimal number."
-msgstr "Vennligst skriv inn et godkjent desimal tall."
-
-#: core/validators.py:349
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-msgid_plural "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Skriv inn et desimal tall med maksimum %s total antall tall."
-msgstr[1] "Skriv inn et desimal tall med maksimum %s total antall tall."
-
-#: core/validators.py:352
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-msgid_plural "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
-msgstr[1] "Skriv inn et desimal tall med maksimum %s tall bak komma. "
-
-#: core/validators.py:362
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Vær sikker på at fila du prøver å laste opp er minimum %s bytes stor."
-
-#: core/validators.py:363
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Vær sikker på at fila du prøver å laste opp er maksimum %s bytes stor."
-
-#: core/validators.py:376
-msgid "The format for this field is wrong."
-msgstr "Formatet i dette feltet er feil."
-
-#: core/validators.py:391
-msgid "This field is invalid."
-msgstr "Dette feltet er feil."
-
-#: core/validators.py:426
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr "Klarte ikke å motta noe fra %s."
-
-#: core/validators.py:429
-#, python-format
-msgid "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-"Internettadressen %(url)s returnerte en ikke godkjent Content-Type '%"
-"(contenttype)s'."
-
-#: core/validators.py:462
+#: contrib/comments/models.py:264
 #, python-format
 msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
 msgstr ""
-"Vennligst lukk taggen %(tag)s på linje %(line)s. (Linjen starer med \"%(start)"
-"s\".)"
+"Denne kommentaren er flagget av %(user)s:\n"
+"\n"
+"%(text)s"
 
-#: core/validators.py:466
+#: contrib/comments/models.py:271
+msgid "flag date"
+msgstr "flaggdato"
+
+#: contrib/comments/models.py:274
+msgid "user flag"
+msgstr "brukerflag"
+
+#: contrib/comments/models.py:275
+msgid "user flags"
+msgstr "brukerflag"
+
+#: contrib/comments/models.py:279
+#, python-format
+msgid "Flag by %r"
+msgstr "Flagg med %r"
+
+#: contrib/comments/models.py:284
+msgid "deletion date"
+msgstr "dato fjernet"
+
+#: contrib/comments/models.py:286
+msgid "moderator deletion"
+msgstr "fjernet av  moderator"
+
+#: contrib/comments/models.py:287
+msgid "moderator deletions"
+msgstr "fjernet av moderator"
+
+#: contrib/comments/models.py:291
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "Fjernet av moderator med %r"
+
+#: contrib/comments/views/karma.py:20
+msgid "Anonymous users cannot vote"
+msgstr "Anonyme brukere kan ikke stemme"
+
+#: contrib/comments/views/karma.py:24
+msgid "Invalid comment ID"
+msgstr "Ikke gyldig kommentar-ID"
+
+#: contrib/comments/views/karma.py:26
+msgid "No voting for yourself"
+msgstr "Du kan ikke stemme på deg selv"
+
+#: contrib/comments/views/comments.py:28
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr ""
+"Denne rangeringen er påkrevd, fordi du har rangert en eller flere ting fra "
+"før "
+
+#: contrib/comments/views/comments.py:112
 #, python-format
 msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"Noe av teksten som starter på linje %(line)s er ikke tillatt. (Linjen starter "
-"med \"%(start)s\".)"
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
+"(count)s kommentarer:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"Denne kommentaren var skrevet av en bruker som har fra før skrevet under %"
+"(count)s kommentarer:\n"
+"\n"
+"%(text)s"
 
-#: core/validators.py:471
+#: contrib/comments/views/comments.py:117
 #, python-format
 msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
 msgstr ""
-"\"%(attr)s\" på linje %(line)s er ikke en godkjent tillegg. (Linjen starter "
-"med \"%(start)s\".)"
+"Denne kommentaren er skrevet av en upålitelig bruker:\n"
+"\n"
+"%(text)s"
 
-#: core/validators.py:476
+#: contrib/comments/views/comments.py:189
+#: contrib/comments/views/comments.py:281
+msgid "Only POSTs are allowed"
+msgstr "Kun POST er tillatt"
+
+#: contrib/comments/views/comments.py:193
+#: contrib/comments/views/comments.py:285
+msgid "One or more of the required fields wasn't submitted"
+msgstr "En eller flere av feltene som er påkrevd ble ikke sendt."
+
+#: contrib/comments/views/comments.py:197
+#: contrib/comments/views/comments.py:287
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "Noen har endret på komentarfeltene (sikkerhetsadvarsel)"
+
+#: contrib/comments/views/comments.py:207
+#: contrib/comments/views/comments.py:293
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr "Skjemaet hadde en ugyldig 'target'-verdi - objekt-IDen var ugyldig"
+
+#: contrib/comments/views/comments.py:258
+#: contrib/comments/views/comments.py:322
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "Kommentarskjemaet la ikke ved 'preview'- eller 'post'-element"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "Ditt navn:"
+
+#: contrib/comments/templates/comments/freeform.html:5
+#: contrib/comments/templates/comments/form.html:28
+msgid "Comment:"
+msgstr "Kommentar:"
+
+#: contrib/comments/templates/comments/freeform.html:10
+#: contrib/comments/templates/comments/form.html:35
+msgid "Preview comment"
+msgstr "Forhåndvis kommentar"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:17
+msgid "Username:"
+msgstr "Brukernavn:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Log out"
+msgstr "Logg ut"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:20
+msgid "Password:"
+msgstr "Passord:"
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "Har du glemt passordet ditt?"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr "Rangeringer"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "Påkrevd"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "Valgfri"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "Send et bilde"
+
+#: contrib/flatpages/models.py:7 contrib/admin/views/doc.py:317
+msgid "URL"
+msgstr "URL"
+
+#: contrib/flatpages/models.py:8
+msgid ""
+"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+msgstr ""
+"Eksempel: '/om/kontakt/'. Vær sikker på at det er en skråstrek foran og bak."
+
+#: contrib/flatpages/models.py:9
+msgid "title"
+msgstr "tittel"
+
+#: contrib/flatpages/models.py:10
+msgid "content"
+msgstr "innhold"
+
+#: contrib/flatpages/models.py:11
+msgid "enable comments"
+msgstr "tillat kommentarer"
+
+#: contrib/flatpages/models.py:12
+msgid "template name"
+msgstr "navn på mal"
+
+#: contrib/flatpages/models.py:13
+msgid ""
+"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
+"will use 'flatpages/default.html'."
+msgstr ""
+"Eksempel: 'flatpages/kontakt_side.html'. Hvis denne ikke denne er gitt, vil "
+"'flatpages/default.html' bli brukt."
+
+#: contrib/flatpages/models.py:14
+msgid "registration required"
+msgstr "registrering kreves"
+
+#: contrib/flatpages/models.py:14
+msgid "If this is checked, only logged-in users will be able to view the page."
+msgstr ""
+"Hvis denne er krysset av, er det kun innloggede brukere som kan se siden."
+
+#: contrib/flatpages/models.py:18
+msgid "flat page"
+msgstr "flatside"
+
+#: contrib/flatpages/models.py:19
+msgid "flat pages"
+msgstr "flatsider"
+
+#: contrib/sessions/models.py:68
+msgid "session key"
+msgstr "sesjonsnøkkel"
+
+#: contrib/sessions/models.py:69
+msgid "session data"
+msgstr "sesjonsdata"
+
+#: contrib/sessions/models.py:70
+msgid "expire date"
+msgstr "utløpsdato"
+
+#: contrib/sessions/models.py:74
+msgid "session"
+msgstr "sesjon"
+
+#: contrib/sessions/models.py:75
+msgid "sessions"
+msgstr "sesjoner"
+
+#: contrib/sites/models.py:15
+msgid "domain name"
+msgstr "domenenavn"
+
+#: contrib/sites/models.py:16
+msgid "display name"
+msgstr "visningsnavn"
+
+#: contrib/sites/models.py:20
+msgid "site"
+msgstr "nettsted"
+
+#: contrib/sites/models.py:21
+msgid "sites"
+msgstr "nettsteder"
+
+#: contrib/admin/filterspecs.py:42
 #, python-format
 msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
+"<h3>By %s:</h3>\n"
+"<ul>\n"
 msgstr ""
-"\"<%(tag)s>\" på linje %(line)s er ikke en godkjent tag. (linjen starter med "
-"\"%(start)s\".)"
+"<h3>Av %s:</h3>\n"
+"<ul>\n"
 
-#: core/validators.py:480
+#: contrib/admin/filterspecs.py:72 contrib/admin/filterspecs.py:90
+#: contrib/admin/filterspecs.py:145 contrib/admin/filterspecs.py:171
+msgid "All"
+msgstr "Alle"
+
+#: contrib/admin/filterspecs.py:111
+msgid "Any date"
+msgstr "Når som helst"
+
+#: contrib/admin/filterspecs.py:112
+msgid "Today"
+msgstr "I dag"
+
+#: contrib/admin/filterspecs.py:115
+msgid "Past 7 days"
+msgstr "Siste 7 dager"
+
+#: contrib/admin/filterspecs.py:117
+msgid "This month"
+msgstr "Denne måneden"
+
+#: contrib/admin/filterspecs.py:119
+msgid "This year"
+msgstr "I år"
+
+#: contrib/admin/filterspecs.py:145 oldforms/__init__.py:591
+#: newforms/widgets.py:188
+msgid "Yes"
+msgstr "Ja"
+
+#: contrib/admin/filterspecs.py:145 oldforms/__init__.py:591
+#: newforms/widgets.py:188
+msgid "No"
+msgstr "Nei"
+
+#: contrib/admin/filterspecs.py:152 oldforms/__init__.py:591
+#: newforms/widgets.py:188
+msgid "Unknown"
+msgstr "Ukjent"
+
+#: contrib/admin/models.py:17
+msgid "action time"
+msgstr "tid for handling"
+
+#: contrib/admin/models.py:20
+msgid "object id"
+msgstr "objekt-ID"
+
+#: contrib/admin/models.py:21
+msgid "object repr"
+msgstr "objekt repr"
+
+#: contrib/admin/models.py:22
+msgid "action flag"
+msgstr "handlingsflagg"
+
+#: contrib/admin/models.py:23
+msgid "change message"
+msgstr "endre melding"
+
+#: contrib/admin/models.py:26
+msgid "log entry"
+msgstr "logginnlegg"
+
+#: contrib/admin/models.py:27
+msgid "log entries"
+msgstr "logginnlegg"
+
+#: contrib/admin/templatetags/admin_list.py:254
+msgid "All dates"
+msgstr "Alle datoer"
+
+#: contrib/admin/views/decorators.py:24
+#: contrib/admin/templates/admin/login.html:25
+msgid "Log in"
+msgstr "Logg inn"
+
+#: contrib/admin/views/decorators.py:62
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Du må logge inn igjen, fordi økten din har gått ut. Slapp av, innlegget ditt "
+"ble lagret."
+
+#: contrib/admin/views/decorators.py:69
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Det ser ut som om nettleseren din ikke støtter informasjonskapsler "
+"('cookies'). Vennligst konfigurer nettleseren din, og prøv igjen."
+
+#: contrib/admin/views/decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "Brukernavnet kan ikke inneholde '@'"
+
+#: contrib/admin/views/decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "E-postadressen din er ikke brukernavnet ditt, prøv '%s' i stede."
+
+#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:264
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" ble lagt inn i databasen."
+
+#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:268
+#: contrib/admin/views/main.py:354
+msgid "You may edit it again below."
+msgstr "Du kan endre under"
+
+#: contrib/admin/views/auth.py:31
+msgid "Add user"
+msgstr "Ny bruker"
+
+#: contrib/admin/views/auth.py:58
+msgid "Password changed successfully."
+msgstr "Passordet er endret."
+
+#: contrib/admin/views/auth.py:65
+#, python-format
+msgid "Change password: %s"
+msgstr "Endre passord: %s"
+
+#: contrib/admin/views/main.py:230
+msgid "Site administration"
+msgstr "Nettstedsadministrasjon"
+
+#: contrib/admin/views/main.py:278 contrib/admin/views/main.py:363
+#, python-format
+msgid "You may add another %s below."
+msgstr "Du kan legge til en ny %s under."
+
+#: contrib/admin/views/main.py:296
+#, python-format
+msgid "Add %s"
+msgstr "Ny %s"
+
+#: contrib/admin/views/main.py:342
+#, python-format
+msgid "Added %s."
+msgstr "La til %s"
+
+#: contrib/admin/views/main.py:344
+#, python-format
+msgid "Changed %s."
+msgstr "Endret %s."
+
+#: contrib/admin/views/main.py:346
+#, python-format
+msgid "Deleted %s."
+msgstr "Slettet %s."
+
+#: contrib/admin/views/main.py:349
+msgid "No fields changed."
+msgstr "Ingen felt endret."
+
+#: contrib/admin/views/main.py:352
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" ble endret."
+
+#: contrib/admin/views/main.py:360
 #, python-format
 msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-"En tag på linje %(line)s mangler en av de påkrevde attributtene. (linjen starter "
-"med \"%(start)s\".)"
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" ble endret. Du kan endre det igjen under."
 
-#: core/validators.py:485
+#: contrib/admin/views/main.py:398
+#, python-format
+msgid "Change %s"
+msgstr "Endre %s"
+
+#: contrib/admin/views/main.py:483
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "En eller flere %(fieldname)s i %(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:488
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "En eller flere %(fieldname)s i %(name)s:"
+
+#: contrib/admin/views/main.py:520
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ble slettet."
+
+#: contrib/admin/views/main.py:523
+msgid "Are you sure?"
+msgstr "Er du sikker?"
+
+#: contrib/admin/views/main.py:545
+#, python-format
+msgid "Change history: %s"
+msgstr "Endringshistorikk: %s"
+
+#: contrib/admin/views/main.py:579
+#, python-format
+msgid "Select %s"
+msgstr "Velg %s"
+
+#: contrib/admin/views/main.py:579
+#, python-format
+msgid "Select %s to change"
+msgstr "Velg %s for å endre"
+
+#: contrib/admin/views/main.py:780
+msgid "Database error"
+msgstr "Databasefeil"
+
+#: contrib/admin/views/doc.py:47 contrib/admin/views/doc.py:49
+#: contrib/admin/views/doc.py:51
+msgid "tag:"
+msgstr ""
+
+#: contrib/admin/views/doc.py:78 contrib/admin/views/doc.py:80
+#: contrib/admin/views/doc.py:82
+msgid "filter:"
+msgstr ""
+
+#: contrib/admin/views/doc.py:136 contrib/admin/views/doc.py:138
+#: contrib/admin/views/doc.py:140
+msgid "view:"
+msgstr ""
+
+#: contrib/admin/views/doc.py:165
+#, python-format
+msgid "App %r not found"
+msgstr "Fan ikke applikasjonen %r"
+
+#: contrib/admin/views/doc.py:172
+#, python-format
+msgid "Model %(name)r not found in app %(label)r"
+msgstr "Fant ikke %(name)r-modellen i applikasjonen %(label)r"
+
+#: contrib/admin/views/doc.py:184
+#, python-format
+msgid "the related `%(label)s.%(type)s` object"
+msgstr "det relaterte `%(label)s.%(type)s`-objektet"
+
+#: contrib/admin/views/doc.py:184 contrib/admin/views/doc.py:206
+#: contrib/admin/views/doc.py:220 contrib/admin/views/doc.py:225
+msgid "model:"
+msgstr ""
+
+#: contrib/admin/views/doc.py:215
+#, python-format
+msgid "related `%(label)s.%(name)s` objects"
+msgstr "relaterte `%(label)s.%(name)s`-objekter"
+
+#: contrib/admin/views/doc.py:220
+#, python-format
+msgid "all %s"
+msgstr "alle %s"
+
+#: contrib/admin/views/doc.py:225
+#, python-format
+msgid "number of %s"
+msgstr "antall %s"
+
+#: contrib/admin/views/doc.py:230
+#, python-format
+msgid "Fields on %s objects"
+msgstr "Felter på %s objekter"
+
+#: contrib/admin/views/doc.py:292 contrib/admin/views/doc.py:303
+#: contrib/admin/views/doc.py:305 contrib/admin/views/doc.py:311
+#: contrib/admin/views/doc.py:312 contrib/admin/views/doc.py:314
+msgid "Integer"
+msgstr "Heltall"
+
+#: contrib/admin/views/doc.py:293
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (enten \"True\" eller \"False\")"
+
+#: contrib/admin/views/doc.py:294 contrib/admin/views/doc.py:313
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Tekst (opp til %(max_length)s tegn)"
+
+#: contrib/admin/views/doc.py:295
+msgid "Comma-separated integers"
+msgstr "Heltall adskilt med komma"
+
+#: contrib/admin/views/doc.py:296
+msgid "Date (without time)"
+msgstr "Dato (uten tid)"
+
+#: contrib/admin/views/doc.py:297
+msgid "Date (with time)"
+msgstr "Dato/tid"
+
+#: contrib/admin/views/doc.py:298
+msgid "Decimal number"
+msgstr "Desimaltall"
+
+#: contrib/admin/views/doc.py:299
+msgid "E-mail address"
+msgstr "E-postadresse"
+
+#: contrib/admin/views/doc.py:300 contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:304
+msgid "File path"
+msgstr "Filsti"
+
+#: contrib/admin/views/doc.py:302
+msgid "Floating point number"
+msgstr "Flyttall"
+
+#: contrib/admin/views/doc.py:308
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (enten \"True\", \"False\" eller \"None\")"
+
+#: contrib/admin/views/doc.py:309
+msgid "Relation to parent model"
+msgstr "Relasjon til foreldermodell"
+
+#: contrib/admin/views/doc.py:310
+msgid "Phone number"
+msgstr "Telefonnummer"
+
+#: contrib/admin/views/doc.py:315
+msgid "Text"
+msgstr "Tekst"
+
+#: contrib/admin/views/doc.py:316
+msgid "Time"
+msgstr "Tid"
+
+#: contrib/admin/views/doc.py:318
+msgid "U.S. state (two uppercase letters)"
+msgstr "Stat (i USA, to store bokstaver)"
+
+#: contrib/admin/views/doc.py:319
+msgid "XML text"
+msgstr "XML-tekst"
+
+#: contrib/admin/views/doc.py:345
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ser ikke ut til å være et urlpattern-objekt"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "Nå:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "Endre:"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Dato:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Tid:"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "Dokumentasjon"
+
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/model_index.html:5
+msgid "Change password"
+msgstr "Endre passord"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_list.html:6
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/auth/user/change_password.html:12
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Home"
+msgstr "Hjem"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:21
+msgid "History"
+msgstr "Historikk"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Dato/tid"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "User"
+msgstr "Bruker"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Handling"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "h:i, j. M Y"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Dette objektet har ingen endringshistorikk. Det var sannsynligvis ikke lagt "
+"til via denne siden."
+
+#: contrib/admin/templates/admin/change_list.html:12
+#, python-format
+msgid "Add %(name)s"
+msgstr "Legg til %(name)s"
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Av %(filter_title)s "
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Tjenerfeil"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Tjenerfeil (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Tjenerfeil <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Det har oppstått en feil. Feilen er blitt rapportert til administrator via e-"
+"post, og vil bli fikset snart. Takk for din tålmodighet."
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr "Noe er galt med databaseinstallasjonen din. Sørg for at "
+"databasetabellene er opprett, og at brukeren har de nødvendige rettigheter."
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "Gå"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "Ett resultat"
+msgstr[1] "(counter)s resultat"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s totalt"
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Vis alle"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django administrasjonsside"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Django-administrasjon"
+
+#: contrib/admin/templates/admin/filters.html:4
+msgid "Filter"
+msgstr "Filter"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Fant ikke siden"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Beklager, men siden du spør etter finnes ikke."
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Modeller tilgjengelig i %(name)s-applikasjonen."
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr ""
+
+#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:15
+msgid "Add"
+msgstr "Legg til"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "Endre"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "Du har ikke rettigheter til å endre noe."
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "Siste handlinger"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "Mine handlinger"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "Ingen tilgjengelige"
+
+#: contrib/admin/templates/admin/change_form.html:22
+msgid "View on site"
+msgstr "Vis på nettsted"
+
+#: contrib/admin/templates/admin/change_form.html:32
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Vennligst fiks feilen under."
+msgstr[1] "Vennligst fiks feilene under."
+
+#: contrib/admin/templates/admin/change_form.html:50
+msgid "Ordering"
+msgstr "Rekkefølge"
+
+#: contrib/admin/templates/admin/change_form.html:53
+msgid "Order:"
+msgstr "Rekkefølge:"
+
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "Velkommen,"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Slett"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
 msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
 msgstr ""
-"\"%(attr)s\" tillegg på linje %(line)s har en ikke godkjent verdi. (Linjen "
-"starter med \"%(start)s\".)"
+"Hivs du sletter %(object_name)s '%(escaped_object)s', vil du også slette "
+"relaterte objekter, men du har ikke tillatelse til å slette følgende "
+"objektene:"
 
-#: db/models/manipulators.py:302
+#: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr "%(object)s med %(type)s finnes allerede for angitt %(field)s."
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Er du sikker på at du vill slette %(object_name)s \"%(escaped_object)s\"? "
+"Alle de følgende relaterte objektene vil bli slettet:"
 
-#: db/models/fields/__init__.py:40
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "Ja, jeg er sikker"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Lagre som ny"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Lagre og legg til ny"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Lagre og fortsett å endre"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Lagre"
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
 #, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s med %(fieldname)s finnes allerede."
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Skriv inn et nytt passord for brukeren <strong>%(username)s</strong>."
 
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:542 db/models/fields/__init__.py:553
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "Dette feltet er påkrevd."
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+msgid "Password"
+msgstr "Passord"
 
-#: db/models/fields/__init__.py:337
-msgid "This value must be an integer."
-msgstr "Denne verdien må være et heltall."
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+msgid "Password (again)"
+msgstr "Passord (gjenta)"
 
-#: db/models/fields/__init__.py:369
-msgid "This value must be either True or False."
-msgstr "Denne verdien må være enten \"True\" eller \"False\"."
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+msgid "Enter the same password as above, for verification."
+msgstr "Skriv inn det samme passordet som ovenfor, for verifisering."
 
-#: db/models/fields/__init__.py:385
-msgid "This field cannot be null."
-msgstr "Dette feltet kan ikke være null/tom."
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "Skriv først inn brukernavn og passord. Deretter vil du få mulighet "
+"til å endre flere brukerinnstillinger."
 
-#: db/models/fields/__init__.py:562
-msgid "Enter a valid filename."
-msgstr "Skriv inn et godkjent fil navn."
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "Brukernavn"
 
-#: db/models/fields/related.py:43
+#: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/password_change_form.html:6
+#: contrib/admin/templates/registration/password_change_form.html:10
+msgid "Password change"
+msgstr "Endre passord"
+
+#: contrib/admin/templates/registration/password_change_done.html:6
+#: contrib/admin/templates/registration/password_change_done.html:10
+msgid "Password change successful"
+msgstr "Passordet er endret"
+
+#: contrib/admin/templates/registration/password_change_done.html:12
+msgid "Your password was changed."
+msgstr "Ditt passord er endret."
+
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+#: contrib/admin/templates/registration/password_reset_done.html:4
+msgid "Password reset"
+msgstr "Tilbakestill passord"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Har du glemt passordet ditt? Skriv inn e-postadressen din under, så sender "
+"vi deg et nytt passord til deg."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "E-postadresse:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Tilbakestill mitt passord"
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Takk for at du valgte å bruke kvalitetstid på nettstedet i dag."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Logg inn igjen"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "Passordet ble tilbakestilt"
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"Vi har sendt deg et nytt passord til e-postadressen du oppgav. Du vil "
+"forhåpentligvis motta det snart."
+
+#: contrib/admin/templates/registration/password_change_form.html:12
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Venligst skriv inn ditt gamle passord, av sikkerthetsårsaker. Skriv deretter "
+"inn ditt nye passord to ganger, slik at vi kan kontrollere at det er rett."
+
+#: contrib/admin/templates/registration/password_change_form.html:17
+msgid "Old password:"
+msgstr "Gammelt passord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:19
+msgid "New password:"
+msgstr "Nytt passord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:21
+msgid "Confirm password:"
+msgstr "Gjenta nytt passord:"
+
+#: contrib/admin/templates/registration/password_change_form.html:23
+msgid "Change my password"
+msgstr "Endre passord"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"Du har mottatt denne e-posten fordi du ba om å tilbakestille passordet ditt"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
-msgid "Please enter a valid %s."
-msgstr "Vennligst skriv inn en/et gyldig %s."
+msgid "for your user account at %(site_name)s"
+msgstr "for din konto hos %(site_name)s"
 
-#: db/models/fields/related.py:579
-msgid "Separate multiple IDs with commas."
-msgstr "Separer Id-ene med kommaer."
-
-#: db/models/fields/related.py:581
-msgid "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Hold nede \"Control\", eller \"Command\" på en Mac, for å velge mere enn en."
-
-#: db/models/fields/related.py:625
+#: contrib/admin/templates/registration/password_reset_email.html:5
 #, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Skriv inn gyldige %(self)s ID-er. Verdien %(value)r er ikke gyldig."
-msgstr[1] "Skriv inn gyldige %(self)s ID-er. Verdiene %(value)r er ikke gyldige."
+msgid "Your new password is: %(new_password)s"
+msgstr "Ditt nye passord er: %(new_password)s"
 
-#: forms/__init__.py:380
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Du kan endre dette passordet ved å gå til denne siden:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "I tilfellet du har glemt brukernavnet ditt, så er det:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Takk for at du bruker siden vår!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "Hilsen %(site_name)s"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "Bokmerker"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:5
+msgid "Documentation bookmarklets"
+msgstr "Dokumentasjonsbokmerker"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:9
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">For å installere bokmerker, dra linken til verktøylinja\n"
+"for bokmerker, eller høyreklikk og legg til i bokmerker. Nå kan du du velge\n"
+"bokmerket fra hvilken som helst side på nettstedet. Noen av disse\n"
+"bokmerkene krever at datamaskinen du bruker er markert som \"intern\"\n"
+"(kontakt din systemadministrator hvis du er usikker på om maskinen din er "
+"\"intern\").</p>\n"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid "Documentation for this page"
+msgstr "Dokumentasjon for denne siden"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:20
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr ""
+"Hopp fra hvilken som helst side til dokumentasjonen for visnings funksjonen "
+"som laget siden."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid "Show object ID"
+msgstr "Vis objekt-ID"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:23
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr ""
+"Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
+"objekt."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Edit this object (current window)"
+msgstr "Endre dette objektet (nåværende vindu)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:26
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr ""
+"Hopper til administrasjonsiden for sider som representerer et enkelt objekt."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "Edit this object (new window)"
+msgstr "Endre dette objektet (nytt vindu)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:29
+msgid "As above, but opens the admin page in a new window."
+msgstr "Samme som over, men åpner administrasjonsiden i et nytt vindu."
+
+#: contrib/localflavor/no/forms.py:14 contrib/localflavor/ch/forms.py:18
+msgid "Enter a zip code in the format XXXX."
+msgstr "Skriv inn et postnummer som XXXX."
+
+#: contrib/localflavor/no/forms.py:35
+msgid "Enter a valid Norwegian social security number."
+msgstr "Skriv et gyldig norsk personnummer."
+
+#: template/defaultfilters.py:485
+msgid "yes,no,maybe"
+msgstr "ja,nei,kanskje"
+
+#: template/defaultfilters.py:514
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:516
+#, python-format
+msgid "%.1f KB"
+msgstr ""
+
+#: template/defaultfilters.py:518
+#, python-format
+msgid "%.1f MB"
+msgstr ""
+
+#: template/defaultfilters.py:519
+#, python-format
+msgid "%.1f GB"
+msgstr ""
+
+#: oldforms/__init__.py:408
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Sjekk at teksten er kortere enn %s bokstav"
-msgstr[1] "Sjekk at teksten er kortere enn %s bokstaver"
+msgstr[0] "Sjekk at teksten er kortere enn %s tegn."
+msgstr[1] "Sjekk at teksten er kortere enn %s tegn."
 
-#: forms/__init__.py:385
+#: oldforms/__init__.py:413
 msgid "Line breaks are not allowed here."
-msgstr "Det er ikke tillatt med flere linjer her."
+msgstr "Det er ikke tillatt med linjeskift her."
 
-#: forms/__init__.py:480 forms/__init__.py:551 forms/__init__.py:589
+#: oldforms/__init__.py:511 oldforms/__init__.py:585 oldforms/__init__.py:624
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Velg et gyldig valg; '%(data)s' er ikke i %(choices)s."
 
-#: forms/__init__.py:645
+#: oldforms/__init__.py:688 newforms/fields.py:380
 msgid "The submitted file is empty."
 msgstr "Filen er tom."
 
-#: forms/__init__.py:699
+#: oldforms/__init__.py:744
 msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Skriv inn et heltall mellom -31768 og 32767."
+msgstr "Skriv inn et heltall mellom -32768 og 32767."
 
-#: forms/__init__.py:708
+#: oldforms/__init__.py:754
 msgid "Enter a positive number."
 msgstr "Skriv inn et positivt heltall."
 
-#: forms/__init__.py:717
+#: oldforms/__init__.py:764
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Skriv inn et heltall mellom 0 og 32767."
 
-#: template/defaultfilters.py:379
-msgid "yes,no,maybe"
-msgstr "ja,nei,kanskje"
+#: newforms/models.py:180 newforms/fields.py:478
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Velg et gyldig valg. Ditt valg er ikke et av de gyldige valgene."
 
-#, fuzzy
-#~ msgid "Comments"
-#~ msgstr "tillat kommentarer"
+#: newforms/models.py:197 newforms/fields.py:494 newforms/fields.py:570
+msgid "Enter a list of values."
+msgstr "Skriv inn en liste med verdier."
 
-#~ msgid "String (up to 50)"
-#~ msgstr "Tekst (opp til 50 tegn)"
+#: newforms/models.py:203 newforms/fields.py:500
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Velg et gyldig valg;  %s er ikke et av de tilgjengelige valgene."
 
-#~ msgid "label"
-#~ msgstr "merkelapp"
+#: newforms/fields.py:116
+#, python-format
+msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
+msgstr "Pass på at denne er på maks %(max)d tegn (den er %(length)d)."
 
-#~ msgid "package"
-#~ msgstr "pakke"
+#: newforms/fields.py:118
+#, python-format
+msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
+msgstr "Pass på at denne er på minst %(min)d tegn (den er %(length)d)."
 
-#~ msgid "packages"
-#~ msgstr "pakker"
+#: newforms/fields.py:144 newforms/fields.py:167 newforms/fields.py:197
+#, python-format
+msgid "Ensure this value is less than or equal to %s."
+msgstr "Pass på at denne er mindre eller lik %s."
 
-#~ msgid "Error in Template"
-#~ msgstr "Feil i mal"
+#: newforms/fields.py:146 newforms/fields.py:169 newforms/fields.py:199
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr "Pass på at denne er større eller lik %s."
 
-#~ msgid ""
-#~ "\n"
-#~ "In template %(name)s, error at line %(line)s:\n"
-#~ msgstr ""
-#~ "\n"
-#~ "I mal %(name)s, var det en feil på linje %(line)s:\n"
+#: newforms/fields.py:165 newforms/fields.py:192
+msgid "Enter a number."
+msgstr "Skriv inn et tall."
+
+#: newforms/fields.py:201
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Pass på at det ikke er mer enn %s siffer totalt."
+
+#: newforms/fields.py:203
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Pass på at ikke er mer enn %s desimaler."
+
+#: newforms/fields.py:205
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Pass på at det ikke er mer enn %s siffer foran komma."
+
+#: newforms/fields.py:238 newforms/fields.py:610
+msgid "Enter a valid date."
+msgstr "Skriv inn en gyldig dato."
+
+#: newforms/fields.py:265 newforms/fields.py:612
+msgid "Enter a valid time."
+msgstr "Skriv inn et gyldig tidspunkt."
+
+#: newforms/fields.py:301
+msgid "Enter a valid date/time."
+msgstr "Skriv inn et gyldig tidspunkt."
+
+#: newforms/fields.py:314
+msgid "Enter a valid value."
+msgstr "Skriv inn en gyldig verdi."
+
+#: newforms/fields.py:378
+msgid "No file was submitted."
+msgstr "Ingen fil ble sendt."
+
+#: newforms/fields.py:403 newforms/fields.py:425
+msgid "Enter a valid URL."
+msgstr "Skriv inn en gyldig URL."
+
+#: newforms/fields.py:427
+msgid "This URL appears to be a broken link."
+msgstr "Denne URL'en fører til en side som ikke eksisterer."
+
