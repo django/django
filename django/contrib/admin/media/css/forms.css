@@ -58,3 +58,24 @@ fieldset.monospace textarea { font-family:"Bitstream Vera Sans Mono",Monaco,"Cou
 .vLargeTextField, .vXMLLargeTextField { width:48em; }
 .flatpages-flatpage #id_content { height:40.2em; }
 .module table .vPositiveSmallIntegerField { width:2.2em; }
+
+/* x unsorted */
+.inline-group {padding:10px; padding-bottom:5px; background:#eee; margin:10px 0;}
+.inline-group h3.header {margin:-5px -10px 5px -10px; background:#bbb; color:#fff; padding:2px 5px 3px 5px; font-size:11px}
+.inline-related {margin-bottom:15px; position:relative;}
+.last-related {margin-bottom:0px;}
+.inline-related h2 { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; font-weight:bold;  color:#888; }
+.inline-related h2 b {font-weight:normal; color:#aaa;}
+.inline-related h2 span.delete {padding-left:20px; position:absolute; top:0px; right:5px;}
+.inline-related h2 span.delete label {margin-left:2px; padding-top:1px;}
+.inline-related fieldset {background:#fbfbfb;}
+.inline-related fieldset.module h2 { margin:0; padding:2px 5px 3px 5px; font-size:11px; text-align:left; font-weight:bold; background:#bcd; color:#fff; }
+.inline-related.tabular fieldset.module table {width:100%;}
+
+.inline-group .tabular tr.has_original td {padding-top:2em;}
+.inline-group .tabular tr td.original { padding:2px 0 0 0; width:0; _position:relative; }
+.inline-group .tabular th.original {width:0px; padding:0;}
+.inline-group .tabular td.original p {position:absolute; left:0; height:1.1em; padding:2px 7px; overflow:hidden; font-size:9px; font-weight:bold; color:#666; _width:700px;     }
+.inline-group ul.tools {padding:0; margin: 0; list-style:none;}
+.inline-group ul.tools li {display:inline; padding:0 5px;}
+.inline-group ul.tools a.add {background:url(../img/admin/icon_addlink.gif) 0 50% no-repeat; padding-left:14px;}

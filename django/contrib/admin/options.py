@@ -729,10 +729,10 @@ class InlineModelAdmin(BaseModelAdmin):
         return [(None, {'fields': form.base_fields.keys()})]
 
 class StackedInline(InlineModelAdmin):
-    template = 'admin/edit_inline_stacked.html'
+    template = 'admin/edit_inline/stacked.html'
 
 class TabularInline(InlineModelAdmin):
-    template = 'admin/edit_inline_tabular.html'
+    template = 'admin/edit_inline/tabular.html'
 
 class InlineAdminFormSet(object):
     """
