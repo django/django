@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-17 15:35-0400\n"
+"POT-Creation-Date: 2007-08-30 23:46-0400\n"
 "PO-Revision-Date: 2007-07-14 13:00-0500\n"
 "Last-Translator: Mario Gonzalez <gonzalemario @t gmail.com>\n"
 "Language-Team: Castellano <Django-I18N@googlegroups.com>\n"
@@ -75,18 +75,18 @@ msgstr "Este valor debe ser Verdadero o Falso."
 msgid "Please enter a valid %s."
 msgstr "Por favor, introduzca un %s válido."
 
-#: db/models/fields/related.py:661
+#: db/models/fields/related.py:658
 msgid "Separate multiple IDs with commas."
 msgstr "Separe múltiples IDs con comas."
 
-#: db/models/fields/related.py:663
+#: db/models/fields/related.py:660
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 "Mantenga presionado \"Control\", o \"Command\" en un Mac, para seleccionar "
 "más de uno."
 
-#: db/models/fields/related.py:710
+#: db/models/fields/related.py:707
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
@@ -98,175 +98,175 @@ msgstr[1] ""
 "Por favor, introduzca IDs de %(self)s válidos. Los valores %(value)r no son "
 "válidos."
 
-#: conf/global_settings.py:38
+#: conf/global_settings.py:39
 msgid "Arabic"
 msgstr "Árabe"
 
-#: conf/global_settings.py:39
+#: conf/global_settings.py:40
 msgid "Bengali"
 msgstr "Bengalí"
 
-#: conf/global_settings.py:40
+#: conf/global_settings.py:41
 msgid "Bulgarian"
 msgstr "Búlgaro"
 
-#: conf/global_settings.py:41
+#: conf/global_settings.py:42
 msgid "Catalan"
 msgstr "Catalán"
 
-#: conf/global_settings.py:42
+#: conf/global_settings.py:43
 msgid "Czech"
 msgstr "Checo"
 
-#: conf/global_settings.py:43
+#: conf/global_settings.py:44
 msgid "Welsh"
 msgstr "Galés"
 
-#: conf/global_settings.py:44
+#: conf/global_settings.py:45
 msgid "Danish"
 msgstr "Danés"
 
-#: conf/global_settings.py:45
+#: conf/global_settings.py:46
 msgid "German"
 msgstr "Alemán"
 
-#: conf/global_settings.py:46
+#: conf/global_settings.py:47
 msgid "Greek"
 msgstr "Griego"
 
-#: conf/global_settings.py:47
+#: conf/global_settings.py:48
 msgid "English"
 msgstr "Inglés"
 
-#: conf/global_settings.py:48
+#: conf/global_settings.py:49
 msgid "Spanish"
 msgstr "Español"
 
-#: conf/global_settings.py:49
+#: conf/global_settings.py:50
 msgid "Argentinean Spanish"
 msgstr "Español Argentino"
 
-#: conf/global_settings.py:50
+#: conf/global_settings.py:51
 msgid "Persian"
 msgstr "Persa"
 
-#: conf/global_settings.py:51
+#: conf/global_settings.py:52
 msgid "Finnish"
 msgstr "Finés"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "French"
 msgstr "Francés"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "Galician"
 msgstr "Gallego"
 
-#: conf/global_settings.py:54
+#: conf/global_settings.py:55
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: conf/global_settings.py:55
+#: conf/global_settings.py:56
 msgid "Hebrew"
 msgstr "Hebreo"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Croatian"
 msgstr "Croata"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Icelandic"
 msgstr "Islandés"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Italian"
 msgstr "Italiano"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Japanese"
 msgstr "Japonés"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Korean"
 msgstr "Koreano"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Kannada"
 msgstr "Kannada"
 
-#: conf/global_settings.py:62
+#: conf/global_settings.py:63
 msgid "Latvian"
 msgstr "Latvio"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Macedonian"
 msgstr "Macedonio"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Dutch"
 msgstr "Alemán"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Norwegian"
 msgstr "Noruego"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Polish"
 msgstr "Polaco"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Portugese"
 msgstr "Portugés"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Brazilian"
 msgstr "Brasileño"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Romanian"
 msgstr "Rumano"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Russian"
 msgstr "Ruso"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Serbian"
 msgstr "Serbio"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Swedish"
 msgstr "Sueco"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Tamil"
 msgstr "Tamil"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Telugu"
 msgstr "Telugu"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Turkish"
 msgstr "Turco"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Simplified Chinese"
 msgstr "Chino simplificado"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Traditional Chinese"
 msgstr "Chino tradicional"
 
@@ -697,78 +697,90 @@ msgstr "tipo de contenido"
 msgid "content types"
 msgstr "tipos de contenido"
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "th"
 msgstr "th"
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "st"
 msgstr "st"
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "nd"
 msgstr "nd"
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "rd"
 msgstr "rd"
 
-#: contrib/humanize/templatetags/humanize.py:47
+#: contrib/humanize/templatetags/humanize.py:50
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f millón"
 msgstr[1] "%(value).1f millión"
 
-#: contrib/humanize/templatetags/humanize.py:50
+#: contrib/humanize/templatetags/humanize.py:53
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f billión"
 msgstr[1] "%(value).1f billión"
 
-#: contrib/humanize/templatetags/humanize.py:53
+#: contrib/humanize/templatetags/humanize.py:56
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trillión"
 msgstr[1] "%(value).1f trillión"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "one"
 msgstr "uno"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "two"
 msgstr "dos"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "three"
 msgstr "tres"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "four"
 msgstr "cuatro"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "five"
 msgstr "cinco"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "six"
 msgstr "seis"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "seven"
 msgstr "siete"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "eight"
 msgstr "ocho"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "nine"
 msgstr "nueve"
+
+#: contrib/humanize/templatetags/humanize.py:90
+msgid "today"
+msgstr "hoy"
+
+#: contrib/humanize/templatetags/humanize.py:92
+msgid "tomorrow"
+msgstr "mañana"
+
+#: contrib/humanize/templatetags/humanize.py:94
+msgid "yesterday"
+msgstr "ayer"
 
 #: contrib/auth/views.py:47
 msgid "Logged out"
@@ -910,7 +922,7 @@ msgstr "Fechas importantes"
 msgid "Groups"
 msgstr "Grupos"
 
-#: contrib/auth/models.py:287
+#: contrib/auth/models.py:288
 msgid "message"
 msgstr "mensaje"
 
@@ -3082,28 +3094,110 @@ msgstr "Introduzca un código postal en el formato XXXXX o XXX XX."
 msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Introduzca un código postal en el formato XXXXXXX."
 
-#: template/defaultfilters.py:485
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+msgid "Lower Silesia"
+msgstr "Lower Silesia"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr "Kuyavia-Pomerania"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr "Lublin"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr "Lubusz"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr "Lodz"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr "Lesser Poland"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr "Masovia"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+msgid "Opole"
+msgstr "Opole"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr "Subcarpatia"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr "Podlasie"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+msgid "Pomerania"
+msgstr "Pomerania"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+msgid "Silesia"
+msgstr "Silesia"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr "Swietokrzyskie"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr "Warmia-Masuria"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr "Greater Poland"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+msgid "West Pomerania"
+msgstr "West Pomerania"
+
+#: contrib/localflavor/pl/forms.py:53
+msgid "National Identification Number consists of 11 digits."
+msgstr "Número de Identificación Nacional consiste en 11 dígitos"
+
+#: contrib/localflavor/pl/forms.py:59
+msgid "Wrong checksum for the National Identification Number."
+msgstr "El Número de Identificación Nacional es incorrecto."
+
+#: contrib/localflavor/pl/forms.py:71
+#, fuzzy
+msgid ""
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr "Introduzca un número de impuesto (NIP) en el formato XX-XXX-XX-XX o XX-XX-XXX-XXX."
+
+#: contrib/localflavor/pl/forms.py:82
+msgid "Enter a postal code in the format XX-XXX."
+msgstr "Introduzca un código postal en el formato XX-XXX."
+
+#: template/defaultfilters.py:532
 msgid "yes,no,maybe"
 msgstr "sí,no,tal vez"
 
-#: template/defaultfilters.py:514
+#: template/defaultfilters.py:561
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:516
+#: template/defaultfilters.py:563
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:518
+#: template/defaultfilters.py:565
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:519
+#: template/defaultfilters.py:566
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
