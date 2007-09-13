@@ -3821,6 +3821,31 @@ u''
 True
 >>> f.cleaned_data['username']
 u'sirrobin'
+
+#######################################
+# Test overriding ErrorList in a form #
+#######################################
+
+>>> from django.newforms.util import ErrorList
+>>> class DivErrorList(ErrorList):
+...     def __unicode__(self):
+...         return self.as_divs()
+...     def as_divs(self):
+...         if not self: return u''
+...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+>>> class CommentForm(Form):
+...     name = CharField(max_length=50, required=False)
+...     email = EmailField()
+...     comment = CharField()
+>>> data = dict(email='invalid')
+>>> f = CommentForm(data, auto_id=False, error_class=DivErrorList)
+>>> print f.as_p()
+<p>Name: <input type="text" name="name" maxlength="50" /></p>
+<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<p>Email: <input type="text" name="email" value="invalid" /></p>
+<div class="errorlist"><div class="error">This field is required.</div></div>
+<p>Comment: <input type="text" name="comment" /></p>
+
 """
 
 __test__ = {
