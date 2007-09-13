@@ -1,5 +1,6 @@
 from django.utils.html import escape
 from django.utils.encoding import smart_unicode, StrAndUnicode
+from django.utils.functional import Promise
 
 def flatatt(attrs):
     """
@@ -47,7 +48,7 @@ class ValidationError(Exception):
         if isinstance(message, list):
             self.messages = ErrorList([smart_unicode(msg) for msg in message])
         else:
-            assert isinstance(message, basestring), ("%s should be a basestring" % repr(message))
+            assert isinstance(message, (basestring, Promise)), ("%s should be a basestring or lazy translation" % repr(message))
             message = smart_unicode(message)
             self.messages = ErrorList([message])
 
