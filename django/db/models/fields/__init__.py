@@ -117,6 +117,13 @@ class Field(object):
         # This is needed because bisect does not take a comparison function.
         return cmp(self.creation_counter, other.creation_counter)
 
+    def __deepcopy__(self, memodict):
+        # Slight hack; deepcopy() is difficult to do on classes with
+        # dynamically created methods. Fortunately, we can get away with doing
+        # a shallow copy in this particular case.
+        import copy
+        return copy.copy(self)
+
     def to_python(self, value):
         """
         Converts the input value into the expected Python data type, raising
