@@ -258,7 +258,7 @@ TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: id, h
 >>> Article.objects.filter(headline__starts='Article')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'headline__starts' into field. Choices are: id, headline, pub_date
+TypeError: Join on field 'headline' not permitted.
 
 # Create some articles with a bit more interesting headlines for testing field lookups:
 >>> now = datetime.now()

@@ -334,8 +334,8 @@ class Model(object):
             qn(self._meta.db_table), qn(self._meta.pk.column), op)
         param = smart_str(getattr(self, field.attname))
         q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
-        q._where.append(where)
-        q._params.extend([param, param, getattr(self, self._meta.pk.attname)])
+        q.extra(where=where, params=[param, param,
+            getattr(self, self._meta.pk.attname)])
         try:
             return q[0]
         except IndexError:

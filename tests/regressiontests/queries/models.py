@@ -111,11 +111,9 @@ Bug #4464
 >>> Item.objects.filter(tags__in=[t1, t2]).filter(tags=t3)
 [<Item: two>]
 
-Bug #2080
-# FIXME: Still problematic: the join needs to be "left outer" on the reverse
-# fk, but the individual joins only need to be inner.
-# >>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
-# [<Author: a3>]
+Bug #2080, #3592
+>>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
+[<Author: a1>, <Author: a3>]
 
 Bug #2939
 # FIXME: ValueQuerySets don't work yet.

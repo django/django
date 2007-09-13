@@ -21,6 +21,10 @@ class Node(object):
         self.subtree_parents = []
         self.negated = False
 
+    def __str__(self):
+        return '(%s: %s)' % (self.connection, ', '.join([str(c) for c in
+            self.children]))
+
     def __deepcopy__(self, memodict):
         """
         Utility method used by copy.deepcopy().
@@ -59,7 +63,8 @@ class Node(object):
         if len(self.children) < 2:
             self.connection = conn_type
         if self.connection == conn_type:
-            if isinstance(node, Node) and node.connection == conn_type:
+            if isinstance(node, Node) and (node.connection == conn_type
+                    or len(node) == 1):
                 self.children.extend(node.children)
             else:
                 self.children.append(node)

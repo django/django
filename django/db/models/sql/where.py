@@ -64,11 +64,19 @@ class WhereNode(tree.Node):
                 else:
                     format = '(%s)'
             else:
-                sql = self.make_atom(child)
-                params = child[2].get_db_prep_lookup(child[3], child[4])
-                format = '%s'
-            result.append(format % sql)
-            result_params.extend(params)
+                try:
+                    sql = self.make_atom(child)
+                    params = child[2].get_db_prep_lookup(child[3], child[4])
+                    format = '%s'
+                except EmptyResultSet:
+                    if node.negated:
+                        # If this is a "not" atom, being empty means it has no
+                        # effect on the result, so we can ignore it.
+                        continue
+                    raise
+            if sql:
+                result.append(format % sql)
+                result_params.extend(params)
         conn = ' %s ' % node.connection
         return conn.join(result), result_params
 

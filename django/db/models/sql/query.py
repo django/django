@@ -10,7 +10,7 @@ all about the internals of models in order to get the information it needs.
 import copy
 
 from django.utils import tree
-from django.db.models.sql.where import WhereNode, AND
+from django.db.models.sql.where import WhereNode, AND, OR
 from django.db.models.sql.datastructures import Count
 from django.db.models.fields import FieldDoesNotExist
 from django.contrib.contenttypes import generic
@@ -233,13 +233,26 @@ class Query(object):
         # Work out how to relabel the rhs aliases, if necessary.
         change_map = {}
         used = {}
+        first_new_join = True
         for alias in rhs.tables:
+            if not rhs.alias_map[alias][ALIAS_REFCOUNT]:
+                # An unused alias.
+                continue
             promote = (rhs.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] ==
                     self.LOUTER)
             new_alias = self.join(rhs.rev_join_map[alias], exclusions=used,
-                    promote=promote)
+                    promote=promote, outer_if_first=True)
+            if self.alias_map[alias][ALIAS_REFCOUNT] == 1:
+                first_new_join = False
             used[new_alias] = None
             change_map[alias] = new_alias
+
+        # So that we don't exclude valid results, the first join that is
+        # exclusive to the lhs (self) must be converted to an outer join.
+        for alias in self.tables[1:]:
+            if self.alias_map[alias][ALIAS_REFCOUNT] == 1:
+                self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+                break
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
@@ -380,8 +393,12 @@ class Query(object):
         """ Decreases the reference count for this alias. """
         self.alias_map[alias][ALIAS_REFCOUNT] -= 1
 
+    def promote_alias(self, alias):
+        """ Promotes the join type of an alias to an outer join. """
+        self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+
     def join(self, (lhs, table, lhs_col, col), always_create=False,
-            exclusions=(), promote=False):
+            exclusions=(), promote=False, outer_if_first=False):
         """
         Returns an alias for a join between 'table' and 'lhs' on the given
         columns, either reusing an existing alias for that join or creating a
@@ -398,6 +415,10 @@ class Query(object):
         If 'promote' is True, the join type for the alias will be LOUTER (if
         the alias previously existed, the join type will be promoted from INNER
         to LOUTER, if necessary).
+
+        If 'outer_if_first' is True and a new join is created, it will have the
+        LOUTER join type. This is used when joining certain types of querysets
+        and Q-objects together.
         """
         if lhs not in self.alias_map:
             lhs_table = lhs
@@ -422,7 +443,7 @@ class Query(object):
         assert not is_table, \
                 "Must pass in lhs alias when creating a new join."
         alias, _ = self.table_alias(table, True)
-        join_type = promote and self.LOUTER or self.INNER
+        join_type = (promote or outer_if_first) and self.LOUTER or self.INNER
         join = [table, alias, join_type, lhs, lhs_col, col]
         if not lhs:
             # Not all tables need to be joined to anything. No join type
@@ -487,7 +508,8 @@ class Query(object):
         opts = self.model._meta
         alias = self.join((None, opts.db_table, None, None))
         dupe_multis = (connection == AND)
-        last = None
+        seen_aliases = []
+        done_split = not self.where
 
         # FIXME: Using enumerate() here is expensive. We only need 'i' to
         # check we aren't joining against a non-joinable field. Find a
@@ -498,23 +520,35 @@ class Query(object):
             if name == 'pk':
                 name = target_field.name
             if joins is not None:
+                seen_aliases.extend(joins)
                 last = joins
                 alias = joins[-1]
+                if connection == OR and not done_split:
+                    if self.alias_map[joins[0]][ALIAS_REFCOUNT] == 1:
+                        done_split = True
+                        self.promote_alias(joins[0])
+                        for t in self.tables[1:]:
+                            if t in seen_aliases:
+                                continue
+                            self.promote_alias(t)
+                            break
+                    else:
+                        seen_aliases.extend(joins)
             else:
                 # Normal field lookup must be the last field in the filter.
                 if i != len(parts) - 1:
-                    raise TypeError("Joins on field %r not permitted."
+                    raise TypeError("Join on field %r not permitted."
                             % name)
 
         col = target_col or target_field.column
 
-        if target_field is opts.pk and last:
+        if target_field is opts.pk and seen_aliases:
             # An optimization: if the final join is against a primary key,
             # we can go back one step in the join chain and compare against
             # the lhs of the join instead. The result (potentially) involves
             # one less table join.
             self.unref_alias(alias)
-            join = self.alias_map[last[-1]][ALIAS_JOIN]
+            join = self.alias_map[seen_aliases[-1]][ALIAS_JOIN]
             alias = join[LHS_ALIAS]
             col = join[LHS_JOIN_COL]
 
@@ -523,13 +557,13 @@ class Query(object):
             # join when connecting to the previous model. We make that
             # adjustment here. We don't do this unless needed because it's less
             # efficient at the database level.
-            self.alias_map[joins[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+            self.promote_alias(joins[0])
 
         self.where.add([alias, col, orig_field, lookup_type, value],
                 connection)
         if negate:
-            if last:
-                self.alias_map[last[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+            if seen_aliases:
+                self.promote_alias(last[0])
             self.where.negate()
 
     def add_q(self, q_object):
