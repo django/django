@@ -506,7 +506,7 @@ class Query(object):
                     raise TypeError("Joins on field %r not permitted."
                             % name)
 
-        name = target_col or name
+        col = target_col or target_field.column
 
         if target_field is opts.pk and last:
             # An optimization: if the final join is against a primary key,
@@ -516,7 +516,7 @@ class Query(object):
             self.unref_alias(alias)
             join = self.alias_map[last[-1]][ALIAS_JOIN]
             alias = join[LHS_ALIAS]
-            name = join[LHS_JOIN_COL]
+            col = join[LHS_JOIN_COL]
 
         if (lookup_type == 'isnull' and value is True):
             # If the comparison is against NULL, we need to use a left outer
@@ -525,7 +525,7 @@ class Query(object):
             # efficient at the database level.
             self.alias_map[joins[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
 
-        self.where.add([alias, name, orig_field, lookup_type, value],
+        self.where.add([alias, col, orig_field, lookup_type, value],
                 connection)
         if negate:
             self.alias_map[last[0]][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
