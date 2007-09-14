@@ -290,7 +290,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     # string instead of null, but only if the field accepts the
                     # empty string.
                     if value is None and isinstance(field, Field) and field.empty_strings_allowed:
-                        value = ''
+                        value = u''
                     # Convert 1 or 0 to True or False
                     elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
                         value = bool(value)
