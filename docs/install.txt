@@ -129,14 +129,14 @@ Installing an official release
 
     2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
        where ``NNN`` is the version number of the latest release).
-       If you are a Windows user, you can download the command-line tool
+       If you're using Windows, you can download the command-line tool
        bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
 
     3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
 
-    4. If you are using Linux, Mac OSX or some other flavour of Unix, enter
-       the command``sudo python setup.py install`` at the shell prompt.
-       If you are using Windows, start up a command shell with administrator
+    4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
+       the command ``sudo python setup.py install`` at the shell prompt.
+       If you're using Windows, start up a command shell with administrator
        privileges and run the command ``setup.py install``.
 
 These commands will install Django in your Python installation's
@@ -153,17 +153,16 @@ If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
 1. Make sure that you have Subversion_ installed, and that you can run its
-   commands from a shell.  (Enter ``svn help`` at a shell prompt to test
+   commands from a shell. (Enter ``svn help`` at a shell prompt to test
    this.)
 
 2. Check out Django's main development branch (the 'trunk') like so::
 
        svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
 
-3. Next, you need to make sure that the Python interpreter can load Django's
-   code.  There are various ways of accomplishing this.  One of the most
-   convenient, on Linux, Mac OSX or other Unix-like systems, is to use a
-   symbolic link::
+3. Next, make sure that the Python interpreter can load Django's code. There
+   are various ways of accomplishing this.  One of the most convenient, on
+   Linux, Mac OSX or other Unix-like systems, is to use a symbolic link::
 
        ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
 
@@ -174,15 +173,20 @@ latest bug fixes and improvements, follow these instructions:
    Alternatively, you can define your ``PYTHONPATH`` environment variable
    so that it includes the ``django`` subdirectory of ``django-trunk``.
    This is perhaps the most convenient solution on Windows systems, which
-   don't support symbolic links.  (Environment variables can be defined on
+   don't support symbolic links. (Environment variables can be defined on
    Windows systems `from the Control Panel`_.)
 
    .. admonition:: What about Apache and mod_python?
 
-      If you are using Apache and mod_python rather than Django's
-      development server, then instead of defining the ``PYTHONPATH``
-      shell environment variable, you will need to specify the
-      ``PythonPath`` directive in your Apache configuration file.
+      If you take the approach of setting ``PYTHONPATH``, you'll need to
+      remember to do the same thing in your Apache configuration once you
+      deploy your production site. Do this by setting ``PythonPath`` in your
+      Apache configuration file.
+
+      More information about deployment is available, of course, in our
+      `How to use Django with mod_python`_ documentation.
+
+      .. _How to use Django with mod_python: ../modpython/
 
 4. Copy the file ``django-trunk/django/bin/django-admin.py`` to somewhere on
    your system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
