@@ -1,7 +1,15 @@
-# GEOS Routines
 from warnings import warn
+
+# GEOS is a requirement
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.gdal import OGRGeometry, SpatialReference
+
+# GDAL is a lot more complicated to install, and isn't necessary for many
+# operations.
+try:
+    from django.contrib.gis.gdal import OGRGeometry, SpatialReference
+    HAS_GDAL = True
+except ImportError, e:
+    HAS_GDAL = False
 
 # Until model subclassing is a possibility, a mixin class is used to add
 # the necessary functions that may be contributed for geographic objects.
@@ -17,8 +25,11 @@ class GeoMixin:
 
     def _get_GEOM_ogr(self, field, srid):
         "Returns an OGR Python object for the geometry."
-        return OGRGeometry(getattr(self, field.attname).wkt,
-                           SpatialReference('EPSG:%d' % srid))
+        if HAS_GDAL:
+            return OGRGeometry(getattr(self, field.attname).wkt,
+                               SpatialReference('EPSG:%d' % srid))
+        else:
+            raise Exception, "GDAL is not installed!"
 
     def _get_GEOM_srid(self, srid):
         "Returns the spatial reference identifier (SRID) of the geometry."
@@ -27,7 +38,10 @@ class GeoMixin:
 
     def _get_GEOM_srs(self, srid):
         "Returns ane OGR Spatial Reference object of the geometry."
-        return SpatialReference('EPSG:%d' % srid)
+        if HAS_GDAL:
+            return SpatialReference('EPSG:%d' % srid)
+        else:
+            raise Exception, "GDAL is not installed!"
 
     def _get_GEOM_wkt(self, field):
         "Returns the WKT of the geometry."
@@ -43,5 +57,3 @@ class GeoMixin:
         "Returns the area of the geometry, in projected units."
         warn("use model.%s.area" % field.attname, DeprecationWarning)
         return getattr(self, field.attname).area
-
-
