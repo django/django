@@ -569,8 +569,8 @@ Testing responses
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
-Django views; this object is simpler and has some additional data useful for
-tests.
+Django views; the test response object has some additional data useful for
+test code to verify.
 
 Specifically, a ``Response`` object has the following attributes:
 
@@ -582,7 +582,7 @@ Specifically, a ``Response`` object has the following attributes:
 
     ``content``      The body of the response, as a string. This is the final
                      page content as rendered by the view, or any error
-                     message (such as the URL for a 302 redirect).
+                     message.
 
     ``context``      The template ``Context`` instance that was used to render
                      the template that produced the response content.
@@ -590,6 +590,8 @@ Specifically, a ``Response`` object has the following attributes:
                      If the rendered page used multiple templates, then
                      ``context`` will be a list of ``Context``
                      objects, in the order in which they were rendered.
+
+    ``headers``      The HTTP headers of the response. This is a dictionary.
 
     ``request``      The request data that stimulated the response.
 
