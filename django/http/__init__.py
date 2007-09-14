@@ -54,7 +54,7 @@ class HttpRequest(object):
         ``request.get_full_path()``.
         """
         if not location:
-            location = request.get_full_path()
+            location = self.get_full_path()
         if not ':' in location:
             current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
                                          get_host(self), self.path)
