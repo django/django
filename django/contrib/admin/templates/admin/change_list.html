@@ -27,7 +27,7 @@
 <div id="changelist-filter">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}
-   {% filter cl spec %}
+   {% admin_list_filter cl spec %}
 {% endfor %}
 </div>
 {% endif %}

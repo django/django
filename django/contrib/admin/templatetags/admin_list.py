@@ -277,6 +277,6 @@ def search_form(cl):
     }
 search_form = register.inclusion_tag('admin/search_form.html')(search_form)
 
-def filter(cl, spec):
+def admin_list_filter(cl, spec):
     return {'title': spec.title(), 'choices' : list(spec.choices(cl))}
-filter = register.inclusion_tag('admin/filter.html')(filter)
+admin_list_filter = register.inclusion_tag('admin/filter.html')(admin_list_filter)
