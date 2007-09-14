@@ -33,7 +33,7 @@ class Options(object):
         self.admin = None
         self.meta = meta
         self.pk = None
-        self.has_auto_field = False
+        self.has_auto_field, self.auto_field = False, None
         self.one_to_one_field = None
         self.parents = []
 

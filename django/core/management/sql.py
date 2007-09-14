@@ -302,7 +302,8 @@ def sql_model_create(model, style, known_models=set()):
 
     if opts.has_auto_field:
         # Add any extra SQL needed to support auto-incrementing primary keys.
-        autoinc_sql = connection.ops.autoinc_sql(opts.db_table)
+        auto_column = opts.auto_field.db_column or opts.auto_field.name
+        autoinc_sql = connection.ops.autoinc_sql(opts.db_table, auto_column)
         if autoinc_sql:
             for stmt in autoinc_sql:
                 final_output.append(stmt)
@@ -385,7 +386,7 @@ def many_to_many_sql_for_model(model, style):
             final_output.append('\n'.join(table_output))
 
             # Add any extra SQL needed to support auto-incrementing PKs
-            autoinc_sql = connection.ops.autoinc_sql(f.m2m_db_table())
+            autoinc_sql = connection.ops.autoinc_sql(f.m2m_db_table(), 'id')
             if autoinc_sql:
                 for stmt in autoinc_sql:
                     final_output.append(stmt)

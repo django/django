@@ -20,6 +20,11 @@ class Article(models.Model):
     def __unicode__(self):
         return self.headline
 
+class Movie(models.Model):
+    #5218: Test models with non-default primary keys / AutoFields
+    movie_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=60)
+
 __test__ = {'API_TESTS': """
 (NOTE: Part of the regression test here is merely parsing the model
 declaration. The verbose_name, in particular, did not always work.)
