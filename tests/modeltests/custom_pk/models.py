@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 14. Using a custom primary key
 
@@ -91,5 +92,9 @@ DoesNotExist: Employee matching query does not exist.
 [<Business: Sears>]
 >>> Business.objects.filter(employees__first_name__startswith='Fran')
 [<Business: Sears>]
+
+# Primary key may be unicode string
+>>> emp = Employee(employee_code='jaźń')
+>>> emp.save()
 
 """}

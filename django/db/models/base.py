@@ -12,7 +12,7 @@ from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
 from itertools import izip
 import types
@@ -213,7 +213,7 @@ class Model(object):
         pk_val = self._get_pk_val()
         # Note: the comparison with '' is required for compatibility with
         # oldforms-style model creation.
-        pk_set = pk_val is not None and pk_val != u''
+        pk_set = pk_val is not None and smart_unicode(pk_val) != u''
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
