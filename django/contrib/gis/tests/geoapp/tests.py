@@ -256,6 +256,11 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, 'T********')).name)
         self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, 'T********')).name)
 
+    def test16_createnull(self):
+        "Testing creating a model instance and the geometry being None"
+        c = City()
+        self.assertEqual(c.point, None)
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))

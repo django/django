@@ -19,10 +19,12 @@ class GeometryProxy(object):
         # Getting the value of the field.
         geom_value = obj.__dict__[self._field.attname] 
 
-        if (geom_value is None) or (isinstance(geom_value, GEOSGeometry)): 
+        if isinstance(geom_value, GEOSGeometry): 
             # If the value of the field is None, or is already a GEOS Geometry
             #  no more work is needed.
-            geom = geom_value 
+            geom = geom_value
+        elif (geom_value is None) or (geom_value==''):
+            geom = None
         else: 
             # Otherwise, a GEOSGeometry object is built using the field's contents,
             #  and the model's corresponding attribute is set.
