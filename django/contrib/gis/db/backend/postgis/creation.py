@@ -28,8 +28,10 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
 
     # Constructing the necessary SQL to create the database (the DATABASE_USER
     #  must possess the privileges to create a database)
-    create_sql = 'CREATE DATABASE %s OWNER %s' % (connection.ops.quote_name(db_name),
-                                                  settings.DATABASE_USER)
+    create_sql = 'CREATE DATABASE %s' % connection.ops.quote_name(db_name)
+    if settings.DATABASE_USER:
+        create_sql += ' OWNER %s' % settings.DATABASE_USER
+        
     cursor = connection.cursor()
     _set_autocommit(connection)
 
@@ -133,10 +135,11 @@ def drop_db(db_name=False, test=False):
 def get_cmd_options(db_name):
     "Obtains the command-line PostgreSQL connection options for shell commands."
     # The db_name parameter is optional
+    options = ''
     if db_name:
-        options = '-d %s -U %s ' % (db_name, settings.DATABASE_USER)
-    else:
-        options = '-U %s ' % settings.DATABASE_USER
+        options += '-d %s ' % db_name
+    if settings.DATABASE_USER:
+        options += '-U %s ' % settings.DATABASE_USER
     if settings.DATABASE_HOST:
         options += '-h %s ' % settings.DATABASE_HOST
     if settings.DATABASE_PORT:
