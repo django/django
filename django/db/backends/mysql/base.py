@@ -25,6 +25,7 @@ import types
 import re
 
 # Raise exceptions for database warnings if DEBUG is on
+from django.conf import settings
 if settings.DEBUG:
     from warnings import filterwarnings
     filterwarnings("error", category=Database.Warning)
