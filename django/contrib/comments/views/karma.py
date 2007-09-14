@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.contrib.comments.models import Comment, KarmaScore
 from django.utils.translation import ugettext as _
 
-def vote(request, comment_id, vote):
+def vote(request, comment_id, vote, extra_context=None, context_processors=None):
     """
     Rate a comment (+1 or -1)
 
@@ -13,6 +13,7 @@ def vote(request, comment_id, vote):
         comment
             `comments.comments` object being rated
     """
+    if extra_context is None: extra_context = {}
     rating = {'up': 1, 'down': -1}.get(vote, False)
     if not rating:
         raise Http404, "Invalid vote"
@@ -27,4 +28,5 @@ def vote(request, comment_id, vote):
     KarmaScore.objects.vote(request.user.id, comment_id, rating)
     # Reload comment to ensure we have up to date karma count
     comment = Comment.objects.get(pk=comment_id)
-    return render_to_response('comments/karma_vote_accepted.html', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/karma_vote_accepted.html', {'comment': comment},
+        context_instance=RequestContext(request, extra_context, context_processors))
