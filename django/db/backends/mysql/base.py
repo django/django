@@ -24,6 +24,11 @@ from MySQLdb.constants import FIELD_TYPE
 import types
 import re
 
+# Raise exceptions for database warnings if DEBUG is on
+if settings.DEBUG:
+    from warnings import filterwarnings
+    filterwarnings("error", category=Database.Warning)
+
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
@@ -153,7 +158,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return False
 
     def _cursor(self, settings):
-        from warnings import filterwarnings
         if not self._valid_connection():
             kwargs = {
                 'conv': django_conversions,
@@ -175,8 +179,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             kwargs.update(self.options)
             self.connection = Database.connect(**kwargs)
         cursor = self.connection.cursor()
-        if settings.DEBUG:
-            filterwarnings("error", category=Database.Warning)
         return cursor
 
     def _rollback(self):
