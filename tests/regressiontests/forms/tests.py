@@ -2690,16 +2690,24 @@ to the next.
 ...         super(Person, self).__init__(*args, **kwargs)
 ...         if names_required:
 ...             self.fields['first_name'].required = True
+...             self.fields['first_name'].widget.attrs['class'] = 'required'
 ...             self.fields['last_name'].required = True
+...             self.fields['last_name'].widget.attrs['class'] = 'required'
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> f = Person(names_required=True)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (True, True)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({'class': 'required'}, {'class': 'required'})
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> class Person(Form):
 ...     first_name = CharField(max_length=30)
 ...     last_name = CharField(max_length=30)

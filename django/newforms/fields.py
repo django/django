@@ -2,6 +2,7 @@
 Field classes
 """
 
+import copy
 import datetime
 import re
 import time
@@ -99,6 +100,12 @@ class Field(object):
         Field.
         """
         return {}
+
+    def __deepcopy__(self, memo):
+        result = copy.copy(self)
+        memo[id(self)] = result
+        result.widget = copy.deepcopy(self.widget, memo)
+        return result
 
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
