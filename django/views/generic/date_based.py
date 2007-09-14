@@ -10,7 +10,7 @@ from django.http import Http404, HttpResponse
 def archive_index(request, queryset, date_field, num_latest=15,
         template_name=None, template_loader=loader,
         extra_context=None, allow_empty=False, context_processors=None,
-        mimetype=None, allow_future=False):
+        mimetype=None, allow_future=False, template_object_name='latest'):
     """
     Generic top-level archive of date-based objects.
 
@@ -39,7 +39,7 @@ def archive_index(request, queryset, date_field, num_latest=15,
     t = template_loader.get_template(template_name)
     c = RequestContext(request, {
         'date_list' : date_list,
-        'latest' : latest,
+        template_object_name : latest,
     }, context_processors)
     for key, value in extra_context.items():
         if callable(value):

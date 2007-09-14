@@ -201,6 +201,9 @@ a date in the *future* are not included unless you set ``allow_future`` to
       specified in ``date_field`` is greater than the current date/time. By
       default, this is ``False``.
 
+    * ``template_object_name``: Designates the name of the template variable
+      to use in the template context. By default, this is ``'latest'``.
+
 **Template name:**
 
 If ``template_name`` isn't specified, this view will use the template
@@ -221,9 +224,13 @@ In addition to ``extra_context``, the template's context will be:
       years that have objects available according to ``queryset``. These are
       ordered in reverse. This is equivalent to
       ``queryset.dates(date_field, 'year')[::-1]``.
+
     * ``latest``: The ``num_latest`` objects in the system, ordered descending
       by ``date_field``. For example, if ``num_latest`` is ``10``, then
-      ``latest`` will be a list of the latest 10 objects in ``queryset``.
+      ``latest`` will be a list of the latest 10 objects in ``queryset``. This
+      variable's name depends on the ``template_object_name`` parameter, which
+      is ``'latest'`` by default. If ``template_object_name`` is ``'foo'``, 
+      this variable's name will be ``foo``.
 
 .. _RequestContext docs: ../templates_python/#subclassing-context-requestcontext
 
