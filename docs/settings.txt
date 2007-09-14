@@ -325,7 +325,8 @@ The default formatting to use for date fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
+See also ``DATETIME_FORMAT``, ``TIME_FORMAT``, ``YEAR_MONTH_FORMAT``
+and ``MONTH_DAY_FORMAT``.
 
 .. _allowed date format strings: ../templates/#now
 
@@ -338,7 +339,8 @@ The default formatting to use for datetime fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and MONTH_DAY_FORMAT.
+See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
+``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
 
 .. _allowed date format strings: ../templates/#now
 
@@ -350,8 +352,8 @@ Default: ``False``
 A boolean that turns on/off debug mode.
 
 If you define custom settings, django/views/debug.py has a ``HIDDEN_SETTINGS``
-regular expression which will hide from the DEBUG view anything that contins
-``'SECRET``, ``PASSWORD``, or ``PROFANITIES'``. This allows untrusted users to
+regular expression which will hide from the DEBUG view anything that contains
+``'SECRET'``, ``'PASSWORD'``, or ``'PROFANITIES'``. This allows untrusted users to
 be able to give backtraces without seeing sensitive (or offensive) settings.
 
 Still, note that there are always going to be sections of your debug output that
@@ -656,8 +658,8 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
-See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
-TIME_FORMAT and YEAR_MONTH_FORMAT.
+See `allowed date format strings`_. See also ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``YEAR_MONTH_FORMAT``.
 
 PREPEND_WWW
 -----------
@@ -815,7 +817,7 @@ highlighted.
 Note that Django only displays fancy error pages if ``DEBUG`` is ``True``, so
 you'll want to set that to take advantage of this setting.
 
-See also DEBUG.
+See also ``DEBUG``.
 
 TEMPLATE_DIRS
 -------------
@@ -905,8 +907,8 @@ The default formatting to use for time fields on Django admin change-list
 pages -- and, possibly, by other parts of the system. See
 `allowed date format strings`_.
 
-See also DATE_FORMAT, DATETIME_FORMAT, TIME_FORMAT, YEAR_MONTH_FORMAT and
-MONTH_DAY_FORMAT.
+See also ``DATE_FORMAT``, ``DATETIME_FORMAT``, ``TIME_FORMAT``,
+``YEAR_MONTH_FORMAT`` and ``MONTH_DAY_FORMAT``.
 
 .. _allowed date format strings: ../templates/#now
 
@@ -980,8 +982,8 @@ drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
 
-See `allowed date format strings`_. See also DATE_FORMAT, DATETIME_FORMAT,
-TIME_FORMAT and MONTH_DAY_FORMAT.
+See `allowed date format strings`_. See also ``DATE_FORMAT``,
+``DATETIME_FORMAT``, ``TIME_FORMAT`` and ``MONTH_DAY_FORMAT``.
 
 .. _cache docs: ../cache/
 .. _middleware docs: ../middleware/
