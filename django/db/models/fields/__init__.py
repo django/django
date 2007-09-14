@@ -686,7 +686,8 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 75
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 75
         CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):

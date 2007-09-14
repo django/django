@@ -221,8 +221,10 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``max_length``; its ``max_length`` is automatically set to
-75.
+
+In Django 0.96, this doesn't accept ``max_length``; its ``max_length`` is
+automatically set to 75. In the Django development version, ``max_length`` is
+set to 75 by default, but you can specify it to override default behavior.
 
 ``FileField``
 ~~~~~~~~~~~~~
