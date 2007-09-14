@@ -246,7 +246,7 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self.headers = {'content-type': content_type}
+        self._headers = {'content-type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
@@ -254,24 +254,24 @@ class HttpResponse(object):
     def __str__(self):
         "Full HTTP message, including headers"
         return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self.headers.items()]) \
+            for key, value in self._headers.items()]) \
             + '\n\n' + self.content
 
     def __setitem__(self, header, value):
-        self.headers[header.lower()] = value
+        self._headers[header.lower()] = value
 
     def __delitem__(self, header):
         try:
-            del self.headers[header.lower()]
+            del self._headers[header.lower()]
         except KeyError:
             pass
 
     def __getitem__(self, header):
-        return self.headers[header.lower()]
+        return self._headers[header.lower()]
 
     def has_header(self, header):
         "Case-insensitive check for a header"
-	return self.headers.has_key(header.lower())
+        return self._headers.has_key(header.lower())
 
     __contains__ = has_header
 
