@@ -1550,8 +1550,8 @@ Finally, note that in order to use ``list_display_links``, you must define
 
 Set ``list_filter`` to activate filters in the right sidebar of the change list
 page of the admin. This should be a list of field names, and each specified
-field should be either a ``BooleanField``, ``DateField``, ``DateTimeField``
-or ``ForeignKey``.
+field should be either a ``BooleanField``, ``CharField``, ``DateField``, 
+``DateTimeField``, ``IntegerField`` or ``ForeignKey``. 
 
 This example, taken from the ``django.contrib.auth.models.User`` model, shows
 how both ``list_display`` and ``list_filter`` work::
