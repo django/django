@@ -1607,10 +1607,18 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+>>> f.clean('http://localhost')
+u'http://localhost'
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://www.example.com')
 u'http://www.example.com'
+>>> f.clean('http://www.example.com:8000/test')
+u'http://www.example.com:8000/test'
+>>> f.clean('http://200.8.9.10')
+u'http://200.8.9.10'
+>>> f.clean('http://200.8.9.10:8000/test')
+u'http://200.8.9.10:8000/test'
 >>> f.clean('foo')
 Traceback (most recent call last):
 ...
