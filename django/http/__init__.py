@@ -246,7 +246,7 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self.headers = {'Content-Type': content_type}
+        self.headers = {'content-type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
@@ -258,24 +258,20 @@ class HttpResponse(object):
             + '\n\n' + self.content
 
     def __setitem__(self, header, value):
-        self.headers[header] = value
+        self.headers[header.lower()] = value
 
     def __delitem__(self, header):
         try:
-            del self.headers[header]
+            del self.headers[header.lower()]
         except KeyError:
             pass
 
     def __getitem__(self, header):
-        return self.headers[header]
+        return self.headers[header.lower()]
 
     def has_header(self, header):
         "Case-insensitive check for a header"
-        header = header.lower()
-        for key in self.headers.keys():
-            if key.lower() == header:
-                return True
-        return False
+	return self.headers.has_key(header.lower())
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
