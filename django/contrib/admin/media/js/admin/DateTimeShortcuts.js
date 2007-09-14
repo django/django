@@ -195,6 +195,19 @@ var DateTimeShortcuts = {
     openCalendar: function(num) {
         var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
         var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num)
+	var inp = DateTimeShortcuts.calendarInputs[num];
+
+	// Determine if the current value in the input has a valid date.
+	// If so, draw the calendar with that date's year and month.
+	if (inp.value) {
+	    var date_parts = inp.value.split('-');
+	    var year = date_parts[0];
+	    var month = parseFloat(date_parts[1]);
+	    if (year.match(/\d\d\d\d/) && month >= 1 && month <= 12) {
+		DateTimeShortcuts.calendars[num].drawDate(month, year);
+	    }
+	}
+
     
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
