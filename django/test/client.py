@@ -16,6 +16,7 @@ from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import smart_str
 from django.utils.http import urlencode
+from django.utils.itercompat import is_iterable
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -74,21 +75,22 @@ def encode_multipart(boundary, data):
                 '',
                 value.read()
             ])
-        elif hasattr(value, '__iter__'):
-            for item in value:
+        else:
+            if not isinstance(value, basestring) and is_iterable(value):
+                for item in value:
+                    lines.extend([
+                        '--' + boundary,
+                        'Content-Disposition: form-data; name="%s"' % to_str(key),
+                        '',
+                        to_str(item)
+                    ])
+            else:
                 lines.extend([
                     '--' + boundary,
                     'Content-Disposition: form-data; name="%s"' % to_str(key),
                     '',
-                    to_str(item)
+                    to_str(value)
                 ])
-        else:
-            lines.extend([
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % to_str(key),
-                '',
-                to_str(value)
-            ])
 
     lines.extend([
         '--' + boundary + '--',

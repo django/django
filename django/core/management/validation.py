@@ -1,5 +1,6 @@
 import sys
 from django.core.management.color import color_style
+from django.utils.itercompat import is_iterable
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -51,7 +52,8 @@ def get_validation_errors(outfile, app=None):
             if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
                 e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
-                if not hasattr(f.choices, '__iter__'):
+                if isinstance(f.choices, basestring) or \
+                       not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:

@@ -304,7 +304,7 @@ class HttpResponse(object):
     content = property(_get_content, _set_content)
 
     def __iter__(self):
-        self._iterator = self._container.__iter__()
+        self._iterator = iter(self._container)
         return self
 
     def next(self):
