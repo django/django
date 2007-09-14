@@ -39,6 +39,8 @@ def object_list(request, queryset, paginate_by=None, page=None,
         first_on_page
             the result number of the first object in the
             object_list (1-indexed)
+        page_range:
+            A list of the page numbers (1-indexed).
     """
     if extra_context is None: extra_context = {}
     queryset = queryset._clone()
@@ -67,6 +69,7 @@ def object_list(request, queryset, paginate_by=None, page=None,
             'first_on_page': paginator.first_on_page(page - 1),
             'pages': paginator.pages,
             'hits' : paginator.hits,
+            'page_range' : paginator.page_range
         }, context_processors)
     else:
         c = RequestContext(request, {

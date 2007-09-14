@@ -765,6 +765,9 @@ If the results are paginated, the context will contain these extra variables:
     * ``hits``: The total number of objects across *all* pages, not just this
       page.
 
+    * ``page_range``: A list of the page numbers that are available. This
+      is 1-based.
+
 Notes on pagination
 ~~~~~~~~~~~~~~~~~~~
 
@@ -781,7 +784,11 @@ specify the page number in the URL in one of two ways:
 
         /objects/?page=3
 
-In both cases, ``page`` is 1-based, not 0-based, so the first page would be
+    * To loop over all the available page numbers, use the ``page_range`` 
+      variable. You can iterate over the list provided by ``page_range`` 
+      to create a link to every page of results.
+
+These values and lists are is 1-based, not 0-based, so the first page would be
 represented as page ``1``.
 
 ``django.views.generic.list_detail.object_detail``
