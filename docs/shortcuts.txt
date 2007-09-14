@@ -1,0 +1,41 @@
+=========================
+Django shortcut functions
+=========================
+
+The package ``django.shortcuts`` collects helper functions and classes that
+"span" multiple levels of MVC. In other words, these functions/classes
+introduce controlled coupling for convenience's sake.
+
+``render_to_response``
+======================
+
+``django.shortcuts.render_to_response`` renders a given template with a given
+context dictionary and returns an ``HttpResponse`` object with that rendered
+text.
+
+Example::
+
+    from django.shortcuts import render_to_response
+    r = render_to_response('myapp/template.html', {'foo': 'bar'})
+
+This example is equivalent to::
+
+    from django.http import HttpResponse
+    from django.template import Context, loader
+    t = loader.get_template('myapp/template.html')
+    c = Context({'foo': 'bar'})
+    r = HttpResponse(t.render(c))
+
+``get_object_or_404``
+=====================
+
+``django.shortcuts.get_object_or_404`` calls ``get()`` on a given model
+manager, but it raises ``django.http.Http404`` instead of the model's
+``DoesNotExist`` exception.
+
+``get_list_or_404``
+===================
+
+``django.shortcuts.get_list_or_404`` returns the result of ``filter()`` on a
+given model manager, raising ``django.http.Http404`` if the resulting list is
+empty.
