@@ -254,13 +254,20 @@ def escape(value):
 escape = stringfilter(escape)
 
 def linebreaks(value):
-    "Converts newlines into <p> and <br />s"
+    """
+    Replaces line breaks in plain text with appropriate HTML; a single
+    newline becomes an HTML line break (``<br />``) and a new line
+    followed by a blank line becomes a paragraph break (``</p>``).
+    """
     from django.utils.html import linebreaks
     return linebreaks(value)
 linebreaks = stringfilter(linebreaks)
 
 def linebreaksbr(value):
-    "Converts newlines into <br />s"
+    """
+    Converts all newlines in a piece of plain text to HTML line breaks
+    (``<br />``).
+    """
     return value.replace('\n', '<br />')
 linebreaksbr = stringfilter(linebreaksbr)
 
