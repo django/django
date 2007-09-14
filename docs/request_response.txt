@@ -161,6 +161,16 @@ Methods
 
    Example: ``"/music/bands/the_beatles/?print=true"``
 
+``build_absolute_uri(location)``
+   Returns the absolute URI form of ``location``. If no location is provided,
+   the location will be set to ``request.get_full_path()``.
+
+   If the location is already an absolute URI, it will not be altered.
+   Otherwise the absolute URI is built using the server variables available in
+   this request.
+
+   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+
 ``is_secure()``
    Returns ``True`` if the request is secure; that is, if it was made with
    HTTPS.

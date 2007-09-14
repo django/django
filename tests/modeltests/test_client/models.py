@@ -83,9 +83,13 @@ class ClientTest(TestCase):
     def test_redirect(self):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')
-        
         # Check that the response was a 302 (redirect)
         self.assertRedirects(response, '/test_client/get_view/')
+        
+        client_providing_host = Client(HTTP_HOST='django.testserver')
+        response = client_providing_host.get('/test_client/redirect_view/')
+        # Check that the response was a 302 (redirect) with absolute URI
+        self.assertRedirects(response, 'http://django.testserver/test_client/get_view/')
     
     def test_redirect_with_query(self):
         "GET a URL that redirects with given GET parameters"
@@ -97,9 +101,13 @@ class ClientTest(TestCase):
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
         response = self.client.get('/test_client/permanent_redirect_view/')
-        
         # Check that the response was a 301 (permanent redirect)
         self.assertRedirects(response, '/test_client/get_view/', status_code=301)
+
+        client_providing_host = Client(HTTP_HOST='django.testserver')
+        response = client_providing_host.get('/test_client/permanent_redirect_view/')
+        # Check that the response was a 301 (permanent redirect) with absolute URI
+        self.assertRedirects(response, 'http://django.testserver/test_client/get_view/', status_code=301)
 
     def test_redirect_to_strange_location(self):
         "GET a URL that redirects to a non-200 page"
