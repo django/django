@@ -15,7 +15,6 @@ CONTRIB_DIR_NAME = 'django.contrib'
 MODEL_TESTS_DIR_NAME = 'modeltests'
 REGRESSION_TESTS_DIR_NAME = 'regressiontests'
 
-TEST_DATABASE_NAME = 'django_test_db'
 TEST_TEMPLATE_DIR = 'templates'
 
 CONTRIB_DIR = os.path.dirname(contrib.__file__)
@@ -97,7 +96,6 @@ def django_tests(verbosity, interactive, test_labels):
     old_middleware_classes = settings.MIDDLEWARE_CLASSES
 
     # Redirect some settings for the duration of these tests.
-    settings.TEST_DATABASE_NAME = TEST_DATABASE_NAME
     settings.INSTALLED_APPS = ALWAYS_INSTALLED_APPS
     settings.ROOT_URLCONF = 'urls'
     settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
@@ -150,7 +148,6 @@ def django_tests(verbosity, interactive, test_labels):
 
     # Restore the old settings.
     settings.INSTALLED_APPS = old_installed_apps
-    settings.TESTS_DATABASE_NAME = old_test_database_name
     settings.ROOT_URLCONF = old_root_urlconf
     settings.TEMPLATE_DIRS = old_template_dirs
     settings.USE_I18N = old_use_i18n
