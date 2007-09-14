@@ -162,6 +162,8 @@ Methods
    Example: ``"/music/bands/the_beatles/?print=true"``
 
 ``build_absolute_uri(location)``
+   **New in Django development version**
+
    Returns the absolute URI form of ``location``. If no location is provided,
    the location will be set to ``request.get_full_path()``.
 
