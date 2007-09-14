@@ -379,9 +379,16 @@ class HttpResponseServerError(HttpResponse):
 
 def get_host(request):
     "Gets the HTTP host from the environment or request headers."
+    # We try three options, in order of decreasing preference.
     host = request.META.get('HTTP_X_FORWARDED_HOST', '')
-    if not host:
-        host = request.META.get('HTTP_HOST', '')
+    if 'HTTP_HOST' in request.META:
+        host = request.META['HTTP_HOST']
+    else:
+        # Reconstruct the host using the algorithm from PEP 333.
+        host = request.META['SERVER_NAME']
+        server_port = request.META['SERVER_PORT']
+        if server_port != (request.is_secure() and 443 or 80):
+            host = '%s:%s' % (host, server_port)
     return host
 
 # It's neither necessary nor appropriate to use
