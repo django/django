@@ -2,7 +2,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from urllib import quote
 
-def user_passes_test(test_func, login_url=None):
+def user_passes_test(test_func, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks that the user passes the given test,
     redirecting to the log-in page if necessary. The test should be a callable
@@ -15,20 +15,25 @@ def user_passes_test(test_func, login_url=None):
         def _checklogin(request, *args, **kwargs):
             if test_func(request.user):
                 return view_func(request, *args, **kwargs)
-            return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, quote(request.get_full_path())))
+            return HttpResponseRedirect('%s?%s=%s' % (login_url, redirect_field_name, quote(request.get_full_path())))
         _checklogin.__doc__ = view_func.__doc__
         _checklogin.__dict__ = view_func.__dict__
 
         return _checklogin
     return _dec
 
-login_required = user_passes_test(lambda u: u.is_authenticated())
-login_required.__doc__ = (
+def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Decorator for views that checks that the user is logged in, redirecting
     to the log-in page if necessary.
     """
+    actual_decorator = user_passes_test(
+        lambda u: u.is_authenticated(),
+        redirect_field_name=redirect_field_name
     )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 def permission_required(perm, login_url=None):
     """

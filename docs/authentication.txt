@@ -402,11 +402,29 @@ introduced in Python 2.4::
     def my_view(request):
         # ...
 
+In the Django development version, ``login_required`` also takes an optional
+``redirect_field_name`` parameter. Example::
+    
+    from django.contrib.auth.decorators import login_required
+
+    def my_view(request):
+        # ...
+    my_view = login_required(redirect_field_name='redirect_to')(my_view)
+
+Again, an equivalent example of the more compact decorator syntax introduced in Python 2.4::
+    
+    from django.contrib.auth.decorators import login_required
+
+    @login_required(redirect_field_name='redirect_to')
+    def my_view(request):
+        # ...
+
 ``login_required`` does the following:
 
     * If the user isn't logged in, redirect to ``settings.LOGIN_URL``
       (``/accounts/login/`` by default), passing the current absolute URL
-      in the query string as ``next``. For example:
+      in the query string as ``next`` or the value of ``redirect_field_name``. 
+      For example:
       ``/accounts/login/?next=/polls/3/``.
     * If the user is logged in, execute the view normally. The view code is
       free to assume the user is logged in.
