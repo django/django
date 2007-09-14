@@ -354,7 +354,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             for sequence_info in sequences:
                 table_name = sequence_info['table']
                 seq_name = get_sequence_name(table_name)
-                query = _get_sequence_reset_sql() % {'sequence': seq_name, 'table': self.quote_name(table_name)}
+                column_name = self.quote_name(sequence_info['column'] or 'id')
+                query = _get_sequence_reset_sql() % {'sequence': seq_name,
+                                                     'table': self.quote_name(table_name),
+                                                     'column': column_name}
                 sql.append(query)
             return sql
         else:
@@ -368,13 +371,16 @@ class DatabaseOperations(BaseDatabaseOperations):
             for f in model._meta.fields:
                 if isinstance(f, models.AutoField):
                     sequence_name = get_sequence_name(model._meta.db_table)
-                    output.append(query % {'sequence':sequence_name,
-                                           'table':model._meta.db_table})
+                    column_name = self.quote_name(f.db_column or f.name)
+                    output.append(query % {'sequence': sequence_name,
+                                           'table': model._meta.db_table,
+                                           'column': column_name})
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 sequence_name = get_sequence_name(f.m2m_db_table())
-                output.append(query % {'sequence':sequence_name,
-                                       'table':f.m2m_db_table()})
+                output.append(query % {'sequence': sequence_name,
+                                       'table': f.m2m_db_table(),
+                                       'column': self.quote_name('id')})
         return output
 
     def start_transaction_sql(self):
@@ -507,7 +513,7 @@ def _get_sequence_reset_sql():
             cval integer;
         BEGIN
             LOCK TABLE %(table)s IN SHARE MODE;
-            SELECT NVL(MAX(id), 0) INTO startvalue FROM %(table)s;
+            SELECT NVL(MAX(%(column)s), 0) INTO startvalue FROM %(table)s;
             SELECT %(sequence)s.nextval INTO cval FROM dual;
             cval := startvalue - cval;
             IF cval != 0 THEN
