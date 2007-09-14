@@ -6,7 +6,7 @@ BR-specific Form helpers
 from django.newforms import ValidationError
 from django.newforms.fields import Field, RegexField, CharField, Select, EMPTY_VALUES
 from django.utils.encoding import smart_unicode
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext as _
 import re
 
 phone_digits_re = re.compile(r'^(\d{2})[-\.]?(\d{4})[-\.]?(\d{4})$')
@@ -15,7 +15,7 @@ class BRZipCodeField(RegexField):
     def __init__(self, *args, **kwargs):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
             max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXXX-XXX.'),
+            error_message=_('Enter a zip code in the format XXXXX-XXX.'),
                     *args, **kwargs)
 
 class BRPhoneNumberField(Field):
@@ -27,7 +27,7 @@ class BRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(ugettext('Phone numbers must be in XX-XXXX-XXXX format.'))
+        raise ValidationError(_('Phone numbers must be in XX-XXXX-XXXX format.'))
 
 class BRStateSelect(Select):
     """
@@ -38,6 +38,32 @@ class BRStateSelect(Select):
         from br_states import STATE_CHOICES
         super(BRStateSelect, self).__init__(attrs, choices=STATE_CHOICES)
 
+class BRStateChoiceField(Field):
+    """
+    A choice field that uses a list of Brazilian states as its choices.
+    """
+    widget = Select
+
+    def __init__(self, required=True, widget=None, label=None,
+                 initial=None, help_text=None):
+        super(BRStateChoiceField, self).__init__(required, widget, label,
+                                                 initial, help_text)
+        from br_states import STATE_CHOICES
+        self.widget.choices = STATE_CHOICES
+
+    def clean(self, value):
+        value = super(BRStateChoiceField, self).clean(value)
+        if value in EMPTY_VALUES:
+            value = u''
+        value = smart_unicode(value)
+        if value == u'':
+            return value
+        valid_values = set([smart_unicode(k) for k, v in self.widget.choices])
+        if value not in valid_values:
+            raise ValidationError(_(u'Select a valid brazilian state.'
+                                           u' That state is not one'
+                                           u' of the available states.'))
+        return value
 
 def DV_maker(v):
     if v >= 2:
@@ -69,9 +95,9 @@ class BRCPFField(CharField):
         try:
             int(value)
         except ValueError:
-            raise ValidationError(ugettext("This field requires only numbers."))
+            raise ValidationError(_("This field requires only numbers."))
         if len(value) != 11:
-            raise ValidationError(ugettext("This field requires at most 11 digits or 14 characters."))
+            raise ValidationError(_("This field requires at most 11 digits or 14 characters."))
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(10, 1, -1))])
@@ -81,7 +107,7 @@ class BRCPFField(CharField):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(ugettext("Invalid CPF number."))
+            raise ValidationError(_("Invalid CPF number."))
 
         return orig_value
 
@@ -103,7 +129,7 @@ class BRCNPJField(Field):
             raise ValidationError("This field requires only numbers.")
         if len(value) != 14:
             raise ValidationError(
-                ugettext("This field requires at least 14 digits"))
+                _("This field requires at least 14 digits"))
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(5, 1, -1) + range(9, 1, -1))])
@@ -113,7 +139,7 @@ class BRCNPJField(Field):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(ugettext("Invalid CNPJ number."))
+            raise ValidationError(_("Invalid CNPJ number."))
 
         return orig_value
 
