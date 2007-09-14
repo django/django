@@ -84,7 +84,7 @@ class ClientTest(TestCase):
         "GET a URL that redirects elsewhere"
         response = self.client.get('/test_client/redirect_view/')
         # Check that the response was a 302 (redirect)
-        self.assertRedirects(response, '/test_client/get_view/')
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/')
         
         client_providing_host = Client(HTTP_HOST='django.testserver')
         response = client_providing_host.get('/test_client/redirect_view/')
@@ -96,13 +96,13 @@ class ClientTest(TestCase):
         response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
         
         # Check if parameters are intact
-        self.assertRedirects(response, '/test_client/get_view/?var=value')
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/?var=value')
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
         response = self.client.get('/test_client/permanent_redirect_view/')
         # Check that the response was a 301 (permanent redirect)
-        self.assertRedirects(response, '/test_client/get_view/', status_code=301)
+        self.assertRedirects(response, 'http://testserver/test_client/get_view/', status_code=301)
 
         client_providing_host = Client(HTTP_HOST='django.testserver')
         response = client_providing_host.get('/test_client/permanent_redirect_view/')
@@ -115,7 +115,7 @@ class ClientTest(TestCase):
         
         # Check that the response was a 302, and that
         # the attempt to get the redirection location returned 301 when retrieved
-        self.assertRedirects(response, '/test_client/permanent_redirect_view/', target_status_code=301)
+        self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/', target_status_code=301)
 
     def test_notfound_response(self):
         "GET a URL that responds as '404:Not Found'"
@@ -239,7 +239,7 @@ class ClientTest(TestCase):
         
         # Get the page without logging in. Should result in 302.
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, '/accounts/login/?next=/test_client/login_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
         
         # Log in
         login = self.client.login(username='testclient', password='password')
@@ -277,7 +277,7 @@ class ClientTest(TestCase):
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')
-        self.assertRedirects(response, '/accounts/login/?next=/test_client/login_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"

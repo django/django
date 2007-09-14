@@ -119,7 +119,7 @@ class AssertRedirectsTests(TestCase):
         try:
             self.assertRedirects(response, '/test_client/get_view/')
         except AssertionError, e:
-            self.assertEquals(str(e), "Response redirected to '/test_client/get_view/?var=value', expected '/test_client/get_view/'")
+            self.assertEquals(str(e), "Response redirected to 'http://testserver/test_client/get_view/?var=value', expected '/test_client/get_view/'")
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -135,7 +135,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.get('/test_client/double_redirect_view/')
         try:
             # The redirect target responds with a 301 code, not 200
-            self.assertRedirects(response, '/test_client/permanent_redirect_view/')
+            self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/')
         except AssertionError, e:
             self.assertEquals(str(e), "Couldn't retrieve redirection page '/test_client/permanent_redirect_view/': response code was 301 (expected 200)")
             
@@ -260,4 +260,4 @@ class LoginTests(TestCase):
         # At this points, the self.client isn't logged in. 
         # Check that assertRedirects uses the original client, not the 
         # default client.
-        self.assertRedirects(response, "/test_client_regress/get_view/")
+        self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")
