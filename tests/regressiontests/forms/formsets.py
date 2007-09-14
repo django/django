@@ -243,7 +243,7 @@ If we try to skip a form, even if it was initially displayed as blank, we will
 get an error.
 
 >>> data = {
-...     'choices-COUNT': '4', # the number of forms rendered
+...     'choices-COUNT': '3', # the number of forms rendered
 ...     'choices-0-choice': 'Calexico',
 ...     'choices-0-votes': '100',
 ...     'choices-1-choice': '',
