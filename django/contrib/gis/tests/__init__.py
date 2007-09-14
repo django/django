@@ -17,7 +17,7 @@ def suite():
     "Builds a test suite for the GIS package."
     s = TestSuite()
     for test_suite in test_suite_names:
-        tsuite = getattr(__import__('django.contrib.gis.tests', fromlist=[test_suite]),test_suite)
+        tsuite = getattr(__import__('django.contrib.gis.tests', globals(), locals(), [test_suite]),test_suite)
         s.addTest(tsuite.suite())
     return s
 
@@ -69,7 +69,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
     for test_model in test_models:
         module_name = 'django.contrib.gis.tests.%s' % test_model
         settings.INSTALLED_APPS.append(module_name)
-        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, fromlist=['tests']), 'tests')
+        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), ['tests']), 'tests')
         test_suite.addTest(tsuite.suite())
 
     # Resetting the loaded flag to take into account what we appended to the INSTALLED_APPS

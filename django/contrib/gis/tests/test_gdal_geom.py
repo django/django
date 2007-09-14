@@ -105,6 +105,7 @@ class OGRGeomTest(unittest.TestCase):
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
+        print "\nBEGIN - expecting IllegalArgumentException; safe to ignore.\n"
         try:
             c = poly.centroid
         except OGRException:
@@ -112,6 +113,7 @@ class OGRGeomTest(unittest.TestCase):
             pass
         else:
             self.fail('Should have raised an OGRException!')
+        print "\nEND - expecting IllegalArgumentException; safe to ignore.\n"
 
         # Closing the rings
         poly.close_rings()
