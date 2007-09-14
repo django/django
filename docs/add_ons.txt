@@ -70,8 +70,9 @@ An abstraction of the following workflow:
 
 "Display an HTML form, force a preview, then do something with the submission."
 
-Full documentation for this feature does not yet exist, but you can read the
-code and docstrings in ``django/contrib/formtools/preview.py`` for a start.
+See the `form preview documentation`_.
+
+.. _form preview documentation: ../form_preview/
 
 humanize
 ========
