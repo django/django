@@ -52,8 +52,7 @@ def get_validation_errors(outfile, app=None):
             if f.prepopulate_from is not None and type(f.prepopulate_from) not in (list, tuple):
                 e.add(opts, '"%s": prepopulate_from should be a list or tuple.' % f.name)
             if f.choices:
-                if isinstance(f.choices, basestring) or \
-                       not is_iterable(f.choices):
+                if isinstance(f.choices, basestring) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:
