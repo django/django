@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.http import get_host
 
 class SiteManager(models.Manager):
     def get_current(self):
@@ -36,7 +37,7 @@ class RequestSite(object):
     The save() and delete() methods raise NotImplementedError.
     """
     def __init__(self, request):
-        self.domain = self.name = request.META['SERVER_NAME']
+        self.domain = self.name = get_host(request)
 
     def __unicode__(self):
         return self.domain
