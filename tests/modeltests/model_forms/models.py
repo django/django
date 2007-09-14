@@ -306,7 +306,7 @@ Add some categories and test the many-to-many form output.
 >>> new_art.id
 1
 >>> new_art = Article.objects.get(id=1)
->>> new_art.categories.all()
+>>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
 Now, submit form data with no categories. This deletes the existing categories.
@@ -348,7 +348,7 @@ The m2m data won't be saved until save_m2m() is invoked on the form.
 ...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save(commit=False)
 
-# Manually save the instance 
+# Manually save the instance
 >>> new_art.save()
 >>> new_art.id
 4
