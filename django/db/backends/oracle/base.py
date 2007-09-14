@@ -438,21 +438,6 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     """
     charset = 'utf-8'
 
-    def _rewrite_args(self, query, params=None):
-        if params is None:
-            params = []
-        else:
-            params = self._format_params(params)
-        args = [(':arg%d' % i) for i in range(len(params))]
-        query = smart_str(query, self.charset) % tuple(args)
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
-        # it does want a trailing ';' but not a trailing '/'.  However, these
-        # characters must be included in the original query in case the query
-        # is being passed to SQL*Plus.
-        if query.endswith(';') or query.endswith('/'):
-            query = query[:-1]
-        return query, params
-
     def _format_params(self, params):
         if isinstance(params, dict):
             result = {}
@@ -464,12 +449,35 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             return tuple([smart_str(p, self.charset, True) for p in params])
 
     def execute(self, query, params=None):
-        query, params = self._rewrite_args(query, params)
+        if params is None:
+            params = []
+        else:
+            params = self._format_params(params)
+        args = [(':arg%d' % i) for i in range(len(params))]
+        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # characters must be included in the original query in case the query
+        # is being passed to SQL*Plus.
+        if query.endswith(';') or query.endswith('/'):
+            query = query[:-1]
+        query = smart_str(query, self.charset) % tuple(args)
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
-        query, params = self._rewrite_args(query, params)
-        return Database.Cursor.executemany(self, query, params)
+        try:
+          args = [(':arg%d' % i) for i in range(len(params[0]))]
+        except (IndexError, TypeError):
+          # No params given, nothing to do
+          return None
+        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # characters must be included in the original query in case the query
+        # is being passed to SQL*Plus.
+        if query.endswith(';') or query.endswith('/'):
+            query = query[:-1]
+        query = smart_str(query, self.charset) % tuple(args)
+        new_param_list = [self._format_params(i) for i in params]
+        return Database.Cursor.executemany(self, query, new_param_list)
 
     def fetchone(self):
         return to_unicode(Database.Cursor.fetchone(self))
