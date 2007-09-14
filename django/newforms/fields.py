@@ -416,6 +416,9 @@ class URLField(RegexField):
         self.user_agent = validator_user_agent
 
     def clean(self, value):
+        # If no URL scheme given, assume http://
+        if value and '://' not in value:
+            value = u'http://%s' % value
         value = super(URLField, self).clean(value)
         if value == u'':
             return value
