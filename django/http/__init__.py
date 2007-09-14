@@ -273,6 +273,8 @@ class HttpResponse(object):
         "Case-insensitive check for a header"
 	return self.headers.has_key(header.lower())
 
+    __contains__ = has_header
+
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
         for var in ('max_age', 'path', 'domain', 'secure', 'expires'):

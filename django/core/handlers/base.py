@@ -142,7 +142,7 @@ def fix_location_header(request, response):
     Code constructing response objects is free to insert relative paths and
     this function converts them to absolute paths.
     """
-    if 'location' in response.headers and http.get_host(request):
+    if 'Location' in response and http.get_host(request):
         response['Location'] = request.build_absolute_uri(response['Location'])
     return response
 
