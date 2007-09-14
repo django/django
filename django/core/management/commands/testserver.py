@@ -7,6 +7,9 @@ class Command(BaseCommand):
         make_option('--verbosity', action='store', dest='verbosity', default='1',
             type='choice', choices=['0', '1', '2'],
             help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+        make_option('--addrport', action='store', dest='addrport', 
+            type='string', default='',
+            help='port number or ipaddr:port to run the server on'),
     )
     help = 'Runs a development server with data from the given fixture(s).'
     args = '[fixture ...]'
@@ -19,6 +22,7 @@ class Command(BaseCommand):
         from django.test.utils import create_test_db
 
         verbosity = int(options.get('verbosity', 1))
+        addrport = options.get('addrport')
 
         # Create a test database.
         db_name = create_test_db(verbosity=verbosity)
@@ -30,4 +34,4 @@ class Command(BaseCommand):
         # a strange error -- it causes this handle() method to be called
         # multiple times.
         shutdown_message = '\nServer stopped.\nNote that the test database, %r, has not been deleted. You can explore it on your own.' % db_name
-        call_command('runserver', shutdown_message=shutdown_message, use_reloader=False)
+        call_command('runserver', addrport=addrport, shutdown_message=shutdown_message, use_reloader=False)
