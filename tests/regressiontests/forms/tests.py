@@ -3795,14 +3795,6 @@ u'1'
 >>> smart_unicode('foo')
 u'foo'
 
-# flatatt tests
->>> from django.newforms.util import flatatt
->>> flatatt({'id': "header"})
-u' id="header"'
->>> flatatt({'class': "news", 'title': "Read this"})
-u' class="news" title="Read this"'
->>> flatatt({})
-u''
 
 ####################################
 # Test accessing errors in clean() #

@@ -7,6 +7,18 @@ util_tests = r"""
 >>> from django.newforms.util import *
 >>> from django.utils.translation import ugettext_lazy
 
+###########
+# flatatt #
+###########
+
+>>> from django.newforms.util import flatatt
+>>> flatatt({'id': "header"})
+u' id="header"'
+>>> flatatt({'class': "news", 'title': "Read this"})
+u' class="news" title="Read this"'
+>>> flatatt({})
+u''
+
 ###################
 # ValidationError #
 ###################
