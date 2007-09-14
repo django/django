@@ -58,4 +58,29 @@ How to use Databrowse
 
     4. Run the Django server and visit ``/databrowse/`` in your browser.
 
+Requiring user login
+====================
+
+You can restrict access to logged-in users with only a few extra lines of
+code. Simply add the following import to your URLconf::
+
+    from django.contrib.auth.decorators import login_required
+
+Then modify the URLconf so that the ``databrowse.site.root`` view is decorated
+with ``login_required``::
+
+    (r'^databrowse/(.*)', login_required(databrowse.site.root)),
+
+If you haven't already added support for user logins to your URLconf, as
+described in the `user authentication docs`_, then you will need to do so
+now with the following mapping::
+
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+
+The final step is to create the login form required by
+``django.contrib.auth.views.login``. The `user authentication docs`_
+provide full details and a sample template that can be used for this
+purpose.
+
 .. _template loader docs: ../templates_python/#loader-types
+.. _user authentication docs: ../authentication/
