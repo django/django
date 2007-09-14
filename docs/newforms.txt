@@ -1916,6 +1916,17 @@ Note that your callback needs to handle *all* possible model field types, not
 just the ones that you want to behave differently to the default. That's why
 this example has an ``else`` clause that implements the default behavior.
 
+.. warning::
+    The field that is passed into the ``formfield_callback`` function in
+    ``form_for_model()`` and ``form_for_instance`` is the field instance from
+    your model's class. You **must not** alter that object at all; treat it
+    as read-only!
+
+    If you make any alterations to that object, it will affect any future
+    users of the model class, because you will have changed the field object
+    used to construct the class. This is almost certainly what you don't want
+    to have happen.
+
 Finding the model associated with a form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
