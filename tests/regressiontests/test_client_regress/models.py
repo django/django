@@ -252,7 +252,7 @@ class LoginTests(TestCase):
         # Create a second client, and log in.
         c = Client()
         login = c.login(username='testclient', password='password')
-        self.assertTrue(login, 'Could not log in')
+        self.failUnless(login, 'Could not log in')
 
         # Get a redirection page with the second client.
         response = c.get("/test_client_regress/login_protected_redirect_view/")

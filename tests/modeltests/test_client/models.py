@@ -243,7 +243,7 @@ class ClientTest(TestCase):
         
         # Log in
         login = self.client.login(username='testclient', password='password')
-        self.assertTrue(login, 'Could not log in')
+        self.failUnless(login, 'Could not log in')
 
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')
