@@ -292,7 +292,7 @@ class ModelAdmin(BaseModelAdmin):
         Returns a QuerySet of all model instances that can be edited by the
         admin site.
         """
-        return self.model._default_manager.get_query_set()
+        return self.model._default_manager.get_query_set().order_by(*self.ordering)
 
     def queryset_add(self, request):
         """
