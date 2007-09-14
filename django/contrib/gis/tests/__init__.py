@@ -1,15 +1,24 @@
 from copy import copy
 from unittest import TestSuite, TextTestRunner
+import sys
 
 # Tests that do not require setting up and tearing down a spatial database.
-test_suite_names = ['test_gdal_driver',
-                    'test_gdal_ds',
-                    'test_gdal_geom',
-                    'test_gdal_srs',
-                    'test_geos',
-                    'test_measure',
-                    'test_spatialrefsys',
-                    ]
+test_suite_names = [
+    'test_geos',
+    'test_measure',
+]
+try:
+    # GDAL tests
+    import django.contrib.gis.gdal
+    test_suite_names += [
+        'test_gdal_driver',
+        'test_gdal_ds',
+        'test_gdal_geom',
+        'test_gdal_srs',
+        'test_spatialrefsys',
+    ]
+except ImportError, e:
+    print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
 
 test_models = ['geoapp']
 
