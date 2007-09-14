@@ -49,10 +49,17 @@ def object_list(request, queryset, paginate_by=None, page=None,
         if not page:
             page = request.GET.get('page', 1)
         try:
-            page = int(page)
-            object_list = paginator.get_page(page - 1)
-        except (InvalidPage, ValueError):
-            if page == 1 and allow_empty:
+            page_number = int(page)
+        except ValueError:
+            if page == 'last':
+                page_number = paginator.pages
+            else:
+                # Page is not 'last', nor can it be converted to an int
+                raise Http404
+        try:
+            object_list = paginator.get_page(page_number - 1)
+        except InvalidPage:
+            if page_number == 1 and allow_empty:
                 object_list = []
             else:
                 raise Http404
@@ -60,13 +67,13 @@ def object_list(request, queryset, paginate_by=None, page=None,
             '%s_list' % template_object_name: object_list,
             'is_paginated': paginator.pages > 1,
             'results_per_page': paginate_by,
-            'has_next': paginator.has_next_page(page - 1),
-            'has_previous': paginator.has_previous_page(page - 1),
-            'page': page,
-            'next': page + 1,
-            'previous': page - 1,
-            'last_on_page': paginator.last_on_page(page - 1),
-            'first_on_page': paginator.first_on_page(page - 1),
+            'has_next': paginator.has_next_page(page_number - 1),
+            'has_previous': paginator.has_previous_page(page_number - 1),
+            'page': page_number,
+            'next': page_number + 1,
+            'previous': page_number - 1,
+            'last_on_page': paginator.last_on_page(page_number - 1),
+            'first_on_page': paginator.first_on_page(page_number - 1),
             'pages': paginator.pages,
             'hits' : paginator.hits,
             'page_range' : paginator.page_range
