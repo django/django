@@ -511,6 +511,9 @@ like so::
 
     Entry.objects.order_by('?')
 
+Note: ``order_by('?')`` queries may be expensive and slow, depending on the
+database backend you're using.
+
 To order by a field in a different table, add the other table's name and a dot,
 like so::
 

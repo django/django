@@ -1,6 +1,7 @@
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
+from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -293,6 +294,11 @@ class Message(models.Model):
 class AnonymousUser(object):
     id = None
     username = ''
+    is_staff = False
+    is_active = True
+    is_superuser = False
+    _groups = EmptyManager()
+    _user_permissions = EmptyManager()
 
     def __init__(self):
         pass
@@ -325,11 +331,11 @@ class AnonymousUser(object):
         raise NotImplementedError
 
     def _get_groups(self):
-        raise NotImplementedError
+        return self._groups
     groups = property(_get_groups)
 
     def _get_user_permissions(self):
-        raise NotImplementedError
+        return self._user_permissions
     user_permissions = property(_get_user_permissions)
 
     def has_perm(self, perm):

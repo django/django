@@ -51,6 +51,7 @@ LANGUAGES = (
     ('fa', gettext_noop('Persian')),
     ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
+    ('ga', gettext_noop('Gaeilge')),
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),

@@ -1,292 +1,137 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Finnish translation of Django
+# Copyright (C) 2006-2007
+# This file is distributed under the same license as the Django package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-05 14:41+0300\n"
-"PO-Revision-Date: 2006-08-12 23:41+0300\n"
+"POT-Creation-Date: 2007-09-14 23:33+0300\n"
+"PO-Revision-Date: 2007-09-15 00:34+0300\n"
 "Last-Translator: Antti Kaihola <antti.kaihola@ambitone.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Finnish\n"
+"X-Poedit-Country: FINLAND\n"
 
-#: db/models/manipulators.py:302
-#, python-format
-msgid "%(object)s with this %(type)s already exists for the given %(field)s."
-msgstr ""
-
-#: db/models/fields/related.py:51
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Syöttämäsi %s ei kelpaa."
-
-#: db/models/fields/related.py:618
-msgid "Separate multiple IDs with commas."
-msgstr "Erottele tunnisteet pilkuilla."
-
-#: db/models/fields/related.py:620
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-" Pidä \"Ctrl\"-näppäin (tai Macin \"Command\") pohjassa valitaksesi useita "
-"vaihtoehtoja."
-
-#: db/models/fields/related.py:664
-#, python-format
-msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
-msgid_plural ""
-"Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "Syöttämäsi %(self)s-tunniste %(value)r ei kelpaa."
-msgstr[1] "Syöttämäsi %(self)s-tunnisteet %(value)r eivät kelpaa."
-
-#: db/models/fields/__init__.py:40
-#, python-format
-msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s, jolla on tämä %(fieldname)s, on jo olemassa."
-
-#: db/models/fields/__init__.py:114 db/models/fields/__init__.py:265
-#: db/models/fields/__init__.py:551 db/models/fields/__init__.py:562
-#: forms/__init__.py:346
-msgid "This field is required."
-msgstr "Tämä kenttä vaaditaan."
-
-#: db/models/fields/__init__.py:340
-msgid "This value must be an integer."
-msgstr "Tarvitaan kokonaisluku."
-
-#: db/models/fields/__init__.py:372
-msgid "This value must be either True or False."
-msgstr "Tarvitaan tosi (True) tai epätosi (False)."
-
-#: db/models/fields/__init__.py:388
-msgid "This field cannot be null."
-msgstr "Tämän kentän arvo ei voi olla \"null\"."
-
-#: db/models/fields/__init__.py:415 core/validators.py:127
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr "Päivämäärän pitää olla muodossa VVVV-KK-PP."
-
-#: db/models/fields/__init__.py:477 core/validators.py:135
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr "Ajankohdan pitää olla muodossa VVVV-KK-PP TT:MM."
-
-#: db/models/fields/__init__.py:571
-msgid "Enter a valid filename."
-msgstr "Tiedostonimi ei kelpaa."
-
-#: conf/global_settings.py:39
-msgid "Arabic"
-msgstr "arabia"
-
-#: conf/global_settings.py:40
-msgid "Bengali"
-msgstr "bengali"
-
-#: conf/global_settings.py:41
-msgid "Czech"
-msgstr "tšekki"
-
-#: conf/global_settings.py:42
-msgid "Welsh"
-msgstr "wales"
-
-#: conf/global_settings.py:43
-msgid "Danish"
-msgstr "tanska"
-
-#: conf/global_settings.py:44
-msgid "German"
-msgstr "saksa"
-
-#: conf/global_settings.py:45
-msgid "Greek"
-msgstr "kreikka"
-
-#: conf/global_settings.py:46
-msgid "English"
-msgstr "englanti"
-
-#: conf/global_settings.py:47
-msgid "Spanish"
-msgstr "espanja"
-
-#: conf/global_settings.py:48
-msgid "Argentinean Spanish"
-msgstr "Argentiinan espanja"
-
-#: conf/global_settings.py:49
-msgid "French"
-msgstr "ranska"
-
-#: conf/global_settings.py:50
-msgid "Galician"
-msgstr ""
-
-#: conf/global_settings.py:51
-msgid "Hungarian"
-msgstr "unkari"
-
-#: conf/global_settings.py:52
-msgid "Hebrew"
-msgstr "heprea"
-
-#: conf/global_settings.py:53
-msgid "Icelandic"
-msgstr "islanti"
-
-#: conf/global_settings.py:54
-msgid "Italian"
-msgstr "italia"
-
-#: conf/global_settings.py:55
-msgid "Japanese"
-msgstr "japani"
-
-#: conf/global_settings.py:56
-msgid "Dutch"
-msgstr "hollanti"
-
-#: conf/global_settings.py:57
-msgid "Norwegian"
-msgstr "norja"
-
-#: conf/global_settings.py:58
-msgid "Brazilian"
-msgstr ""
-
-#: conf/global_settings.py:59
-msgid "Romanian"
-msgstr "romania"
-
-#: conf/global_settings.py:60
-msgid "Russian"
-msgstr "venäjä"
-
-#: conf/global_settings.py:61
-msgid "Slovak"
-msgstr "slovakia"
-
-#: conf/global_settings.py:62
-msgid "Slovenian"
-msgstr "slovenia"
-
-#: conf/global_settings.py:63
-msgid "Serbian"
-msgstr "serbia"
-
-#: conf/global_settings.py:64
-msgid "Swedish"
-msgstr "ruotsi"
-
-#: conf/global_settings.py:65
-msgid "Tamil"
-msgstr ""
-
-#: conf/global_settings.py:66
-msgid "Ukrainian"
-msgstr "ukraina"
-
-#: conf/global_settings.py:67
-msgid "Simplified Chinese"
-msgstr "kiina (yksinkertaistettu)"
-
-#: conf/global_settings.py:68
-msgid "Traditional Chinese"
-msgstr "kiina (perinteinen)"
-
-#: core/validators.py:63
+#: core/validators.py:72
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) ja alaviivoja (_)."
+msgstr ""
+"Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) ja alaviivoja "
+"(_)."
 
-#: core/validators.py:67
+#: core/validators.py:76
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
-msgstr "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala-, tavu- ja kauttaviivoja (_ - /)."
+msgstr ""
+"Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala-, tavu- "
+"ja kauttaviivoja (_ - /)."
 
-#: core/validators.py:75
+#: core/validators.py:80
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr "Tässä voidaan käyttää vain kirjaimia (a-z), numeroita (0-9) sekä ala- ja tavuviivoja (_ -)."
+
+#: core/validators.py:84
 msgid "Uppercase letters are not allowed here."
 msgstr "Isot kirjaimet (ABC) eivät kelpaa tässä."
 
-#: core/validators.py:79
+#: core/validators.py:88
 msgid "Lowercase letters are not allowed here."
 msgstr "Pienet kirjaimet (abc) eivät kelpaa tässä."
 
-#: core/validators.py:86
+#: core/validators.py:95
 msgid "Enter only digits separated by commas."
 msgstr "Vain pilkulla erotetut luvut kelpaavat tässä."
 
-#: core/validators.py:98
+#: core/validators.py:107
 msgid "Enter valid e-mail addresses separated by commas."
 msgstr "Syötä sähköpostiosoitteita pilkuilla erotettuina."
 
-#: core/validators.py:102
+#: core/validators.py:111
 msgid "Please enter a valid IP address."
 msgstr "IP-osoite ei kelpaa."
 
-#: core/validators.py:106
+#: core/validators.py:115
 msgid "Empty values are not allowed here."
 msgstr "Tätä kohtaa ei voi jättää tyhjäksi."
 
-#: core/validators.py:110
+#: core/validators.py:119
 msgid "Non-numeric characters aren't allowed here."
 msgstr "Vain numerot (0-9) kelpaavat tässä."
 
-#: core/validators.py:114
+#: core/validators.py:123
 msgid "This value can't be comprised solely of digits."
 msgstr "Tarvitaan vähintään yksi merkki, joka ei ole numero (0-9)."
 
-#: core/validators.py:119
+#: core/validators.py:128 newforms/fields.py:149
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-#: core/validators.py:123
+#: core/validators.py:132
 msgid "Only alphabetical characters are allowed here."
 msgstr "Vain kirjaimet kelpaavat tässä."
 
-#: core/validators.py:131
+#: core/validators.py:147
+msgid "Year must be 1900 or later."
+msgstr "Vuosiluvuksi kelpaa vain 1900 tai myöhempi."
+
+#: core/validators.py:151
+#, python-format
+msgid "Invalid date: %s"
+msgstr "Päivämäärä %s ei kelpaa"
+
+#: core/validators.py:156 db/models/fields/__init__.py:505
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr "Päivämäärän pitää olla muodossa VVVV-KK-PP."
+
+#: core/validators.py:161
 msgid "Enter a valid time in HH:MM format."
 msgstr "Ajan täytyy olla muodossa TT:MM."
 
-#: core/validators.py:139
+#: core/validators.py:165 db/models/fields/__init__.py:579
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr "Ajankohdan pitää olla muodossa VVVV-KK-PP TT:MM."
+
+#: core/validators.py:170 newforms/fields.py:343
 msgid "Enter a valid e-mail address."
 msgstr "Syötä kelvollinen sähköpostiosoite."
 
-#: core/validators.py:151 core/validators.py:379 forms/__init__.py:661
+#: core/validators.py:182 core/validators.py:469 newforms/fields.py:377
+#: oldforms/__init__.py:686
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
 
-#: core/validators.py:155
+#: core/validators.py:193 newforms/fields.py:405
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
-msgstr "Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
+msgstr ""
+"Kuva ei kelpaa. Lähettämäsi tiedosto ei ole kuva, tai tiedosto on vioittunut."
 
-#: core/validators.py:162
+#: core/validators.py:200
 #, python-format
 msgid "The URL %s does not point to a valid image."
 msgstr "Osoittessa %s ei ole kuvaa tai se on vioittunut."
 
-#: core/validators.py:166
+#: core/validators.py:204
 #, python-format
 msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
 msgstr "Puhelinnumeron tulee olla muodossa XXX-XXX-XXXX. \"%s\" ei kelpaa."
 
-#: core/validators.py:174
+#: core/validators.py:212
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
 msgstr "Osoitteessa %s ei ole QuickTime-videota tai se on vioittunut."
 
-#: core/validators.py:178
+#: core/validators.py:216
 msgid "A valid URL is required."
 msgstr "URL-osoite ei kelpaa."
 
-#: core/validators.py:192
+#: core/validators.py:230
 #, python-format
 msgid ""
 "Valid HTML is required. Specific errors are:\n"
@@ -295,343 +140,916 @@ msgstr ""
 "HTML-koodi ei kelpaa. Virheilmoitus on:\n"
 "%s"
 
-#: core/validators.py:199
+#: core/validators.py:237
 #, python-format
 msgid "Badly formed XML: %s"
 msgstr "Vääränmuotoinen XML: %s"
 
-#: core/validators.py:209
+#: core/validators.py:254
 #, python-format
 msgid "Invalid URL: %s"
 msgstr "URL-osoite %s ei kelpaa."
 
-#: core/validators.py:213 core/validators.py:215
+#: core/validators.py:259 core/validators.py:261
 #, python-format
 msgid "The URL %s is a broken link."
 msgstr "Osoite %s on rikkoutunut tai väärä linkki."
 
-#: core/validators.py:221
+#: core/validators.py:267
 msgid "Enter a valid U.S. state abbreviation."
 msgstr "Syötä USA:n osavaltion lyhenne."
 
-#: core/validators.py:236
+#: core/validators.py:281
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Sanaa \"%s\" ei saa käyttää tässä."
 msgstr[1] "Sanoja \"%s\" ei saa käyttää tässä."
 
-#: core/validators.py:243
+#: core/validators.py:283 db/models/manipulators.py:310
+#: contrib/admin/views/main.py:342 contrib/admin/views/main.py:344
+#: contrib/admin/views/main.py:346
+msgid "and"
+msgstr "ja"
+
+#: core/validators.py:288
 #, python-format
 msgid "This field must match the '%s' field."
 msgstr "Arvon täytyy olla sama kuin kentässä '%s'."
 
-#: core/validators.py:262
+#: core/validators.py:307
 msgid "Please enter something for at least one field."
 msgstr "Täytä ainakin yksi kenttä."
 
-#: core/validators.py:271 core/validators.py:282
+#: core/validators.py:316 core/validators.py:327
 msgid "Please enter both fields or leave them both empty."
 msgstr "Täytä tai jätä tyhjäksi kummatkin kentät."
 
-#: core/validators.py:289
+#: core/validators.py:335
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
 msgstr "Tämä kenttä pitää täyttää, jos %(field)s on %(value)s."
 
-#: core/validators.py:301
+#: core/validators.py:348
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
 msgstr "Tämä kenttä pitää täyttää, jos %(field)s ei ole %(value)s."
 
-#: core/validators.py:320
+#: core/validators.py:367
 msgid "Duplicate values are not allowed."
 msgstr "Samaa arvoa ei voi käyttää kahdesti."
 
-#: core/validators.py:343
+#: core/validators.py:382
+#, python-format
+msgid "This value must be between %(lower)s and %(upper)s."
+msgstr "Tämän luvun on oltava välillä %(lower)s–%(upper)s."
+
+#: core/validators.py:384
+#, python-format
+msgid "This value must be at least %s."
+msgstr "Tämän luvun on oltava vähintään %s."
+
+#: core/validators.py:386
+#, python-format
+msgid "This value must be no more than %s."
+msgstr "Tämän luvun on oltava enintään %s."
+
+#: core/validators.py:422
 #, python-format
 msgid "This value must be a power of %s."
 msgstr "Tämän luvun on oltava %s:n potenssi."
 
-#: core/validators.py:354
+#: core/validators.py:432
 msgid "Please enter a valid decimal number."
 msgstr "Desimaaliluku ei kelpaa."
 
-#: core/validators.py:356
+#: core/validators.py:439
 #, python-format
 msgid "Please enter a valid decimal number with at most %s total digit."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s total digits."
-msgstr[0] "Desimaaliluvussa saa tässä olla yhteensä vain %s merkitsevä numero. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
-msgstr[1] "Desimaaliluvussa saa tässä olla yhteensä vain %s merkitsevää numeroa. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
+msgstr[0] ""
+"Desimaaliluvussa saa tässä olla yhteensä vain %s merkitsevä numero. Huomaa, "
+"että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
+msgstr[1] ""
+"Desimaaliluvussa saa tässä olla yhteensä vain %s merkitsevää numeroa. "
+"Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
 
-#: core/validators.py:359
+#: core/validators.py:442
 #, python-format
 msgid ""
 "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural ""
 "Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr[0] "Desimaaliluvun kokonaisosassa saa tässä olla vain %s numero. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
-msgstr[1] "Desimaaliluvun kokonaisosassa saa tässä olla vain %s numeroa. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
+msgstr[0] ""
+"Desimaaliluvun kokonaisosassa saa tässä olla vain %s numero. Huomaa, että "
+"desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
+msgstr[1] ""
+"Desimaaliluvun kokonaisosassa saa tässä olla vain %s numeroa. Huomaa, että "
+"desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
 
-#: core/validators.py:362
+#: core/validators.py:445
 #, python-format
 msgid "Please enter a valid decimal number with at most %s decimal place."
 msgid_plural ""
 "Please enter a valid decimal number with at most %s decimal places."
-msgstr[0] "Tässä saa olla vain %s desimaali. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
-msgstr[1] "Tässä saa olla vain %s desimaalia. Huomaa, että desimaalierottimena käytetään pilkun (,) sijasta pistettä (.)."
+msgstr[0] ""
+"Tässä saa olla vain %s desimaali. Huomaa, että desimaalierottimena käytetään "
+"pilkun (,) sijasta pistettä (.)."
+msgstr[1] ""
+"Tässä saa olla vain %s desimaalia. Huomaa, että desimaalierottimena "
+"käytetään pilkun (,) sijasta pistettä (.)."
 
-#: core/validators.py:372
+#: core/validators.py:453
+msgid "Please enter a valid floating point number."
+msgstr "Syötä liukuluku."
+
+#: core/validators.py:462
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
 msgstr "Lähetä vähintään %s tavun kokoinen tiedosto."
 
-#: core/validators.py:373
+#: core/validators.py:463
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
 msgstr "Lähetä enintään %s tavun kokoinen tiedosto."
 
-#: core/validators.py:390
+#: core/validators.py:480
 msgid "The format for this field is wrong."
 msgstr "Muoto ei kelpaa."
 
-#: core/validators.py:405
+#: core/validators.py:495
 msgid "This field is invalid."
 msgstr "Tämä arvo ei kelpaa."
 
-#: core/validators.py:441
+#: core/validators.py:531
 #, python-format
 msgid "Could not retrieve anything from %s."
 msgstr "Tietoja ei voida noutaa kohteesta: %s."
 
-#: core/validators.py:444
+#: core/validators.py:534
 #, python-format
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr "Osoitteesta %(url)s saatiin virheellinen Content-Type '%(contenttype)s'."
+msgstr ""
+"Osoitteesta %(url)s saatiin virheellinen Content-Type '%(contenttype)s'."
 
-#: core/validators.py:477
+#: core/validators.py:567
 #, python-format
 msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
-msgstr "Rivillä %(line)s oleva tagi %(tag)s pitää sulkea. (Rivi alkaa \"%(start)s\")"
+msgstr ""
+"Rivillä %(line)s oleva tagi %(tag)s pitää sulkea. (Rivi alkaa \"%(start)s\")"
 
-#: core/validators.py:481
+#: core/validators.py:571
 #, python-format
 msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
-msgstr "Rivillä %(line)s on tekstiä, joka ei kelpaa tässä yhteydessä. (Rivi alkaa \"%(start)s\")"
+msgstr ""
+"Rivillä %(line)s on tekstiä, joka ei kelpaa tässä yhteydessä. (Rivi alkaa \"%"
+"(start)s\")"
 
-#: core/validators.py:486
+#: core/validators.py:576
 #, python-format
 msgid ""
 "\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
 "(start)s\".)"
-msgstr "Rivillä %(line)s attribuutti %(attr)s ei kelpaa. (Rivi alkaa \"%(start)s\")"
+msgstr ""
+"Rivillä %(line)s attribuutti %(attr)s ei kelpaa. (Rivi alkaa \"%(start)s\")"
 
-#: core/validators.py:491
+#: core/validators.py:581
 #, python-format
 msgid ""
 "\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
 "(start)s\".)"
-msgstr "Rivillä %(line)s tagi \"<%(tag)s>\" ei kelpaa. (Rivi alkaa \"%(start)s\")"
+msgstr ""
+"Rivillä %(line)s tagi \"<%(tag)s>\" ei kelpaa. (Rivi alkaa \"%(start)s\")"
 
-#: core/validators.py:495
+#: core/validators.py:585
 #, python-format
 msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
-msgstr "Rivillä %(line)s yhdestä tagista puuttuu yksi tai useampi attribuutti. (Rivi alkaa \"%(start)s\")"
+msgstr ""
+"Rivillä %(line)s yhdestä tagista puuttuu yksi tai useampi attribuutti. (Rivi "
+"alkaa \"%(start)s\")"
 
-#: core/validators.py:500
+#: core/validators.py:590
 #, python-format
 msgid ""
 "The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
 "starts with \"%(start)s\".)"
-msgstr "Rivillä %(line)s attribuutin %(attr)s arvo ei kelpaa. (Rivi alkaa \"%(start)s\")"
-
-#: contrib/auth/forms.py:52
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "Selaimesi ei salli evästeitä. Sisäänkirjautuminen vaatii evästeen."
-
-#: contrib/auth/forms.py:59 contrib/admin/views/decorators.py:10
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr "Käyttäjätunnus tai salasana ei kelpaa. Huomaa, että isot ja pienet kirjaimet ovat merkitseviä."
-
-#: contrib/auth/forms.py:61
-msgid "This account is inactive."
-msgstr "Tämä käyttäjätili ei ole voimassa."
-
-#: contrib/auth/models.py:38 contrib/auth/models.py:57
-msgid "name"
-msgstr "nimi"
-
-#: contrib/auth/models.py:40
-msgid "codename"
-msgstr "koodinimi"
-
-#: contrib/auth/models.py:42
-msgid "permission"
-msgstr "oikeus"
-
-#: contrib/auth/models.py:43 contrib/auth/models.py:58
-msgid "permissions"
-msgstr "oikeudet"
-
-#: contrib/auth/models.py:60
-msgid "group"
-msgstr "ryhmä"
-
-#: contrib/auth/models.py:61 contrib/auth/models.py:100
-msgid "groups"
-msgstr "ryhmät"
-
-#: contrib/auth/models.py:90
-msgid "username"
-msgstr "tunnus"
-
-#: contrib/auth/models.py:90
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr " Vaaditaan. Enintään 30 kirjanta (a-z), numeroa (0-9) tai alaviivaa (_)."
-
-#: contrib/auth/models.py:91
-msgid "first name"
-msgstr "etunimi"
-
-#: contrib/auth/models.py:92
-msgid "last name"
-msgstr "sukunimi"
-
-#: contrib/auth/models.py:93
-msgid "e-mail address"
-msgstr "sähköposti"
-
-#: contrib/auth/models.py:94
-msgid "password"
-msgstr "salasana"
-
-#: contrib/auth/models.py:94
-msgid "Use '[algo]$[salt]$[hexdigest]'"
-msgstr "(Salasanaa ei näytetä selväkielisenä)"
-
-#: contrib/auth/models.py:95
-msgid "staff status"
-msgstr "ylläpitäjä"
-
-#: contrib/auth/models.py:95
-msgid "Designates whether the user can log into this admin site."
-msgstr "Ylläpitäjillä on pääsy tähän sivuston ylläpito-osioon."
-
-#: contrib/auth/models.py:96
-msgid "active"
-msgstr "voimassa"
-
-#: contrib/auth/models.py:96
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
-msgstr "Määrää, voiko käyttäjä kirjautua sisään. Tällä voi estää käyttäjätilin käytön poistamatta sitä."
-
-#: contrib/auth/models.py:97
-msgid "superuser status"
-msgstr "pääkäyttäjä"
-
-#: contrib/auth/models.py:97
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr "Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella."
-
-#: contrib/auth/models.py:98
-msgid "last login"
-msgstr "viimeksi kirjautunut"
-
-#: contrib/auth/models.py:99
-msgid "date joined"
-msgstr "liittynyt"
-
-#: contrib/auth/models.py:101
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
 msgstr ""
-"Tässä valittujen oikeuksien lisäksi käyttäjä saa myös kaikki niiden ryhmien "
-"oikeudet, joiden jäsen hän on."
+"Rivillä %(line)s attribuutin %(attr)s arvo ei kelpaa. (Rivi alkaa \"%(start)s"
+"\")"
 
-#: contrib/auth/models.py:102
-msgid "user permissions"
-msgstr "käyttäjän oikeudet"
+#: newforms/fields.py:93 newforms/fields.py:509 newforms/fields.py:585
+#: newforms/fields.py:596 newforms/models.py:193
+#: db/models/fields/__init__.py:159 db/models/fields/__init__.py:316
+#: db/models/fields/__init__.py:731 db/models/fields/__init__.py:742
+#: oldforms/__init__.py:373
+msgid "This field is required."
+msgstr "Tämä kenttä vaaditaan."
 
-#: contrib/auth/models.py:105
-msgid "user"
-msgstr "käyttäjä"
+#: newforms/fields.py:123
+#, python-format
+msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
+msgstr "Tähän kelpaa enintään %(max)d merkkiä (nyt niitä on %(length)d)."
 
-#: contrib/auth/models.py:106
-msgid "users"
-msgstr "käyttäjät"
+#: newforms/fields.py:125
+#, python-format
+msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
+msgstr "Tähän tarvitaan vähintään %(min)d merkkiä (nyt on vain %(length)d)."
 
-#: contrib/auth/models.py:111
-msgid "Personal info"
-msgstr "Henkilökohtaiset tiedot"
+#: newforms/fields.py:151 newforms/fields.py:174 newforms/fields.py:204
+#, python-format
+msgid "Ensure this value is less than or equal to %s."
+msgstr "Tämän luvun on oltava enintään %s."
 
-#: contrib/auth/models.py:112
-msgid "Permissions"
-msgstr "Oikeudet"
+#: newforms/fields.py:153 newforms/fields.py:176 newforms/fields.py:206
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
+msgstr "Tämän luvun on oltava vähintään %s."
 
-#: contrib/auth/models.py:113
-msgid "Important dates"
-msgstr "Tärkeät päivämäärät"
+#: newforms/fields.py:172 newforms/fields.py:199
+msgid "Enter a number."
+msgstr "Syötä kokonaisluku."
 
-#: contrib/auth/models.py:114
-msgid "Groups"
-msgstr "Ryhmät"
+#: newforms/fields.py:208
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr "Tässä luvussa voi olla yhteensä enintään %s numeroa."
 
-#: contrib/auth/models.py:256
-msgid "message"
-msgstr "viesti"
+#: newforms/fields.py:210
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr "Tässä luvussa saa olla enintään %s desimaalia."
 
-#: contrib/auth/views.py:39
-msgid "Logged out"
-msgstr "Kirjautunut ulos"
+#: newforms/fields.py:212
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr "Tässä luvussa saa olla enintään %s numeroa ennen desimaalipilkkua."
 
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "tapahtumahetki"
+#: newforms/fields.py:245 newforms/fields.py:629
+msgid "Enter a valid date."
+msgstr "Syötä oikea päivämäärä."
 
-#: contrib/admin/models.py:19
-msgid "object id"
+#: newforms/fields.py:272 newforms/fields.py:631
+msgid "Enter a valid time."
+msgstr "Syötä oikea kellonaika."
+
+#: newforms/fields.py:308
+msgid "Enter a valid date/time."
+msgstr "Syötä oikea pvm/kellonaika."
+
+#: newforms/fields.py:321
+msgid "Enter a valid value."
+msgstr "Syötä oikea arvo."
+
+#: newforms/fields.py:379
+msgid "No file was submitted."
+msgstr "Yhtään tiedostoa ei ole lähetetty."
+
+#: newforms/fields.py:381 oldforms/__init__.py:688
+msgid "The submitted file is empty."
+msgstr "Lähetetty tiedosto on tyhjä."
+
+#: newforms/fields.py:419 newforms/fields.py:444
+msgid "Enter a valid URL."
+msgstr "Syötä oikea URL-osoite."
+
+#: newforms/fields.py:446
+msgid "This URL appears to be a broken link."
+msgstr "Tämä URL-osoite on rikkinäinen linkki."
+
+#: newforms/fields.py:497 newforms/models.py:180
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
+
+#: newforms/fields.py:513 newforms/fields.py:589 newforms/models.py:197
+msgid "Enter a list of values."
+msgstr "Syötä lista."
+
+#: newforms/fields.py:519 newforms/models.py:203
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
+msgstr "Valitse oikea vaihtoehto. %s ei löydy vaihtoehtojen joukosta."
+
+#: newforms/widgets.py:188 contrib/admin/filterspecs.py:152
+#: oldforms/__init__.py:591
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#: newforms/widgets.py:188 contrib/admin/filterspecs.py:145
+#: oldforms/__init__.py:591
+msgid "Yes"
+msgstr "Kyllä"
+
+#: newforms/widgets.py:188 contrib/admin/filterspecs.py:145
+#: oldforms/__init__.py:591
+msgid "No"
+msgstr "Ei"
+
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "%(verbose_name)s luotiin onnistuneesti."
+
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "%(verbose_name)s päivitettiin onnistuneesti."
+
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "%(verbose_name)s on poistettu."
+
+#: template/defaultfilters.py:532
+msgid "yes,no,maybe"
+msgstr "kyllä,ei,ehkä"
+
+#: template/defaultfilters.py:561
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: template/defaultfilters.py:563
+#, python-format
+msgid "%.1f KB"
+msgstr "%.1f Kt"
+
+#: template/defaultfilters.py:565
+#, python-format
+msgid "%.1f MB"
+msgstr "%.1f Mt"
+
+#: template/defaultfilters.py:566
+#, python-format
+msgid "%.1f GB"
+msgstr "%.1f Gt"
+
+#: db/models/manipulators.py:309
+#, python-format
+msgid "%(object)s with this %(type)s already exists for the given %(field)s."
+msgstr "%(field)s omaa jo kohteen %(object)s, joka on tyyppiä %(type)s."
+
+#: db/models/fields/__init__.py:52
+#, python-format
+msgid "%(optname)s with this %(fieldname)s already exists."
+msgstr "%(optname)s, jolla on tämä %(fieldname)s, on jo olemassa."
+
+#: db/models/fields/__init__.py:414
+msgid "This value must be an integer."
+msgstr "Tarvitaan kokonaisluku."
+
+#: db/models/fields/__init__.py:450
+msgid "This value must be either True or False."
+msgstr "Tarvitaan tosi (True) tai epätosi (False)."
+
+#: db/models/fields/__init__.py:471
+msgid "This field cannot be null."
+msgstr "Tämän kentän arvo ei voi olla \"null\"."
+
+#: db/models/fields/__init__.py:640
+msgid "This value must be a decimal number."
+msgstr "Tähän tarvitaan desimaaliluku."
+
+#: db/models/fields/__init__.py:751
+msgid "Enter a valid filename."
+msgstr "Tiedostonimi ei kelpaa."
+
+#: db/models/fields/__init__.py:894
+msgid "This value must be either None, True or False."
+msgstr "Tähän tarvitaan tyhjä (None), tosi (True) tai epätosi (False)."
+
+#: db/models/fields/related.py:55
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "Syöttämäsi %s ei kelpaa."
+
+#: db/models/fields/related.py:658
+msgid "Separate multiple IDs with commas."
+msgstr "Erottele tunnisteet pilkuilla."
+
+#: db/models/fields/related.py:660
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+" Pidä \"Ctrl\"-näppäin (tai Macin \"Command\") pohjassa valitaksesi useita "
+"vaihtoehtoja."
+
+#: db/models/fields/related.py:707
+#, python-format
+msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
+msgid_plural ""
+"Please enter valid %(self)s IDs. The values %(value)r are invalid."
+msgstr[0] "Syöttämäsi %(self)s-tunniste %(value)r ei kelpaa."
+msgstr[1] "Syöttämäsi %(self)s-tunnisteet %(value)r eivät kelpaa."
+
+#: contrib/sites/models.py:33
+msgid "domain name"
+msgstr "domain-nimi"
+
+#: contrib/sites/models.py:34
+msgid "display name"
+msgstr "näyttönimi"
+
+#: contrib/sites/models.py:38
+msgid "site"
+msgstr "sivusto"
+
+#: contrib/sites/models.py:39
+msgid "sites"
+msgstr "sivustot"
+
+#: contrib/redirects/models.py:7
+msgid "redirect from"
+msgstr "ohjaa osoitteesta"
+
+#: contrib/redirects/models.py:8
+msgid ""
+"This should be an absolute path, excluding the domain name. Example: '/"
+"events/search/'."
+msgstr ""
+"Tässä on käytettävä absoluuttista polkua ilman verkkotunnusta. Esimerkki: "
+"'\\\n"
+"events/search/'"
+
+#: contrib/redirects/models.py:9
+msgid "redirect to"
+msgstr "ohjaa osoitteeseen"
+
+#: contrib/redirects/models.py:10
+msgid ""
+"This can be either an absolute path (as above) or a full URL starting with "
+"'http://'."
+msgstr ""
+"Tässä on käytettävä joko absoluuttista polkua (kuten yllä) tai täydellistä "
+"'http://'-alkuista URL-osoitetta."
+
+#: contrib/redirects/models.py:13
+msgid "redirect"
+msgstr "edelleenohjaus"
+
+#: contrib/redirects/models.py:14
+msgid "redirects"
+msgstr "edelleenohjaukset"
+
+#: contrib/comments/models.py:67 contrib/comments/models.py:169
+msgid "object ID"
 msgstr "kohteen tunniste"
 
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr "kohteen tiedot"
+#: contrib/comments/models.py:68
+msgid "headline"
+msgstr "otsikko"
 
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr "tapahtumatyyppi"
+#: contrib/comments/models.py:69 contrib/comments/models.py:90
+#: contrib/comments/models.py:170
+msgid "comment"
+msgstr "kommentti"
 
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr "selitys"
+#: contrib/comments/models.py:70
+msgid "rating #1"
+msgstr "1. pisteytys"
 
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr "lokimerkintä"
+#: contrib/comments/models.py:71
+msgid "rating #2"
+msgstr "2. pisteytys"
 
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr "lokimerkinnät"
+#: contrib/comments/models.py:72
+msgid "rating #3"
+msgstr "3. pisteytys"
 
-#: contrib/admin/filterspecs.py:40
+#: contrib/comments/models.py:73
+msgid "rating #4"
+msgstr "4. pisteytys"
+
+#: contrib/comments/models.py:74
+msgid "rating #5"
+msgstr "5. pisteytys"
+
+#: contrib/comments/models.py:75
+msgid "rating #6"
+msgstr "6. pisteytys"
+
+#: contrib/comments/models.py:76
+msgid "rating #7"
+msgstr "7. pisteytys"
+
+#: contrib/comments/models.py:77
+msgid "rating #8"
+msgstr "8. pisteytys"
+
+#: contrib/comments/models.py:82
+msgid "is valid rating"
+msgstr "on sallittu pisteytys"
+
+#: contrib/comments/models.py:83 contrib/comments/models.py:172
+msgid "date/time submitted"
+msgstr "lähetyshetki"
+
+#: contrib/comments/models.py:84 contrib/comments/models.py:173
+msgid "is public"
+msgstr "on julkinen"
+
+#: contrib/comments/models.py:85 contrib/admin/views/doc.py:306
+msgid "IP address"
+msgstr "IP-osoite"
+
+#: contrib/comments/models.py:86
+msgid "is removed"
+msgstr "on poistettu"
+
+#: contrib/comments/models.py:86
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Rastita jos kommentti on asiaankuulumaton. Kommentin tilalla näytetään\n"
+"viesti \"Tämä kommentti on poistettu\"."
+
+#: contrib/comments/models.py:91
+msgid "comments"
+msgstr "kommentit"
+
+#: contrib/comments/models.py:134 contrib/comments/models.py:213
+msgid "Content object"
+msgstr "Kommentoitu kohde"
+
+#: contrib/comments/models.py:162
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+" Kirjoittanut %(user)s, pvm %(date)s\\n\n"
+" \\n\n"
+" %(comment)s\\n\n"
+" \\n\n"
+" http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:171
+msgid "person's name"
+msgstr "henkilön nimi"
+
+#: contrib/comments/models.py:174
+msgid "ip address"
+msgstr "IP-osoite"
+
+#: contrib/comments/models.py:176
+msgid "approved by staff"
+msgstr "ylläpidon hyväksymä"
+
+#: contrib/comments/models.py:179
+msgid "free comment"
+msgstr "vapaa kommentti"
+
+#: contrib/comments/models.py:180
+msgid "free comments"
+msgstr "vapaat kommentit"
+
+#: contrib/comments/models.py:239
+msgid "score"
+msgstr "pisteet"
+
+#: contrib/comments/models.py:240
+msgid "score date"
+msgstr "pisteytyspäivä"
+
+#: contrib/comments/models.py:243
+msgid "karma score"
+msgstr "karma-pisteytys"
+
+#: contrib/comments/models.py:244
+msgid "karma scores"
+msgstr "karma-pisteytykset"
+
+#: contrib/comments/models.py:248
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "%(score)d pistettä käyttäjältä %(user)s"
+
+#: contrib/comments/models.py:264
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+" %(user)s on merkinnyt tämän kommentin:\\n\n"
+" \\n\n"
+" %(text)s"
+
+#: contrib/comments/models.py:271
+msgid "flag date"
+msgstr "merkintäpäivä"
+
+#: contrib/comments/models.py:274
+msgid "user flag"
+msgstr "käyttäjän merkki"
+
+#: contrib/comments/models.py:275
+msgid "user flags"
+msgstr "käyttäjien merkit"
+
+#: contrib/comments/models.py:279
+#, python-format
+msgid "Flag by %r"
+msgstr "Käyttäjän %r merkki"
+
+#: contrib/comments/models.py:284
+msgid "deletion date"
+msgstr "poistamispäivä"
+
+#: contrib/comments/models.py:286
+msgid "moderator deletion"
+msgstr "valvojan poisto"
+
+#: contrib/comments/models.py:287
+msgid "moderator deletions"
+msgstr "valvojien poistot"
+
+#: contrib/comments/models.py:291
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr "Valvojan %r poisto"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "Nimesi:"
+
+#: contrib/comments/templates/comments/freeform.html:5
+#: contrib/comments/templates/comments/form.html:28
+msgid "Comment:"
+msgstr "Kommentti:"
+
+#: contrib/comments/templates/comments/freeform.html:10
+#: contrib/comments/templates/comments/form.html:35
+msgid "Preview comment"
+msgstr "Esikatsele kommenttia"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:17
+msgid "Username:"
+msgstr "Käyttäjätunnus:"
+
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/admin/templates/admin_doc/template_tag_index.html:5
+#: contrib/admin/templates/admin_doc/model_detail.html:3
+#: contrib/admin/templates/admin_doc/template_detail.html:4
+#: contrib/admin/templates/admin_doc/index.html:4
+#: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/view_index.html:5
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+msgid "Log out"
+msgstr "Kirjaudu ulos"
+
+#: contrib/comments/templates/comments/form.html:8
+#: contrib/admin/templates/admin/login.html:20
+msgid "Password:"
+msgstr "Salasana:"
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "Unohditko salasanasi?"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr "Pisteytykset"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "Vaaditaan"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "Vapaavalintainen"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "Lähetä valokuva"
+
+#: contrib/comments/views/karma.py:20
+msgid "Anonymous users cannot vote"
+msgstr "Anonyymit käyttäjät eivät voi äänestää"
+
+#: contrib/comments/views/karma.py:24
+msgid "Invalid comment ID"
+msgstr "Kommentin tunniste on virheellinen"
+
+#: contrib/comments/views/karma.py:26
+msgid "No voting for yourself"
+msgstr "Itseään ei voi äänestää"
+
+#: contrib/comments/views/comments.py:28
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr ""
+"Tämä pisteytys on annettava, koska olet syöttänyt ainakin yhden muunkin "
+"pisteytyksen."
+
+#: contrib/comments/views/comments.py:112
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+msgid_plural ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr[0] ""
+"Kommentin kirjoittanut käyttäjä on kirjoittanut vain yhden kommentin:\n"
+"\n"
+"%(text)s"
+msgstr[1] ""
+"Kommentin kirjoittanut käyttäjä on kirjoittanut alle %(count)s kommenttia:\n"
+"\n"
+"%(text)s"
+
+# Mitä "sketchy user" tarkoittaa?
+#: contrib/comments/views/comments.py:117
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+"Tämä on \"sketchy\"-käyttäjän kirjoittama kommentti:\n"
+"\n"
+"%(text)s"
+
+#: contrib/comments/views/comments.py:189
+#: contrib/comments/views/comments.py:281
+msgid "Only POSTs are allowed"
+msgstr "Vain POST-kutsut sallittu"
+
+#: contrib/comments/views/comments.py:193
+#: contrib/comments/views/comments.py:285
+msgid "One or more of the required fields wasn't submitted"
+msgstr "Yksi tai useampi vaadittu kenttä on jäänyt täyttämättä"
+
+#: contrib/comments/views/comments.py:197
+#: contrib/comments/views/comments.py:287
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr "Kommenttilomaketta on käpälöity (turvallisuusrike)"
+
+#: contrib/comments/views/comments.py:207
+#: contrib/comments/views/comments.py:293
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr ""
+"Kommenttilomakkeen 'target'-parametri ei kelpaa -- kohteen ID oli "
+"virheellinen"
+
+#: contrib/comments/views/comments.py:258
+#: contrib/comments/views/comments.py:322
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr "Kommenttilomake ei pyytänyt esikatselua tai lähettämistä"
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "th"
+msgstr "."
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "st"
+msgstr "."
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "nd"
+msgstr "."
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "rd"
+msgstr "."
+
+#: contrib/humanize/templatetags/humanize.py:50
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:53
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:56
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] ""
+msgstr[1] ""
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "one"
+msgstr "yksi"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "two"
+msgstr "kaksi"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "three"
+msgstr "kolme"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "four"
+msgstr "neljä"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "five"
+msgstr "viisi"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "six"
+msgstr "kuusi"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "seven"
+msgstr "seitsemän"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "eight"
+msgstr "kahdeksan"
+
+#: contrib/humanize/templatetags/humanize.py:71
+msgid "nine"
+msgstr "yhdeksän"
+
+#: contrib/humanize/templatetags/humanize.py:90
+msgid "today"
+msgstr "tänään"
+
+#: contrib/humanize/templatetags/humanize.py:92
+msgid "tomorrow"
+msgstr "huomenna"
+
+#: contrib/humanize/templatetags/humanize.py:94
+msgid "yesterday"
+msgstr "eilen"
+
+#: contrib/sessions/models.py:68
+msgid "session key"
+msgstr "istunnon avain"
+
+#: contrib/sessions/models.py:69
+msgid "session data"
+msgstr "istunnon tiedot"
+
+#: contrib/sessions/models.py:70
+msgid "expire date"
+msgstr "vanhenee"
+
+#: contrib/sessions/models.py:74
+msgid "session"
+msgstr "istunto"
+
+#: contrib/sessions/models.py:75
+msgid "sessions"
+msgstr "istunnot"
+
+#: contrib/contenttypes/models.py:37
+msgid "python model class name"
+msgstr "mallin python-luokan nimi"
+
+#: contrib/contenttypes/models.py:40
+msgid "content type"
+msgstr "sisältötyyppi"
+
+#: contrib/contenttypes/models.py:41
+msgid "content types"
+msgstr "sisältötyypit"
+
+#: contrib/admin/filterspecs.py:42
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -640,553 +1058,114 @@ msgstr ""
 "<h3>Yksi %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
+#: contrib/admin/filterspecs.py:72 contrib/admin/filterspecs.py:90
+#: contrib/admin/filterspecs.py:145 contrib/admin/filterspecs.py:171
 msgid "All"
 msgstr "Kaikki"
 
-#: contrib/admin/filterspecs.py:109
+#: contrib/admin/filterspecs.py:111
 msgid "Any date"
 msgstr "Mikä tahansa päivä"
 
-#: contrib/admin/filterspecs.py:110
+#: contrib/admin/filterspecs.py:112
 msgid "Today"
 msgstr "Tänään"
 
-#: contrib/admin/filterspecs.py:113
+#: contrib/admin/filterspecs.py:115
 msgid "Past 7 days"
 msgstr "Viimeiset 7 päivää"
 
-#: contrib/admin/filterspecs.py:115
+#: contrib/admin/filterspecs.py:117
 msgid "This month"
 msgstr "Tässä kuussa"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:119
 msgid "This year"
 msgstr "Tänä vuonna"
 
-#: contrib/admin/filterspecs.py:143
-msgid "Yes"
-msgstr "Kyllä"
+#: contrib/admin/models.py:17
+msgid "action time"
+msgstr "tapahtumahetki"
 
-#: contrib/admin/filterspecs.py:143
-msgid "No"
-msgstr "Ei"
+#: contrib/admin/models.py:20
+msgid "object id"
+msgstr "kohteen tunniste"
 
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "Tuntematon"
+#: contrib/admin/models.py:21
+msgid "object repr"
+msgstr "kohteen tiedot"
 
-#: contrib/admin/views/decorators.py:24
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr "Kirjaudu sisään"
+#: contrib/admin/models.py:22
+msgid "action flag"
+msgstr "tapahtumatyyppi"
 
-#: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr "Kirjaudu uudelleen sisään, koska istuntosi on mennyt umpeen. Muutoksesi ovat silti tallessa."
+#: contrib/admin/models.py:23
+msgid "change message"
+msgstr "selitys"
 
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr "Selaimesi ei salli evästeitä. Muuta asetukset sallimaan evästeet, lataa tämä sivu uudelleen ja yritä toistamiseen."
+#: contrib/admin/models.py:26
+msgid "log entry"
+msgstr "lokimerkintä"
 
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr "Käyttäjätunnuksessa ei saa olla '@'-merkkiä."
+#: contrib/admin/models.py:27
+msgid "log entries"
+msgstr "lokimerkinnät"
 
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr "Käyttäjätunnus ei ole sama kuin sähköpostiosoite. Kokeile '%s'."
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr "Sivuston ylläpito"
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:14
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" on nyt lisätty."
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:345
-#: contrib/admin/views/auth.py:19
-msgid "You may edit it again below."
-msgstr "Voit muokata sitä uudelleen alla."
-
-#: contrib/admin/views/main.py:269 contrib/admin/views/main.py:354
-#, python-format
-msgid "You may add another %s below."
-msgstr "Uusi %s on lisättävissä alla."
-
-#: contrib/admin/views/main.py:287
-#, python-format
-msgid "Add %s"
-msgstr "Uusi %s"
-
-#: contrib/admin/views/main.py:333
-#, python-format
-msgid "Added %s."
-msgstr "Lisätty %s."
-
-#: contrib/admin/views/main.py:333 contrib/admin/views/main.py:335
-#: contrib/admin/views/main.py:337
-msgid "and"
-msgstr "ja"
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Changed %s."
-msgstr "Muokattu: %s."
-
-#: contrib/admin/views/main.py:337
-#, python-format
-msgid "Deleted %s."
-msgstr "Poistettu %s."
-
-#: contrib/admin/views/main.py:340
-msgid "No fields changed."
-msgstr "Ei muutoksia kenttiin."
-
-#: contrib/admin/views/main.py:343
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" on nyt muutettu."
-
-#: contrib/admin/views/main.py:351
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" on nyt lisätty. Voit muokata sitä uudelleen alla."
-
-#: contrib/admin/views/main.py:389
-#, python-format
-msgid "Change %s"
-msgstr "Muokkaa: %s"
-
-#: contrib/admin/views/main.py:471
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s: %(obj)s"
-
-#: contrib/admin/views/main.py:476
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s:"
-
-#: contrib/admin/views/main.py:509
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" on poistettu."
-
-#: contrib/admin/views/main.py:512
-msgid "Are you sure?"
-msgstr "Oletko varma?"
-
-#: contrib/admin/views/main.py:534
-#, python-format
-msgid "Change history: %s"
-msgstr "Muokkaushistoria: %s"
-
-#: contrib/admin/views/main.py:568
-#, python-format
-msgid "Select %s"
-msgstr "Valitse %s"
-
-#: contrib/admin/views/main.py:568
-#, python-format
-msgid "Select %s to change"
-msgstr "Valitse muokattava %s"
-
-#: contrib/admin/views/main.py:744
-msgid "Database error"
-msgstr "Tietokantavirhe"
-
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
-#: contrib/admin/views/doc.py:310 contrib/admin/views/doc.py:312
-msgid "Integer"
-msgstr "Kokonaisluku"
-
-#: contrib/admin/views/doc.py:292
-msgid "Boolean (Either True or False)"
-msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
-
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:311
-#, python-format
-msgid "String (up to %(maxlength)s)"
-msgstr "Merkkijono (enintään %(maxlength)s merkkiä)"
-
-#: contrib/admin/views/doc.py:294
-msgid "Comma-separated integers"
-msgstr "Pilkulla erotetut kokonaisluvut"
-
-#: contrib/admin/views/doc.py:295
-msgid "Date (without time)"
-msgstr "Päivämäärä"
-
-#: contrib/admin/views/doc.py:296
-msgid "Date (with time)"
-msgstr "Päivämäärä ja kellonaika"
-
-#: contrib/admin/views/doc.py:297
-msgid "E-mail address"
-msgstr "Sähköpostios."
-
-#: contrib/admin/views/doc.py:298 contrib/admin/views/doc.py:299
-#: contrib/admin/views/doc.py:302
-msgid "File path"
-msgstr "Tiedostopolku"
-
-#: contrib/admin/views/doc.py:300
-msgid "Decimal number"
-msgstr "Desimaaliluku"
-
-#: contrib/admin/views/doc.py:304 contrib/comments/models.py:85
-msgid "IP address"
-msgstr "IP-osoite"
-
-#: contrib/admin/views/doc.py:306
-msgid "Boolean (Either True, False or None)"
-msgstr "Totuusarvo: joko tosi (True), epätosi (False) tai ei mikään (None)"
-
-#: contrib/admin/views/doc.py:307
-msgid "Relation to parent model"
-msgstr "Relaatio emomalliin"
-
-#: contrib/admin/views/doc.py:308
-msgid "Phone number"
-msgstr "Puhelinnumero"
-
-#: contrib/admin/views/doc.py:313
-msgid "Text"
-msgstr "Tekstiä"
-
-#: contrib/admin/views/doc.py:314
-msgid "Time"
-msgstr "Kellonaika"
-
-#: contrib/admin/views/doc.py:315 contrib/flatpages/models.py:7
-msgid "URL"
-msgstr "URL-osoite"
-
-#: contrib/admin/views/doc.py:316
-msgid "U.S. state (two uppercase letters)"
-msgstr "USA:n osavaltio (kaksikirjaiminen versaalein)"
-
-#: contrib/admin/views/doc.py:317
-msgid "XML text"
-msgstr "XML-teksti"
-
-#: contrib/admin/views/auth.py:25
-msgid "Add user"
-msgstr "Uusi käyttäjä"
-
-#: contrib/admin/templatetags/admin_list.py:230
+#: contrib/admin/templatetags/admin_list.py:254
 msgid "All dates"
 msgstr "Kaikki päivät"
 
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "Näytä kaikki"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Documentation"
-msgstr "Ohjeita"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
 #: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
 #: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/index.html:4
 #: contrib/admin/templates/admin_doc/view_detail.html:4
+#: contrib/admin/templates/admin_doc/missing_docutils.html:4
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+#: contrib/admin/templates/admin_doc/template_filter_index.html:5
+#: contrib/admin/templates/admin_doc/model_index.html:5
+#: contrib/admin/templates/admin_doc/view_index.html:5
 #: contrib/admin/templates/registration/password_change_form.html:3
 #: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+#: contrib/admin/templates/admin/auth/user/change_password.html:15
+#: contrib/admin/templates/admin/auth/user/change_password.html:46
 msgid "Change password"
 msgstr "Vaihda salasana"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/base.html:24
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/comments/templates/comments/form.html:6
-msgid "Log out"
-msgstr "Kirjaudu ulos"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/base.html:29
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/logged_out.html:4
 #: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_change_form.html:4
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_change_done.html:4
+#: contrib/admin/templates/admin/delete_confirmation.html:6
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_list.html:6
+#: contrib/admin/templates/admin/change_form.html:13
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/auth/user/change_password.html:12
 msgid "Home"
 msgstr "Etusivu"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-#: contrib/admin/templates/admin/submit_line.html:3
-msgid "Delete"
-msgstr "Poista"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr "Kohteen '%(escaped_object)s' (%(object_name)s) poisto poistaisi myös siihen liittyviä kohteita, mutta sinulla ei ole oikeutta näiden kohteiden poistamiseen:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr "Haluatko varmasti poistaa kohteen \"%(escaped_object)s\" (%(object_name)s)? Myös seuraavat kohteet poistettaisiin samalla:"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "Kyllä, olen varma"
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr "Sivua ei löydy"
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr "Pahoittelemme, pyydettyä sivua ei voitu löytää."
-
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
-msgid "Add"
-msgstr "Lisää uusi"
-
-#: contrib/admin/templates/admin/change_form.html:20
-#: contrib/admin/templates/admin/object_history.html:5
-msgid "History"
-msgstr "Muokkaushistoria"
-
-#: contrib/admin/templates/admin/change_form.html:21
-msgid "View on site"
-msgstr "Näytä lopputulos"
-
-#: contrib/admin/templates/admin/change_form.html:30
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Korjaa virhe."
-msgstr[1] "Korjaa virheet."
-
-#: contrib/admin/templates/admin/change_form.html:48
-msgid "Ordering"
-msgstr "Järjestys"
-
-#: contrib/admin/templates/admin/change_form.html:51
-msgid "Order:"
-msgstr "Järjestysnumero:"
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr " %(filter_title)s:"
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr "Tallenna uutena"
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr "Tallenna ja lisää seuraava"
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr "Tallenna välillä ja jatka muokkaamista"
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr "Tallenna ja poistu"
-
-#: contrib/admin/templates/admin/change_list.html:11
-#, python-format
-msgid "Add %(name)s"
-msgstr "Lisää uusi %(name)s"
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr "Sovelluksen %(name)s mallit."
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "Muokkaa"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "Sinulla ei ole oikeutta muokata mitään."
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "Viimeisimmät muutokset"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "Sinun tekemäsi muutokset"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "Ei yhtään"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "Django-sivuston ylläpito"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "Djangon ylläpito"
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "Pvm/klo"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "Käyttäjä"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "Toiminto"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
-msgstr "N j, Y, P"
-
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
-msgstr "Tällä kohteella ei ole muutoshistoriaa. Sitä ei ole lisätty tämän ylläpitosivun avulla."
-
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
-msgstr "Palvelinvirhe"
-
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "Palvelinvirhe (500)"
-
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "Palvelinvirhe <em>(500)</em>"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr "Tietokanta-asennuksessasi on jotain vialla. Varmistu, että sopivat taulut on luotu ja että oikea käyttäjä voi lukea tietokantaa."
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr "Etsi"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgid_plural "%(counter)s results"
-msgstr[0] "1 hakutulas"
-msgstr[1] "%(counter)s hakutulosta"
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "yhteensä %(full_result_count)s"
-
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
-msgstr "Suodatin"
-
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-msgid "Username:"
-msgstr "Käyttäjätunnus:"
-
-#: contrib/admin/templates/admin/login.html:20
-#: contrib/comments/templates/comments/form.html:8
-msgid "Password:"
-msgstr "Salasana:"
-
-#: contrib/admin/templates/admin/login.html:22
-msgid "Have you <a href=\"/password_reset/\">forgotten your password</a>?"
-msgstr "Oletko <a href=\"/password_reset\">unohtanut salasanasi</a>?"
-
-#: contrib/admin/templates/admin/base.html:24
-msgid "Welcome,"
-msgstr "Tervetuloa,"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "Syötä ensin käyttäjätunnus ja salasana. Sen jälkeen voit muokata muita käyttäjän tietoja."
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
-msgstr "Käyttäjätunnus"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-msgid "Password"
-msgstr "Salasana"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-msgid "Password (again)"
-msgstr "Salasana toistamiseen"
-
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-msgid "Enter the same password as above, for verification."
-msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/admin/delete_confirmation.html:3
+#: contrib/admin/templates/admin/base.html:25
+#: contrib/admin/templates/admin/object_history.html:3
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/change_form.html:10
+#: contrib/admin/templates/admin/auth/user/change_password.html:9
+msgid "Documentation"
+msgstr "Ohjeita"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:3
 msgid "Bookmarklets"
@@ -1205,7 +1184,15 @@ msgid ""
 "bookmarklets require you to be viewing the site from a computer designated\n"
 "as \"internal\" (talk to your system administrator if you aren't sure if\n"
 "your computer is \"internal\").</p>\n"
-msgstr "\n<p class=\"help\">Asenna kirjanmerkkinen raahaamalla linkki kirjanmerkkien työkalupalkkiin tai napsauttamalla linkkiä oikeanpuoleisella hiiren painikkeella ja valitsemalla kirjanmerkkeihin lisäämisen. Sen jälkeen voit valita kirjanmerkkisen miltä tahansa sivuston sivulta. Huomaa, että jotkin näistä kirjanmerkkisistä toimivat vain, jos selaat sivustoa \"paikalliseksi\" määritellyltä tietokoneelta (kysy lisätietoja verkkonne ylläpitäjältä).</p>\n"
+msgstr ""
+"\n"
+"<p class=\"help\">Asenna kirjanmerkkinen raahaamalla linkki kirjanmerkkien "
+"työkalupalkkiin tai napsauttamalla linkkiä oikeanpuoleisella hiiren "
+"painikkeella ja valitsemalla kirjanmerkkeihin lisäämisen. Sen jälkeen voit "
+"valita kirjanmerkkisen miltä tahansa sivuston sivulta. Huomaa, että jotkin "
+"näistä kirjanmerkkisistä toimivat vain, jos selaat sivustoa \"paikalliseksi"
+"\" määritellyltä tietokoneelta (kysy lisätietoja verkkonne ylläpitäjältä).</"
+"p>\n"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid "Documentation for this page"
@@ -1225,7 +1212,9 @@ msgstr "Näytä kohteen tunniste"
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
-msgstr "Näyttää yksittäistä kohdetta vastaavilla sivuilla kohteen tyypin ja tunnisteen."
+msgstr ""
+"Näyttää yksittäistä kohdetta vastaavilla sivuilla kohteen tyypin ja "
+"tunnisteen."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
@@ -1233,7 +1222,8 @@ msgstr "Muokkaa tätä kohdetta (tässä ikkunassa)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Siirtyy yksittäistä kohdetta vastaavalta sivulta kohteen ylläpitosivulle."
+msgstr ""
+"Siirtyy yksittäistä kohdetta vastaavalta sivulta kohteen ylläpitosivulle."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
@@ -1243,83 +1233,12 @@ msgstr "Muokkaa tätä kohdetta (uudessa ikkunassa)"
 msgid "As above, but opens the admin page in a new window."
 msgstr "Kuten yllä, mutta avaa ylläpitosivun uuteen ikkunaan."
 
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
-msgstr "Pvm:"
-
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
-msgstr "Klo:"
-
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
-msgstr "Tällä hetkellä:"
-
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
-msgstr "Muokkaa:"
-
+#: contrib/admin/templates/registration/password_reset_done.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:4
 #: contrib/admin/templates/registration/password_reset_form.html:6
 #: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
 msgid "Password reset"
 msgstr "Salasanan nollaus"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-"Unohditko salasanasi? Syötä alle sähköpostiosoitteesi, niin \n"
-"lähetämme sinulle uuden salasanan."
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "Sähköpostiosoite:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "Nollaa salasana"
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Sait tämän viestin, koska pyysit uutta salasanaa"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "sivuston %(site_name)s käyttäjätilillesi"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "Uusi salasanasi on: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "Voit vaihtaa salasanan sivulla:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "Käyttäjätunnuksesi siltä varalta, että olet unohtanut sen:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "Kiitos vierailustasi sivuillemme!"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "%(site_name)s ylläpitäjät"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Kiitos sivuillamme viettämästäsi ajasta."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "Kirjaudu uudelleen sisään"
 
 #: contrib/admin/templates/registration/password_reset_done.html:6
 #: contrib/admin/templates/registration/password_reset_done.html:10
@@ -1365,6 +1284,61 @@ msgstr "Varmista uusi salasana:"
 msgid "Change my password"
 msgstr "Vaihda salasana"
 
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Kiitos sivuillamme viettämästäsi ajasta."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "Kirjaudu uudelleen sisään"
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr "Sait tämän viestin, koska pyysit uutta salasanaa"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "sivuston %(site_name)s käyttäjätilillesi"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "Uusi salasanasi on: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "Voit vaihtaa salasanan sivulla:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "Käyttäjätunnuksesi siltä varalta, että olet unohtanut sen:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "Kiitos vierailustasi sivuillemme!"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s ylläpitäjät"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr ""
+"Unohditko salasanasi? Syötä alle sähköpostiosoitteesi, niin \n"
+"lähetämme sinulle uuden salasanan."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "Sähköpostiosoite:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "Nollaa salasana"
+
 #: contrib/admin/templates/registration/password_change_done.html:6
 #: contrib/admin/templates/registration/password_change_done.html:10
 msgid "Password change successful"
@@ -1374,21 +1348,719 @@ msgstr "Salasanan muuttaminen onnistui"
 msgid "Your password was changed."
 msgstr "Salasanasi on muutettu."
 
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr "domain-nimi"
+#: contrib/admin/templates/admin/delete_confirmation.html:9
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "Poista"
 
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr "näyttönimi"
+#: contrib/admin/templates/admin/delete_confirmation.html:14
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"Kohteen '%(escaped_object)s' (%(object_name)s) poisto poistaisi myös siihen "
+"liittyviä kohteita, mutta sinulla ei ole oikeutta näiden kohteiden "
+"poistamiseen:"
 
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr "sivusto"
+#: contrib/admin/templates/admin/delete_confirmation.html:21
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Haluatko varmasti poistaa kohteen \"%(escaped_object)s\" (%(object_name)s)? "
+"Myös seuraavat kohteet poistettaisiin samalla:"
 
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr "sivustot"
+#: contrib/admin/templates/admin/delete_confirmation.html:26
+msgid "Yes, I'm sure"
+msgstr "Kyllä, olen varma"
+
+#: contrib/admin/templates/admin/filters.html:4
+msgid "Filter"
+msgstr "Suodatin"
+
+#: contrib/admin/templates/admin/base.html:25
+msgid "Welcome,"
+msgstr "Tervetuloa,"
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Tietokanta-asennuksessasi on jotain vialla. Varmistu, että sopivat taulut on "
+"luotu ja että oikea käyttäjä voi lukea tietokantaa."
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " %(filter_title)s:"
+
+#: contrib/admin/templates/admin/object_history.html:5
+#: contrib/admin/templates/admin/change_form.html:21
+msgid "History"
+msgstr "Muokkaushistoria"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "Date/time"
+msgstr "Pvm/klo"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "User"
+msgstr "Käyttäjä"
+
+#: contrib/admin/templates/admin/object_history.html:20
+msgid "Action"
+msgstr "Toiminto"
+
+#: contrib/admin/templates/admin/object_history.html:26
+msgid "DATE_WITH_TIME_FULL"
+msgstr "N j, Y, P"
+
+#: contrib/admin/templates/admin/object_history.html:36
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr ""
+"Tällä kohteella ei ole muutoshistoriaa. Sitä ei ole lisätty tämän "
+"ylläpitosivun avulla."
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "Sovelluksen %(name)s mallit."
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/index.html:28
+#: contrib/admin/templates/admin/change_form.html:15
+msgid "Add"
+msgstr "Lisää uusi"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "Muokkaa"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "Sinulla ei ole oikeutta muokata mitään."
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "Viimeisimmät muutokset"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "Sinun tekemäsi muutokset"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "Ei yhtään"
+
+#: contrib/admin/templates/admin/login.html:25
+#: contrib/admin/views/decorators.py:24
+msgid "Log in"
+msgstr "Kirjaudu sisään"
+
+#: contrib/admin/templates/admin/change_list.html:12
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lisää uusi %(name)s"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "Tallenna uutena"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "Tallenna ja lisää seuraava"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "Tallenna välillä ja jatka muokkaamista"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "Tallenna ja poistu"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "Etsi"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgid_plural "%(counter)s results"
+msgstr[0] "1 hakutulas"
+msgstr[1] "%(counter)s hakutulosta"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "yhteensä %(full_result_count)s"
+
+#: contrib/admin/templates/admin/change_form.html:22
+msgid "View on site"
+msgstr "Näytä lopputulos"
+
+#: contrib/admin/templates/admin/change_form.html:32
+#: contrib/admin/templates/admin/auth/user/change_password.html:24
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Korjaa virhe."
+msgstr[1] "Korjaa virheet."
+
+#: contrib/admin/templates/admin/change_form.html:50
+msgid "Ordering"
+msgstr "Järjestys"
+
+#: contrib/admin/templates/admin/change_form.html:53
+msgid "Order:"
+msgstr "Järjestysnumero:"
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "Näytä kaikki"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "Sivua ei löydy"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Pahoittelemme, pyydettyä sivua ei voitu löytää."
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "Django-sivuston ylläpito"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "Djangon ylläpito"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "Palvelinvirhe"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "Palvelinvirhe (500)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "Palvelinvirhe <em>(500)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr "Palvelimella on tapahtunut virhe. Se on ilmoitettu sivuston ylläpitäjille sähköpostilla ja korjataan pian. Kiitämme kärsivällisyydestä."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr ""
+"Syötä ensin käyttäjätunnus ja salasana. Sen jälkeen voit muokata muita "
+"käyttäjän tietoja."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "Käyttäjätunnus"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/change_password.html:34
+msgid "Password"
+msgstr "Salasana"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+msgid "Password (again)"
+msgstr "Salasana toistamiseen"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+#: contrib/admin/templates/admin/auth/user/change_password.html:40
+msgid "Enter the same password as above, for verification."
+msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:28
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Syötä käyttäjän <strong>%(username)s</strong> uusi salasana."
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "Pvm:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "Klo:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "Tällä hetkellä:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "Muokkaa:"
+
+#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:264
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(name)s \"%(obj)s\" on nyt lisätty."
+
+#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:268
+#: contrib/admin/views/main.py:354
+msgid "You may edit it again below."
+msgstr "Voit muokata sitä uudelleen alla."
+
+#: contrib/admin/views/auth.py:31
+msgid "Add user"
+msgstr "Uusi käyttäjä"
+
+#: contrib/admin/views/auth.py:58
+msgid "Password changed successfully."
+msgstr "Salasanan muuttaminen onnistui."
+
+#: contrib/admin/views/auth.py:65
+#, python-format
+msgid "Change password: %s"
+msgstr "Vaihda salasana: %s"
+
+#: contrib/admin/views/doc.py:47 contrib/admin/views/doc.py:49
+#: contrib/admin/views/doc.py:51
+msgid "tag:"
+msgstr "tag:"
+
+#: contrib/admin/views/doc.py:78 contrib/admin/views/doc.py:80
+#: contrib/admin/views/doc.py:82
+msgid "filter:"
+msgstr "suodatin:"
+
+#: contrib/admin/views/doc.py:136 contrib/admin/views/doc.py:138
+#: contrib/admin/views/doc.py:140
+msgid "view:"
+msgstr "view:"
+
+#: contrib/admin/views/doc.py:165
+#, python-format
+msgid "App %r not found"
+msgstr "Sovellusta %r ei löydy"
+
+#: contrib/admin/views/doc.py:172
+#, python-format
+msgid "Model %(name)r not found in app %(label)r"
+msgstr "Sovelluksesta %(label)r ei löydy mallia %(name)r"
+
+#: contrib/admin/views/doc.py:184
+#, python-format
+msgid "the related `%(label)s.%(type)s` object"
+msgstr "tähän liittyvä `%(label)s.%(type)s`-kohde"
+
+#: contrib/admin/views/doc.py:184 contrib/admin/views/doc.py:206
+#: contrib/admin/views/doc.py:220 contrib/admin/views/doc.py:225
+msgid "model:"
+msgstr "malli:"
+
+#: contrib/admin/views/doc.py:215
+#, python-format
+msgid "related `%(label)s.%(name)s` objects"
+msgstr "tähän liittyvät `%(label)s.%(name)s`-kohteet"
+
+#: contrib/admin/views/doc.py:220
+#, python-format
+msgid "all %s"
+msgstr "kaikki %s"
+
+#: contrib/admin/views/doc.py:225
+#, python-format
+msgid "number of %s"
+msgstr "%s-kohteiden lukumäärä"
+
+#: contrib/admin/views/doc.py:230
+#, python-format
+msgid "Fields on %s objects"
+msgstr "%s-kohteiden kentät"
+
+#: contrib/admin/views/doc.py:292 contrib/admin/views/doc.py:303
+#: contrib/admin/views/doc.py:305 contrib/admin/views/doc.py:311
+#: contrib/admin/views/doc.py:312 contrib/admin/views/doc.py:314
+msgid "Integer"
+msgstr "Kokonaisluku"
+
+#: contrib/admin/views/doc.py:293
+msgid "Boolean (Either True or False)"
+msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
+
+#: contrib/admin/views/doc.py:294 contrib/admin/views/doc.py:313
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "Merkkijono (enintään %(max_length)s merkkiä)"
+
+#: contrib/admin/views/doc.py:295
+msgid "Comma-separated integers"
+msgstr "Pilkulla erotetut kokonaisluvut"
+
+#: contrib/admin/views/doc.py:296
+msgid "Date (without time)"
+msgstr "Päivämäärä"
+
+#: contrib/admin/views/doc.py:297
+msgid "Date (with time)"
+msgstr "Päivämäärä ja kellonaika"
+
+#: contrib/admin/views/doc.py:298
+msgid "Decimal number"
+msgstr "Desimaaliluku"
+
+#: contrib/admin/views/doc.py:299
+msgid "E-mail address"
+msgstr "Sähköpostios."
+
+#: contrib/admin/views/doc.py:300 contrib/admin/views/doc.py:301
+#: contrib/admin/views/doc.py:304
+msgid "File path"
+msgstr "Tiedostopolku"
+
+#: contrib/admin/views/doc.py:302
+msgid "Floating point number"
+msgstr "Liukuluku"
+
+#: contrib/admin/views/doc.py:308
+msgid "Boolean (Either True, False or None)"
+msgstr "Totuusarvo: joko tosi (True), epätosi (False) tai ei mikään (None)"
+
+#: contrib/admin/views/doc.py:309
+msgid "Relation to parent model"
+msgstr "Relaatio emomalliin"
+
+#: contrib/admin/views/doc.py:310
+msgid "Phone number"
+msgstr "Puhelinnumero"
+
+#: contrib/admin/views/doc.py:315
+msgid "Text"
+msgstr "Tekstiä"
+
+#: contrib/admin/views/doc.py:316
+msgid "Time"
+msgstr "Kellonaika"
+
+#: contrib/admin/views/doc.py:317 contrib/flatpages/models.py:7
+msgid "URL"
+msgstr "URL-osoite"
+
+#: contrib/admin/views/doc.py:318
+msgid "U.S. state (two uppercase letters)"
+msgstr "USA:n osavaltio (kaksikirjaiminen versaalein)"
+
+#: contrib/admin/views/doc.py:319
+msgid "XML text"
+msgstr "XML-teksti"
+
+#: contrib/admin/views/doc.py:345
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s ei näytä urlpattern-objektilta"
+
+#: contrib/admin/views/main.py:230
+msgid "Site administration"
+msgstr "Sivuston ylläpito"
+
+#: contrib/admin/views/main.py:278 contrib/admin/views/main.py:363
+#, python-format
+msgid "You may add another %s below."
+msgstr "Uusi %s on lisättävissä alla."
+
+#: contrib/admin/views/main.py:296
+#, python-format
+msgid "Add %s"
+msgstr "Uusi %s"
+
+#: contrib/admin/views/main.py:342
+#, python-format
+msgid "Added %s."
+msgstr "Lisätty %s."
+
+#: contrib/admin/views/main.py:344
+#, python-format
+msgid "Changed %s."
+msgstr "Muokattu: %s."
+
+#: contrib/admin/views/main.py:346
+#, python-format
+msgid "Deleted %s."
+msgstr "Poistettu %s."
+
+#: contrib/admin/views/main.py:349
+msgid "No fields changed."
+msgstr "Ei muutoksia kenttiin."
+
+#: contrib/admin/views/main.py:352
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "%(name)s \"%(obj)s\" on nyt muutettu."
+
+#: contrib/admin/views/main.py:360
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "%(name)s \"%(obj)s\" on nyt lisätty. Voit muokata sitä uudelleen alla."
+
+#: contrib/admin/views/main.py:398
+#, python-format
+msgid "Change %s"
+msgstr "Muokkaa: %s"
+
+#: contrib/admin/views/main.py:483
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
+msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s: %(obj)s"
+
+#: contrib/admin/views/main.py:488
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr "Yksi tai useampi %(fieldname)s kohteessa %(name)s:"
+
+#: contrib/admin/views/main.py:520
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" on poistettu."
+
+#: contrib/admin/views/main.py:523
+msgid "Are you sure?"
+msgstr "Oletko varma?"
+
+#: contrib/admin/views/main.py:545
+#, python-format
+msgid "Change history: %s"
+msgstr "Muokkaushistoria: %s"
+
+#: contrib/admin/views/main.py:579
+#, python-format
+msgid "Select %s"
+msgstr "Valitse %s"
+
+#: contrib/admin/views/main.py:579
+#, python-format
+msgid "Select %s to change"
+msgstr "Valitse muokattava %s"
+
+#: contrib/admin/views/main.py:780
+msgid "Database error"
+msgstr "Tietokantavirhe"
+
+#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr ""
+"Käyttäjätunnus tai salasana ei kelpaa. Huomaa, että isot ja pienet kirjaimet "
+"ovat merkitseviä."
+
+#: contrib/admin/views/decorators.py:62
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr ""
+"Kirjaudu uudelleen sisään, koska istuntosi on mennyt umpeen. Muutoksesi ovat "
+"silti tallessa."
+
+#: contrib/admin/views/decorators.py:69
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr ""
+"Selaimesi ei salli evästeitä. Muuta asetukset sallimaan evästeet, lataa tämä "
+"sivu uudelleen ja yritä toistamiseen."
+
+#: contrib/admin/views/decorators.py:83
+msgid "Usernames cannot contain the '@' character."
+msgstr "Käyttäjätunnuksessa ei saa olla '@'-merkkiä."
+
+#: contrib/admin/views/decorators.py:85
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "Käyttäjätunnus ei ole sama kuin sähköpostiosoite. Kokeile '%s'."
+
+#: contrib/auth/views.py:47
+msgid "Logged out"
+msgstr "Kirjautunut ulos"
+
+#: contrib/auth/models.py:53 contrib/auth/models.py:73
+msgid "name"
+msgstr "nimi"
+
+#: contrib/auth/models.py:55
+msgid "codename"
+msgstr "koodinimi"
+
+#: contrib/auth/models.py:58
+msgid "permission"
+msgstr "oikeus"
+
+#: contrib/auth/models.py:59 contrib/auth/models.py:74
+msgid "permissions"
+msgstr "oikeudet"
+
+#: contrib/auth/models.py:77
+msgid "group"
+msgstr "ryhmä"
+
+#: contrib/auth/models.py:78 contrib/auth/models.py:121
+msgid "groups"
+msgstr "ryhmät"
+
+#: contrib/auth/models.py:111
+msgid "username"
+msgstr "tunnus"
+
+#: contrib/auth/models.py:111
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr ""
+" Vaaditaan. Enintään 30 kirjanta (a-z), numeroa (0-9) tai alaviivaa (_)."
+
+#: contrib/auth/models.py:112
+msgid "first name"
+msgstr "etunimi"
+
+#: contrib/auth/models.py:113
+msgid "last name"
+msgstr "sukunimi"
+
+#: contrib/auth/models.py:114
+msgid "e-mail address"
+msgstr "sähköposti"
+
+#: contrib/auth/models.py:115
+msgid "password"
+msgstr "salasana"
+
+#: contrib/auth/models.py:115
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr "Syötä muodossa '[algo]$[suola]$[heksa-digest]' tai käytä <a href=\"password/\">muutoslomaketta</a>."
+
+#: contrib/auth/models.py:116
+msgid "staff status"
+msgstr "ylläpitäjä"
+
+#: contrib/auth/models.py:116
+msgid "Designates whether the user can log into this admin site."
+msgstr "Ylläpitäjillä on pääsy tähän sivuston ylläpito-osioon."
+
+#: contrib/auth/models.py:117
+msgid "active"
+msgstr "voimassa"
+
+#: contrib/auth/models.py:117
+msgid ""
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Määrää, voiko käyttäjä kirjautua sisään. Tällä voi estää käyttäjätilin "
+"käytön poistamatta sitä."
+
+#: contrib/auth/models.py:118
+msgid "superuser status"
+msgstr "pääkäyttäjä"
+
+#: contrib/auth/models.py:118
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Antaa käyttäjälle kaikki oikeudet ilman, että niitä täytyy erikseen luetella."
+
+#: contrib/auth/models.py:119
+msgid "last login"
+msgstr "viimeksi kirjautunut"
+
+#: contrib/auth/models.py:120
+msgid "date joined"
+msgstr "liittynyt"
+
+#: contrib/auth/models.py:122
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr ""
+"Tässä valittujen oikeuksien lisäksi käyttäjä saa myös kaikki niiden ryhmien "
+"oikeudet, joiden jäsen hän on."
+
+#: contrib/auth/models.py:123
+msgid "user permissions"
+msgstr "käyttäjän oikeudet"
+
+#: contrib/auth/models.py:127
+msgid "user"
+msgstr "käyttäjä"
+
+#: contrib/auth/models.py:128
+msgid "users"
+msgstr "käyttäjät"
+
+#: contrib/auth/models.py:134
+msgid "Personal info"
+msgstr "Henkilökohtaiset tiedot"
+
+#: contrib/auth/models.py:135
+msgid "Permissions"
+msgstr "Oikeudet"
+
+#: contrib/auth/models.py:136
+msgid "Important dates"
+msgstr "Tärkeät päivämäärät"
+
+#: contrib/auth/models.py:137
+msgid "Groups"
+msgstr "Ryhmät"
+
+#: contrib/auth/models.py:288
+msgid "message"
+msgstr "viesti"
+
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+msgid "The two password fields didn't match."
+msgstr "Salasanat eivät täsmää."
+
+#: contrib/auth/forms.py:25
+msgid "A user with that username already exists."
+msgstr "Käyttäjätunnus on jo rekisteröity."
+
+#: contrib/auth/forms.py:53
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "Selaimesi ei salli evästeitä. Sisäänkirjautuminen vaatii evästeen."
+
+#: contrib/auth/forms.py:62
+msgid "This account is inactive."
+msgstr "Tämä käyttäjätili ei ole voimassa."
+
+#: contrib/auth/forms.py:84
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "Sähköpostiosoitetta vastaavaa käyttäjätunnusta ei löydy. Oletko varmasti jo rekisteröitynyt?"
+
+#: contrib/auth/forms.py:117
+msgid "The two 'new password' fields didn't match."
+msgstr "Salasanat eivät täsmää."
+
+#: contrib/auth/forms.py:124
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Vanha salasana on virheellinen. Yritä uudelleen."
 
 #: contrib/flatpages/models.py:8
 msgid ""
@@ -1417,7 +2089,9 @@ msgstr "mallipohjan nimi"
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
-msgstr "Esimerkiksi: 'flatpages/yhteydenotto.html'. Jos tämä jätetään tyhjäksi, käytetään oletuspohjaa 'flatpages/default.html'."
+msgstr ""
+"Esimerkiksi: 'flatpages/yhteydenotto.html'. Jos tämä jätetään tyhjäksi, "
+"käytetään oletuspohjaa 'flatpages/default.html'."
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
@@ -1425,7 +2099,8 @@ msgstr "vaaditaan rekisteröityminen"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr "Jos tämä kohta on valittu, vain sisäänkirjautuneet käyttäjät näkevät sivun."
+msgstr ""
+"Jos tämä kohta on valittu, vain sisäänkirjautuneet käyttäjät näkevät sivun."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -1435,393 +2110,1022 @@ msgstr "tekstisivu"
 msgid "flat pages"
 msgstr "tekstisivut"
 
-#: contrib/redirects/models.py:7
-msgid "redirect from"
-msgstr "ohjaa osoitteesta"
+#: contrib/localflavor/sk/sk_regions.py:8
+msgid "Banska Bystrica region"
+msgstr "Banská Bystrican aule"
 
-#: contrib/redirects/models.py:8
+#: contrib/localflavor/sk/sk_regions.py:9
+msgid "Bratislava region"
+msgstr "Bratislavan alue"
+
+#: contrib/localflavor/sk/sk_regions.py:10
+msgid "Kosice region"
+msgstr "Košicen alue"
+
+#: contrib/localflavor/sk/sk_regions.py:11
+msgid "Nitra region"
+msgstr "Nitran alue"
+
+#: contrib/localflavor/sk/sk_regions.py:12
+msgid "Presov region"
+msgstr "Prešovin alue"
+
+#: contrib/localflavor/sk/sk_regions.py:13
+msgid "Trencin region"
+msgstr "Trenčínin alue"
+
+#: contrib/localflavor/sk/sk_regions.py:14
+msgid "Trnava region"
+msgstr "Trnava region"
+
+#: contrib/localflavor/sk/sk_regions.py:15
+msgid "Zilina region"
+msgstr "Zilina region"
+
+#: contrib/localflavor/sk/forms.py:32
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr "Syötä postinumero muodossa XXXXX tai XXX XX."
+
+#: contrib/localflavor/sk/sk_districts.py:8
+msgid "Banska Bystrica"
+msgstr "Banska Bystrica"
+
+#: contrib/localflavor/sk/sk_districts.py:9
+msgid "Banska Stiavnica"
+msgstr "Banska Stiavnica"
+
+#: contrib/localflavor/sk/sk_districts.py:10
+msgid "Bardejov"
+msgstr "Bardejov"
+
+#: contrib/localflavor/sk/sk_districts.py:11
+msgid "Banovce nad Bebravou"
+msgstr "Banovce nad Bebravou"
+
+#: contrib/localflavor/sk/sk_districts.py:12
+msgid "Brezno"
+msgstr "Brezno"
+
+#: contrib/localflavor/sk/sk_districts.py:13
+msgid "Bratislava I"
+msgstr "Bratislava I"
+
+#: contrib/localflavor/sk/sk_districts.py:14
+msgid "Bratislava II"
+msgstr "Bratislava II"
+
+#: contrib/localflavor/sk/sk_districts.py:15
+msgid "Bratislava III"
+msgstr "Bratislava III"
+
+#: contrib/localflavor/sk/sk_districts.py:16
+msgid "Bratislava IV"
+msgstr "Bratislava IV"
+
+#: contrib/localflavor/sk/sk_districts.py:17
+msgid "Bratislava V"
+msgstr "Bratislava V"
+
+#: contrib/localflavor/sk/sk_districts.py:18
+msgid "Bytca"
+msgstr "Bytca"
+
+#: contrib/localflavor/sk/sk_districts.py:19
+msgid "Cadca"
+msgstr "Cadca"
+
+#: contrib/localflavor/sk/sk_districts.py:20
+msgid "Detva"
+msgstr "Detva"
+
+#: contrib/localflavor/sk/sk_districts.py:21
+msgid "Dolny Kubin"
+msgstr "Dolny Kubin"
+
+#: contrib/localflavor/sk/sk_districts.py:22
+msgid "Dunajska Streda"
+msgstr "Dunajska Streda"
+
+#: contrib/localflavor/sk/sk_districts.py:23
+msgid "Galanta"
+msgstr "Galanta"
+
+#: contrib/localflavor/sk/sk_districts.py:24
+msgid "Gelnica"
+msgstr "Gelnica"
+
+#: contrib/localflavor/sk/sk_districts.py:25
+msgid "Hlohovec"
+msgstr "Hlohovec"
+
+#: contrib/localflavor/sk/sk_districts.py:26
+msgid "Humenne"
+msgstr "Humenne"
+
+#: contrib/localflavor/sk/sk_districts.py:27
+msgid "Ilava"
+msgstr "Ilava"
+
+#: contrib/localflavor/sk/sk_districts.py:28
+msgid "Kezmarok"
+msgstr "Kezmarok"
+
+#: contrib/localflavor/sk/sk_districts.py:29
+msgid "Komarno"
+msgstr "Komarno"
+
+#: contrib/localflavor/sk/sk_districts.py:30
+msgid "Kosice I"
+msgstr "Kosice I"
+
+#: contrib/localflavor/sk/sk_districts.py:31
+msgid "Kosice II"
+msgstr "Kosice II"
+
+#: contrib/localflavor/sk/sk_districts.py:32
+msgid "Kosice III"
+msgstr "Kosice III"
+
+#: contrib/localflavor/sk/sk_districts.py:33
+msgid "Kosice IV"
+msgstr "Kosice IV"
+
+#: contrib/localflavor/sk/sk_districts.py:34
+msgid "Kosice - okolie"
+msgstr "Kosice - okolie"
+
+#: contrib/localflavor/sk/sk_districts.py:35
+msgid "Krupina"
+msgstr "Krupina"
+
+#: contrib/localflavor/sk/sk_districts.py:36
+msgid "Kysucke Nove Mesto"
+msgstr "Kysucke Nove Mesto"
+
+#: contrib/localflavor/sk/sk_districts.py:37
+msgid "Levice"
+msgstr "Levice"
+
+#: contrib/localflavor/sk/sk_districts.py:38
+msgid "Levoca"
+msgstr "Levoca"
+
+#: contrib/localflavor/sk/sk_districts.py:39
+msgid "Liptovsky Mikulas"
+msgstr "Liptovsky Mikulas"
+
+#: contrib/localflavor/sk/sk_districts.py:40
+msgid "Lucenec"
+msgstr "Lucenec"
+
+#: contrib/localflavor/sk/sk_districts.py:41
+msgid "Malacky"
+msgstr "Malacky"
+
+#: contrib/localflavor/sk/sk_districts.py:42
+msgid "Martin"
+msgstr "Martin"
+
+#: contrib/localflavor/sk/sk_districts.py:43
+msgid "Medzilaborce"
+msgstr "Medzilaborce"
+
+#: contrib/localflavor/sk/sk_districts.py:44
+msgid "Michalovce"
+msgstr "Michalovce"
+
+#: contrib/localflavor/sk/sk_districts.py:45
+msgid "Myjava"
+msgstr "Myjava"
+
+#: contrib/localflavor/sk/sk_districts.py:46
+msgid "Namestovo"
+msgstr "Namestovo"
+
+#: contrib/localflavor/sk/sk_districts.py:47
+msgid "Nitra"
+msgstr "Nitra"
+
+#: contrib/localflavor/sk/sk_districts.py:48
+msgid "Nove Mesto nad Vahom"
+msgstr "Nove Mesto nad Vahom"
+
+#: contrib/localflavor/sk/sk_districts.py:49
+msgid "Nove Zamky"
+msgstr "Nove Zamky"
+
+#: contrib/localflavor/sk/sk_districts.py:50
+msgid "Partizanske"
+msgstr "Partizanske"
+
+#: contrib/localflavor/sk/sk_districts.py:51
+msgid "Pezinok"
+msgstr "Pezinok"
+
+#: contrib/localflavor/sk/sk_districts.py:52
+msgid "Piestany"
+msgstr "Piestany"
+
+#: contrib/localflavor/sk/sk_districts.py:53
+msgid "Poltar"
+msgstr "Poltar"
+
+#: contrib/localflavor/sk/sk_districts.py:54
+msgid "Poprad"
+msgstr "Poprad"
+
+#: contrib/localflavor/sk/sk_districts.py:55
+msgid "Povazska Bystrica"
+msgstr "Povazska Bystrica"
+
+#: contrib/localflavor/sk/sk_districts.py:56
+msgid "Presov"
+msgstr "Presov"
+
+#: contrib/localflavor/sk/sk_districts.py:57
+msgid "Prievidza"
+msgstr "Prievidza"
+
+#: contrib/localflavor/sk/sk_districts.py:58
+msgid "Puchov"
+msgstr "Puchov"
+
+#: contrib/localflavor/sk/sk_districts.py:59
+msgid "Revuca"
+msgstr "Revuca"
+
+#: contrib/localflavor/sk/sk_districts.py:60
+msgid "Rimavska Sobota"
+msgstr "Rimavska Sobota"
+
+#: contrib/localflavor/sk/sk_districts.py:61
+msgid "Roznava"
+msgstr "Roznava"
+
+#: contrib/localflavor/sk/sk_districts.py:62
+msgid "Ruzomberok"
+msgstr "Ruzomberok"
+
+#: contrib/localflavor/sk/sk_districts.py:63
+msgid "Sabinov"
+msgstr "Sabinov"
+
+#: contrib/localflavor/sk/sk_districts.py:64
+msgid "Senec"
+msgstr "Senec"
+
+#: contrib/localflavor/sk/sk_districts.py:65
+msgid "Senica"
+msgstr "Senica"
+
+#: contrib/localflavor/sk/sk_districts.py:66
+msgid "Skalica"
+msgstr "Skalica"
+
+#: contrib/localflavor/sk/sk_districts.py:67
+msgid "Snina"
+msgstr "Snina"
+
+#: contrib/localflavor/sk/sk_districts.py:68
+msgid "Sobrance"
+msgstr "Sobrance"
+
+#: contrib/localflavor/sk/sk_districts.py:69
+msgid "Spisska Nova Ves"
+msgstr "Spisska Nova Ves"
+
+#: contrib/localflavor/sk/sk_districts.py:70
+msgid "Stara Lubovna"
+msgstr "Stara Lubovna"
+
+#: contrib/localflavor/sk/sk_districts.py:71
+msgid "Stropkov"
+msgstr "Stropkov"
+
+#: contrib/localflavor/sk/sk_districts.py:72
+msgid "Svidnik"
+msgstr "Svidnik"
+
+#: contrib/localflavor/sk/sk_districts.py:73
+msgid "Sala"
+msgstr "Sala"
+
+#: contrib/localflavor/sk/sk_districts.py:74
+msgid "Topolcany"
+msgstr "Topolcany"
+
+#: contrib/localflavor/sk/sk_districts.py:75
+msgid "Trebisov"
+msgstr "Trebisov"
+
+#: contrib/localflavor/sk/sk_districts.py:76
+msgid "Trencin"
+msgstr "Trencin"
+
+#: contrib/localflavor/sk/sk_districts.py:77
+msgid "Trnava"
+msgstr "Trnava"
+
+#: contrib/localflavor/sk/sk_districts.py:78
+msgid "Turcianske Teplice"
+msgstr "Turcianske Teplice"
+
+#: contrib/localflavor/sk/sk_districts.py:79
+msgid "Tvrdosin"
+msgstr "Tvrdosin"
+
+#: contrib/localflavor/sk/sk_districts.py:80
+msgid "Velky Krtis"
+msgstr "Velky Krtis"
+
+#: contrib/localflavor/sk/sk_districts.py:81
+msgid "Vranov nad Toplou"
+msgstr "Vranov nad Toplou"
+
+#: contrib/localflavor/sk/sk_districts.py:82
+msgid "Zlate Moravce"
+msgstr "Zlate Moravce"
+
+#: contrib/localflavor/sk/sk_districts.py:83
+msgid "Zvolen"
+msgstr "Zvolen"
+
+#: contrib/localflavor/sk/sk_districts.py:84
+msgid "Zarnovica"
+msgstr "Zarnovica"
+
+#: contrib/localflavor/sk/sk_districts.py:85
+msgid "Ziar nad Hronom"
+msgstr "Ziar nad Hronom"
+
+#: contrib/localflavor/sk/sk_districts.py:86
+msgid "Zilina"
+msgstr "Zilina"
+
+#: contrib/localflavor/fr/forms.py:17 contrib/localflavor/fi/forms.py:14
+#: contrib/localflavor/de/forms.py:16
+msgid "Enter a zip code in the format XXXXX."
+msgstr "Syötä postinumero muodossa XXXXX."
+
+#: contrib/localflavor/in_/forms.py:16
+msgid "Enter a zip code in the format XXXXXXX."
+msgstr "Syötä postinumero muodossa XXXXXXX."
+
+#: contrib/localflavor/ch/forms.py:18 contrib/localflavor/no/forms.py:14
+msgid "Enter a zip code in the format XXXX."
+msgstr "Syötä postinumero muodossa XXXX."
+
+#: contrib/localflavor/ch/forms.py:90
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"Enter a valid Swiss identity or passport card number in X1234567<0 or "
+"1234567890 format."
+msgstr "Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format."
+
+#: contrib/localflavor/ch/ch_states.py:5
+msgid "Aargau"
+msgstr "Aargau"
+
+#: contrib/localflavor/ch/ch_states.py:6
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzell Innerrhoden"
+
+#: contrib/localflavor/ch/ch_states.py:7
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzell Ausserrhoden"
+
+#: contrib/localflavor/ch/ch_states.py:8
+msgid "Basel-Stadt"
+msgstr "Basel-Stadt"
+
+#: contrib/localflavor/ch/ch_states.py:9
+msgid "Basel-Land"
+msgstr "Basel-Land"
+
+#: contrib/localflavor/ch/ch_states.py:10
+msgid "Berne"
+msgstr "Berne"
+
+#: contrib/localflavor/ch/ch_states.py:11
+msgid "Fribourg"
+msgstr "Fribourg"
+
+#: contrib/localflavor/ch/ch_states.py:12
+msgid "Geneva"
+msgstr "Geneve"
+
+#: contrib/localflavor/ch/ch_states.py:13
+msgid "Glarus"
+msgstr "Glarus"
+
+#: contrib/localflavor/ch/ch_states.py:14
+msgid "Graubuenden"
+msgstr "Graubuenden"
+
+#: contrib/localflavor/ch/ch_states.py:15
+msgid "Jura"
+msgstr "Jura"
+
+#: contrib/localflavor/ch/ch_states.py:16
+msgid "Lucerne"
+msgstr "Lucerne"
+
+#: contrib/localflavor/ch/ch_states.py:17
+msgid "Neuchatel"
+msgstr "Neuchatel"
+
+#: contrib/localflavor/ch/ch_states.py:18
+msgid "Nidwalden"
+msgstr "Nidwalden"
+
+#: contrib/localflavor/ch/ch_states.py:19
+msgid "Obwalden"
+msgstr "Obwalden"
+
+#: contrib/localflavor/ch/ch_states.py:20
+msgid "Schaffhausen"
+msgstr "Schaffhausen"
+
+#: contrib/localflavor/ch/ch_states.py:21
+msgid "Schwyz"
+msgstr "Schwyz"
+
+#: contrib/localflavor/ch/ch_states.py:22
+msgid "Solothurn"
+msgstr "Solothurn"
+
+#: contrib/localflavor/ch/ch_states.py:23
+msgid "St. Gallen"
+msgstr "St. Gallen"
+
+#: contrib/localflavor/ch/ch_states.py:24
+msgid "Thurgau"
+msgstr "Thurgau"
+
+#: contrib/localflavor/ch/ch_states.py:25
+msgid "Ticino"
+msgstr "Ticino"
+
+#: contrib/localflavor/ch/ch_states.py:26
+msgid "Uri"
+msgstr "Uri"
+
+#: contrib/localflavor/ch/ch_states.py:27
+msgid "Valais"
+msgstr "Valais"
+
+#: contrib/localflavor/ch/ch_states.py:28
+msgid "Vaud"
+msgstr "Vaud"
+
+#: contrib/localflavor/ch/ch_states.py:29
+msgid "Zug"
+msgstr "Zug"
+
+#: contrib/localflavor/ch/ch_states.py:30
+msgid "Zurich"
+msgstr "Zürich"
+
+#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:45
+msgid "Enter a valid Finnish social security number."
+msgstr "Syötä oikea suomalainen henkilötunnus."
+
+#: contrib/localflavor/uk/forms.py:18
+msgid "Enter a postcode. A space is required between the two postcode parts."
 msgstr ""
-"Tässä on käytettävä absoluuttista polkua ilman verkkotunnusta. Esimerkki: "
-"'\\\n"
-"events/search/'"
 
-#: contrib/redirects/models.py:9
-msgid "redirect to"
-msgstr "ohjaa osoitteeseen"
+#: contrib/localflavor/au/forms.py:18
+msgid "Enter a 4 digit post code."
+msgstr "Syötä nelinumeroinen postinumero."
 
-#: contrib/redirects/models.py:10
+#: contrib/localflavor/br/forms.py:23
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "Syötä postinumero muodossa XXXXX-XXX."
+
+#: contrib/localflavor/br/forms.py:35
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr "Puhelinnumeron tulee olla muodossa XX-XXXX-XXXX."
+
+#: contrib/localflavor/br/forms.py:68
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"Select a valid brazilian state. That state is not one of the available "
+"states."
 msgstr ""
-"Tässä on käytettävä joko absoluuttista polkua (kuten yllä) tai täydellistä "
-"'http://'-alkuista URL-osoitetta."
 
-#: contrib/redirects/models.py:13
-msgid "redirect"
-msgstr "edelleenohjaus"
+#: contrib/localflavor/br/forms.py:103 contrib/localflavor/ar/forms.py:61
+msgid "This field requires only numbers."
+msgstr "Tähän kenttään kelpaavat vain numerot."
 
-#: contrib/redirects/models.py:14
-msgid "redirects"
-msgstr "edelleenohjaukset"
-
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
-msgstr "kohteen tunniste"
-
-#: contrib/comments/models.py:68
-msgid "headline"
-msgstr "otsikko"
-
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "kommentti"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
-msgstr "1. pisteytys"
-
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr "2. pisteytys"
-
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr "3. pisteytys"
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr "4. pisteytys"
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr "5. pisteytys"
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr "6. pisteytys"
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr "7. pisteytys"
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr "8. pisteytys"
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr "on sallittu pisteytys"
-
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr "lähetyshetki"
-
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "on julkinen"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "on poistettu"
-
-#: contrib/comments/models.py:86
-msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
+#: contrib/localflavor/br/forms.py:105
+msgid "This field requires at most 11 digits or 14 characters."
 msgstr ""
-"Rastita jos kommentti on asiaankuulumaton. Kommentin tilalla näytetään\n"
-"viesti \"Tämä kommentti on poistettu\"."
 
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "kommentit"
-
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "Kommentoitu kohde"
-
-#: contrib/comments/models.py:159
-#, python-format
-msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
+#: contrib/localflavor/br/forms.py:115
+msgid "Invalid CPF number."
 msgstr ""
-" Kirjoittanut %(user)s, pvm %(date)s\\n\n"
-" \\n\n"
-" %(comment)s\\n\n"
-" \\n\n"
-" http://%(domain)s%(url)s"
 
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "henkilön nimi"
+#: contrib/localflavor/br/forms.py:137
+msgid "This field requires at least 14 digits"
+msgstr "Tähän kenttään vaaditaan ainakin 14 numeroa."
 
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr "IP-osoite"
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr "ylläpidon hyväksymä"
-
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr "vapaa kommentti"
-
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr "vapaat kommentit"
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "pisteet"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "pisteytyspäivä"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "karma-pisteytys"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "karma-pisteytykset"
-
-#: contrib/comments/models.py:242
-#, python-format
-msgid "%(score)d rating by %(user)s"
-msgstr "%(score)d pistettä käyttäjältä %(user)s"
-
-#: contrib/comments/models.py:258
-#, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
+#: contrib/localflavor/br/forms.py:147
+msgid "Invalid CNPJ number."
 msgstr ""
-" %(user)s on merkinnyt tämän kommentin:\\n\n"
-" \\n\n"
-" %(text)s"
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "merkintäpäivä"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "käyttäjän merkki"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "käyttäjien merkit"
-
-#: contrib/comments/models.py:273
-#, python-format
-msgid "Flag by %r"
-msgstr "Käyttäjän %r merkki"
-
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr "poistamispäivä"
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr "valvojan poisto"
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr "valvojien poistot"
-
-#: contrib/comments/models.py:285
-#, python-format
-msgid "Moderator deletion by %r"
-msgstr "Valvojan %r poisto"
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr "Anonyymit käyttäjät eivät voi äänestää"
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr "Kommentin tunniste on virheellinen"
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr "Itseään ei voi äänestää"
-
-#: contrib/comments/views/comments.py:27
-msgid ""
-"This rating is required because you've entered at least one other rating."
-msgstr "Tämä pisteytys on annettava, koska olet syöttänyt ainakin yhden muunkin pisteytyksen."
-
-#: contrib/comments/views/comments.py:111
-#, python-format
-msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-msgid_plural ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
-msgstr[0] ""
-"Kommentin kirjoittanut käyttäjä on kirjoittanut vain yhden kommentin:\n"
-"\n"
-"%(text)s"
-msgstr[1] ""
-"Kommentin kirjoittanut käyttäjä on kirjoittanut alle %(count)s kommenttia:\n"
-"\n"
-"%(text)s"
-
-# Mitä "sketchy user" tarkoittaa?
-#: contrib/comments/views/comments.py:116
-#, python-format
-msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
 msgstr ""
-"Tämä on \"sketchy\"-käyttäjän kirjoittama kommentti:\n"
-"\n"
-"%(text)s"
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr "Vain POST-kutsut sallittu"
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
+msgstr ""
 
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr "Yksi tai useampi vaadittu kenttä on jäänyt täyttämättä"
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr "Berliini"
 
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Kommenttilomaketta on käpälöity (turvallisuusrike)"
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr ""
 
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr "Hampuri"
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr ""
+
+#: contrib/localflavor/de/forms.py:60
 msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr "Kommenttilomakkeen 'target'-parametri ei kelpaa -- kohteen ID oli virheellinen"
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format."
+msgstr ""
 
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr "Kommenttilomake ei pyytänyt esikatselua tai lähettämistä"
+#: contrib/localflavor/pl/forms.py:53
+msgid "National Identification Number consists of 11 digits."
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "Unohditko salasanasi?"
+#: contrib/localflavor/pl/forms.py:59
+msgid "Wrong checksum for the National Identification Number."
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr "Pisteytykset"
+#: contrib/localflavor/pl/forms.py:71
+msgid ""
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "Vaaditaan"
+#: contrib/localflavor/pl/forms.py:82
+msgid "Enter a postal code in the format XX-XXX."
+msgstr "Syötä postinumero muodossa XX-XXX."
 
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "Vapaavalintainen"
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+msgid "Lower Silesia"
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "Lähetä valokuva"
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "Kommentti:"
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr ""
 
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "Esikatsele kommenttia"
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr ""
 
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "Nimesi:"
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr ""
 
-#: contrib/sessions/models.py:51
-msgid "session key"
-msgstr "istunnon avain"
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr ""
 
-#: contrib/sessions/models.py:52
-msgid "session data"
-msgstr "istunnon tiedot"
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr ""
 
-#: contrib/sessions/models.py:53
-msgid "expire date"
-msgstr "vanhenee"
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+msgid "Opole"
+msgstr ""
 
-#: contrib/sessions/models.py:57
-msgid "session"
-msgstr "istunto"
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr ""
 
-#: contrib/sessions/models.py:58
-msgid "sessions"
-msgstr "istunnot"
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr ""
 
-#: contrib/contenttypes/models.py:20
-msgid "python model class name"
-msgstr "mallin python-luokan nimi"
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+msgid "Pomerania"
+msgstr ""
 
-#: contrib/contenttypes/models.py:23
-msgid "content type"
-msgstr "sisältötyyppi"
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+msgid "Silesia"
+msgstr ""
 
-#: contrib/contenttypes/models.py:24
-msgid "content types"
-msgstr "sisältötyypit"
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr ""
 
-#: forms/__init__.py:381
-#, python-format
-msgid "Ensure your text is less than %s character."
-msgid_plural "Ensure your text is less than %s characters."
-msgstr[0] "Varmista, että tekstin pituus on vähemmän kuin %s merkki."
-msgstr[1] "Varmista, että teksti pituus on vähemmän kuin %s merkkiä."
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr ""
 
-#: forms/__init__.py:386
-msgid "Line breaks are not allowed here."
-msgstr "Rivinvaihtoja ei voi käyttää."
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr ""
 
-#: forms/__init__.py:487 forms/__init__.py:560 forms/__init__.py:599
-#, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "Valinta ei kelpaa; '%(data)s' ei löydy vaihtoehtojen %(choices)s joukosta."
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+msgid "West Pomerania"
+msgstr ""
 
-#: forms/__init__.py:663
-msgid "The submitted file is empty."
-msgstr "Lähetetty tiedosto on tyhjä."
+#: contrib/localflavor/it/forms.py:16
+msgid "Enter a valid zip code."
+msgstr "Syötä oikea postinumero."
 
-#: forms/__init__.py:719
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr "Syötä kokonaisluku väliltä -32768 ja 32767."
+#: contrib/localflavor/it/forms.py:41
+msgid "Enter a valid Social Security number."
+msgstr "Syötä oikea henkilötunnus."
 
-#: forms/__init__.py:729
-msgid "Enter a positive number."
-msgstr "Syötä positiivinen kokonaisluku."
+#: contrib/localflavor/it/forms.py:68
+msgid "Enter a valid VAT number."
+msgstr "Syötä oikea ALV-tunnus."
 
-#: forms/__init__.py:739
-msgid "Enter a whole number between 0 and 32,767."
-msgstr "Syötä kokonaisluku väliltä 0 ja 32767."
+#: contrib/localflavor/is_/forms.py:17
+msgid ""
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/is_/forms.py:31
+msgid "The Icelandic identification number is not valid."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:30 contrib/localflavor/ar/forms.py:38
+msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:64
+msgid "This field requires 7 or 8 digits."
+msgstr "Tähän kenttään vaaditaan 7 tai 8 numeroa."
+
+#: contrib/localflavor/ar/forms.py:75
+msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:88
+msgid "Invalid CUIT."
+msgstr "Virheellinen CUIT."
+
+#: contrib/localflavor/ca/forms.py:19
+msgid "Enter a postal code in the format XXX XXX."
+msgstr "Syötä postinumero muodossa XXX XXX."
+
+#: contrib/localflavor/ca/forms.py:81
+msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format."
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:25
+msgid "Enter a valid postal code"
+msgstr "Syötä oikea postinumero."
+
+#: contrib/localflavor/nl/forms.py:53
+msgid "Enter a valid phone number"
+msgstr "Syötä oikea puhelinnumero."
+
+#: contrib/localflavor/nl/forms.py:76
+msgid "Enter a valid SoFi number"
+msgstr "Syötä ikea SoFi-numero."
+
+#: contrib/localflavor/nl/nl_provinces.py:4
+msgid "Drente"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:5
+msgid "Flevoland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:6
+msgid "Friesland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:7
+msgid "Gelderland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:8
+msgid "Groningen"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:9
+msgid "Limburg"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:10
+msgid "Noord-Brabant"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:11
+msgid "Noord-Holland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:12
+msgid "Overijssel"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:13
+msgid "Utrecht"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:14
+msgid "Zeeland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:15
+msgid "Zuid-Holland"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:4
+msgid "Hokkaido"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:5
+msgid "Aomori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:6
+msgid "Iwate"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:7
+msgid "Miyagi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:8
+msgid "Akita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:9
+msgid "Yamagata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:10
+msgid "Fukushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:11
+msgid "Ibaraki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:12
+msgid "Tochigi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:13
+msgid "Gunma"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:14
+msgid "Saitama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:15
+msgid "Chiba"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:16
+msgid "Tokyo"
+msgstr "Tokio"
+
+#: contrib/localflavor/jp/jp_prefectures.py:17
+msgid "Kanagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:18
+msgid "Yamanashi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:19
+msgid "Nagano"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:20
+msgid "Niigata"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:21
+msgid "Toyama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:22
+msgid "Ishikawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:23
+msgid "Fukui"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:24
+msgid "Gifu"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:25
+msgid "Shizuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:26
+msgid "Aichi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:27
+msgid "Mie"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:28
+msgid "Shiga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:29
+msgid "Kyoto"
+msgstr "Kioto"
+
+#: contrib/localflavor/jp/jp_prefectures.py:30
+msgid "Osaka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:31
+msgid "Hyogo"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:32
+msgid "Nara"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:33
+msgid "Wakayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:34
+msgid "Tottori"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:35
+msgid "Shimane"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:36
+msgid "Okayama"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:37
+msgid "Hiroshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:38
+msgid "Yamaguchi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:39
+msgid "Tokushima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:40
+msgid "Kagawa"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:41
+msgid "Ehime"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:42
+msgid "Kochi"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:43
+msgid "Fukuoka"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:44
+msgid "Saga"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:45
+msgid "Nagasaki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:46
+msgid "Kumamoto"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:47
+msgid "Oita"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:48
+msgid "Miyazaki"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:49
+msgid "Kagoshima"
+msgstr ""
+
+#: contrib/localflavor/jp/jp_prefectures.py:50
+msgid "Okinawa"
+msgstr ""
+
+#: contrib/localflavor/jp/forms.py:21
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/cl/forms.py:32
+msgid "Enter valid a Chilean RUT. The format is XX.XXX.XXX-X."
+msgstr ""
+
+#: contrib/localflavor/cl/forms.py:37
+msgid "Enter valid a Chilean RUT"
+msgstr "Syötä oikea chileläinen RUT"
+
+#: contrib/localflavor/us/forms.py:18
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:51
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr ""
+
+#: contrib/localflavor/no/forms.py:35
+msgid "Enter a valid Norwegian social security number."
+msgstr "Syötä oikea norjalainen henkilötunnus."
+
+#: utils/dateformat.py:41
+msgid "p.m."
+msgstr "ip"
+
+#: utils/dateformat.py:42
+msgid "a.m."
+msgstr "ap"
+
+#: utils/dateformat.py:47
+msgid "PM"
+msgstr "IP"
+
+#: utils/dateformat.py:48
+msgid "AM"
+msgstr "AP"
+
+#: utils/dateformat.py:97
+msgid "midnight"
+msgstr "keskiyö"
+
+#: utils/dateformat.py:99
+msgid "noon"
+msgstr "keskipäivä"
+
+#: utils/text.py:127
+msgid "or"
+msgstr "tai"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -1851,127 +3155,155 @@ msgstr "lauantai"
 msgid "Sunday"
 msgstr "sunnuntai"
 
-#: utils/dates.py:14
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Ma"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Ti"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Ke"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "To"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Pe"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "La"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "Su"
+
+#: utils/dates.py:18
 msgid "January"
 msgstr "tammikuu"
 
-#: utils/dates.py:14
+#: utils/dates.py:18
 msgid "February"
 msgstr "helmikuu"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "March"
 msgstr "maaliskuu"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "April"
 msgstr "huhtikuu"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "May"
 msgstr "toukokuu"
 
-#: utils/dates.py:14 utils/dates.py:27
+#: utils/dates.py:18 utils/dates.py:31
 msgid "June"
 msgstr "kesäkuu"
 
-#: utils/dates.py:15 utils/dates.py:27
+#: utils/dates.py:19 utils/dates.py:31
 msgid "July"
 msgstr "heinäkuu"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "August"
 msgstr "elokuu"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "September"
 msgstr "syyskuu"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "October"
 msgstr "lokakuu"
 
-#: utils/dates.py:15
+#: utils/dates.py:19
 msgid "November"
 msgstr "marraskuu"
 
-#: utils/dates.py:16
+#: utils/dates.py:20
 msgid "December"
 msgstr "joulukuu"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jan"
 msgstr "tam"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "feb"
 msgstr "hel"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "mar"
 msgstr "maa"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "apr"
 msgstr "huh"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "may"
 msgstr "tou"
 
-#: utils/dates.py:19
+#: utils/dates.py:23
 msgid "jun"
 msgstr "kes"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "jul"
 msgstr "hei"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "aug"
 msgstr "elo"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "sep"
 msgstr "syy"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "oct"
 msgstr "lok"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "nov"
 msgstr "mar"
 
-#: utils/dates.py:20
+#: utils/dates.py:24
 msgid "dec"
 msgstr "jou"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Jan."
 msgstr "tammi"
 
-#: utils/dates.py:27
+#: utils/dates.py:31
 msgid "Feb."
 msgstr "helmi"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Aug."
 msgstr "elo"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Sept."
 msgstr "syys"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Oct."
 msgstr "loka"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Nov."
 msgstr "marras"
 
-#: utils/dates.py:28
+#: utils/dates.py:32
 msgid "Dec."
 msgstr "joulu"
 
@@ -2011,26 +3343,237 @@ msgid_plural "minutes"
 msgstr[0] "minuutti"
 msgstr[1] "minuuttia"
 
-#: utils/translation/trans_real.py:362
+#: utils/timesince.py:39
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr "%(number)d %(type)s"
+
+#: utils/timesince.py:45
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ", %(number)d %(type)s"
+
+#: utils/translation/trans_real.py:391
 msgid "DATE_FORMAT"
 msgstr "j.n.Y"
 
-#: utils/translation/trans_real.py:363
+#: utils/translation/trans_real.py:392
 msgid "DATETIME_FORMAT"
 msgstr "j.n.Y G:i"
 
-#: utils/translation/trans_real.py:364
+#: utils/translation/trans_real.py:393
 msgid "TIME_FORMAT"
 msgstr "G:i"
 
-#: utils/translation/trans_real.py:380
+#: utils/translation/trans_real.py:409
 msgid "YEAR_MONTH_FORMAT"
 msgstr "N Y"
 
-#: utils/translation/trans_real.py:381
+#: utils/translation/trans_real.py:410
 msgid "MONTH_DAY_FORMAT"
 msgstr "N j, Y"
 
-#: template/defaultfilters.py:401
-msgid "yes,no,maybe"
-msgstr "kyllä,ei,ehkä"
+#: conf/global_settings.py:39
+msgid "Arabic"
+msgstr "arabia"
+
+#: conf/global_settings.py:40
+msgid "Bengali"
+msgstr "bengali"
+
+#: conf/global_settings.py:41
+msgid "Bulgarian"
+msgstr "bulgaria"
+
+#: conf/global_settings.py:42
+msgid "Catalan"
+msgstr "katalaani"
+
+#: conf/global_settings.py:43
+msgid "Czech"
+msgstr "tšekki"
+
+#: conf/global_settings.py:44
+msgid "Welsh"
+msgstr "wales"
+
+#: conf/global_settings.py:45
+msgid "Danish"
+msgstr "tanska"
+
+#: conf/global_settings.py:46
+msgid "German"
+msgstr "saksa"
+
+#: conf/global_settings.py:47
+msgid "Greek"
+msgstr "kreikka"
+
+#: conf/global_settings.py:48
+msgid "English"
+msgstr "englanti"
+
+#: conf/global_settings.py:49
+msgid "Spanish"
+msgstr "espanja"
+
+#: conf/global_settings.py:50
+msgid "Argentinean Spanish"
+msgstr "Argentiinan espanja"
+
+#: conf/global_settings.py:51
+msgid "Persian"
+msgstr "persia"
+
+#: conf/global_settings.py:52
+msgid "Finnish"
+msgstr "suomi"
+
+#: conf/global_settings.py:53
+msgid "French"
+msgstr "ranska"
+
+#: conf/global_settings.py:54
+msgid "Galician"
+msgstr "galicia"
+
+#: conf/global_settings.py:55
+msgid "Hungarian"
+msgstr "unkari"
+
+#: conf/global_settings.py:56
+msgid "Hebrew"
+msgstr "heprea"
+
+#: conf/global_settings.py:57
+msgid "Croatian"
+msgstr "kroatia"
+
+#: conf/global_settings.py:58
+msgid "Icelandic"
+msgstr "islanti"
+
+#: conf/global_settings.py:59
+msgid "Italian"
+msgstr "italia"
+
+#: conf/global_settings.py:60
+msgid "Japanese"
+msgstr "japani"
+
+#: conf/global_settings.py:61
+msgid "Korean"
+msgstr "korea"
+
+#: conf/global_settings.py:62
+msgid "Khmer"
+msgstr "khmer"
+
+#: conf/global_settings.py:63
+msgid "Kannada"
+msgstr "kannada"
+
+#: conf/global_settings.py:64
+msgid "Latvian"
+msgstr "latvia"
+
+#: conf/global_settings.py:65
+msgid "Macedonian"
+msgstr "makedonia"
+
+#: conf/global_settings.py:66
+msgid "Dutch"
+msgstr "hollanti"
+
+#: conf/global_settings.py:67
+msgid "Norwegian"
+msgstr "norja"
+
+#: conf/global_settings.py:68
+msgid "Polish"
+msgstr "puola"
+
+#: conf/global_settings.py:69
+msgid "Portugese"
+msgstr "portugali"
+
+#: conf/global_settings.py:70
+msgid "Brazilian"
+msgstr "Brasilian portugali"
+
+#: conf/global_settings.py:71
+msgid "Romanian"
+msgstr "romania"
+
+#: conf/global_settings.py:72
+msgid "Russian"
+msgstr "venäjä"
+
+#: conf/global_settings.py:73
+msgid "Slovak"
+msgstr "slovakia"
+
+#: conf/global_settings.py:74
+msgid "Slovenian"
+msgstr "slovenia"
+
+#: conf/global_settings.py:75
+msgid "Serbian"
+msgstr "serbia"
+
+#: conf/global_settings.py:76
+msgid "Swedish"
+msgstr "ruotsi"
+
+#: conf/global_settings.py:77
+msgid "Tamil"
+msgstr "tamili"
+
+#: conf/global_settings.py:78
+msgid "Telugu"
+msgstr "telugu"
+
+#: conf/global_settings.py:79
+msgid "Turkish"
+msgstr "turkki"
+
+#: conf/global_settings.py:80
+msgid "Ukrainian"
+msgstr "ukraina"
+
+#: conf/global_settings.py:81
+msgid "Simplified Chinese"
+msgstr "kiina (yksinkertaistettu)"
+
+#: conf/global_settings.py:82
+msgid "Traditional Chinese"
+msgstr "kiina (perinteinen)"
+
+#: oldforms/__init__.py:408
+#, python-format
+msgid "Ensure your text is less than %s character."
+msgid_plural "Ensure your text is less than %s characters."
+msgstr[0] "Varmista, että tekstin pituus on vähemmän kuin %s merkki."
+msgstr[1] "Varmista, että teksti pituus on vähemmän kuin %s merkkiä."
+
+#: oldforms/__init__.py:413
+msgid "Line breaks are not allowed here."
+msgstr "Rivinvaihtoja ei voi käyttää."
+
+#: oldforms/__init__.py:511 oldforms/__init__.py:585 oldforms/__init__.py:624
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgstr ""
+"Valinta ei kelpaa; '%(data)s' ei löydy vaihtoehtojen %(choices)s joukosta."
+
+#: oldforms/__init__.py:744
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr "Syötä kokonaisluku väliltä -32768 ja 32767."
+
+#: oldforms/__init__.py:754
+msgid "Enter a positive number."
+msgstr "Syötä positiivinen kokonaisluku."
+
+#: oldforms/__init__.py:764
+msgid "Enter a whole number between 0 and 32,767."
+msgstr "Syötä kokonaisluku väliltä 0 ja 32767."

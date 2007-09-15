@@ -247,6 +247,7 @@ class Model(object):
                     qn(self._meta.order_with_respect_to.column))
                 cursor.execute(subsel, (getattr(self, self._meta.order_with_respect_to.attname),))
                 db_values.append(cursor.fetchone()[0])
+            record_exists = False
             if db_values:
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
                     (qn(self._meta.db_table), ','.join(field_names),
@@ -261,7 +262,8 @@ class Model(object):
         transaction.commit_unless_managed()
 
         # Run any post-save hooks.
-        dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
+        dispatcher.send(signal=signals.post_save, sender=self.__class__,
+                instance=self, created=(not record_exists))
 
     save.alters_data = True
 

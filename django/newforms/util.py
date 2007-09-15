@@ -1,5 +1,5 @@
 from django.utils.html import escape
-from django.utils.encoding import smart_unicode, StrAndUnicode
+from django.utils.encoding import smart_unicode, StrAndUnicode, force_unicode
 from django.utils.functional import Promise
 
 def flatatt(attrs):
@@ -22,10 +22,10 @@ class ErrorDict(dict, StrAndUnicode):
 
     def as_ul(self):
         if not self: return u''
-        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s%s</li>' % (k, smart_unicode(v)) for k, v in self.items()])
+        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s%s</li>' % (k, force_unicode(v)) for k, v in self.items()])
 
     def as_text(self):
-        return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % smart_unicode(i) for i in v])) for k, v in self.items()])
+        return u'\n'.join([u'* %s\n%s' % (k, u'\n'.join([u'  * %s' % force_unicode(i) for i in v])) for k, v in self.items()])
 
 class ErrorList(list, StrAndUnicode):
     """
@@ -36,11 +36,11 @@ class ErrorList(list, StrAndUnicode):
 
     def as_ul(self):
         if not self: return u''
-        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s</li>' % smart_unicode(e) for e in self])
+        return u'<ul class="errorlist">%s</ul>' % ''.join([u'<li>%s</li>' % force_unicode(e) for e in self])
 
     def as_text(self):
         if not self: return u''
-        return u'\n'.join([u'* %s' % smart_unicode(e) for e in self])
+        return u'\n'.join([u'* %s' % force_unicode(e) for e in self])
 
 class ValidationError(Exception):
     def __init__(self, message):
@@ -58,3 +58,4 @@ class ValidationError(Exception):
         # AttributeError: ValidationError instance has no attribute 'args'
         # See http://www.python.org/doc/current/tut/node10.html#handling
         return repr(self.messages)
+

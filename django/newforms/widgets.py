@@ -24,6 +24,7 @@ __all__ = (
 
 class Widget(object):
     is_hidden = False          # Determines whether this corresponds to an <input type="hidden">.
+    needs_multipart_form = False # Determines does this widget need multipart-encrypted form
 
     def __init__(self, attrs=None):
         if attrs is not None:
@@ -120,6 +121,7 @@ class MultipleHiddenInput(HiddenInput):
 
 class FileInput(Input):
     input_type = 'file'
+    needs_multipart_form = True
 
     def render(self, name, value, attrs=None):
         return super(FileInput, self).render(name, None, attrs=attrs)

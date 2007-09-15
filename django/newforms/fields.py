@@ -144,7 +144,7 @@ class IntegerField(Field):
         if value in EMPTY_VALUES:
             return None
         try:
-            value = int(value)
+            value = int(str(value))
         except (ValueError, TypeError):
             raise ValidationError(ugettext(u'Enter a whole number.'))
         if self.max_value is not None and value > self.max_value:
@@ -192,7 +192,7 @@ class DecimalField(Field):
         super(DecimalField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
             return None
-        value = value.strip()
+        value = str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
@@ -452,6 +452,10 @@ class BooleanField(Field):
     def clean(self, value):
         "Returns a Python boolean object."
         super(BooleanField, self).clean(value)
+        # Explicitly check for the string '0', which is what as hidden field
+        # will submit for False.
+        if value == '0':
+            return False
         return bool(value)
 
 class NullBooleanField(BooleanField):

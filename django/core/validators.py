@@ -405,12 +405,17 @@ class NumberIsInRange(object):
 
 class IsAPowerOf(object):
     """
-    >>> v = IsAPowerOf(2)
-    >>> v(4, None)
-    >>> v(8, None)
-    >>> v(16, None)
-    >>> v(17, None)
-    django.core.validators.ValidationError: ['This value must be a power of 2.']
+    Usage: If you create an instance of the IsPowerOf validator:
+        v = IsAPowerOf(2)
+    
+    The following calls will succeed:
+        v(4, None) 
+        v(8, None)
+        v(16, None)
+    
+    But this call:
+        v(17, None)
+    will raise "django.core.validators.ValidationError: ['This value must be a power of 2.']"
     """
     def __init__(self, power_of):
         self.power_of = power_of

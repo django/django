@@ -16,7 +16,6 @@ def render_to_response(*args, **kwargs):
     """
     httpresponse_kwargs = {'mimetype': kwargs.pop('mimetype', None)}
     return HttpResponse(loader.render_to_string(*args, **kwargs), **httpresponse_kwargs)
-load_and_render = render_to_response # For backwards compatibility.
 
 def _get_queryset(klass):
     """

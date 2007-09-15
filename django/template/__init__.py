@@ -34,14 +34,8 @@ will be raised if the template doesn't have proper syntax.
 
 Sample code:
 
->>> import template
->>> s = '''
-... <html>
-... {% if test %}
-...     <h1>{{ varvalue }}</h1>
-... {% endif %}
-... </html>
-... '''
+>>> from django import template
+>>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
 >>> t = template.Template(s)
 
 (t is now a compiled template, and its render() method can be called multiple
@@ -49,10 +43,10 @@ times with multiple contexts)
 
 >>> c = template.Context({'test':True, 'varvalue': 'Hello'})
 >>> t.render(c)
-'\n<html>\n\n    <h1>Hello</h1>\n\n</html>\n'
+u'<html><h1>Hello</h1></html>'
 >>> c = template.Context({'test':False, 'varvalue': 'Hello'})
 >>> t.render(c)
-'\n<html>\n\n</html>\n'
+u'<html></html>'
 """
 import re
 from inspect import getargspec
@@ -529,10 +523,11 @@ class FilterExpression(object):
     and return a list of tuples of the filter name and arguments.
     Sample:
         >>> token = 'variable|default:"Default value"|date:"Y-m-d"'
-        >>> p = FilterParser(token)
-        >>> p.filters
-        [('default', 'Default value'), ('date', 'Y-m-d')]
-        >>> p.var
+        >>> p = Parser('')
+        >>> fe = FilterExpression(token, p)
+        >>> len(fe.filters)
+        2
+        >>> fe.var
         'variable'
 
     This class should never be instantiated outside of the
@@ -647,7 +642,7 @@ def resolve_variable(path, context):
 
     >>> c = {'article': {'section':'News'}}
     >>> resolve_variable('article.section', c)
-    'News'
+    u'News'
     >>> resolve_variable('article', c)
     {'section': 'News'}
     >>> class AClass: pass
@@ -655,7 +650,7 @@ def resolve_variable(path, context):
     >>> c.article = AClass()
     >>> c.article.section = 'News'
     >>> resolve_variable('article.section', c)
-    'News'
+    u'News'
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """

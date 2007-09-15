@@ -116,7 +116,7 @@ class BaseHandler(object):
             else:
                 # Get the exception info now, in case another exception is thrown later.
                 exc_info = sys.exc_info()
-                receivers = dispatcher.send(signal=signals.got_request_exception)
+                receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
                 # When DEBUG is False, send an error message to the admins.
                 subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
                 try:
@@ -142,7 +142,7 @@ def fix_location_header(request, response):
     Code constructing response objects is free to insert relative paths and
     this function converts them to absolute paths.
     """
-    if 'Location' in response and http.get_host(request):
+    if 'Location' in response and request.get_host():
         response['Location'] = request.build_absolute_uri(response['Location'])
     return response
 

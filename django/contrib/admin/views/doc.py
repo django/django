@@ -5,7 +5,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.db import models
 from django.shortcuts import render_to_response
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.http import Http404, get_host
+from django.http import Http404
 from django.core import urlresolvers
 from django.contrib.admin import utils
 from django.contrib.sites.models import Site
@@ -29,7 +29,7 @@ def bookmarklets(request):
     # Hack! This couples this view to the URL it lives at.
     admin_root = request.path[:-len('doc/bookmarklets/')]
     return render_to_response('admin_doc/bookmarklets.html', {
-        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', get_host(request), admin_root),
+        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root),
     }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 

@@ -961,6 +961,12 @@ True
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
+>>> f.clean(42)
+42
+>>> f.clean(3.14)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a whole number.']
 >>> f.clean('1 ')
 1
 >>> f.clean(' 1')
@@ -1084,6 +1090,10 @@ True
 23.0
 >>> f.clean('3.14')
 3.1400000000000001
+>>> f.clean(3.14)
+3.1400000000000001
+>>> f.clean(42)
+42.0
 >>> f.clean('a')
 Traceback (most recent call last):
 ...
@@ -1141,6 +1151,10 @@ True
 >>> f.clean('23')
 Decimal("23")
 >>> f.clean('3.14')
+Decimal("3.14")
+>>> f.clean(3.14)
+Decimal("3.14")
+>>> f.clean(Decimal('3.14'))
 Decimal("3.14")
 >>> f.clean('a')
 Traceback (most recent call last):
@@ -3855,6 +3869,25 @@ u'sirrobin'
 <p>Email: <input type="text" name="email" value="invalid" /></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" /></p>
+
+#################################
+# Test multipart-encoded form #
+#################################
+
+>>> class FormWithoutFile(Form):
+...     username = CharField()
+>>> class FormWithFile(Form):
+...     username = CharField()
+...     file = FileField()
+>>> class FormWithImage(Form):
+...     image = ImageField()
+
+>>> FormWithoutFile().is_multipart()
+False
+>>> FormWithFile().is_multipart()
+True
+>>> FormWithImage().is_multipart()
+True
 
 """
 

@@ -32,7 +32,7 @@ class CommonMiddleware(object):
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
 
         # Check for a redirect based on settings.APPEND_SLASH and settings.PREPEND_WWW
-        host = http.get_host(request)
+        host = request.get_host()
         old_url = [host, request.path]
         new_url = old_url[:]
         if settings.PREPEND_WWW and old_url[0] and not old_url[0].startswith('www.'):
@@ -61,7 +61,7 @@ class CommonMiddleware(object):
             if settings.SEND_BROKEN_LINK_EMAILS:
                 # If the referrer was from an internal link or a non-search-engine site,
                 # send a note to the managers.
-                domain = http.get_host(request)
+                domain = request.get_host()
                 referer = request.META.get('HTTP_REFERER', None)
                 is_internal = _is_internal_request(domain, referer)
                 path = request.get_full_path()

@@ -212,6 +212,16 @@ class BaseForm(StrAndUnicode):
         """
         return self.cleaned_data
 
+    def is_multipart(self):
+        """
+        Returns True if the form needs to be multipart-encrypted, i.e. it has
+        FileInput. Otherwise, False.
+        """
+        for field in self.fields.values():
+            if field.widget.needs_multipart_form:
+                return True
+        return False
+
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
