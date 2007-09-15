@@ -496,13 +496,22 @@ class GEOSGeometry(object):
         "Computes an interior point of this Geometry."
         return self._unary_topology(lgeos.GEOSPointOnSurface)
 
-    def simplify(self, tolerance=0.0):
+    def simplify(self, tolerance=0.0, preserve_topology=False):
         """
         Returns the Geometry, simplified using the Douglas-Peucker algorithm
          to the specified tolerance (higher tolerance => less points).  If no
          tolerance provided, defaults to 0.
+
+        By default, this function does not preserve topology - e.g. polygons can 
+         be split, collapse to lines or disappear holes can be created or 
+         disappear, and lines can cross. By specifying preserve_topology=True, 
+         the result will have the same dimension and number of components as the 
+         input. This is significantly slower.         
         """
-        return self._unary_topology(lgeos.GEOSSimplify, c_double(tolerance))
+        if preserve_topology:
+            return self._unary_topology(lgeos.GEOSTopologyPreserveSimplify, c_double(tolerance))
+        else:
+            return self._unary_topology(lgeos.GEOSSimplify, c_double(tolerance))        
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this Geometry and the other."
