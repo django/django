@@ -779,20 +779,20 @@ form data *and* file data::
 Testing for multipart forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're writing some reusable views or templates, you may not know ahead of
-time whether your form is a multipart form or not. The ``is_multipart()``
-method tells you if the form requires multipart encoding for submission::
+If you're writing reusable views or templates, you may not know ahead of time
+whether your form is a multipart form or not. The ``is_multipart()`` method
+tells you whether the form requires multipart encoding for submission::
 
     >>> f = ContactFormWithMugshot()
     >>> f.is_multipart()
     True
 
-In a template, this sort of code could be useful::
+Here's an example of how you might use this in a template::
 
     {% if form.is_multipart %}
-      <form enctype="multipart/form-data" method="post" action="/foo/">
+        <form enctype="multipart/form-data" method="post" action="/foo/">
     {% else %}
-      <form method="post" action="/foo/">
+        <form method="post" action="/foo/">
     {% endif %}
     {% form %}
     </form>
