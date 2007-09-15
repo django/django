@@ -59,6 +59,7 @@ LANGUAGES = (
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
     ('ko', gettext_noop('Korean')),
+    ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),

@@ -1151,7 +1151,7 @@ msgstr "Suodatin"
 #: contrib/comments/templates/comments/form.html:6
 #: contrib/comments/templates/comments/form.html:8
 msgid "Username:"
-msgstr "Käyttäjätunnus"
+msgstr "Käyttäjätunnus:"
 
 #: contrib/admin/templates/admin/login.html:20
 #: contrib/comments/templates/comments/form.html:8
@@ -1178,7 +1178,7 @@ msgstr "Käyttäjätunnus"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:18
 msgid "Password"
-msgstr "Salasana:"
+msgstr "Salasana"
 
 #: contrib/admin/templates/admin/auth/user/add_form.html:23
 msgid "Password (again)"
