@@ -654,10 +654,31 @@ info, with the ``DATABASE_ENGINE`` setting. You will also need a ``ROOT_URLCONF`
 setting (its value is ignored; it just needs to be present) and a ``SITE_ID``
 setting (any non-zero integer value will do) in order for all the tests to pass.
 
-The unit tests will not touch your existing databases; they create a new
-database, called ``django_test_db``, which is deleted when the tests are
-finished. This means your user account needs permission to execute ``CREATE
-DATABASE``.
+If you're using the ``sqlite3`` database backend, no further settings are
+needed. A temporary database will be created in memory when running the tests.
+
+If you're using another backend:
+
+    * Your ``DATABASE_USER`` setting needs to specify an existing user account
+      for the database engine.
+
+    * The ``DATABASE_NAME`` setting must be the name of an existing database to
+      which the given user has permission to connect. The unit tests will not
+      touch this database; the test runner creates a new database whose name is
+      ``DATABASE_NAME`` prefixed with ``test_``, and this test database is
+      deleted when the tests are finished. This means your user account needs
+      permission to execute ``CREATE DATABASE``.
+
+To run a subset of the unit tests, append the names of the test modules to the
+``runtests.py`` command line. See the list of directories in
+``tests/modeltests`` and ``tests/regressiontests`` for module names.
+
+As an example, if Django is not in your ``PYTHONPATH``, you placed
+``settings.py`` in the ``tests/`` directory, and you'd like to only run tests
+for generic relations and internationalization, type::
+
+    PYTHONPATH=..
+    ./runtests.py --settings=settings generic_relations i18n
 
 Requesting features
 ===================
