@@ -38,13 +38,13 @@ class Command(NoArgsCommand):
 
         cursor = connection.cursor()
 
-        # Get a list of all existing database tables,
-        # so we know what needs to be added.
-        tables = table_list()
         if connection.features.uses_case_insensitive_names:
             table_name_converter = str.upper
         else:
             table_name_converter = lambda x: x
+        # Get a list of all existing database tables, so we know what needs to
+        # be added.
+        tables = [table_name_converter(name) for name in table_list()]
 
         # Get a list of already installed *models* so that references work right.
         seen_models = installed_models(tables)
