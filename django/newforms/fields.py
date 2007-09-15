@@ -144,7 +144,7 @@ class IntegerField(Field):
         if value in EMPTY_VALUES:
             return None
         try:
-            value = int(value)
+            value = int(str(value))
         except (ValueError, TypeError):
             raise ValidationError(ugettext(u'Enter a whole number.'))
         if self.max_value is not None and value > self.max_value:
@@ -192,7 +192,7 @@ class DecimalField(Field):
         super(DecimalField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
             return None
-        value = value.strip()
+        value = str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
