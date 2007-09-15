@@ -985,7 +985,7 @@ validation if a particular field's value is not given. ``initial`` values are
 ~~~~~~~~~~
 
 The ``widget`` argument lets you specify a ``Widget`` class to use when
-rendering this ``Field``. See "Widgets"_ below for more information.
+rendering this ``Field``. See `Widgets`_ below for more information.
 
 ``help_text``
 ~~~~~~~~~~~~~

@@ -440,6 +440,7 @@ class AutoField(Field):
         assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
+        cls._meta.auto_field = self
 
     def formfield(self, **kwargs):
         return None
@@ -545,7 +546,12 @@ class DateField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            value = value.strftime('%Y-%m-%d')
+            try:
+                value = value.strftime('%Y-%m-%d')
+            except AttributeError:
+                # If value is already a string it won't have a strftime method,
+                # so we'll just let it pass through.
+                pass
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
