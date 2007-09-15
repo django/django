@@ -98,8 +98,8 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     
     def render(self, name, value, attrs=None):
         attrs['class'] = 'vManyToManyRawIdAdminField'
-        if value:
-            value = ','.join([str(v) for v in value])
+        if value: 
+            value = ','.join(value)
         else: 
             value = ""
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)

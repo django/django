@@ -627,7 +627,7 @@ class ModelAdmin(BaseModelAdmin):
         # will also be deleted.
         deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), object_id, escape(str(obj))), []]
         perms_needed = sets.Set()
-        get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1, self.admin_site)
+        get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
         if request.POST: # The user has already confirmed the deletion.
             if perms_needed:

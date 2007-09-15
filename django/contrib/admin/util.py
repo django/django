@@ -10,14 +10,13 @@ def _nest_help(obj, depth, val):
         current = current[-1]
     current.append(val)
 
-def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_depth, admin_site):
+def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_depth):
     "Helper function that recursively populates deleted_objects."
     nh = _nest_help # Bind to local variable for performance
     if current_depth > 16:
         return # Avoid recursing too deep.
     opts_seen = []
     for related in opts.get_all_related_objects():
-        has_admin = related.__class__ in admin_site._registry
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
@@ -28,13 +27,13 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
             except ObjectDoesNotExist:
                 pass
             else:
-                if has_admin:
+                if related.opts.admin:
                     p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                     if not user.has_perm(p):
                         perms_needed.add(related.opts.verbose_name)
                         # We don't care about populating deleted_objects now.
                         continue
-                if related.field.rel.edit_inline or not has_admin:
+                if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
@@ -43,12 +42,12 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                     nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
                         sub_obj._get_pk_val(), sub_obj), []])
-                get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
+                get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
             has_related_objs = False
             for sub_obj in getattr(obj, rel_opts_name).all():
                 has_related_objs = True
-                if related.field.rel.edit_inline or not has_admin:
+                if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
@@ -56,15 +55,14 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
                         (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
-                get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
+                get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
-            if has_admin and has_related_objs:
+            if related.opts.admin and has_related_objs:
                 p = '%s.%s' % (related.opts.app_label, related.opts.get_delete_permission())
                 if not user.has_perm(p):
                     perms_needed.add(related.opts.verbose_name)
     for related in opts.get_all_related_many_to_many_objects():
-        has_admin = related.__class__ in admin_site._registry
         if related.opts in opts_seen:
             continue
         opts_seen.append(related.opts)
@@ -79,7 +77,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
 
         if has_related_objs:
             for sub_obj in rel_objs.all():
-                if related.field.rel.edit_inline or not has_admin:
+                if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
                     nh(deleted_objects, current_depth, [_('One or more %(fieldname)s in %(name)s: %(obj)s') % \
@@ -92,7 +90,7 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                             (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
-        if has_admin and has_related_objs:
+        if related.opts.admin and has_related_objs:
             p = u'%s.%s' % (related.opts.app_label, related.opts.get_change_permission())
             if not user.has_perm(p):
                 perms_needed.add(related.opts.verbose_name)
