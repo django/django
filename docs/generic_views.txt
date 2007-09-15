@@ -775,7 +775,7 @@ If the results are paginated, the context will contain these extra variables:
       page.
 
     * **New in Django development version:** ``page_range``: A list of the 
-    page numbers that are available. This is 1-based.
+      page numbers that are available. This is 1-based.
 
 Notes on pagination
 ~~~~~~~~~~~~~~~~~~~
