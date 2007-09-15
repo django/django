@@ -452,6 +452,10 @@ class BooleanField(Field):
     def clean(self, value):
         "Returns a Python boolean object."
         super(BooleanField, self).clean(value)
+        # Explicitly check for the string '0', which is what as hidden field
+        # will submit for False.
+        if value == '0':
+            return False
         return bool(value)
 
 class NullBooleanField(BooleanField):
