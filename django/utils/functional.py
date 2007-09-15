@@ -1,3 +1,5 @@
+import copy
+
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
         return _curried_func(*(args+moreargs), **dict(kwargs, **morekwargs))
@@ -100,6 +102,11 @@ def lazy(func, *resultclasses):
                 return unicode(self) % rhs
             else:
                 raise AssertionError('__mod__ not supported for non-string types')
+
+        def __deepcopy__(self, memo):
+            result = copy.copy(self)
+            memo[id(self)] = result
+            return result
 
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
