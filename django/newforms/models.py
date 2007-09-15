@@ -36,7 +36,7 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
             continue
         if fields and f.name not in fields:
             continue
-        f.save_form_data(instance, cleaned_data[f.name])        
+        f.save_form_data(instance, cleaned_data[f.name])
     # Wrap up the saving of m2m data as a function
     def save_m2m():
         opts = instance.__class__._meta
@@ -51,7 +51,7 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
         instance.save()
         save_m2m()
     else:
-        # We're not committing. Add a method to the form to allow deferred 
+        # We're not committing. Add a method to the form to allow deferred
         # saving of m2m data
         form.save_m2m = save_m2m
     return instance
@@ -61,7 +61,7 @@ def make_model_save(model, fields, fail_message):
     def save(self, commit=True):
         return save_instance(self, model(), fields, fail_message, commit)
     return save
-    
+
 def make_instance_save(instance, fields, fail_message):
     "Returns the save() method for a Form."
     def save(self, commit=True):
@@ -89,7 +89,7 @@ def form_for_model(model, form=BaseForm, fields=None, formfield_callback=lambda 
         if formfield:
             field_list.append((f.name, formfield))
     base_fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (form,), 
+    return type(opts.object_name + 'Form', (form,),
         {'base_fields': base_fields, '_model': model, 'save': make_model_save(model, fields, 'created')})
 
 def form_for_instance(instance, form=BaseForm, fields=None, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
@@ -211,9 +211,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
 
 def initial_data(instance, fields=None):
     """
-    Return a dictionary from data in ``instance`` that is suitable for 
+    Return a dictionary from data in ``instance`` that is suitable for
     use as a ``Form`` constructor's ``initial`` argument.
-    
+
     Provide ``fields`` to specify the names of specific fields to return.
     All field values in the instance will be returned if ``fields`` is not
     provided.
@@ -234,7 +234,7 @@ class BaseModelFormSet(BaseFormSet):
     A ``FormSet`` attatched to a particular model or sequence of model instances.
     """
     model = None
-    
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, instances=None):
         self.instances = instances
         kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
@@ -308,7 +308,7 @@ class InlineFormset(BaseModelFormSet):
 def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orderable=False, deletable=True, formfield_callback=lambda f: f.formfield()):
     """
     Returns an ``InlineFormset`` for the given kwargs.
-    
+
     You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
     to ``parent_model``.
     """
@@ -323,10 +323,18 @@ def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orde
             raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
         else:
             raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+    else:
+        fks_to_parent = [f for f in opts.fields if f.name == fk_name]
+        if len(fks_to_parent) == 1:
+            fk = fks_to_parent[0]
+            if not isinstance(fk, ForeignKey) or fk.rel.to != parent_model:
+                raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
+        elif len(fks_to_parent) == 0:
+            raise Exception("%s has no field named '%s'" % (model, fk_name))
     # let the formset handle object deletion by default
-    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields, 
-                                formfield_callback=formfield_callback, 
-                                extra=extra, orderable=orderable, 
+    FormSet = formset_for_model(model, formset=InlineFormset, fields=fields,
+                                formfield_callback=formfield_callback,
+                                extra=extra, orderable=orderable,
                                 deletable=deletable)
     # HACK: remove the ForeignKey to the parent from every form
     # This should be done a line above before we pass 'fields' to formset_for_model
