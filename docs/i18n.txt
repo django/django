@@ -752,7 +752,7 @@ The main solution to these problems is the ``javascript_catalog`` view, which
 sends out a JavaScript code library with functions that mimic the ``gettext``
 interface, plus an array of translation strings. Those translation strings are
 taken from the application, project or Django core, according to what you
-specify in either the {{{info_dict}}} or the URL.
+specify in either the info_dict or the URL.
 
 You hook it up like this::
 
@@ -817,8 +817,8 @@ pluralizations).
 Creating JavaScript translation catalogs
 ----------------------------------------
 
-You create and update the translation catalogs the same way as the other Django
-translation catalogs -- with the {{{make-messages.py}}} tool. The only
+You create and update the translation catalogs the same way as the other
+Django translation catalogs -- with the make-messages.py tool. The only
 difference is you need to provide a ``-d djangojs`` parameter, like this::
 
     make-messages.py -d djangojs -l de
