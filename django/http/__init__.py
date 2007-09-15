@@ -44,6 +44,20 @@ class HttpRequest(object):
 
     __contains__ = has_key
 
+    def get_host(self):
+        "Returns the HTTP host using the environment or request headers."
+        # We try three options, in order of decreasing preference.
+        host = self.META.get('HTTP_X_FORWARDED_HOST', '')
+        if 'HTTP_HOST' in self.META:
+            host = self.META['HTTP_HOST']
+        else:
+            # Reconstruct the host using the algorithm from PEP 333.
+            host = self.META['SERVER_NAME']
+            server_port = self.META['SERVER_PORT']
+            if server_port != (self.is_secure() and 443 or 80):
+                host = '%s:%s' % (host, server_port)
+        return host
+
     def get_full_path(self):
         return ''
 
@@ -57,7 +71,7 @@ class HttpRequest(object):
             location = self.get_full_path()
         if not ':' in location:
             current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
-                                         get_host(self), self.path)
+                                         self.get_host(), self.path)
             location = urljoin(current_uri, location)
         return location
 
@@ -381,19 +395,9 @@ class HttpResponseServerError(HttpResponse):
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
 
+# A backwards compatible alias for HttpRequest.get_host.
 def get_host(request):
-    "Gets the HTTP host from the environment or request headers."
-    # We try three options, in order of decreasing preference.
-    host = request.META.get('HTTP_X_FORWARDED_HOST', '')
-    if 'HTTP_HOST' in request.META:
-        host = request.META['HTTP_HOST']
-    else:
-        # Reconstruct the host using the algorithm from PEP 333.
-        host = request.META['SERVER_NAME']
-        server_port = request.META['SERVER_PORT']
-        if server_port != (request.is_secure() and 443 or 80):
-            host = '%s:%s' % (host, server_port)
-    return host
+    return request.get_host()
 
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.smart_unicode for parsing URLs and form inputs. Thus,

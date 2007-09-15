@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.http import get_host
 
 SITE_CACHE = {}
 
@@ -54,7 +53,7 @@ class RequestSite(object):
     The save() and delete() methods raise NotImplementedError.
     """
     def __init__(self, request):
-        self.domain = self.name = get_host(request)
+        self.domain = self.name = request.get_host()
 
     def __unicode__(self):
         return self.domain
