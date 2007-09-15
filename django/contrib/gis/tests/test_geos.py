@@ -31,14 +31,48 @@ class GEOSTest(unittest.TestCase):
 
     def test01d_errors(self):
         "Testing the Error handlers."
+        # string-based
         print "\nBEGIN - expecting GEOS_ERROR; safe to ignore.\n"
         for err in errors:
-            if err.hex:
-                self.assertRaises(GEOSException, fromstr, err.wkt)
-            else:
-                self.assertRaises(GEOSException, fromstr, err.wkt)
+            self.assertRaises(GEOSException, fromstr, err.wkt)
         print "\nEND - expecting GEOS_ERROR; safe to ignore.\n"
+        
+        class NotAGeometry(object):
+            pass
+        
+        # Some other object
+        self.assertRaises(TypeError, GEOSGeometry, NotAGeometry())
+        # None
+        self.assertRaises(TypeError, GEOSGeometry, None)
+        # Bad WKB
+        self.assertRaises(GEOSException, GEOSGeometry, buffer('0'))
                 
+    def test01e_wkb(self):
+        "Testing WKB output."
+        from binascii import b2a_hex
+        for g in hex_wkt:
+            geom = fromstr(g.wkt)
+            wkb = geom.wkb
+            self.assertEqual(b2a_hex(wkb).upper(), g.hex)
+
+    def test01f_create_hex(self):
+        "Testing creation from HEX."
+        for g in hex_wkt:
+            geom_h = GEOSGeometry(g.hex)
+            # we need to do this so decimal places get normalised
+            geom_t = fromstr(g.wkt)
+            self.assertEqual(geom_t.wkt, geom_h.wkt)
+
+    def test01g_create_wkb(self):
+        "Testing creation from WKB."
+        from binascii import a2b_hex
+        for g in hex_wkt:
+            wkb = buffer(a2b_hex(g.hex))
+            geom_h = GEOSGeometry(wkb)
+            # we need to do this so decimal places get normalised
+            geom_t = fromstr(g.wkt)
+            self.assertEqual(geom_t.wkt, geom_h.wkt)
+    
     def test02a_points(self):
         "Testing Point objects."
         prev = fromstr('POINT(0 0)')

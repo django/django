@@ -52,8 +52,12 @@ lgeos = CDLL(lib_name)
 #  Supposed to mimic the GEOS message handler (C below):
 #  "typedef void (*GEOSMessageHandler)(const char *fmt, ...);"
 NOTICEFUNC = CFUNCTYPE(None, c_char_p, c_char_p)
-def notice_h(fmt, list, output_h=sys.stdout):
-    output_h.write('GEOS_NOTICE: %s\n' % (fmt % list))
+def notice_h(fmt, lst, output_h=sys.stdout):
+    try:
+        warn_msg = fmt % lst
+    except:
+        warn_msg = fmt 
+    output_h.write('GEOS_NOTICE: %s\n' % warn_msg)
 notice_h = NOTICEFUNC(notice_h)
 
 ERRORFUNC = CFUNCTYPE(None, c_char_p, c_char_p)

@@ -49,6 +49,7 @@ errors = (TestGeom('GEOMETR##!@#%#............a32515', bad=True, hex=False),
           TestGeom('POINT (5, 23)', bad=True, hex=False),
           TestGeom('AAABBBDDDAAD##@#1113511111-098111111111111111533333333333333', bad=True, hex=True),
           TestGeom('FFFFFFFFFFFFFFFFF1355555555555555555565111', bad=True, hex=True),
+          TestGeom('', bad=True, hex=False),
           )
 
 # Polygons

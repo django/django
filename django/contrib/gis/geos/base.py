@@ -6,7 +6,7 @@
 from ctypes import \
      byref, string_at, create_string_buffer, pointer, \
      c_char_p, c_double, c_int, c_size_t
-from types import StringType, UnicodeType, IntType, FloatType
+from types import StringType, UnicodeType, IntType, FloatType, BufferType
 
 # Python and GEOS-related dependencies.
 import re
@@ -30,9 +30,13 @@ class GEOSGeometry(object):
     #### Python 'magic' routines ####
     def __init__(self, geo_input, srid=None):
         """
-        The base constructor for GEOS geometry objects, and may take the following
-         string inputs: WKT and HEXEWKB (a PostGIS-specific canonical form).
-
+        The base constructor for GEOS geometry objects, and may take the 
+         following inputs:
+         
+         * string: WKT
+         * string: HEXEWKB (a PostGIS-specific canonical form)
+         * buffer: WKB
+        
         The `srid` keyword is used to specify the Source Reference Identifier
          (SRID) number for this Geometry.  If not set, the SRID will be None.
         """
@@ -55,6 +59,11 @@ class GEOSGeometry(object):
             # When the input is either a memory address (an integer), or a 
             #  GEOSPointer object.
             g = geo_input
+        elif isinstance(geo_input, BufferType):
+            # When the input is a buffer (WKB).
+            wkb_input = str(geo_input)
+            sz = c_size_t(len(wkb_input))
+            g = lgeos.GEOSGeomFromWKB_buf(c_char_p(wkb_input), sz)
         else:
             # Invalid geometry type.
             raise TypeError, 'Improper geometry input type: %s' % str(type(geo_input))
@@ -412,6 +421,13 @@ class GEOSGeometry(object):
         sz = c_size_t()
         h = lgeos.GEOSGeomToHEX_buf(self._ptr(), byref(sz))
         return string_at(h, sz.value)
+
+    @property
+    def wkb(self):
+        "Returns the WKB of the Geometry as a buffer."
+        sz = c_size_t()
+        h = lgeos.GEOSGeomToWKB_buf(self._ptr(), byref(sz))
+        return buffer(string_at(h, sz.value))
 
     @property
     def kml(self):
