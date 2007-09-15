@@ -12,5 +12,58 @@ Django's admin interface.
 
     The admin site has been refactored significantly since Django 0.96. This
     document describes the newest version of the admin site, which allows for
-    much richer customization. If you've kept up with Django development, you
-    may have heard this described as "newforms-admin."
+    much richer customization. If you follow the development of Django itself,
+    you may have heard this described as "newforms-admin."
+
+Overview
+========
+
+There are four steps in activating the Django admin site:
+
+    1. Determine which of your application's models should be editable in the
+       admin interface.
+
+    2. For each of those models, optionally create a ``ModelAdmin`` class that
+       encapsulates the customized admin functionality and options for that
+       particular model.
+
+    3. Instantiate an ``AdminSite`` and tell it about each of your models and
+       ``ModelAdmin`` classes.
+
+    4. Hook the ``AdminSite`` instance into your URLconf.
+
+``ModelAdmin`` objects
+======================
+
+``AdminSite`` objects
+=====================
+
+Hooking ``AdminSite`` instances into your URLconf
+=================================================
+
+The last step in setting up the Django admin is to hook your ``AdminSite``
+instance into your URLconf. Do this by pointing a given URL at the
+``AdminSite.root`` method.
+
+In this example, we register the ``AdminSite`` instance
+``myproject.admin.admin_site`` at the URL ``/admin/`` ::
+
+    from django.conf.urls.defaults import *
+    from myproject.admin import admin_site
+
+    urlpatterns = patterns('',
+        ('^admin/(.*)', admin_site.root),
+    )
+
+In this example, we register the default ``AdminSite`` instance
+``django.contrib.admin.site`` at the URL ``/myadmin/`` ::
+
+    from django.conf.urls.defaults import *
+    from django.contrib import admin
+
+    urlpatterns = patterns('',
+        ('^myadmin/(.*)', admin.site.root),
+    )
+
+Note that the regular expression in the URLpattern *must* group everything in
+the URL that comes after the URL root -- hence the ``(.*)`` in these examples.
