@@ -111,3 +111,7 @@ class ManagerDescriptor(object):
         if instance != None:
             raise AttributeError, "Manager isn't accessible via %s instances" % type.__name__
         return self.manager
+
+class EmptyManager(Manager):
+    def get_query_set(self):
+        return self.get_empty_query_set()
