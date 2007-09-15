@@ -115,7 +115,7 @@ True
 >>> obj = f.save()
 >>> obj
 <Category: It's a test>
->>> Category.objects.all()
+>>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
 If you call save() with commit=False, then it will return an object that
@@ -129,10 +129,10 @@ True
 >>> obj = f.save(commit=False)
 >>> obj
 <Category: Third test>
->>> Category.objects.all()
+>>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 >>> obj.save()
->>> Category.objects.all()
+>>> Category.objects.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
 If you call save() with invalid data, you'll get a ValueError.
@@ -327,7 +327,7 @@ Create a new article, with categories, via the form.
 >>> new_art.id
 2
 >>> new_art = Article.objects.get(id=2)
->>> new_art.categories.all()
+>>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
 Create a new article, with no categories, via the form.
@@ -360,7 +360,7 @@ The m2m data won't be saved until save_m2m() is invoked on the form.
 
 # Save the m2m data on the form
 >>> f.save_m2m()
->>> new_art.categories.all()
+>>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
 Here, we define a custom Form. Because it happens to have the same fields as
