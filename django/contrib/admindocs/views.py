@@ -169,7 +169,7 @@ def model_detail(request, app_label, model_name):
             model = m
             break
     if model is None:
-        raise Http404, _("Model %r not found in app %r") % (model_name, app_label)
+        raise Http404, _("Model %(model_name)r not found in app %(app_label)r") % {'model_name': model_name, 'app_label': app_label}
 
     opts = model._meta
 
@@ -181,7 +181,7 @@ def model_detail(request, app_label, model_name):
         if isinstance(field, models.ForeignKey):
             data_type = related_object_name = field.rel.to.__name__
             app_label = field.rel.to._meta.app_label
-            verbose = utils.parse_rst((_("the related `%s.%s` object")  % (app_label, data_type)), 'model', _('model:') + data_type)
+            verbose = utils.parse_rst((_("the related `%(app_label)s.%(data_type)s` object")  % {'app_label': app_label, 'data_type': data_type}), 'model', _('model:') + data_type)
         else:
             data_type = get_readable_field_data_type(field)
             verbose = field.verbose_name
@@ -212,7 +212,7 @@ def model_detail(request, app_label, model_name):
 
     # Gather related objects
     for rel in opts.get_all_related_objects():
-        verbose = _("related `%s.%s` objects") % (rel.opts.app_label, rel.opts.object_name)
+        verbose = _("related `%(app_label)s.%(object_name)s` objects") % {'app_label': rel.opts.app_label, 'object_name': rel.opts.object_name}
         accessor = rel.get_accessor_name()
         fields.append({
             'name'      : "%s.all" % accessor,
