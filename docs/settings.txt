@@ -253,9 +253,14 @@ DATABASE_ENGINE
 
 Default: ``''`` (Empty string)
 
-The database backend to use. Either ``'postgresql_psycopg2'``,
-``'postgresql'``, ``'mysql'``,  ``'mysql_old'``, ``'sqlite3'``,
-``'oracle'``, or ``'ado_mssql'``.
+The database backend to use. The build-in database backends are
+``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
+``'sqlite3'``, ``'oracle'``, or ``'ado_mssql'``.
+
+You can also use a database backend that doesn't ship with Django by
+setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
+``mypackage.backends.whatever``). Writing a whole new database backend from
+scratch is left as an exercise to the reader.
 
 DATABASE_HOST
 -------------
@@ -728,6 +733,21 @@ Default: ``'root@localhost'``
 The e-mail address that error messages come from, such as those sent to
 ``ADMINS`` and ``MANAGERS``.
 
+SESSION_ENGINE
+--------------
+
+**New in Django development version**
+
+Default: ``django.contrib.sessions.backends.db``
+
+Controls where Django stores session data. Valid values are:
+
+    * ``'django.contrib.sessions.backends.db'``      
+    * ``'django.contrib.sessions.backends.file'``    
+    * ``'django.contrib.sessions.backends.cache'``
+    
+See the `session docs`_ for more details.
+
 SESSION_COOKIE_AGE
 ------------------
 
@@ -769,6 +789,17 @@ Default: ``False``
 
 Whether to expire the session when the user closes his or her browser.
 See the `session docs`_.
+
+SESSION_FILE_PATH
+-----------------
+
+**New in Django development version**
+
+Default: ``/tmp/``
+
+If you're using file-based session storage, this sets the directory in
+which Django will store session data. See the `session docs`_ for
+more details.
 
 SESSION_SAVE_EVERY_REQUEST
 --------------------------

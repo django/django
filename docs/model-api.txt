@@ -178,7 +178,8 @@ A date field. Has a few extra optional arguments:
     ======================  ===================================================
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar and a shortcut for "Today."
+calendar, and a shortcut for "Today."  The JavaScript calendar will always start
+the week on a Sunday.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~

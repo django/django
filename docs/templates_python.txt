@@ -555,6 +555,38 @@ template loaders that come with Django:
 Django uses the template loaders in order according to the ``TEMPLATE_LOADERS``
 setting. It uses each loader until a loader finds a match.
 
+The ``render_to_string()`` shortcut
+===================================
+
+To cut down on the repetitive nature of loading and rendering
+templates, Django provides a shortcut function which largely
+automates the process: ``render_to_string()`` in
+``django.template.loader``, which loads a template, renders it and
+returns the resulting string::
+
+    from django.template.loader import render_to_string
+    rendered = render_to_string('my_template.html', { 'foo': 'bar' })
+
+The ``render_to_string`` shortcut takes one required argument --
+``template_name``, which should be the name of the template to load
+and render -- and two optional arguments::
+
+    dictionary
+        A dictionary to be used as variables and values for the
+        template's context. This can also be passed as the second
+        positional argument.
+
+    context_instance
+        An instance of ``Context`` or a subclass (e.g., an instance of
+        ``RequestContext``) to use as the template's context. This can
+        also be passed as the third positional argument.
+
+See also the `render_to_response()`_ shortcut, which calls
+``render_to_string`` and feeds the result into an ``HttpResponse``
+suitable for returning directly from a view.
+
+.. _render_to_response(): ../shortcuts/#render-to-response
+
 Extending the template system
 =============================
 
