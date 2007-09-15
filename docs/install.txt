@@ -67,6 +67,16 @@ installed.
 
 * If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher.
 
+If you plan to use Django's ``manage.py syncdb`` command to
+automatically create database tables for your models, you'll need to
+ensure that Django has permission to create tables in the database
+you're using; if you plan to manually create the tables, you can
+simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and ``DELETE``
+permissions. Django does not issue ``ALTER TABLE`` statements, and so
+will not require permission to do so. If you will be using Django's
+`testing framework`_ with data fixtures, Django will need permission
+to create a temporary test database.
+
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
@@ -78,6 +88,7 @@ installed.
 .. _MySQL backend: ../databases/
 .. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 .. _Oracle: http://www.oracle.com/
+.. _testing framework: ../testing/
 
 Remove any old versions of Django
 =================================
