@@ -4,8 +4,6 @@ from cStringIO import StringIO
 from urlparse import urlparse
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.middleware import SessionWrapper
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
@@ -132,9 +130,10 @@ class Client:
     def _session(self):
         "Obtain the current session variables"
         if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
-                return SessionWrapper(cookie.value)
+                return engine.SessionClass(cookie.value)
         return {}
     session = property(_session)
 
@@ -247,24 +246,23 @@ class Client:
         """
         user = authenticate(**credentials)
         if user and user.is_active and 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            obj = Session.objects.get_new_session_object()
+            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
 
             # Create a fake request to store login details
             request = HttpRequest()
-            request.session = SessionWrapper(obj.session_key)
+            request.session = engine.SessionClass()
             login(request, user)
 
             # Set the cookie to represent the session
-            self.cookies[settings.SESSION_COOKIE_NAME] = obj.session_key
+            self.cookies[settings.SESSION_COOKIE_NAME] = request.session.session_key
             self.cookies[settings.SESSION_COOKIE_NAME]['max-age'] = None
             self.cookies[settings.SESSION_COOKIE_NAME]['path'] = '/'
             self.cookies[settings.SESSION_COOKIE_NAME]['domain'] = settings.SESSION_COOKIE_DOMAIN
             self.cookies[settings.SESSION_COOKIE_NAME]['secure'] = settings.SESSION_COOKIE_SECURE or None
             self.cookies[settings.SESSION_COOKIE_NAME]['expires'] = None
 
-            # Set the session values
-            Session.objects.save(obj.session_key, request.session._session,
-                datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
+            # Save the session values
+            request.session.save()   
 
             return True
         else:
