@@ -400,6 +400,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': "LIKE UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKE UPPER(%s) ESCAPE '\\'",
     }
+    oracle_version = None
 
     def _valid_connection(self):
         return self.connection is not None
@@ -414,6 +415,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
+            try:
+                self.oracle_version = int(self.connection.version.split('.')[0])
+            except ValueError:
+                pass
         cursor = FormatStylePlaceholderCursor(self.connection)
         # Default arraysize of 1 is highly sub-optimal.
         cursor.arraysize = 100

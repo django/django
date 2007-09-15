@@ -131,6 +131,8 @@ class WhereNode(tree.Node):
         elif lookup_type in ('regex', 'iregex'):
             # FIXME: Factor this out in to conn.ops
             if settings.DATABASE_ENGINE == 'oracle':
+                if connection.oracle_version and connection.oracle_version <= 9:
+                    raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
                 if lookup_type == 'regex':
                     match_option = 'c'
                 else:
