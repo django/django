@@ -1,4 +1,5 @@
 from django.core.management.base import AppCommand
+from django.utils.encoding import force_unicode
 from django.utils.text import capfirst
 
 MODULE_TEMPLATE = '''    {%% if perms.%(app)s.%(addperm)s or perms.%(app)s.%(changeperm)s %%}
@@ -24,7 +25,7 @@ class Command(AppCommand):
                 output.append(MODULE_TEMPLATE % {
                     'app': app_label,
                     'mod': model._meta.module_name,
-                    'name': capfirst(model._meta.verbose_name_plural),
+                    'name': force_unicode(capfirst(model._meta.verbose_name_plural)),
                     'addperm': model._meta.get_add_permission(),
                     'changeperm': model._meta.get_change_permission(),
                 })

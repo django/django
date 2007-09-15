@@ -250,6 +250,22 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    def test_view_with_login_and_custom_redirect(self):
+        "Request a page that is protected with @login_required(redirect_field_name='redirect_to')"
+        
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/test_client/login_protected_view_custom_redirect/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?redirect_to=/test_client/login_protected_view_custom_redirect/')
+
+        # Log in
+        login = self.client.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_view_custom_redirect/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
     def test_view_with_bad_login(self):
         "Request a page that is protected with @login, but use bad credentials"
 

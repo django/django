@@ -221,8 +221,10 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``max_length``; its ``max_length`` is automatically set to
-75.
+
+In Django 0.96, this doesn't accept ``max_length``; its ``max_length`` is
+automatically set to 75. In the Django development version, ``max_length`` is
+set to 75 by default, but you can specify it to override default behavior.
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -1223,6 +1225,13 @@ This is a list of lists of fields that must be unique when considered
 together. It's used in the Django admin and is enforced at the database
 level (i.e., the appropriate ``UNIQUE`` statements are included in the
 ``CREATE TABLE`` statement).
+
+**New in Django development version**
+
+For convenience, unique_together can be a single list when dealing
+with a single set of fields::
+
+	unique_together = ("driver", "restaurant")
 
 ``verbose_name``
 ----------------
