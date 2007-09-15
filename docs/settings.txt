@@ -257,10 +257,11 @@ The database backend to use. The build-in database backends are
 ``'postgresql_psycopg2'``, ``'postgresql'``, ``'mysql'``, ``'mysql_old'``,
 ``'sqlite3'``, ``'oracle'``, or ``'ado_mssql'``.
 
-You can also use a database backend that doesn't ship with Django by
-setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
+In the Django development version, you can use a database backend that doesn't
+ship with Django by setting ``DATABASE_ENGINE`` to a fully-qualified path (i.e.
 ``mypackage.backends.whatever``). Writing a whole new database backend from
-scratch is left as an exercise to the reader.
+scratch is left as an exercise to the reader; see the other backends for
+examples.
 
 DATABASE_HOST
 -------------
