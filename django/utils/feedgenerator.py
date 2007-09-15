@@ -27,7 +27,10 @@ def rfc2822_date(date):
     return email.Utils.formatdate(time.mktime(date.timetuple()))
 
 def rfc3339_date(date):
-    return date.strftime('%Y-%m-%dT%H:%M:%SZ')
+    if date.tzinfo:
+        return date.strftime('%Y-%m-%dT%H:%M:%S%z')
+    else:
+        return date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 def get_tag_uri(url, date):
     "Creates a TagURI. See http://diveintomark.org/archives/2004/05/28/howto-atom-id"

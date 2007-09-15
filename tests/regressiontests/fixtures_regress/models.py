@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class Animal(models.Model):
     name = models.CharField(max_length=150)
@@ -20,7 +21,12 @@ class Stuff(models.Model):
     owner = models.ForeignKey(User, null=True)
     
     def __unicode__(self):
-        return unicode(self.name) + u' is owned by ' + unicode(self.owner)
+        # Oracle doesn't distinguish between None and the empty string.
+        # This hack makes the test case pass using Oracle.
+        name = self.name
+        if settings.DATABASE_ENGINE == 'oracle' and name == u'':
+            name = None
+        return unicode(name) + u' is owned by ' + unicode(self.owner)
 
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
