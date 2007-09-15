@@ -641,15 +641,15 @@ Activate this view by adding the following line to your URLconf::
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
-The view expects to be called via the ``GET`` method, with a ``language``
-parameter set in the query string. If session support is enabled, the view
+The view expects to be called via the ``POST`` method, with a ``language``
+parameter set in request. If session support is enabled, the view
 saves the language choice in the user's session. Otherwise, it saves the
 language choice in a ``django_language`` cookie.
 
 After setting the language choice, Django redirects the user, following this
 algorithm:
 
-    * Django looks for a ``next`` parameter in the query string.
+    * Django looks for a ``next`` parameter in ``POST`` request.
     * If that doesn't exist, or is empty, Django tries the URL in the
       ``Referer`` header.
     * If that's empty -- say, if a user's browser suppresses that header --
@@ -657,7 +657,7 @@ algorithm:
 
 Here's example HTML template code::
 
-    <form action="/i18n/setlang/" method="get">
+    <form action="/i18n/setlang/" method="post">
     <input name="next" type="hidden" value="/next/page/" />
     <select name="language">
     {% for lang in LANGUAGES %}
