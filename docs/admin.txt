@@ -2,3 +2,15 @@
 The Django admin site
 =====================
 
+One of the most powerful parts of Django is the automatic admin interface. It
+reads metadata in your model to provide a powerful and production-ready
+interface that content producers can immediately use to start adding content to
+the site. In this document, we discuss how to activate, use and customize
+Django's admin interface.
+
+.. admonition:: Note
+
+    The admin site has been refactored significantly since Django 0.96. This
+    document describes the newest version of the admin site, which allows for
+    much richer customization. If you've kept up with Django development, you
+    may have heard this described as "newforms-admin."
