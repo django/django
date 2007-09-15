@@ -366,7 +366,7 @@ class ModelAdmin(BaseModelAdmin):
                 formset.save()
 
         pk_value = new_object._get_pk_val()
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), ADDITION)
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), ADDITION)
         msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': opts.verbose_name, 'obj': new_object}
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
@@ -425,7 +425,7 @@ class ModelAdmin(BaseModelAdmin):
         #change_message = ' '.join(change_message)
         if not change_message:
             change_message = _('No fields changed.')
-        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, str(new_object), CHANGE, change_message)
+        LogEntry.objects.log_action(request.user.id, ContentType.objects.get_for_model(model).id, pk_value, force_unicode(new_object), CHANGE, change_message)
 
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % {'name': opts.verbose_name, 'obj': new_object}
         if request.POST.has_key("_continue"):
