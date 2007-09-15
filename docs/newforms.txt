@@ -1887,7 +1887,7 @@ field on the model, you could define the callback::
     ...     else:
     ...         return field.formfield(**kwargs)
 
-    >>> ArticleForm = form_for_model(formfield_callback=my_callback)
+    >>> ArticleForm = form_for_model(Article, formfield_callback=my_callback)
 
 Note that your callback needs to handle *all* possible model field types, not
 just the ones that you want to behave differently to the default. That's why

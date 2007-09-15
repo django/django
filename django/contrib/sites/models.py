@@ -38,6 +38,9 @@ class RequestSite(object):
     def __init__(self, request):
         self.domain = self.name = request.META['SERVER_NAME']
 
+    def __unicode__(self):
+        return self.domain
+
     def save(self):
         raise NotImplementedError('RequestSite cannot be saved.')
 
