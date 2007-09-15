@@ -241,10 +241,12 @@ class Model(object):
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
                 field_names.append(qn('_order'))
-                # TODO: This assumes the database supports subqueries.
-                placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                    (qn(self._meta.db_table), qn(self._meta.order_with_respect_to.column)))
-                db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
+                placeholders.append('%s')
+                subsel = 'SELECT COUNT(*) FROM %s WHERE %s = %%s' % (
+                    qn(self._meta.db_table),
+                    qn(self._meta.order_with_respect_to.column))
+                cursor.execute(subsel, (getattr(self, self._meta.order_with_respect_to.attname),))
+                db_values.append(cursor.fetchone()[0])
             if db_values:
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
                     (qn(self._meta.db_table), ','.join(field_names),

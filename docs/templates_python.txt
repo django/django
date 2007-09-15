@@ -642,18 +642,22 @@ your function. Example::
         "Converts a string into all lowercase"
         return value.lower()
 
-Template filters which expect strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Template filters that expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you're writing a template filter which only expects a string as the first
-argument, you should use the included decorator ``stringfilter``. This will
-convert an object to it's string value before being passed to your function::
+If you're writing a template filter that only expects a string as the first
+argument, you should use the decorator ``stringfilter``. This will
+convert an object to its string value before being passed to your function::
 
     from django.template.defaultfilters import stringfilter
 
     @stringfilter
     def lower(value):
         return value.lower()
+
+This way, you'll be able to pass, say, an integer to this filter, and it
+won't cause an ``AttributeError`` (because integers don't have ``lower()``
+methods).
 
 Registering a custom filters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

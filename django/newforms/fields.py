@@ -2,6 +2,7 @@
 Field classes
 """
 
+import copy
 import datetime
 import re
 import time
@@ -99,6 +100,12 @@ class Field(object):
         Field.
         """
         return {}
+
+    def __deepcopy__(self, memo):
+        result = copy.copy(self)
+        memo[id(self)] = result
+        result.widget = copy.deepcopy(self.widget, memo)
+        return result
 
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -386,10 +393,15 @@ class ImageField(FileField):
         from PIL import Image
         from cStringIO import StringIO
         try:
-            Image.open(StringIO(f.content))
-        except (IOError, OverflowError): # Python Imaging Library doesn't recognize it as an image
-            # OverflowError is due to a bug in PIL with Python 2.4+ which can cause 
-            # it to gag on OLE files. 
+            # load() is the only method that can spot a truncated JPEG,
+            #  but it cannot be called sanely after verify()
+            trial_image = Image.open(StringIO(f.content))
+            trial_image.load()
+            # verify() is the only method that can spot a corrupt PNG,
+            #  but it must be called immediately after the constructor
+            trial_image = Image.open(StringIO(f.content))
+            trial_image.verify()
+        except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
         return f
 
@@ -409,6 +421,9 @@ class URLField(RegexField):
         self.user_agent = validator_user_agent
 
     def clean(self, value):
+        # If no URL scheme given, assume http://
+        if value and '://' not in value:
+            value = u'http://%s' % value
         value = super(URLField, self).clean(value)
         if value == u'':
             return value

@@ -1623,10 +1623,6 @@ u'http://200.8.9.10:8000/test'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
->>> f.clean('example.com')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid URL.']
 >>> f.clean('http://')
 Traceback (most recent call last):
 ...
@@ -1654,10 +1650,6 @@ u'http://example.com'
 >>> f.clean('http://www.example.com')
 u'http://www.example.com'
 >>> f.clean('foo')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid URL.']
->>> f.clean('example.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
@@ -1713,6 +1705,15 @@ u'http://example.com'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at most 20 characters (it has 37).']
+
+URLField should prepend 'http://' if no scheme was given
+>>> f = URLField(required=False)
+>>> f.clean('example.com')
+u'http://example.com'
+>>> f.clean('')
+u''
+>>> f.clean('https://example.com')
+u'https://example.com'
 
 # BooleanField ################################################################
 
@@ -2690,16 +2691,24 @@ to the next.
 ...         super(Person, self).__init__(*args, **kwargs)
 ...         if names_required:
 ...             self.fields['first_name'].required = True
+...             self.fields['first_name'].widget.attrs['class'] = 'required'
 ...             self.fields['last_name'].required = True
+...             self.fields['last_name'].widget.attrs['class'] = 'required'
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> f = Person(names_required=True)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (True, True)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({'class': 'required'}, {'class': 'required'})
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> class Person(Form):
 ...     first_name = CharField(max_length=30)
 ...     last_name = CharField(max_length=30)

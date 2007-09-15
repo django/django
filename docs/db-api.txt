@@ -799,6 +799,9 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
+    The combined number of placeholders in the list of strings for ``select``
+    or ``where`` should equal the number of values in the ``params`` list.
+
 QuerySet methods that do not return QuerySets
 ---------------------------------------------
 

@@ -1431,4 +1431,4 @@ Read the document `The Django template language: For Python programmers`_ if
 you're interested in learning the template system from a technical
 perspective -- how it works and how to extend it.
 
-.. _The Django template language: For Python programmers: ../templates_python/
+.. _The Django template language\: For Python programmers: ../templates_python/

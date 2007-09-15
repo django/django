@@ -2,6 +2,7 @@ import os
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
+from urlparse import urljoin
 from django.utils.datastructures import MultiValueDict, FileDict
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
@@ -42,9 +43,23 @@ class HttpRequest(object):
         return key in self.GET or key in self.POST
 
     __contains__ = has_key
-        
+
     def get_full_path(self):
         return ''
+
+    def build_absolute_uri(self, location=None):
+        """
+        Builds an absolute URI from the location and the variables available in
+        this request. If no location is specified, the absolute URI is built on
+        ``request.get_full_path()``.
+        """
+        if not location:
+            location = self.get_full_path()
+        if not ':' in location:
+            current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
+                                         get_host(self), self.path)
+            location = urljoin(current_uri, location)
+        return location
 
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
@@ -364,9 +379,16 @@ class HttpResponseServerError(HttpResponse):
 
 def get_host(request):
     "Gets the HTTP host from the environment or request headers."
+    # We try three options, in order of decreasing preference.
     host = request.META.get('HTTP_X_FORWARDED_HOST', '')
-    if not host:
-        host = request.META.get('HTTP_HOST', '')
+    if 'HTTP_HOST' in request.META:
+        host = request.META['HTTP_HOST']
+    else:
+        # Reconstruct the host using the algorithm from PEP 333.
+        host = request.META['SERVER_NAME']
+        server_port = request.META['SERVER_PORT']
+        if server_port != (request.is_secure() and 443 or 80):
+            host = '%s:%s' % (host, server_port)
     return host
 
 # It's neither necessary nor appropriate to use

@@ -31,7 +31,7 @@ class SortedDictFromList(SortedDict):
         dict.__init__(self, dict(data))
 
     def copy(self):
-        return SortedDictFromList([(k, copy.copy(v)) for k, v in self.items()])
+        return SortedDictFromList([(k, copy.deepcopy(v)) for k, v in self.items()])
 
 class DeclarativeFieldsMetaclass(type):
     """
