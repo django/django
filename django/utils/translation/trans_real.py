@@ -491,6 +491,8 @@ def templatize(src):
                     elif g[0] == "'": g = g.strip("'")
                     out.write(' gettext(%r) ' % g)
                 elif bmatch:
+                    for fmatch in constant_re.findall(t.contents):
+                        out.write(' _(%s) ' % fmatch)
                     intrans = True
                     inplural = False
                     singular = []
