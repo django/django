@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 41. Serialization
 
@@ -43,6 +44,25 @@ class AuthorProfile(models.Model):
     
     def __unicode__(self):
         return u"Profile of %s" % self.author
+        
+class Actor(models.Model):
+    name = models.CharField(max_length=20, primary_key=True)
+
+    class Meta:
+        ordering = ('name',)
+    
+    def __unicode__(self):
+        return self.name
+    
+class Movie(models.Model):
+    actor = models.ForeignKey(Actor)
+    title = models.CharField(max_length=50)
+
+    class Meta:
+       ordering = ('title',)
+
+    def __unicode__(self):
+        return self.title
 
 __test__ = {'API_TESTS':"""
 # Create some data:
@@ -101,7 +121,7 @@ __test__ = {'API_TESTS':"""
 # Django also ships with a built-in JSON serializers
 >>> json = serializers.serialize("json", Category.objects.filter(pk=2))
 >>> json
-'[{"pk": "2", "model": "serializers.category", "fields": {"name": "Music"}}]'
+'[{"pk": 2, "model": "serializers.category", "fields": {"name": "Music"}}]'
 
 # You can easily create new objects by deserializing data with an empty PK
 # (It's easier to demo this with JSON...)
@@ -133,7 +153,7 @@ __test__ = {'API_TESTS':"""
 
 >>> json = serializers.serialize("json", AuthorProfile.objects.all())
 >>> json
-'[{"pk": "1", "model": "serializers.authorprofile", "fields": {"date_of_birth": "1970-01-01"}}]'
+'[{"pk": 1, "model": "serializers.authorprofile", "fields": {"date_of_birth": "1970-01-01"}}]'
 
 >>> for obj in serializers.deserialize("json", json):
 ...     print obj
@@ -141,7 +161,7 @@ __test__ = {'API_TESTS':"""
 
 # Objects ids can be referenced before they are defined in the serialization data
 # However, the deserialization process will need to be contained within a transaction
->>> json = '[{"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00", "categories": [4, 1], "author": 4}}, {"pk": "4", "model": "serializers.category", "fields": {"name": "Reference"}}, {"pk": "4", "model": "serializers.author", "fields": {"name": "Agnes"}}]'
+>>> json = '[{"pk": 3, "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00", "categories": [4, 1], "author": 4}}, {"pk": 4, "model": "serializers.category", "fields": {"name": "Reference"}}, {"pk": 4, "model": "serializers.author", "fields": {"name": "Agnes"}}]'
 >>> from django.db import transaction
 >>> transaction.enter_transaction_management()
 >>> transaction.managed(True)
@@ -161,6 +181,30 @@ __test__ = {'API_TESTS':"""
 
 # Serializer output can be restricted to a subset of fields
 >>> print serializers.serialize("json", Article.objects.all(), fields=('headline','pub_date'))
-[{"pk": "1", "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": "2", "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": "3", "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
+[{"pk": 1, "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 2, "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 3, "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
+
+# Every string is serialized as a unicode object, also primary key 
+# which is 'varchar'
+>>> ac = Actor(name="Zażółć")
+>>> mv = Movie(title="Gęślą jaźń", actor=ac)
+>>> ac.save(); mv.save()
+
+# Let's serialize our movie
+>>> print serializers.serialize("json", [mv])
+[{"pk": 1, "model": "serializers.movie", "fields": {"actor": "Za\u017c\u00f3\u0142\u0107", "title": "G\u0119\u015bl\u0105 ja\u017a\u0144"}}]
+
+# Deserialization of movie
+>>> list(serializers.deserialize('json', serializers.serialize('json', [mv])))[0].object.title
+u'G\u0119\u015bl\u0105 ja\u017a\u0144'
+
+# None is null after serialization to json
+# Primary key is None in case of not saved model
+>>> mv2 = Movie(title="Movie 2", actor=ac)
+>>> print serializers.serialize("json", [mv2])
+[{"pk": null, "model": "serializers.movie", "fields": {"actor": "Za\u017c\u00f3\u0142\u0107", "title": "Movie 2"}}]
+
+# Deserialization of null returns None for pk
+>>> print list(serializers.deserialize('json', serializers.serialize('json', [mv2])))[0].object.id
+None
 
 """}
