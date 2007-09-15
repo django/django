@@ -168,13 +168,17 @@ class BaseModelAdmin(object):
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
-                return db_field.formfield(**kwargs)
             else:
-                # Wrap the widget's render() method with a method that adds
-                # extra HTML to the end of the rendered output.
-                formfield = db_field.formfield(**kwargs)
+                if isinstance(db_field, models.ManyToManyField) and db_field.name in self.raw_id_fields:
+                    kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
+                    kwargs['help_text'] = ''
+            # Wrap the widget's render() method with a method that adds
+            # extra HTML to the end of the rendered output.
+            formfield = db_field.formfield(**kwargs)
+            # Don't wrap raw_id fields. Their add function is in the popup window.
+            if not db_field.name in self.raw_id_fields:
                 formfield.widget.render = widgets.RelatedFieldWidgetWrapper(formfield.widget.render, db_field.rel, self.admin_site)
-                return formfield
+            return formfield
 
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)

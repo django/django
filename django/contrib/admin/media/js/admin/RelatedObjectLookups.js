@@ -19,7 +19,7 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 function dismissRelatedLookupPopup(win, chosenId) {
     var name = win.name.replace(/___/g, '.');
     var elem = document.getElementById(name);
-    if (elem.className.indexOf('vRawIdAdminField') != -1 && elem.value) {
+    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
         elem.value += ',' + chosenId;
     } else {
         document.getElementById(name).value = chosenId;

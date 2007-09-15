@@ -3,6 +3,7 @@ Form Widget classes specific to the Django admin site.
 """
 
 from django import newforms as forms
+from django.utils.datastructures import MultiValueDict
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -75,7 +76,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             url = '?' + '&amp;'.join(['%s=%s' % (k, v) for k, v in self.rel.limit_choices_to.items()])
         else:
             url = ''
-        attrs['class'] = 'vRawIdAdminField' # The JavaScript looks for this hook.
+        if not attrs.has_key('class'):
+          attrs['class'] = 'vForeignKeyRawIdAdminField' # The JavaScript looks for this hook.
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)]
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
@@ -85,6 +87,27 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         return u''.join(output)
         #if self.change: # TODO
             #output.append('&nbsp;<strong>TODO</strong>')
+            
+class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
+    """
+    A Widget for displaying ManyToMany ids in the "raw_id" interface rather than
+    in a <select multiple> box.
+    """
+    def __init__(self, rel, attrs=None):
+        super(ManyToManyRawIdWidget, self).__init__(rel, attrs)
+    
+    def render(self, name, value, attrs=None):
+        attrs['class'] = 'vManyToManyRawIdAdminField'
+        if value: 
+            value = ','.join(value)
+        else: 
+            value = ""
+        return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
+
+    def value_from_datadict(self, data, files, name):
+        if isinstance(data, MultiValueDict):
+            return data[name].split(',')
+        return data.get(name, None)
 
 class RelatedFieldWidgetWrapper(object):
     """
