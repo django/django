@@ -170,15 +170,7 @@ class Model(object):
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
     def add_to_class(cls, name, value):
-        if name == 'Admin':
-            assert type(value) == types.ClassType, "%r attribute of %s model must be a class, not a %s object" % (name, cls.__name__, type(value))
-            from django.contrib.admin.options import ModelAdmin
-            # Dynamically create a new ModelAdmin class, which is a subclass
-            # of both ModelAdmin and the 'class Admin' on this model. The
-            # resulting class is same as if the 'class Admin' were a subclass
-            # of ModelAdmin.
-            cls._meta.admin = type('ModelAdmin', (value, ModelAdmin), {})
-        elif hasattr(value, 'contribute_to_class'):
+        if hasattr(value, 'contribute_to_class'):
             value.contribute_to_class(cls, name)
         else:
             setattr(cls, name, value)
