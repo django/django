@@ -50,7 +50,11 @@ def make_msgid(idstring=None):
     """
     timeval = time.time()
     utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
-    pid = os.getpid()
+    try:
+        pid = os.getpid()
+    except AttributeError:
+        # Not getpid() in Jython, for example.
+        pid = 1
     randint = random.randrange(100000)
     if idstring is None:
         idstring = ''
