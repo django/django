@@ -951,6 +951,23 @@ Example::
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
+``iterator()``
+~~~~~~~~~~~~
+
+Evaluates the ``QuerySet`` (by performing the query) and returns an
+`iterator`_ over the results. A ``QuerySet`` typically reads all of
+its results and instantiates all of the corresponding objects the
+first time you access it; ``iterator()`` will instead read results and
+instantiate objects in discrete chunks, yielding them one at a
+time. For a ``QuerySet`` which returns a large number of objects, this
+often results in better performance and a significant reduction in
+memory use.
+
+Note that using ``iterator()`` on a ``QuerySet`` which has already
+been evaluated will force it to evaluate again, repeating the query.
+
+.. _iterator: http://www.python.org/dev/peps/pep-0234/
+
 ``latest(field_name=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
