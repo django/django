@@ -133,7 +133,7 @@ class Client:
             engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
-                return engine.SessionClass(cookie.value)
+                return engine.SessionStore(cookie.value)
         return {}
     session = property(_session)
 
@@ -250,7 +250,7 @@ class Client:
 
             # Create a fake request to store login details
             request = HttpRequest()
-            request.session = engine.SessionClass()
+            request.session = engine.SessionStore()
             login(request, user)
 
             # Set the cookie to represent the session
@@ -273,9 +273,6 @@ class Client:
 
         Causes the authenticated user to be logged out.
         """
-        try:
-            Session.objects.get(session_key=self.cookies['sessionid'].value).delete()
-        except KeyError:
-            pass
-
+        session = __import__(settings.SESSION_ENGINE, {}, {}, ['']).SessionStore()
+        session.delete(session_key=self.cookies['sessionid'].value)
         self.cookies = SimpleCookie()
