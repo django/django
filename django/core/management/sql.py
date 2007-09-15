@@ -130,7 +130,7 @@ def sql_delete(app, style):
     else:
         table_names = []
     if connection.features.uses_case_insensitive_names:
-        table_name_converter = str.upper
+        table_name_converter = lambda x: x.upper()
     else:
         table_name_converter = lambda x: x
 

@@ -39,7 +39,7 @@ class Command(NoArgsCommand):
         cursor = connection.cursor()
 
         if connection.features.uses_case_insensitive_names:
-            table_name_converter = str.upper
+            table_name_converter = lambda x: x.upper()
         else:
             table_name_converter = lambda x: x
         # Get a list of all existing database tables, so we know what needs to
