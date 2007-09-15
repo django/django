@@ -554,6 +554,29 @@ method you're using::
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
+Customizing the error list format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, forms use ``django.newforms.util.ErrorList`` to format validation
+errors. If you'd like to use an alternate class for displaying errors, you can
+pass that in at construction time::
+
+    >>> from django.newforms.util import ErrorList
+    >>> class DivErrorList(ErrorList):
+    ...     def __unicode__(self):
+    ...         return self.as_divs()
+    ...     def as_divs(self):
+    ...         if not self: return u''
+    ...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+    >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
+    >>> f.as_p()
+    <div class="errorlist"><div class="error">This field is required.</div></div>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
 More granular output
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1892,6 +1915,17 @@ field on the model, you could define the callback::
 Note that your callback needs to handle *all* possible model field types, not
 just the ones that you want to behave differently to the default. That's why
 this example has an ``else`` clause that implements the default behavior.
+
+.. warning::
+    The field that is passed into the ``formfield_callback`` function in
+    ``form_for_model()`` and ``form_for_instance`` is the field instance from
+    your model's class. You **must not** alter that object at all; treat it
+    as read-only!
+
+    If you make any alterations to that object, it will affect any future
+    users of the model class, because you will have changed the field object
+    used to construct the class. This is almost certainly what you don't want
+    to have happen.
 
 Finding the model associated with a form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

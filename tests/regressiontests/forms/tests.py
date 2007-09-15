@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from localflavor import localflavor_tests
 from regressions import regression_tests
+from util import util_tests
 
 form_tests = r"""
 >>> from django.newforms import *
@@ -1606,10 +1607,18 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+>>> f.clean('http://localhost')
+u'http://localhost'
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://www.example.com')
 u'http://www.example.com'
+>>> f.clean('http://www.example.com:8000/test')
+u'http://www.example.com:8000/test'
+>>> f.clean('http://200.8.9.10')
+u'http://200.8.9.10'
+>>> f.clean('http://200.8.9.10:8000/test')
+u'http://200.8.9.10:8000/test'
 >>> f.clean('foo')
 Traceback (most recent call last):
 ...
@@ -3794,14 +3803,6 @@ u'1'
 >>> smart_unicode('foo')
 u'foo'
 
-# flatatt tests
->>> from django.newforms.util import flatatt
->>> flatatt({'id': "header"})
-u' id="header"'
->>> flatatt({'class': "news", 'title': "Read this"})
-u' class="news" title="Read this"'
->>> flatatt({})
-u''
 
 ####################################
 # Test accessing errors in clean() #
@@ -3821,12 +3822,38 @@ u''
 True
 >>> f.cleaned_data['username']
 u'sirrobin'
+
+#######################################
+# Test overriding ErrorList in a form #
+#######################################
+
+>>> from django.newforms.util import ErrorList
+>>> class DivErrorList(ErrorList):
+...     def __unicode__(self):
+...         return self.as_divs()
+...     def as_divs(self):
+...         if not self: return u''
+...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+>>> class CommentForm(Form):
+...     name = CharField(max_length=50, required=False)
+...     email = EmailField()
+...     comment = CharField()
+>>> data = dict(email='invalid')
+>>> f = CommentForm(data, auto_id=False, error_class=DivErrorList)
+>>> print f.as_p()
+<p>Name: <input type="text" name="name" maxlength="50" /></p>
+<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<p>Email: <input type="text" name="email" value="invalid" /></p>
+<div class="errorlist"><div class="error">This field is required.</div></div>
+<p>Comment: <input type="text" name="comment" /></p>
+
 """
 
 __test__ = {
     'form_tests': form_tests,
     'localflavor': localflavor_tests,
     'regressions': regression_tests,
+    'util_tests': util_tests,
 }
 
 if __name__ == "__main__":

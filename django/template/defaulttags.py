@@ -30,6 +30,7 @@ class CycleNode(Node):
     def render(self, context):
         self.counter += 1
         value = self.cyclevars[self.counter % self.cyclevars_len]
+        value = resolve_variable(value, context)
         if self.variable_name:
             context[self.variable_name] = value
         return value
@@ -403,7 +404,7 @@ def cycle(parser, token):
     the loop::
 
         {% for o in some_list %}
-            <tr class="{% cycle row1,row2 %}">
+            <tr class="{% cycle 'row1' 'row2' %}">
                 ...
             </tr>
         {% endfor %}
@@ -411,16 +412,17 @@ def cycle(parser, token):
     Outside of a loop, give the values a unique name the first time you call
     it, then use that name each sucessive time through::
 
-            <tr class="{% cycle row1,row2,row3 as rowcolors %}">...</tr>
+            <tr class="{% cycle 'row1' 'row2' 'row3' as rowcolors %}">...</tr>
             <tr class="{% cycle rowcolors %}">...</tr>
             <tr class="{% cycle rowcolors %}">...</tr>
 
-    You can use any number of values, seperated by commas. Make sure not to
-    put spaces between the values -- only commas.
+    You can use any number of values, seperated by spaces. Commas can also
+    be used to separate values; if a comma is used, the cycle values are 
+    interpreted as literal strings.
     """
 
     # Note: This returns the exact same node on each {% cycle name %} call; that
-    # is, the node object returned from {% cycle a,b,c as name %} and the one
+    # is, the node object returned from {% cycle a b c as name %} and the one
     # returned from {% cycle name %} are the exact same object.  This shouldn't
     # cause problems (heh), but if it does, now you know.
     #
@@ -429,40 +431,34 @@ def cycle(parser, token):
     # a global variable, which would make cycle names have to be unique across
     # *all* templates.
 
-    args = token.contents.split()
+    args = token.split_contents()
+
     if len(args) < 2:
-        raise TemplateSyntaxError("'Cycle' statement requires at least two arguments")
+        raise TemplateSyntaxError("'cycle' tag requires at least two arguments")
 
-    elif len(args) == 2 and "," in args[1]:
-        # {% cycle a,b,c %}
-        cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
-        return CycleNode(cyclevars)
-        # {% cycle name %}
+    if ',' in args[1]:
+        # Backwards compatibility: {% cycle a,b %} or {% cycle a,b as foo %}
+        # case.
+        args[1:2] = ['"%s"' % arg for arg in args[1].split(",")]
 
-    elif len(args) == 2:
+    if len(args) == 2:
+        # {% cycle foo %} case
         name = args[1]
         if not hasattr(parser, '_namedCycleNodes'):
             raise TemplateSyntaxError("No named cycles in template: '%s' is not defined" % name)
-        if name not in parser._namedCycleNodes:
+        if not name in parser._namedCycleNodes:
             raise TemplateSyntaxError("Named cycle '%s' does not exist" % name)
         return parser._namedCycleNodes[name]
 
-    elif len(args) == 4:
-        # {% cycle a,b,c as name %}
-        if args[2] != 'as':
-            raise TemplateSyntaxError("Second 'cycle' argument must be 'as'")
-        cyclevars = [v for v in args[1].split(",") if v]    # split and kill blanks
-        name = args[3]
-        node = CycleNode(cyclevars, name)
-
+    if len(args) > 4 and args[-2] == 'as':
+        name = args[-1]
+        node = CycleNode(args[1:-2], name)
         if not hasattr(parser, '_namedCycleNodes'):
             parser._namedCycleNodes = {}
-
         parser._namedCycleNodes[name] = node
-        return node
-
     else:
-        raise TemplateSyntaxError("Invalid arguments to 'cycle': %s" % args)
+        node = CycleNode(args[1:])
+    return node
 cycle = register.tag(cycle)
 
 def debug(parser, token):

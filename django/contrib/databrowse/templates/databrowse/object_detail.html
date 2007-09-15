@@ -10,7 +10,7 @@
 
 <table class="objectinfo">
 {% for field in object.fields %}
-<tr class="{% cycle odd,even %}">
+<tr class="{% cycle 'odd' 'even' %}">
 <th>{{ field.field.verbose_name|capfirst }}</th>
 <td>
 {% if field.urls %}
@@ -29,7 +29,7 @@
   {% if related_object.object_list %}
   <ul class="objectlist">
     {% for object in related_object.object_list %}
-    <li class="{% cycle odd,even %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
+    <li class="{% cycle 'odd' 'even' %}"><a href="{{ object.url }}">{{ object|escape }}</a></li>
     {% endfor %}
   </ul>
   {% else %}

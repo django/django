@@ -20,6 +20,7 @@ class ObjectPaginator(object):
         self.num_per_page = num_per_page
         self.orphans = orphans
         self._hits = self._pages = None
+        self._page_range = None
 
     def validate_page_number(self, page_number):
         try:
@@ -83,6 +84,16 @@ class ObjectPaginator(object):
                 hits = 0
             self._pages = hits // self.num_per_page + 1
         return self._pages
+    
+    def _get_page_range(self):
+        """
+        Returns a 1-based range of pages for iterating through within 
+        a template for loop.
+        """
+        if self._page_range is None:
+            self._page_range = range(1, self._pages + 1)
+        return self._page_range
 
     hits = property(_get_hits)
     pages = property(_get_pages)
+    page_range = property(_get_page_range)

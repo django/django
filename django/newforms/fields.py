@@ -335,12 +335,6 @@ class EmailField(RegexField):
         RegexField.__init__(self, email_re, max_length, min_length,
             ugettext(u'Enter a valid e-mail address.'), *args, **kwargs)
 
-url_re = re.compile(
-    r'^https?://' # http:// or https://
-    r'(?:[A-Z0-9-]+\.)+[A-Z]{2,6}' # domain
-    r'(?::\d+)?' # optional port
-    r'(?:/?|/\S+)$', re.IGNORECASE)
-
 try:
     from django.conf import settings
     URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
@@ -398,6 +392,14 @@ class ImageField(FileField):
             # it to gag on OLE files. 
             raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
         return f
+
+url_re = re.compile(
+    r'^https?://' # http:// or https://
+    r'(?:(?:[A-Z0-9-]+\.)+[A-Z]{2,6}|' #domain...
+    r'localhost|' #localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+    r'(?::\d+)?' # optional port
+    r'(?:/?|/\S+)$', re.IGNORECASE)
 
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
