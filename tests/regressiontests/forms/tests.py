@@ -3856,6 +3856,25 @@ u'sirrobin'
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" /></p>
 
+#################################
+# Test multipart-encoded form #
+#################################
+
+>>> class FormWithoutFile(Form):
+...     username = CharField()
+>>> class FormWithFile(Form):
+...     username = CharField()
+...     file = FileField()
+>>> class FormWithImage(Form):
+...     image = ImageField()
+
+>>> FormWithoutFile().is_multipart()
+False
+>>> FormWithFile().is_multipart()
+True
+>>> FormWithImage().is_multipart()
+True
+
 """
 
 __test__ = {
