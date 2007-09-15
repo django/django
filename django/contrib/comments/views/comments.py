@@ -155,7 +155,7 @@ class PublicFreeCommentManipulator(oldforms.Manipulator):
         c.save()
         return c
 
-def post_comment(request):
+def post_comment(request, extra_context=None, context_processors=None):
     """
     Post a comment
 
@@ -185,6 +185,7 @@ def post_comment(request):
         rating_choices
             choice of ratings
     """
+    if extra_context is None: extra_context = {}
     if not request.POST:
         raise Http404, _("Only POSTs are allowed")
     try:
@@ -244,7 +245,7 @@ def post_comment(request):
             'ratings_required': RATINGS_REQUIRED in option_list,
             'rating_range': rating_range,
             'rating_choices': rating_choices,
-        }, context_instance=RequestContext(request))
+        }, context_instance=RequestContext(request, extra_context, context_processors))
     elif 'post' in request.POST:
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -257,7 +258,7 @@ def post_comment(request):
     else:
         raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
-def post_free_comment(request):
+def post_free_comment(request, extra_context=None, context_processors=None):
     """
     Post a free comment (not requiring a log in)
 
@@ -277,6 +278,7 @@ def post_free_comment(request):
             security hash (must be included in a posted form to succesfully
             post a comment).
     """
+    if extra_context is None: extra_context = {}
     if not request.POST:
         raise Http404, _("Only POSTs are allowed")
     try:
@@ -307,7 +309,7 @@ def post_free_comment(request):
             'options': options,
             'target': target,
             'hash': security_hash,
-        }, context_instance=RequestContext(request))
+        }, context_instance=RequestContext(request, extra_context, context_processors))
     elif 'post' in request.POST:
         # If the IP is banned, mail the admins, do NOT save the comment, and
         # serve up the "Thanks for posting" page as if the comment WAS posted.
@@ -321,7 +323,7 @@ def post_free_comment(request):
     else:
         raise Http404, _("The comment form didn't provide either 'preview' or 'post'")
 
-def comment_was_posted(request):
+def comment_was_posted(request, extra_context=None, context_processors=None):
     """
     Display "comment was posted" success page
 
@@ -330,6 +332,7 @@ def comment_was_posted(request):
         object
             The object the comment was posted on
     """
+    if extra_context is None: extra_context = {}
     obj = None
     if 'c' in request.GET:
         content_type_id, object_id = request.GET['c'].split(':')
@@ -338,4 +341,5 @@ def comment_was_posted(request):
             obj = content_type.get_object_for_this_type(pk=object_id)
         except ObjectDoesNotExist:
             pass
-    return render_to_response('comments/posted.html', {'object': obj}, context_instance=RequestContext(request))
+    return render_to_response('comments/posted.html', {'object': obj},
+        context_instance=RequestContext(request, extra_context, context_processors))

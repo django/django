@@ -3,9 +3,9 @@ Interfaces for serializing Django objects.
 
 Usage::
 
-    >>> from django.core import serializers
-    >>> json = serializers.serialize("json", some_query_set)
-    >>> objects = list(serializers.deserialize("json", json))
+    from django.core import serializers
+    json = serializers.serialize("json", some_query_set)
+    objects = list(serializers.deserialize("json", json))
 
 To add your own serializers, use the SERIALIZATION_MODULES setting::
 

@@ -56,7 +56,7 @@ class BaseDatabaseOperations(object):
     a backend performs ordering or calculates the ID of a recently-inserted
     row.
     """
-    def autoinc_sql(self, table):
+    def autoinc_sql(self, table, column):
         """
         Returns any SQL needed to support auto-incrementing primary keys, or
         None if no SQL is necessary.

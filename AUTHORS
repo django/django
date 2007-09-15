@@ -76,6 +76,7 @@ answer newbie questions, and generally made Django that much better:
     Chris Chamberlin <dja@cdc.msbx.net>
     Amit Chakradeo <http://amit.chakradeo.net/>
     ChaosKCW
+    Sengtha Chay <sengtha@e-khmer.com>
     ivan.chelubeev@gmail.com
     Bryan Chow <bryan at verdjn dot com>
     Michal Chruszcz <troll@pld-linux.org>
@@ -113,6 +114,7 @@ answer newbie questions, and generally made Django that much better:
     Ludvig Ericson <ludvig.ericson@gmail.com>
     Dirk Eschler <dirk.eschler@gmx.net>
     Marc Fargas <telenieko@telenieko.com>
+    Szilveszter Farkas <szilveszter.farkas@gmail.com>
     favo@exoweb.net
     Bill Fenner <fenner@gmail.com>
     Stefane Fermgier <sf@fermigier.com>
@@ -123,8 +125,10 @@ answer newbie questions, and generally made Django that much better:
     gandalf@owca.info
     Marc Garcia <marc.garcia@accopensys.com>
     Baishampayan Ghose
+    Dimitris Glezos <dimitris@glezos.com>
     glin@seznam.cz
     martin.glueck@gmail.com
+    Artyom Gnilov <boobsd@gmail.com>
     GomoX <gomo@datafull.com>
     Mario Gonzalez <gonzalemario@gmail.com>
     pradeep.gowda@gmail.com
@@ -146,6 +150,7 @@ answer newbie questions, and generally made Django that much better:
     Sung-Jin Hong <serialx.net@gmail.com>
     Richard House <Richard.House@i-logue.com>
     Robert Rock Howard <http://djangomojo.com/>
+    Rob Hudson <http://rob.cogit8.org/>
     Jason Huggins <http://www.jrandolph.com/blog/>
     Hyun Mi Ae
     Tom Insam
@@ -158,6 +163,7 @@ answer newbie questions, and generally made Django that much better:
     jpellerin@gmail.com
     junzhang.jn@gmail.com
     Antti Kaihola <http://akaihola.blogspot.com/>
+    Nagy Károly <charlie@rendszergazda.com>
     Ben Dean Kawamura <ben.dean.kawamura@gmail.com>
     Ian G. Kelly <ian.g.kelly@gmail.com>
     Ben Khoo <khoobks@westnet.com.au>
@@ -179,6 +185,7 @@ answer newbie questions, and generally made Django that much better:
     lakin.wecker@gmail.com
     Nick Lane <nick.lane.au@gmail.com>
     Stuart Langridge <http://www.kryogenix.org/>
+    Paul Lanier <planier@google.com>
     Nicola Larosa <nico@teknico.net>
     Eugene Lazutkin <http://lazutkin.com/blog/>
     Jeong-Min Lee <falsetru@gmail.com>
@@ -194,6 +201,7 @@ answer newbie questions, and generally made Django that much better:
     Petr Marhoun <petr.marhoun@gmail.com>
     masonsimon+django@gmail.com
     Manuzhai
+    Petr Marhoun <petr.marhoun@gmail.com>
     Petar Marić <http://www.petarmaric.com/>
     Nuno Mariz <nmariz@gmail.com>
     Marijn Vriens <marijn@metronomo.cl>
@@ -232,6 +240,7 @@ answer newbie questions, and generally made Django that much better:
     phil@produxion.net
     phil.h.smith@gmail.com
     Gustavo Picon
+    pigletto
     Luke Plant <http://lukeplant.me.uk/>
     plisk
     Daniel Poelzleithner <http://poelzi.org/>
@@ -239,16 +248,20 @@ answer newbie questions, and generally made Django that much better:
     Matthias Pronk <django@masida.nl>
     Jyrki Pulliainen <jyrki.pulliainen@gmail.com>
     Johann Queuniet <johann.queuniet@adh.naellia.eu>
-    J. Rademaker
+    Jan Rademaker
     Michael Radziej <mir@noris.de>
+    Amit Ramon <amit.ramon@gmail.com>
+    Philippe Raoult <philippe.raoult@n2nsoft.com>
     Massimiliano Ravelli <massimiliano.ravelli@gmail.com>
     Brian Ray <http://brianray.chipy.org/>
     remco@diji.biz
     rhettg@gmail.com
+    Matt Riggott
     Henrique Romano <onaiort@gmail.com>
     Armin Ronacher
     Brian Rosner <brosner@gmail.com>
     Oliver Rutherfurd <http://rutherfurd.net/>
+    ryankanno
     Ivan Sagalaev (Maniac) <http://www.softwaremaniacs.org/>
     Vinay Sajip <vinay_sajip@yahoo.co.uk>
     David Schein
@@ -259,8 +272,11 @@ answer newbie questions, and generally made Django that much better:
     Jozko Skrablin <jozko.skrablin@gmail.com>
     SmileyChris <smileychris@gmail.com>
     smurf@smurf.noris.de
+    Vsevolod Solovyov
     sopel
+    Leo Soto <leo.soto@gmail.com>
     Wiliam Alves de Souza <wiliamsouza83@gmail.com>
+    Bjørn Stabell <bjorn@exoweb.net>
     Georgi Stanojevski <glisha@gmail.com>
     Vasiliy Stavenko <stavenko@gmail.com>
     Thomas Steinacher <http://www.eggdrop.ch/>
@@ -272,10 +288,13 @@ answer newbie questions, and generally made Django that much better:
     Swaroop C H <http://www.swaroopch.info>
     Aaron Swartz <http://www.aaronsw.com/>
     Ville Säävuori <http://www.unessa.net/>
+    Tyler Tarabula <tyler.tarabula@gmail.com>
     Tyson Tate <tyson@fallingbullets.com>
     Frank Tegtmeyer <fte@fte.to>
     thebjorn <bp@datakortet.no>
     Zach Thompson <zthompson47@gmail.com>
+    Michael Thornhill
+    Deepak Thukral <deep.thukral@gmail.com>
     tibimicu@gmax.net
     tobias@neuyork.de
     Tom Tobin
@@ -288,10 +307,12 @@ answer newbie questions, and generally made Django that much better:
     Amit Upadhyay
     Geert Vanderkelen
     viestards.lists@gmail.com
+    George Vilches <gav@thataddress.com>
     Vlado <vlado@labath.org>
     Milton Waddams
     wam-djangobug@wamber.net
     wangchun <yaohua2000@gmail.com>
+    Filip Wasilewski <filip.wasilewski@gmail.com>
     Dan Watson <http://theidioteque.net/>
     Chris Wesseling <Chris.Wesseling@cwi.nl>
     James Wheare <django@sparemint.com>

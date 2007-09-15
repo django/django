@@ -12,7 +12,7 @@ from django.db.models.loading import register_models, get_model
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
 from itertools import izip
 import types
@@ -210,7 +210,7 @@ class Model(object):
         pk_val = self._get_pk_val()
         # Note: the comparison with '' is required for compatibility with
         # oldforms-style model creation.
-        pk_set = pk_val is not None and pk_val != u''
+        pk_set = pk_val is not None and smart_unicode(pk_val) != u''
         record_exists = True
         if pk_set:
             # Determine whether a record with the primary key already exists.
@@ -238,10 +238,13 @@ class Model(object):
             placeholders = ['%s'] * len(field_names)
             if self._meta.order_with_respect_to:
                 field_names.append(qn('_order'))
-                # TODO: This assumes the database supports subqueries.
-                placeholders.append('(SELECT COUNT(*) FROM %s WHERE %s = %%s)' % \
-                    (qn(self._meta.db_table), qn(self._meta.order_with_respect_to.column)))
-                db_values.append(getattr(self, self._meta.order_with_respect_to.attname))
+                placeholders.append('%s')
+                subsel = 'SELECT COUNT(*) FROM %s WHERE %s = %%s' % (
+                    qn(self._meta.db_table),
+                    qn(self._meta.order_with_respect_to.column))
+                cursor.execute(subsel, (getattr(self, self._meta.order_with_respect_to.attname),))
+                db_values.append(cursor.fetchone()[0])
+            record_exists = False
             if db_values:
                 cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
                     (qn(self._meta.db_table), ','.join(field_names),
@@ -256,7 +259,8 @@ class Model(object):
         transaction.commit_unless_managed()
 
         # Run any post-save hooks.
-        dispatcher.send(signal=signals.post_save, sender=self.__class__, instance=self)
+        dispatcher.send(signal=signals.post_save, sender=self.__class__,
+                instance=self, created=(not record_exists))
 
     save.alters_data = True
 

@@ -181,8 +181,15 @@ def isValidImage(field_data, all_data):
     except TypeError:
         raise ValidationError, _("No file was submitted. Check the encoding type on the form.")
     try:
-        Image.open(StringIO(content))
-    except IOError: # Python Imaging Library doesn't recognize it as an image
+        # load() is the only method that can spot a truncated JPEG,
+        #  but it cannot be called sanely after verify()
+        trial_image = Image.open(StringIO(content))
+        trial_image.load()
+        # verify() is the only method that can spot a corrupt PNG,
+        #  but it must be called immediately after the constructor
+        trial_image = Image.open(StringIO(content))
+        trial_image.verify()
+    except Exception: # Python Imaging Library doesn't recognize it as an image
         raise ValidationError, _("Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
 
 def isValidImageURL(field_data, all_data):
@@ -398,12 +405,17 @@ class NumberIsInRange(object):
 
 class IsAPowerOf(object):
     """
-    >>> v = IsAPowerOf(2)
-    >>> v(4, None)
-    >>> v(8, None)
-    >>> v(16, None)
-    >>> v(17, None)
-    django.core.validators.ValidationError: ['This value must be a power of 2.']
+    Usage: If you create an instance of the IsPowerOf validator:
+        v = IsAPowerOf(2)
+    
+    The following calls will succeed:
+        v(4, None) 
+        v(8, None)
+        v(16, None)
+    
+    But this call:
+        v(17, None)
+    will raise "django.core.validators.ValidationError: ['This value must be a power of 2.']"
     """
     def __init__(self, power_of):
         self.power_of = power_of

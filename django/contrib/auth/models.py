@@ -1,6 +1,7 @@
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, models
+from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -14,25 +15,43 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
+def get_hexdigest(algorithm, salt, raw_password):
+    """
+    Returns a string of the hexdigest of the given plaintext password and salt
+    using the given algorithm ('md5', 'sha1' or 'crypt').
+    """
+    raw_password, salt = smart_str(raw_password), smart_str(salt)
+    if algorithm == 'crypt':
+        try:
+            import crypt
+        except ImportError:
+            raise ValueError('"crypt" password algorithm not supported in this environment')
+        return crypt.crypt(raw_password, salt)
+    # The rest of the supported algorithms are supported by hashlib, but
+    # hashlib is only available in Python 2.5.
+    try:
+        import hashlib
+    except ImportError:
+        if algorithm == 'md5':
+            import md5
+            return md5.new(salt + raw_password).hexdigest()
+        elif algorithm == 'sha1':
+            import sha
+            return sha.new(salt + raw_password).hexdigest()
+    else:
+        if algorithm == 'md5':
+            return hashlib.md5(salt + raw_password).hexdigest()
+        elif algorithm == 'sha1':
+            return hashlib.sha1(salt + raw_password).hexdigest()
+    raise ValueError("Got unknown password algorithm type in password.")
+
 def check_password(raw_password, enc_password):
     """
     Returns a boolean of whether the raw_password was correct. Handles
     encryption formats behind the scenes.
     """
     algo, salt, hsh = enc_password.split('$')
-    if algo == 'md5':
-        import md5
-        return hsh == md5.new(smart_str(salt + raw_password)).hexdigest()
-    elif algo == 'sha1':
-        import sha
-        return hsh == sha.new(smart_str(salt + raw_password)).hexdigest()
-    elif algo == 'crypt':
-        try:
-            import crypt
-        except ImportError:
-            raise ValueError, "Crypt password algorithm not supported in this environment."
-        return hsh == crypt.crypt(smart_str(raw_password), smart_str(salt))
-    raise ValueError, "Got unknown password algorithm type in password."
+    return hsh == get_hexdigest(algo, salt, raw_password)
 
 class SiteProfileNotAvailable(Exception):
     pass
@@ -146,10 +165,10 @@ class User(models.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        import sha, random
+        import random
         algo = 'sha1'
-        salt = sha.new(str(random.random())).hexdigest()[:5]
-        hsh = sha.new(salt + smart_str(raw_password)).hexdigest()
+        salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
+        hsh = get_hexdigest(algo, salt, raw_password)
         self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
@@ -160,8 +179,7 @@ class User(models.Model):
         # Backwards-compatibility check. Older passwords won't include the
         # algorithm or salt.
         if '$' not in self.password:
-            import md5
-            is_correct = (self.password == md5.new(smart_str(raw_password)).hexdigest())
+            is_correct = (self.password == get_hexdigest('md5', '', raw_password))
             if is_correct:
                 # Convert the password to the new, more secure format.
                 self.set_password(raw_password)
@@ -278,6 +296,11 @@ class Message(models.Model):
 class AnonymousUser(object):
     id = None
     username = ''
+    is_staff = False
+    is_active = True
+    is_superuser = False
+    _groups = EmptyManager()
+    _user_permissions = EmptyManager()
 
     def __init__(self):
         pass
@@ -310,11 +333,11 @@ class AnonymousUser(object):
         raise NotImplementedError
 
     def _get_groups(self):
-        raise NotImplementedError
+        return self._groups
     groups = property(_get_groups)
 
     def _get_user_permissions(self):
-        raise NotImplementedError
+        return self._user_permissions
     user_permissions = property(_get_user_permissions)
 
     def has_perm(self, perm):

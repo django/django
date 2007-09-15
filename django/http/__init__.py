@@ -2,6 +2,7 @@ import os
 from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
+from urlparse import urljoin
 from django.utils.datastructures import MultiValueDict, FileDict
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
 
@@ -41,8 +42,38 @@ class HttpRequest(object):
     def has_key(self, key):
         return key in self.GET or key in self.POST
 
+    __contains__ = has_key
+
+    def get_host(self):
+        "Returns the HTTP host using the environment or request headers."
+        # We try three options, in order of decreasing preference.
+        host = self.META.get('HTTP_X_FORWARDED_HOST', '')
+        if 'HTTP_HOST' in self.META:
+            host = self.META['HTTP_HOST']
+        else:
+            # Reconstruct the host using the algorithm from PEP 333.
+            host = self.META['SERVER_NAME']
+            server_port = self.META['SERVER_PORT']
+            if server_port != (self.is_secure() and 443 or 80):
+                host = '%s:%s' % (host, server_port)
+        return host
+
     def get_full_path(self):
         return ''
+
+    def build_absolute_uri(self, location=None):
+        """
+        Builds an absolute URI from the location and the variables available in
+        this request. If no location is specified, the absolute URI is built on
+        ``request.get_full_path()``.
+        """
+        if not location:
+            location = self.get_full_path()
+        if not ':' in location:
+            current_uri = '%s://%s%s' % (self.is_secure() and 'https' or 'http',
+                                         self.get_host(), self.path)
+            location = urljoin(current_uri, location)
+        return location
 
     def is_secure(self):
         return os.environ.get("HTTPS") == "on"
@@ -229,7 +260,7 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self.headers = {'Content-Type': content_type}
+        self._headers = {'content-type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
@@ -237,28 +268,32 @@ class HttpResponse(object):
     def __str__(self):
         "Full HTTP message, including headers"
         return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self.headers.items()]) \
+            for key, value in self._headers.items()]) \
             + '\n\n' + self.content
 
     def __setitem__(self, header, value):
-        self.headers[header] = value
+        self._headers[header.lower()] = value
 
     def __delitem__(self, header):
         try:
-            del self.headers[header]
+            del self._headers[header.lower()]
         except KeyError:
             pass
 
     def __getitem__(self, header):
-        return self.headers[header]
+        return self._headers[header.lower()]
 
     def has_header(self, header):
         "Case-insensitive check for a header"
-        header = header.lower()
-        for key in self.headers.keys():
-            if key.lower() == header:
-                return True
-        return False
+        return self._headers.has_key(header.lower())
+
+    __contains__ = has_header
+    
+    def items(self):
+        return self._headers.items()
+    
+    def get(self, header, alternate):
+        return self._headers.get(header, alternate)
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
@@ -287,7 +322,7 @@ class HttpResponse(object):
     content = property(_get_content, _set_content)
 
     def __iter__(self):
-        self._iterator = self._container.__iter__()
+        self._iterator = iter(self._container)
         return self
 
     def next(self):
@@ -360,12 +395,9 @@ class HttpResponseServerError(HttpResponse):
     def __init__(self, *args, **kwargs):
         HttpResponse.__init__(self, *args, **kwargs)
 
+# A backwards compatible alias for HttpRequest.get_host.
 def get_host(request):
-    "Gets the HTTP host from the environment or request headers."
-    host = request.META.get('HTTP_X_FORWARDED_HOST', '')
-    if not host:
-        host = request.META.get('HTTP_HOST', '')
-    return host
+    return request.get_host()
 
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.smart_unicode for parsing URLs and form inputs. Thus,

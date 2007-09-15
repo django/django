@@ -1,5 +1,6 @@
 import sys
 from django.core.management.color import color_style
+from django.utils.itercompat import is_iterable
 
 class ModelErrorCollection:
     def __init__(self, outfile=sys.stdout):
@@ -49,7 +50,7 @@ def get_validation_errors(outfile, app=None):
                 except ImportError:
                     e.add(opts, '"%s": To use ImageFields, you need to install the Python Imaging Library. Get it at http://www.pythonware.com/products/pil/ .' % f.name)
             if f.choices:
-                if not hasattr(f.choices, '__iter__'):
+                if isinstance(f.choices, basestring) or not is_iterable(f.choices):
                     e.add(opts, '"%s": "choices" should be iterable (e.g., a tuple or list).' % f.name)
                 else:
                     for c in f.choices:

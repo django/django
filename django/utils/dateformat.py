@@ -248,10 +248,15 @@ class DateFormat(TimeFormat):
         return doy
 
     def Z(self):
-        """Time zone offset in seconds (i.e. '-43200' to '43200'). The offset
-        for timezones west of UTC is always negative, and for those east of UTC
-        is always positive."""
-        return self.timezone.utcoffset(self.data).seconds
+        """
+        Time zone offset in seconds (i.e. '-43200' to '43200'). The offset for
+        timezones west of UTC is always negative, and for those east of UTC is
+        always positive.
+        """
+        offset = self.timezone.utcoffset(self.data)
+        # Only days can be negative, so negative offsets have days=-1 and
+        # seconds positive. Positive offsets have days=0
+        return offset.days * 86400 + offset.seconds
 
 def format(value, format_string):
     "Convenience function"

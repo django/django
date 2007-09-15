@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.conf import settings
 
-def flag(request, comment_id):
+def flag(request, comment_id, extra_context=None, context_processors=None):
     """
     Flags a comment. Confirmation on GET, action on POST.
 
@@ -15,18 +15,22 @@ def flag(request, comment_id):
         comment
             the flagged `comments.comments` object
     """
+    if extra_context is None: extra_context = {}
     comment = get_object_or_404(Comment,pk=comment_id, site__id__exact=settings.SITE_ID)
     if request.POST:
         UserFlag.objects.flag(comment, request.user)
         return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('comments/flag_verify.html', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/flag_verify.html', {'comment': comment},
+        context_instance=RequestContext(request, extra_context, context_processors))
 flag = login_required(flag)
 
-def flag_done(request, comment_id):
+def flag_done(request, comment_id, extra_context=None, context_processors=None):
+    if extra_context is None: extra_context = {}
     comment = get_object_or_404(Comment,pk=comment_id, site__id__exact=settings.SITE_ID)
-    return render_to_response('comments/flag_done.html', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/flag_done.html', {'comment': comment},
+        context_instance=RequestContext(request, extra_context, context_processors))
 
-def delete(request, comment_id):
+def delete(request, comment_id, extra_context=None, context_processors=None):
     """
     Deletes a comment. Confirmation on GET, action on POST.
 
@@ -35,6 +39,7 @@ def delete(request, comment_id):
         comment
             the flagged `comments.comments` object
     """
+    if extra_context is None: extra_context = {}
     comment = get_object_or_404(Comment,pk=comment_id, site__id__exact=settings.SITE_ID)
     if not Comment.objects.user_is_moderator(request.user):
         raise Http404
@@ -46,9 +51,12 @@ def delete(request, comment_id):
             m = ModeratorDeletion(None, request.user.id, comment.id, None)
             m.save()
         return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response('comments/delete_verify.html', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/delete_verify.html', {'comment': comment},
+        context_instance=RequestContext(request, extra_context, context_processors))
 delete = login_required(delete)
 
-def delete_done(request, comment_id):
+def delete_done(request, comment_id, extra_context=None, context_processors=None):
+    if extra_context is None: extra_context = {}
     comment = get_object_or_404(Comment,pk=comment_id, site__id__exact=settings.SITE_ID)
-    return render_to_response('comments/delete_done.html', {'comment': comment}, context_instance=RequestContext(request))
+    return render_to_response('comments/delete_done.html', {'comment': comment},
+        context_instance=RequestContext(request, extra_context, context_processors))

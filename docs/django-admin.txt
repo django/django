@@ -627,13 +627,33 @@ This is useful in a number of ways:
       in any way, knowing that whatever data changes you're making are only
       being made to a test database.
 
-Note that this server can only run on the default port on localhost; it does
-not yet accept a ``host`` or ``port`` parameter.
-
-Also note that it does *not* automatically detect changes to your Python source
-code (as ``runserver`` does). It does, however, detect changes to templates.
+Note that this server does *not* automatically detect changes to your Python
+source code (as ``runserver`` does). It does, however, detect changes to
+templates.
 
 .. _unit tests: ../testing/
+
+--addrport [port number or ipaddr:port]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use ``--addrport`` to specify a different port, or IP address and port, from
+the default of 127.0.0.1:8000. This value follows exactly the same format and
+serves exactly the same function as the argument to the ``runserver`` subcommand.
+
+Examples:
+
+To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
+
+    django-admin.py testserver --addrport 7000 fixture1 fixture2
+    django-admin.py testserver fixture1 fixture2 --addrport 8080
+
+(The above statements are equivalent. We include both of them to demonstrate
+that it doesn't matter whether the options come before or after the
+``testserver`` command.)
+
+To run on 1.2.3.4:7000 with a `test` fixture::
+
+    django-admin.py testserver --addrport 1.2.3.4:7000 test
 
 --verbosity
 ~~~~~~~~~~~

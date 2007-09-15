@@ -431,6 +431,7 @@ class AutoField(Field):
         assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
+        cls._meta.auto_field = self
 
     def formfield(self, **kwargs):
         return None
@@ -536,7 +537,12 @@ class DateField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            value = value.strftime('%Y-%m-%d')
+            try:
+                value = value.strftime('%Y-%m-%d')
+            except AttributeError:
+                # If value is already a string it won't have a strftime method,
+                # so we'll just let it pass through.
+                pass
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
@@ -678,7 +684,8 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 75
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 75
         CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
@@ -846,6 +853,7 @@ class ImageField(FileField):
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
+        defaults.update(kwargs)
         return super(ImageField, self).formfield(**defaults)
 
 class IntegerField(Field):
@@ -907,10 +915,20 @@ class PhoneNumberField(IntegerField):
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveIntegerField]
+    
+    def formfield(self, **kwargs):
+        defaults = {'min_value': 0}
+        defaults.update(kwargs)
+        return super(PositiveIntegerField, self).formfield(**defaults) 
 
 class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveSmallIntegerField]
+
+    def formfield(self, **kwargs):
+        defaults = {'min_value': 0}
+        defaults.update(kwargs)
+        return super(PositiveSmallIntegerField, self).formfield(**defaults) 
 
 class SlugField(CharField):
     def __init__(self, *args, **kwargs):

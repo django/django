@@ -101,6 +101,13 @@ def lazy(func, *resultclasses):
             else:
                 raise AssertionError('__mod__ not supported for non-string types')
 
+        def __deepcopy__(self, memo):
+            # Instances of this class are effectively immutable. It's just a
+            # collection of functions. So we don't need to do anything
+            # complicated for copying.
+            memo[id(self)] = self
+            return self
+
     def __wrapper__(*args, **kw):
         # Creates the proxy object, instead of the actual value.
         return __proxy__(args, kw)

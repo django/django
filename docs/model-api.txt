@@ -148,7 +148,7 @@ and in Django's validation.
 
 Django veterans: Note that the argument is now called ``max_length`` to
 provide consistency throughout Django. There is full legacy support for
-the old ``maxlength`` argument, but ``max_length`` is prefered.
+the old ``maxlength`` argument, but ``max_length`` is preferred.
 	
 ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -178,7 +178,8 @@ A date field. Has a few extra optional arguments:
     ======================  ===================================================
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar and a shortcut for "Today."
+calendar, and a shortcut for "Today."  The JavaScript calendar will always start
+the week on a Sunday.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -221,8 +222,10 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``max_length``; its ``max_length`` is automatically set to
-75.
+
+In Django 0.96, this doesn't accept ``max_length``; its ``max_length`` is
+automatically set to 75. In the Django development version, ``max_length`` is
+set to 75 by default, but you can specify it to override default behavior.
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -1224,6 +1227,13 @@ together. It's used in the Django admin and is enforced at the database
 level (i.e., the appropriate ``UNIQUE`` statements are included in the
 ``CREATE TABLE`` statement).
 
+**New in Django development version**
+
+For convenience, unique_together can be a single list when dealing
+with a single set of fields::
+
+	unique_together = ("driver", "restaurant")
+
 ``verbose_name``
 ----------------
 
@@ -1550,8 +1560,8 @@ Finally, note that in order to use ``list_display_links``, you must define
 
 Set ``list_filter`` to activate filters in the right sidebar of the change list
 page of the admin. This should be a list of field names, and each specified
-field should be either a ``BooleanField``, ``DateField``, ``DateTimeField``
-or ``ForeignKey``.
+field should be either a ``BooleanField``, ``CharField``, ``DateField``, 
+``DateTimeField``, ``IntegerField`` or ``ForeignKey``. 
 
 This example, taken from the ``django.contrib.auth.models.User`` model, shows
 how both ``list_display`` and ``list_filter`` work::

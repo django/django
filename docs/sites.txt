@@ -213,6 +213,31 @@ To do this, you can use the sites framework. A simple example::
     >>> 'http://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
     'http://example.com/mymodel/objects/3/'
 
+Caching the current ``Site`` object
+===================================
+
+**New in Django development version**
+
+As the current site is stored in the database, each call to
+``Site.objects.get_current()`` could result in a database query. But Django is a
+little cleverer than that: on the first request, the current site is cached, and
+any subsequent call returns the cached data instead of hitting the database.
+
+If for any reason you want to force a database query, you can tell Django to
+clear the cache using ``Site.objects.clear_cache()``::
+
+    # First call; current site fetched from database.
+    current_site = Site.objects.get_current()
+    # ...
+
+    # Second call; current site fetched from cache.
+    current_site = Site.objects.get_current()
+    # ...
+
+    # Force a database query for the third call.
+    Site.objects.clear_cache()
+    current_site = Site.objects.get_current()
+
 The ``CurrentSiteManager``
 ==========================
 
@@ -315,6 +340,9 @@ Here's how Django uses the sites framework:
 
     * The shortcut view (``django.views.defaults.shortcut``) uses the domain of
       the current ``Site`` object when calculating an object's URL.
+
+    * In the admin framework, the ''view on site'' link uses the current
+      ``Site`` to work out the domain for the site that it will redirect to.
 
 .. _redirects framework: ../redirects/
 .. _flatpages framework: ../flatpages/

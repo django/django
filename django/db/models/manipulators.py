@@ -9,7 +9,6 @@ from django.utils.datastructures import DotExpandedDict
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
-import types
 
 def add_manipulators(sender):
     cls = sender
@@ -38,7 +37,7 @@ class ManipulatorDescriptor(object):
                 bases = [self.base]
                 if hasattr(model, 'Manipulator'):
                     bases = [model.Manipulator] + bases
-                self.man = types.ClassType(self.name, tuple(bases), {})
+                self.man = type(self.name, tuple(bases), {})
                 self.man._prepare(model)
             return self.man
 

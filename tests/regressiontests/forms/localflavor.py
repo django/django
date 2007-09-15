@@ -980,6 +980,20 @@ u'41-3562-3464'
 >>> w.render('states', 'PR')
 u'<select name="states">\n<option value="AC">Acre</option>\n<option value="AL">Alagoas</option>\n<option value="AP">Amap\xe1</option>\n<option value="AM">Amazonas</option>\n<option value="BA">Bahia</option>\n<option value="CE">Cear\xe1</option>\n<option value="DF">Distrito Federal</option>\n<option value="ES">Esp\xedrito Santo</option>\n<option value="GO">Goi\xe1s</option>\n<option value="MA">Maranh\xe3o</option>\n<option value="MT">Mato Grosso</option>\n<option value="MS">Mato Grosso do Sul</option>\n<option value="MG">Minas Gerais</option>\n<option value="PA">Par\xe1</option>\n<option value="PB">Para\xedba</option>\n<option value="PR" selected="selected">Paran\xe1</option>\n<option value="PE">Pernambuco</option>\n<option value="PI">Piau\xed</option>\n<option value="RJ">Rio de Janeiro</option>\n<option value="RN">Rio Grande do Norte</option>\n<option value="RS">Rio Grande do Sul</option>\n<option value="RO">Rond\xf4nia</option>\n<option value="RR">Roraima</option>\n<option value="SC">Santa Catarina</option>\n<option value="SP">S\xe3o Paulo</option>\n<option value="SE">Sergipe</option>\n<option value="TO">Tocantins</option>\n</select>'
 
+# BRStateChoiceField #########################################################
+>>> from django.contrib.localflavor.br.forms import BRStateChoiceField
+>>> f = BRStateChoiceField()
+>>> ', '.join([f.clean(s) for s, _ in f.widget.choices])
+u'AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO'
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('pr')
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid brazilian state. That state is not one of the available states.']
+
 # DEZipCodeField ##############################################################
 
 >>> from django.contrib.localflavor.de.forms import DEZipCodeField
@@ -1446,4 +1460,738 @@ ValidationError: [u'National Identification Number consists of 11 digits.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'National Identification Number consists of 11 digits.']
+
+# NLPhoneNumberField ########################################################
+
+>>> from django.contrib.localflavor.nl.forms import NLPhoneNumberField
+>>> f = NLPhoneNumberField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean('012-3456789')
+'012-3456789'
+>>> f.clean('0123456789')
+'0123456789'
+>>> f.clean('+31-12-3456789')
+'+31-12-3456789'
+>>> f.clean('(0123) 456789')
+'(0123) 456789'
+>>> f.clean('foo')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid phone number']
+
+# NLZipCodeField ############################################################
+
+>>> from django.contrib.localflavor.nl.forms import NLZipCodeField
+>>> f = NLZipCodeField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean('1234ab')
+u'1234 AB'
+>>> f.clean('1234 ab')
+u'1234 AB'
+>>> f.clean('1234 AB')
+u'1234 AB'
+>>> f.clean('0123AB')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid postal code']
+>>> f.clean('foo')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid postal code']
+
+# NLSoFiNumberField #########################################################
+
+>>> from django.contrib.localflavor.nl.forms import NLSoFiNumberField
+>>> f = NLSoFiNumberField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean('123456782')
+'123456782'
+>>> f.clean('000000000')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid SoFi number']
+>>> f.clean('123456789')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid SoFi number']
+>>> f.clean('foo')
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Enter a valid SoFi number']
+
+# NLProvinceSelect ##########################################################
+
+>>> from django.contrib.localflavor.nl.forms import NLProvinceSelect
+>>> s = NLProvinceSelect()
+>>> s.render('provinces', 'OV')
+u'<select name="provinces">\n<option value="DR">Drente</option>\n<option value="FL">Flevoland</option>\n<option value="FR">Friesland</option>\n<option value="GL">Gelderland</option>\n<option value="GR">Groningen</option>\n<option value="LB">Limburg</option>\n<option value="NB">Noord-Brabant</option>\n<option value="NH">Noord-Holland</option>\n<option value="OV" selected="selected">Overijssel</option>\n<option value="UT">Utrecht</option>\n<option value="ZE">Zeeland</option>\n<option value="ZH">Zuid-Holland</option>\n</select>'
+
+# ARProvinceField #############################################################
+
+>>> from django.contrib.localflavor.ar.forms import ARProvinceSelect
+>>> f = ARProvinceSelect()
+>>> f.render('provincias', 'A')
+u'<select name="provincias">\n<option value="B">Buenos Aires</option>\n<option value="K">Catamarca</option>\n<option value="H">Chaco</option>\n<option value="U">Chubut</option>\n<option value="C">Ciudad Aut\xf3noma de Buenos Aires</option>\n<option value="X">C\xf3rdoba</option>\n<option value="W">Corrientes</option>\n<option value="E">Entre R\xedos</option>\n<option value="P">Formosa</option>\n<option value="Y">Jujuy</option>\n<option value="L">La Pampa</option>\n<option value="F">La Rioja</option>\n<option value="M">Mendoza</option>\n<option value="N">Misiones</option>\n<option value="Q">Neuqu\xe9n</option>\n<option value="R">R\xedo Negro</option>\n<option value="A" selected="selected">Salta</option>\n<option value="J">San Juan</option>\n<option value="D">San Luis</option>\n<option value="Z">Santa Cruz</option>\n<option value="S">Santa Fe</option>\n<option value="G">Santiago del Estero</option>\n<option value="V">Tierra del Fuego, Ant\xe1rtida e Islas del Atl\xe1ntico Sur</option>\n<option value="T">Tucum\xe1n</option>\n</select>'
+
+# ARPostalCodeField ###########################################################
+
+>>> from django.contrib.localflavor.ar.forms import ARPostalCodeField
+>>> f = ARPostalCodeField()
+>>> f.clean('5000')
+u'5000'
+>>> f.clean('C1064AAB')
+u'C1064AAB'
+>>> f.clean('c1064AAB')
+u'C1064AAB'
+>>> f.clean('C1064aab')
+u'C1064AAB'
+>>> f.clean(u'4400')
+u'4400'
+>>> f.clean(u'C1064AAB')
+u'C1064AAB'
+>>> f.clean('C1064AABB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+>>> f.clean('C1064AA')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('C106AAB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('106AAB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('500')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 4 characters (it has 3).']
+>>> f.clean('5PPP')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(u'')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = ARPostalCodeField(required=False)
+>>> f.clean('5000')
+u'5000'
+>>> f.clean('C1064AAB')
+u'C1064AAB'
+>>> f.clean('c1064AAB')
+u'C1064AAB'
+>>> f.clean('C1064aab')
+u'C1064AAB'
+>>> f.clean(u'4400')
+u'4400'
+>>> f.clean(u'C1064AAB')
+u'C1064AAB'
+>>> f.clean('C1064AABB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at most 8 characters (it has 9).']
+>>> f.clean('C1064AA')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('C106AAB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('106AAB')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean('500')
+Traceback (most recent call last):
+...
+ValidationError: [u'Ensure this value has at least 4 characters (it has 3).']
+>>> f.clean('5PPP')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format NNNN or ANNNNAAA.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+>>> f.clean(u'')
+u''
+
+# ARDNIField ##################################################################
+
+>>> from django.contrib.localflavor.ar.forms import ARDNIField
+>>> f = ARDNIField()
+>>> f.clean('20123456')
+u'20123456'
+>>> f.clean('20.123.456')
+u'20123456'
+>>> f.clean('9123456')
+u'9123456'
+>>> f.clean('9.123.456')
+u'9123456'
+>>> f.clean(u'20123456')
+u'20123456'
+>>> f.clean(u'20.123.456')
+u'20123456'
+>>> f.clean('20.123456')
+u'20123456'
+>>> f.clean('101234566')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires 7 or 8 digits.']
+>>> f.clean('W0123456')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean('10,123,456')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(u'')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = ARDNIField(required=False)
+>>> f.clean('20123456')
+u'20123456'
+>>> f.clean('20.123.456')
+u'20123456'
+>>> f.clean('9123456')
+u'9123456'
+>>> f.clean('9.123.456')
+u'9123456'
+>>> f.clean(u'20123456')
+u'20123456'
+>>> f.clean(u'20.123.456')
+u'20123456'
+>>> f.clean('20.123456')
+u'20123456'
+>>> f.clean('101234566')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires 7 or 8 digits.']
+>>> f.clean('W0123456')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean('10,123,456')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field requires only numbers.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+>>> f.clean(u'')
+u''
+
+# ARCUITField #################################################################
+
+>>> from django.contrib.localflavor.ar.forms import ARCUITField
+>>> f = ARCUITField()
+>>> f.clean('20-10123456-9')
+u'20-10123456-9'
+>>> f.clean(u'20-10123456-9')
+u'20-10123456-9'
+>>> f.clean('27-10345678-4')
+u'27-10345678-4'
+>>> f.clean('20101234569')
+u'20-10123456-9'
+>>> f.clean('27103456784')
+u'27-10345678-4'
+>>> f.clean('2-10123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('210123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456-5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(u'2-10123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('27-10345678-1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(u'27-10345678-1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(u'')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = ARCUITField(required=False)
+>>> f.clean('20-10123456-9')
+u'20-10123456-9'
+>>> f.clean(u'20-10123456-9')
+u'20-10123456-9'
+>>> f.clean('27-10345678-4')
+u'27-10345678-4'
+>>> f.clean('20101234569')
+u'20-10123456-9'
+>>> f.clean('27103456784')
+u'27-10345678-4'
+>>> f.clean('2-10123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('210123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456-')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('20-10123456-5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(u'2-10123456-9')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.']
+>>> f.clean('27-10345678-1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(u'27-10345678-1')
+Traceback (most recent call last):
+...
+ValidationError: [u'Invalid CUIT.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+>>> f.clean(u'')
+u''
+
+# CAPostalCodeField ##############################################################
+
+CAPostalCodeField validates that the data is a six-character Canadian postal code.
+>>> from django.contrib.localflavor.ca.forms import CAPostalCodeField
+>>> f = CAPostalCodeField()
+>>> f.clean('T2S 2H7')
+u'T2S 2H7'
+>>> f.clean('T2S 2H')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('2T6 H8I')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('T2S2H')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean(90210)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f = CAPostalCodeField(required=False)
+>>> f.clean('T2S 2H7')
+u'T2S 2H7'
+>>> f.clean('T2S2H7')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('T2S 2H')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('2T6 H8I')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean('T2S2H')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean(90210)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a postal code in the format XXX XXX.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# CAPhoneNumberField ##########################################################
+
+CAPhoneNumberField validates that the data is a valid Canadian phone number,
+including the area code. It's normalized to XXX-XXX-XXXX format.
+Note: This test is exactly the same as the USPhoneNumberField except using a real
+Candian area code
+
+>>> from django.contrib.localflavor.ca.forms import CAPhoneNumberField
+>>> f = CAPhoneNumberField()
+>>> f.clean('403-555-1212')
+u'403-555-1212'
+>>> f.clean('4035551212')
+u'403-555-1212'
+>>> f.clean('403 555-1212')
+u'403-555-1212'
+>>> f.clean('(403) 555-1212')
+u'403-555-1212'
+>>> f.clean('403 555 1212')
+u'403-555-1212'
+>>> f.clean('403.555.1212')
+u'403-555-1212'
+>>> f.clean('403.555-1212')
+u'403-555-1212'
+>>> f.clean(' (403) 555.1212 ')
+u'403-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('403-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = CAPhoneNumberField(required=False)
+>>> f.clean('403-555-1212')
+u'403-555-1212'
+>>> f.clean('4035551212')
+u'403-555-1212'
+>>> f.clean('403 555-1212')
+u'403-555-1212'
+>>> f.clean('(403) 555-1212')
+u'403-555-1212'
+>>> f.clean('403 555 1212')
+u'403-555-1212'
+>>> f.clean('403.555.1212')
+u'403-555-1212'
+>>> f.clean('403.555-1212')
+u'403-555-1212'
+>>> f.clean(' (403) 555.1212 ')
+u'403-555-1212'
+>>> f.clean('555-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean('403-55-1212')
+Traceback (most recent call last):
+...
+ValidationError: [u'Phone numbers must be in XXX-XXX-XXXX format.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# CAProvinceField ################################################################
+
+CAProvinceField validates that the data is either an abbreviation or name of a
+Canadian province.
+>>> from django.contrib.localflavor.ca.forms import CAProvinceField
+>>> f = CAProvinceField()
+>>> f.clean('ab')
+u'AB'
+>>> f.clean('BC')
+u'BC'
+>>> f.clean('nova scotia')
+u'NS'
+>>> f.clean('  manitoba ')
+u'MB'
+>>> f.clean('T2S 2H7')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a Canadian province or territory.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = CAProvinceField(required=False)
+>>> f.clean('ab')
+u'AB'
+>>> f.clean('BC')
+u'BC'
+>>> f.clean('nova scotia')
+u'NS'
+>>> f.clean('  manitoba ')
+u'MB'
+>>> f.clean('T2S 2H7')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a Canadian province or territory.']
+>>> f.clean(None)
+u''
+>>> f.clean('')
+u''
+
+# CAProvinceSelect ###############################################################
+
+CAProvinceSelect is a Select widget that uses a list of Canadian provinces/territories
+as its choices.
+>>> from django.contrib.localflavor.ca.forms import CAProvinceSelect
+>>> w = CAProvinceSelect()
+>>> print w.render('province', 'AB')
+<select name="province">
+<option value="AB" selected="selected">Alberta</option>
+<option value="BC">British Columbia</option>
+<option value="MB">Manitoba</option>
+<option value="NB">New Brunswick</option>
+<option value="NF">Newfoundland and Labrador</option>
+<option value="NT">Northwest Territories</option>
+<option value="NS">Nova Scotia</option>
+<option value="NU">Nunavut</option>
+<option value="ON">Ontario</option>
+<option value="PE">Prince Edward Island</option>
+<option value="QC">Quebec</option>
+<option value="SK">Saskatchewan</option>
+<option value="YK">Yukon</option>
+</select>
+
+# CASocialInsuranceNumberField #################################################
+>>> from django.contrib.localflavor.ca.forms import CASocialInsuranceNumberField
+>>> f = CASocialInsuranceNumberField()
+>>> f.clean('046-454-286')
+u'046-454-286'
+>>> f.clean('046-454-287')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format.']
+>>> f.clean('046 454 286')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format.']
+>>> f.clean('046-44-286')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format.']
+
+## Generic DateField ##########################################################
+
+>>> from django.contrib.localflavor.generic.forms import *
+
+A DateField that uses generic dd/mm/yy dates instead of mm/dd/yy where
+appropriate.
+
+>>> import datetime
+>>> f = DateField()
+>>> f.clean(datetime.date(2006, 10, 25))
+datetime.date(2006, 10, 25)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
+datetime.date(2006, 10, 25)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
+datetime.date(2006, 10, 25)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+datetime.date(2006, 10, 25)
+>>> f.clean('2006-10-25')
+datetime.date(2006, 10, 25)
+>>> f.clean('25/10/2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('25/10/06')
+datetime.date(2006, 10, 25)
+>>> f.clean('Oct 25 2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('October 25 2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('October 25, 2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('25 October 2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('25 October, 2006')
+datetime.date(2006, 10, 25)
+>>> f.clean('2006-4-31')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+>>> f.clean('200a-10-25')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+>>> f.clean('10/25/06')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f = DateField(required=False)
+>>> f.clean(None)
+>>> repr(f.clean(None))
+'None'
+>>> f.clean('')
+>>> repr(f.clean(''))
+'None'
+
+DateField accepts an optional input_formats parameter:
+>>> f = DateField(input_formats=['%Y %m %d'])
+>>> f.clean(datetime.date(2006, 10, 25))
+datetime.date(2006, 10, 25)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
+datetime.date(2006, 10, 25)
+>>> f.clean('2006 10 25')
+datetime.date(2006, 10, 25)
+
+The input_formats parameter overrides all default input formats,
+so the default formats won't work unless you specify them:
+>>> f.clean('2006-10-25')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+>>> f.clean('25/10/2006')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+>>> f.clean('25/10/06')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date.']
+
+## Generic DateTimeField ######################################################
+
+A DateField that uses generic dd/mm/yy dates instead of mm/dd/yy where
+appropriate.
+
+>>> import datetime
+>>> f = DateTimeField()
+>>> f.clean(datetime.date(2006, 10, 25))
+datetime.datetime(2006, 10, 25, 0, 0)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
+datetime.datetime(2006, 10, 25, 14, 30, 59)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+datetime.datetime(2006, 10, 25, 14, 30, 59, 200)
+>>> f.clean('2006-10-25 14:30:45')
+datetime.datetime(2006, 10, 25, 14, 30, 45)
+>>> f.clean('2006-10-25 14:30:00')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('2006-10-25 14:30')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('2006-10-25')
+datetime.datetime(2006, 10, 25, 0, 0)
+>>> f.clean('25/10/2006 14:30:45')
+datetime.datetime(2006, 10, 25, 14, 30, 45)
+>>> f.clean('25/10/2006 14:30:00')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('25/10/2006 14:30')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('25/10/2006')
+datetime.datetime(2006, 10, 25, 0, 0)
+>>> f.clean('25/10/06 14:30:45')
+datetime.datetime(2006, 10, 25, 14, 30, 45)
+>>> f.clean('25/10/06 14:30:00')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('25/10/06 14:30')
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean('25/10/06')
+datetime.datetime(2006, 10, 25, 0, 0)
+>>> f.clean('hello')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date/time.']
+>>> f.clean('2006-10-25 4:30 p.m.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date/time.']
+
+DateField accepts an optional input_formats parameter:
+>>> f = DateTimeField(input_formats=['%Y %m %d %I:%M %p'])
+>>> f.clean(datetime.date(2006, 10, 25))
+datetime.datetime(2006, 10, 25, 0, 0)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30))
+datetime.datetime(2006, 10, 25, 14, 30)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59))
+datetime.datetime(2006, 10, 25, 14, 30, 59)
+>>> f.clean(datetime.datetime(2006, 10, 25, 14, 30, 59, 200))
+datetime.datetime(2006, 10, 25, 14, 30, 59, 200)
+>>> f.clean('2006 10 25 2:30 PM')
+datetime.datetime(2006, 10, 25, 14, 30)
+
+The input_formats parameter overrides all default input formats,
+so the default formats won't work unless you specify them:
+>>> f.clean('2006-10-25 14:30:45')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid date/time.']
+
+>>> f = DateTimeField(required=False)
+>>> f.clean(None)
+>>> repr(f.clean(None))
+'None'
+>>> f.clean('')
+>>> repr(f.clean(''))
+'None'
+
 """

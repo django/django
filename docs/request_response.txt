@@ -161,6 +161,18 @@ Methods
 
    Example: ``"/music/bands/the_beatles/?print=true"``
 
+``build_absolute_uri(location)``
+   **New in Django development version**
+
+   Returns the absolute URI form of ``location``. If no location is provided,
+   the location will be set to ``request.get_full_path()``.
+
+   If the location is already an absolute URI, it will not be altered.
+   Otherwise the absolute URI is built using the server variables available in
+   this request.
+
+   Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+
 ``is_secure()``
    Returns ``True`` if the request is secure; that is, if it was made with
    HTTPS.
@@ -183,6 +195,9 @@ subclass of dictionary. Exceptions are outlined here:
 
     * ``__getitem__(key)`` -- Returns the value for the given key. If the key
       has more than one value, ``__getitem__()`` returns the last value.
+      Raises ``django.utils.datastructure.MultiValueDictKeyError`` if the key
+      does not exist. (This is a subclass of Python's standard ``KeyError``,
+      so you can stick to catching ``KeyError``.)
 
     * ``__setitem__(key, value)`` -- Sets the given key to ``[value]``
       (a Python list whose single element is ``value``). Note that this, as

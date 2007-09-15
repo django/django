@@ -9,10 +9,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.utils.translation import ugettext as _
 
-def login(request, template_name='registration/login.html'):
+def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
     manipulator = AuthenticationForm(request)
-    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
     if request.POST:
         errors = manipulator.get_validation_errors(request.POST)
         if not errors:
@@ -35,7 +35,7 @@ def login(request, template_name='registration/login.html'):
 
     return render_to_response(template_name, {
         'form': oldforms.FormWrapper(manipulator, request.POST, errors),
-        REDIRECT_FIELD_NAME: redirect_to,
+        redirect_field_name: redirect_to,
         'site_name': current_site.name,
     }, context_instance=RequestContext(request))
 
@@ -56,12 +56,12 @@ def logout_then_login(request, login_url=None):
         login_url = settings.LOGIN_URL
     return logout(request, login_url)
 
-def redirect_to_login(next, login_url=None):
+def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     "Redirects the user to the login page, passing the given 'next' page"
     if not login_url:
         from django.conf import settings
         login_url = settings.LOGIN_URL
-    return HttpResponseRedirect('%s?%s=%s' % (login_url, REDIRECT_FIELD_NAME, next))
+    return HttpResponseRedirect('%s?%s=%s' % (login_url, redirect_field_name, next))
 
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html'):

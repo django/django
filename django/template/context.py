@@ -49,8 +49,7 @@ class Context(object):
                 return True
         return False
 
-    def __contains__(self, key):
-        return self.has_key(key)
+    __contains__ = has_key
 
     def get(self, key, otherwise=None):
         for d in self.dicts:

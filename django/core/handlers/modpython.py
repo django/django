@@ -159,8 +159,8 @@ class ModPythonHandler(BaseHandler):
 
         # Convert our custom HttpResponse object back into the mod_python req.
         req.content_type = response['Content-Type']
-        for key, value in response.headers.items():
-            if key != 'Content-Type':
+        for key, value in response.items():
+            if key != 'content-type':
                 req.headers_out[str(key)] = str(value)
         for c in response.cookies.values():
             req.headers_out.add('Set-Cookie', c.output(header=''))

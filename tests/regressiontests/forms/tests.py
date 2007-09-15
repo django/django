@@ -3,6 +3,7 @@ from localflavor import localflavor_tests
 from regressions import regression_tests
 from formsets import formset_tests
 from media import media_tests
+from util import util_tests
 
 form_tests = r"""
 >>> from django.newforms import *
@@ -962,6 +963,12 @@ True
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a whole number.']
+>>> f.clean(42)
+42
+>>> f.clean(3.14)
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a whole number.']
 >>> f.clean('1 ')
 1
 >>> f.clean(' 1')
@@ -1085,6 +1092,10 @@ True
 23.0
 >>> f.clean('3.14')
 3.1400000000000001
+>>> f.clean(3.14)
+3.1400000000000001
+>>> f.clean(42)
+42.0
 >>> f.clean('a')
 Traceback (most recent call last):
 ...
@@ -1142,6 +1153,10 @@ True
 >>> f.clean('23')
 Decimal("23")
 >>> f.clean('3.14')
+Decimal("3.14")
+>>> f.clean(3.14)
+Decimal("3.14")
+>>> f.clean(Decimal('3.14'))
 Decimal("3.14")
 >>> f.clean('a')
 Traceback (most recent call last):
@@ -1608,15 +1623,19 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+>>> f.clean('http://localhost')
+u'http://localhost'
 >>> f.clean('http://example.com')
 u'http://example.com'
 >>> f.clean('http://www.example.com')
 u'http://www.example.com'
+>>> f.clean('http://www.example.com:8000/test')
+u'http://www.example.com:8000/test'
+>>> f.clean('http://200.8.9.10')
+u'http://200.8.9.10'
+>>> f.clean('http://200.8.9.10:8000/test')
+u'http://200.8.9.10:8000/test'
 >>> f.clean('foo')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid URL.']
->>> f.clean('example.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
@@ -1647,10 +1666,6 @@ u'http://example.com'
 >>> f.clean('http://www.example.com')
 u'http://www.example.com'
 >>> f.clean('foo')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a valid URL.']
->>> f.clean('example.com')
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a valid URL.']
@@ -1706,6 +1721,15 @@ u'http://example.com'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Ensure this value has at most 20 characters (it has 37).']
+
+URLField should prepend 'http://' if no scheme was given
+>>> f = URLField(required=False)
+>>> f.clean('example.com')
+u'http://example.com'
+>>> f.clean('')
+u''
+>>> f.clean('https://example.com')
+u'https://example.com'
 
 # BooleanField ################################################################
 
@@ -2683,16 +2707,24 @@ to the next.
 ...         super(Person, self).__init__(*args, **kwargs)
 ...         if names_required:
 ...             self.fields['first_name'].required = True
+...             self.fields['first_name'].widget.attrs['class'] = 'required'
 ...             self.fields['last_name'].required = True
+...             self.fields['last_name'].widget.attrs['class'] = 'required'
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> f = Person(names_required=True)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (True, True)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({'class': 'required'}, {'class': 'required'})
 >>> f = Person(names_required=False)
 >>> f['first_name'].field.required, f['last_name'].field.required
 (False, False)
+>>> f['first_name'].field.widget.attrs, f['last_name'].field.widget.attrs
+({}, {})
 >>> class Person(Form):
 ...     first_name = CharField(max_length=30)
 ...     last_name = CharField(max_length=30)
@@ -3796,14 +3828,6 @@ u'1'
 >>> smart_unicode('foo')
 u'foo'
 
-# flatatt tests
->>> from django.newforms.util import flatatt
->>> flatatt({'id': "header"})
-u' id="header"'
->>> flatatt({'class': "news", 'title': "Read this"})
-u' class="news" title="Read this"'
->>> flatatt({})
-u''
 
 ####################################
 # Test accessing errors in clean() #
@@ -3823,6 +3847,50 @@ u''
 True
 >>> f.cleaned_data['username']
 u'sirrobin'
+
+#######################################
+# Test overriding ErrorList in a form #
+#######################################
+
+>>> from django.newforms.util import ErrorList
+>>> class DivErrorList(ErrorList):
+...     def __unicode__(self):
+...         return self.as_divs()
+...     def as_divs(self):
+...         if not self: return u''
+...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+>>> class CommentForm(Form):
+...     name = CharField(max_length=50, required=False)
+...     email = EmailField()
+...     comment = CharField()
+>>> data = dict(email='invalid')
+>>> f = CommentForm(data, auto_id=False, error_class=DivErrorList)
+>>> print f.as_p()
+<p>Name: <input type="text" name="name" maxlength="50" /></p>
+<div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
+<p>Email: <input type="text" name="email" value="invalid" /></p>
+<div class="errorlist"><div class="error">This field is required.</div></div>
+<p>Comment: <input type="text" name="comment" /></p>
+
+#################################
+# Test multipart-encoded form #
+#################################
+
+>>> class FormWithoutFile(Form):
+...     username = CharField()
+>>> class FormWithFile(Form):
+...     username = CharField()
+...     file = FileField()
+>>> class FormWithImage(Form):
+...     image = ImageField()
+
+>>> FormWithoutFile().is_multipart()
+False
+>>> FormWithFile().is_multipart()
+True
+>>> FormWithImage().is_multipart()
+True
+
 """
 
 __test__ = {
@@ -3831,6 +3899,7 @@ __test__ = {
     'regressions': regression_tests,
     'formset_tests': formset_tests,
     'media_tests': media_tests,
+    'util_tests': util_tests,
 }
 
 if __name__ == "__main__":

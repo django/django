@@ -27,13 +27,13 @@ class Serializer(base.Serializer):
     def end_object(self, obj):
         self.objects.append({
             "model"  : smart_unicode(obj._meta),
-            "pk"     : smart_unicode(obj._get_pk_val()),
+            "pk"     : smart_unicode(obj._get_pk_val(), strings_only=True),
             "fields" : self._current
         })
         self._current = None
 
     def handle_field(self, obj, field):
-        self._current[field.name] = getattr(obj, field.name)
+        self._current[field.name] = smart_unicode(getattr(obj, field.name), strings_only=True)
 
     def handle_fk_field(self, obj, field):
         related = getattr(obj, field.name)
@@ -44,10 +44,11 @@ class Serializer(base.Serializer):
             else:
                 # Related to remote object via other field
                 related = getattr(related, field.rel.field_name)
-        self._current[field.name] = related
+        self._current[field.name] = smart_unicode(related, strings_only=True)
 
     def handle_m2m_field(self, obj, field):
-        self._current[field.name] = [related._get_pk_val() for related in getattr(obj, field.name).iterator()]
+        self._current[field.name] = [smart_unicode(related._get_pk_val(), strings_only=True)
+                           for related in getattr(obj, field.name).iterator()]
 
     def getvalue(self):
         return self.objects
