@@ -45,25 +45,48 @@ The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
 ``AdminSite.root`` method.
 
-In this example, we register the ``AdminSite`` instance
-``myproject.admin.admin_site`` at the URL ``/admin/`` ::
-
-    from django.conf.urls.defaults import *
-    from myproject.admin import admin_site
-
-    urlpatterns = patterns('',
-        ('^admin/(.*)', admin_site.root),
-    )
-
 In this example, we register the default ``AdminSite`` instance
-``django.contrib.admin.site`` at the URL ``/myadmin/`` ::
+``django.contrib.admin.site`` at the URL ``/admin/`` ::
 
+    # urls.py
     from django.conf.urls.defaults import *
     from django.contrib import admin
 
     urlpatterns = patterns('',
-        ('^myadmin/(.*)', admin.site.root),
+        ('^admin/(.*)', admin.site.root),
+    )
+
+In this example, we register the ``AdminSite`` instance
+``myproject.admin.admin_site`` at the URL ``/myadmin/`` ::
+
+    # urls.py
+    from django.conf.urls.defaults import *
+    from myproject.admin import admin_site
+
+    urlpatterns = patterns('',
+        ('^myadmin/(.*)', admin_site.root),
     )
 
 Note that the regular expression in the URLpattern *must* group everything in
 the URL that comes after the URL root -- hence the ``(.*)`` in these examples.
+
+Multiple admin sites in the same URLconf
+----------------------------------------
+
+It's easy to create multiple instances of the admin site on the same
+Django-powered Web site. Just create multiple instances of ``AdminSite`` and
+root each one at a different URL.
+
+In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
+separate versions of the admin site -- using the ``AdminSite`` instances
+``myproject.admin.basic_site`` and ``myproject.admin.advanced_site``,
+respectively.
+
+    # urls.py
+    from django.conf.urls.defaults import *
+    from myproject.admin import basic_site, advanced_site
+
+    urlpatterns = patterns('',
+        ('^basic-admin/(.*)', basic_site.root),
+        ('^advanced-admin/(.*)', advanced_site.root),
+    )
