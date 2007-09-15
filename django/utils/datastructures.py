@@ -238,22 +238,20 @@ class DotExpandedDict(dict):
     may contain dots to specify inner dictionaries. It's confusing, but this
     example should make sense.
 
-    >>> d = DotExpandedDict({'person.1.firstname': ['Simon'],
-            'person.1.lastname': ['Willison'],
-            'person.2.firstname': ['Adrian'],
+    >>> d = DotExpandedDict({'person.1.firstname': ['Simon'], \
+            'person.1.lastname': ['Willison'], \
+            'person.2.firstname': ['Adrian'], \
             'person.2.lastname': ['Holovaty']})
     >>> d
-    {'person': {'1': {'lastname': ['Willison'], 'firstname': ['Simon']},
-    '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}}
+    {'person': {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}}
     >>> d['person']
-    {'1': {'firstname': ['Simon'], 'lastname': ['Willison'],
-    '2': {'firstname': ['Adrian'], 'lastname': ['Holovaty']}
+    {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}
     >>> d['person']['1']
-    {'firstname': ['Simon'], 'lastname': ['Willison']}
+    {'lastname': ['Willison'], 'firstname': ['Simon']}
 
     # Gotcha: Results are unpredictable if the dots are "uneven":
     >>> DotExpandedDict({'c.1': 2, 'c.2': 3, 'c': 1})
-    >>> {'c': 1}
+    {'c': 1}
     """
     def __init__(self, key_to_list_mapping):
         for k, v in key_to_list_mapping.items():

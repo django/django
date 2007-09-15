@@ -3,6 +3,7 @@ Syndication feed generation library -- used for generating RSS, etc.
 
 Sample usage:
 
+>>> from django.utils import feedgenerator
 >>> feed = feedgenerator.Rss201rev2Feed(
 ...     title=u"Poynter E-Media Tidbits",
 ...     link=u"http://www.poynter.org/column.asp?id=31",
