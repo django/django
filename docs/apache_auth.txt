@@ -29,7 +29,7 @@ with the standard ``Auth*`` and ``Require`` directives::
         PythonAuthenHandler django.contrib.auth.handlers.modpython
     </Location>
     
-.. admonition:: Apache 2.2
+.. note:: Using the authentication handler with Apache 2.2
 
     If you're using Apache 2.2, you'll need to take a couple extra steps.
     
