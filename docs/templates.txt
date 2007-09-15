@@ -1419,6 +1419,12 @@ A collection of template filters that implement these common markup languages:
     * Markdown
     * ReST (ReStructured Text)
 
+See the `markup section`_ of the `add-ons documentation`_ for more
+information.
+
+.. _markup section: ../add_ons/#markup
+.. _add-ons documentation: ../add_ons/
+
 django.contrib.webdesign
 ------------------------
 
