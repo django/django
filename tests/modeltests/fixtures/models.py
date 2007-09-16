@@ -9,6 +9,7 @@ FIXTURE_DIRS setting.
 """
 
 from django.db import models
+from django.conf import settings
 
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
@@ -53,7 +54,13 @@ __test__ = {'API_TESTS': """
 # object list is unaffected
 >>> Article.objects.all()
 [<Article: XML identified as leading cause of cancer>, <Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker on TV is great!>, <Article: Python program becomes self aware>]
+"""}
 
+# Database flushing does not work on MySQL with the default storage engine,
+# because it requires transaction spuport.
+if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
+    __test__['API_TESTS'] += \
+"""
 # Reset the database representation of this app. This will delete all data.
 >>> management.call_command('flush', verbosity=0, interactive=False)
 >>> Article.objects.all()
@@ -75,7 +82,7 @@ Multiple fixtures named 'fixture2' in '...fixtures'. Aborting.
 # Dump the current contents of the database as a JSON fixture
 >>> management.call_command('dumpdata', 'fixtures', format='json')
 [{"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16 12:00:00"}}, {"pk": 1, "model": "fixtures.article", "fields": {"headline": "Python program becomes self aware", "pub_date": "2006-06-16 11:00:00"}}]
-"""}
+"""
 
 from django.test import TestCase
 
