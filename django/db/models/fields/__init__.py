@@ -880,6 +880,11 @@ class IPAddressField(Field):
     def validate(self, field_data, all_data):
         validators.isValidIPAddress4(field_data, None)
 
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.IPAddressField}
+        defaults.update(kwargs)
+        return super(IPAddressField, self).formfield(**defaults)
+
 class NullBooleanField(Field):
     empty_strings_allowed = False
     def __init__(self, *args, **kwargs):

@@ -3834,6 +3834,61 @@ ValidationError: [u'This field is required.']
 >>> f.cleaned_data
 {'field1': u'some text,JP,2007-04-25 06:24:00'}
 
+
+# IPAddressField ##################################################################
+
+>>> f = IPAddressField()
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean(None)
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+>>> f.clean('127.0.0.1')
+u'127.0.0.1'
+>>> f.clean('foo')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('127.0.0.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('1.2.3.4.5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('256.125.1.5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+
+>>> f = IPAddressField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean(None)
+u''
+>>> f.clean('127.0.0.1')
+u'127.0.0.1'
+>>> f.clean('foo')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('127.0.0.')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('1.2.3.4.5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+>>> f.clean('256.125.1.5')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid IPv4 address.']
+
 #################################
 # Tests of underlying functions #
 #################################

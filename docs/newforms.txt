@@ -1284,6 +1284,15 @@ When you use a ``FileField`` on a form, you must also remember to
 Takes two optional arguments for validation, ``max_value`` and ``min_value``.
 These control the range of values permitted in the field.
 
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value is a valid IPv4 address, using a regular
+      expression.
+
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1710,7 +1719,7 @@ the full list of conversions:
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
     ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
-    ``IPAddressField``               ``CharField``
+    ``IPAddressField``               ``IPAddressField``
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
                                      below)
     ``NullBooleanField``             ``CharField``
