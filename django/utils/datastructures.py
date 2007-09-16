@@ -72,11 +72,22 @@ class SortedDict(dict):
     def items(self):
         return zip(self.keyOrder, self.values())
 
+    def iteritems(self):
+        for key in self.keyOrder:
+            yield key, dict.__getitem__(self, key)
+
     def keys(self):
         return self.keyOrder[:]
 
+    def iterkeys(self):
+        return iter(self.keyOrder)
+
     def values(self):
         return [dict.__getitem__(self, k) for k in self.keyOrder]
+
+    def itervalues(self):
+        for key in self.keyOrder:
+            yield dict.__getitem__(self, key)
 
     def update(self, dict):
         for k, v in dict.items():
@@ -90,6 +101,15 @@ class SortedDict(dict):
     def value_for_index(self, index):
         "Returns the value of the item at the given zero-based index."
         return self[self.keyOrder[index]]
+
+    def insert(self, index, key, value):
+        "Inserts the key, value pair before the item with the given index."
+        if key in self.keyOrder:
+            n = self.keyOrder.index(key)
+            del self.keyOrder[n]
+            if n < index: index -= 1
+        self.keyOrder.insert(index, key)
+        dict.__setitem__(self, key, value)
 
     def copy(self):
         "Returns a copy of this object."
