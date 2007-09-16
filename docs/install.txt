@@ -86,7 +86,7 @@ to create a temporary test database.
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
 .. _MySQL backend: ../databases/
-.. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+.. _cx_Oracle: http://cx-oracle.sourceforge.net//
 .. _Oracle: http://www.oracle.com/
 .. _testing framework: ../testing/
 
