@@ -669,8 +669,11 @@ To create message files, you use the same ``make-messages.py`` tool as with the
 Django message files. You only need to be in the right place -- in the directory
 where either the ``conf/locale`` (in case of the source tree) or the ``locale/``
 (in case of app messages or project messages) directory are located. And you
-use the same ``compile-messages.py`` to produce the binary ``django.mo`` files that
-are used by ``gettext``.
+use the same ``compile-messages.py`` to produce the binary ``django.mo`` files
+that are used by ``gettext``.
+
+You can also run ``compile-message.py --settings=path.to.settings`` to make
+the compiler process all the directories in your ``LOCALE_PATHS`` setting.
 
 Application message files are a bit complicated to discover -- they need the
 ``LocaleMiddleware``. If you don't use the middleware, only the Django message
