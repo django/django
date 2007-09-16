@@ -31,11 +31,12 @@ class SessionStore(SessionBase):
         try:
             session_file = open(self._key_to_file(), "rb")
             try:
-                session_data = self.decode(session_file.read())
-            except(EOFError, SuspiciousOperation):
-                self._session_key = self._get_new_session_key()
-                self._session_cache = {}
-                self.save()
+                try:
+                    session_data = self.decode(session_file.read())
+                except(EOFError, SuspiciousOperation):
+                    self._session_key = self._get_new_session_key()
+                    self._session_cache = {}
+                    self.save()
             finally:
                 session_file.close()
         except(IOError):
