@@ -34,12 +34,12 @@ with the standard ``Auth*`` and ``Require`` directives::
     If you're using Apache 2.2, you'll need to take a couple extra steps.
     
     You'll need to ensure that ``mod_auth_basic`` and ``mod_authz_user``
-    are loaded. These might be compiled staticly into Apache, or you might
+    are loaded. These might be compiled statically into Apache, or you might
     need to use ``LoadModule`` to load them dynamically (as shown in the
     example at the bottom of this note).
         
     You'll also need to insert configuration directives that prevent Apache
-    from trying to use other authentication modules. Depnding on which other
+    from trying to use other authentication modules. Depending on which other
     authentication modules you have loaded, you might need one or more of
     the following directives::
     
