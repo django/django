@@ -513,6 +513,26 @@ include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
 
+Normally, a colon (``:``) will be appended after any label name when a form is
+rendered. It's possible to change the colon to another character, or omit it
+entirely, using the ``label_suffix`` parameter::
+
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender -></label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+
+Note that the label suffix is added only if the last character of the
+label isn't a punctuation character (``.``, ``!``, ``?`` or ``:``)
+
 Notes on field ordering
 ~~~~~~~~~~~~~~~~~~~~~~~
 

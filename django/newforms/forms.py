@@ -58,7 +58,7 @@ class BaseForm(StrAndUnicode):
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-            initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList, label_suffix=':'):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -66,6 +66,7 @@ class BaseForm(StrAndUnicode):
         self.prefix = prefix
         self.initial = initial or {}
         self.error_class = error_class
+        self.label_suffix = label_suffix
         self._errors = None # Stores the errors after clean() has been called.
 
         # The base_fields class attribute is the *class-wide* definition of
@@ -129,9 +130,10 @@ class BaseForm(StrAndUnicode):
                     output.append(error_row % force_unicode(bf_errors))
                 if bf.label:
                     label = escape(force_unicode(bf.label))
-                    # Only add a colon if the label does not end in punctuation.
-                    if label[-1] not in ':?.!':
-                        label += ':'
+                    # Only add the suffix if the label does not end in punctuation.
+                    if self.label_suffix:
+                        if label[-1] not in ':?.!':
+                            label += self.label_suffix
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''

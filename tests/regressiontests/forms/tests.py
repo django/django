@@ -2943,6 +2943,37 @@ is default behavior.
 <li><label for="id_username">Username:</label> <input id="id_username" type="text" name="username" maxlength="10" /></li>
 <li><label for="id_password">Password:</label> <input type="password" name="password" id="id_password" /></li>
 
+
+# Label Suffix ################################################################
+
+You can specify the 'label_suffix' argument to a Form class to modify the
+punctuation symbol used at the end of a label.  By default, the colon (:) is
+used, and is only appended to the label if the label doesn't already end with a
+punctuation symbol: ., !, ? or :.  If you specify a different suffix, it will
+be appended regardless of the last character of the label.
+
+>>> class FavoriteForm(Form):
+...     color = CharField(label='Favorite color?')
+...     animal = CharField(label='Favorite animal')
+... 
+>>> f = FavoriteForm(auto_id=False)
+>>> print f.as_ul()
+<li>Favorite color? <input type="text" name="color" /></li>
+<li>Favorite animal: <input type="text" name="animal" /></li>
+>>> f = FavoriteForm(auto_id=False, label_suffix='?')
+>>> print f.as_ul()
+<li>Favorite color? <input type="text" name="color" /></li>
+<li>Favorite animal? <input type="text" name="animal" /></li>
+>>> f = FavoriteForm(auto_id=False, label_suffix='')
+>>> print f.as_ul()
+<li>Favorite color? <input type="text" name="color" /></li>
+<li>Favorite animal <input type="text" name="animal" /></li>
+>>> f = FavoriteForm(auto_id=False, label_suffix=u'\u2192')
+>>> f.as_ul()
+u'<li>Favorite color? <input type="text" name="color" /></li>\n<li>Favorite animal\u2192 <input type="text" name="animal" /></li>'
+
+
+
 # Initial data ################################################################
 
 You can specify initial data for a field by using the 'initial' argument to a
