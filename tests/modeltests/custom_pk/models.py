@@ -56,6 +56,15 @@ DoesNotExist: Employee matching query does not exist.
 >>> Employee.objects.filter(pk__in=['ABC123','XYZ456'])
 [<Employee: Fran Bones>, <Employee: Dan Jones>]
 
+# The primary key can be accessed via the pk property on the model.
+>>> e = Employee.objects.get(pk='ABC123')
+>>> e.pk
+u'ABC123'
+
+# Or we can use the real attribute name for the primary key:
+>>> e.employee_code
+u'ABC123'
+
 # Fran got married and changed her last name.
 >>> fran = Employee.objects.get(pk='XYZ456')
 >>> fran.last_name = 'Jones'

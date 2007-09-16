@@ -83,6 +83,11 @@ class Model(object):
     def _get_pk_val(self):
         return getattr(self, self._meta.pk.attname)
 
+    def _set_pk_val(self, value):
+        return setattr(self, self._meta.pk.attname, value)
+
+    pk = property(_get_pk_val, _set_pk_val)
+
     def __repr__(self):
         return smart_str(u'<%s: %s>' % (self.__class__.__name__, unicode(self)))
 
