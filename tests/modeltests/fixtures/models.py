@@ -56,8 +56,8 @@ __test__ = {'API_TESTS': """
 [<Article: XML identified as leading cause of cancer>, <Article: Django conquers world!>, <Article: Copyright is fine the way it is>, <Article: Poker on TV is great!>, <Article: Python program becomes self aware>]
 """}
 
-# Database flushing does not work on MySQL with the default storage engine,
-# because it requires transaction spuport.
+# Database flushing does not work on MySQL with the default storage engine
+# because it requires transaction support.
 if settings.DATABASE_ENGINE not in ('mysql', 'mysql_old'):
     __test__['API_TESTS'] += \
 """
