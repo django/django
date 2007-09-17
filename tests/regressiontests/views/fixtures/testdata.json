@@ -1,0 +1,25 @@
+[
+    {
+        "pk": 1, 
+        "model": "views.article", 
+        "fields": {
+            "author": 1, 
+            "title": "An Article"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "views.author", 
+        "fields": {
+            "name": "Boris"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "sites.site", 
+        "fields": {
+            "domain": "testserver", 
+            "name": "testserver"
+        }
+    }
+]
