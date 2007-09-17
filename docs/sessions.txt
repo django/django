@@ -10,24 +10,65 @@ Cookies contain a session ID -- not the data itself.
 Enabling sessions
 =================
 
-Sessions are implemented via a piece of middleware_ and a Django model.
+Sessions are implemented via a piece of middleware_.
 
-To enable session functionality, do these two things:
+To enable session functionality, do the following:
 
     * Edit the ``MIDDLEWARE_CLASSES`` setting and make sure
       ``MIDDLEWARE_CLASSES`` contains ``'django.contrib.sessions.middleware.SessionMiddleware'``.
       The default ``settings.py`` created by ``django-admin.py startproject`` has
       ``SessionMiddleware`` activated.
 
-    * Add ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting, and
-      run ``manage.py syncdb`` to install the single database table that stores
-      session data.
+    * Add ``'django.contrib.sessions'`` to your ``INSTALLED_APPS`` setting,
+      and run ``manage.py syncdb`` to install the single database table
+      that stores session data.
+
+      **New in development version**: this step is optional if you're not using
+      the database session backend; see `configuring the session engine`_.
 
 If you don't want to use sessions, you might as well remove the
 ``SessionMiddleware`` line from ``MIDDLEWARE_CLASSES`` and ``'django.contrib.sessions'``
 from your ``INSTALLED_APPS``. It'll save you a small bit of overhead.
 
 .. _middleware: ../middleware/
+
+Configuring the session engine
+==============================
+
+**New in development version**.
+
+By default, Django stores sessions in your database (using the model
+``django.contrib.sessions.models.Session``). Though this is convenient, in
+some setups it's faster to store session data elsewhere, so Django can be
+configured to store session data on your filesystem or in your cache.
+
+Using file-based sessions
+-------------------------
+
+To use file-based sessions, set the ``SESSION_ENGINE`` setting to
+``"django.contrib.sessions.backends.file"``.
+
+You might also want to set the ``SESSION_FILE_PATH`` setting (which
+defaults to ``/tmp``) to control where Django stores session files. Be
+sure to check that your Web server has permissions to read and write to
+this location.
+
+Using cache-based sessions
+--------------------------
+
+To store session data using Django's cache system, set ``SESSION_ENGINE``
+to ``"django.contrib.sessions.backends.cache"``. You'll want to make sure
+you've configured your cache; see the `cache documentation`_ for details.
+
+.. _cache documentation: ../cache/
+
+.. note::
+
+    You should probably only use cache-based sessions if you're using the
+    memcached cache backend. The local memory and simple cache backends
+    don't retain data long enough to be good choices, and it'll be faster
+    to use file or database sessions directly instead of sending everything
+    through the file or database cache backends.
 
 Using sessions in views
 =======================
@@ -153,9 +194,21 @@ Here's a typical usage example::
 Using sessions out of views
 ===========================
 
-Internally, each session is just a normal Django model. The ``Session`` model
-is defined in ``django/contrib/sessions/models.py``. Because it's a normal
-model, you can access sessions using the normal Django database API::
+**New in Django development version**
+
+An API is available to manipulate session data outside of a view::
+
+    >>> from django.contrib.sessions.engines.db import SessionStore
+    >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s['last_login'] = datetime.datetime(2005, 8, 20, 13, 35, 10)
+    >>> s['last_login']
+    datetime.datetime(2005, 8, 20, 13, 35, 0)
+    >>> s.save()
+
+If you're using the ``django.contrib.sessions.engine.db`` backend, each
+session is just a normal Django model. The ``Session`` model is defined in
+``django/contrib/sessions/models.py``. Because it's a normal model, you can
+access sessions using the normal Django database API::
 
     >>> from django.contrib.sessions.models import Session
     >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
@@ -244,6 +297,31 @@ Settings
 ========
 
 A few `Django settings`_ give you control over session behavior:
+
+SESSION_ENGINE
+--------------
+
+**New in Django development version**
+
+Default: ``django.contrib.sessions.backends.db``
+
+Controls where Django stores session data. Valid values are:
+
+    * ``'django.contrib.sessions.backends.db'``
+    * ``'django.contrib.sessions.backends.file'``
+    * ``'django.contrib.sessions.backends.cache'``
+
+See `configuring the session engine`_ for more details.
+
+SESSION_FILE_PATH
+-----------------
+
+**New in Django development version**
+
+Default: ``/tmp/``
+
+If you're using file-based session storage, this sets the directory in
+which Django will store session data.
 
 SESSION_COOKIE_AGE
 ------------------

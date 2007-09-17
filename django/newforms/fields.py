@@ -26,7 +26,7 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField',
+    'SplitDateTimeField', 'IPAddressField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -635,3 +635,11 @@ class SplitDateTimeField(MultiValueField):
                 raise ValidationError(ugettext(u'Enter a valid time.'))
             return datetime.datetime.combine(*data_list)
         return None
+
+ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
+
+class IPAddressField(RegexField):
+    def __init__(self, *args, **kwargs):
+        RegexField.__init__(self, ipv4_re,
+                            error_message=ugettext(u'Enter a valid IPv4 address.'),
+                            *args, **kwargs)

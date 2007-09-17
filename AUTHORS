@@ -84,10 +84,12 @@ answer newbie questions, and generally made Django that much better:
     Russell Cloran <russell@rucus.net>
     colin@owlfish.com
     crankycoder@gmail.com
+    Paul Collier <paul@paul-collier.com>
     Pete Crosier <pete.crosier@gmail.com>
     Matt Croydon <http://www.postneo.com/>
     flavio.curella@gmail.com
     Jure Cuhalev <gandalf@owca.info>
+    John D'Agostino <john.dagostino@gmail.com>
     dackze+django@gmail.com
     David Danier <goliath.mailinglist@gmx.de>
     Dirk Datzert <dummy@habmalnefrage.de>
@@ -121,6 +123,7 @@ answer newbie questions, and generally made Django that much better:
     Afonso Fernández Nogueira <fonzzo.django@gmail.com>
     Matthew Flanagan <http://wadofstuff.blogspot.com>
     Eric Floehr <eric@intellovations.com>
+    Vincent Foley <vfoleybourgon@yahoo.ca>
     Jorge Gajon <gajon@gajon.org>
     gandalf@owca.info
     Marc Garcia <marc.garcia@accopensys.com>
@@ -195,7 +198,11 @@ answer newbie questions, and generally made Django that much better:
     Waylan Limberg <waylan@gmail.com>
     limodou
     Philip Lindborg <philip.lindborg@gmail.com>
+<<<<<<< .working
     Simon Litchfield <simon@quo.com.au>
+=======
+    msaelices <msaelices@gmail.com>
+>>>>>>> .merge-right.r6370
     Matt McClanahan <http://mmcc.cx/>
     Martin Maney <http://www.chipy.org/Martin_Maney>
     Petr Marhoun <petr.marhoun@gmail.com>
@@ -262,6 +269,7 @@ answer newbie questions, and generally made Django that much better:
     Brian Rosner <brosner@gmail.com>
     Oliver Rutherfurd <http://rutherfurd.net/>
     ryankanno
+    Manuel Saelices <msaelices@yaco.es> 
     Ivan Sagalaev (Maniac) <http://www.softwaremaniacs.org/>
     Vinay Sajip <vinay_sajip@yahoo.co.uk>
     David Schein

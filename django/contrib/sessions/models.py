@@ -1,4 +1,4 @@
-import base64, md5, random, sys, datetime, os, time
+import base64, md5, random, sys, datetime
 import cPickle as pickle
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -74,6 +74,7 @@ class Session(models.Model):
     session_data = models.TextField(_('session data'))
     expire_date = models.DateTimeField(_('expire date'))
     objects = SessionManager()
+
     class Meta:
         db_table = 'django_session'
         verbose_name = _('session')
