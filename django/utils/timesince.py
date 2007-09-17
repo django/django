@@ -1,4 +1,6 @@
-import datetime, math, time
+import datetime
+import time
+
 from django.utils.tzinfo import LocalTimezone
 from django.utils.translation import ungettext, ugettext
 
