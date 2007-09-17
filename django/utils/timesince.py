@@ -4,8 +4,15 @@ from django.utils.translation import ungettext, ugettext
 
 def timesince(d, now=None):
     """
-    Takes two datetime objects and returns the time between then and now
-    as a nicely formatted string, e.g "10 minutes"
+    Takes two datetime objects and returns the time between d and now
+    as a nicely formatted string, e.g. "10 minutes".  If d occurs after now,
+    then "0 minutes" is returned.
+
+    Units used are years, months, weeks, days, hours, and minutes.
+    Seconds and microseconds are ignored.  Up to two adjacent units will be
+    displayed.  For example, "2 weeks, 3 days" and "1 year, 3 months" are
+    possible outputs, but "2 weeks, 3 hours" and "1 year, 5 days" are not.
+
     Adapted from http://blog.natbat.co.uk/archive/2003/Jun/14/time_since
     """
     chunks = (
@@ -32,6 +39,9 @@ def timesince(d, now=None):
     # ignore microsecond part of 'd' since we removed it from 'now'
     delta = now - (d - datetime.timedelta(0, 0, d.microsecond))
     since = delta.days * 24 * 60 * 60 + delta.seconds
+    if since <= 0:
+        # d is in the future compared to now, stop processing.
+        return u'0 ' + ugettext('minutes')
     for i, (seconds, name) in enumerate(chunks):
         count = since // seconds
         if count != 0:

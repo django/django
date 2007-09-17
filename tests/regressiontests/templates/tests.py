@@ -771,6 +771,10 @@ class Templates(unittest.TestCase):
             # Check that timezone is respected
             'timesince06' : ('{{ a|timesince:b }}', {'a':NOW_tz + timedelta(hours=8), 'b':NOW_tz}, '8 hours'),
 
+            # Check times in the future.
+            'timesince07' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=1, seconds=10)}, '0 minutes'),
+            'timesince08' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(days=1, minutes=1)}, '0 minutes'),
+
             ### TIMEUNTIL TAG ##################################################
             # Default compare with datetime.now()
             'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
@@ -780,6 +784,10 @@ class Templates(unittest.TestCase):
             # Compare to a given parameter
             'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
             'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
+
+            # Check times in the past.
+            'timeuntil07' : ('{{ a|timeuntil }}', {'a':datetime.now() - timedelta(minutes=1, seconds=10)}, '0 minutes'),
+            'timeuntil08' : ('{{ a|timeuntil }}', {'a':datetime.now() - timedelta(days=1, minutes=1)}, '0 minutes'),
 
             ### URL TAG ########################################################
             # Successes
