@@ -1062,3 +1062,40 @@ object the first time a user authenticates::
                 return User.objects.get(pk=user_id)
             except User.DoesNotExist:
                 return None
+
+Handling authorization in custom backends
+-----------------------------------------
+
+Custom auth backends can provide their own permissions. 
+
+The user model will delegate permission lookup functions
+(``get_group_permissions()``, ``get_all_permissions()``, ``has_perm()``, and
+``has_module_perms()``) to any authentication backend that implements these
+functions.
+
+The permissions given to the user will be the superset of all permissions
+returned by all backends. That is, Django grants a permission to a user that any
+one backend grants.
+
+The simple backend above could implement permissions for the magic admin fairly
+simply::
+        
+    class SettingsBackend:
+    
+        # ...
+
+        def has_perm(self, user_obj, perm):
+            if user_obj.username == settings.ADMIN_LOGIN:
+                return True
+            else:
+                return False
+                
+This gives full permissions to user granted access in the above example. Notice
+that the backend auth functions all take the user object as an argument, and
+also accept the same arguments given to the associated ``User`` functions.
+
+A full authorization implementation can be found in
+``django/contrib/auth/backends.py`` _, which is the default backend and queries
+the ``auth_permission``-table most of the time.
+
+.. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py

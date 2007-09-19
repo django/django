@@ -1,6 +1,7 @@
+from django.contrib import auth
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, models
+from django.db import models
 from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
@@ -210,64 +211,68 @@ class User(models.Model):
         return self.password != UNUSABLE_PASSWORD
 
     def get_group_permissions(self):
-        "Returns a list of permission strings that this user has through his/her groups."
-        if not hasattr(self, '_group_perm_cache'):
-            cursor = connection.cursor()
-            # The SQL below works out to the following, after DB quoting:
-            # cursor.execute("""
-            #     SELECT ct."app_label", p."codename"
-            #     FROM "auth_permission" p, "auth_group_permissions" gp, "auth_user_groups" ug, "django_content_type" ct
-            #     WHERE p."id" = gp."permission_id"
-            #         AND gp."group_id" = ug."group_id"
-            #         AND ct."id" = p."content_type_id"
-            #         AND ug."user_id" = %s, [self.id])
-            qn = connection.ops.quote_name
-            sql = """
-                SELECT ct.%s, p.%s
-                FROM %s p, %s gp, %s ug, %s ct
-                WHERE p.%s = gp.%s
-                    AND gp.%s = ug.%s
-                    AND ct.%s = p.%s
-                    AND ug.%s = %%s""" % (
-                qn('app_label'), qn('codename'),
-                qn('auth_permission'), qn('auth_group_permissions'),
-                qn('auth_user_groups'), qn('django_content_type'),
-                qn('id'), qn('permission_id'),
-                qn('group_id'), qn('group_id'),
-                qn('id'), qn('content_type_id'),
-                qn('user_id'),)
-            cursor.execute(sql, [self.id])
-            self._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
-        return self._group_perm_cache
+        """
+        Returns a list of permission strings that this user has through
+        his/her groups. This method queries all available auth backends.
+        """
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_group_permissions"):
+                permissions.update(backend.get_group_permissions(self))
+        return permissions
 
     def get_all_permissions(self):
-        if not hasattr(self, '_perm_cache'):
-            self._perm_cache = set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
-            self._perm_cache.update(self.get_group_permissions())
-        return self._perm_cache
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(self))
+        return permissions 
 
     def has_perm(self, perm):
-        "Returns True if the user has the specified permission."
+        """
+        Returns True if the user has the specified permission. This method
+        queries all available auth backends, but returns immediately if any
+        backend returns True. Thus, a user who has permission from a single
+        auth backend is assumed to have permission in general.
+        """
+        # Inactive users have no permissions.
         if not self.is_active:
             return False
+        
+        # Superusers have all permissions.
         if self.is_superuser:
             return True
-        return perm in self.get_all_permissions()
+            
+        # Otherwise we need to check the backends.
+        for backend in auth.get_backends():
+            if hasattr(backend, "has_perm"):
+                if backend.has_perm(self, perm):
+                    return True
+        return False
 
     def has_perms(self, perm_list):
-        "Returns True if the user has each of the specified permissions."
+        """Returns True if the user has each of the specified permissions."""
         for perm in perm_list:
             if not self.has_perm(perm):
                 return False
         return True
 
     def has_module_perms(self, app_label):
-        "Returns True if the user has any permissions in the given app label."
+        """
+        Returns True if the user has any permissions in the given app
+        label. Uses pretty much the same logic as has_perm, above.
+        """
         if not self.is_active:
             return False
+
         if self.is_superuser:
             return True
-        return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
+
+        for backend in auth.get_backends():
+            if hasattr(backend, "has_module_perms"):
+                if backend.has_module_perms(self, app_label):
+                    return True
+        return False
 
     def get_and_delete_messages(self):
         messages = []
@@ -300,7 +305,12 @@ class User(models.Model):
 
 class Message(models.Model):
     """
-    The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
+    The message system is a lightweight way to queue messages for given
+    users. A message is associated with a User instance (so it is only
+    applicable for registered users). There's no concept of expiration or
+    timestamps. Messages are created by the Django admin after successful
+    actions. For example, "The poll Foo was created successfully." is a
+    message.
     """
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))
