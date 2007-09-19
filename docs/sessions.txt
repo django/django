@@ -198,7 +198,7 @@ Using sessions out of views
 
 An API is available to manipulate session data outside of a view::
 
-    >>> from django.contrib.sessions.engines.db import SessionStore
+    >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
     >>> s['last_login'] = datetime.datetime(2005, 8, 20, 13, 35, 10)
     >>> s['last_login']
