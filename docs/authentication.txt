@@ -1090,12 +1090,12 @@ simply::
             else:
                 return False
                 
-This gives full permissions to user granted access in the above example. Notice
+This gives full permissions to the user granted access in the above example. Notice
 that the backend auth functions all take the user object as an argument, and
-also accept the same arguments given to the associated ``User`` functions.
+they also accept the same arguments given to the associated ``User`` functions.
 
 A full authorization implementation can be found in
 ``django/contrib/auth/backends.py`` _, which is the default backend and queries
-the ``auth_permission``-table most of the time.
+the ``auth_permission`` table most of the time.
 
 .. _django/contrib/auth/backends.py: http://code.djangoproject.com/browser/django/trunk/django/contrib/auth/backends.py
