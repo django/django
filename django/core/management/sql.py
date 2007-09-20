@@ -238,7 +238,7 @@ def sql_indexes(app, style):
 
 def sql_all(app, style):
     "Returns a list of CREATE TABLE SQL, initial-data inserts, and CREATE INDEX SQL for the given module."
-    return sql_create(app, style) + sql_custom(app) + sql_indexes(app, style)
+    return sql_create(app, style) + sql_custom(app, style) + sql_indexes(app, style)
 
 def sql_model_create(model, style, known_models=set()):
     """
