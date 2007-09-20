@@ -8,7 +8,7 @@
 >>> q['foo']
 Traceback (most recent call last):
 ...
-MultiValueDictKeyError: "Key 'foo' not found in <MultiValueDict: {}>"
+MultiValueDictKeyError: "Key 'foo' not found in <QueryDict: {}>"
 
 >>> q['something'] = 'bar'
 Traceback (most recent call last):
@@ -89,7 +89,7 @@ AttributeError: This QueryDict instance is immutable
 >>> q['foo']
 Traceback (most recent call last):
 ...
-MultiValueDictKeyError: "Key 'foo' not found in <MultiValueDict: {}>"
+MultiValueDictKeyError: "Key 'foo' not found in <QueryDict: {}>"
 
 >>> q['name'] = 'john'
 
@@ -201,7 +201,7 @@ u'bar'
 >>> q['bar']
 Traceback (most recent call last):
 ...
-MultiValueDictKeyError: "Key 'bar' not found in <MultiValueDict: {u'foo': [u'bar']}>"
+MultiValueDictKeyError: "Key 'bar' not found in <QueryDict: {u'foo': [u'bar']}>"
 
 >>> q['something'] = 'bar'
 Traceback (most recent call last):
