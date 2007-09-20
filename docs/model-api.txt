@@ -293,11 +293,9 @@ visiting its URL on your site. Don't allow that.
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
-**New in development version:**
-
-By default, file fields are created as ``varchar(100)`` database fields. Like
-other fields, you can change the maximum length using the ``max_length``
-argument.
+**New in development version:**  By default, ``FileField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
 
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
@@ -336,11 +334,9 @@ not the full path. So, this example::
 because the ``match`` applies to the base filename (``foo.gif`` and
 ``bar.gif``).
 
-**New in development version:** 
-
-By default, file fields are created as ``varchar(100)`` database fields. Like
-other fields, you can change the maximum length using the ``max_length``
-argument.
+**New in development version:**  By default, ``FilePathField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
 
 ``FloatField``
 ~~~~~~~~~~~~~~
@@ -373,11 +369,10 @@ Requires the `Python Imaging Library`_.
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 .. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
 
-**New in development version:** 
+**New in development version:**  By default, ``ImageField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
 
-By default, file fields are created as ``varchar(100)`` database fields. Like
-other fields, you can change the maximum length using the ``max_length``
-argument.
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
