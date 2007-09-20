@@ -190,7 +190,7 @@ necessary because some HTML form elements, notably
 That means you can't change attributes of ``request.POST`` and ``request.GET``
 directly.
 
-``QueryDict`` implements the all standard dictionary methods, because it's a
+``QueryDict`` implements all the standard dictionary methods, because it's a
 subclass of dictionary. Exceptions are outlined here:
 
     * ``__getitem__(key)`` -- Returns the value for the given key. If the key
