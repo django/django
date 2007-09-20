@@ -16,7 +16,6 @@ class SessionBase(object):
     """
     Base class for all Session classes.
     """
-
     TEST_COOKIE_NAME = 'testcookie'
     TEST_COOKIE_VALUE = 'worked'
 
@@ -59,7 +58,7 @@ class SessionBase(object):
 
     def delete_test_cookie(self):
         del self[self.TEST_COOKIE_NAME]
-        
+
     def encode(self, session_dict):
         "Returns the given session dictionary pickled and encoded as a string."
         pickled = pickle.dumps(session_dict, pickle.HIGHEST_PROTOCOL)
@@ -77,7 +76,7 @@ class SessionBase(object):
         # just return an empty dictionary (an empty session).
         except:
             return {}
-        
+
     def _get_new_session_key(self):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
@@ -93,17 +92,17 @@ class SessionBase(object):
             if not self.exists(session_key):
                 break
         return session_key
-        
+
     def _get_session_key(self):
         if self._session_key:
             return self._session_key
         else:
             self._session_key = self._get_new_session_key()
             return self._session_key
-    
+
     def _set_session_key(self, session_key):
         self._session_key = session_key
-    
+
     session_key = property(_get_session_key, _set_session_key)
 
     def _get_session(self):
@@ -119,9 +118,9 @@ class SessionBase(object):
         return self._session_cache
 
     _session = property(_get_session)
-    
+
     # Methods that child classes must implement.
-    
+
     def exists(self, session_key):
         """
         Returns True if the given session_key already exists.
@@ -145,4 +144,3 @@ class SessionBase(object):
         Loads the session data and returns a dictionary.
         """
         raise NotImplementedError
-        
