@@ -328,7 +328,7 @@ attribute on the ``EmailMessage`` class to change the main content type. The
 major type will always be ``"text"``, but you can change it to the subtype. For
 example::
 
-    msg = EmailMessage(subject, html_content, from_email, to)
+    msg = EmailMessage(subject, html_content, from_email, [to])
     msg.content_subtype = "html"  # Main content is now text/html
     msg.send()
 

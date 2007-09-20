@@ -13,10 +13,10 @@ DATA_TYPES = {
     'DateField':                    'DATE',
     'DateTimeField':                'TIMESTAMP',
     'DecimalField':                 'NUMBER(%(max_digits)s, %(decimal_places)s)',
-    'FileField':                    'NVARCHAR2(100)',
-    'FilePathField':                'NVARCHAR2(100)',
+    'FileField':                    'NVARCHAR2(%(max_length)s)',
+    'FilePathField':                'NVARCHAR2(%(max_length)s)',
     'FloatField':                   'DOUBLE PRECISION',
-    'ImageField':                   'NVARCHAR2(100)',
+    'ImageField':                   'NVARCHAR2(%(max_length)s)',
     'IntegerField':                 'NUMBER(11)',
     'IPAddressField':               'VARCHAR2(15)',
     'NullBooleanField':             'NUMBER(1) CHECK ((%(column)s IN (0,1)) OR (%(column)s IS NULL))',
@@ -28,7 +28,7 @@ DATA_TYPES = {
     'SmallIntegerField':            'NUMBER(11)',
     'TextField':                    'NCLOB',
     'TimeField':                    'TIMESTAMP',
-    'URLField':                     'VARCHAR2(200)',
+    'URLField':                     'VARCHAR2(%(max_length)s)',
     'USStateField':                 'CHAR(2)',
 }
 

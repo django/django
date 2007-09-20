@@ -140,7 +140,7 @@ class AdminBoundField(object):
 
     def original_value(self):
         if self.original:
-            return self.original.__dict__[self.field.column]
+            return self.original.__dict__[self.field.attname]
 
     def existing_display(self):
         try:

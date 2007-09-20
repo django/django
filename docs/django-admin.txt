@@ -645,11 +645,11 @@ Examples:
 To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
 
     django-admin.py testserver --addrport 7000 fixture1 fixture2
-    django-admin.py testserver fixture1 fixture2 --addrport 8080
+    django-admin.py testserver fixture1 fixture2 --addrport 7000
 
 (The above statements are equivalent. We include both of them to demonstrate
-that it doesn't matter whether the options come before or after the
-``testserver`` command.)
+that it doesn't matter whether the options come before or after the fixture
+arguments.)
 
 To run on 1.2.3.4:7000 with a `test` fixture::
 

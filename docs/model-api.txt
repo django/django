@@ -293,6 +293,10 @@ visiting its URL on your site. Don't allow that.
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
+**New in development version:**  By default, ``FileField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
+
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
 
@@ -330,6 +334,10 @@ not the full path. So, this example::
 because the ``match`` applies to the base filename (``foo.gif`` and
 ``bar.gif``).
 
+**New in development version:**  By default, ``FilePathField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
+
 ``FloatField``
 ~~~~~~~~~~~~~~
 
@@ -360,6 +368,11 @@ Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 .. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
+
+**New in development version:**  By default, ``ImageField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
+
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -1283,6 +1296,17 @@ on one of your fields. If Django sees you've explicitly set ``primary_key``, it
 won't add the automatic ``id`` column.
 
 Each model requires exactly one field to have ``primary_key=True``.
+
+The ``pk`` property
+-------------------
+**New in Django development version**
+
+Regardless of whether you define a primary key field yourself, or let Django
+supply one for you, each model will have a property called ``pk``. It behaves
+like a normal attribute on the model, but is actually an alias for whichever
+attribute is the primary key field for the model. You can read and set this
+value, just as you would for any other attribute, and it will update the
+correct field in the model.
 
 Admin options
 =============

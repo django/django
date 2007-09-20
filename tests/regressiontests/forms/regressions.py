@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Tests to prevent against recurrences of earlier bugs.
 
-regression_tests = r"""
+tests = r"""
 It should be possible to re-use attribute dictionaries (#3810)
 >>> from django.newforms import *
 >>> extra_attrs = {'class': 'special'}

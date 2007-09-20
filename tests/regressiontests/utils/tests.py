@@ -6,6 +6,8 @@ from unittest import TestCase
 
 from django.utils import html
 
+from timesince import timesince_tests
+
 class TestUtilsHtml(TestCase):
 
     def check_output(self, function, value, output=None):
@@ -113,3 +115,11 @@ class TestUtilsHtml(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
+
+__test__ = {
+    'timesince_tests': timesince_tests,
+}
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

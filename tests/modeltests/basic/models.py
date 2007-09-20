@@ -33,6 +33,11 @@ __test__ = {'API_TESTS': """
 >>> a.id
 1L
 
+# Models have a pk property that is an alias for the primary key attribute (by
+# default, the 'id' attribute).
+>>> a.pk
+1L
+
 # Access database columns via Python attributes.
 >>> a.headline
 'Area man programs in Python'

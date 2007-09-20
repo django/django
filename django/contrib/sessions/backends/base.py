@@ -107,7 +107,7 @@ class SessionBase(object):
         try:
             return self._session_cache
         except AttributeError:
-            if self.session_key is None:
+            if self._session_key is None:
                 self._session_cache = {}
             else:
                 self._session_cache = self.load()

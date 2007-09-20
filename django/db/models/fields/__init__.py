@@ -693,8 +693,7 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
-        if 'max_length' not in kwargs:
-            kwargs['max_length'] = 75
+        kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
@@ -714,6 +713,7 @@ class EmailField(CharField):
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
         self.upload_to = upload_to
+        kwargs['max_length'] = kwargs.get('max_length', 100)        
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_save(self, value):
@@ -815,6 +815,7 @@ class FileField(Field):
 class FilePathField(Field):
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
+        kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
@@ -886,6 +887,11 @@ class IPAddressField(Field):
 
     def validate(self, field_data, all_data):
         validators.isValidIPAddress4(field_data, None)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.IPAddressField}
+        defaults.update(kwargs)
+        return super(IPAddressField, self).formfield(**defaults)
 
 class NullBooleanField(Field):
     empty_strings_allowed = False
