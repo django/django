@@ -1,6 +1,5 @@
 from django.contrib.gis.utils.layermapping import LayerMapping
 from django.contrib.gis.utils.inspect_data import sample
-from django.contrib.gis.utils.shortcuts import render_to_kml
 
 # Importing GeoIP
 try:
