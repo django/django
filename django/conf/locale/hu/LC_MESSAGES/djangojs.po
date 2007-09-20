@@ -1,20 +1,21 @@
-# translation of djangojs.po to 
+# translation of djangojs.po to Hungarian
+# translation of djangojs.po to
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
-# Nagy Károly <charlie@rendszergazda.com>, 2006.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-12-09 11:51+0100\n"
-"PO-Revision-Date: 2006-05-10 11:59+0200\n"
-"Last-Translator: Nagy Károly <charlie@rendszergazda.com>\n"
-"Language-Team:  <hu@li.org>\n"
+"PO-Revision-Date: 2007-09-13 13:30+0200\n"
+"Last-Translator: Szilveszter Farkas <szilveszter.farkas@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.9.1\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -23,15 +24,15 @@ msgstr "Elérhető %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr "Mindent kijelöl"
+msgstr "Mindet kijelölni"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr "Hozzáad"
+msgstr "Hozzáadás"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr "Eltávolít"
+msgstr "Eltávolítás"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
@@ -40,7 +41,7 @@ msgstr "%s kiválasztva"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr "Válaszd ki a kért elemeket és kattints"
+msgstr "Válassza ki a kért elemeket és kattintson"
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
@@ -51,11 +52,11 @@ msgstr "Összes törlése"
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr "Január Február Március Április Május Június Július Szeptember Október November December"
+msgstr "január február március április május június július augusztus szeptember október november december"
 
 #: contrib/admin/media/js/dateparse.js:27
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr "Vasárnap Hétfő Kedd Szerda Csütörtök Péntek Szombat"
+msgstr "vasárnap hétfő kedd szerda csütörtök péntek szombat"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
@@ -72,7 +73,7 @@ msgstr "Óra"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:77
 msgid "Choose a time"
-msgstr "Válaszd ki az időt"
+msgstr "Válassza ki az időt"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Midnight"

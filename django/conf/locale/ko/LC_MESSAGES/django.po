@@ -825,12 +825,12 @@ msgstr "%d 자 이상 입력해 주세요."
 #: newforms/fields.py:130
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
-msgstr "%s 자 이하로 입력해 주세요."
+msgstr "%s 이하의 값을 입력해 주세요."
 
 #: newforms/fields.py:132
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
-msgstr "%s 자 이상 입력해 주세요."
+msgstr "%s 이상의 값을 입력해 주세요."
 
 #: newforms/fields.py:165
 msgid "Enter a valid date."

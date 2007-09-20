@@ -9,15 +9,16 @@ form field is required.
 """
 
 import urllib2
-from django.conf import settings
-from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
-from django.utils.functional import Promise, lazy
-from django.utils.encoding import force_unicode
 import re
 try:
     from decimal import Decimal, DecimalException
 except ImportError:
     from django.utils._decimal import Decimal, DecimalException    # Python 2.3
+
+from django.conf import settings
+from django.utils.translation import ugettext as _, ugettext_lazy, ungettext
+from django.utils.functional import Promise, lazy
+from django.utils.encoding import force_unicode
 
 _datere = r'\d{4}-\d{1,2}-\d{1,2}'
 _timere = r'(?:[01]?[0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?'
@@ -148,7 +149,7 @@ def _isValidDate(date_string):
         date(year, month, day)
     except ValueError, e:
         msg = _('Invalid date: %s') % _(str(e))
-        raise ValidationError, msg    
+        raise ValidationError, msg
 
 def isValidANSIDate(field_data, all_data):
     if not ansi_date_re.search(field_data):
@@ -180,8 +181,15 @@ def isValidImage(field_data, all_data):
     except TypeError:
         raise ValidationError, _("No file was submitted. Check the encoding type on the form.")
     try:
-        Image.open(StringIO(content))
-    except IOError: # Python Imaging Library doesn't recognize it as an image
+        # load() is the only method that can spot a truncated JPEG,
+        #  but it cannot be called sanely after verify()
+        trial_image = Image.open(StringIO(content))
+        trial_image.load()
+        # verify() is the only method that can spot a corrupt PNG,
+        #  but it must be called immediately after the constructor
+        trial_image = Image.open(StringIO(content))
+        trial_image.verify()
+    except Exception: # Python Imaging Library doesn't recognize it as an image
         raise ValidationError, _("Upload a valid image. The file you uploaded was either not an image or a corrupted image.")
 
 def isValidImageURL(field_data, all_data):
@@ -251,7 +259,7 @@ def isExistingURL(field_data, all_data):
             raise ValidationError, _("The URL %s is a broken link.") % field_data
     except: # urllib2.URLError, httplib.InvalidURL, etc.
         raise ValidationError, _("The URL %s is a broken link.") % field_data
-        
+
 def isValidUSState(field_data, all_data):
     "Checks that the given string is a valid two-letter U.S. state abbreviation"
     states = ['AA', 'AE', 'AK', 'AL', 'AP', 'AR', 'AS', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'FM', 'GA', 'GU', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MH', 'MI', 'MN', 'MO', 'MP', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'PW', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VI', 'VT', 'WA', 'WI', 'WV', 'WY']
@@ -380,13 +388,13 @@ class NumberIsInRange(object):
             self.error_message = error_message
 
     def __call__(self, field_data, all_data):
-        # Try to make the value numeric. If this fails, we assume another 
+        # Try to make the value numeric. If this fails, we assume another
         # validator will catch the problem.
         try:
             val = float(field_data)
         except ValueError:
             return
-            
+
         # Now validate
         if self.lower and self.upper and (val < self.lower or val > self.upper):
             raise ValidationError(self.error_message)
@@ -397,12 +405,17 @@ class NumberIsInRange(object):
 
 class IsAPowerOf(object):
     """
-    >>> v = IsAPowerOf(2)
-    >>> v(4, None)
-    >>> v(8, None)
-    >>> v(16, None)
-    >>> v(17, None)
-    django.core.validators.ValidationError: ['This value must be a power of 2.']
+    Usage: If you create an instance of the IsPowerOf validator:
+        v = IsAPowerOf(2)
+    
+    The following calls will succeed:
+        v(4, None) 
+        v(8, None)
+        v(16, None)
+    
+    But this call:
+        v(17, None)
+    will raise "django.core.validators.ValidationError: ['This value must be a power of 2.']"
     """
     def __init__(self, power_of):
         self.power_of = power_of
@@ -423,7 +436,7 @@ class IsValidDecimal(object):
         except DecimalException:
             raise ValidationError, _("Please enter a valid decimal number.")
 
-        pieces = str(val).split('.')
+        pieces = str(val).lstrip("-").split('.')
         decimals = (len(pieces) == 2) and len(pieces[1]) or 0
         digits = len(pieces[0])
 

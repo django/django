@@ -17,14 +17,12 @@ import sys, os
 __version__ = "0.1"
 __all__ = ["runfastcgi"]
 
-FASTCGI_HELP = r"""runfcgi:
+FASTCGI_HELP = r"""
   Run this project as a fastcgi (or some other protocol supported
   by flup) application. To do this, the flup package from
   http://www.saddi.com/software/flup/ is required.
 
-Usage:
-   django-admin.py runfcgi --settings=yourproject.settings [fcgi settings]
-   manage.py runfcgi [fcgi settings]
+   runfcgi [options] [fcgi settings]
 
 Optional Fcgi settings: (setting=value)
   protocol=PROTOCOL    fcgi, scgi, ajp, ... (default fcgi)

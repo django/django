@@ -35,39 +35,61 @@ be consistent, but any example can use ``manage.py`` just as well.
 Usage
 =====
 
-``django-admin.py action [options]``
+``django-admin.py <subcommand> [options]``
 
-``manage.py action [options]``
+``manage.py <subcommand> [options]``
 
-``action`` should be one of the actions listed in this document. ``options``,
-which is optional, should be zero or more of the options listed in this
-document.
+``subcommand`` should be one of the subcommands listed in this document.
+``options``, which is optional, should be zero or more of the options available
+for the given subcommand.
 
-Run ``django-admin.py --help`` to display a help message that includes a terse
-list of all available actions and options.
+Getting runtime help
+--------------------
 
-Most actions take a list of ``appname``s. An ``appname`` is the basename of the
-package containing your models. For example, if your ``INSTALLED_APPS``
-contains the string ``'mysite.blog'``, the ``appname`` is ``blog``.
+In Django 0.96, run ``django-admin.py --help`` to display a help message that
+includes a terse list of all available subcommands and options.
 
-Available actions
-=================
+In the Django development version, run ``django-admin.py help`` to display a
+list of all available subcommands. Run ``django-admin.py help <subcommand>``
+to display a description of the given subcommand and a list of its available
+options.
 
-adminindex [appname appname ...]
+App names
+---------
+
+Many subcommands take a list of "app names." An "app name" is the basename of
+the package containing your models. For example, if your ``INSTALLED_APPS``
+contains the string ``'mysite.blog'``, the app name is ``blog``.
+
+Determining the version
+-----------------------
+
+Run ``django-admin.py --version`` to display the current Django version.
+
+Examples of output::
+
+	0.95
+    0.96
+    0.97-pre-SVN-6069
+
+Available subcommands
+=====================
+
+adminindex <appname appname ...>
 --------------------------------
 
-Prints the admin-index template snippet for the given appnames.
+Prints the admin-index template snippet for the given app name(s).
 
 Use admin-index template snippets if you want to customize the look and feel of
 your admin's index page. See `Tutorial 2`_ for more information.
 
 .. _Tutorial 2: ../tutorial02/
 
-createcachetable [tablename]
+createcachetable <tablename>
 ----------------------------
 
 Creates a cache table named ``tablename`` for use with the database cache
-backend.  See the `cache documentation`_ for more information.
+backend. See the `cache documentation`_ for more information.
 
 .. _cache documentation: ../cache/
 
@@ -100,26 +122,44 @@ example, the default settings don't define ``ROOT_URLCONF``, so
 Note that Django's default settings live in ``django/conf/global_settings.py``,
 if you're ever curious to see the full list of defaults.
 
-dumpdata [appname appname ...]
+dumpdata <appname appname ...>
 ------------------------------
 
-Output to standard output all data in the database associated with the named
+Outputs to standard output all data in the database associated with the named
 application(s).
-
-By default, the database will be dumped in JSON format. If you want the output
-to be in another format, use the ``--format`` option (e.g., ``format=xml``).
-You may specify any Django serialization backend (including any user specified
-serialization backends named in the ``SERIALIZATION_MODULES`` setting). The
-``--indent`` option can be used to pretty-print the output.
 
 If no application name is provided, all installed applications will be dumped.
 
 The output of ``dumpdata`` can be used as input for ``loaddata``.
 
+--format
+~~~~~~~~
+
+By default, ``dumpdata`` will format its output in JSON, but you can use the
+``--format`` option to specify another format. Currently supported formats are
+listed in `Serialization formats`_.
+
+Example usage::
+
+    django-admin.py dumpdata --format=xml
+
+.. _Serialization formats: ../serialization/#serialization-formats
+
+--indent
+~~~~~~~~
+
+By default, ``dumpdata`` will output all data on a single line. This isn't easy
+for humans to read, so you can use the ``--indent`` option to pretty-print the
+output with a number of indentation spaces.
+
+Example usage::
+
+    django-admin.py dumpdata --indent=4
+
 flush
 -----
 
-Return the database to the state it was in immediately after syncdb was
+Returns the database to the state it was in immediately after syncdb was
 executed. This means that all data will be removed from the database, any
 post-synchronization handlers will be re-executed, and the ``initial_data``
 fixture will be re-installed.
@@ -130,6 +170,27 @@ table that Django didn't know about (i.e., tables that didn't have associated
 models and/or weren't in ``INSTALLED_APPS``). Now, the command only clears
 tables that are represented by Django models and are activated in
 ``INSTALLED_APPS``.
+
+--noinput
+~~~~~~~~~
+
+Use the ``--noinput`` option to suppress all user prompting, such as
+"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
+is being executed as an unattended, automated script.
+
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no input.
+	* ``1`` means normal input (default).
+	* ``2`` means verbose input.
+
+Example usage::
+
+    django-admin.py flush --verbosity=2
 
 inspectdb
 ---------
@@ -172,15 +233,14 @@ needed.
 ``inspectdb`` works with PostgreSQL, MySQL and SQLite. Foreign-key detection
 only works in PostgreSQL and with certain types of MySQL tables.
 
-loaddata [fixture fixture ...]
+loaddata <fixture fixture ...>
 ------------------------------
 
 Searches for and loads the contents of the named fixture into the database.
 
-A *Fixture* is a collection of files that contain the serialized contents of
-the database. Each fixture has a unique name; however, the files that
-comprise the fixture can be distributed over multiple directories, in
-multiple applications.
+A *fixture* is a collection of files that contain the serialized contents of
+the database. Each fixture has a unique name, and the files that comprise the
+fixture can be distributed over multiple directories, in multiple applications.
 
 Django will search in three locations for fixtures:
 
@@ -240,16 +300,37 @@ The ``dumpdata`` command can be used to generate input for ``loaddata``.
     references in your data files - MySQL doesn't provide a mechanism to
     defer checking of row constraints until a transaction is committed.
 
-reset [appname appname ...]
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no input.
+	* ``1`` means normal input (default).
+	* ``2`` means verbose input.
+
+Example usage::
+
+    django-admin.py loaddata --verbosity=2
+
+reset <appname appname ...>
 ---------------------------
 
-Executes the equivalent of ``sqlreset`` for the given appnames.
+Executes the equivalent of ``sqlreset`` for the given app name(s).
+
+--noinput
+~~~~~~~~~
+
+Use the ``--noinput`` option to suppress all user prompting, such as
+"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
+is being executed as an unattended, automated script.
 
 runfcgi [options]
 -----------------
 
-Starts a set of FastCGI processes suitable for use with any web server
-which supports the FastCGI protocol. See the `FastCGI deployment
+Starts a set of FastCGI processes suitable for use with any Web server
+that supports the FastCGI protocol. See the `FastCGI deployment
 documentation`_ for details. Requires the Python FastCGI module from
 `flup`_.
 
@@ -289,8 +370,36 @@ machines on your network. To make your development server viewable to other
 machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
 ``0.0.0.0``.
 
-Examples:
-~~~~~~~~~
+--adminmedia
+~~~~~~~~~~~~
+
+Use the ``--adminmedia`` option to tell Django where to find the various CSS
+and JavaScript files for the Django admin interface. Normally, the development
+server serves these files out of the Django source tree magically, but you'd
+want to use this if you made any changes to those files for your own site.
+
+Example usage::
+
+    django-admin.py runserver --adminmedia=/tmp/new-admin-style/
+
+--noreload
+~~~~~~~~~~
+
+Use the ``--noreload`` option to disable the use of the auto-reloader. This
+means any Python code changes you make while the server is running will *not*
+take effect if the particular Python modules have already been loaded into
+memory.
+
+Examples of using different ports and addresses
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Port 8000 on IP address 127.0.0.1::
+
+	django-admin.py runserver
+
+Port 8000 on IP address 1.2.3.4::
+
+	django-admin.py runserver 1.2.3.4:8000
 
 Port 7000 on IP address 127.0.0.1::
 
@@ -331,31 +440,31 @@ option, like so::
 
 .. _IPython: http://ipython.scipy.org/
 
-sql [appname appname ...]
+sql <appname appname ...>
 -------------------------
 
-Prints the CREATE TABLE SQL statements for the given appnames.
+Prints the CREATE TABLE SQL statements for the given app name(s).
 
-sqlall [appname appname ...]
+sqlall <appname appname ...>
 ----------------------------
 
-Prints the CREATE TABLE and initial-data SQL statements for the given appnames.
+Prints the CREATE TABLE and initial-data SQL statements for the given app name(s).
 
 Refer to the description of ``sqlcustom`` for an explanation of how to
 specify initial data.
 
-sqlclear [appname appname ...]
+sqlclear <appname appname ...>
 ------------------------------
 
-Prints the DROP TABLE SQL statements for the given appnames.
+Prints the DROP TABLE SQL statements for the given app name(s).
 
-sqlcustom [appname appname ...]
+sqlcustom <appname appname ...>
 -------------------------------
 
-Prints the custom SQL statements for the given appnames.
+Prints the custom SQL statements for the given app name(s).
 
 For each model in each specified app, this command looks for the file
-``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given appname and
+``<appname>/sql/<modelname>.sql``, where ``<appname>`` is the given app name and
 ``<modelname>`` is the model's name in lowercase. For example, if you have an
 app ``news`` that includes a ``Story`` model, ``sqlcustom`` will attempt
 to read a file ``news/sql/story.sql`` and append it to the output of this
@@ -373,31 +482,30 @@ sqlflush
 
 Prints the SQL statements that would be executed for the `flush`_ command.
 
-sqlindexes [appname appname ...]
+sqlindexes <appname appname ...>
 --------------------------------
 
-Prints the CREATE INDEX SQL statements for the given appnames.
+Prints the CREATE INDEX SQL statements for the given app name(s).
 
-sqlreset [appname appname ...]
+sqlreset <appname appname ...>
 ------------------------------
 
-Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given appnames.
+Prints the DROP TABLE SQL, then the CREATE TABLE SQL, for the given app name(s).
 
-sqlsequencereset [appname appname ...]
+sqlsequencereset <appname appname ...>
 --------------------------------------
 
-Prints the SQL statements for resetting sequences for the given
-appnames.
+Prints the SQL statements for resetting sequences for the given app name(s).
 
 See http://simon.incutio.com/archive/2004/04/21/postgres for more information.
 
-startapp [appname]
+startapp <appname>
 ------------------
 
 Creates a Django app directory structure for the given app name in the current
 directory.
 
-startproject [projectname]
+startproject <projectname>
 --------------------------
 
 Creates a Django project directory structure for the given project name in the
@@ -435,14 +543,57 @@ with an appropriate extension (e.g. ``json`` or ``xml``). See the
 documentation for ``loaddata`` for details on the specification of fixture
 data files.
 
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no input.
+	* ``1`` means normal input (default).
+	* ``2`` means verbose input.
+
+Example usage::
+
+    django-admin.py syncdb --verbosity=2
+
+--noinput
+~~~~~~~~~
+
+Use the ``--noinput`` option to suppress all user prompting, such as
+"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
+is being executed as an unattended, automated script.
+
 test
 ----
 
-Discover and run tests for all installed models.  See `Testing Django applications`_ for more information.
+Runs tests for all installed models.  See `Testing Django applications`_
+for more information.
 
 .. _testing Django applications: ../testing/
 
-testserver [fixture fixture ...]
+--noinput
+~~~~~~~~~
+
+Use the ``--noinput`` option to suppress all user prompting, such as
+"Are you sure?" confirmation messages. This is useful if ``django-admin.py``
+is being executed as an unattended, automated script.
+
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no input.
+	* ``1`` means normal input (default).
+	* ``2`` means verbose input.
+
+Example usage::
+
+    django-admin.py test --verbosity=2
+
+testserver <fixture fixture ...>
 --------------------------------
 
 **New in Django development version**
@@ -476,13 +627,47 @@ This is useful in a number of ways:
       in any way, knowing that whatever data changes you're making are only
       being made to a test database.
 
-Note that this server can only run on the default port on localhost; it does
-not yet accept a ``host`` or ``port`` parameter.
-
-Also note that it does *not* automatically detect changes to your Python source
-code (as ``runserver`` does). It does, however, detect changes to templates.
+Note that this server does *not* automatically detect changes to your Python
+source code (as ``runserver`` does). It does, however, detect changes to
+templates.
 
 .. _unit tests: ../testing/
+
+--addrport [port number or ipaddr:port]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use ``--addrport`` to specify a different port, or IP address and port, from
+the default of 127.0.0.1:8000. This value follows exactly the same format and
+serves exactly the same function as the argument to the ``runserver`` subcommand.
+
+Examples:
+
+To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
+
+    django-admin.py testserver --addrport 7000 fixture1 fixture2
+    django-admin.py testserver fixture1 fixture2 --addrport 7000
+
+(The above statements are equivalent. We include both of them to demonstrate
+that it doesn't matter whether the options come before or after the fixture
+arguments.)
+
+To run on 1.2.3.4:7000 with a `test` fixture::
+
+    django-admin.py testserver --addrport 1.2.3.4:7000 test
+
+--verbosity
+~~~~~~~~~~~
+
+Use ``--verbosity`` to specify the amount of notification and debug information
+that ``django-admin.py`` should print to the console.
+
+	* ``0`` means no input.
+	* ``1`` means normal input (default).
+	* ``2`` means verbose input.
+
+Example usage::
+
+    django-admin.py testserver --verbosity=2
 
 validate
 --------
@@ -490,23 +675,11 @@ validate
 Validates all installed models (according to the ``INSTALLED_APPS`` setting)
 and prints validation errors to standard output.
 
-Available options
-=================
+Default options
+===============
 
---settings
-----------
-
-Example usage::
-
-    django-admin.py syncdb --settings=mysite.settings
-
-Explicitly specifies the settings module to use. The settings module should be
-in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
-``django-admin.py`` will use the ``DJANGO_SETTINGS_MODULE`` environment
-variable.
-
-Note that this option is unnecessary in ``manage.py``, because it takes care of
-setting ``DJANGO_SETTINGS_MODULE`` for you.
+Although some subcommands may allow their own custom options, every subcommand
+allows for the following options:
 
 --pythonpath
 ------------
@@ -524,77 +697,20 @@ setting the Python path for you.
 
 .. _import search path: http://diveintopython.org/getting_to_know_python/everything_is_an_object.html
 
---format
---------
-
-Example usage::
-
-    django-admin.py dumpdata --format=xml
-
-Specifies the output format that will be used. The name provided must be the name
-of a registered serializer.
-
---help
-------
-
-Displays a help message that includes a terse list of all available actions and
-options.
-
---indent
---------
-
-Example usage::
-
-    django-admin.py dumpdata --indent=4
-
-Specifies the number of spaces that will be used for indentation when
-pretty-printing output. By default, output will *not* be pretty-printed.
-Pretty-printing will only be enabled if the indent option is provided.
-
---noinput
----------
-
-Inform django-admin that the user should NOT be prompted for any input. Useful
-if the django-admin script will be executed as an unattended, automated
-script.
-
---noreload
+--settings
 ----------
 
-Disable the use of the auto-reloader when running the development server.
-
---version
----------
-
-Displays the current Django version.
-
-Example output::
-
-    0.9.1
-    0.9.1 (SVN)
-
---verbosity
------------
-
 Example usage::
 
-    django-admin.py syncdb --verbosity=2
+    django-admin.py syncdb --settings=mysite.settings
 
-Verbosity determines the amount of notification and debug information that
-will be printed to the console. '0' is no output, '1' is normal output,
-and ``2`` is verbose output.
+Explicitly specifies the settings module to use. The settings module should be
+in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
+``django-admin.py`` will use the ``DJANGO_SETTINGS_MODULE`` environment
+variable.
 
---adminmedia
-------------
-
-Example usage::
-
-    django-admin.py --adminmedia=/tmp/new-admin-style/
-
-Tells Django where to find the various CSS and JavaScript files for the admin
-interface when running the development server. Normally these files are served
-out of the Django source tree, but because some designers customize these files
-for their site, this option allows you to test against custom versions.
+Note that this option is unnecessary in ``manage.py``, because it takes care of
+setting ``DJANGO_SETTINGS_MODULE`` for you.
 
 Extra niceties
 ==============

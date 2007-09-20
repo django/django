@@ -176,9 +176,11 @@ just implements the cache interface without doing anything.
 
 This is useful if you have a production site that uses heavy-duty caching in
 various places but a development/test environment on which you don't want to
-cache. In that case, set ``CACHE_BACKEND`` to ``"dummy:///"`` in the settings
-file for your development environment. As a result, your development
-environment won't use caching and your production environment still will.
+cache. As a result, your development environment won't use caching and your
+production environment still will. To activate dummy caching, set
+``CACHE_BACKEND`` like so::
+
+    CACHE_BACKEND = 'dummy:///'
 
 CACHE_BACKEND arguments
 -----------------------
@@ -521,6 +523,15 @@ For explanation of Cache-Control HTTP directives, see the `Cache-Control spec`_.
 the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
+
+If you want to use headers to disable caching altogether, 
+``django.views.decorators.never_cache`` is a view decorator that adds
+headers to ensure the response won't be cached by browsers or other caches. Example::
+
+    from django.views.decorators.cache import never_cache
+    @never_cache
+    def myview(request):
+        ...
 
 .. _`Cache-Control spec`: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9
 

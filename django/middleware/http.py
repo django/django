@@ -55,6 +55,7 @@ class SetRemoteAddrFromForwardedFor(object):
             return None
         else:
             # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
-            # Take just the first one.
-            real_ip = real_ip.split(",")[0]
+            # Take just the last one.
+            # See http://bob.pythonmac.org/archives/2005/09/23/apache-x-forwarded-for-caveat/
+            real_ip = real_ip.split(",")[-1].strip()
             request.META['REMOTE_ADDR'] = real_ip

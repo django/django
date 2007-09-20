@@ -14,9 +14,6 @@ class MergeDict(object):
                 pass
         raise KeyError
 
-    def __contains__(self, key):
-        return self.has_key(key)
-
     def __copy__(self):
         return self.__class__(*self.dicts)
 
@@ -45,6 +42,8 @@ class MergeDict(object):
             if key in dict:
                 return True
         return False
+    
+    __contains__ = has_key
 
     def copy(self):
         """ returns a copy of this object"""
@@ -73,11 +72,22 @@ class SortedDict(dict):
     def items(self):
         return zip(self.keyOrder, self.values())
 
+    def iteritems(self):
+        for key in self.keyOrder:
+            yield key, dict.__getitem__(self, key)
+
     def keys(self):
         return self.keyOrder[:]
 
+    def iterkeys(self):
+        return iter(self.keyOrder)
+
     def values(self):
         return [dict.__getitem__(self, k) for k in self.keyOrder]
+
+    def itervalues(self):
+        for key in self.keyOrder:
+            yield dict.__getitem__(self, key)
 
     def update(self, dict):
         for k, v in dict.items():
@@ -91,6 +101,15 @@ class SortedDict(dict):
     def value_for_index(self, index):
         "Returns the value of the item at the given zero-based index."
         return self[self.keyOrder[index]]
+
+    def insert(self, index, key, value):
+        "Inserts the key, value pair before the item with the given index."
+        if key in self.keyOrder:
+            n = self.keyOrder.index(key)
+            del self.keyOrder[n]
+            if n < index: index -= 1
+        self.keyOrder.insert(index, key)
+        dict.__setitem__(self, key, value)
 
     def copy(self):
         "Returns a copy of this object."
@@ -130,7 +149,7 @@ class MultiValueDict(dict):
         dict.__init__(self, key_to_list_mapping)
 
     def __repr__(self):
-        return "<MultiValueDict: %s>" % dict.__repr__(self)
+        return "<%s: %s>" % (self.__class__.__name__, dict.__repr__(self))
 
     def __getitem__(self, key):
         """
@@ -239,22 +258,20 @@ class DotExpandedDict(dict):
     may contain dots to specify inner dictionaries. It's confusing, but this
     example should make sense.
 
-    >>> d = DotExpandedDict({'person.1.firstname': ['Simon'],
-            'person.1.lastname': ['Willison'],
-            'person.2.firstname': ['Adrian'],
+    >>> d = DotExpandedDict({'person.1.firstname': ['Simon'], \
+            'person.1.lastname': ['Willison'], \
+            'person.2.firstname': ['Adrian'], \
             'person.2.lastname': ['Holovaty']})
     >>> d
-    {'person': {'1': {'lastname': ['Willison'], 'firstname': ['Simon']},
-    '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}}
+    {'person': {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}}
     >>> d['person']
-    {'1': {'firstname': ['Simon'], 'lastname': ['Willison'],
-    '2': {'firstname': ['Adrian'], 'lastname': ['Holovaty']}
+    {'1': {'lastname': ['Willison'], 'firstname': ['Simon']}, '2': {'lastname': ['Holovaty'], 'firstname': ['Adrian']}}
     >>> d['person']['1']
-    {'firstname': ['Simon'], 'lastname': ['Willison']}
+    {'lastname': ['Willison'], 'firstname': ['Simon']}
 
     # Gotcha: Results are unpredictable if the dots are "uneven":
     >>> DotExpandedDict({'c.1': 2, 'c.2': 3, 'c': 1})
-    >>> {'c': 1}
+    {'c': 1}
     """
     def __init__(self, key_to_list_mapping):
         for k, v in key_to_list_mapping.items():

@@ -67,6 +67,16 @@ installed.
 
 * If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher.
 
+If you plan to use Django's ``manage.py syncdb`` command to
+automatically create database tables for your models, you'll need to
+ensure that Django has permission to create tables in the database
+you're using; if you plan to manually create the tables, you can
+simply grant Django ``SELECT``, ``INSERT``, ``UPDATE`` and ``DELETE``
+permissions. Django does not issue ``ALTER TABLE`` statements, and so
+will not require permission to do so. If you will be using Django's
+`testing framework`_ with data fixtures, Django will need permission
+to create a temporary test database.
+
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com/
 .. _Django's ticket system: http://code.djangoproject.com/report/1
@@ -76,8 +86,9 @@ installed.
 .. _SQLite: http://www.sqlite.org/
 .. _pysqlite: http://initd.org/tracker/pysqlite
 .. _MySQL backend: ../databases/
-.. _cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
+.. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
+.. _testing framework: ../testing/
 
 Remove any old versions of Django
 =================================
@@ -127,16 +138,24 @@ Installing an official release
 
     1. Download the latest release from our `download page`_.
 
-    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``).
+    2. Untar the downloaded file (e.g. ``tar xzvf Django-NNN.tar.gz``,
+       where ``NNN`` is the version number of the latest release).
+       If you're using Windows, you can download the command-line tool
+       bsdtar_ to do this, or you can use a GUI-based tool such as 7-zip_.
 
-    3. Change into the downloaded directory (e.g. ``cd Django-NNN``).
+    3. Change into the directory created in step 2 (e.g. ``cd Django-NNN``).
 
-    4. Run ``sudo python setup.py install``.
+    4. If you're using Linux, Mac OS X or some other flavor of Unix, enter
+       the command ``sudo python setup.py install`` at the shell prompt.
+       If you're using Windows, start up a command shell with administrator
+       privileges and run the command ``setup.py install``.
 
-The command will install Django in your Python installation's ``site-packages``
-directory.
+These commands will install Django in your Python installation's
+``site-packages`` directory.
 
 .. _distribution specific notes: ../distributions/
+.. _bsdtar: http://gnuwin32.sourceforge.net/packages/bsdtar.htm
+.. _7-zip: http://www.7-zip.org/
 
 Installing the development version
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,34 +163,55 @@ Installing the development version
 If you'd like to be able to update your Django code occasionally with the
 latest bug fixes and improvements, follow these instructions:
 
-1. Make sure you have Subversion_ installed.
-2. Check out the Django code into your Python ``site-packages`` directory.
+1. Make sure that you have Subversion_ installed, and that you can run its
+   commands from a shell. (Enter ``svn help`` at a shell prompt to test
+   this.)
 
-   On Linux / Mac OSX / Unix, do this::
+2. Check out Django's main development branch (the 'trunk') like so::
 
-       svn co http://code.djangoproject.com/svn/django/trunk/ django_src
-       ln -s `pwd`/django_src/django SITE-PACKAGES-DIR/django
+       svn co http://code.djangoproject.com/svn/django/trunk/ django-trunk
+
+3. Next, make sure that the Python interpreter can load Django's code. There
+   are various ways of accomplishing this.  One of the most convenient, on
+   Linux, Mac OSX or other Unix-like systems, is to use a symbolic link::
+
+       ln -s `pwd`/django-trunk/django SITE-PACKAGES-DIR/django
 
    (In the above line, change ``SITE-PACKAGES-DIR`` to match the location of
    your system's ``site-packages`` directory, as explained in the
    "Where are my ``site-packages`` stored?" section above.)
 
-   On Windows, do this::
+   Alternatively, you can define your ``PYTHONPATH`` environment variable
+   so that it includes the ``django`` subdirectory of ``django-trunk``.
+   This is perhaps the most convenient solution on Windows systems, which
+   don't support symbolic links. (Environment variables can be defined on
+   Windows systems `from the Control Panel`_.)
 
-       svn co http://code.djangoproject.com/svn/django/trunk/django c:\Python24\lib\site-packages\django
+   .. admonition:: What about Apache and mod_python?
 
-3. Copy the file ``django_src/django/bin/django-admin.py`` to somewhere on your
-   system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
+      If you take the approach of setting ``PYTHONPATH``, you'll need to
+      remember to do the same thing in your Apache configuration once you
+      deploy your production site. Do this by setting ``PythonPath`` in your
+      Apache configuration file.
+
+      More information about deployment is available, of course, in our
+      `How to use Django with mod_python`_ documentation.
+
+      .. _How to use Django with mod_python: ../modpython/
+
+4. Copy the file ``django-trunk/django/bin/django-admin.py`` to somewhere on
+   your system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
    (Windows). This step simply lets you type ``django-admin.py`` from within
    any directory, rather than having to qualify the command with the full path
    to the file.
 
-You *don't* have to run ``python setup.py install``, because that command
-takes care of steps 2 and 3 for you.
+You *don't* have to run ``python setup.py install``, because you've already
+carried out the equivalent actions in steps 3 and 4.
 
 When you want to update your copy of the Django source code, just run the
-command ``svn update`` from within the ``django`` directory. When you do this,
-Subversion will automatically download any changes.
+command ``svn update`` from within the ``django-trunk`` directory. When you do
+this, Subversion will automatically download any changes.
 
 .. _`download page`: http://www.djangoproject.com/download/
 .. _Subversion: http://subversion.tigris.org/
+.. _from the Control Panel: http://www.microsoft.com/resources/documentation/windows/xp/all/proddocs/en-us/sysdm_advancd_environmnt_addchange_variable.mspx

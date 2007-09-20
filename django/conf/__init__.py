@@ -112,6 +112,7 @@ class Settings(object):
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
+            time.tzset()
 
     def get_all_members(self):
         return dir(self)

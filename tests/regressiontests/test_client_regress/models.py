@@ -75,7 +75,7 @@ class AssertTemplateUsedTests(TestCase):
         try:
             self.assertTemplateUsed(response, 'Empty POST Template')        
         except AssertionError, e:
-            self.assertEquals(str(e), "Template 'Empty POST Template' was not used to render the response. Actual template was 'Empty GET Template'")
+            self.assertEquals(str(e), "Template 'Empty POST Template' was not a template used to render the response. Actual template(s) used: Empty GET Template")
     
     def test_multiple_context(self):
         "Template assertions work when there are multiple contexts"
@@ -101,7 +101,7 @@ class AssertTemplateUsedTests(TestCase):
         try:
             self.assertTemplateUsed(response, "Valid POST Template")        
         except AssertionError, e:
-            self.assertEquals(str(e), "Template 'Valid POST Template' was not one of the templates used to render the response. Templates used: form_view.html, base.html")
+            self.assertEquals(str(e), "Template 'Valid POST Template' was not a template used to render the response. Actual template(s) used: form_view.html, base.html")
 
 class AssertRedirectsTests(TestCase):
     def test_redirect_page(self):
@@ -112,6 +112,14 @@ class AssertRedirectsTests(TestCase):
             self.assertRedirects(response, '/test_client/get_view/')
         except AssertionError, e:
             self.assertEquals(str(e), "Response didn't redirect as expected: Response code was 301 (expected 302)")
+    
+    def test_lost_query(self):
+        "An assertion is raised if the redirect location doesn't preserve GET parameters"
+        response = self.client.get('/test_client/redirect_view/', {'var': 'value'})
+        try:
+            self.assertRedirects(response, '/test_client/get_view/')
+        except AssertionError, e:
+            self.assertEquals(str(e), "Response redirected to 'http://testserver/test_client/get_view/?var=value', expected '/test_client/get_view/'")
 
     def test_incorrect_target(self):
         "An assertion is raised if the response redirects to another target"
@@ -127,7 +135,7 @@ class AssertRedirectsTests(TestCase):
         response = self.client.get('/test_client/double_redirect_view/')
         try:
             # The redirect target responds with a 301 code, not 200
-            self.assertRedirects(response, '/test_client/permanent_redirect_view/')
+            self.assertRedirects(response, 'http://testserver/test_client/permanent_redirect_view/')
         except AssertionError, e:
             self.assertEquals(str(e), "Couldn't retrieve redirection page '/test_client/permanent_redirect_view/': response code was 301 (expected 200)")
             
@@ -203,8 +211,29 @@ class AssertFormErrorTests(TestCase):
             self.assertFormError(response, 'form', 'email', 'Some error.')
         except AssertionError, e:
             self.assertEqual(str(e), "The field 'email' on form 'form' in context 0 does not contain the error 'Some error.' (actual errors: [u'Enter a valid e-mail address.'])")
+    
+    def test_unknown_nonfield_error(self):
+        """
+        Checks that an assertion is raised if the form's non field errors
+        doesn't contain the provided error.
+        """
+        post_data = {
+            'text': 'Hello World',
+            'email': 'not an email address',
+            'value': 37,
+            'single': 'b',
+            'multi': ('b','c','e')
+        }
+        response = self.client.post('/test_client/form_view/', post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "Invalid POST Template")
 
-class AssertFileUploadTests(TestCase):
+        try:
+            self.assertFormError(response, 'form', None, 'Some error.')
+        except AssertionError, e:
+            self.assertEqual(str(e), "The form 'form' in context 0 does not contain the non-field error 'Some error.' (actual errors: )")        
+
+class FileUploadTests(TestCase):
     def test_simple_upload(self):
         fd = open(os.path.join(os.path.dirname(__file__), "views.py"))
         post_data = {
@@ -213,3 +242,22 @@ class AssertFileUploadTests(TestCase):
         }
         response = self.client.post('/test_client_regress/file_upload/', post_data)
         self.assertEqual(response.status_code, 200)
+
+class LoginTests(TestCase):
+    fixtures = ['testdata']
+
+    def test_login_different_client(self):
+        "Check that using a different test client doesn't violate authentication"
+
+        # Create a second client, and log in.
+        c = Client()
+        login = c.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Get a redirection page with the second client.
+        response = c.get("/test_client_regress/login_protected_redirect_view/")
+        
+        # At this points, the self.client isn't logged in. 
+        # Check that assertRedirects uses the original client, not the 
+        # default client.
+        self.assertRedirects(response, "http://testserver/test_client_regress/get_view/")

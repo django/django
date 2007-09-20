@@ -112,6 +112,61 @@ Submitting patches
 We're always grateful for patches to Django's code. Indeed, bug reports with
 associated patches will get fixed *far* more quickly than those without patches.
 
+"Claiming" tickets
+------------------
+
+In an open-source project with hundreds of contributors around the world, it's
+important to manage communication efficiently so that work doesn't get
+duplicated and contributors can be as effective as possible. Hence, our policy
+is for contributors to "claim" tickets in order to let other developers know
+that a particular bug or feature is being worked on.
+
+If you have identified a contribution you want to make and you're capable of
+fixing it (as measured by your coding ability, knowledge of Django internals
+and time availability), claim it by following these steps:
+
+    * `Create an account`_ to use in our ticket system.
+    * If a ticket for this issue doesn't exist yet, create one in our
+      `ticket tracker`_.
+    * If a ticket for this issue already exists, make sure nobody else has
+      claimed it. To do this, look at the "Assigned to" section of the ticket.
+      If it's assigned to "nobody," then it's available to be claimed.
+      Otherwise, somebody else is working on this ticket, and you either find
+      another bug/feature to work on, or contact the developer working on the
+      ticket to offer your help.
+    * Log into your account, if you haven't already, by clicking "Login" in the
+      upper right of the ticket page.
+    * Claim the ticket by clicking the radio button next to "Accept ticket"
+      near the bottom of the page, then clicking "Submit changes."
+
+.. _Create an account: http://www.djangoproject.com/accounts/register/
+
+Ticket claimers' responsibility
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've claimed a ticket, you have a responsibility to work on that ticket
+in a reasonably timely fashion. If you don't have time to work on it, either
+unclaim it or don't claim it in the first place!
+
+Core Django developers go through the list of claimed tickets from time to
+time, checking whether any progress has been made. If there's no sign of
+progress on a particular claimed ticket for a week or two after it's been
+claimed, we will unclaim it for you so that it's no longer monopolized and
+somebody else can claim it.
+
+If you've claimed a ticket and it's taking a long time (days or weeks) to code,
+keep everybody updated by posting comments on the ticket. That way, we'll know
+not to unclaim it. More communication is better than less communication!
+
+Which tickets should be claimed?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Of course, going through the steps of claiming tickets is overkill in some
+cases. In the case of small changes, such as typos in the documentation or
+small bugs that will only take a few minutes to fix, you don't need to jump
+through the hoops of claiming tickets. Just submit your patch and be done with
+it.
+
 Patch style
 -----------
 
@@ -121,6 +176,11 @@ Patch style
       An exception is for code changes that are described more clearly in plain
       English than in code. Indentation is the most common example; it's hard to
       read patches when the only difference in code is that it's indented.
+
+	* When creating patches, always run ``svn diff`` from the top-level
+	  ``trunk`` directory -- i.e., the one that contains ``django``, ``docs``,
+	  ``tests``, ``AUTHORS``, etc. This makes it easy for other people to apply
+	  your patches.
 
     * Attach patches to a ticket in the `ticket tracker`_, using the "attach file"
       button. Please *don't* put the patch in the ticket description or comment
@@ -412,6 +472,44 @@ Documentation style
 We place a high importance on consistency and readability of documentation.
 (After all, Django was created in a journalism environment!)
 
+How to document new features
+----------------------------
+
+We treat our documentation like we treat our code: we aim to improve it as
+often as possible. This section explains how writers can craft their
+documentation changes in the most useful and least error-prone ways.
+
+Documentation changes come in two forms:
+
+    * General improvements -- Typo corrections, error fixes and better
+      explanations through clearer writing and more examples.
+
+    * New features -- Documentation of features that have been added to the
+      framework since the last release.
+
+Our philosophy is that "general improvements" are something that *all* current
+Django users should benefit from, including users of trunk *and* users of the
+latest release. Hence, the documentation section on djangoproject.com points
+people by default to the newest versions of the docs, because they have the
+latest and greatest content. (In fact, the Web site pulls directly from the
+Subversion repository, converting to HTML on the fly.)
+
+But this decision to feature bleeding-edge documentation has one large caveat:
+any documentation of *new* features will be seen by Django users who don't
+necessarily have access to those features yet, because they're only using the
+latest release. Thus, our policy is:
+
+    **All documentation of new features should be written in a way that clearly
+    designates the features are only available in the Django development
+    version. Assume documentation readers are using the latest release, not the
+    development version.**
+
+Our traditional way of marking new features is by prefacing the features'
+documentation with: "New in Django development version." Changes aren't
+*required* to include this exact text, but all documentation of new features
+should include the phrase "development version," so we can find and remove
+those phrases for the next release.
+
 Guidelines for ReST files
 -------------------------
 
@@ -556,10 +654,31 @@ info, with the ``DATABASE_ENGINE`` setting. You will also need a ``ROOT_URLCONF`
 setting (its value is ignored; it just needs to be present) and a ``SITE_ID``
 setting (any non-zero integer value will do) in order for all the tests to pass.
 
-The unit tests will not touch your existing databases; they create a new
-database, called ``django_test_db``, which is deleted when the tests are
-finished. This means your user account needs permission to execute ``CREATE
-DATABASE``.
+If you're using the ``sqlite3`` database backend, no further settings are
+needed. A temporary database will be created in memory when running the tests.
+
+If you're using another backend:
+
+    * Your ``DATABASE_USER`` setting needs to specify an existing user account
+      for the database engine.
+
+    * The ``DATABASE_NAME`` setting must be the name of an existing database to
+      which the given user has permission to connect. The unit tests will not
+      touch this database; the test runner creates a new database whose name is
+      ``DATABASE_NAME`` prefixed with ``test_``, and this test database is
+      deleted when the tests are finished. This means your user account needs
+      permission to execute ``CREATE DATABASE``.
+
+To run a subset of the unit tests, append the names of the test modules to the
+``runtests.py`` command line. See the list of directories in
+``tests/modeltests`` and ``tests/regressiontests`` for module names.
+
+As an example, if Django is not in your ``PYTHONPATH``, you placed
+``settings.py`` in the ``tests/`` directory, and you'd like to only run tests
+for generic relations and internationalization, type::
+
+    PYTHONPATH=..
+    ./runtests.py --settings=settings generic_relations i18n
 
 Requesting features
 ===================

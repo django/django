@@ -10,7 +10,7 @@
 
 <ul class="objectlist">
 {% for field in field_list %}
-<li class="{% cycle odd,even %}"><a href="{{ field.name }}/">{{ model.verbose_name_plural|capfirst }} by {{ field.verbose_name }}</a></li>
+<li class="{% cycle 'odd' 'even' %}"><a href="{{ field.name }}/">{{ model.verbose_name_plural|capfirst }} by {{ field.verbose_name }}</a></li>
 {% endfor %}
 </ul>
 

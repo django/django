@@ -6,4 +6,4 @@ class Command(NoArgsCommand):
     requires_model_validation = False
 
     def handle_noargs(self, **options):
-        self.validate()
+        self.validate(display_num_errors=True)

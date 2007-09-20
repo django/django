@@ -31,7 +31,7 @@ class SortedDictFromList(SortedDict):
         dict.__init__(self, dict(data))
 
     def copy(self):
-        return SortedDictFromList([(k, copy.copy(v)) for k, v in self.items()])
+        return SortedDictFromList([(k, copy.deepcopy(v)) for k, v in self.items()])
 
 class DeclarativeFieldsMetaclass(type):
     """
@@ -57,13 +57,16 @@ class BaseForm(StrAndUnicode):
     # class is different than Form. See the comments by the Form class for more
     # information. Any improvements to the form API should be made to *this*
     # class, not to the Form class.
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':'):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
         self.auto_id = auto_id
         self.prefix = prefix
         self.initial = initial or {}
+        self.error_class = error_class
+        self.label_suffix = label_suffix
         self._errors = None # Stores the errors after clean() has been called.
 
         # The base_fields class attribute is the *class-wide* definition of
@@ -117,7 +120,7 @@ class BaseForm(StrAndUnicode):
         output, hidden_fields = [], []
         for name, field in self.fields.items():
             bf = BoundField(self, field, name)
-            bf_errors = ErrorList([escape(error) for error in bf.errors]) # Escape and cache in local variable.
+            bf_errors = self.error_class([escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
                     top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
@@ -127,9 +130,10 @@ class BaseForm(StrAndUnicode):
                     output.append(error_row % force_unicode(bf_errors))
                 if bf.label:
                     label = escape(force_unicode(bf.label))
-                    # Only add a colon if the label does not end in punctuation.
-                    if label[-1] not in ':?.!':
-                        label += ':'
+                    # Only add the suffix if the label does not end in punctuation.
+                    if self.label_suffix:
+                        if label[-1] not in ':?.!':
+                            label += self.label_suffix
                     label = bf.label_tag(label) or ''
                 else:
                     label = ''
@@ -168,7 +172,7 @@ class BaseForm(StrAndUnicode):
         field -- i.e., from Form.clean(). Returns an empty ErrorList if there
         are none.
         """
-        return self.errors.get(NON_FIELD_ERRORS, ErrorList())
+        return self.errors.get(NON_FIELD_ERRORS, self.error_class())
 
     def full_clean(self):
         """
@@ -210,6 +214,16 @@ class BaseForm(StrAndUnicode):
         """
         return self.cleaned_data
 
+    def is_multipart(self):
+        """
+        Returns True if the form needs to be multipart-encrypted, i.e. it has
+        FileInput. Otherwise, False.
+        """
+        for field in self.fields.values():
+            if field.widget.needs_multipart_form:
+                return True
+        return False
+
 class Form(BaseForm):
     "A collection of Fields, plus their associated data."
     # This is a separate class from BaseForm in order to abstract the way
@@ -241,7 +255,7 @@ class BoundField(StrAndUnicode):
         Returns an ErrorList for this field. Returns an empty ErrorList
         if there are none.
         """
-        return self.form.errors.get(self.name, ErrorList())
+        return self.form.errors.get(self.name, self.form.error_class())
     errors = property(_errors)
 
     def as_widget(self, widget=None, attrs=None):

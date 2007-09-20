@@ -4,17 +4,17 @@ from cStringIO import StringIO
 from urlparse import urlparse
 from django.conf import settings
 from django.contrib.auth import authenticate, login
-from django.contrib.sessions.models import Session
-from django.contrib.sessions.middleware import SessionWrapper
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.signals import got_request_exception
 from django.dispatch import dispatcher
 from django.http import SimpleCookie, HttpRequest
+from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.utils.functional import curry
 from django.utils.encoding import smart_str
 from django.utils.http import urlencode
+from django.utils.itercompat import is_iterable
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -73,21 +73,22 @@ def encode_multipart(boundary, data):
                 '',
                 value.read()
             ])
-        elif hasattr(value, '__iter__'):
-            for item in value:
+        else:
+            if not isinstance(value, basestring) and is_iterable(value):
+                for item in value:
+                    lines.extend([
+                        '--' + boundary,
+                        'Content-Disposition: form-data; name="%s"' % to_str(key),
+                        '',
+                        to_str(item)
+                    ])
+            else:
                 lines.extend([
                     '--' + boundary,
                     'Content-Disposition: form-data; name="%s"' % to_str(key),
                     '',
-                    to_str(item)
+                    to_str(value)
                 ])
-        else:
-            lines.extend([
-                '--' + boundary,
-                'Content-Disposition: form-data; name="%s"' % to_str(key),
-                '',
-                to_str(value)
-            ])
 
     lines.extend([
         '--' + boundary + '--',
@@ -129,9 +130,10 @@ class Client:
     def _session(self):
         "Obtain the current session variables"
         if 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
             cookie = self.cookies.get(settings.SESSION_COOKIE_NAME, None)
             if cookie:
-                return SessionWrapper(cookie.value)
+                return engine.SessionStore(cookie.value)
         return {}
     session = property(_session)
 
@@ -165,7 +167,25 @@ class Client:
         # Capture exceptions created by the handler
         dispatcher.connect(self.store_exc_info, signal=got_request_exception)
 
-        response = self.handler(environ)
+        try:
+            response = self.handler(environ)
+        except TemplateDoesNotExist, e:
+            # If the view raises an exception, Django will attempt to show
+            # the 500.html template. If that template is not available,
+            # we should ignore the error in favor of re-raising the
+            # underlying exception that caused the 500 error. Any other
+            # template found to be missing during view error handling
+            # should be reported as-is.
+            if e.args != ('500.html',):
+                raise
+
+        # Look for a signalled exception and reraise it
+        if self.exc_info:
+            raise self.exc_info[1], None, self.exc_info[2]
+
+        # Save the client and request that stimulated the response
+        response.client = self
+        response.request = request
 
         # Add any rendered template detail to the response
         # If there was only one template rendered (the most likely case),
@@ -178,10 +198,6 @@ class Client:
                     setattr(response, detail, data[detail])
             else:
                 setattr(response, detail, None)
-
-        # Look for a signalled exception and reraise it
-        if self.exc_info:
-            raise self.exc_info[1], None, self.exc_info[2]
 
         # Update persistent cookie data
         if response.cookies:
@@ -230,24 +246,23 @@ class Client:
         """
         user = authenticate(**credentials)
         if user and user.is_active and 'django.contrib.sessions' in settings.INSTALLED_APPS:
-            obj = Session.objects.get_new_session_object()
+            engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
 
             # Create a fake request to store login details
             request = HttpRequest()
-            request.session = SessionWrapper(obj.session_key)
+            request.session = engine.SessionStore()
             login(request, user)
 
             # Set the cookie to represent the session
-            self.cookies[settings.SESSION_COOKIE_NAME] = obj.session_key
+            self.cookies[settings.SESSION_COOKIE_NAME] = request.session.session_key
             self.cookies[settings.SESSION_COOKIE_NAME]['max-age'] = None
             self.cookies[settings.SESSION_COOKIE_NAME]['path'] = '/'
             self.cookies[settings.SESSION_COOKIE_NAME]['domain'] = settings.SESSION_COOKIE_DOMAIN
             self.cookies[settings.SESSION_COOKIE_NAME]['secure'] = settings.SESSION_COOKIE_SECURE or None
             self.cookies[settings.SESSION_COOKIE_NAME]['expires'] = None
 
-            # Set the session values
-            Session.objects.save(obj.session_key, request.session._session,
-                datetime.datetime.now() + datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE))
+            # Save the session values
+            request.session.save()   
 
             return True
         else:
@@ -258,9 +273,6 @@ class Client:
 
         Causes the authenticated user to be logged out.
         """
-        try:
-            Session.objects.get(session_key=self.cookies['sessionid'].value).delete()
-        except KeyError:
-            pass
-
+        session = __import__(settings.SESSION_ENGINE, {}, {}, ['']).SessionStore()
+        session.delete(session_key=self.cookies['sessionid'].value)
         self.cookies = SimpleCookie()

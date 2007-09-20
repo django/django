@@ -1,5 +1,9 @@
 """
-SQLite3 backend for django.  Requires pysqlite2 (http://pysqlite.org/).
+SQLite3 backend for django.
+
+Python 2.3 and 2.4 require pysqlite2 (http://pysqlite.org/).
+
+Python 2.5 and later use the sqlite3 module in the standard library.
 """
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
@@ -129,8 +133,12 @@ class SQLiteCursorWrapper(Database.Cursor):
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, param_list):
-        query = self.convert_query(query, len(param_list[0]))
-        return Database.Cursor.executemany(self, query, param_list)
+        try:
+          query = self.convert_query(query, len(param_list[0]))
+          return Database.Cursor.executemany(self, query, param_list)
+        except (IndexError,TypeError):
+          # No parameter list provided
+          return None
 
     def convert_query(self, query, num_params):
         return query % tuple("?" * num_params)

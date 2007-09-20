@@ -117,7 +117,7 @@ Here's a sample configuration which uses a MySQL option file::
   [client]
   database = DATABASE_NAME
   user = DATABASE_USER
-  passwd = DATABASE_PASSWORD
+  password = DATABASE_PASSWORD
   default-character-set = utf8
 
 Several other MySQLdb connection options may be useful, such as ``ssl``,

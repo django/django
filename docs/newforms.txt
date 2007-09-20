@@ -513,6 +513,26 @@ include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
 
 By default, ``auto_id`` is set to the string ``'id_%s'``.
 
+Normally, a colon (``:``) will be appended after any label name when a form is
+rendered. It's possible to change the colon to another character, or omit it
+entirely, using the ``label_suffix`` parameter::
+
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender</label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+    >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
+    >>> print f.as_ul()
+    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" /></li>
+    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" /></li>
+    <li><label for="id_for_sender">Sender -></label> <input type="text" name="sender" id="id_for_sender" /></li>
+    <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself" /></li>
+
+Note that the label suffix is added only if the last character of the
+label isn't a punctuation character (``.``, ``!``, ``?`` or ``:``)
+
 Notes on field ordering
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -551,6 +571,29 @@ method you're using::
     <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
     <p>Message: <input type="text" name="message" value="Hi there" /></p>
     <p><ul class="errorlist"><li>Enter a valid e-mail address.</li></ul></p>
+    <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
+    <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
+
+Customizing the error list format
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default, forms use ``django.newforms.util.ErrorList`` to format validation
+errors. If you'd like to use an alternate class for displaying errors, you can
+pass that in at construction time::
+
+    >>> from django.newforms.util import ErrorList
+    >>> class DivErrorList(ErrorList):
+    ...     def __unicode__(self):
+    ...         return self.as_divs()
+    ...     def as_divs(self):
+    ...         if not self: return u''
+    ...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+    >>> f = ContactForm(data, auto_id=False, error_class=DivErrorList)
+    >>> f.as_p()
+    <div class="errorlist"><div class="error">This field is required.</div></div>
+    <p>Subject: <input type="text" name="subject" maxlength="100" /></p>
+    <p>Message: <input type="text" name="message" value="Hi there" /></p>
+    <div class="errorlist"><div class="error">Enter a valid e-mail address.</div></div>
     <p>Sender: <input type="text" name="sender" value="invalid e-mail address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
@@ -752,6 +795,27 @@ form data *and* file data::
 
     # Unbound form with a image field
     >>> f = ContactFormWithMugshot()
+
+Testing for multipart forms
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're writing reusable views or templates, you may not know ahead of time
+whether your form is a multipart form or not. The ``is_multipart()`` method
+tells you whether the form requires multipart encoding for submission::
+
+    >>> f = ContactFormWithMugshot()
+    >>> f.is_multipart()
+    True
+
+Here's an example of how you might use this in a template::
+
+    {% if form.is_multipart %}
+        <form enctype="multipart/form-data" method="post" action="/foo/">
+    {% else %}
+        <form method="post" action="/foo/">
+    {% endif %}
+    {% form %}
+    </form>
 
 Subclassing forms
 -----------------
@@ -962,7 +1026,7 @@ validation if a particular field's value is not given. ``initial`` values are
 ~~~~~~~~~~
 
 The ``widget`` argument lets you specify a ``Widget`` class to use when
-rendering this ``Field``. See "Widgets"_ below for more information.
+rendering this ``Field``. See `Widgets`_ below for more information.
 
 ``help_text``
 ~~~~~~~~~~~~~
@@ -1219,6 +1283,15 @@ When you use a ``FileField`` on a form, you must also remember to
 
 Takes two optional arguments for validation, ``max_value`` and ``min_value``.
 These control the range of values permitted in the field.
+
+``IPAddressField``
+~~~~~~~~~~~~~~~~~~
+
+    * Default widget: ``TextInput``
+    * Empty value: ``''`` (an empty string)
+    * Normalizes to: A Unicode object.
+    * Validates that the given value is a valid IPv4 address, using a regular
+      expression.
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1646,7 +1719,7 @@ the full list of conversions:
     ``ForeignKey``                   ``ModelChoiceField`` (see below)
     ``ImageField``                   ``ImageField``
     ``IntegerField``                 ``IntegerField``
-    ``IPAddressField``               ``CharField``
+    ``IPAddressField``               ``IPAddressField``
     ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
                                      below)
     ``NullBooleanField``             ``CharField``
@@ -1887,11 +1960,22 @@ field on the model, you could define the callback::
     ...     else:
     ...         return field.formfield(**kwargs)
 
-    >>> ArticleForm = form_for_model(formfield_callback=my_callback)
+    >>> ArticleForm = form_for_model(Article, formfield_callback=my_callback)
 
 Note that your callback needs to handle *all* possible model field types, not
 just the ones that you want to behave differently to the default. That's why
 this example has an ``else`` clause that implements the default behavior.
+
+.. warning::
+    The field that is passed into the ``formfield_callback`` function in
+    ``form_for_model()`` and ``form_for_instance`` is the field instance from
+    your model's class. You **must not** alter that object at all; treat it
+    as read-only!
+
+    If you make any alterations to that object, it will affect any future
+    users of the model class, because you will have changed the field object
+    used to construct the class. This is almost certainly what you don't want
+    to have happen.
 
 Finding the model associated with a form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

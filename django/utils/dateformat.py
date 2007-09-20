@@ -166,8 +166,8 @@ class DateFormat(TimeFormat):
 
     def O(self):
         "Difference to Greenwich time in hours; e.g. '+0200'"
-        tz = self.timezone.utcoffset(self.data)
-        return u"%+03d%02d" % (tz.seconds // 3600, (tz.seconds // 60) % 60)
+        seconds = self.Z()
+        return u"%+03d%02d" % (seconds // 3600, (seconds // 60) % 60)
 
     def r(self):
         "RFC 822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
@@ -248,10 +248,15 @@ class DateFormat(TimeFormat):
         return doy
 
     def Z(self):
-        """Time zone offset in seconds (i.e. '-43200' to '43200'). The offset
-        for timezones west of UTC is always negative, and for those east of UTC
-        is always positive."""
-        return self.timezone.utcoffset(self.data).seconds
+        """
+        Time zone offset in seconds (i.e. '-43200' to '43200'). The offset for
+        timezones west of UTC is always negative, and for those east of UTC is
+        always positive.
+        """
+        offset = self.timezone.utcoffset(self.data)
+        # Only days can be negative, so negative offsets have days=-1 and
+        # seconds positive. Positive offsets have days=0
+        return offset.days * 86400 + offset.seconds
 
 def format(value, format_string):
     "Convenience function"

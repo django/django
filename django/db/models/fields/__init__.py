@@ -1,3 +1,11 @@
+import datetime
+import os
+import time
+try:
+    import decimal
+except ImportError:
+    from django.utils import _decimal as decimal    # for Python 2.3
+
 from django.db import get_creation_module
 from django.db.models import signals
 from django.dispatch import dispatcher
@@ -12,11 +20,6 @@ from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.encoding import smart_unicode, force_unicode, smart_str
 from django.utils.maxlength import LegacyMaxlength
-import datetime, os, time
-try:
-    import decimal
-except ImportError:
-    from django.utils import _decimal as decimal    # for Python 2.3
 
 class NOT_PROVIDED:
     pass
@@ -386,7 +389,7 @@ class Field(object):
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
-        
+
     def formfield(self, form_class=forms.CharField, **kwargs):
         "Returns a django.newforms.Field instance for this database Field."
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
@@ -434,6 +437,7 @@ class AutoField(Field):
         assert not cls._meta.has_auto_field, "A model can't have more than one AutoField."
         super(AutoField, self).contribute_to_class(cls, name)
         cls._meta.has_auto_field = True
+        cls._meta.auto_field = self
 
     def formfield(self, **kwargs):
         return None
@@ -539,7 +543,12 @@ class DateField(Field):
     def get_db_prep_save(self, value):
         # Casts dates into string format for entry into database.
         if value is not None:
-            value = value.strftime('%Y-%m-%d')
+            try:
+                value = value.strftime('%Y-%m-%d')
+            except AttributeError:
+                # If value is already a string it won't have a strftime method,
+                # so we'll just let it pass through.
+                pass
         return Field.get_db_prep_save(self, value)
 
     def get_manipulator_field_objs(self):
@@ -681,7 +690,7 @@ class DecimalField(Field):
 
 class EmailField(CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 75
+        kwargs['max_length'] = kwargs.get('max_length', 75)
         CharField.__init__(self, *args, **kwargs)
 
     def get_internal_type(self):
@@ -701,6 +710,7 @@ class EmailField(CharField):
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
         self.upload_to = upload_to
+        kwargs['max_length'] = kwargs.get('max_length', 100)        
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_save(self, value):
@@ -789,10 +799,10 @@ class FileField(Field):
     def save_form_data(self, instance, data):
         if data:
             getattr(instance, "save_%s_file" % self.name)(data.filename, data.content, save=False)
-        
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
-        # If a file has been provided previously, then the form doesn't require 
+        # If a file has been provided previously, then the form doesn't require
         # that a new file is provided this time.
         if 'initial' in kwargs:
             defaults['required'] = False
@@ -802,6 +812,7 @@ class FileField(Field):
 class FilePathField(Field):
     def __init__(self, verbose_name=None, name=None, path='', match=None, recursive=False, **kwargs):
         self.path, self.match, self.recursive = path, match, recursive
+        kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_manipulator_field_objs(self):
@@ -849,6 +860,7 @@ class ImageField(FileField):
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ImageField}
+        defaults.update(kwargs)
         return super(ImageField, self).formfield(**defaults)
 
 class IntegerField(Field):
@@ -872,6 +884,11 @@ class IPAddressField(Field):
 
     def validate(self, field_data, all_data):
         validators.isValidIPAddress4(field_data, None)
+
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.IPAddressField}
+        defaults.update(kwargs)
+        return super(IPAddressField, self).formfield(**defaults)
 
 class NullBooleanField(Field):
     empty_strings_allowed = False
@@ -905,22 +922,29 @@ class PhoneNumberField(IntegerField):
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveIntegerField]
+    
+    def formfield(self, **kwargs):
+        defaults = {'min_value': 0}
+        defaults.update(kwargs)
+        return super(PositiveIntegerField, self).formfield(**defaults) 
 
 class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveSmallIntegerField]
 
-class SlugField(Field):
+    def formfield(self, **kwargs):
+        defaults = {'min_value': 0}
+        defaults.update(kwargs)
+        return super(PositiveSmallIntegerField, self).formfield(**defaults) 
+
+class SlugField(CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = kwargs.get('max_length', 50)
         kwargs.setdefault('validator_list', []).append(validators.isSlug)
         # Set db_index=True unless it's been set manually.
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
-        Field.__init__(self, *args, **kwargs)
-
-    def get_manipulator_field_objs(self):
-        return [oldforms.TextField]
+        super(SlugField, self).__init__(*args, **kwargs)
 
 class SmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):

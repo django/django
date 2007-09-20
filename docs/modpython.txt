@@ -78,12 +78,12 @@ you have some applications under ``/usr/local/django-apps/`` (for example,
 ``DJANGO_SETTINGS_MODULE`` as in the above example. In this case, you would
 need to write your ``PythonPath`` directive as::
 
-    PythonPath "['/var/production/django-apps/', '/var/www'] + sys.path"
+	PythonPath "['/usr/local/django-apps/', '/var/www'] + sys.path"
 
 With this path, ``import weblog`` and ``import mysite.settings`` will both
 work. If you had ``import blogroll`` in your code somewhere and ``blogroll``
 lived under the ``weblog/`` directory, you would *also* need to add
-``/var/production/django-apps/weblog/`` to your ``PythonPath``. Remember: the
+``/usr/local/django-apps/weblog/`` to your ``PythonPath``. Remember: the
 **parent directories** of anything you import directly must be on the Python
 path.
 
@@ -262,7 +262,8 @@ else. This is done using the PythonImport_ directive to mod_python. You need
 to ensure that you have specified the ``PythonInterpreter`` directive to
 mod_python as described above__ (you need to do this even if you aren't
 serving multiple installations in this case). Then add the ``PythonImport``
-line inside the ``Location`` or ``VirtualHost`` section. For example::
+line in the main server configuration (i.e., outside the ``Location`` or
+``VirtualHost`` sections). For example::
 
     PythonInterpreter my_django
     PythonImport /path/to/my/project/file.py my_django

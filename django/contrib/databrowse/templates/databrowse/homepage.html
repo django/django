@@ -7,7 +7,7 @@
 {% block content %}
 
 {% for model in model_list %}
-  <div class="modelgroup {% cycle even,odd %}">
+  <div class="modelgroup {% cycle 'even' 'odd' %}">
 	  <h2><a href="{{ model.url }}">{{ model.verbose_name_plural|capfirst }}</a></h2>
 		<p>
 		{% for object in model.sample_objects %}

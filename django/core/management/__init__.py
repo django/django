@@ -2,7 +2,6 @@ import django
 from optparse import OptionParser
 import os
 import sys
-import textwrap
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
@@ -18,9 +17,9 @@ def load_command_class(name):
 def call_command(name, *args, **options):
     """
     Calls the given command, with the given options and args/kwargs.
-    
+
     This is the primary API you should use for calling specific commands.
-    
+
     Some examples:
         call_command('syncdb')
         call_command('shell', plain=True)
@@ -36,7 +35,9 @@ class ManagementUtility(object):
     A ManagementUtility has a number of commands, which can be manipulated
     by editing the self.commands dictionary.
     """
-    def __init__(self):
+    def __init__(self, argv=None):
+        self.argv = argv or sys.argv[:]
+        self.prog_name = os.path.basename(self.argv[0])
         self.commands = self.default_commands()
 
     def default_commands(self):
@@ -52,76 +53,57 @@ class ManagementUtility(object):
         names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
         return dict([(name, load_command_class(name)) for name in names])
 
-    def usage(self):
+    def main_help_text(self):
         """
-        Returns a usage string, for use with optparse.
-
-        The string doesn't include the options (e.g., "--verbose"), because
-        optparse puts those in automatically.
+        Returns the script's main help text, as a string.
         """
-        usage = ["%prog command [options]\nactions:"]
-        commands = self.commands.items()
+        usage = ['%s <subcommand> [options] [args]' % self.prog_name]
+        usage.append('Django command line tool, version %s' % django.get_version())
+        usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
+        usage.append('Available subcommands:')
+        commands = self.commands.keys()
         commands.sort()
-        for name, cmd in commands:
-            usage.append('  %s %s' % (name, cmd.args))
-            usage.extend(textwrap.wrap(cmd.help, initial_indent='    ', subsequent_indent='    '))
-            usage.append('')
-        return '\n'.join(usage[:-1]) # Cut off the last list element, an empty space.
+        for cmd in commands:
+            usage.append('  %s' % cmd)
+        return '\n'.join(usage)
 
-    def execute(self, argv=None):
+    def fetch_command(self, subcommand):
         """
-        Parses the given argv from the command line, determines which command
-        to run and runs the command.
+        Tries to fetch the given subcommand, printing a message with the
+        appropriate command called from the command line (usually
+        django-admin.py or manage.py) if it can't be found.
         """
-        if argv is None:
-            argv = sys.argv
-
-        # Create the parser object and parse the command-line args.
-        # TODO: Ideally each Command class would register its own options for
-        # add_option(), but we'd need to figure out how to allow for multiple
-        # Commands using the same options. The optparse library gets in the way
-        # by checking for conflicts:
-        # http://docs.python.org/lib/optparse-conflicts-between-options.html
-        parser = OptionParser(usage=self.usage(), version=get_version())
-        parser.add_option('--settings',
-            help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.')
-        parser.add_option('--pythonpath',
-            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
-        parser.add_option('--plain', action='store_true', dest='plain',
-            help='When using "shell": Tells Django to use plain Python, not IPython.')
-        parser.add_option('--noinput', action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
-        parser.add_option('--noreload', action='store_false', dest='use_reloader', default=True,
-            help='When using "runserver": Tells Django to NOT use the auto-reloader.')
-        parser.add_option('--format', default='json', dest='format',
-            help='Specifies the output serialization format for fixtures')
-        parser.add_option('--indent', default=None, dest='indent',
-            type='int', help='Specifies the indent level to use when pretty-printing output')
-        parser.add_option('--verbosity', action='store', dest='verbosity', default='1',
-            type='choice', choices=['0', '1', '2'],
-            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output')
-        parser.add_option('--adminmedia', dest='admin_media_path', default='',
-            help='When using "runserver": Specifies the directory from which to serve admin media.')
-        options, args = parser.parse_args(argv[1:])
-
-        # If the 'settings' or 'pythonpath' options were submitted, activate those.
-        if options.settings:
-            os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
-        if options.pythonpath:
-            sys.path.insert(0, options.pythonpath)
-
-        # Run the appropriate command.
         try:
-            command_name = args[0]
-        except IndexError:
-            sys.stderr.write("Type '%s --help' for usage.\n" % os.path.basename(argv[0]))
-            sys.exit(1)
-        try:
-            command = self.commands[command_name]
+            return self.commands[subcommand]
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s --help' for usage.\n" % (command_name, os.path.basename(argv[0])))
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, self.prog_name))
             sys.exit(1)
-        command.execute(*args[1:], **options.__dict__)
+
+    def execute(self):
+        """
+        Given the command-line arguments, this figures out which subcommand is
+        being run, creates a parser appropriate to that command, and runs it.
+        """
+        try:
+            subcommand = self.argv[1]
+        except IndexError:
+            sys.stderr.write("Type '%s help' for usage.\n" % self.prog_name)
+            sys.exit(1)
+
+        if subcommand == 'help':
+            if len(self.argv) > 2:
+                self.fetch_command(self.argv[2]).print_help(self.prog_name, self.argv[2])
+            else:
+                sys.stderr.write(self.main_help_text() + '\n')
+                sys.exit(1)
+        # Special-cases: We want 'django-admin.py --version' and
+        # 'django-admin.py --help' to work, for backwards compatibility.
+        elif self.argv[1:] == ['--version']:
+            print django.get_version()
+        elif self.argv[1:] == ['--help']:
+            sys.stderr.write(self.main_help_text() + '\n')
+        else:
+            self.fetch_command(subcommand).run_from_argv(self.argv)
 
 class ProjectManagementUtility(ManagementUtility):
     """
@@ -132,8 +114,8 @@ class ProjectManagementUtility(ManagementUtility):
     In practice, this class represents manage.py, whereas ManagementUtility
     represents django-admin.py.
     """
-    def __init__(self, project_directory):
-        super(ProjectManagementUtility, self).__init__()
+    def __init__(self, argv, project_directory):
+        super(ProjectManagementUtility, self).__init__(argv)
 
         # Remove the "startproject" command from self.commands, because
         # that's a django-admin.py command, not a manage.py command.
@@ -167,8 +149,8 @@ def execute_from_command_line(argv=None):
     """
     A simple method that runs a ManagementUtility.
     """
-    utility = ManagementUtility()
-    utility.execute(argv)
+    utility = ManagementUtility(argv)
+    utility.execute()
 
 def execute_manager(settings_mod, argv=None):
     """
@@ -176,5 +158,5 @@ def execute_manager(settings_mod, argv=None):
     project-specific django-admin.py utility.
     """
     project_directory = setup_environ(settings_mod)
-    utility = ProjectManagementUtility(project_directory)
-    utility.execute(argv)
+    utility = ProjectManagementUtility(argv, project_directory)
+    utility.execute()

@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms: nplurals=2; nplurals=n>1;"
+"Plural-Forms: nplurals=2; plural=n>1;"
 
 #: contrib/comments/models.py:67 contrib/comments/models.py:166
 msgid "object ID"

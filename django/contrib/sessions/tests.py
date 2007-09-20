@@ -1,34 +1,58 @@
 r"""
->>> s = SessionWrapper(None)
 
-Inject data into the session cache.
->>> s._session_cache = {}
->>> s._session_cache['some key'] = 'exists'
+>>> from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
+>>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
+>>> from django.contrib.sessions.backends.file import SessionStore as FileSession
 
->>> s.accessed
+>>> db_session = DatabaseSession()
+>>> db_session.modified
 False
->>> s.modified
-False
-
->>> s.pop('non existant key', 'does not exist')
+>>> db_session['cat'] = "dog"
+>>> db_session.modified
+True
+>>> db_session.pop('cat')
+'dog'
+>>> db_session.pop('some key', 'does not exist')
 'does not exist'
->>> s.accessed
+>>> db_session.save()
+>>> db_session.exists(db_session.session_key)
 True
->>> s.modified
+>>> db_session.delete(db_session.session_key)
+>>> db_session.exists(db_session.session_key)
 False
 
->>> s.pop('some key')
-'exists'
->>> s.accessed
+>>> file_session = FileSession()
+>>> file_session.modified
+False
+>>> file_session['cat'] = "dog"
+>>> file_session.modified
 True
->>> s.modified
-True
-
->>> s.pop('some key', 'does not exist')
+>>> file_session.pop('cat')
+'dog'
+>>> file_session.pop('some key', 'does not exist')
 'does not exist'
+>>> file_session.save()
+>>> file_session.exists(file_session.session_key)
+True
+>>> file_session.delete(file_session.session_key)
+>>> file_session.exists(file_session.session_key)
+False
+
+>>> cache_session = CacheSession()
+>>> cache_session.modified
+False
+>>> cache_session['cat'] = "dog"
+>>> cache_session.modified
+True
+>>> cache_session.pop('cat')
+'dog'
+>>> cache_session.pop('some key', 'does not exist')
+'does not exist'
+>>> cache_session.save()
+>>> cache_session.delete(cache_session.session_key)
+>>> cache_session.exists(cache_session.session_key)
+False
 """
-
-from django.contrib.sessions.middleware import SessionWrapper
 
 if __name__ == '__main__':
     import doctest

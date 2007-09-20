@@ -366,25 +366,36 @@ Ignore everything between ``{% comment %}`` and ``{% endcomment %}``
 cycle
 ~~~~~
 
-Cycle among the given strings each time this tag is encountered.
+**Changed in Django development version**
+Cycle among the given strings or variables each time this tag is encountered.
 
-Within a loop, cycles among the given strings each time through the loop::
+Within a loop, cycles among the given strings/variables each time through the
+loop::
 
     {% for o in some_list %}
-        <tr class="{% cycle row1,row2 %}">
+        <tr class="{% cycle 'row1' 'row2' rowvar %}">
             ...
         </tr>
     {% endfor %}
-
+ 
 Outside of a loop, give the values a unique name the first time you call it,
 then use that name each successive time through::
 
-        <tr class="{% cycle row1,row2,row3 as rowcolors %}">...</tr>
+        <tr class="{% cycle 'row1' 'row2' rowvar as rowcolors %}">...</tr>
         <tr class="{% cycle rowcolors %}">...</tr>
         <tr class="{% cycle rowcolors %}">...</tr>
 
-You can use any number of values, separated by commas. Make sure not to put
-spaces between the values -- only commas.
+You can use any number of values, separated by spaces. Values enclosed in 
+single (') or double quotes (") are treated as string literals, while values 
+without quotes are assumed to refer to context variables. 
+
+You can also separate values with commas::
+
+    {% cycle row1,row2,row3 %}
+    
+In this syntax, each value will be interpreted as literal text. The 
+comma-based syntax exists for backwards-compatibility, and should not be 
+used for new projects.
 
 debug
 ~~~~~
@@ -1124,12 +1135,15 @@ Returns a boolean of whether the value's length is the argument.
 linebreaks
 ~~~~~~~~~~
 
-Converts newlines into ``<p>`` and ``<br />`` tags.
+Replaces line breaks in plain text with appropriate HTML; a single
+newline becomes an HTML line break (``<br />``) and a new line
+followed by a blank line becomes a paragraph break (``</p>``).
 
 linebreaksbr
 ~~~~~~~~~~~~
 
-Converts newlines into ``<br />`` tags.
+Converts all newlines in a piece of plain text to HTML line breaks
+(``<br />``).
 
 linenumbers
 ~~~~~~~~~~~
@@ -1261,17 +1275,23 @@ For example, if ``blog_date`` is a date instance representing midnight on 1
 June 2006, and ``comment_date`` is a date instance for 08:00 on 1 June 2006,
 then ``{{ comment_date|timesince:blog_date }}`` would return "8 hours".
 
+Minutes is the smallest unit used, and "0 minutes" will be returned for any
+date that is in the future relative to the comparison point.
+
 timeuntil
 ~~~~~~~~~
 
 Similar to ``timesince``, except that it measures the time from now until the
 given date or datetime. For example, if today is 1 June 2006 and
 ``conference_date`` is a date instance holding 29 June 2006, then
-``{{ conference_date|timeuntil }}`` will return "28 days".
+``{{ conference_date|timeuntil }}`` will return "4 weeks".
 
 Takes an optional argument that is a variable containing the date to use as
 the comparison point (instead of *now*). If ``from_date`` contains 22 June
-2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "7 days".
+2006, then ``{{ conference_date|timeuntil:from_date }}`` will return "1 week".
+
+Minutes is the smallest unit used, and "0 minutes" will be returned for any
+date that is in the past relative to the comparison point.
 
 title
 ~~~~~
@@ -1405,6 +1425,12 @@ A collection of template filters that implement these common markup languages:
     * Markdown
     * ReST (ReStructured Text)
 
+See the `markup section`_ of the `add-ons documentation`_ for more
+information.
+
+.. _markup section: ../add_ons/#markup
+.. _add-ons documentation: ../add_ons/
+
 django.contrib.webdesign
 ------------------------
 
@@ -1412,3 +1438,12 @@ A collection of template tags that can be useful while designing a website,
 such as a generator of Lorem Ipsum text. See the `webdesign documentation`_.
 
 .. _webdesign documentation: ../webdesign/
+
+Next steps
+==========
+
+Read the document `The Django template language: For Python programmers`_ if
+you're interested in learning the template system from a technical
+perspective -- how it works and how to extend it.
+
+.. _The Django template language\: For Python programmers: ../templates_python/

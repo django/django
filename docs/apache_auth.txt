@@ -21,14 +21,57 @@ file, you'll need to use mod_python's ``PythonAuthenHandler`` directive along
 with the standard ``Auth*`` and ``Require`` directives::
 
     <Location /example/>
-        AuthType basic
+        AuthType Basic
         AuthName "example.com"
         Require valid-user
 
         SetEnv DJANGO_SETTINGS_MODULE mysite.settings
         PythonAuthenHandler django.contrib.auth.handlers.modpython
     </Location>
+    
+.. admonition:: Using the authentication handler with Apache 2.2
 
+    If you're using Apache 2.2, you'll need to take a couple extra steps.
+    
+    You'll need to ensure that ``mod_auth_basic`` and ``mod_authz_user``
+    are loaded. These might be compiled statically into Apache, or you might
+    need to use ``LoadModule`` to load them dynamically (as shown in the
+    example at the bottom of this note).
+        
+    You'll also need to insert configuration directives that prevent Apache
+    from trying to use other authentication modules. Depending on which other
+    authentication modules you have loaded, you might need one or more of
+    the following directives::
+    
+        AuthBasicAuthoritative Off
+        AuthDefaultAuthoritative Off
+        AuthzLDAPAuthoritative Off
+        AuthzDBMAuthoritative Off
+        AuthzDefaultAuthoritative Off
+        AuthzGroupFileAuthoritative Off
+        AuthzOwnerAuthoritative Off
+        AuthzUserAuthoritative Off
+        
+    A complete configuration, with differences between Apache 2.0 and
+    Apache 2.2 marked in bold, would look something like:
+    
+    .. parsed-literal::
+    
+        **LoadModule auth_basic_module modules/mod_auth_basic.so**
+        **LoadModule authz_user_module modules/mod_authz_user.so**
+    
+        ...
+    
+        <Location /exmaple/>
+            AuthType Basic
+            AuthName "example.com"
+            **AuthBasicAuthoritative Off**
+            Require valid-user
+
+            SetEnv DJANGO_SETTINGS_MODULE mysite.settings
+            PythonAuthenHandler django.contrib.auth.handlers.modpython
+        </Location>
+        
 By default, the authentication handler will limit access to the ``/example/``
 location to users marked as staff members.  You can use a set of
 ``PythonOption`` directives to modify this behavior:

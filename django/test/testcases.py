@@ -1,13 +1,27 @@
-import re, unittest
-from urlparse import urlparse
+import re
+import unittest
+from urlparse import urlsplit
+
+from django.http import QueryDict
 from django.db import transaction
 from django.core import mail
 from django.core.management import call_command
-from django.db.models import get_apps
 from django.test import _doctest as doctest
 from django.test.client import Client
 
 normalize_long_ints = lambda s: re.sub(r'(?<![\w])(\d+)L(?![\w])', '\\1', s)
+
+def to_list(value):
+    """
+    Puts value into a list if it's not already one.
+    Returns an empty list if value is None.
+    """
+    if value is None:
+        value = []
+    elif not isinstance(value, list):
+        value = [value]
+    return value
+
 
 class OutputChecker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
@@ -20,28 +34,27 @@ class OutputChecker(doctest.OutputChecker):
         if not ok:
             return normalize_long_ints(want) == normalize_long_ints(got)
         return ok
-                  
+
 class DocTestRunner(doctest.DocTestRunner):
     def __init__(self, *args, **kwargs):
         doctest.DocTestRunner.__init__(self, *args, **kwargs)
         self.optionflags = doctest.ELLIPSIS
-        
+
     def report_unexpected_exception(self, out, test, example, exc_info):
-        doctest.DocTestRunner.report_unexpected_exception(self,out,test,example,exc_info)
-        
+        doctest.DocTestRunner.report_unexpected_exception(self, out, test,
+                                                          example, exc_info)
         # Rollback, in case of database errors. Otherwise they'd have
         # side effects on other tests.
-        from django.db import transaction
         transaction.rollback_unless_managed()
 
-class TestCase(unittest.TestCase):    
+class TestCase(unittest.TestCase):
     def _pre_setup(self):
-        """Perform any pre-test setup. This includes:
-        
-            * If the Test Case class has a 'fixtures' member, clearing the 
-            database and installing the named fixtures at the start of each test.
+        """Performs any pre-test setup. This includes:
+
+            * If the Test Case class has a 'fixtures' member, clearing the
+              database and installing the named fixtures at the start of each
+              test.
             * Clearing the mail test outbox.
-            
         """
         call_command('flush', verbosity=0, interactive=False)
         if hasattr(self, 'fixtures'):
@@ -60,97 +73,116 @@ class TestCase(unittest.TestCase):
         self._pre_setup()
         super(TestCase, self).__call__(result)
 
-    def assertRedirects(self, response, expected_path, status_code=302, target_status_code=200):
-        """Assert that a response redirected to a specific URL, and that the
+    def assertRedirects(self, response, expected_url, status_code=302,
+                        target_status_code=200):
+        """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
-        
-        """
-        self.assertEqual(response.status_code, status_code, 
-            "Response didn't redirect as expected: Response code was %d (expected %d)" % 
-                (response.status_code, status_code))
-        scheme, netloc, path, params, query, fragment = urlparse(response['Location'])
-        self.assertEqual(path, expected_path, 
-            "Response redirected to '%s', expected '%s'" % (path, expected_path))
-        redirect_response = self.client.get(path)
-        self.assertEqual(redirect_response.status_code, target_status_code, 
-            "Couldn't retrieve redirection page '%s': response code was %d (expected %d)" % 
-                (path, redirect_response.status_code, target_status_code))
-    
-    def assertContains(self, response, text, count=None, status_code=200):
-        """Assert that a response indicates that a page was retreived successfully,
-        (i.e., the HTTP status code was as expected), and that ``text`` occurs ``count``
-        times in the content of the response. If ``count`` is None, the count doesn't
-        matter - the assertion is true if the text occurs at least once in the response.
-        
+
+        Note that assertRedirects won't work for external links since it uses
+        TestClient to do a request.
         """
         self.assertEqual(response.status_code, status_code,
-            "Couldn't retrieve page: Response code was %d (expected %d)'" % 
+            ("Response didn't redirect as expected: Response code was %d"
+             " (expected %d)" % (response.status_code, status_code)))
+        url = response['Location']
+        scheme, netloc, path, query, fragment = urlsplit(url)
+        self.assertEqual(url, expected_url,
+            "Response redirected to '%s', expected '%s'" % (url, expected_url))
+
+        # Get the redirection page, using the same client that was used
+        # to obtain the original response.
+        redirect_response = response.client.get(path, QueryDict(query))
+        self.assertEqual(redirect_response.status_code, target_status_code,
+            ("Couldn't retrieve redirection page '%s': response code was %d"
+             " (expected %d)") %
+                 (path, redirect_response.status_code, target_status_code))
+
+    def assertContains(self, response, text, count=None, status_code=200):
+        """
+        Asserts that a response indicates that a page was retreived
+        successfully, (i.e., the HTTP status code was as expected), and that
+        ``text`` occurs ``count`` times in the content of the response.
+        If ``count`` is None, the count doesn't matter - the assertion is true
+        if the text occurs at least once in the response.
+        """
+        self.assertEqual(response.status_code, status_code,
+            "Couldn't retrieve page: Response code was %d (expected %d)'" %
                 (response.status_code, status_code))
         real_count = response.content.count(text)
         if count is not None:
             self.assertEqual(real_count, count,
-                "Found %d instances of '%s' in response (expected %d)" % (real_count, text, count))
+                "Found %d instances of '%s' in response (expected %d)" %
+                    (real_count, text, count))
         else:
-            self.failUnless(real_count != 0, "Couldn't find '%s' in response" % text)
-                
+            self.failUnless(real_count != 0,
+                            "Couldn't find '%s' in response" % text)
+
     def assertFormError(self, response, form, field, errors):
-        "Assert that a form used to render the response has a specific field error"
-        if not response.context:
-            self.fail('Response did not use any contexts to render the response')
+        """
+        Asserts that a form used to render the response has a specific field
+        error.
+        """
+        # Put context(s) into a list to simplify processing.
+        contexts = to_list(response.context)
+        if not contexts:
+            self.fail('Response did not use any contexts to render the'
+                      ' response')
 
-        # If there is a single context, put it into a list to simplify processing
-        if not isinstance(response.context, list):
-            contexts = [response.context]
-        else:
-            contexts = response.context
+        # Put error(s) into a list to simplify processing.
+        errors = to_list(errors)
 
-        # If a single error string is provided, make it a list to simplify processing
-        if not isinstance(errors, list):
-            errors = [errors]
-        
         # Search all contexts for the error.
         found_form = False
         for i,context in enumerate(contexts):
-            if form in context:
-                found_form = True
-                for err in errors:
-                    if field:
-                        if field in context[form].errors:
-                            self.failUnless(err in context[form].errors[field], 
-                            "The field '%s' on form '%s' in context %d does not contain the error '%s' (actual errors: %s)" % 
-                                (field, form, i, err, list(context[form].errors[field])))
-                        elif field in context[form].fields:
-                            self.fail("The field '%s' on form '%s' in context %d contains no errors" % 
-                                (field, form, i))
-                        else:
-                            self.fail("The form '%s' in context %d does not contain the field '%s'" % (form, i, field))
+            if form not in context:
+                continue
+            found_form = True
+            for err in errors:
+                if field:
+                    if field in context[form].errors:
+                        field_errors = context[form].errors[field]
+                        self.failUnless(err in field_errors,
+                                        "The field '%s' on form '%s' in"
+                                        " context %d does not contain the"
+                                        " error '%s' (actual errors: %s)" %
+                                            (field, form, i, err,
+                                             list(field_errors)))
+                    elif field in context[form].fields:
+                        self.fail("The field '%s' on form '%s' in context %d"
+                                  " contains no errors" % (field, form, i))
                     else:
-                        self.failUnless(err in context[form].non_field_errors(), 
-                            "The form '%s' in context %d does not contain the non-field error '%s' (actual errors: %s)" % 
-                                (form, i, err, list(context[form].non_field_errors())))
+                        self.fail("The form '%s' in context %d does not"
+                                  " contain the field '%s'" %
+                                      (form, i, field))
+                else:
+                    non_field_errors = context[form].non_field_errors()
+                    self.failUnless(err in non_field_errors,
+                        "The form '%s' in context %d does not contain the"
+                        " non-field error '%s' (actual errors: %s)" %
+                            (form, i, err, non_field_errors))
         if not found_form:
-            self.fail("The form '%s' was not used to render the response" % form)
-            
+            self.fail("The form '%s' was not used to render the response" %
+                          form)
+
     def assertTemplateUsed(self, response, template_name):
-        "Assert that the template with the provided name was used in rendering the response"
-        if isinstance(response.template, list):
-            template_names = [t.name for t in response.template]
-            self.failUnless(template_name in template_names,
-                u"Template '%s' was not one of the templates used to render the response. Templates used: %s" %
-                    (template_name, u', '.join(template_names)))
-        elif response.template:
-            self.assertEqual(template_name, response.template.name,
-                u"Template '%s' was not used to render the response. Actual template was '%s'" %
-                    (template_name, response.template.name))
-        else:
+        """
+        Asserts that the template with the provided name was used in rendering
+        the response.
+        """
+        template_names = [t.name for t in to_list(response.template)]
+        if not template_names:
             self.fail('No templates used to render the response')
+        self.failUnless(template_name in template_names,
+            (u"Template '%s' was not a template used to render the response."
+             u" Actual template(s) used: %s") % (template_name,
+                                                 u', '.join(template_names)))
 
     def assertTemplateNotUsed(self, response, template_name):
-        "Assert that the template with the provided name was NOT used in rendering the response"
-        if isinstance(response.template, list):            
-            self.failIf(template_name in [t.name for t in response.template],
-                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
-        elif response.template:
-            self.assertNotEqual(template_name, response.template.name,
-                u"Template '%s' was used unexpectedly in rendering the response" % template_name)
-
+        """
+        Asserts that the template with the provided name was NOT used in
+        rendering the response.
+        """
+        template_names = [t.name for t in to_list(response.template)]
+        self.failIf(template_name in template_names,
+            (u"Template '%s' was used unexpectedly in rendering the"
+             u" response") % template_name)

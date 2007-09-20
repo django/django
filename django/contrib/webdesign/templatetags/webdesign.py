@@ -62,6 +62,6 @@ def lorem(parser, token):
         count = '1'
     count = parser.compile_filter(count)
     if len(bits) != 1:
-        raise TemplateSyntaxError("Incorrect format for %r tag" % tagname)
+        raise template.TemplateSyntaxError("Incorrect format for %r tag" % tagname)
     return LoremNode(count, method, common)
 lorem = register.tag(lorem)

@@ -1,6 +1,8 @@
+from django.contrib import auth
 from django.core import validators
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, models
+from django.db import models
+from django.db.models.manager import EmptyManager
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
@@ -14,25 +16,43 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
+def get_hexdigest(algorithm, salt, raw_password):
+    """
+    Returns a string of the hexdigest of the given plaintext password and salt
+    using the given algorithm ('md5', 'sha1' or 'crypt').
+    """
+    raw_password, salt = smart_str(raw_password), smart_str(salt)
+    if algorithm == 'crypt':
+        try:
+            import crypt
+        except ImportError:
+            raise ValueError('"crypt" password algorithm not supported in this environment')
+        return crypt.crypt(raw_password, salt)
+    # The rest of the supported algorithms are supported by hashlib, but
+    # hashlib is only available in Python 2.5.
+    try:
+        import hashlib
+    except ImportError:
+        if algorithm == 'md5':
+            import md5
+            return md5.new(salt + raw_password).hexdigest()
+        elif algorithm == 'sha1':
+            import sha
+            return sha.new(salt + raw_password).hexdigest()
+    else:
+        if algorithm == 'md5':
+            return hashlib.md5(salt + raw_password).hexdigest()
+        elif algorithm == 'sha1':
+            return hashlib.sha1(salt + raw_password).hexdigest()
+    raise ValueError("Got unknown password algorithm type in password.")
+
 def check_password(raw_password, enc_password):
     """
     Returns a boolean of whether the raw_password was correct. Handles
     encryption formats behind the scenes.
     """
     algo, salt, hsh = enc_password.split('$')
-    if algo == 'md5':
-        import md5
-        return hsh == md5.new(smart_str(salt + raw_password)).hexdigest()
-    elif algo == 'sha1':
-        import sha
-        return hsh == sha.new(smart_str(salt + raw_password)).hexdigest()
-    elif algo == 'crypt':
-        try:
-            import crypt
-        except ImportError:
-            raise ValueError, "Crypt password algorithm not supported in this environment."
-        return hsh == crypt.crypt(smart_str(raw_password), smart_str(salt))
-    raise ValueError, "Got unknown password algorithm type in password."
+    return hsh == get_hexdigest(algo, salt, raw_password)
 
 class SiteProfileNotAvailable(Exception):
     pass
@@ -161,10 +181,10 @@ class User(models.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        import sha, random
+        import random
         algo = 'sha1'
-        salt = sha.new(str(random.random())).hexdigest()[:5]
-        hsh = sha.new(salt + smart_str(raw_password)).hexdigest()
+        salt = get_hexdigest(algo, str(random.random()), str(random.random()))[:5]
+        hsh = get_hexdigest(algo, salt, raw_password)
         self.password = '%s$%s$%s' % (algo, salt, hsh)
 
     def check_password(self, raw_password):
@@ -175,8 +195,7 @@ class User(models.Model):
         # Backwards-compatibility check. Older passwords won't include the
         # algorithm or salt.
         if '$' not in self.password:
-            import md5
-            is_correct = (self.password == md5.new(smart_str(raw_password)).hexdigest())
+            is_correct = (self.password == get_hexdigest('md5', '', raw_password))
             if is_correct:
                 # Convert the password to the new, more secure format.
                 self.set_password(raw_password)
@@ -192,64 +211,68 @@ class User(models.Model):
         return self.password != UNUSABLE_PASSWORD
 
     def get_group_permissions(self):
-        "Returns a list of permission strings that this user has through his/her groups."
-        if not hasattr(self, '_group_perm_cache'):
-            cursor = connection.cursor()
-            # The SQL below works out to the following, after DB quoting:
-            # cursor.execute("""
-            #     SELECT ct."app_label", p."codename"
-            #     FROM "auth_permission" p, "auth_group_permissions" gp, "auth_user_groups" ug, "django_content_type" ct
-            #     WHERE p."id" = gp."permission_id"
-            #         AND gp."group_id" = ug."group_id"
-            #         AND ct."id" = p."content_type_id"
-            #         AND ug."user_id" = %s, [self.id])
-            qn = connection.ops.quote_name
-            sql = """
-                SELECT ct.%s, p.%s
-                FROM %s p, %s gp, %s ug, %s ct
-                WHERE p.%s = gp.%s
-                    AND gp.%s = ug.%s
-                    AND ct.%s = p.%s
-                    AND ug.%s = %%s""" % (
-                qn('app_label'), qn('codename'),
-                qn('auth_permission'), qn('auth_group_permissions'),
-                qn('auth_user_groups'), qn('django_content_type'),
-                qn('id'), qn('permission_id'),
-                qn('group_id'), qn('group_id'),
-                qn('id'), qn('content_type_id'),
-                qn('user_id'),)
-            cursor.execute(sql, [self.id])
-            self._group_perm_cache = set(["%s.%s" % (row[0], row[1]) for row in cursor.fetchall()])
-        return self._group_perm_cache
+        """
+        Returns a list of permission strings that this user has through
+        his/her groups. This method queries all available auth backends.
+        """
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_group_permissions"):
+                permissions.update(backend.get_group_permissions(self))
+        return permissions
 
     def get_all_permissions(self):
-        if not hasattr(self, '_perm_cache'):
-            self._perm_cache = set([u"%s.%s" % (p.content_type.app_label, p.codename) for p in self.user_permissions.select_related()])
-            self._perm_cache.update(self.get_group_permissions())
-        return self._perm_cache
+        permissions = set()
+        for backend in auth.get_backends():
+            if hasattr(backend, "get_all_permissions"):
+                permissions.update(backend.get_all_permissions(self))
+        return permissions 
 
     def has_perm(self, perm):
-        "Returns True if the user has the specified permission."
+        """
+        Returns True if the user has the specified permission. This method
+        queries all available auth backends, but returns immediately if any
+        backend returns True. Thus, a user who has permission from a single
+        auth backend is assumed to have permission in general.
+        """
+        # Inactive users have no permissions.
         if not self.is_active:
             return False
+        
+        # Superusers have all permissions.
         if self.is_superuser:
             return True
-        return perm in self.get_all_permissions()
+            
+        # Otherwise we need to check the backends.
+        for backend in auth.get_backends():
+            if hasattr(backend, "has_perm"):
+                if backend.has_perm(self, perm):
+                    return True
+        return False
 
     def has_perms(self, perm_list):
-        "Returns True if the user has each of the specified permissions."
+        """Returns True if the user has each of the specified permissions."""
         for perm in perm_list:
             if not self.has_perm(perm):
                 return False
         return True
 
     def has_module_perms(self, app_label):
-        "Returns True if the user has any permissions in the given app label."
+        """
+        Returns True if the user has any permissions in the given app
+        label. Uses pretty much the same logic as has_perm, above.
+        """
         if not self.is_active:
             return False
+
         if self.is_superuser:
             return True
-        return bool(len([p for p in self.get_all_permissions() if p[:p.index('.')] == app_label]))
+
+        for backend in auth.get_backends():
+            if hasattr(backend, "has_module_perms"):
+                if backend.has_module_perms(self, app_label):
+                    return True
+        return False
 
     def get_and_delete_messages(self):
         messages = []
@@ -282,7 +305,12 @@ class User(models.Model):
 
 class Message(models.Model):
     """
-    The message system is a lightweight way to queue messages for given users. A message is associated with a User instance (so it is only applicable for registered users). There's no concept of expiration or timestamps. Messages are created by the Django admin after successful actions. For example, "The poll Foo was created successfully." is a message.
+    The message system is a lightweight way to queue messages for given
+    users. A message is associated with a User instance (so it is only
+    applicable for registered users). There's no concept of expiration or
+    timestamps. Messages are created by the Django admin after successful
+    actions. For example, "The poll Foo was created successfully." is a
+    message.
     """
     user = models.ForeignKey(User)
     message = models.TextField(_('message'))
@@ -293,6 +321,11 @@ class Message(models.Model):
 class AnonymousUser(object):
     id = None
     username = ''
+    is_staff = False
+    is_active = True
+    is_superuser = False
+    _groups = EmptyManager()
+    _user_permissions = EmptyManager()
 
     def __init__(self):
         pass
@@ -325,11 +358,11 @@ class AnonymousUser(object):
         raise NotImplementedError
 
     def _get_groups(self):
-        raise NotImplementedError
+        return self._groups
     groups = property(_get_groups)
 
     def _get_user_permissions(self):
-        raise NotImplementedError
+        return self._user_permissions
     user_permissions = property(_get_user_permissions)
 
     def has_perm(self, perm):

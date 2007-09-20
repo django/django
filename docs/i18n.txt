@@ -27,21 +27,8 @@ Essentially, Django does two things:
     * It uses these hooks to translate Web apps for particular users according
       to their language preferences.
 
-How to internationalize your app: in three steps
-------------------------------------------------
-
-    1. Embed translation strings in your Python code and templates.
-    2. Get translations for those strings, in whichever languages you want to
-       support.
-    3. Activate the locale middleware in your Django settings.
-
-.. admonition:: Behind the scenes
-
-    Django's translation machinery uses the standard ``gettext`` module that
-    comes with Python.
-
-If you don't need internationalization
-======================================
+If you don't need internationalization in your app
+==================================================
 
 Django's internationalization hooks are on by default, and that means there's a
 bit of i18n-related overhead in certain places of the framework. If you don't
@@ -55,8 +42,21 @@ from your ``TEMPLATE_CONTEXT_PROCESSORS`` setting.
 
 .. _documentation for USE_I18N: ../settings/#use-i18n
 
-How to specify translation strings
-==================================
+If you do need internationalization: three steps
+================================================
+
+    1. Embed translation strings in your Python code and templates.
+    2. Get translations for those strings, in whichever languages you want to
+       support.
+    3. Activate the locale middleware in your Django settings.
+
+.. admonition:: Behind the scenes
+
+    Django's translation machinery uses the standard ``gettext`` module that
+    comes with Python.
+
+1. How to specify translation strings
+=====================================
 
 Translation strings specify "This text should be translated." These strings can
 appear in your Python code and templates. It's your responsibility to mark
@@ -295,7 +295,7 @@ string, so they don't need to be aware of translations.
 .. _Django templates: ../templates_python/
 
 Working with lazy translation objects
-=====================================
+-------------------------------------
 
 Using ``ugettext_lazy()`` and ``ungettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
@@ -305,7 +305,7 @@ convert them to strings, because they should be converted as late as possible
 couple of helper functions.
 
 Joining strings: string_concat()
---------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Standard Python string joins (``''.join([...])``) will not work on lists
 containing lazy translation objects. Instead, you can use
@@ -324,7 +324,7 @@ strings when ``result`` itself is used in a string (usually at template
 rendering time).
 
 The allow_lazy() decorator
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Django offers many utility functions (particularly in ``django.utils``) that
 take a string as their first argument and do something to that string. These
@@ -359,8 +359,8 @@ Using this decorator means you can write your function and assume that the
 input is a proper string, then add support for lazy translation objects at the
 end.
 
-How to create language files
-============================
+2. How to create language files
+===============================
 
 Once you've tagged your strings for later translation, you need to write (or
 obtain) the language translations themselves. Here's how that works.
@@ -393,7 +393,7 @@ To create or update a message file, run this command::
 
 ...where ``de`` is the language code for the message file you want to create.
 The language code, in this case, is in locale format. For example, it's
-``pt_BR`` for Brazilian Portugese and ``de_AT`` for Austrian German.
+``pt_BR`` for Brazilian Portuguese and ``de_AT`` for Austrian German.
 
 The script should be run from one of three places:
 
@@ -490,8 +490,8 @@ That's it. Your translations are ready for use.
 
     .. _Submitting and maintaining translations: ../contributing/
 
-How Django discovers language preference
-========================================
+3. How Django discovers language preference
+===========================================
 
 Once you've prepared your translations -- or, if you just want to use the
 translations that come with Django -- you'll just need to activate translation
@@ -546,7 +546,7 @@ following this algorithm:
 Notes:
 
     * In each of these places, the language preference is expected to be in the
-      standard language format, as a string. For example, Brazilian Portugese
+      standard language format, as a string. For example, Brazilian Portuguese
       is ``pt-br``.
     * If a base language is available but the sublanguage specified is not,
       Django uses the base language. For example, if a user specifies ``de-at``
@@ -629,44 +629,6 @@ in ``request.LANGUAGE_CODE``.
 .. _session: ../sessions/
 .. _request object: ../request_response/#httprequest-objects
 
-The ``set_language`` redirect view
-==================================
-
-As a convenience, Django comes with a view, ``django.views.i18n.set_language``,
-that sets a user's language preference and redirects back to the previous page.
-
-Activate this view by adding the following line to your URLconf::
-
-    (r'^i18n/', include('django.conf.urls.i18n')),
-
-(Note that this example makes the view available at ``/i18n/setlang/``.)
-
-The view expects to be called via the ``GET`` method, with a ``language``
-parameter set in the query string. If session support is enabled, the view
-saves the language choice in the user's session. Otherwise, it saves the
-language choice in a ``django_language`` cookie.
-
-After setting the language choice, Django redirects the user, following this
-algorithm:
-
-    * Django looks for a ``next`` parameter in the query string.
-    * If that doesn't exist, or is empty, Django tries the URL in the
-      ``Referer`` header.
-    * If that's empty -- say, if a user's browser suppresses that header --
-      then the user will be redirected to ``/`` (the site root) as a fallback.
-
-Here's example HTML template code::
-
-    <form action="/i18n/setlang/" method="get">
-    <input name="next" type="hidden" value="/next/page/" />
-    <select name="language">
-    {% for lang in LANGUAGES %}
-    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
-    {% endfor %}
-    </select>
-    <input type="submit" value="Go" />
-    </form>
-
 Using translations in your own projects
 =======================================
 
@@ -707,8 +669,11 @@ To create message files, you use the same ``make-messages.py`` tool as with the
 Django message files. You only need to be in the right place -- in the directory
 where either the ``conf/locale`` (in case of the source tree) or the ``locale/``
 (in case of app messages or project messages) directory are located. And you
-use the same ``compile-messages.py`` to produce the binary ``django.mo`` files that
-are used by ``gettext``.
+use the same ``compile-messages.py`` to produce the binary ``django.mo`` files
+that are used by ``gettext``.
+
+You can also run ``compile-message.py --settings=path.to.settings`` to make
+the compiler process all the directories in your ``LOCALE_PATHS`` setting.
 
 Application message files are a bit complicated to discover -- they need the
 ``LocaleMiddleware``. If you don't use the middleware, only the Django message
@@ -727,6 +692,44 @@ The easiest way out is to store applications that are not part of the project
 ``make-messages`` on the project level will only translate strings that are
 connected to your explicit project and not strings that are distributed
 independently.
+
+The ``set_language`` redirect view
+==================================
+
+As a convenience, Django comes with a view, ``django.views.i18n.set_language``,
+that sets a user's language preference and redirects back to the previous page.
+
+Activate this view by adding the following line to your URLconf::
+
+    (r'^i18n/', include('django.conf.urls.i18n')),
+
+(Note that this example makes the view available at ``/i18n/setlang/``.)
+
+The view expects to be called via the ``POST`` method, with a ``language``
+parameter set in request. If session support is enabled, the view
+saves the language choice in the user's session. Otherwise, it saves the
+language choice in a ``django_language`` cookie.
+
+After setting the language choice, Django redirects the user, following this
+algorithm:
+
+    * Django looks for a ``next`` parameter in the ``POST`` data.
+    * If that doesn't exist, or is empty, Django tries the URL in the
+      ``Referrer`` header.
+    * If that's empty -- say, if a user's browser suppresses that header --
+      then the user will be redirected to ``/`` (the site root) as a fallback.
+
+Here's example HTML template code::
+
+    <form action="/i18n/setlang/" method="post">
+    <input name="next" type="hidden" value="/next/page/" />
+    <select name="language">
+    {% for lang in LANGUAGES %}
+    <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+    {% endfor %}
+    </select>
+    <input type="submit" value="Go" />
+    </form>
 
 Translations and JavaScript
 ===========================
@@ -752,7 +755,7 @@ The main solution to these problems is the ``javascript_catalog`` view, which
 sends out a JavaScript code library with functions that mimic the ``gettext``
 interface, plus an array of translation strings. Those translation strings are
 taken from the application, project or Django core, according to what you
-specify in either the {{{info_dict}}} or the URL.
+specify in either the info_dict or the URL.
 
 You hook it up like this::
 
@@ -817,8 +820,8 @@ pluralizations).
 Creating JavaScript translation catalogs
 ----------------------------------------
 
-You create and update the translation catalogs the same way as the other Django
-translation catalogs -- with the {{{make-messages.py}}} tool. The only
+You create and update the translation catalogs the same way as the other
+Django translation catalogs -- with the make-messages.py tool. The only
 difference is you need to provide a ``-d djangojs`` parameter, like this::
 
     make-messages.py -d djangojs -l de
@@ -827,13 +830,13 @@ This would create or update the translation catalog for JavaScript for German.
 After updating translation catalogs, just run ``compile-messages.py`` the same
 way as you do with normal Django translation catalogs.
 
-Specialities of Django translation
+Specialties of Django translation
 ==================================
 
-If you know ``gettext``, you might note these specialities in the way Django
+If you know ``gettext``, you might note these specialties in the way Django
 does translation:
 
-    * The string domain is ``django`` or ``djangojs``. The string domain is
+    * The string domain is ``django`` or ``djangojs``. This string domain is
       used to differentiate between different programs that store their data
       in a common message-file library (usually ``/usr/share/locale/``). The
       ``django`` domain is used for python and template translation strings
@@ -841,5 +844,5 @@ does translation:
       domain is only used for JavaScript translation catalogs to make sure
       that those are as small as possible.
     * Django doesn't use ``xgettext`` alone. It uses Python wrappers around
-      ``xgettext`` and ``msgfmt``. That's mostly for convenience.
+      ``xgettext`` and ``msgfmt``. This is mostly for convenience.
 

@@ -148,7 +148,7 @@ and in Django's validation.
 
 Django veterans: Note that the argument is now called ``max_length`` to
 provide consistency throughout Django. There is full legacy support for
-the old ``maxlength`` argument, but ``max_length`` is prefered.
+the old ``maxlength`` argument, but ``max_length`` is preferred.
 	
 ``CommaSeparatedIntegerField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -178,7 +178,8 @@ A date field. Has a few extra optional arguments:
     ======================  ===================================================
 
 The admin represents this as an ``<input type="text">`` with a JavaScript
-calendar and a shortcut for "Today."
+calendar, and a shortcut for "Today."  The JavaScript calendar will always start
+the week on a Sunday.
 
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
@@ -221,8 +222,10 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ~~~~~~~~~~~~~~
 
 A ``CharField`` that checks that the value is a valid e-mail address.
-This doesn't accept ``max_length``; its ``max_length`` is automatically set to
-75.
+
+In Django 0.96, this doesn't accept ``max_length``; its ``max_length`` is
+automatically set to 75. In the Django development version, ``max_length`` is
+set to 75 by default, but you can specify it to override default behavior.
 
 ``FileField``
 ~~~~~~~~~~~~~
@@ -290,6 +293,10 @@ visiting its URL on your site. Don't allow that.
 
 .. _`strftime formatting`: http://docs.python.org/lib/module-time.html#l2h-1941
 
+**New in development version:**  By default, ``FileField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
+
 ``FilePathField``
 ~~~~~~~~~~~~~~~~~
 
@@ -308,7 +315,7 @@ on the filesystem. Has three special arguments, of which the first is
                             ``FilePathField`` will use to filter filenames.
                             Note that the regex will be applied to the
                             base filename, not the full path. Example:
-                            ``"foo.*\.txt^"``, which will match a file called
+                            ``"foo.*\.txt$"``, which will match a file called
                             ``foo23.txt`` but not ``bar.txt`` or ``foo23.gif``.
 
     ``recursive``           Optional. Either ``True`` or ``False``. Default is
@@ -326,6 +333,10 @@ not the full path. So, this example::
 ...will match ``/home/images/foo.gif`` but not ``/home/images/foo/bar.gif``
 because the ``match`` applies to the base filename (``foo.gif`` and
 ``bar.gif``).
+
+**New in development version:**  By default, ``FilePathField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
 
 ``FloatField``
 ~~~~~~~~~~~~~~
@@ -357,6 +368,11 @@ Requires the `Python Imaging Library`_.
 
 .. _Python Imaging Library: http://www.pythonware.com/products/pil/
 .. _elsewhere: ../db-api/#get-foo-height-and-get-foo-width
+
+**New in development version:**  By default, ``ImageField`` instances are
+created as ``varchar(100)`` columns in your database. As with other fields, you
+can change the maximum length using the ``max_length`` argument.
+
 
 ``IntegerField``
 ~~~~~~~~~~~~~~~~
@@ -1224,6 +1240,13 @@ together. It's used in the Django admin and is enforced at the database
 level (i.e., the appropriate ``UNIQUE`` statements are included in the
 ``CREATE TABLE`` statement).
 
+**New in Django development version**
+
+For convenience, unique_together can be a single list when dealing
+with a single set of fields::
+
+	unique_together = ("driver", "restaurant")
+
 ``verbose_name``
 ----------------
 
@@ -1273,6 +1296,17 @@ on one of your fields. If Django sees you've explicitly set ``primary_key``, it
 won't add the automatic ``id`` column.
 
 Each model requires exactly one field to have ``primary_key=True``.
+
+The ``pk`` property
+-------------------
+**New in Django development version**
+
+Regardless of whether you define a primary key field yourself, or let Django
+supply one for you, each model will have a property called ``pk``. It behaves
+like a normal attribute on the model, but is actually an alias for whichever
+attribute is the primary key field for the model. You can read and set this
+value, just as you would for any other attribute, and it will update the
+correct field in the model.
 
 Admin options
 =============
@@ -1550,8 +1584,8 @@ Finally, note that in order to use ``list_display_links``, you must define
 
 Set ``list_filter`` to activate filters in the right sidebar of the change list
 page of the admin. This should be a list of field names, and each specified
-field should be either a ``BooleanField``, ``DateField``, ``DateTimeField``
-or ``ForeignKey``.
+field should be either a ``BooleanField``, ``CharField``, ``DateField``, 
+``DateTimeField``, ``IntegerField`` or ``ForeignKey``. 
 
 This example, taken from the ``django.contrib.auth.models.User`` model, shows
 how both ``list_display`` and ``list_filter`` work::
@@ -1903,7 +1937,7 @@ as the value displayed to render an object in the Django admin site and as the
 value inserted into a template when it displays an object. Thus, you should
 always return a nice, human-readable string for the object's ``__str__``.
 Although this isn't required, it's strongly encouraged (see the description of
-``__unicode__``, below, before putting ``_str__`` methods everywhere).
+``__unicode__``, below, before putting ``__str__`` methods everywhere).
 
 For example::
 

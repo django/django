@@ -160,7 +160,7 @@ When you save an object, Django performs the following steps:
        is used to provide notification that an object has been successfully
        saved. (These signals are not yet documented.)
 
-Raw Saves
+Raw saves
 ~~~~~~~~~
 
 **New in Django development version**
@@ -481,7 +481,7 @@ In SQL terms, that evaluates to::
     WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
 
 This example excludes all entries whose ``pub_date`` is later than 2005-1-3
-AND whose headline is NOT "Hello"::
+OR whose headline is "Hello"::
 
     Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
 
@@ -510,6 +510,9 @@ The result above will be ordered by ``pub_date`` descending, then by
 like so::
 
     Entry.objects.order_by('?')
+
+Note: ``order_by('?')`` queries may be expensive and slow, depending on the
+database backend you're using.
 
 To order by a field in a different table, add the other table's name and a dot,
 like so::
@@ -799,6 +802,9 @@ of the arguments is required, but you should use at least one of them.
 
         Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
 
+    The combined number of placeholders in the list of strings for ``select``
+    or ``where`` should equal the number of values in the ``params`` list.
+
 QuerySet methods that do not return QuerySets
 ---------------------------------------------
 
@@ -944,6 +950,23 @@ Example::
     {}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+``iterator()``
+~~~~~~~~~~~~
+
+Evaluates the ``QuerySet`` (by performing the query) and returns an
+`iterator`_ over the results. A ``QuerySet`` typically reads all of
+its results and instantiates all of the corresponding objects the
+first time you access it; ``iterator()`` will instead read results and
+instantiate objects in discrete chunks, yielding them one at a
+time. For a ``QuerySet`` which returns a large number of objects, this
+often results in better performance and a significant reduction in
+memory use.
+
+Note that using ``iterator()`` on a ``QuerySet`` which has already
+been evaluated will force it to evaluate again, repeating the query.
+
+.. _iterator: http://www.python.org/dev/peps/pep-0234/
 
 ``latest(field_name=None)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

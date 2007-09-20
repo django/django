@@ -1,12 +1,22 @@
+import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
+import itertools
+from optparse import make_option, OptionParser
 import sys
+import os
 
 class CommandError(Exception):
     pass
 
 class BaseCommand(object):
     # Metadata about this command.
+    option_list = (
+        make_option('--settings',
+            help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
+        make_option('--pythonpath',
+            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
+    )
     help = ''
     args = ''
 
@@ -17,6 +27,39 @@ class BaseCommand(object):
 
     def __init__(self):
         self.style = color_style()
+
+    def get_version(self):
+        """
+        Returns the Django version, which should be correct for all built-in
+        Django commands. User-supplied commands should override this method.
+        """
+        return django.get_version()
+
+    def usage(self, subcommand):
+        usage = '%%prog %s [options] %s' % (subcommand, self.args)
+        if self.help:
+            return '%s\n\n%s' % (usage, self.help)
+        else:
+            return usage
+
+    def create_parser(self, prog_name, subcommand):
+        return OptionParser(prog=prog_name,
+                            usage=self.usage(subcommand),
+                            version=self.get_version(),
+                            option_list=self.option_list)
+
+    def print_help(self, prog_name, subcommand):
+        parser = self.create_parser(prog_name, subcommand)
+        parser.print_help()
+
+    def run_from_argv(self, argv):
+        parser = self.create_parser(argv[0], argv[1])
+        options, args = parser.parse_args(argv[2:])
+        if options.settings:
+            os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
+        if options.pythonpath:
+            sys.path.insert(0, options.pythonpath)
+        self.execute(*args, **options.__dict__)
 
     def execute(self, *args, **options):
         # Switch to English, because django-admin.py creates database content
@@ -44,7 +87,7 @@ class BaseCommand(object):
             sys.stderr.write(self.style.ERROR(str('Error: %s\n' % e)))
             sys.exit(1)
 
-    def validate(self, app=None):
+    def validate(self, app=None, display_num_errors=False):
         """
         Validates the given app, raising CommandError for any errors.
 
@@ -61,12 +104,14 @@ class BaseCommand(object):
             s.seek(0)
             error_text = s.read()
             raise CommandError("One or more models did not validate:\n%s" % error_text)
+        if display_num_errors:
+            print "%s error%s found" % (num_errors, num_errors != 1 and 's' or '')
 
     def handle(self, *args, **options):
         raise NotImplementedError()
 
 class AppCommand(BaseCommand):
-    args = '[appname ...]'
+    args = '<appname appname ...>'
 
     def handle(self, *app_labels, **options):
         from django.db import models
@@ -87,7 +132,7 @@ class AppCommand(BaseCommand):
         raise NotImplementedError()
 
 class LabelCommand(BaseCommand):
-    args = '[label ...]'
+    args = '<label label ...>'
     label = 'label'
 
     def handle(self, *labels, **options):
@@ -119,7 +164,6 @@ class NoArgsCommand(BaseCommand):
 
 def copy_helper(style, app_or_project, name, directory, other_name=''):
     import django
-    import os
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -155,5 +199,18 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
             fp_new.close()
             try:
                 shutil.copymode(path_old, path_new)
+                _make_writeable(path_new)
             except OSError:
                 sys.stderr.write(style.NOTICE("Notice: Couldn't set permission bits on %s. You're probably using an uncommon filesystem setup. No problem.\n" % path_new))
+
+def _make_writeable(filename):
+    "Makes sure that the file is writeable. Useful if our source is read-only."
+    import stat
+    if sys.platform.startswith('java'):
+        # On Jython there is no os.access()
+        return
+    if not os.access(filename, os.W_OK):
+        st = os.stat(filename)
+        new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
+        os.chmod(filename, new_permissions)
+

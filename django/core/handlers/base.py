@@ -50,6 +50,10 @@ class BaseHandler(object):
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
+        response = self._real_get_response(request)
+        return fix_location_header(request, response)
+
+    def _real_get_response(self, request):
         from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
         from django.conf import settings
@@ -112,7 +116,7 @@ class BaseHandler(object):
             else:
                 # Get the exception info now, in case another exception is thrown later.
                 exc_info = sys.exc_info()
-                receivers = dispatcher.send(signal=signals.got_request_exception)
+                receivers = dispatcher.send(signal=signals.got_request_exception, request=request)
                 # When DEBUG is False, send an error message to the admins.
                 subject = 'Error (%s IP): %s' % ((request.META.get('REMOTE_ADDR') in settings.INTERNAL_IPS and 'internal' or 'EXTERNAL'), request.path)
                 try:
@@ -129,3 +133,16 @@ class BaseHandler(object):
         "Helper function to return the traceback as a string"
         import traceback
         return '\n'.join(traceback.format_exception(*(exc_info or sys.exc_info())))
+
+def fix_location_header(request, response):
+    """
+    Ensure that we always use an absolute URI in any location header in the
+    response. This is required by RFC 2616, section 14.30.
+
+    Code constructing response objects is free to insert relative paths and
+    this function converts them to absolute paths.
+    """
+    if 'Location' in response and request.get_host():
+        response['Location'] = request.build_absolute_uri(response['Location'])
+    return response
+

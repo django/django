@@ -1,5 +1,5 @@
 """
->>> from models import User
+>>> from models import User, AnonymousUser
 >>> u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
 >>> u.has_usable_password()
 True
@@ -16,4 +16,11 @@ False
 >>> u2 = User.objects.create_user('testuser2', 'test2@example.com')
 >>> u2.has_usable_password()
 False
+>>> a = AnonymousUser()
+>>> a.is_staff
+False
+>>> a.groups.all()
+[]
+>>> a.user_permissions.all()
+[]
 """

@@ -10,6 +10,10 @@ def authenhandler(req, **kwargs):
     # that so that the following import works
     os.environ.update(req.subprocess_env)
 
+    # apache 2.2 requires a call to req.get_basic_auth_pw() before 
+    # req.user and friends are available.
+    req.get_basic_auth_pw()
+
     # check for PythonOptions
     _str_to_bool = lambda s: s.lower() in ('1', 'true', 'on', 'yes')
 

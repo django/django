@@ -2,6 +2,7 @@
 Field classes
 """
 
+import copy
 import datetime
 import re
 import time
@@ -25,7 +26,7 @@ __all__ = (
     'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField', 'BooleanField',
     'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
-    'SplitDateTimeField',
+    'SplitDateTimeField', 'IPAddressField',
 )
 
 # These values, if given to to_python(), will trigger the self.required check.
@@ -100,6 +101,12 @@ class Field(object):
         """
         return {}
 
+    def __deepcopy__(self, memo):
+        result = copy.copy(self)
+        memo[id(self)] = result
+        result.widget = copy.deepcopy(self.widget, memo)
+        return result
+
 class CharField(Field):
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
@@ -137,7 +144,7 @@ class IntegerField(Field):
         if value in EMPTY_VALUES:
             return None
         try:
-            value = int(value)
+            value = int(str(value))
         except (ValueError, TypeError):
             raise ValidationError(ugettext(u'Enter a whole number.'))
         if self.max_value is not None and value > self.max_value:
@@ -185,12 +192,12 @@ class DecimalField(Field):
         super(DecimalField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
             return None
-        value = value.strip()
+        value = str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
             raise ValidationError(ugettext('Enter a number.'))
-        pieces = str(value).split('.')
+        pieces = str(value).lstrip("-").split('.')
         decimals = (len(pieces) == 2) and len(pieces[1]) or 0
         digits = len(pieces[0])
         if self.max_value is not None and value > self.max_value:
@@ -335,12 +342,6 @@ class EmailField(RegexField):
         RegexField.__init__(self, email_re, max_length, min_length,
             ugettext(u'Enter a valid e-mail address.'), *args, **kwargs)
 
-url_re = re.compile(
-    r'^https?://' # http:// or https://
-    r'(?:[A-Z0-9-]+\.)+[A-Z]{2,6}' # domain
-    r'(?::\d+)?' # optional port
-    r'(?:/?|/\S+)$', re.IGNORECASE)
-
 try:
     from django.conf import settings
     URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
@@ -353,7 +354,7 @@ class UploadedFile(StrAndUnicode):
     def __init__(self, filename, content):
         self.filename = filename
         self.content = content
-        
+
     def __unicode__(self):
         """
         The unicode representation is the filename, so that the pre-database-insertion
@@ -392,11 +393,26 @@ class ImageField(FileField):
         from PIL import Image
         from cStringIO import StringIO
         try:
-            Image.open(StringIO(f.content))
-        except IOError: # Python Imaging Library doesn't recognize it as an image
+            # load() is the only method that can spot a truncated JPEG,
+            #  but it cannot be called sanely after verify()
+            trial_image = Image.open(StringIO(f.content))
+            trial_image.load()
+            # verify() is the only method that can spot a corrupt PNG,
+            #  but it must be called immediately after the constructor
+            trial_image = Image.open(StringIO(f.content))
+            trial_image.verify()
+        except Exception: # Python Imaging Library doesn't recognize it as an image
             raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
         return f
-        
+
+url_re = re.compile(
+    r'^https?://' # http:// or https://
+    r'(?:(?:[A-Z0-9-]+\.)+[A-Z]{2,6}|' #domain...
+    r'localhost|' #localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+    r'(?::\d+)?' # optional port
+    r'(?:/?|/\S+)$', re.IGNORECASE)
+
 class URLField(RegexField):
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
@@ -405,6 +421,9 @@ class URLField(RegexField):
         self.user_agent = validator_user_agent
 
     def clean(self, value):
+        # If no URL scheme given, assume http://
+        if value and '://' not in value:
+            value = u'http://%s' % value
         value = super(URLField, self).clean(value)
         if value == u'':
             return value
@@ -433,6 +452,10 @@ class BooleanField(Field):
     def clean(self, value):
         "Returns a Python boolean object."
         super(BooleanField, self).clean(value)
+        # Explicitly check for the string '0', which is what as hidden field
+        # will submit for False.
+        if value == '0':
+            return False
         return bool(value)
 
 class NullBooleanField(BooleanField):
@@ -526,7 +549,7 @@ class ComboField(Field):
 class MultiValueField(Field):
     """
     A Field that aggregates the logic of multiple Fields.
-    
+
     Its clean() method takes a "decompressed" list of values, which are then
     cleaned into a single value according to self.fields. Each value in
     this list is cleaned by the corresponding field -- the first value is
@@ -612,3 +635,11 @@ class SplitDateTimeField(MultiValueField):
                 raise ValidationError(ugettext(u'Enter a valid time.'))
             return datetime.datetime.combine(*data_list)
         return None
+
+ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
+
+class IPAddressField(RegexField):
+    def __init__(self, *args, **kwargs):
+        RegexField.__init__(self, ipv4_re,
+                            error_message=ugettext(u'Enter a valid IPv4 address.'),
+                            *args, **kwargs)

@@ -1,5 +1,6 @@
 from django.core.management.base import NoArgsCommand
 from django.core.management.color import no_style
+from optparse import make_option
 import sys
 
 try:
@@ -8,8 +9,14 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 class Command(NoArgsCommand):
+    option_list = NoArgsCommand.option_list + (
+        make_option('--verbosity', action='store', dest='verbosity', default='1',
+            type='choice', choices=['0', '1', '2'],
+            help='Verbosity level; 0=minimal output, 1=normal output, 2=all output'),
+        make_option('--noinput', action='store_false', dest='interactive', default=True,
+            help='Tells Django to NOT prompt the user for input of any kind.'),
+    )
     help = "Create the database tables for all apps in INSTALLED_APPS whose tables haven't already been created."
-    args = '[--verbosity] [--noinput]'
 
     def handle_noargs(self, **options):
         from django.db import connection, transaction, models
@@ -31,16 +38,16 @@ class Command(NoArgsCommand):
 
         cursor = connection.cursor()
 
-        # Get a list of all existing database tables,
-        # so we know what needs to be added.
-        table_list = table_list()
         if connection.features.uses_case_insensitive_names:
-            table_name_converter = str.upper
+            table_name_converter = lambda x: x.upper()
         else:
             table_name_converter = lambda x: x
+        # Get a list of all existing database tables, so we know what needs to
+        # be added.
+        tables = [table_name_converter(name) for name in table_list()]
 
         # Get a list of already installed *models* so that references work right.
-        seen_models = installed_models(table_list)
+        seen_models = installed_models(tables)
         created_models = set()
         pending_references = {}
 
@@ -52,7 +59,7 @@ class Command(NoArgsCommand):
                 # Create the model's database table, if it doesn't already exist.
                 if verbosity >= 2:
                     print "Processing %s.%s model" % (app_name, model._meta.object_name)
-                if table_name_converter(model._meta.db_table) in table_list:
+                if table_name_converter(model._meta.db_table) in tables:
                     continue
                 sql, references = sql_model_create(model, self.style, seen_models)
                 seen_models.add(model)
@@ -64,7 +71,7 @@ class Command(NoArgsCommand):
                     print "Creating table %s" % model._meta.db_table
                 for statement in sql:
                     cursor.execute(statement)
-                table_list.append(table_name_converter(model._meta.db_table))
+                tables.append(table_name_converter(model._meta.db_table))
 
         # Create the m2m tables. This must be done after all tables have been created
         # to ensure that all referred tables will exist.

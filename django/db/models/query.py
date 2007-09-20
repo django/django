@@ -816,6 +816,9 @@ def get_where_clause(lookup_type, table_prefix, field_name, value, db_type):
         return connection.ops.fulltext_search_sql(field_sql)
     elif lookup_type in ('regex', 'iregex'):
         if settings.DATABASE_ENGINE == 'oracle':
+            if connection.oracle_version and connection.oracle_version <= 9:
+                msg = "Regexes are not supported in Oracle before version 10g."
+                raise NotImplementedError(msg)
             if lookup_type == 'regex':
                 match_option = 'c'
             else:

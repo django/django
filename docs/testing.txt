@@ -137,12 +137,14 @@ When you `run your tests`_, the test runner will find this docstring, notice
 that portions of it look like an interactive Python session, and execute those
 lines while checking that the results match.
 
-In the case of model tests, note that the test runner takes care of creating
-its own test database. That is, any test that accesses a database -- by
-creating and saving model instances, for example -- will not affect your
-production database. Each doctest begins with a "blank slate" -- a fresh
-database containing an empty table for each model. (See the section on
-fixtures, below, for more on this.)
+In the case of model tests, note that the test runner takes care of
+creating its own test database. That is, any test that accesses a
+database -- by creating and saving model instances, for example --
+will not affect your production database. Each doctest begins with a
+"blank slate" -- a fresh database containing an empty table for each
+model. (See the section on fixtures, below, for more on this.) Note
+that to use this feature, the database user Django is connecting as
+must have ``CREATE DATABASE`` rights.
 
 For more details about how doctest works, see the `standard library
 documentation for doctest`_
@@ -569,20 +571,34 @@ Testing responses
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
-Django views; this object is simpler and has some additional data useful for
-tests.
+Django views; the test response object has some additional data useful for
+test code to verify.
 
 Specifically, a ``Response`` object has the following attributes:
 
     ===============  ==========================================================
     Attribute        Description
     ===============  ==========================================================
-    ``status_code``  The HTTP status of the response, as an integer. See
-                     RFC2616_ for a full list of HTTP status codes.
+    ``client``       The test client that was used to make the request that
+                     resulted in the response.
 
     ``content``      The body of the response, as a string. This is the final
                      page content as rendered by the view, or any error
-                     message (such as the URL for a 302 redirect).
+                     message.
+
+    ``context``      The template ``Context`` instance that was used to render
+                     the template that produced the response content.
+
+                     If the rendered page used multiple templates, then
+                     ``context`` will be a list of ``Context``
+                     objects, in the order in which they were rendered.
+
+    ``headers``      The HTTP headers of the response. This is a dictionary.
+
+    ``request``      The request data that stimulated the response.
+
+    ``status_code``  The HTTP status of the response, as an integer. See
+                     RFC2616_ for a full list of HTTP status codes.
 
     ``template``     The ``Template`` instance that was used to render the
                      final content. Use ``template.name`` to get the
@@ -594,13 +610,6 @@ Specifically, a ``Response`` object has the following attributes:
                      using `template inheritance`_ -- then ``template`` will
                      be a list of ``Template`` instances, in the order in
                      which they were rendered.
-
-    ``context``      The template ``Context`` instance that was used to render
-                     the template that produced the response content.
-
-                     As with ``template``, if the rendered page used multiple
-                     templates, then ``context`` will be a list of ``Context``
-                     objects, in the order in which they were rendered.
     ===============  ==========================================================
 
 .. _RFC2616: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -826,10 +835,10 @@ useful for testing Web applications:
     Asserts that the template with the given name was *not* used in rendering
     the response.
 
-``assertRedirects(response, expected_path, status_code=302, target_status_code=200)``
+``assertRedirects(response, expected_url, status_code=302, target_status_code=200)``
     Asserts that the response return a ``status_code`` redirect status,
-    it redirected to ``expected_path`` and the subsequent page was received with
-    ``target_status_code``.
+    it redirected to ``expected_url`` (including any GET data), and the subsequent
+    page was received with ``target_status_code``.
 
 ``assertTemplateUsed(response, template_name)``
     Asserts that the template with the given name was used in rendering the

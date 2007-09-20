@@ -51,6 +51,7 @@ LANGUAGES = (
     ('fa', gettext_noop('Persian')),
     ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
+    ('ga', gettext_noop('Gaeilge')),
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),
@@ -59,6 +60,7 @@ LANGUAGES = (
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
     ('ko', gettext_noop('Korean')),
+    ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('lv', gettext_noop('Latvian')),
     ('mk', gettext_noop('Macedonian')),
@@ -269,12 +271,14 @@ MIDDLEWARE_CLASSES = (
 # SESSIONS #
 ############
 
-SESSION_COOKIE_NAME = 'sessionid'         # Cookie name. This can be whatever you want.
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2 # Age of cookie, in seconds (default: 2 weeks).
-SESSION_COOKIE_DOMAIN = None              # A string like ".lawrence.com", or None for standard domain cookie.
-SESSION_COOKIE_SECURE = False             # Whether the session cookie should be secure (https:// only).
-SESSION_SAVE_EVERY_REQUEST = False        # Whether to save the session data on every request.
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False   # Whether sessions expire when a user closes his browser.
+SESSION_COOKIE_NAME = 'sessionid'                       # Cookie name. This can be whatever you want.
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2               # Age of cookie, in seconds (default: 2 weeks).
+SESSION_COOKIE_DOMAIN = None                            # A string like ".lawrence.com", or None for standard domain cookie.
+SESSION_COOKIE_SECURE = False                           # Whether the session cookie should be secure (https:// only).
+SESSION_SAVE_EVERY_REQUEST = False                      # Whether to save the session data on every request.
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False                 # Whether sessions expire when a user closes his browser.
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # The module to store session data
+SESSION_FILE_PATH = '/tmp/'                             # Directory to store session files if using the file session module
 
 #########
 # CACHE #

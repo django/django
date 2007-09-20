@@ -41,6 +41,16 @@ From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the command ``django-admin.py startproject mysite``. This
 will create a ``mysite`` directory in your current directory.
 
+.. admonition:: Max OS X permissions
+   
+   If you're using Mac OS X, you may see the message "permission
+   denied" when you try to run ``django-admin.py startproject``. This
+   is because, on Unix-based systems like OS X, a file must be marked
+   as "executable" before it can be run as a program. To do this, open
+   Terminal.app and navigate (using the `cd` command) to the directory
+   where ``django-admin.py`` is installed, then run the command
+   ``chmod +x django-admin.py``.
+
 .. note::
 
     You'll need to avoid naming projects after built-in Python or Django
@@ -383,7 +393,7 @@ Note the following:
       the SQL to the database.
 
 If you're interested, also run the following commands:
-    * ``python manage.py validate polls`` -- Checks for any errors in the
+    * ``python manage.py validate`` -- Checks for any errors in the
       construction of your models.
 
     * ``python manage.py sqlcustom polls`` -- Outputs any custom SQL statements

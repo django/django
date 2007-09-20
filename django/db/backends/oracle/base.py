@@ -31,20 +31,23 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     uses_custom_queryset = True
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def autoinc_sql(self, table):
+    def autoinc_sql(self, table, column):
         # To simulate auto-incrementing primary keys in Oracle, we have to
         # create a sequence and a trigger.
         sq_name = get_sequence_name(table)
         tr_name = get_trigger_name(table)
+        tbl_name = self.quote_name(table)
+        col_name = self.quote_name(column)
         sequence_sql = 'CREATE SEQUENCE %s;' % sq_name
         trigger_sql = """
-            CREATE OR REPLACE TRIGGER %s
-            BEFORE INSERT ON %s
+            CREATE OR REPLACE TRIGGER %(tr_name)s
+            BEFORE INSERT ON %(tbl_name)s
             FOR EACH ROW
-            WHEN (new.id IS NULL)
+            WHEN (new.%(col_name)s IS NULL)
                 BEGIN
-                    SELECT %s.nextval INTO :new.id FROM dual;
-                END;/""" % (tr_name, self.quote_name(table), sq_name)
+                    SELECT %(sq_name)s.nextval
+                    INTO :new.%(col_name)s FROM dual;
+                END;/""" % locals()
         return sequence_sql, trigger_sql
 
     def date_extract_sql(self, lookup_type, field_name):
@@ -287,7 +290,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                     # string instead of null, but only if the field accepts the
                     # empty string.
                     if value is None and isinstance(field, Field) and field.empty_strings_allowed:
-                        value = ''
+                        value = u''
                     # Convert 1 or 0 to True or False
                     elif value in (1, 0) and isinstance(field, (BooleanField, NullBooleanField)):
                         value = bool(value)
@@ -351,7 +354,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             for sequence_info in sequences:
                 table_name = sequence_info['table']
                 seq_name = get_sequence_name(table_name)
-                query = _get_sequence_reset_sql() % {'sequence': seq_name, 'table': self.quote_name(table_name)}
+                column_name = self.quote_name(sequence_info['column'] or 'id')
+                query = _get_sequence_reset_sql() % {'sequence': seq_name,
+                                                     'table': self.quote_name(table_name),
+                                                     'column': column_name}
                 sql.append(query)
             return sql
         else:
@@ -365,13 +371,16 @@ class DatabaseOperations(BaseDatabaseOperations):
             for f in model._meta.fields:
                 if isinstance(f, models.AutoField):
                     sequence_name = get_sequence_name(model._meta.db_table)
-                    output.append(query % {'sequence':sequence_name,
-                                           'table':model._meta.db_table})
+                    column_name = self.quote_name(f.db_column or f.name)
+                    output.append(query % {'sequence': sequence_name,
+                                           'table': model._meta.db_table,
+                                           'column': column_name})
                     break # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
                 sequence_name = get_sequence_name(f.m2m_db_table())
-                output.append(query % {'sequence':sequence_name,
-                                       'table':f.m2m_db_table()})
+                output.append(query % {'sequence': sequence_name,
+                                       'table': f.m2m_db_table(),
+                                       'column': self.quote_name('id')})
         return output
 
     def start_transaction_sql(self):
@@ -397,6 +406,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'istartswith': "LIKE UPPER(%s) ESCAPE '\\'",
         'iendswith': "LIKE UPPER(%s) ESCAPE '\\'",
     }
+    oracle_version = None
 
     def _valid_connection(self):
         return self.connection is not None
@@ -411,6 +421,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
+            try:
+                self.oracle_version = int(self.connection.version.split('.')[0])
+            except ValueError:
+                pass
         cursor = FormatStylePlaceholderCursor(self.connection)
         # Default arraysize of 1 is highly sub-optimal.
         cursor.arraysize = 100
@@ -430,21 +444,6 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     """
     charset = 'utf-8'
 
-    def _rewrite_args(self, query, params=None):
-        if params is None:
-            params = []
-        else:
-            params = self._format_params(params)
-        args = [(':arg%d' % i) for i in range(len(params))]
-        query = smart_str(query, self.charset) % tuple(args)
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
-        # it does want a trailing ';' but not a trailing '/'.  However, these
-        # characters must be included in the original query in case the query
-        # is being passed to SQL*Plus.
-        if query.endswith(';') or query.endswith('/'):
-            query = query[:-1]
-        return query, params
-
     def _format_params(self, params):
         if isinstance(params, dict):
             result = {}
@@ -456,12 +455,35 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             return tuple([smart_str(p, self.charset, True) for p in params])
 
     def execute(self, query, params=None):
-        query, params = self._rewrite_args(query, params)
+        if params is None:
+            params = []
+        else:
+            params = self._format_params(params)
+        args = [(':arg%d' % i) for i in range(len(params))]
+        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # characters must be included in the original query in case the query
+        # is being passed to SQL*Plus.
+        if query.endswith(';') or query.endswith('/'):
+            query = query[:-1]
+        query = smart_str(query, self.charset) % tuple(args)
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
-        query, params = self._rewrite_args(query, params)
-        return Database.Cursor.executemany(self, query, params)
+        try:
+          args = [(':arg%d' % i) for i in range(len(params[0]))]
+        except (IndexError, TypeError):
+          # No params given, nothing to do
+          return None
+        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # it does want a trailing ';' but not a trailing '/'.  However, these
+        # characters must be included in the original query in case the query
+        # is being passed to SQL*Plus.
+        if query.endswith(';') or query.endswith('/'):
+            query = query[:-1]
+        query = smart_str(query, self.charset) % tuple(args)
+        new_param_list = [self._format_params(i) for i in params]
+        return Database.Cursor.executemany(self, query, new_param_list)
 
     def fetchone(self):
         return to_unicode(Database.Cursor.fetchone(self))
@@ -491,7 +513,7 @@ def _get_sequence_reset_sql():
             cval integer;
         BEGIN
             LOCK TABLE %(table)s IN SHARE MODE;
-            SELECT NVL(MAX(id), 0) INTO startvalue FROM %(table)s;
+            SELECT NVL(MAX(%(column)s), 0) INTO startvalue FROM %(table)s;
             SELECT %(sequence)s.nextval INTO cval FROM dual;
             cval := startvalue - cval;
             IF cval != 0 THEN

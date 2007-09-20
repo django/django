@@ -555,6 +555,38 @@ template loaders that come with Django:
 Django uses the template loaders in order according to the ``TEMPLATE_LOADERS``
 setting. It uses each loader until a loader finds a match.
 
+The ``render_to_string()`` shortcut
+===================================
+
+To cut down on the repetitive nature of loading and rendering
+templates, Django provides a shortcut function which largely
+automates the process: ``render_to_string()`` in
+``django.template.loader``, which loads a template, renders it and
+returns the resulting string::
+
+    from django.template.loader import render_to_string
+    rendered = render_to_string('my_template.html', { 'foo': 'bar' })
+
+The ``render_to_string`` shortcut takes one required argument --
+``template_name``, which should be the name of the template to load
+and render -- and two optional arguments::
+
+    dictionary
+        A dictionary to be used as variables and values for the
+        template's context. This can also be passed as the second
+        positional argument.
+
+    context_instance
+        An instance of ``Context`` or a subclass (e.g., an instance of
+        ``RequestContext``) to use as the template's context. This can
+        also be passed as the third positional argument.
+
+See also the `render_to_response()`_ shortcut, which calls
+``render_to_string`` and feeds the result into an ``HttpResponse``
+suitable for returning directly from a view.
+
+.. _render_to_response(): ../shortcuts/#render-to-response
+
 Extending the template system
 =============================
 
@@ -642,7 +674,27 @@ your function. Example::
         "Converts a string into all lowercase"
         return value.lower()
 
-When you've written your filter definition, you need to register it with
+Template filters that expect strings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're writing a template filter that only expects a string as the first
+argument, you should use the decorator ``stringfilter``. This will
+convert an object to its string value before being passed to your function::
+
+    from django.template.defaultfilters import stringfilter
+
+    @stringfilter
+    def lower(value):
+        return value.lower()
+
+This way, you'll be able to pass, say, an integer to this filter, and it
+won't cause an ``AttributeError`` (because integers don't have ``lower()``
+methods).
+
+Registering a custom filters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language::
 
     register.filter('cut', cut)
@@ -658,27 +710,17 @@ If you're using Python 2.4 or above, you can use ``register.filter()`` as a
 decorator instead::
 
     @register.filter(name='cut')
+    @stringfilter
     def cut(value, arg):
         return value.replace(arg, '')
 
     @register.filter
+    @stringfilter
     def lower(value):
         return value.lower()
 
 If you leave off the ``name`` argument, as in the second example above, Django
 will use the function's name as the filter name.
-
-Template filters which expect strings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-If you are writing a template filter which only expects a string as the first
-argument, you should use the included decorator ``stringfilter`` which will convert
-an object to it's string value before being passed to your function::
-
-    from django.template.defaultfilters import stringfilter
-
-    @stringfilter
-    def lower(value):
-        return value.lower()
 
 Writing custom template tags
 ----------------------------

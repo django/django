@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Tests to prevent against recurrences of earlier bugs.
 
-regression_tests = r"""
+tests = r"""
 It should be possible to re-use attribute dictionaries (#3810)
 >>> from django.newforms import *
 >>> extra_attrs = {'class': 'special'}
@@ -60,19 +60,11 @@ Translated error messages used to be buggy.
 u'<ul class="errorlist"><li>\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.</li></ul>\n<p><label for="id_somechoice_0">\xc5\xf8\xdf:</label> <ul>\n<li><label><input type="radio" id="id_somechoice_0" value="\xc5" name="somechoice" /> En tied\xe4</label></li>\n<li><label><input type="radio" id="id_somechoice_1" value="\xf8" name="somechoice" /> Mies</label></li>\n<li><label><input type="radio" id="id_somechoice_2" value="\xdf" name="somechoice" /> Nainen</label></li>\n</ul></p>'
 >>> deactivate()
 
-#######################
-# Miscellaneous Tests #
-#######################
-
-There once was a problem with Form fields called "data". Let's make sure that
-doesn't come back.
->>> class DataForm(Form):
-...     data = CharField(max_length=10)
->>> f = DataForm({'data': 'xyzzy'})
->>> f.is_valid()
-True
->>> f.cleaned_data
-{'data': u'xyzzy'}
+Deep copying translated text shouldn't raise an error
+>>> from django.utils.translation import gettext_lazy
+>>> class CopyForm(Form):
+...     degree = IntegerField(widget=Select(choices=((1, gettext_lazy('test')),)))
+>>> f = CopyForm()
 
 #######################
 # Miscellaneous Tests #
