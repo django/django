@@ -82,9 +82,14 @@ class SessionBase(object):
         "Returns session key that isn't being used."
         # The random module is seeded when this Apache child is created.
         # Use settings.SECRET_KEY as added salt.
+        try:
+            pid = os.getpid()
+        except AttributeError:
+            # No getpid() in Jython, for example
+            pid = 1
         while 1:
-            session_key = md5.new("%s%s%s%s" % (random.randint(0, sys.maxint - 1), 
-                                  os.getpid(), time.time(), settings.SECRET_KEY)).hexdigest()
+            session_key = md5.new("%s%s%s%s" % (random.randint(0, sys.maxint - 1),
+                                  pid, time.time(), settings.SECRET_KEY)).hexdigest()
             if not self.exists(session_key):
                 break
         return session_key
