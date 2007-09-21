@@ -1,6 +1,6 @@
 "Default tags used by the template system, available to all templates."
 
-from django.template import Node, NodeList, Template, Context, resolve_variable
+from django.template import Node, NodeList, Template, Context, Variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
@@ -30,7 +30,7 @@ class CycleNode(Node):
     def render(self, context):
         self.counter += 1
         value = self.cyclevars[self.counter % self.cyclevars_len]
-        value = resolve_variable(value, context)
+        value = Variable(value).resolve(context)
         if self.variable_name:
             context[self.variable_name] = value
         return value
@@ -57,12 +57,12 @@ class FilterNode(Node):
 
 class FirstOfNode(Node):
     def __init__(self, vars):
-        self.vars = vars
+        self.vars = map(Variable, vars)
 
     def render(self, context):
         for var in self.vars:
             try:
-                value = resolve_variable(var, context)
+                value = var.resolve(context)
             except VariableDoesNotExist:
                 continue
             if value:
@@ -147,7 +147,7 @@ class IfChangedNode(Node):
     def __init__(self, nodelist, *varlist):
         self.nodelist = nodelist
         self._last_seen = None
-        self._varlist = varlist
+        self._varlist = map(Variable, varlist)
 
     def render(self, context):
         if 'forloop' in context and context['forloop']['first']:
@@ -156,7 +156,7 @@ class IfChangedNode(Node):
             if self._varlist:
                 # Consider multiple parameters.
                 # This automatically behaves like a OR evaluation of the multiple variables.
-                compare_to = [resolve_variable(var, context) for var in self._varlist]
+                compare_to = [var.resolve(context) for var in self._varlist]
             else:
                 compare_to = self.nodelist.render(context)
         except VariableDoesNotExist:
@@ -175,7 +175,7 @@ class IfChangedNode(Node):
 
 class IfEqualNode(Node):
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
-        self.var1, self.var2 = var1, var2
+        self.var1, self.var2 = Variable(var1), Variable(var2)
         self.nodelist_true, self.nodelist_false = nodelist_true, nodelist_false
         self.negate = negate
 
@@ -184,11 +184,11 @@ class IfEqualNode(Node):
 
     def render(self, context):
         try:
-            val1 = resolve_variable(self.var1, context)
+            val1 = self.var1.resolve(context)
         except VariableDoesNotExist:
             val1 = None
         try:
-            val2 = resolve_variable(self.var2, context)
+            val2 = self.var2.resolve(context)
         except VariableDoesNotExist:
             val2 = None
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):

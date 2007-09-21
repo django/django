@@ -19,6 +19,8 @@ class CommentFormNode(template.Node):
         ratings_optional=False, ratings_required=False, rating_options='',
         is_public=True):
         self.content_type = content_type
+        if obj_id_lookup_var is not None:
+            obj_id_lookup_var = template.Variable(obj_id_lookup_var)
         self.obj_id_lookup_var, self.obj_id, self.free = obj_id_lookup_var, obj_id, free
         self.photos_optional, self.photos_required = photos_optional, photos_required
         self.ratings_optional, self.ratings_required = ratings_optional, ratings_required
@@ -32,7 +34,7 @@ class CommentFormNode(template.Node):
         context.push()
         if self.obj_id_lookup_var is not None:
             try:
-                self.obj_id = template.resolve_variable(self.obj_id_lookup_var, context)
+                self.obj_id = self.obj_id_lookup_var.resolve(context)
             except template.VariableDoesNotExist:
                 return ''
             # Validate that this object ID is valid for this content-type.
@@ -75,6 +77,8 @@ class CommentFormNode(template.Node):
 class CommentCountNode(template.Node):
     def __init__(self, package, module, context_var_name, obj_id, var_name, free):
         self.package, self.module = package, module
+        if context_var_name is not None:
+            context_var_name = template.Variable(context_var_name)
         self.context_var_name, self.obj_id = context_var_name, obj_id
         self.var_name, self.free = var_name, free
 
@@ -82,7 +86,7 @@ class CommentCountNode(template.Node):
         from django.conf import settings
         manager = self.free and FreeComment.objects or Comment.objects
         if self.context_var_name is not None:
-            self.obj_id = template.resolve_variable(self.context_var_name, context)
+            self.obj_id = self.context_var_name.resolve(context)
         comment_count = manager.filter(object_id__exact=self.obj_id,
             content_type__app_label__exact=self.package,
             content_type__model__exact=self.module, site__id__exact=settings.SITE_ID).count()
@@ -92,6 +96,8 @@ class CommentCountNode(template.Node):
 class CommentListNode(template.Node):
     def __init__(self, package, module, context_var_name, obj_id, var_name, free, ordering, extra_kwargs=None):
         self.package, self.module = package, module
+        if context_var_name is not None:
+            context_var_name = template.Variable(context_var_name)
         self.context_var_name, self.obj_id = context_var_name, obj_id
         self.var_name, self.free = var_name, free
         self.ordering = ordering
@@ -102,7 +108,7 @@ class CommentListNode(template.Node):
         get_list_function = self.free and FreeComment.objects.filter or Comment.objects.get_list_with_karma
         if self.context_var_name is not None:
             try:
-                self.obj_id = template.resolve_variable(self.context_var_name, context)
+                self.obj_id = self.context_var_name.resolve(context)
             except template.VariableDoesNotExist:
                 return ''
         kwargs = {
