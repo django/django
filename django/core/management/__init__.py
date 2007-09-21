@@ -168,7 +168,7 @@ class ManagementUtility(object):
         try:
             app_name = get_commands(self.user_commands, self.project_directory)[subcommand]
             if isinstance(app_name, BaseCommand): 
-                # If the app_name is already loaded, use it directly.
+                # If the command is already loaded, use it directly.
                 klass = app_name
             else:
                 klass = load_command_class(app_name, subcommand)
