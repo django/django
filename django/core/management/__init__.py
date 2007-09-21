@@ -1,18 +1,100 @@
 import django
+from django.core.management.base import BaseCommand, CommandError, handle_default_options 
 from optparse import OptionParser
 import os
 import sys
+from imp import find_module
 
 # For backwards compatibility: get_version() used to be in this module.
 get_version = django.get_version
 
-def load_command_class(name):
+# A cache of loaded commands, so that call_command 
+# doesn't have to reload every time it is called
+_commands = None
+
+def find_commands(management_dir):
     """
-    Given a command name, returns the Command class instance. Raises
-    ImportError if it doesn't exist.
+    Given a path to a management directory, return a list of all the command names 
+    that are available. Returns an empty list if no commands are defined.
     """
-    # Let the ImportError propogate.
-    return getattr(__import__('django.core.management.commands.%s' % name, {}, {}, ['Command']), 'Command')()
+    command_dir = os.path.join(management_dir,'commands')
+    try:
+        return [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
+    except OSError:
+        return []
+
+def find_management_module(app_name):
+    """
+    Determine the path to the management module for the application named,
+    without acutally importing the application or the management module.
+
+    Raises ImportError if the management module cannot be found for any reason.
+    """
+    parts = app_name.split('.')
+    parts.append('management')
+    parts.reverse()
+    path = None
+    while parts:
+        part = parts.pop()
+        f,path,descr = find_module(part, path and [path] or None)
+    return path
+    
+def load_command_class(app_name, name):
+    """
+    Given a command name and an application name, returns the Command 
+    class instance. All errors raised by the importation process
+    (ImportError, AttributeError) are allowed to propagate.
+    """
+    return getattr(__import__('%s.management.commands.%s' % (app_name, name), 
+                   {}, {}, ['Command']), 'Command')()
+
+def get_commands(load_user_commands=True, project_directory=None):
+    """
+    Returns a dictionary of commands against the application in which
+    those commands can be found. This works by looking for a 
+    management.commands package in django.core, and in each installed 
+    application -- if a commands package exists, all commands in that
+    package are registered.
+
+    Core commands are always included; user-defined commands will also
+    be included if ``load_user_commands`` is True. If a project directory
+    is provided, the startproject command will be disabled, and the
+    startapp command will be modified to use that directory.
+
+    The dictionary is in the format {command_name: app_name}. Key-value
+    pairs from this dictionary can then be used in calls to 
+    load_command_class(app_name, command_name)
+    
+    The dictionary is cached on the first call, and reused on subsequent
+    calls.
+    """
+    global _commands
+    if _commands is None:
+        _commands = dict([(name, 'django.core') 
+                          for name in find_commands(__path__[0])])
+        if load_user_commands:
+            # Get commands from all installed apps
+            from django.conf import settings
+            for app_name in settings.INSTALLED_APPS:
+                try:
+                    path = find_management_module(app_name)
+                    _commands.update(dict([(name, app_name) 
+                                           for name in find_commands(path)]))
+                except ImportError:
+                    pass # No management module - ignore this app
+                    
+        if project_directory:
+            # Remove the "startproject" command from self.commands, because
+            # that's a django-admin.py command, not a manage.py command.
+            del _commands['startproject']
+
+            # Override the startapp command so that it always uses the
+            # project_directory, not the current working directory 
+            # (which is default).
+            from django.core.management.commands.startapp import ProjectCommand
+            _commands['startapp'] = ProjectCommand(project_directory)
+
+    return _commands
 
 def call_command(name, *args, **options):
     """
@@ -25,8 +107,22 @@ def call_command(name, *args, **options):
         call_command('shell', plain=True)
         call_command('sqlall', 'myapp')
     """
-    klass = load_command_class(name)
+    try:
+        app_name = get_commands()[name]
+        klass = load_command_class(app_name, name)
+    except KeyError:
+        raise CommandError, "Unknown command: %r" % name
     return klass.execute(*args, **options)
+    
+class LaxOptionParser(OptionParser): 
+    """
+    An option parser that doesn't raise any errors on unknown options.
+    
+    This is needed because the --settings and --pythonpath options affect
+    the commands (and thus the options) that are available to the user. 
+    """
+    def error(self, msg): 
+ 	    pass    
 
 class ManagementUtility(object):
     """
@@ -38,21 +134,9 @@ class ManagementUtility(object):
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
-        self.commands = self.default_commands()
-
-    def default_commands(self):
-        """
-        Returns a dictionary of instances of all available Command classes.
-
-        This works by looking for and loading all Python modules in the
-        django.core.management.commands package.
-
-        The dictionary is in the format {name: command_instance}.
-        """
-        command_dir = os.path.join(__path__[0], 'commands')
-        names = [f[:-3] for f in os.listdir(command_dir) if not f.startswith('_') and f.endswith('.py')]
-        return dict([(name, load_command_class(name)) for name in names])
-
+        self.project_directory = None
+        self.user_commands = False
+        
     def main_help_text(self):
         """
         Returns the script's main help text, as a string.
@@ -61,7 +145,7 @@ class ManagementUtility(object):
         usage.append('Django command line tool, version %s' % django.get_version())
         usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
         usage.append('Available subcommands:')
-        commands = self.commands.keys()
+        commands = get_commands(self.user_commands, self.project_directory).keys()
         commands.sort()
         for cmd in commands:
             usage.append('  %s' % cmd)
@@ -74,16 +158,26 @@ class ManagementUtility(object):
         django-admin.py or manage.py) if it can't be found.
         """
         try:
-            return self.commands[subcommand]
+            app_name = get_commands(self.user_commands, self.project_directory)[subcommand]
+            klass = load_command_class(app_name, subcommand)
         except KeyError:
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, self.prog_name))
             sys.exit(1)
-
+        return klass
+        
     def execute(self):
         """
         Given the command-line arguments, this figures out which subcommand is
         being run, creates a parser appropriate to that command, and runs it.
         """
+        # Preprocess options to extract --settings and --pythonpath. These options
+        # could affect the commands that are available, so they must be processed
+        # early
+        parser = LaxOptionParser(version=get_version(), 
+                                 option_list=BaseCommand.option_list) 
+        options, args = parser.parse_args(self.argv) 
+        handle_default_options(options)
+         
         try:
             subcommand = self.argv[1]
         except IndexError:
@@ -91,8 +185,8 @@ class ManagementUtility(object):
             sys.exit(1)
 
         if subcommand == 'help':
-            if len(self.argv) > 2:
-                self.fetch_command(self.argv[2]).print_help(self.prog_name, self.argv[2])
+            if len(args) > 2:
+                self.fetch_command(args[2]).print_help(self.prog_name, args[2])
             else:
                 sys.stderr.write(self.main_help_text() + '\n')
                 sys.exit(1)
@@ -116,16 +210,9 @@ class ProjectManagementUtility(ManagementUtility):
     """
     def __init__(self, argv, project_directory):
         super(ProjectManagementUtility, self).__init__(argv)
-
-        # Remove the "startproject" command from self.commands, because
-        # that's a django-admin.py command, not a manage.py command.
-        del self.commands['startproject']
-
-        # Override the startapp command so that it always uses the
-        # project_directory, not the current working directory (which is default).
-        from django.core.management.commands.startapp import ProjectCommand
-        self.commands['startapp'] = ProjectCommand(project_directory)
-
+        self.project_directory = project_directory
+        self.user_commands = True
+                
 def setup_environ(settings_mod):
     """
     Configure the runtime environment. This can also be used by external
