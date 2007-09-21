@@ -65,6 +65,10 @@ def get_commands(load_user_commands=True, project_directory=None):
     pairs from this dictionary can then be used in calls to 
     load_command_class(app_name, command_name)
     
+    If a specific version of a command must be loaded (e.g., with the
+    startapp command), the instantiated module can be placed in the
+    dictionary in place of the application name.
+    
     The dictionary is cached on the first call, and reused on subsequent
     calls.
     """
@@ -109,7 +113,11 @@ def call_command(name, *args, **options):
     """
     try:
         app_name = get_commands()[name]
-        klass = load_command_class(app_name, name)
+        if isinstance(app_name, BaseCommand): 
+            # If the command is already loaded, use it directly.
+            klass = app_name
+        else:
+            klass = load_command_class(app_name, subcommand)
     except KeyError:
         raise CommandError, "Unknown command: %r" % name
     return klass.execute(*args, **options)
@@ -159,7 +167,11 @@ class ManagementUtility(object):
         """
         try:
             app_name = get_commands(self.user_commands, self.project_directory)[subcommand]
-            klass = load_command_class(app_name, subcommand)
+            if isinstance(app_name, BaseCommand): 
+                # If the app_name is already loaded, use it directly.
+                klass = app_name
+            else:
+                klass = load_command_class(app_name, subcommand)
         except KeyError:
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % (subcommand, self.prog_name))
             sys.exit(1)
