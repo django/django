@@ -122,7 +122,7 @@ class LaxOptionParser(OptionParser):
     the commands (and thus the options) that are available to the user. 
     """
     def error(self, msg): 
- 	    pass    
+ 	    pass
 
 class ManagementUtility(object):
     """
@@ -175,8 +175,11 @@ class ManagementUtility(object):
         # early
         parser = LaxOptionParser(version=get_version(), 
                                  option_list=BaseCommand.option_list) 
-        options, args = parser.parse_args(self.argv) 
-        handle_default_options(options)
+        try:
+            options, args = parser.parse_args(self.argv) 
+            handle_default_options(options)
+        except: 
+            pass # Ignore any option errors at this point.
          
         try:
             subcommand = self.argv[1]
