@@ -43,9 +43,9 @@ class MonthArchiveTest(TestCase):
         author.save()
 
         # 2004 was a leap year, so it should be weird enough to not cheat 
-        first_second_of_feb = datetime(2004, 2, 1, 0, 0, 0) 
-        first_second_of_mar = datetime(2004, 3, 1, 0, 0, 0) 
-        one_microsecond = timedelta(0, 0, 1) 
+        first_second_of_feb = datetime(2004, 2, 1, 0, 0, 1) 
+        first_second_of_mar = datetime(2004, 3, 1, 0, 0, 1) 
+        two_seconds = timedelta(0, 2, 0) 
         article = Article(title="example", author=author) 
 
         article.date_created = first_second_of_feb 
@@ -53,12 +53,12 @@ class MonthArchiveTest(TestCase):
         response = self.client.get('/views/date_based/archive_month/2004/02/') 
         self.assertEqual(response.status_code, 200) 
       
-        article.date_created = first_second_of_feb-one_microsecond 
+        article.date_created = first_second_of_feb-two_seconds 
         article.save() 
         response = self.client.get('/views/date_based/archive_month/2004/02/') 
         self.assertEqual(response.status_code, 404) 
 
-        article.date_created = first_second_of_mar-one_microsecond 
+        article.date_created = first_second_of_mar-two_seconds 
         article.save() 
         response = self.client.get('/views/date_based/archive_month/2004/02/') 
         self.assertEqual(response.status_code, 200) 
