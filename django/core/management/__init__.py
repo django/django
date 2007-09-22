@@ -117,7 +117,7 @@ def call_command(name, *args, **options):
             # If the command is already loaded, use it directly.
             klass = app_name
         else:
-            klass = load_command_class(app_name, subcommand)
+            klass = load_command_class(app_name, name)
     except KeyError:
         raise CommandError, "Unknown command: %r" % name
     return klass.execute(*args, **options)
