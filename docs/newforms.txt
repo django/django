@@ -1923,11 +1923,22 @@ of the model fields:
 .. note::
 
     If you specify ``fields`` when creating a form with ``form_for_model()``,
-    make sure that the fields that are *not* specified can provide default
-    values, or are allowed to have a value of ``None``. If a field isn't
-    specified on a form, the object created from the form can't provide
-    a value for that attribute, which will prevent the new instance from
-    being saved.
+    then the fields that are *not* specified will not be set by the form's
+    ``save()`` method. Django will prevent any attempt to save an incomplete
+    model, so if the model does not allow the missing fields to be empty, and
+    does not provide a default value for the missing fields, any attempt to
+    ``save()`` a ``form_for_model`` with missing fields will fail. To avoid
+    this failure, you must use ``save(commit=False)`` and manually set any
+    extra required fields::
+
+        instance = form.save(commit=False)
+        instance.required_field = 'new value'
+        instance.save()
+
+    See the `section on saving forms`_ for more details on using
+    ``save(commit=False)``.
+
+.. _section on saving forms: `The save() method`_
 
 Overriding the default field types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
