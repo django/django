@@ -800,8 +800,13 @@ specify the page number in the URL in one of two ways:
       variable. You can iterate over the list provided by ``page_range`` 
       to create a link to every page of results.
 
-These values and lists are is 1-based, not 0-based, so the first page would be
+These values and lists are 1-based, not 0-based, so the first page would be
 represented as page ``1``. 
+
+An example of the use of pagination can be found in the `object pagination`_
+example model. 
+	 
+.. _`object pagination`: ../models/pagination/
 
 **New in Django development version:** 
 
