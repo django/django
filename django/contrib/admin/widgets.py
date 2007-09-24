@@ -1,6 +1,7 @@
 """
 Form Widget classes specific to the Django admin site.
 """
+import copy
 
 from django import newforms as forms
 from django.utils.datastructures import MultiValueDict
@@ -131,3 +132,8 @@ class RelatedFieldWidgetWrapper(object):
                 (related_url, name))
             output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/></a>' % settings.ADMIN_MEDIA_PREFIX)
         return u''.join(output)
+
+    def __deepcopy__(self, memo):
+        # There is no reason to deepcopy self.admin_site, etc, so just return
+        # a shallow copy.
+        return copy.copy(self)
