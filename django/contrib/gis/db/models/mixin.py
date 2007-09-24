@@ -1,15 +1,10 @@
 from warnings import warn
 
-# GEOS is a requirement
+# GEOS is a requirement, GDAL is not
 from django.contrib.gis.geos import GEOSGeometry
-
-# GDAL is a lot more complicated to install, and isn't necessary for many
-# operations.
-try:
+from django.contrib.gis.gdal import HAS_GDAL
+if HAS_GDAL:
     from django.contrib.gis.gdal import OGRGeometry, SpatialReference
-    HAS_GDAL = True
-except ImportError, e:
-    HAS_GDAL = False
 
 # Until model subclassing is a possibility, a mixin class is used to add
 # the necessary functions that may be contributed for geographic objects.
