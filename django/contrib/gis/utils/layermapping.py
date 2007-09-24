@@ -30,10 +30,14 @@ Usage:
              geometry type, e.g. 'POINT', 'LINESTRING', 'POLYGON'.
 
 Keyword Args:
-  layer -- The index of the layer to use from the Data Source (defaults to 0)
+  layer: 
+    The index of the layer to use from the Data Source (defaults to 0)
 
-  source_srs -- Use this to specify the source SRS manually (for example, 
-                 some shapefiles don't come with a '.prj' file)
+  source_srs:
+    Use this to specify the source SRS manually (for example, some 
+     shapefiles don't come with a '.prj' file).  A SRID integer, a
+     WKT string, a SpatialReference, and a SpatialRefSys object are
+     all valid parameters here.
 
 Example:
 
@@ -167,7 +171,7 @@ def check_feature(feat, model_fields, mapping):
         else:
             raise Exception, 'Given mapping field "%s" not in given Model fields!' % model_field
 
-        ## Handling if we get a geometry in the Field ###
+        ### Handling if we get a geometry in the Field ###
         if ogr_field in ogc_types:
             # At this time, no more than one geographic field per model =(
             if HAS_GEO:
@@ -218,6 +222,8 @@ def check_srs(layer, source_srs):
         sr = source_srs
     elif isinstance(source_srs, SpatialRefSys):
         sr = source_srs.srs
+    elif isinstance(source_srs, (int, str)):
+        sr = SpatialReference(source_srs)
     else:
         sr = layer.srs
     if not sr:
