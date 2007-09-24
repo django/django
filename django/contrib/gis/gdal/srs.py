@@ -1,4 +1,3 @@
-# Getting what we need from ctypes
 import re
 from types import StringType, UnicodeType, TupleType
 from ctypes import \
@@ -39,12 +38,12 @@ from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
   >>> print srs.name
   NAD83 / Texas South Central
 """
-
-
 #### ctypes function prototypes ####
 def ellipsis_func(f):
-    """Creates a ctypes function prototype for OSR ellipsis property functions,
-    e.g., OSRGetSemiMajor, OSRGetSemiMinor, OSRGetInvFlattening."""
+    """
+    Creates a ctypes function prototype for OSR ellipsis property functions, e.g., 
+     OSRGetSemiMajor, OSRGetSemiMinor, OSRGetInvFlattening.
+    """
     f.restype = c_double
     f.argtypes = [c_void_p, POINTER(c_int)]
     return f
@@ -55,8 +54,10 @@ semi_minor = ellipsis_func(lgdal.OSRGetSemiMinor)
 invflattening = ellipsis_func(lgdal.OSRGetInvFlattening)
 
 def units_func(f):
-    """Creates a ctypes function prototype for OSR units functions,
-    e.g., OSRGetAngularUnits, OSRGetLinearUnits."""
+    """
+    Creates a ctypes function prototype for OSR units functions, e.g., 
+     OSRGetAngularUnits, OSRGetLinearUnits.
+    """
     f.restype = c_double
     f.argtypes = [c_void_p, POINTER(c_char_p)]
     return f
@@ -67,9 +68,11 @@ angular_units = units_func(lgdal.OSRGetAngularUnits)
 
 #### Spatial Reference class. ####
 class SpatialReference(object):
-    """A wrapper for the OGRSpatialReference object.  According to the GDAL website,
-    the SpatialReference object 'provide[s] services to represent coordinate systems
-    (projections and datums) and to transform between them.'"""
+    """
+    A wrapper for the OGRSpatialReference object.  According to the GDAL website,
+     the SpatialReference object 'provide[s] services to represent coordinate 
+     systems (projections and datums) and to transform between them.'
+    """
 
     # Well-Known Geographical Coordinate System Name
     _well_known = {'WGS84':4326, 'WGS72':4322, 'NAD27':4267, 'NAD83':4269}
@@ -129,8 +132,11 @@ class SpatialReference(object):
         if self._srs: lgdal.OSRRelease(self._srs)
 
     def __getitem__(self, target):
-        """Returns the value of the given string attribute node, None if the node doesn't exist.
-        Can also take a tuple as a parameter, (target, child), where child is the child index to get."""
+        """
+        Returns the value of the given string attribute node, None if the node 
+         doesn't exist.  Can also take a tuple as a parameter, (target, child), 
+         where child is the child index to get.
+        """
         if isinstance(target, TupleType):
             return self.attr_value(*target)
         else:
@@ -141,7 +147,10 @@ class SpatialReference(object):
         return self.pretty_wkt
 
     def _string_ptr(self, ptr):
-        "Returns the string at the pointer if it is valid, None if the pointer is NULL."
+        """
+        Returns the string at the pointer if it is valid, None if the pointer
+         is NULL.
+        """
         if not ptr: return None
         else: return string_at(ptr)
 
@@ -157,8 +166,10 @@ class SpatialReference(object):
         return self._string_ptr(ptr)
 
     def attr_value(self, target, index=0):
-        """The attribute value for the given target node (e.g. 'PROJCS'). The index keyword
-        specifies an index of the child node to return."""
+        """
+        The attribute value for the given target node (e.g. 'PROJCS'). The index
+         keyword specifies an index of the child node to return.
+        """
         ptr = lgdal.OSRGetAttrValue(self._srs, c_char_p(target), c_int(index))
         return self._string_ptr(ptr)
 
@@ -220,13 +231,15 @@ class SpatialReference(object):
     #### Spheroid/Ellipsoid Properties ####
     @property
     def ellipsoid(self):
-        """Returns a tuple of the ellipsoid parameters:
-        (semimajor axis, semiminor axis, and inverse flattening)."""
+        """
+        Returns a tuple of the ellipsoid parameters:
+         (semimajor axis, semiminor axis, and inverse flattening)
+        """
         return (self.semi_major, self.semi_minor, self.inverse_flattening)
 
     @property
     def semi_major(self):
-        "Gets the Semi Major Axis for this Spatial Reference."
+        "Returns the Semi Major Axis for this Spatial Reference."
         err = c_int(0)
         sm = semi_major(self._srs, byref(err))
         check_err(err.value)
@@ -234,7 +247,7 @@ class SpatialReference(object):
 
     @property
     def semi_minor(self):
-        "Gets the Semi Minor Axis for this Spatial Reference."
+        "Returns the Semi Minor Axis for this Spatial Reference."
         err = c_int()
         sm = semi_minor(self._srs, byref(err))
         check_err(err.value)
@@ -242,7 +255,7 @@ class SpatialReference(object):
 
     @property
     def inverse_flattening(self):
-        "Gets the Inverse Flattening for this Spatial Reference."
+        "Returns the Inverse Flattening for this Spatial Reference."
         err = c_int()
         inv_flat = invflattening(self._srs, byref(err))
         check_err(err.value)
@@ -251,7 +264,10 @@ class SpatialReference(object):
     #### Boolean Properties ####
     @property
     def geographic(self):
-        "Returns True if this SpatialReference is geographic (root node is GEOGCS)."
+        """
+        Returns True if this SpatialReference is geographic 
+         (root node is GEOGCS).
+        """
         if lgdal.OSRIsGeographic(self._srs): return True
         else: return False
 
@@ -263,7 +279,10 @@ class SpatialReference(object):
 
     @property
     def projected(self):
-        "Returns True if this SpatialReference is a projected coordinate system (root node is PROJCS)."
+        """
+        Returns True if this SpatialReference is a projected coordinate system 
+         (root node is PROJCS).
+        """
         if lgdal.OSRIsProjected(self._srs): return True
         else: return False
 
@@ -340,4 +359,3 @@ class CoordTransform(object):
 
     def __str__(self):
         return 'Transform from "%s" to "%s"' % (str(self._srs1_name), str(self._srs2_name))
-        

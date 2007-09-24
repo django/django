@@ -7,6 +7,14 @@
 # OGR & SRS Exceptions
 class OGRException(Exception): pass
 class SRSException(Exception): pass
+class OGRIndexError(OGRException, KeyError):
+    """
+    This exception is raised when an invalid index is encountered, and has
+    the 'silent_variable_feature' attribute set to true.  This ensures that
+    django's templates proceed to use the next lookup type gracefully when
+    an Exception is raised.  Fixes ticket #4740.
+    """
+    silent_variable_failure = True
 
 # OGR Error Codes
 OGRERR_DICT = { 1 : (OGRException, 'Not enough data.'),
