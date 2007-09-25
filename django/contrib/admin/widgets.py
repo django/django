@@ -1,7 +1,6 @@
 """
 Form Widget classes specific to the Django admin site.
 """
-import copy
 
 from django import newforms as forms
 from django.utils.datastructures import MultiValueDict
