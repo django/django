@@ -218,6 +218,8 @@ def initial_data(instance, fields=None):
     All field values in the instance will be returned if ``fields`` is not
     provided.
     """
+    # avoid a circular import
+    from django.db.models.fields.related import ManyToManyField
     model = instance.__class__
     opts = model._meta
     initial = {}
@@ -226,7 +228,11 @@ def initial_data(instance, fields=None):
             continue
         if fields and not f.name in fields:
             continue
-        initial[f.name] = f.value_from_object(instance)
+        if isinstance(f, ManyToManyField):
+            # MultipleChoiceWidget needs a list of ints, not object instances.
+            initial[f.name] = [obj._get_pk_val() for obj in f.value_from_object(instance)]
+        else:
+            initial[f.name] = f.value_from_object(instance)
     return initial
 
 class BaseModelFormSet(BaseFormSet):

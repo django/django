@@ -101,14 +101,17 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
             value = ','.join([str(v) for v in value])
-        else: 
-            value = ""
+        else:
+            value = ''
         return super(ManyToManyRawIdWidget, self).render(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
+        value = data.get(name, None)
+        if value and ',' in value:
             return data[name].split(',')
-        return data.get(name, None)
+        if value:
+            return [value]
+        return None
 
 class RelatedFieldWidgetWrapper(object):
     """
