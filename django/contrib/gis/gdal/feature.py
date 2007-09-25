@@ -4,7 +4,7 @@ from ctypes import c_char_p, c_int, string_at
 
 # The GDAL C library, OGR exception, and the Field object
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.error import OGRException
+from django.contrib.gis.gdal.error import OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 
@@ -35,11 +35,11 @@ class Feature(object):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:
-                raise IndexError, 'index out of range'
+                raise OGRIndexError, 'index out of range'
             i = index
         return Field(lgdal.OGR_F_GetFieldDefnRef(self._feat, c_int(i)),
                      string_at(lgdal.OGR_F_GetFieldAsString(self._feat, c_int(i))))
-
+    
     def __iter__(self):
         "Iterates over each field in the Feature."
         for i in xrange(self.num_fields):
@@ -94,14 +94,18 @@ class Feature(object):
     
     #### Feature Methods ####
     def get(self, field):
-        "Returns the value of the field, instead of an instance of the Field object."
+        """
+        Returns the value of the field, instead of an instance of the Field
+         object.  May take a string of the field name or a Field object as
+         parameters.
+        """
         field_name = getattr(field, 'name', field)
         return self.__getitem__(field_name).value
 
     def index(self, field_name):
         "Returns the index of the given field name."
         i = lgdal.OGR_F_GetFieldIndex(self._feat, c_char_p(field_name))
-        if i < 0: raise IndexError, 'invalid OFT field name given: "%s"' % field_name
+        if i < 0: raise OGRIndexError, 'invalid OFT field name given: "%s"' % field_name
         return i
 
     def clone(self):

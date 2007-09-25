@@ -8,7 +8,7 @@ from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.geometries import OGRGeomType
-from django.contrib.gis.gdal.error import OGRException, check_err
+from django.contrib.gis.gdal.error import OGRException, OGRIndexError, check_err
 from django.contrib.gis.gdal.srs import SpatialReference
 
 # For more information, see the OGR C API source code:
@@ -48,7 +48,7 @@ class Layer(object):
             if index < 0:
                 index = end - index
             if index < 0 or index >= self.num_feat:
-                raise IndexError, 'index out of range'
+                raise OGRIndexError, 'index out of range'
             return make_feature(index)
         else: 
             # A slice was given
