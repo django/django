@@ -5,8 +5,8 @@ formset_tests = """
 FormSet allows us to use multiple instance of the same form on 1 page. For now,
 the best way to create a FormSet is by using the formset_for_form function.
 
->>> from django.newforms import Form, CharField, IntegerField
->>> from django.newforms.formsets import formset_for_form
+>>> from django.newforms import Form, CharField, IntegerField, ValidationError
+>>> from django.newforms.formsets import formset_for_form, BaseFormSet
 
 >>> class Choice(Form):
 ...     choice = CharField()
@@ -419,5 +419,66 @@ True
 >>> formset.deleted_data
 [{'votes': 900, 'DELETE': True, 'ORDER': 2, 'choice': u'Fergie'}]
 
+
+# FormSet clean hook ##########################################################
+
+FormSets have a hook for doing extra validation that shouldn't be tied to any
+particular form. It follows the same pattern as the clean hook on Forms.
+
+Let's define a FormSet that takes a list of favorite drinks, but raises am
+error if there are any duplicates.
+
+>>> class FavoriteDrinkForm(Form):
+...     name = CharField()
+...
+
+>>> class FavoriteDrinksFormSet(BaseFormSet):
+...     form_class = FavoriteDrinkForm
+...     num_extra = 2
+...     orderable = False
+...     deletable = False
+...
+...     def clean(self):
+...         seen_drinks = []
+...         for drink in self.cleaned_data:
+...             if drink['name'] in seen_drinks:
+...                 raise ValidationError('You may only specify a drink once.')
+...             seen_drinks.append(drink['name'])
+...         return self.cleaned_data
+...
+
+We start out with a some duplicate data.
+
+>>> data = {
+...     'drinks-COUNT': '2',
+...     'drinks-0-name': 'Gin and Tonic',
+...     'drinks-1-name': 'Gin and Tonic',
+... }
+
+>>> formset = FavoriteDrinksFormSet(data, prefix='drinks')
+>>> formset.is_valid()
+False
+
+Any errors raised by formset.clean() are available via the
+formset.non_form_errors() method.
+
+>>> for error in formset.non_form_errors():
+...     print error
+You may only specify a drink once.
+
+
+Make sure we didn't break the valid case.
+
+>>> data = {
+...     'drinks-COUNT': '2',
+...     'drinks-0-name': 'Gin and Tonic',
+...     'drinks-1-name': 'Bloody Mary',
+... }
+
+>>> formset = FavoriteDrinksFormSet(data, prefix='drinks')
+>>> formset.is_valid()
+True
+>>> for error in formset.non_form_errors():
+...     print error
 
 """

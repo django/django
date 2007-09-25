@@ -1,6 +1,7 @@
-from forms import Form, ValidationError
+from forms import Form
 from fields import IntegerField, BooleanField
 from widgets import HiddenInput, Media
+from util import ErrorList, ValidationError
 
 __all__ = ('BaseFormSet', 'formset_for_form', 'all_valid')
 
@@ -22,13 +23,15 @@ class ManagementForm(Form):
 class BaseFormSet(object):
     """A collection of instances of the same Form class."""
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None):
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, 
+            initial=None, error_class=ErrorList):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or 'form'
         self.auto_id = auto_id
         self.data = data
         self.files = files
         self.initial = initial
+        self.error_class = error_class
         # initialization is different depending on whether we recieved data, initial, or nothing
         if data or files:
             self.management_form = ManagementForm(data, files, auto_id=self.auto_id, prefix=self.prefix)
@@ -92,55 +95,78 @@ class BaseFormSet(object):
         return self.change_forms + self.add_forms
     forms = property(_forms)
 
+    def non_form_errors(self):
+        """
+        Returns an ErrorList of errors that aren't associated with a particular
+        form -- i.e., from formset.clean(). Returns an empty ErrorList if there
+        are none.
+        """
+        if hasattr(self, '_non_form_errors'):
+            return self._non_form_errors
+        return self.error_class()
+
     def full_clean(self):
         """Cleans all of self.data and populates self.__errors and self.cleaned_data."""
-        is_valid = True
+        self._is_valid = True # Assume the formset is valid until proven otherwise.
         errors = []
         if not self.is_bound: # Stop further processing.
             self.__errors = errors
             return
-        cleaned_data = []
-        deleted_data = []
-        
+        self.cleaned_data = []
+        self.deleted_data = []
         # Process change forms
         for form in self.change_forms:
             if form.is_valid():
                 if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
-                    deleted_data.append(form.cleaned_data)
+                    self.deleted_data.append(form.cleaned_data)
                 else:
-                    cleaned_data.append(form.cleaned_data)
+                    self.cleaned_data.append(form.cleaned_data)
             else:
-                is_valid = False
+                self._is_valid = False
             errors.append(form.errors)
-        
         # Process add forms in reverse so we can easily tell when the remaining
         # ones should be required.
-        required = False
+        reamining_forms_required = False
         add_errors = []
         for i in range(len(self.add_forms)-1, -1, -1):
             form = self.add_forms[i]
             # If an add form is empty, reset it so it won't have any errors
-            if form.is_empty([ORDERING_FIELD_NAME]) and not required:
+            if form.is_empty([ORDERING_FIELD_NAME]) and not reamining_forms_required:
                 form.reset()
                 continue
             else:
-                required = True
+                reamining_forms_required = True
                 if form.is_valid():
-                    cleaned_data.append(form.cleaned_data)
+                    self.cleaned_data.append(form.cleaned_data)
                 else:
-                    is_valid = False
+                    self._is_valid = False
             add_errors.append(form.errors)
         add_errors.reverse()
         errors.extend(add_errors)
-
+        # Sort cleaned_data if the formset is orderable.
         if self.orderable:
-            cleaned_data.sort(lambda x,y: x[ORDERING_FIELD_NAME] - y[ORDERING_FIELD_NAME])
-
-        if is_valid:
-            self.cleaned_data = cleaned_data
-            self.deleted_data = deleted_data
+            self.cleaned_data.sort(lambda x,y: x[ORDERING_FIELD_NAME] - y[ORDERING_FIELD_NAME])
+        # Give self.clean() a chance to do validation
+        try:
+            self.cleaned_data = self.clean()
+        except ValidationError, e:
+            self._non_form_errors = e.messages
+            self._is_valid = False
         self.errors = errors
-        self._is_valid = is_valid
+        # If there were errors, be consistent with forms and remove the
+        # cleaned_data and deleted_data attributes.
+        if not self._is_valid:
+            delattr(self, 'cleaned_data')
+            delattr(self, 'deleted_data')
+
+    def clean(self):
+        """
+        Hook for doing any extra formset-wide cleaning after Form.clean() has
+        been called on every form. Any ValidationError raised by this method
+        will not be associated with a particular form; it will be accesible
+        via formset.non_form_errors()
+        """
+        return self.cleaned_data
 
     def add_fields(self, form, index):
         """A hook for adding extra fields on to each form instance."""
