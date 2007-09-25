@@ -2,11 +2,11 @@
  This module contains useful utilities for GeoDjango.
 """
 
-from django.contrib.gis.utils.inspect_data import sample
-
-# Importing LayerMapping (will not be done if GDAL is not installed)
+# Importing LayerMapping and ogrinfo (will not be done if GDAL is not
+#  installed)
 from django.contrib.gis.gdal import HAS_GDAL
 if HAS_GDAL:
+    from django.contrib.gis.utils.ogrinfo import ogrinfo, sample
     from django.contrib.gis.utils.layermapping import LayerMapping
 
 # Importing GeoIP
