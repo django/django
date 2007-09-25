@@ -1,5 +1,6 @@
 import types
 import urllib
+import datetime
 from django.utils.functional import Promise
 
 class StrAndUnicode(object):
@@ -30,7 +31,7 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
 
     If strings_only is True, don't convert (some) non-string-like objects.
     """
-    if strings_only and isinstance(s, (types.NoneType, int, long)):
+    if strings_only and isinstance(s, (types.NoneType, int, long, datetime.datetime, datetime.time, float)):
         return s
     if not isinstance(s, basestring,):
         if hasattr(s, '__unicode__'):

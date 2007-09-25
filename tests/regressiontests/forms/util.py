@@ -3,7 +3,7 @@
 Tests for newforms/util.py module.
 """
 
-util_tests = r"""
+tests = r"""
 >>> from django.newforms.util import *
 >>> from django.utils.translation import ugettext_lazy
 

@@ -54,7 +54,7 @@ Is updated
 pre_delete signal, Tom Smith
 instance.id is not None: True
 post_delete signal, Tom Smith
-instance.id is None: True
+instance.id is None: False
 
 >>> p2 = Person(first_name='James', last_name='Jones')
 >>> p2.id = 99999
@@ -73,7 +73,7 @@ Is created
 pre_delete signal, James Jones
 instance.id is not None: True
 post_delete signal, James Jones
-instance.id is None: True
+instance.id is None: False
 
 >>> Person.objects.all()
 [<Person: James Jones>]

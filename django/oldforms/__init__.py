@@ -447,7 +447,7 @@ class LargeTextField(TextField):
             self.field_name, self.rows, self.cols, escape(data))
 
 class HiddenField(FormField):
-    def __init__(self, field_name, is_required=False, validator_list=None):
+    def __init__(self, field_name, is_required=False, validator_list=None, max_length=None):
         if validator_list is None: validator_list = []
         self.field_name, self.is_required = field_name, is_required
         self.validator_list = validator_list[:]
@@ -674,7 +674,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
 ####################
 
 class FileUploadField(FormField):
-    def __init__(self, field_name, is_required=False, validator_list=None):
+    def __init__(self, field_name, is_required=False, validator_list=None, max_length=None):
         if validator_list is None: validator_list = []
         self.field_name, self.is_required = field_name, is_required
         self.validator_list = [self.isNonEmptyFile] + validator_list
@@ -946,7 +946,7 @@ class IPAddressField(TextField):
 
 class FilePathField(SelectField):
     "A SelectField whose choices are the files in a given directory."
-    def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=None):
+    def __init__(self, field_name, path, match=None, recursive=False, is_required=False, validator_list=None, max_length=None):
         import os
         from django.db.models import BLANK_CHOICE_DASH
         if match is not None:

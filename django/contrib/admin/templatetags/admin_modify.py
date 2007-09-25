@@ -40,7 +40,7 @@ class FieldWidgetNode(template.Node):
     default = None
 
     def __init__(self, bound_field_var):
-        self.bound_field_var = bound_field_var
+        self.bound_field_var = template.Variable(bound_field_var)
 
     def get_nodelist(cls, klass):
         if klass not in cls.nodelists:
@@ -64,7 +64,7 @@ class FieldWidgetNode(template.Node):
     get_nodelist = classmethod(get_nodelist)
 
     def render(self, context):
-        bound_field = template.resolve_variable(self.bound_field_var, context)
+        bound_field = self.bound_field_var.resolve(context)
 
         context.push()
         context['bound_field'] = bound_field

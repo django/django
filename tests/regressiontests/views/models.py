@@ -17,8 +17,10 @@ class Author(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=100)
+    slug = models.SlugField()
     author = models.ForeignKey(Author)
-
+    date_created = models.DateTimeField()
+    
     def __unicode__(self):
         return self.title
 
