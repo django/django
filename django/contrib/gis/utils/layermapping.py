@@ -18,26 +18,33 @@ Requirements:  OGR C Library (from GDAL) required.
 Usage: 
   lm = LayerMapping(model, source_file, mapping) where,
 
-  model -- GeoDjango model (not an instance)
+  model:
+   GeoDjango model (not an instance)
 
-  data -- OGR-supported data source file (e.g. a shapefile) or
-          gdal.DataSource instance
+  data:
+   OGR-supported data source file (e.g. a shapefile) or
+    gdal.DataSource instance
 
-  mapping -- A python dictionary, keys are strings corresponding
-             to the GeoDjango model field, and values correspond to
-             string field names for the OGR feature, or if the model field
-             is a geographic then it should correspond to the OGR
-             geometry type, e.g. 'POINT', 'LINESTRING', 'POLYGON'.
+  mapping:
+   A python dictionary, keys are strings corresponding
+   to the GeoDjango model field, and values correspond to
+   string field names for the OGR feature, or if the model field
+   is a geographic then it should correspond to the OGR
+   geometry type, e.g. 'POINT', 'LINESTRING', 'POLYGON'.
 
 Keyword Args:
-  layer: 
-    The index of the layer to use from the Data Source (defaults to 0)
+  layer:
+   The index of the layer to use from the Data Source (defaults to 0)
 
   source_srs:
-    Use this to specify the source SRS manually (for example, some 
-     shapefiles don't come with a '.prj' file).  A SRID integer, a
-     WKT string, a SpatialReference, and a SpatialRefSys object are
-     all valid parameters here.
+   Use this to specify the source SRS manually (for example, 
+   some shapefiles don't come with a '.prj' file).  An integer SRID,
+   a string WKT, and SpatialReference objects are valid parameters.
+
+  encoding:
+   Specifies the encoding of the string in the OGR data source.
+   For example, 'latin-1', 'utf-8', and 'cp437' are all valid
+   encoding parameters.
 
 Example:
 
@@ -84,11 +91,11 @@ Example:
   Saved: Name: 3
 
  LayerMapping just transformed the three geometries from the SHP file from their
-   source spatial reference system (WGS84) to the spatial reference system of
-   the GeoDjango model (NAD83).  If no spatial reference system is defined for
-   the layer, use the `source_srs` keyword with a SpatialReference object to
-   specify one. Further, data is selectively imported from the given data source 
-   fields into the model fields.
+  source spatial reference system (WGS84) to the spatial reference system of
+  the GeoDjango model (NAD83).  If no spatial reference system is defined for
+  the layer, use the `source_srs` keyword with a SpatialReference object to
+  specify one. Further, data is selectively imported from the given data source 
+  fields into the model fields.
 """
 from types import StringType, TupleType
 from datetime import datetime
@@ -234,7 +241,7 @@ def check_srs(layer, source_srs):
 class LayerMapping:
     "A class that maps OGR Layers to Django Models."
 
-    def __init__(self, model, data, mapping, layer=0, source_srs=None):
+    def __init__(self, model, data, mapping, layer=0, source_srs=None, encoding=None):
         "Takes the Django model, the data source, and the mapping (dictionary)"
 
         # Getting the field names and types from the model
@@ -256,6 +263,17 @@ class LayerMapping:
         self.model = model
         self.source_srs = check_srs(self.layer, source_srs)
 
+        # Setting the encoding for OFTString fields, if specified.
+        if encoding:
+            # Making sure the encoding exists, if not a LookupError
+            #  exception will be thrown.
+            from codecs import lookup
+            lookup(encoding)
+            self.encoding = encoding
+        else:
+            self.encoding = None
+
+    # Either the import will work, or it won't be committed.
     @transaction.commit_on_success
     def save(self, verbose=False):
         "Runs the layer mapping on the given SHP file, and saves to the database."
@@ -310,8 +328,14 @@ class LayerMapping:
                     val = g.wkt
                 else:
                     ## Otherwise, this is an OGR field type
-                    fi = feat.index(ogr_field)
-                    val = feat[fi].value
+                    fld = feat[ogr_field]
+
+                    if isinstance(fld, OFTString) and self.encoding:
+                        # The encoding for OGR data sources may be specified here
+                        #  (e.g., 'cp437' for Census Bureau boundary files).
+                        val = unicode(fld.value, self.encoding)
+                    else:
+                        val = fld.value
 
                 if is_fk:
                     rel_obj = None
@@ -343,4 +367,3 @@ class LayerMapping:
                     raise
                 except Exception, e:
                     print "Failed to save %s\n  Continuing" % kwargs
-                    
