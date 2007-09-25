@@ -137,6 +137,6 @@ class RelatedFieldWidgetWrapper(object):
         return u''.join(output)
 
     def __deepcopy__(self, memo):
-        # There is no reason to deepcopy self.admin_site, etc, so just return
-        # a shallow copy.
-        return copy.copy(self)
+        # There's no reason to deepcopy admin_site, etc, so just return self.
+        memo[id(self)] = self
+        return self
