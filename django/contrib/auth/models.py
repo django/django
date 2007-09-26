@@ -388,5 +388,9 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
     filter_horizontal = ('user_permissions',)
 
+    def add_view(self, request):
+        from django.contrib.admin.views.auth import user_add_stage
+        return user_add_stage(request)
+
 admin.site.register(Group, GroupAdmin)
 admin.site.register(User, UserAdmin)
