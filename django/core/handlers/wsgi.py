@@ -5,7 +5,6 @@ from django.utils import datastructures
 from django.utils.encoding import force_unicode
 from django import http
 from pprint import pformat
-from shutil import copyfileobj
 from threading import Lock
 try:
     from cStringIO import StringIO
