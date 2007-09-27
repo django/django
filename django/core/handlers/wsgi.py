@@ -105,7 +105,8 @@ class WSGIRequest(http.HttpRequest):
         return '%s%s' % (self.path, self.environ.get('QUERY_STRING', '') and ('?' + self.environ.get('QUERY_STRING', '')) or '')
 
     def is_secure(self):
-        return 'HTTPS' in self.environ and self.environ['HTTPS'] == 'on'
+        return 'wsgi.url_scheme' in self.environ \
+            and self.environ['wsgi.url_scheme'] == 'https'
 
     def _load_post_and_files(self):
         # Populates self._post and self._files
