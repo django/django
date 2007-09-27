@@ -163,7 +163,7 @@ def get_spatial_db(test=False):
         return settings.DATABASE_NAME
 
 def load_postgis_sql(db_name, verbosity=1):
-    """"
+    """
     This routine loads up the PostGIS SQL files lwpostgis.sql and 
      spatial_ref_sys.sql.
     """
