@@ -1,15 +1,16 @@
+from threading import Lock
+from pprint import pformat
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
+
 from django.core.handlers.base import BaseHandler
 from django.core import signals
 from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
 from django import http
-from pprint import pformat
-from threading import Lock
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {
