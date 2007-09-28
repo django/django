@@ -57,6 +57,13 @@ def patch_cache_control(response, **kwargs):
         cc = dict([dictitem(el) for el in cc])
     else:
         cc = {}
+
+    # If there's already a max-age header but we're being asked to set a new
+    # max-age, use the minumum of the two ages. In practice this happens when
+    # a decorator and a piece of middleware both operate on a given view.
+    if 'max-age' in cc and 'max_age' in kwargs:
+        kwargs['max_age'] = min(cc['max-age'], kwargs['max_age'])
+
     for (k,v) in kwargs.items():
         cc[k.replace('_', '-')] = v
     cc = ', '.join([dictvalue(el) for el in cc.items()])
