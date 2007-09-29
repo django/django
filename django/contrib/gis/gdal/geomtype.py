@@ -11,21 +11,21 @@ class OGRGeomType(object):
                  'LinearRing']
     __ogr_int = [1, 2, 3, 4, 5, 6, 7, 101]
 
-    def __init__(self, input):
+    def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."
-        if isinstance(input, OGRGeomType):
-            self._index = input._index
-        elif isinstance(input, StringType):
-            idx = self._has_str(self.__ogr_str, input)
+        if isinstance(type_input, OGRGeomType):
+            self._index = type_input._index
+        elif isinstance(type_input, StringType):
+            idx = self._has_str(self.__ogr_str, type_input)
             if idx == None:
-                raise OGRException, 'Invalid OGR String Type "%s"' % input
+                raise OGRException('Invalid OGR String Type "%s"' % type_input)
             self._index = idx
-        elif isinstance(input, int):
-            if not input in self.__ogr_int:
-                raise OGRException, 'Invalid OGR Integer Type: %d' % input
-            self._index =  self.__ogr_int.index(input)
+        elif isinstance(type_input, int):
+            if not type_input in self.__ogr_int:
+                raise OGRException('Invalid OGR Integer Type: %d' % type_input)
+            self._index =  self.__ogr_int.index(type_input)
         else:
-            raise TypeError, 'Invalid OGR Input type given!'
+            raise TypeError('Invalid OGR Input type given!')
 
     def __str__(self):
         "Returns a short-hand string form of the OGR Geometry type."
@@ -44,7 +44,7 @@ class OGRGeomType(object):
             if not other in self.__ogr_int: return False
             return self.__ogr_int.index(other) == self._index
         else:
-            raise TypeError, 'Cannot compare with type: %s' % str(type(other))
+            raise TypeError('Cannot compare with type: %s' % str(type(other)))
 
     def _has_str(self, arr, s):
         "Case-insensitive search of the string array for the given pattern."

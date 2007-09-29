@@ -1,24 +1,13 @@
-# types & ctypes
-from types import IntType, StringType
-from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
-
-# Getting geodjango gdal prerequisites
-from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError
-from django.contrib.gis.gdal.geomtype import OGRGeomType
-from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
-
 """
   The OGRGeometry is a wrapper for using the OGR Geometry class
-    (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
-    may be instantiated when reading geometries from OGR Data Sources
-    (e.g. SHP files), or when given OGC WKT (a string).
+   (see http://www.gdal.org/ogr/classOGRGeometry.html).  OGRGeometry
+   may be instantiated when reading geometries from OGR Data Sources
+   (e.g. SHP files), or when given OGC WKT (a string).
 
   While the 'full' API is not present yet, the API is "pythonic" unlike
-    the traditional and "next-generation" OGR Python bindings.  One major
-    advantage OGR Geometries have over their GEOS counterparts is support
-    for spatial reference systems and their transformation.
+   the traditional and "next-generation" OGR Python bindings.  One major
+   advantage OGR Geometries have over their GEOS counterparts is support
+   for spatial reference systems and their transformation.
 
   Example:
     >>> from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, SpatialReference
@@ -49,6 +38,16 @@ from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
     >>> print gt1 == 3, gt1 == 'Polygon' # Equivalence works w/non-OGRGeomType objects
     True
 """
+# types & ctypes
+from types import IntType, StringType
+from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
+
+# Getting GDAL prerequisites
+from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
+from django.contrib.gis.gdal.error import check_err, OGRException, OGRIndexError
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.srs import SpatialReference, CoordTransform
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -75,37 +74,45 @@ get_area.argtypes = [c_void_p]
 class OGRGeometry(object):
     "Generally encapsulates an OGR geometry."
 
-    def __init__(self, input, srs=False):
+    def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
         self._g = 0 # Initially NULL
-        self._init_srs(srs)
 
-        if isinstance(input, StringType):
+        if isinstance(geom_input, StringType):
             # First, trying the input as WKT
-            buf = c_char_p(input)
+            buf = c_char_p(geom_input)
             g = c_void_p()
 
             try:
-                check_err(lgdal.OGR_G_CreateFromWkt(byref(buf), self._s._srs, byref(g)))
-            except OGRException, msg:
+                check_err(lgdal.OGR_G_CreateFromWkt(byref(buf), c_void_p(), byref(g)))
+            except OGRException:
                 try:
-                    ogr_t = OGRGeomType(input) # Seeing if the input is a valid short-hand string
+                    # Seeing if the input is a valid short-hand string
+                    ogr_t = OGRGeomType(geom_input)
                     g = lgdal.OGR_G_CreateGeometry(ogr_t.num)
                 except:
-                    raise OGRException, 'Could not initialize on WKT "%s"' % input
-        elif isinstance(input, OGRGeomType):
-            g = lgdal.OGR_G_CreateGeometry(input.num)
-            lgdal.OGR_G_AssignSpatialReference(g, self._s._srs)
-        elif isinstance(input, IntType):
+                    raise OGRException('Could not initialize OGR Geometry from: %s' % geom_input)
+        elif isinstance(geom_input, OGRGeomType):
+            g = lgdal.OGR_G_CreateGeometry(geom_input.num)
+        elif isinstance(geom_input, IntType):
             # OGR Pointer (integer) was the input
-            g = input
+            g = geom_input
         else:
-            raise OGRException, 'Type of input cannot be determined!'
+            raise OGRException('Type of input cannot be determined!')
+
+        # Assigning the SpatialReference object to the geometry, if valid.
+        if bool(srs):
+            if isinstance(srs, SpatialReference):
+                srs_ptr = srs._srs
+            else:
+                sr = SpatialReference(srs)
+                srs_ptr = sr._srs
+            lgdal.OGR_G_AssignSpatialReference(g, srs_ptr)
 
         # Now checking the Geometry pointer before finishing initialization
         if not g:
-            raise OGRException, 'Cannot create OGR Geometry from input: %s' % str(input)
+            raise OGRException('Cannot create OGR Geometry from input: %s' % str(geom_input))
         self._g = g
 
         # Setting the class depending upon the OGR Geometry Type
@@ -114,13 +121,6 @@ class OGRGeometry(object):
     def __del__(self):
         "Deletes this Geometry."
         if self._g: lgdal.OGR_G_DestroyGeometry(self._g)
-
-    def _init_srs(self, srs):
-        # Getting the spatial
-        if not isinstance(srs, SpatialReference):
-            self._s = SpatialReference() # creating an empty spatial reference
-        else:
-            self._s = srs.clone() # cloning the given spatial reference
 
     ### Geometry set-like operations ###
     # g = g1 | g2
@@ -184,7 +184,11 @@ class OGRGeometry(object):
     @property
     def srs(self):
         "Returns the Spatial Reference for this Geometry."
-        return SpatialReference(lgdal.OSRClone(lgdal.OGR_G_GetSpatialReference(self._g)), 'ogr')
+        srs_ptr = lgdal.OGR_G_GetSpatialReference(self._g)
+        if srs_ptr:
+            return SpatialReference(lgdal.OSRClone(srs_ptr), 'ogr')
+        else:
+            return None
 
     @property
     def geom_type(self):
@@ -197,13 +201,6 @@ class OGRGeometry(object):
         return string_at(lgdal.OGR_G_GetGeometryName(self._g))
 
     @property
-    def wkt(self):
-        "Returns the WKT form of the Geometry."
-        buf = c_char_p()
-        check_err(lgdal.OGR_G_ExportToWkt(self._g, byref(buf)))
-        return string_at(buf)
-
-    @property
     def area(self):
         "Returns the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
         return get_area(self._g)
@@ -214,6 +211,21 @@ class OGRGeometry(object):
         env = OGREnvelope()
         lgdal.OGR_G_GetEnvelope(self._g, byref(env))
         return Envelope(env)
+
+    #### Output Methods ####
+    @property
+    def gml(self):
+        "Returns the GML representation of the Geometry."
+        buf = c_char_p()
+        check_err(lgdal.OGR_G_ExportToGML(self._g, byref(buf)))
+        return string_at(buf)
+
+    @property
+    def wkt(self):
+        "Returns the WKT representation of the Geometry."
+        buf = c_char_p()
+        check_err(lgdal.OGR_G_ExportToWkt(self._g, byref(buf)))
+        return string_at(buf)
     
     #### Geometry Methods ####
     def clone(self):
@@ -230,13 +242,13 @@ class OGRGeometry(object):
     def transform(self, coord_trans):
         "Transforms this Geometry with the given CoordTransform object."
         if not isinstance(coord_trans, CoordTransform):
-            raise OGRException, 'CoordTransform object required for transform.'
+            raise OGRException('CoordTransform object required for transform.')
         check_err(lgdal.OGR_G_Transform(self._g, coord_trans._ct))
 
     def transform_to(self, srs):
         "Transforms this Geometry with the given SpatialReference."
         if not isinstance(srs, SpatialReference):
-            raise OGRException, 'SpatialReference object required for transform_to.'
+            raise OGRException('SpatialReference object required for transform_to.')
         check_err(lgdal.OGR_G_TransformTo(self._g, srs._srs))
 
     #### Topology Methods ####
@@ -244,7 +256,7 @@ class OGRGeometry(object):
         """A generalized function for topology operations, takes a GDAL function and
         the other geometry to perform the operation on."""
         if not isinstance(other, OGRGeometry):
-            raise OGRException, 'Must use another OGRGeometry object for topology operations!'
+            raise OGRException('Must use another OGRGeometry object for topology operations!')
 
         # Calling the passed-in topology function with the other geometry
         status = topo_func(self._g, other._g)
@@ -368,7 +380,7 @@ class LineString(OGRGeometry):
             elif self.coord_dim == 3:
                 return (x.value, y.value, z.value)
         else:
-            raise OGRIndexError, 'index out of range: %s' % str(index)
+            raise OGRIndexError('index out of range: %s' % str(index))
 
     def __iter__(self):
         "Iterates over each point in the LineString."
@@ -401,9 +413,9 @@ class Polygon(OGRGeometry):
     def __getitem__(self, index):
         "Gets the ring at the specified index."
         if index < 0 or index >= self.geom_count:
-            raise OGRIndexError, 'index out of range: %s' % str(index)
+            raise OGRIndexError('index out of range: %s' % str(index))
         else:
-            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))))
+            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))), self.srs)
 
     # Polygon Properties
     @property
@@ -437,9 +449,9 @@ class GeometryCollection(OGRGeometry):
     def __getitem__(self, index):
         "Gets the Geometry at the specified index."
         if index < 0 or index >= self.geom_count:
-            raise OGRIndexError, 'index out of range: %s' % str(index)
+            raise OGRIndexError('index out of range: %s' % str(index))
         else:
-            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))))
+            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))), self.srs)
         
     def __iter__(self):
         "Iterates over each Geometry."
@@ -458,7 +470,7 @@ class GeometryCollection(OGRGeometry):
             tmp = OGRGeometry(geom)
             ptr = tmp._g
         else:
-            raise OGRException, 'Must add an OGRGeometry.'
+            raise OGRException('Must add an OGRGeometry.')
         lgdal.OGR_G_AddGeometry(self._g, ptr)
 
     @property

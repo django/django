@@ -1,6 +1,5 @@
 import os, os.path, unittest
-from django.contrib.gis.gdal import DataSource, OGRException
-from django.contrib.gis.gdal.envelope import Envelope
+from django.contrib.gis.gdal import DataSource, Envelope, OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import OFTReal, OFTInteger, OFTString
 
 # Path for SHP files
@@ -48,7 +47,7 @@ class DataSourceTest(unittest.TestCase):
             # Making sure indexing works
             try:
                 ds[len(ds)]
-            except IndexError:
+            except OGRIndexError:
                 pass
             else:
                 self.fail('Expected an IndexError!')
@@ -106,7 +105,9 @@ class DataSourceTest(unittest.TestCase):
 
                         # Asserting the string representation, and making sure we get
                         #  the proper OGR Field instance.
-                        self.assertEqual('%s (%s)' % (k, fld.value), str(fld))
+                        if isinstance(fld, OFTString): fmt = '%s ("%s")'
+                        else: fmt = '%s (%s)'
+                        self.assertEqual(fmt % (k, fld.value), str(fld))
                         self.assertEqual(True, isinstance(fld, v))
 
                     # Testing __iter__ on the Feature
@@ -136,5 +137,3 @@ def suite():
 
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-        

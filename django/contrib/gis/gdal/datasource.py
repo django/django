@@ -4,7 +4,7 @@ from ctypes import c_char_p, c_int, c_void_p, byref, string_at
 
 # The GDAL C library, OGR exceptions, and the Layer object.
 from django.contrib.gis.gdal.libgdal import lgdal
-from django.contrib.gis.gdal.error import OGRException, check_err
+from django.contrib.gis.gdal.error import OGRException, OGRIndexError, check_err
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.driver import Driver
 
@@ -60,7 +60,7 @@ class DataSource(object):
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.
         if not lgdal.OGRGetDriverCount() and not lgdal.OGRRegisterAll():
-            raise OGRException, 'Could not register all the OGR data source drivers!'
+            raise OGRException('Could not register all the OGR data source drivers!')
 
         if isinstance(ds_input, StringType):
 
@@ -72,12 +72,12 @@ class DataSource(object):
         elif isinstance(ds_input, c_void_p) and isinstance(ds_driver, c_void_p):
             ds = ds_input
         else:
-            raise OGRException, 'Invalid data source input type: %s' % str(type(ds_input))
+            raise OGRException('Invalid data source input type: %s' % str(type(ds_input)))
 
         # Raise an exception if the returned pointer is NULL
         if not ds:
             self._ds = False
-            raise OGRException, 'Invalid data source file "%s"' % ds_input
+            raise OGRException('Invalid data source file "%s"' % ds_input)
         else:
             self._ds = ds
             self._driver = Driver(ds_driver)
@@ -95,10 +95,10 @@ class DataSource(object):
         "Allows use of the index [] operator to get a layer at the index."
         if isinstance(index, StringType):
             l = lgdal.OGR_DS_GetLayerByName(self._ds, c_char_p(index))
-            if not l: raise IndexError, 'invalid OGR Layer name given: "%s"' % index
+            if not l: raise OGRIndexError('invalid OGR Layer name given: "%s"' % index)
         else:
             if index < 0 or index >= self.layer_count:
-                raise IndexError, 'index out of range'
+                raise OGRIndexError('index out of range')
             l = lgdal.OGR_DS_GetLayer(self._ds, c_int(index))
         return Layer(l)
         

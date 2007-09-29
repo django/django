@@ -79,7 +79,7 @@ class SpatialReference(object):
     _epsg_regex = re.compile('^EPSG:(?P<epsg>\d+)$', re.I)
 
     #### Python 'magic' routines ####
-    def __init__(self, input='', srs_type='wkt'):
+    def __init__(self, srs_input='', srs_type='wkt'):
         "Creates a spatial reference object from the given OGC Well Known Text (WKT)."
 
         self._srs = 0 # Initially NULL
@@ -87,45 +87,46 @@ class SpatialReference(object):
         # Creating an initial empty string buffer.
         buf = c_char_p('')
 
-        if isinstance(input, UnicodeType):
-            input = input.encode('ascii')
+        # Encoding to ASCII if unicode passed in.
+        if isinstance(srs_input, UnicodeType):
+            srs_input = srs_input.encode('ascii')
 
-        if isinstance(input, StringType):
+        if isinstance(srs_input, StringType):
             # Is this an EPSG well known name?
-            m = self._epsg_regex.match(input)
+            m = self._epsg_regex.match(srs_input)
             if m:
                 srs_type = 'epsg'
-                input = int(m.group('epsg'))
+                srs_input = int(m.group('epsg'))
             # Is this a short-hand well known name?
-            elif input in self._well_known:
+            elif srs_input in self._well_known:
                 srs_type = 'epsg'
-                input = self._well_known[input]
+                srs_input = self._well_known[srs_input]
             elif srs_type == 'proj':
                 pass
             else:
-                buf = c_char_p(input)
-        elif isinstance(input, int):
+                buf = c_char_p(srs_input)
+        elif isinstance(srs_input, int):
             if srs_type == 'wkt': srs_type = 'epsg' # want to try epsg if only integer provided
             if srs_type not in ('epsg', 'ogr'): 
-                raise SRSException, 'Integer input requires SRS type of "ogr" or "epsg".'
+                raise SRSException('Integer input requires SRS type of "ogr" or "epsg".')
         else:
-            raise TypeError, 'Invalid SRS type "%s"' % srs_type
+            raise TypeError('Invalid SRS type "%s"' % srs_type)
 
         # Calling OSRNewSpatialReference with the string buffer.
         if srs_type == 'ogr':
-            srs = input # Input is OGR pointer
+            srs = srs_input # SRS input is OGR pointer
         else:
             srs = lgdal.OSRNewSpatialReference(buf)
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException, 'Could not create spatial reference from WKT! (%s)' % input
+            raise SRSException('Could not create spatial reference from: %s' % srs_input)
         else:
             self._srs = srs
 
         # Post-processing if in PROJ.4 or EPSG formats.
-        if srs_type == 'proj': self.import_proj(input)
-        elif srs_type == 'epsg': self.import_epsg(input)
+        if srs_type == 'proj': self.import_proj(srs_input)
+        elif srs_type == 'epsg': self.import_epsg(srs_input)
 
     def __del__(self):
         "Destroys this spatial reference."
@@ -141,6 +142,14 @@ class SpatialReference(object):
             return self.attr_value(*target)
         else:
             return self.attr_value(target)
+
+    def __nonzero__(self):
+        "Returns True if this SpatialReference object is valid."
+        try:
+            self.validate()
+            return True
+        except OGRException:
+            return False
 
     def __str__(self):
         "The string representation uses 'pretty' WKT."
@@ -188,7 +197,15 @@ class SpatialReference(object):
         elif self.geographic: return self.attr_value('GEOGCS')
         elif self.local: return self.attr_value('LOCAL_CS')
         else: return None
-    
+
+    @property
+    def srid(self):
+        """
+        Returns the EPSG SRID of this Spatial Reference, will be None if
+        if undefined.
+        """
+        return self.srs['AUTHORITY', 1]
+        
     #### Unit Properties ####
     def _cache_linear(self):
         "Caches the linear units value and name."
@@ -345,10 +362,10 @@ class CoordTransform(object):
         "Initializes on a source and target SpatialReference objects."
         self._ct = 0 # Initially NULL 
         if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
-            raise SRSException, 'source and target must be of type SpatialReference'
+            raise SRSException('source and target must be of type SpatialReference')
         ct = lgdal.OCTNewCoordinateTransformation(source._srs, target._srs)
         if not ct:
-            raise SRSException, 'could not intialize CoordTransform object'
+            raise SRSException('could not intialize CoordTransform object')
         self._ct = ct
         self._srs1_name = source.name
         self._srs2_name = target.name

@@ -13,6 +13,7 @@ if HAS_GDAL:
     test_suite_names += [
         'test_gdal_driver',
         'test_gdal_ds',
+        'test_gdal_envelope',
         'test_gdal_geom',
         'test_gdal_srs',
         'test_spatialrefsys',

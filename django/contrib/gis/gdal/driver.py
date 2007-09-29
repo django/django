@@ -45,11 +45,11 @@ class Driver(object):
         elif isinstance(input, c_void_p):
             dr = input
         else:
-            raise OGRException, 'Unrecognized input type for OGR Driver: %s' % str(type(input))
+            raise OGRException('Unrecognized input type for OGR Driver: %s' % str(type(input)))
 
         # Making sure we get a valid pointer to the OGR Driver
         if not dr:
-            raise OGRException, 'Could not initialize OGR Driver on input: %s' % str(input)
+            raise OGRException('Could not initialize OGR Driver on input: %s' % str(input))
         self._dr = dr
 
     def __str__(self):
@@ -61,7 +61,7 @@ class Driver(object):
         # Only register all if the driver count is 0 (or else all drivers
         #  will be registered over and over again)
         if not self.driver_count and not lgdal.OGRRegisterAll():
-            raise OGRException, 'Could not register all the OGR data source drivers!'
+            raise OGRException('Could not register all the OGR data source drivers!')
                     
     # Driver properties
     @property

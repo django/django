@@ -1,5 +1,5 @@
 import unittest
-from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, OGRException
+from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, OGRException, SpatialReference
 from geometries import *
 
 class OGRGeomTest(unittest.TestCase):
@@ -129,6 +129,18 @@ class OGRGeomTest(unittest.TestCase):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
+
+    def test09_srs(self):
+        "Testing OGR Geometries with Spatial Reference objects."
+        for mp in multipolygons:
+            sr = SpatialReference('WGS84')
+            mpoly = OGRGeometry(mp.wkt, sr)
+            self.assertEqual(sr.wkt, mpoly.srs.wkt)
+            for poly in mpoly:
+                self.assertEqual(sr.wkt, poly.srs.wkt)
+                for ring in poly:
+                    self.assertEqual(sr.wkt, ring.srs.wkt)
+            
 
 def suite():
     s = unittest.TestSuite()

@@ -7,6 +7,7 @@ from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
+from django.contrib.gis.gdal.srs import SpatialReference
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -21,7 +22,7 @@ class Feature(object):
         self._feat = 0 # Initially NULL
         self._fdefn = 0 
         if not f:
-            raise OGRException, 'Cannot create OGR Feature, invalid pointer given.'
+            raise OGRException('Cannot create OGR Feature, invalid pointer given.')
         self._feat = f
         self._fdefn = lgdal.OGR_F_GetDefnRef(f)
 
@@ -35,7 +36,7 @@ class Feature(object):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:
-                raise OGRIndexError, 'index out of range'
+                raise OGRIndexError('index out of range')
             i = index
         return Field(lgdal.OGR_F_GetFieldDefnRef(self._feat, c_int(i)),
                      string_at(lgdal.OGR_F_GetFieldAsString(self._feat, c_int(i))))
@@ -84,8 +85,20 @@ class Feature(object):
     @property
     def geom(self):
         "Returns the OGR Geometry for this Feature."
-        # A clone is used, so destruction of the Geometry won't bork the Feature.
-        return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_F_GetGeometryRef(self._feat)))
+        # Retrieving the geometry pointer for the feature.
+        geom_ptr = lgdal.OGR_F_GetGeometryRef(self._feat)
+        if not geom_ptr:
+            raise OGRException('Cannot retrieve Geometry from the feature.')
+
+        # Attempting to retrieve the Spatial Reference for the geometry.
+        srs_ptr  = lgdal.OGR_G_GetSpatialReference(geom_ptr)
+        if srs_ptr:
+            srs = SpatialReference(srs_ptr, 'ogr')
+        else:
+            srs = None
+
+        # Geometry is cloned so the feature isn't invalidated.
+        return OGRGeometry(lgdal.OGR_G_Clone(geom_ptr), srs)
 
     @property
     def geom_type(self):
@@ -105,7 +118,7 @@ class Feature(object):
     def index(self, field_name):
         "Returns the index of the given field name."
         i = lgdal.OGR_F_GetFieldIndex(self._feat, c_char_p(field_name))
-        if i < 0: raise OGRIndexError, 'invalid OFT field name given: "%s"' % field_name
+        if i < 0: raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
         return i
 
     def clone(self):

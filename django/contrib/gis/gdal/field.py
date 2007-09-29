@@ -1,5 +1,4 @@
 from ctypes import string_at
-
 from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.error import OGRException
 
@@ -16,7 +15,7 @@ class Field(object):
         self._fld = 0 # Initially NULL
 
         if not fld:
-            raise OGRException, 'Cannot create OGR Field, invalid pointer given.'
+            raise OGRException('Cannot create OGR Field, invalid pointer given.')
         self._fld = fld
         self._val = val
 
@@ -64,7 +63,10 @@ class OFTReal(Field):
             return None
 class OFTRealList(Field): pass
 
-class OFTString(Field): pass
+class OFTString(Field):
+    def __str__(self):
+        return '%s ("%s")' % (self.name, self.value)
+    
 class OFTStringList(Field): pass
 class OFTWideString(Field): pass
 class OFTWideStringList(Field): pass
