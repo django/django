@@ -17,6 +17,9 @@ from django.db.models.query import field_choices, find_field, get_where_clause, 
     FieldFound, LOOKUP_SEPARATOR, QUERY_TERMS
 from django.utils.datastructures import SortedDict
 
+# These routines default to False
+ASGML, ASKML, UNION = (False, False, False)
+
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
     from django.contrib.gis.db.backend.postgis import \

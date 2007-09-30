@@ -6,7 +6,6 @@ class GeoModelTest(unittest.TestCase):
     
     def test01_initial_sql(self):
         "Testing geographic initial SQL."
-
         # Ensuring that data was loaded from initial SQL.
         self.assertEqual(2, Country.objects.count())
         self.assertEqual(8, City.objects.count())
@@ -71,23 +70,28 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(ply, State.objects.get(name='NullState').poly)
         nullstate.delete()
 
-    def test03_kml(self):
+    def test03a_kml(self):
         "Testing KML output from the database using GeoManager.kml()."
-        # Should throw an error trying to get KML from a non-geometry field.
-        try:
-            qs = City.objects.all().kml('name')
-        except TypeError:
-            pass
-        else:
-            self.fail('Expected a TypeError exception')
+        # Should throw a TypeError when trying to obtain KML from a
+        #  non-geometry field.
+        qs = City.objects.all()
+        self.assertRaises(TypeError, qs.kml, 'name')
 
         # Ensuring the KML is as expected.
         ptown = City.objects.kml('point', precision=9).get(name='Pueblo')
         self.assertEqual('<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>', ptown.kml)
 
-    def test04_transform(self):
-        "Testing the transform() queryset method."
+    def test03b_gml(self):
+        "Testing GML output from the database using GeoManager.gml()."
+        # Should throw a TypeError when tyring to obtain GML from a
+        #  non-geometry field.
+        qs = City.objects.all()
+        self.assertRaises(TypeError, qs.gml, 'name')
+        ptown = City.objects.gml('point', precision=9).get(name='Pueblo')
+        self.assertEqual('<gml:Point srsName="EPSG:4326"><gml:coordinates>-104.609252,38.255001</gml:coordinates></gml:Point>', ptown.gml)
 
+    def test04_transform(self):
+        "Testing the transform() GeoManager method."
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
@@ -103,8 +107,7 @@ class GeoModelTest(unittest.TestCase):
         self.assertAlmostEqual(ptown.y, p.point.y, 8)
 
     def test10_contains_contained(self):
-        "Testing the 'contained' and 'contains' lookup types."
-
+        "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name='Texas')
         
@@ -137,9 +140,13 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(0, len(Country.objects.filter(mpoly__contains=pueblo.point))) # Query w/GEOSGeometry object
         self.assertEqual(0, len(Country.objects.filter(mpoly__contains=okcity.point.wkt))) # Qeury w/WKT
 
+        # OK City is contained w/in bounding box of Texas.
+        qs = Country.objects.filter(mpoly__bbcontains=okcity.point)
+        self.assertEqual(1, len(qs))
+        self.assertEqual('Texas', qs[0].name)
+
     def test11_lookup_insert_transform(self):
         "Testing automatic transform for lookups and inserts."
-
         # San Antonio in 'WGS84' (SRID 4326) and 'NAD83(HARN) / Texas Centric Lambert Conformal' (SRID 3084)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         sa_3084 = 'POINT (1645978.362408288754523 6276356.025927528738976)' # Used ogr.py in gdal 1.4.1 for this transform
@@ -161,7 +168,6 @@ class GeoModelTest(unittest.TestCase):
 
     def test12_null_geometries(self):
         "Testing NULL geometry support."
-
         # Querying for both NULL and Non-NULL values.
         nullqs = State.objects.filter(poly__isnull=True)
         validqs = State.objects.filter(poly__isnull=False)
@@ -182,7 +188,6 @@ class GeoModelTest(unittest.TestCase):
     
     def test13_left_right(self):
         "Testing the 'left' and 'right' lookup types."
-        
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B) 
         #  See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
@@ -261,6 +266,18 @@ class GeoModelTest(unittest.TestCase):
         c = City()
         self.assertEqual(c.point, None)
 
+    def test17_union(self):
+        "Testing the union() GeoManager method."
+        tx = Country.objects.get(name='Texas').mpoly
+        # Houston, Dallas, San Antonio
+        union = fromstr('MULTIPOINT(-98.493183 29.424170,-96.801611 32.782057,-95.363151 29.763374)')
+        qs = City.objects.filter(point__within=tx)
+        self.assertRaises(TypeError, qs.union, 'name')
+        u = qs.union('point')
+        self.assertEqual(True, union.equals_exact(u, 10)) # Going up to 10 digits of precision.
+        qs = City.objects.filter(name='NotACity')
+        self.assertEqual(None, qs.union('point'))
+    
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GeoModelTest))

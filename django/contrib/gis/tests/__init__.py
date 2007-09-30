@@ -3,7 +3,6 @@ from copy import copy
 from unittest import TestSuite, TextTestRunner
 from django.contrib.gis.gdal import HAS_GDAL
 
-
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = [
     'test_geos',
@@ -37,8 +36,7 @@ def run(verbosity=1):
 
 def run_tests(module_list, verbosity=1, interactive=True):
     """
-    Run the tests that require creation of a spatial database.  Does not
-     yet work on Windows platforms.
+    Run the tests that require creation of a spatial database.
     
     In order to run geographic model tests the DATABASE_USER will require
      superuser priviliges.  To accomplish this outside the `postgres` user,
@@ -49,17 +47,24 @@ def run_tests(module_list, verbosity=1, interactive=True):
          /path/to/user/db) to change the database port (e.g. `port = 5433`).  
      (3) Start this database `pg_ctl -D /path/to/user/db start`
 
-    Make sure your settings.py matches the settings of the user database. For example, set the 
-     same port number (`DATABASE_PORT=5433`).  DATABASE_NAME or TEST_DATABSE_NAME must be set,
-     along with DATABASE_USER.
+    On Windows platforms simply use the pgAdmin III utility to add superuser 
+     priviliges to your database user.
+
+    Make sure your settings.py matches the settings of the user database. 
+     For example, set the same port number (`DATABASE_PORT=5433`).  
+     DATABASE_NAME or TEST_DATABSE_NAME must be set, along with DATABASE_USER.
       
     In settings.py set TEST_RUNNER='django.contrib.gis.tests.run_tests'.
 
-    Finally, this assumes that the PostGIS SQL files (lwpostgis.sql and spatial_ref_sys.sql)
-     are installed in /usr/local/share.  If they are not, add `POSTGIS_SQL_PATH=/path/to/sql`
-     in your settings.py.
+    Finally, this assumes that the PostGIS SQL files (lwpostgis.sql and 
+     spatial_ref_sys.sql) are installed in the directory specified by 
+     `pg_config --sharedir` (and defaults to /usr/local/share if that fails).
+     This behavior is overridden if `POSTGIS_SQL_PATH` is in your settings.
+    
+    Windows users should use the POSTGIS_SQL_PATH because the output
+     of `pg_config` uses paths like 'C:/PROGRA~1/POSTGR~1/..'.
 
-    The tests may be run by invoking `./manage.py test`.
+    Finally, the tests may be run by invoking `./manage.py test`.
     """
     from django.conf import settings
     from django.contrib.gis.db.backend import create_spatial_db

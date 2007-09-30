@@ -1,11 +1,13 @@
 import operator
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-from django.db.models.query import Q, QuerySet, handle_legacy_orderlist, quote_only_if_word, orderfield2column, fill_table_cache
+from django.db.models.query import EmptyResultSet, Q, QuerySet, handle_legacy_orderlist, quote_only_if_word, orderfield2column, fill_table_cache
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.backend import parse_lookup # parse_lookup depends on the spatial database backend.
+# parse_lookup depends on the spatial database backend.
+from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, UNION
+from django.contrib.gis.geos import GEOSGeometry
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
@@ -143,34 +145,66 @@ class GeoQuerySet(QuerySet):
 
     #### Methods specific to the GeoQuerySet ####
     def _field_column(self, field):
+        "Helper function that returns the database column for the given field."
         qn = connection.ops.quote_name
         return "%s.%s" % (qn(self.model._meta.db_table),
                           qn(field.column))
-    
-    def kml(self, field_name, precision=8):
-        """Returns KML representation of the given field name in a `kml` 
-        attribute on each element of the QuerySet."""
-        # Is KML output supported?
-        try:
-            from django.contrib.gis.db.backend.postgis import ASKML
-        except ImportError:
-            raise ImproperlyConfigured, 'AsKML() only available in PostGIS versions 1.2.1 and greater.'
+
+    def _geo_column(self, field_name):
+        """
+        Helper function that returns False when the given field name is not an
+        instance of a GeographicField, otherwise, the database column for the
+        geographic field is returned.
+        """
+        field = self.model._meta.get_field(field_name)
+        if isinstance(field, GeometryField):
+            return self._field_column(field)
+        else:
+            return False
+
+    def gml(self, field_name, precision=8, version=2):
+        """
+        Returns GML representation of the given field in a `gml` attribute
+        on each element of the GeoQuerySet.
+        """
+        # Is GML output supported?
+        if not ASGML:
+            raise ImproperlyConfigured('AsGML() stored procedure not available.')
 
         # Is the given field name a geographic field?
-        field = self.model._meta.get_field(field_name)
-        if not isinstance(field, GeometryField):
-            raise TypeError, 'KML output only available on GeometryField fields.'
-        field_col = self._field_column(field)
+        field_col = self._geo_column(field_name)
+        if not field_col:
+            raise TypeError('GML output only available on GeometryFields')
+
+        # Adding AsGML function call to SELECT part of the SQL.
+        return self.extra(select={'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)})
+
+    def kml(self, field_name, precision=8):
+        """
+        Returns KML representation of the given field name in a `kml` 
+        attribute on each element of the GeoQuerySet.
+        """
+        # Is KML output supported?
+        if not ASKML:
+            raise ImproperlyConfigured('AsKML() stored procedure not available.')
+
+        # Is the given field name a geographic field?
+        field_col = self._geo_column(field_name)
+        if not field_col:
+            raise TypeError('KML output only available on GeometryFields.')
         
-        # Adding the AsKML function call to the SELECT part of the SQL.
+        # Adding the AsKML function call to SELECT part of the SQL.
         return self.extra(select={'kml':'%s(%s,%s)' % (ASKML, field_col, precision)})
 
     def transform(self, field_name, srid=4326):
-        """Transforms the given geometry field to the given SRID.  If no SRID is
-        provided, the transformation will default to using 4326 (WGS84)."""
+        """
+        Transforms the given geometry field to the given SRID.  If no SRID is
+        provided, the transformation will default to using 4326 (WGS84).
+        """
+        # Is the given field name a geographic field?
         field = self.model._meta.get_field(field_name)
         if not isinstance(field, GeometryField):
-            raise TypeError, 'ST_Transform() only available for GeometryField fields.'
+            raise TypeError('ST_Transform() only available for GeometryFields')
 
         # Setting the key for the field's column with the custom SELECT SQL to 
         #  override the geometry column returned from the database.
@@ -179,4 +213,33 @@ class GeoQuerySet(QuerySet):
                                               connection.ops.quote_name(field.column))
         return self._clone()
 
-    
+    def union(self, field_name):
+        """
+        Performs an aggregate union on the given geometry field.  Returns
+        None if the GeoQuerySet is empty.
+        """
+        # Making sure backend supports the Union stored procedure
+        if not UNION:
+            raise ImproperlyConfigured('Union stored procedure not available.')
+
+        # Getting the geographic field column
+        field_col = self._geo_column(field_name)
+        if not field_col:
+            raise TypeError('Aggregate Union only available on GeometryFields.')
+
+        # Getting the SQL for the query.
+        try:
+            select, sql, params = self._get_sql_clause()
+        except EmptyResultSet:
+            return None
+
+        # Replacing the select with a call to the ST_Union stored procedure
+        #  on the geographic field column.
+        union_sql = ('SELECT %s(%s)' % (UNION, field_col)) + sql
+        cursor = connection.cursor()
+        cursor.execute(union_sql, params)
+
+        # Pulling the HEXEWKB from the returned cursor.
+        hex = cursor.fetchone()[0]
+        if hex: return GEOSGeometry(hex)
+        else: return None

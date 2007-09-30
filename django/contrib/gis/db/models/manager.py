@@ -7,8 +7,14 @@ class GeoManager(Manager):
     def get_query_set(self):
         return GeoQuerySet(model=self.model)
 
-    def kml(self, field_name, **kwargs):
-        return self.get_query_set().kml(field_name, **kwargs)
+    def gml(self, *args, **kwargs):
+        return self.get_query_set().gml(*args, **kwargs)
 
-    def transform(self, field_name, **kwargs):
-        return self.get_query_set().transform(field_name, **kwargs)
+    def kml(self, *args, **kwargs):
+        return self.get_query_set().kml(*args, **kwargs)
+
+    def transform(self, *args, **kwargs):
+        return self.get_query_set().transform(*args, **kwargs)
+
+    def union(self, *args, **kwargs):
+        return self.get_query_set().union(*args, **kwargs)
