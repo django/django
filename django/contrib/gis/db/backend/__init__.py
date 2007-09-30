@@ -8,8 +8,8 @@
    (2) The parse_lookup() function, used for spatial SQL construction by
        the GeoQuerySet.
       
-  Currently only PostGIS is supported, but someday backends will be aded for
-   additional spatial databases.
+  Currently only PostGIS is supported, but someday backends will be added for
+   additional spatial databases (e.g., Oracle, DB2).
 """
 from django.conf import settings
 from django.db import connection
@@ -20,11 +20,11 @@ from django.utils.datastructures import SortedDict
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
     from django.contrib.gis.db.backend.postgis import \
-        PostGISField as GeoBackendField, \
-        POSTGIS_TERMS as GIS_TERMS, \
-        create_spatial_db, geo_quotename, get_geo_where_clause
+        PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
+        create_spatial_db, geo_quotename, get_geo_where_clause, \
+        ASGML, ASKML, UNION
 else:
-    raise NotImplementedError, 'No Geographic Backend exists for %s' % settings.DATABASE_NAME
+    raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_NAME)
 
 ####    query.py overloaded functions    ####
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py

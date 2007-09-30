@@ -5,7 +5,8 @@ from types import StringType
 
 class PostGISField(Field):
     def _add_geom(self, style, db_table):
-        """Constructs the addition of the geometry to the table using the
+        """
+        Constructs the addition of the geometry to the table using the
         AddGeometryColumn(...) PostGIS (and OGC standard) stored procedure.
 
         Takes the style object (provides syntax highlighting) and the
@@ -98,10 +99,14 @@ class PostGISField(Field):
         if isinstance(value, GEOSGeometry):
             return value
         else:
-            return ("SRID=%d;%s" % (self._srid, wkt))
+            raise TypeError('Geometry Proxy should only return GEOSGeometry objects.')
 
     def get_placeholder(self, value):
-        "Provides a proper substitution value for "
+        """
+        Provides a proper substitution value for Geometries that are not in the
+         SRID of the field.  Specifically, this routine will substitute in the
+         ST_Transform() function call.
+        """
         if isinstance(value, GEOSGeometry) and value.srid != self._srid:
             # Adding Transform() to the SQL placeholder.
             return 'ST_Transform(%%s, %s)' % self._srid

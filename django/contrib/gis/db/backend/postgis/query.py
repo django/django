@@ -14,7 +14,7 @@ POSTGIS_VERSION, MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2 = postgis_version
 #  TODO: Confirm tests with PostGIS versions 1.1.x -- should work.  
 #        Versions <= 1.0.x do not use GEOS C API, and will not be supported.
 if MAJOR_VERSION != 1 or (MAJOR_VERSION == 1 and MINOR_VERSION1 < 1):
-    raise Exception, 'PostGIS version %s not supported.' % POSTGIS_VERSION
+    raise Exception('PostGIS version %s not supported.' % POSTGIS_VERSION)
 
 # PostGIS-specific operators. The commented descriptions of these
 # operators come from Section 6.2.2 of the official PostGIS documentation.
@@ -145,11 +145,11 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
 
             # Ensuring that a tuple _value_ was passed in from the user
             if not isinstance(value, tuple) or len(value) != 2: 
-                raise TypeError, '2-element tuple required for %s lookup type.' % lookup_type
+                raise TypeError('2-element tuple required for %s lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
             if not isinstance(value[1], arg_type):
-                raise TypeError, 'Argument type should be %s, got %s instead.' % (arg_type, type(value[1]))
+                raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
             
             return "%s(%s%s, %%s, %%s)" % (func, table_prefix, field_name)
         else:
@@ -161,7 +161,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     if lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
 
-    raise TypeError, "Got invalid lookup_type: %s" % repr(lookup_type)
+    raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 
 def geo_quotename(value, dbl=False):
     "Returns the quotation used for PostGIS on a given value (uses single quotes by default)."

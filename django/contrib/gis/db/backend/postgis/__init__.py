@@ -8,11 +8,16 @@ from django.contrib.gis.db.backend.postgis.query import \
 from django.contrib.gis.db.backend.postgis.creation import create_spatial_db
 from django.contrib.gis.db.backend.postgis.field import PostGISField
 
-# Whether PostGIS has AsKML() support.
+# Functions used by GeoManager methods, and not via lookup types.
 if MAJOR_VERSION == 1:
-    # AsKML() only supported in versions 1.2.1+
     if MINOR_VERSION1 == 3:
         ASKML = 'ST_AsKML'
+        ASGML = 'ST_AsGML'
+        UNION = 'ST_Union'
     elif MINOR_VERSION1 == 2 and MINOR_VERSION2 >= 1:
         ASKML = 'AsKML'
+        ASGML = 'AsGML'
+        UNION = 'GeomUnion'
+        
+
     

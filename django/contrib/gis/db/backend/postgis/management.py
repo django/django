@@ -1,5 +1,6 @@
 """
-  This utility module is for obtaining information about the PostGIS installation.
+  This utility module is for obtaining information about the PostGIS
+   installation.
 
   See PostGIS docs at Ch. 6.2.1 for more information on these functions.
 """
@@ -48,9 +49,6 @@ def postgis_version_tuple():
         minor1 = int(m.group('minor1'))
         minor2 = int(m.group('minor2'))
     else:
-        raise Exception, 'Could not parse PostGIS version string: %s' % version
+        raise Exception('Could not parse PostGIS version string: %s' % version)
 
     return (version, major, minor1, minor2)
-
-
-    
