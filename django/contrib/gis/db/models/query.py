@@ -1,7 +1,7 @@
 import operator
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-from django.db.models.query import Q, QuerySet, handle_legacy_orderlist, quote_only_if_word, orderfield2column
+from django.db.models.query import Q, QuerySet, handle_legacy_orderlist, quote_only_if_word, orderfield2column, fill_table_cache
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
