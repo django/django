@@ -30,10 +30,17 @@ class OGRGeomTest(unittest.TestCase):
         self.assertEqual(False, OGRGeomType('point') == 2)
         self.assertEqual(True, OGRGeomType(6) == 'MULtiPolyGON')
         
-    def test01_wkt(self):
+    def test01a_wkt(self):
         "Testing WKT output."
         for g in wkt_out:
             geom = OGRGeometry(g.wkt)
+            self.assertEqual(g.wkt, geom.wkt)
+
+    def test01b_gml(self):
+        "Testing GML output."
+        for g in wkt_out:
+            geom = OGRGeometry(g.wkt)
+            self.assertEqual(g.gml, geom.gml)
 
     def test02_points(self):
         "Testing Point objects."
@@ -140,7 +147,6 @@ class OGRGeomTest(unittest.TestCase):
                 self.assertEqual(sr.wkt, poly.srs.wkt)
                 for ring in poly:
                     self.assertEqual(sr.wkt, ring.srs.wkt)
-            
 
 def suite():
     s = unittest.TestSuite()

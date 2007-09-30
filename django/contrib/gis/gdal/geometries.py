@@ -216,9 +216,9 @@ class OGRGeometry(object):
     @property
     def gml(self):
         "Returns the GML representation of the Geometry."
-        buf = c_char_p()
-        check_err(lgdal.OGR_G_ExportToGML(self._g, byref(buf)))
-        return string_at(buf)
+        buf = lgdal.OGR_G_ExportToGML(self._g)
+        if buf: return string_at(buf)
+        else: return None
 
     @property
     def wkt(self):
