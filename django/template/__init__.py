@@ -88,8 +88,6 @@ UNKNOWN_SOURCE="&lt;unknown source&gt;"
 tag_re = re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' % (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
                                           re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
                                           re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END)))
-# matches if the string is valid number
-number_re = re.compile(r'[-+]?(\d+|\d*\.\d+)$')
 
 # global dictionary of libraries that have been loaded using get_library
 libraries = {}
@@ -564,18 +562,19 @@ class FilterExpression(object):
                 elif constant_arg is not None:
                     args.append((False, constant_arg.replace(r'\"', '"')))
                 elif var_arg:
-                    args.append((True, var_arg))
+                    args.append((True, Variable(var_arg)))
                 filter_func = parser.find_filter(filter_name)
                 self.args_check(filter_name,filter_func, args)
                 filters.append( (filter_func,args))
                 upto = match.end()
         if upto != len(token):
             raise TemplateSyntaxError, "Could not parse the remainder: '%s' from '%s'" % (token[upto:], token)
-        self.var, self.filters = var, filters
+        self.filters = filters
+        self.var = Variable(var)
 
     def resolve(self, context, ignore_failures=False):
         try:
-            obj = resolve_variable(self.var, context)
+            obj = self.var.resolve(context)
         except VariableDoesNotExist:
             if ignore_failures:
                 obj = None
@@ -595,7 +594,7 @@ class FilterExpression(object):
                 if not lookup:
                     arg_vals.append(arg)
                 else:
-                    arg_vals.append(resolve_variable(arg, context))
+                    arg_vals.append(arg.resolve(context))
             obj = func(obj, *arg_vals)
         return obj
 
@@ -637,37 +636,98 @@ class FilterExpression(object):
 def resolve_variable(path, context):
     """
     Returns the resolved variable, which may contain attribute syntax, within
-    the given context. The variable may be a hard-coded string (if it begins
-    and ends with single or double quote marks).
+    the given context.
+    
+    Deprecated; use the Variable class instead.
+    """
+    return Variable(path).resolve(context)
 
-    >>> c = {'article': {'section':'News'}}
-    >>> resolve_variable('article.section', c)
-    u'News'
-    >>> resolve_variable('article', c)
-    {'section': 'News'}
-    >>> class AClass: pass
-    >>> c = AClass()
-    >>> c.article = AClass()
-    >>> c.article.section = 'News'
-    >>> resolve_variable('article.section', c)
-    u'News'
+class Variable(object):
+    """
+    A template variable, resolvable against a given context. The variable may be
+    a hard-coded string (if it begins and ends with single or double quote
+    marks)::
+    
+        >>> c = {'article': {'section':'News'}}
+        >>> Variable('article.section').resolve(c)
+        u'News'
+        >>> Variable('article').resolve(c)
+        {'section': 'News'}
+        >>> class AClass: pass
+        >>> c = AClass()
+        >>> c.article = AClass()
+        >>> c.article.section = 'News'
+        >>> Variable('article.section').resolve(c)
+        u'News'
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    if number_re.match(path):
-        number_type = '.' in path and float or int
-        current = number_type(path)
-    elif path[0] in ('"', "'") and path[0] == path[-1]:
-        current = path[1:-1]
-    else:
+    
+    def __init__(self, var):
+        self.var = var
+        self.literal = None
+        self.lookups = None
+        
+        try:
+            # First try to treat this variable as a number.
+            #
+            # Note that this could cause an OverflowError here that we're not 
+            # catching. Since this should only happen at compile time, that's
+            # probably OK.
+            self.literal = float(var)
+        
+            # So it's a float... is it an int? If the original value contained a
+            # dot or an "e" then it was a float, not an int.
+            if '.' not in var and 'e' not in var.lower():
+                self.literal = int(self.literal)
+                
+            # "2." is invalid
+            if var.endswith('.'):
+                raise ValueError
+
+        except ValueError:
+            # A ValueError means that the variable isn't a number.
+            # If it's wrapped with quotes (single or double), then
+            # we're also dealing with a literal.
+            if var[0] in "\"'" and var[0] == var[-1]:
+                self.literal = var[1:-1]
+            
+            else:
+                # Otherwise we'll set self.lookups so that resolve() knows we're
+                # dealing with a bonafide variable
+                self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
+    
+    def resolve(self, context):
+        """Resolve this variable against a given context."""
+        if self.lookups is not None:
+            # We're dealing with a variable that needs to be resolved
+            return self._resolve_lookup(context)
+        else:
+            # We're dealing with a literal, so it's already been "resolved"
+            return self.literal
+            
+    def __repr__(self):
+        return "<%s: %r>" % (self.__class__.__name__, self.var)
+    
+    def __str__(self):
+        return self.var
+
+    def _resolve_lookup(self, context):
+        """
+        Performs resolution of a real variable (i.e. not a literal) against the
+        given context. 
+        
+        As indicated by the method's name, this method is an implementation
+        detail and shouldn't be called by external code. Use Variable.resolve()
+        instead.
+        """
         current = context
-        bits = path.split(VARIABLE_ATTRIBUTE_SEPARATOR)
-        while bits:
+        for bit in self.lookups:
             try: # dictionary lookup
-                current = current[bits[0]]
+                current = current[bit]
             except (TypeError, AttributeError, KeyError):
                 try: # attribute lookup
-                    current = getattr(current, bits[0])
+                    current = getattr(current, bit)
                     if callable(current):
                         if getattr(current, 'alters_data', False):
                             current = settings.TEMPLATE_STRING_IF_INVALID
@@ -685,27 +745,27 @@ def resolve_variable(path, context):
                                     raise
                 except (TypeError, AttributeError):
                     try: # list-index lookup
-                        current = current[int(bits[0])]
+                        current = current[int(bit)]
                     except (IndexError, # list index out of range
                             ValueError, # invalid literal for int()
-                            KeyError,   # current is a dict without `int(bits[0])` key
+                            KeyError,   # current is a dict without `int(bit)` key
                             TypeError,  # unsubscriptable object
                             ):
-                        raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bits[0], current)) # missing attribute
+                        raise VariableDoesNotExist("Failed lookup for key [%s] in %r", (bit, current)) # missing attribute
                 except Exception, e:
                     if getattr(e, 'silent_variable_failure', False):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
                         raise
-            del bits[0]
-    if isinstance(current, (basestring, Promise)):
-        try:
-            current = force_unicode(current)
-        except UnicodeDecodeError:
-            # Failing to convert to unicode can happen sometimes (e.g. debug
-            # tracebacks). So we allow it in this particular instance.
-            pass
-    return current
+    
+        if isinstance(current, (basestring, Promise)):
+            try:
+                current = force_unicode(current)
+            except UnicodeDecodeError:
+                # Failing to convert to unicode can happen sometimes (e.g. debug
+                # tracebacks). So we allow it in this particular instance.
+                pass
+        return current
 
 class Node(object):
     def render(self, context):
@@ -861,10 +921,10 @@ class Library(object):
 
         class SimpleNode(Node):
             def __init__(self, vars_to_resolve):
-                self.vars_to_resolve = vars_to_resolve
+                self.vars_to_resolve = map(Variable, vars_to_resolve)
 
             def render(self, context):
-                resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
+                resolved_vars = [var.resolve(context) for var in self.vars_to_resolve]
                 return func(*resolved_vars)
 
         compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, SimpleNode)
@@ -883,10 +943,10 @@ class Library(object):
 
             class InclusionNode(Node):
                 def __init__(self, vars_to_resolve):
-                    self.vars_to_resolve = vars_to_resolve
+                    self.vars_to_resolve = map(Variable, vars_to_resolve)
 
                 def render(self, context):
-                    resolved_vars = [resolve_variable(var, context) for var in self.vars_to_resolve]
+                    resolved_vars = [var.resolve(context) for var in self.vars_to_resolve]
                     if takes_context:
                         args = [context] + resolved_vars
                     else:

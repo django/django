@@ -952,7 +952,7 @@ Example::
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
 
 ``iterator()``
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 Evaluates the ``QuerySet`` (by performing the query) and returns an
 `iterator`_ over the results. A ``QuerySet`` typically reads all of

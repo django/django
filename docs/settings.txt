@@ -363,7 +363,7 @@ regular expression which will hide from the DEBUG view anything that contains
 be able to give backtraces without seeing sensitive (or offensive) settings.
 
 Still, note that there are always going to be sections of your debug output that
-are inapporpriate for public consumption. File paths, configuration options, and
+are inappropriate for public consumption. File paths, configuration options, and
 the like all give attackers extra information about your server. Never deploy a
 site with ``DEBUG`` turned on.
 

@@ -1180,7 +1180,7 @@ def delete_objects(seen_objs):
                 if field.rel and field.null and field.rel.to in seen_objs:
                     setattr(instance, field.attname, None)
 
-            setattr(instance, cls._meta.pk.attname, None)
             dispatcher.send(signal=signals.post_delete, sender=cls, instance=instance)
+            setattr(instance, cls._meta.pk.attname, None)
 
     transaction.commit_unless_managed()
