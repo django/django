@@ -1,6 +1,7 @@
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Translation of django.po to German
+#
+# Copyright (C) 2005-2007,
+# This file is distributed under the same license as the django package.
 #
 msgid ""
 ""
@@ -1629,76 +1630,76 @@ msgstr "Webseite"
 msgid "flat pages"
 msgstr "Webseiten"
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "th"
-msgstr ""
+msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "st"
-msgstr ""
+msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "nd"
-msgstr ""
+msgstr "."
 
-#: contrib/humanize/templatetags/humanize.py:17
+#: contrib/humanize/templatetags/humanize.py:20
 msgid "rd"
-msgstr ""
-
-#: contrib/humanize/templatetags/humanize.py:47
-#, python-format
-msgid "%(value).1f million"
-msgid_plural "%(value).1f million"
-msgstr[0] ""
-msgstr[1] ""
+msgstr "."
 
 #: contrib/humanize/templatetags/humanize.py:50
 #, python-format
-msgid "%(value).1f billion"
-msgid_plural "%(value).1f billion"
-msgstr[0] ""
-msgstr[1] ""
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f Million"
+msgstr[1] "%(value).1f Millionen"
 
 #: contrib/humanize/templatetags/humanize.py:53
 #, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f Milliarde"
+msgstr[1] "%(value).1f Milliarden"
+
+#: contrib/humanize/templatetags/humanize.py:56
+#, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f Billion"
+msgstr[1] "%(value).1f Billionen"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "one"
 msgstr "ein"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "two"
 msgstr "zwei"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "three"
 msgstr "drei"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "four"
 msgstr "vier"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "five"
 msgstr "fünf"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "six"
 msgstr "sechs"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "seven"
 msgstr "sieben"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "eight"
 msgstr "acht"
 
-#: contrib/humanize/templatetags/humanize.py:68
+#: contrib/humanize/templatetags/humanize.py:71
 msgid "nine"
 msgstr "neun"
 
