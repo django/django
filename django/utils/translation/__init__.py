@@ -2,6 +2,7 @@
 Internationalization support.
 """
 from django.utils.functional import lazy
+from django.utils.encoding import force_unicode
 
 __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
@@ -39,7 +40,7 @@ def delayed_loader(*args, **kwargs):
             g['real_%s' % name] = getattr(trans, name)
 
     # Make the originally requested function call on the way out the door.
-    return g[caller](*args, **kwargs)
+    return g['real_%s' % caller](*args, **kwargs)
 
 g = globals()
 for name in __all__:
@@ -63,14 +64,10 @@ def ugettext(message):
 def ungettext(singular, plural, number):
     return real_ungettext(singular, plural, number)
 
-def string_concat(*strings):
-    return real_string_concat(*strings)
-
 ngettext_lazy = lazy(ngettext, str)
 gettext_lazy = lazy(gettext, str)
 ungettext_lazy = lazy(ungettext, unicode)
 ugettext_lazy = lazy(ugettext, unicode)
-string_concat = lazy(string_concat, unicode)
 
 def activate(language):
     return real_activate(language)
@@ -108,3 +105,10 @@ def templatize(src):
 def deactivate_all():
     return real_deactivate_all()
 
+def string_concat(*strings):
+    """"
+    Lazy variant of string concatenation, needed for translations that are
+    constructed from multiple parts.
+    """
+    return u''.join([force_unicode(s) for s in strings])
+string_concat = lazy(string_concat, unicode)

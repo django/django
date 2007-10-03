@@ -13,7 +13,6 @@ ngettext_lazy = ngettext
 def ungettext(singular, plural, number):
     return force_unicode(ngettext(singular, plural, number))
 
-string_concat = lambda *strings: u''.join([force_unicode(el) for el in strings])
 activate = lambda x: None
 deactivate = deactivate_all = install = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
