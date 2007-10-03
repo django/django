@@ -106,7 +106,7 @@ def deactivate_all():
     return real_deactivate_all()
 
 def string_concat(*strings):
-    """"
+    """
     Lazy variant of string concatenation, needed for translations that are
     constructed from multiple parts.
     """
