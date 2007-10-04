@@ -152,7 +152,7 @@ TypeError: 'foo' is an invalid keyword argument for this function
 >>> a6 = Article(pub_date=datetime(2005, 7, 31))
 >>> a6.save()
 >>> a6.headline
-'Default headline'
+u'Default headline'
 
 # For DateTimeFields, Django saves as much precision (in seconds) as you
 # give it.

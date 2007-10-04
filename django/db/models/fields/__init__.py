@@ -238,7 +238,7 @@ class Field(object):
         if self.default is not NOT_PROVIDED:
             if callable(self.default):
                 return self.default()
-            return self.default
+            return force_unicode(self.default, strings_only=True)
         if not self.empty_strings_allowed or (self.null and settings.DATABASE_ENGINE != 'oracle'):
             return None
         return ""
