@@ -7,7 +7,9 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
+import copy
 from itertools import chain
+
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import ugettext
@@ -31,6 +33,12 @@ class Widget(object):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
+
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.attrs = self.attrs.copy()
+        memo[id(self)] = obj
+        return obj
 
     def render(self, name, value, attrs=None):
         """
