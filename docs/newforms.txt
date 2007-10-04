@@ -2075,9 +2075,9 @@ More coming soon
 ================
 
 That's all the documentation for now. For more, see the file
-http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms/tests.py
+http://code.djangoproject.com/browser/django/trunk/tests/regressiontests/forms
 -- the unit tests for ``django.newforms``. This can give you a good idea of
-what's possible.
+what's possible. (Each submodule there contains separate tests.)
 
 If you're really itching to learn and use this library, please be patient.
 We're working hard on finishing both the code and documentation.
