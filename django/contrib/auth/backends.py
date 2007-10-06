@@ -1,6 +1,11 @@
 from django.db import connection
 from django.contrib.auth.models import User
 
+try: 
+    set 
+except NameError: 
+    from sets import Set as set # Python 2.3 fallback
+ 	
 class ModelBackend:
     """
     Authenticate against django.contrib.auth.models.User

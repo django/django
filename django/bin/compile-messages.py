@@ -14,7 +14,8 @@ def compile_messages(locale=None):
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
-        basedirs += settings.LOCALE_PATHS
+        if hasattr(settings, 'LOCALE_PATHS'):
+            basedirs += settings.LOCALE_PATHS
 
     # Gather existing directories.
     basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))

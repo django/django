@@ -47,8 +47,9 @@ class HttpRequest(object):
     def get_host(self):
         "Returns the HTTP host using the environment or request headers."
         # We try three options, in order of decreasing preference.
-        host = self.META.get('HTTP_X_FORWARDED_HOST', '')
-        if 'HTTP_HOST' in self.META:
+        if 'HTTP_X_FORWARDED_HOST' in self.META:
+            host = self.META['HTTP_X_FORWARDED_HOST']
+        elif 'HTTP_HOST' in self.META:
             host = self.META['HTTP_HOST']
         else:
             # Reconstruct the host using the algorithm from PEP 333.
