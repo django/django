@@ -60,6 +60,21 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         return u'<p class="datetime">%s %s<br />%s %s</p>' % \
             (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1])
 
+class AdminFileWidget(forms.FileInput):
+    """
+    A FileField Widget that shows it's current value if it has one
+    """
+    def __init__(self, attrs={}):
+        super(AdminFileWidget, self).__init__(attrs)
+        
+    def render(self, name, value, attrs=None):
+        from django.conf import settings
+        output = []
+        if value:
+            output.append('Currently: <a target="_blank" href="%s%s">%s</a> <br>Change: ' % (settings.MEDIA_URL, value, value))
+        output.append(super(AdminFileWidget, self).render(name, value, attrs))
+        return u''.join(output)
+
 class ForeignKeyRawIdWidget(forms.TextInput):
     """
     A Widget for displaying ForeignKeys in the "raw_id" interface rather than

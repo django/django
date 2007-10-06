@@ -164,6 +164,11 @@ class BaseModelAdmin(object):
             kwargs['widget'] = widgets.AdminTimeWidget
             return db_field.formfield(**kwargs)
 
+        # For FileFields and ImageFields add a link to the current file.
+        if isinstance(db_field, models.ImageField) or isinstance(db_field, models.FileField):
+            kwargs['widget'] = widgets.AdminFileWidget
+            return db_field.formfield(**kwargs)
+
         # For ForeignKey or ManyToManyFields, use a special widget.
         if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
             if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
