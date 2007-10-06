@@ -239,7 +239,7 @@ def setup_environ(settings_mod):
     project_directory, settings_filename = os.path.split(settings_mod.__file__)
     project_name = os.path.basename(project_directory)
     settings_name = os.path.splitext(settings_filename)[0]
-    sys.path.append(os.path.join(project_directory, '..'))
+    sys.path.append(os.path.join(project_directory, os.pardir))
     project_module = __import__(project_name, {}, {}, [''])
     sys.path.pop()
 
