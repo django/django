@@ -48,8 +48,6 @@ class HttpRequest(object):
         "Returns the HTTP host using the environment or request headers."
         # We try three options, in order of decreasing preference.
         host = self.META.get('HTTP_X_FORWARDED_HOST', '')
-        if host: 
-            return host
         if 'HTTP_HOST' in self.META:
             host = self.META['HTTP_HOST']
         else:
