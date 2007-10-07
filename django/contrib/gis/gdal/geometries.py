@@ -38,9 +38,11 @@
     >>> print gt1 == 3, gt1 == 'Polygon' # Equivalence works w/non-OGRGeomType objects
     True
 """
-# types & ctypes
-from types import IntType, StringType, UnicodeType
-from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
+# Python library imports
+import re, sys
+from binascii import a2b_hex, b2a_hex
+from ctypes import byref, create_string_buffer, string_at, c_char_p, c_double, c_int, c_void_p
+from types import BufferType, IntType, StringType, UnicodeType
 
 # Getting GDAL prerequisites
 from django.contrib.gis.gdal.libgdal import lgdal
@@ -70,6 +72,9 @@ get_area = lgdal.OGR_G_GetArea
 get_area.restype = c_double
 get_area.argtypes = [c_void_p]
 
+# Regular expression for determining whether the input is HEXEWKB.
+hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
+
 #### OGRGeometry Class ####
 class OGRGeometry(object):
     "Generally encapsulates an OGR geometry."
@@ -77,7 +82,16 @@ class OGRGeometry(object):
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
-        self._g = 0 # Initially NULL
+        self._g = c_void_p(None) # Initially NULL
+
+        # Checking if unicode
+        if isinstance(geom_input, UnicodeType):
+            # Encoding to ASCII, WKT or HEX doesn't need any more.
+            geo_input = geo_input.encode('ascii')
+
+        # If HEX, unpack input to to a binary buffer.
+        if isinstance(geom_input, StringType) and hex_regex.match(geom_input):
+            geom_input = buffer(a2b_hex(geom_input.upper()))
 
         if isinstance(geom_input, StringType):
             # First, trying the input as WKT
@@ -93,10 +107,15 @@ class OGRGeometry(object):
                     g = lgdal.OGR_G_CreateGeometry(ogr_t.num)
                 except:
                     raise OGRException('Could not initialize OGR Geometry from: %s' % geom_input)
+        elif isinstance(geom_input, BufferType):
+            # WKB was passed in
+            g = c_void_p()
+            check_err(lgdal.OGR_G_CreateFromWkb(c_char_p(str(geom_input)), c_void_p(), byref(g), len(geom_input)))
         elif isinstance(geom_input, OGRGeomType):
+            # OGRGeomType was passed in, an empty geometry will be created.
             g = lgdal.OGR_G_CreateGeometry(geom_input.num)
-        elif isinstance(geom_input, IntType):
-            # OGR Pointer (integer) was the input
+        elif isinstance(geom_input, c_void_p):
+            # OGR pointer (c_void_p) was the input.
             g = geom_input
         else:
             raise OGRException('Type of input cannot be determined!')
@@ -181,6 +200,30 @@ class OGRGeometry(object):
         "Returns the number of Points in this Geometry."
         return self.point_count
 
+    @property
+    def geom_type(self):
+        "Returns the Type for this Geometry."
+        return OGRGeomType(lgdal.OGR_G_GetGeometryType(self._g))
+
+    @property
+    def geom_name(self):
+        "Returns the Name of this Geometry."
+        return string_at(lgdal.OGR_G_GetGeometryName(self._g))
+
+    @property
+    def area(self):
+        "Returns the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
+        return get_area(self._g)
+
+    @property
+    def envelope(self):
+        "Returns the envelope for this Geometry."
+        env = OGREnvelope()
+        lgdal.OGR_G_GetEnvelope(self._g, byref(env))
+        return Envelope(env)
+
+    #### SpatialReference-related Properties ####
+    
     # The SRS property
     def get_srs(self):
         "Returns the Spatial Reference for this Geometry."
@@ -216,28 +259,6 @@ class OGRGeometry(object):
 
     srid = property(get_srid, set_srid)
 
-    @property
-    def geom_type(self):
-        "Returns the Type for this Geometry."
-        return OGRGeomType(lgdal.OGR_G_GetGeometryType(self._g))
-
-    @property
-    def geom_name(self):
-        "Returns the Name of this Geometry."
-        return string_at(lgdal.OGR_G_GetGeometryName(self._g))
-
-    @property
-    def area(self):
-        "Returns the area for a LinearRing, Polygon, or MultiPolygon; 0 otherwise."
-        return get_area(self._g)
-
-    @property
-    def envelope(self):
-        "Returns the envelope for this Geometry."
-        env = OGREnvelope()
-        lgdal.OGR_G_GetEnvelope(self._g, byref(env))
-        return Envelope(env)
-
     #### Output Methods ####
     @property
     def gml(self):
@@ -245,6 +266,30 @@ class OGRGeometry(object):
         buf = lgdal.OGR_G_ExportToGML(self._g)
         if buf: return string_at(buf)
         else: return None
+
+    @property
+    def hex(self):
+        "Returns the hexadecimal representation of the WKB (a string)."
+        return b2a_hex(self.wkb).upper()
+
+    @property
+    def wkb_size(self):
+        "Returns the size of the WKB buffer."
+        return lgdal.OGR_G_WkbSize(self._g)
+
+    @property
+    def wkb(self):
+        "Returns the WKB representation of the Geometry."
+        if sys.byteorder == 'little':
+            byteorder = c_int(1) # wkbNDR (from ogr_core.h)
+        else:
+            byteorder = c_int(0) # wkbXDR (from ogr_core.h)
+        # Creating a mutable string buffer of the given size, exporting
+        # to WKB, and returning a Python buffer of the WKB.
+        sz = self.wkb_size
+        wkb = create_string_buffer(sz)
+        check_err(lgdal.OGR_G_ExportToWkb(self._g, byteorder, byref(wkb)))
+        return buffer(string_at(wkb, sz))
 
     @property
     def wkt(self):
@@ -256,7 +301,7 @@ class OGRGeometry(object):
     #### Geometry Methods ####
     def clone(self):
         "Clones this OGR Geometry."
-        return OGRGeometry(lgdal.OGR_G_Clone(self._g))
+        return OGRGeometry(c_void_p(lgdal.OGR_G_Clone(self._g)))
 
     def close_rings(self):
         """If there are any rings within this geometry that have not been
@@ -327,9 +372,9 @@ class OGRGeometry(object):
     def _geomgen(self, gen_func, other=None):
         "A helper routine for the OGR routines that generate geometries."
         if isinstance(other, OGRGeometry):
-            return OGRGeometry(gen_func(self._g, other._g))
+            return OGRGeometry(c_void_p(gen_func(self._g, other._g)))
         else:
-            return OGRGeometry(gen_func(self._g))
+            return OGRGeometry(c_void_p(gen_func(self._g)))
 
     @property
     def boundary(self):
@@ -382,9 +427,7 @@ class Point(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple of this point."
-        if self.coord_dim == 1:
-            return (self.x,)
-        elif self.coord_dim == 2:
+        if self.coord_dim == 2:
             return (self.x, self.y)
         elif self.coord_dim == 3:
             return (self.x, self.y, self.z)
@@ -441,7 +484,7 @@ class Polygon(OGRGeometry):
         if index < 0 or index >= self.geom_count:
             raise OGRIndexError('index out of range: %s' % str(index))
         else:
-            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))), self.srs)
+            return OGRGeometry(c_void_p(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index)))), self.srs)
 
     # Polygon Properties
     @property
@@ -477,7 +520,7 @@ class GeometryCollection(OGRGeometry):
         if index < 0 or index >= self.geom_count:
             raise OGRIndexError('index out of range: %s' % str(index))
         else:
-            return OGRGeometry(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index))), self.srs)
+            return OGRGeometry(c_void_p(lgdal.OGR_G_Clone(lgdal.OGR_G_GetGeometryRef(self._g, c_int(index)))), self.srs)
         
     def __iter__(self):
         "Iterates over each Geometry."
@@ -492,7 +535,7 @@ class GeometryCollection(OGRGeometry):
         "Add the geometry to this Geometry Collection."
         if isinstance(geom, OGRGeometry):
             ptr = geom._g
-        elif isinstance(geom, StringType):
+        elif isinstance(geom, (StringType, UnicodeType)):
             tmp = OGRGeometry(geom)
             ptr = tmp._g
         else:

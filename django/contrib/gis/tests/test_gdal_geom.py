@@ -1,6 +1,6 @@
 import unittest
 from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, OGRException, SpatialReference
-from geometries import *
+from django.contrib.gis.tests.geometries import *
 
 class OGRGeomTest(unittest.TestCase):
     "This tests the OGR Geometry."
@@ -41,6 +41,26 @@ class OGRGeomTest(unittest.TestCase):
         for g in wkt_out:
             geom = OGRGeometry(g.wkt)
             self.assertEqual(g.gml, geom.gml)
+
+    def test01c_hex(self):
+        "Testing HEX input/output."
+        for g in hex_wkt:
+            geom1 = OGRGeometry(g.wkt)
+            self.assertEqual(g.hex, geom1.hex)
+            # Constructing w/HEX
+            geom2 = OGRGeometry(g.hex)
+            self.assertEqual(geom1, geom2)
+
+    def test01d_wkb(self):
+        "Testing WKB input/output."
+        from binascii import b2a_hex
+        for g in hex_wkt:
+            geom1 = OGRGeometry(g.wkt)
+            wkb = geom1.wkb
+            self.assertEqual(b2a_hex(wkb).upper(), g.hex)
+            # Constructing w/WKB.
+            geom2 = OGRGeometry(wkb)
+            self.assertEqual(geom1, geom2)
 
     def test02_points(self):
         "Testing Point objects."

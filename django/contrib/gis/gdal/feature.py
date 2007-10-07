@@ -1,6 +1,6 @@
 # types and ctypes
 from types import StringType
-from ctypes import c_char_p, c_int, string_at
+from ctypes import c_char_p, c_int, c_void_p, string_at
 
 # The GDAL C library, OGR exception, and the Field object
 from django.contrib.gis.gdal.libgdal import lgdal
@@ -98,7 +98,7 @@ class Feature(object):
             srs = None
 
         # Geometry is cloned so the feature isn't invalidated.
-        return OGRGeometry(lgdal.OGR_G_Clone(geom_ptr), srs)
+        return OGRGeometry(c_void_p(lgdal.OGR_G_Clone(geom_ptr)), srs)
 
     @property
     def geom_type(self):
