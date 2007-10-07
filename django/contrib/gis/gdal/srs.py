@@ -1,15 +1,3 @@
-import re
-from types import StringType, UnicodeType, TupleType
-from ctypes import \
-     c_char_p, c_int, c_double, c_void_p, POINTER, \
-     byref, string_at, create_string_buffer
-
-# Getting the GDAL C Library
-from django.contrib.gis.gdal.libgdal import lgdal
-
-# Getting the error checking routine and exceptions
-from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
-
 """
   The Spatial Reference class, represensents OGR Spatial Reference objects.
 
@@ -38,6 +26,18 @@ from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
   >>> print srs.name
   NAD83 / Texas South Central
 """
+import re
+from types import StringType, UnicodeType, TupleType
+from ctypes import \
+     c_char_p, c_int, c_double, c_void_p, POINTER, \
+     byref, string_at, create_string_buffer
+
+# Getting the GDAL C Library
+from django.contrib.gis.gdal.libgdal import lgdal
+
+# Getting the error checking routine and exceptions
+from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
+
 #### ctypes function prototypes ####
 def ellipsis_func(f):
     """
@@ -204,7 +204,10 @@ class SpatialReference(object):
         Returns the EPSG SRID of this Spatial Reference, will be None if
         if undefined.
         """
-        return self.srs['AUTHORITY', 1]
+        try:
+            return int(self.attr_value('AUTHORITY', 1))
+        except ValueError:
+            return None
         
     #### Unit Properties ####
     def _cache_linear(self):
@@ -327,21 +330,21 @@ class SpatialReference(object):
         "Returns the WKT representation of this Spatial Reference."
         w = c_char_p()
         check_err(lgdal.OSRExportToWkt(self._srs, byref(w)))
-        return string_at(w)
+        if w: return string_at(w)
 
     @property
     def pretty_wkt(self, simplify=0):
         "Returns the 'pretty' representation of the WKT."
         w = c_char_p()
         check_err(lgdal.OSRExportToPrettyWkt(self._srs, byref(w), c_int(simplify)))
-        return string_at(w)
+        if w: return string_at(w)
 
     @property
     def proj(self):
         "Returns the PROJ.4 representation for this Spatial Reference."
         w = c_char_p()
         check_err(lgdal.OSRExportToProj4(self._srs, byref(w)))
-        return string_at(w)
+        if w: return string_at(w)
 
     @property
     def proj4(self):

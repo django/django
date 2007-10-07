@@ -148,6 +148,27 @@ class OGRGeomTest(unittest.TestCase):
                 for ring in poly:
                     self.assertEqual(sr.wkt, ring.srs.wkt)
 
+            mpoly = OGRGeometry(mp.wkt, 4326)
+            self.assertEqual(4326, mpoly.srid)
+            mpoly.srs = SpatialReference(4269)
+            self.assertEqual(4269, mpoly.srid)
+            self.assertEqual('NAD83', mpoly.srs.name)
+            for poly in mpoly:
+                self.assertEqual(mpoly.srs.wkt, poly.srs.wkt)
+                poly.srs = 32140
+                for ring in poly:
+                    self.assertEqual(32140, ring.srs.srid)
+                    self.assertEqual('NAD83 / Texas South Central', ring.srs.name)
+                    ring.srs = str(SpatialReference(4326)) # back to WGS84
+                    self.assertEqual(4326, ring.srs.srid)
+
+                    # Using the `srid` property.
+                    ring.srid = 4322
+                    self.assertEqual('WGS 72', ring.srs.name)
+                    self.assertEqual(4322, ring.srid)
+            
+
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(OGRGeomTest))

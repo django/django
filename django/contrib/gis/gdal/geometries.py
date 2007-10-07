@@ -39,7 +39,7 @@
     True
 """
 # types & ctypes
-from types import IntType, StringType
+from types import IntType, StringType, UnicodeType
 from ctypes import byref, string_at, c_char_p, c_double, c_int, c_void_p
 
 # Getting GDAL prerequisites
@@ -181,14 +181,40 @@ class OGRGeometry(object):
         "Returns the number of Points in this Geometry."
         return self.point_count
 
-    @property
-    def srs(self):
+    # The SRS property
+    def get_srs(self):
         "Returns the Spatial Reference for this Geometry."
         srs_ptr = lgdal.OGR_G_GetSpatialReference(self._g)
         if srs_ptr:
             return SpatialReference(lgdal.OSRClone(srs_ptr), 'ogr')
         else:
             return None
+
+    def set_srs(self, srs):
+        "Sets the SpatialReference for this geometry."
+        if isinstance(srs, SpatialReference):
+            srs_ptr = lgdal.OSRClone(srs._srs)
+        elif isinstance(srs, (StringType, UnicodeType, IntType)):
+            sr = SpatialReference(srs)
+            srs_ptr = lgdal.OSRClone(sr._srs)
+        else:
+            raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
+        lgdal.OGR_G_AssignSpatialReference(self._g, srs_ptr)
+
+    srs = property(get_srs, set_srs)
+
+    # The SRID property
+    def get_srid(self):
+        if self.srs: return self.srs.srid
+        else: return None
+
+    def set_srid(self, srid):
+        if isinstance(srid, IntType):
+            self.srs = srid
+        else:
+            raise TypeError('SRID must be set with an integer.')
+
+    srid = property(get_srid, set_srid)
 
     @property
     def geom_type(self):
