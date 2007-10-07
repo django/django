@@ -110,19 +110,22 @@ Conversion functions
 The ``django.utils.encoding`` module contains a few functions that are handy
 for converting back and forth between Unicode and bytestrings.
 
-    * ``smart_unicode(s, encoding='utf-8', errors='strict')`` converts its
-      input to a Unicode string. The ``encoding`` parameter specifies the input
-      encoding. (For example, Django uses this internally when processing form
-      input data, which might not be UTF-8 encoded.) The ``errors`` parameter
-      takes any of the values that are accepted by Python's ``unicode()``
-      function for its error handling.
+    * ``smart_unicode(s, encoding='utf-8', strings_only=False, errors='strict')``
+      converts its input to a Unicode string. The ``encoding`` parameter
+      specifies the input encoding. (For example, Django uses this internally
+      when processing form input data, which might not be UTF-8 encoded.) The
+      ``strings_only`` parameter, if set to True, will result in Python
+      numbers, booleans and ``None`` not being converted to a string (they keep
+      their original types). The ``errors`` parameter takes any of the values
+      that are accepted by Python's ``unicode()`` function for its error
+      handling.
 
       If you pass ``smart_unicode()`` an object that has a ``__unicode__``
       method, it will use that method to do the conversion.
 
-    * ``force_unicode(s, encoding='utf-8', errors='strict')`` is identical to
-      ``smart_unicode()`` in almost all cases. The difference is when the
-      first argument is a `lazy translation`_ instance. While
+    * ``force_unicode(s, encoding='utf-8', strings_only=False, errors='strict')``
+      is identical to ``smart_unicode()`` in almost all cases. The difference
+      is when the first argument is a `lazy translation`_ instance. While
       ``smart_unicode()`` preserves lazy translations, ``force_unicode()``
       forces those objects to a Unicode string (causing the translation to
       occur). Normally, you'll want to use ``smart_unicode()``. However,
@@ -132,11 +135,10 @@ for converting back and forth between Unicode and bytestrings.
 
     * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
       is essentially the opposite of ``smart_unicode()``. It forces the first
-      argument to a bytestring. The ``strings_only`` parameter, if set to True,
-      will result in Python integers, booleans and ``None`` not being
-      converted to a string (they keep their original types). This is slightly
-      different semantics from Python's builtin ``str()`` function, but the
-      difference is needed in a few places within Django's internals.
+      argument to a bytestring. The ``strings_only`` parameter has the same
+      behaviour as for ``smart_unicode()`` and ``force_unicode()``. This is
+      slightly different semantics from Python's builtin ``str()`` function,
+      but the difference is needed in a few places within Django's internals.
 
 Normally, you'll only need to use ``smart_unicode()``. Call it as early as
 possible on any input data that might be either Unicode or a bytestring, and
