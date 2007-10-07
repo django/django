@@ -4,9 +4,11 @@ from django.contrib.gis.geos import \
     GEOSGeometry, Point, LineString, LinearRing, Polygon, \
     MultiPoint, MultiLineString, MultiPolygon, GeometryCollection, \
     fromstr, HAS_NUMPY
+from django.contrib.gis.geos.base import HAS_GDAL
 from geometries import *
 
 if HAS_NUMPY: from numpy import array
+if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference
 
 class GEOSTest(unittest.TestCase):
 
@@ -722,6 +724,57 @@ class GEOSTest(unittest.TestCase):
         mpoly = MultiPolygon(poly.clone(), poly)
         self.assertEqual(8.0, mpoly.length)
 
+    def test20_emptyCollections(self):
+        "Testing empty geometries and collections."
+        gc1 = GeometryCollection([])
+        gc2 = fromstr('GEOMETRYCOLLECTION EMPTY')
+        pnt = fromstr('POINT EMPTY')
+        ls = fromstr('LINESTRING EMPTY')
+        poly = fromstr('POLYGON EMPTY')
+        mls = fromstr('MULTILINESTRING EMPTY')
+        mpoly1 = fromstr('MULTIPOLYGON EMPTY')
+        mpoly2 = MultiPolygon(())
+
+        for g in [gc1, gc2, pnt, ls, poly, mls, mpoly1, mpoly2]:
+            self.assertEqual(True, g.empty)
+
+            # Testing len() and num_geom.
+            if isinstance(g, Polygon):
+                self.assertEqual(1, len(g)) # Has one empty linear ring
+                self.assertEqual(1, g.num_geom)
+                self.assertEqual(0, len(g[0]))
+            elif isinstance(g, (Point, LineString)):
+                self.assertEqual(1, g.num_geom)
+                self.assertEqual(0, len(g))
+            else:
+                self.assertEqual(0, g.num_geom)
+                self.assertEqual(0, len(g))
+
+            # Testing __getitem__ (doesn't work on Point or Polygon)
+            if isinstance(g, Point):
+                self.assertRaises(GEOSGeometryIndexError, g.get_x)
+            elif isinstance(g, Polygon):
+                lr = g.shell
+                self.assertEqual('LINEARRING EMPTY', lr.wkt)
+                self.assertEqual(0, len(lr))
+                self.assertEqual(True, lr.empty)
+                self.assertRaises(GEOSGeometryIndexError, lr.__getitem__, 0)
+            else:
+                self.assertRaises(GEOSGeometryIndexError, g.__getitem__, 0)
+
+    def test21_test_gdal(self):
+        "Testing `ogr` and `srs` properties."
+        if not HAS_GDAL: return
+        g1 = fromstr('POINT(5 23)')
+        self.assertEqual(True, isinstance(g1.ogr, OGRGeometry))
+        self.assertEqual(g1.srs, None)
+        
+        g2 = fromstr('LINESTRING(0 0, 5 5, 23 23)', srid=4326)
+        self.assertEqual(True, isinstance(g2.ogr, OGRGeometry))
+        self.assertEqual(True, isinstance(g2.srs, SpatialReference))
+        self.assertEqual(g2.hex, g2.ogr.hex)
+        self.assertEqual('WGS 84', g2.srs.name)
+        
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GEOSTest))

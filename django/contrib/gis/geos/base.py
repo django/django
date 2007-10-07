@@ -15,6 +15,14 @@ from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.libgeos import lgeos, HAS_NUMPY, ISQLQuote
 from django.contrib.gis.geos.pointer import GEOSPointer, NULL_GEOM
 
+# Trying to import GDAL libraries, if available.  Have to place in
+# try/except since this package may be used outside GeoDjango.
+try:
+    from django.contrib.gis.gdal import OGRGeometry, SpatialReference
+    HAS_GDAL=True
+except:
+    HAS_GDAL=False
+
 # Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
 #  to prevent potentially malicious input from reaching the underlying C
 #  library.  Not a substitute for good web security programming practices.
@@ -434,6 +442,26 @@ class GEOSGeometry(object):
         "Returns the KML representation of this Geometry."
         gtype = self.geom_type
         return '<%s>%s</%s>' % (gtype, self.coord_seq.kml, gtype)
+
+    #### GDAL-specific output routines ####
+    @property
+    def ogr(self):
+        "Returns the OGR Geometry for this Geometry."
+        if HAS_GDAL:
+            if self.srid:
+                return OGRGeometry(self.wkb, self.srid)
+            else:
+                return OGRGeometry(self.wkb)
+        else:
+            return None
+
+    @property
+    def srs(self):
+        "Returns the OSR SpatialReference for SRID of this Geometry."
+        if HAS_GDAL and self.srid:
+            return SpatialReference(self.srid)
+        else:
+            return None
 
     #### Topology Routines ####
     def _unary_topology(self, func, *args):

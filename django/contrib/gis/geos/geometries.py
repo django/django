@@ -53,7 +53,8 @@ class Point(GEOSGeometry):
         super(Point, self).__init__(lgeos.GEOSGeom_createPoint(cs), srid=srid)
 
     def __len__(self):
-        "Returns the number of dimensions for this Point (either 2 or 3)."
+        "Returns the number of dimensions for this Point (either 0, 2 or 3)."
+        if self.empty: return 0
         if self.hasz: return 3
         else: return 2
         

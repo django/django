@@ -186,7 +186,7 @@ class GEOSPointer(object):
         n_child = len(ptr_list)
 
         # Determining whether coordinate sequences pointers were passed in.
-        if isinstance(ptr_list[0], (tuple, list)):
+        if n_child and isinstance(ptr_list[0], (tuple, list)):
             self._child_cs = True
         else:
             self._child_cs = False
