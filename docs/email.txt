@@ -100,31 +100,31 @@ mail_admins()
 =============
 
 ``django.core.mail.mail_admins()`` is a shortcut for sending an e-mail to the
-site admins, as defined in the `ADMINS setting`_. Here's the definition::
+site admins, as defined in the `ADMINS`_ setting. Here's the definition::
 
     mail_admins(subject, message, fail_silently=False)
 
 ``mail_admins()`` prefixes the subject with the value of the
-`EMAIL_SUBJECT_PREFIX setting`_, which is ``"[Django] "`` by default.
+`EMAIL_SUBJECT_PREFIX`_ setting, which is ``"[Django] "`` by default.
 
-The "From:" header of the e-mail will be the value of the `SERVER_EMAIL setting`_.
+The "From:" header of the e-mail will be the value of the `SERVER_EMAIL`_ setting.
 
 This method exists for convenience and readability.
 
-.. _ADMINS setting: ../settings/#admins
-.. _EMAIL_SUBJECT_PREFIX setting: ../settings/#email-subject-prefix
-.. _SERVER_EMAIL setting: ../settings/#server-email
+.. _ADMINS: ../settings/#admins
+.. _EMAIL_SUBJECT_PREFIX: ../settings/#email-subject-prefix
+.. _SERVER_EMAIL: ../settings/#server-email
 
 mail_managers() function
 ========================
 
 ``django.core.mail.mail_managers()`` is just like ``mail_admins()``, except it
-sends an e-mail to the site managers, as defined in the `MANAGERS setting`_.
+sends an e-mail to the site managers, as defined in the `MANAGERS`_ setting.
 Here's the definition::
 
     mail_managers(subject, message, fail_silently=False)
 
-.. _MANAGERS setting: ../settings/#managers
+.. _MANAGERS: ../settings/#managers
 
 Examples
 ========
@@ -225,7 +225,7 @@ optional and can be set at any time prior to calling the ``send()`` method.
 
     * ``from_email``: The sender's address. Both ``fred@example.com`` and
       ``Fred <fred@example.com>`` forms are legal. If omitted, the
-      ``DEFAULT_FROM_EMAIL`` setting is used.
+      `DEFAULT_FROM_EMAIL`_ setting is used.
 
     * ``to``: A list or tuple of recipient addresses.
 
@@ -297,6 +297,8 @@ The class has the following methods:
 
         message.attach_file('/images/weather_map.png')
 
+.. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
+
 Sending alternative content types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -315,7 +317,7 @@ To send a text and HTML combination, you could write::
     subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
     text_content = 'This is an important message.'
     html_content = '<p>This is an <strong>important</strong> message.</p>'
-    msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
 

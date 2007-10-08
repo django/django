@@ -29,12 +29,12 @@ def serve(request, path, document_root=None, show_indexes=False):
     newpath = ''
     for part in path.split('/'):
         if not part:
-            # strip empty path components
+            # Strip empty path components.
             continue
         drive, part = os.path.splitdrive(part)
         head, part = os.path.split(part)
         if part in (os.curdir, os.pardir):
-            # strip '.' amd '..' in path
+            # Strip '.' and '..' in path.
             continue
         newpath = os.path.join(newpath, part).replace('\\', '/')
     if newpath and path != newpath:

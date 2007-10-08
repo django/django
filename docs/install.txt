@@ -66,6 +66,7 @@ installed.
 * If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
 
 * If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher.
+  You will also want to read the database-specific notes for the `Oracle backend`_.
 
 If you plan to use Django's ``manage.py syncdb`` command to
 automatically create database tables for your models, you'll need to
@@ -88,6 +89,7 @@ to create a temporary test database.
 .. _MySQL backend: ../databases/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
+.. _Oracle backend: ../databases/#oracle-notes
 .. _testing framework: ../testing/
 
 Remove any old versions of Django

@@ -1,6 +1,6 @@
 "Default variable filters"
 
-from django.template import resolve_variable, Library
+from django.template import Variable, Library
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import force_unicode, smart_str, iri_to_uri
@@ -297,7 +297,8 @@ def dictsort(value, arg):
     Takes a list of dicts, returns that list sorted by the property given in
     the argument.
     """
-    decorated = [(resolve_variable(u'var.' + arg, {u'var' : item}), item) for item in value]
+    var_resolve = Variable(arg).resolve
+    decorated = [(var_resolve(item), item) for item in value]
     decorated.sort()
     return [item[1] for item in decorated]
 
@@ -306,7 +307,8 @@ def dictsortreversed(value, arg):
     Takes a list of dicts, returns that list sorted in reverse order by the
     property given in the argument.
     """
-    decorated = [(resolve_variable(u'var.' + arg, {u'var' : item}), item) for item in value]
+    var_resolve = Variable(arg).resolve
+    decorated = [(var_resolve(item), item) for item in value]
     decorated.sort()
     decorated.reverse()
     return [item[1] for item in decorated]

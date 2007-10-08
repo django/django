@@ -1,4 +1,4 @@
-from django.template import Node, resolve_variable
+from django.template import Node, Variable
 from django.template import TemplateSyntaxError, TokenParser, Library
 from django.template import TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
@@ -32,11 +32,11 @@ class GetCurrentLanguageBidiNode(Node):
 
 class TranslateNode(Node):
     def __init__(self, value, noop):
-        self.value = value
+        self.value = Variable(value)
         self.noop = noop
 
     def render(self, context):
-        value = resolve_variable(self.value, context)
+        value = self.value.resolve(context)
         if self.noop:
             return value
         else:

@@ -1,4 +1,4 @@
-from django.template import TemplateSyntaxError, TemplateDoesNotExist, resolve_variable
+from django.template import TemplateSyntaxError, TemplateDoesNotExist, Variable
 from django.template import Library, Node
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
@@ -99,11 +99,11 @@ class ConstantIncludeNode(Node):
 
 class IncludeNode(Node):
     def __init__(self, template_name):
-        self.template_name = template_name
+        self.template_name = Variable(template_name)
 
     def render(self, context):
         try:
-            template_name = resolve_variable(self.template_name, context)
+            template_name = self.template_name.resolve(context)
             t = get_template(template_name)
             return t.render(context)
         except TemplateSyntaxError, e:

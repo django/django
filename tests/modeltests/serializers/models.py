@@ -63,6 +63,9 @@ class Movie(models.Model):
 
     def __unicode__(self):
         return self.title
+        
+class Score(models.Model):
+    score = models.FloatField()
 
 __test__ = {'API_TESTS':"""
 # Create some data:
@@ -83,7 +86,7 @@ __test__ = {'API_TESTS':"""
 >>> a2 = Article(
 ...     author = joe,
 ...     headline = "Time to reform copyright",
-...     pub_date = datetime(2006, 6, 16, 13, 00))
+...     pub_date = datetime(2006, 6, 16, 13, 00, 11, 345))
 >>> a1.save(); a2.save()
 >>> a1.categories = [sports, op_ed]
 >>> a2.categories = [music, op_ed]
@@ -181,7 +184,7 @@ __test__ = {'API_TESTS':"""
 
 # Serializer output can be restricted to a subset of fields
 >>> print serializers.serialize("json", Article.objects.all(), fields=('headline','pub_date'))
-[{"pk": 1, "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 2, "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:00"}}, {"pk": 3, "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
+[{"pk": 1, "model": "serializers.article", "fields": {"headline": "Just kidding; I love TV poker", "pub_date": "2006-06-16 11:00:00"}}, {"pk": 2, "model": "serializers.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16 13:00:11"}}, {"pk": 3, "model": "serializers.article", "fields": {"headline": "Forward references pose no problem", "pub_date": "2006-06-16 15:00:00"}}]
 
 # Every string is serialized as a unicode object, also primary key 
 # which is 'varchar'
@@ -206,5 +209,12 @@ u'G\u0119\u015bl\u0105 ja\u017a\u0144'
 # Deserialization of null returns None for pk
 >>> print list(serializers.deserialize('json', serializers.serialize('json', [mv2])))[0].object.id
 None
+
+# Serialization and deserialization of floats:
+>>> sc = Score(score=3.4)
+>>> print serializers.serialize("json", [sc])
+[{"pk": null, "model": "serializers.score", "fields": {"score": 3.4}}]
+>>> print list(serializers.deserialize('json', serializers.serialize('json', [sc])))[0].object.score
+3.4
 
 """}

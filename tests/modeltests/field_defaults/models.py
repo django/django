@@ -42,7 +42,7 @@ __test__ = {'API_TESTS':"""
 
 # Access database columns via Python attributes.
 >>> a.headline
-'Default headline'
+u'Default headline'
 
 # make sure the two dates are sufficiently close
 >>> d = now - a.pub_date

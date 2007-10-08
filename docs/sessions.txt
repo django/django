@@ -205,7 +205,7 @@ An API is available to manipulate session data outside of a view::
     datetime.datetime(2005, 8, 20, 13, 35, 0)
     >>> s.save()
 
-If you're using the ``django.contrib.sessions.engine.db`` backend, each
+If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is just a normal Django model. The ``Session`` model is defined in
 ``django/contrib/sessions/models.py``. Because it's a normal model, you can
 access sessions using the normal Django database API::

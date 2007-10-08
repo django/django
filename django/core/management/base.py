@@ -9,6 +9,17 @@ import os
 class CommandError(Exception):
     pass
 
+def handle_default_options(options):
+    """
+    Include any default options that all commands should accept
+    here so that ManagementUtility can handle them before searching
+    for user commands.
+    """
+    if options.settings:
+        os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
+    if options.pythonpath:
+        sys.path.insert(0, options.pythonpath)
+                
 class BaseCommand(object):
     # Metadata about this command.
     option_list = (
@@ -55,10 +66,7 @@ class BaseCommand(object):
     def run_from_argv(self, argv):
         parser = self.create_parser(argv[0], argv[1])
         options, args = parser.parse_args(argv[2:])
-        if options.settings:
-            os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
-        if options.pythonpath:
-            sys.path.insert(0, options.pythonpath)
+        handle_default_options(options)
         self.execute(*args, **options.__dict__)
 
     def execute(self, *args, **options):
