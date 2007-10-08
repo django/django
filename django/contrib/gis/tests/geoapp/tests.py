@@ -1,6 +1,7 @@
 import unittest
-from models import Country, City, State
-from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
+from models import Country, City, State, Feature
+from django.contrib.gis.geos import *
+from django.contrib.gis import gdal
 
 class GeoModelTest(unittest.TestCase):
     
@@ -59,8 +60,17 @@ class GeoModelTest(unittest.TestCase):
         nullstate = State(name='NullState', poly=ply)
         self.assertEqual(4326, nullstate.poly.srid) # SRID auto-set from None
         nullstate.save()
-        self.assertEqual(ply, State.objects.get(name='NullState').poly)
+
+        ns = State.objects.get(name='NullState')
+        self.assertEqual(ply, ns.poly)
         
+        # Testing the `ogr` and `srs` lazy-geometry properties.
+        if gdal.HAS_GDAL:
+            self.assertEqual(True, isinstance(ns.poly.ogr, gdal.OGRGeometry))
+            self.assertEqual(ns.poly.wkb, ns.poly.ogr.wkb)
+            self.assertEqual(True, isinstance(ns.poly.srs, gdal.SpatialReference))
+            self.assertEqual('WGS 84', ns.poly.srs.name)
+
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))
         nullstate.poly[1] = new_inner.clone()
@@ -277,6 +287,32 @@ class GeoModelTest(unittest.TestCase):
         self.assertEqual(True, union.equals_exact(u, 10)) # Going up to 10 digits of precision.
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.union('point'))
+
+    def test18_geometryfield(self):
+        "Testing GeometryField."
+        f1 = Feature(name='Point', geom=Point(1, 1))
+        f2 = Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5)))
+        f3 = Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))
+        f4 = Feature(name='GeometryCollection', 
+                     geom=GeometryCollection(Point(2, 2), LineString((0, 0), (2, 2)), 
+                                             Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0)))))
+        f1.save()
+        f2.save()
+        f3.save()
+        f4.save()
+
+        f_1 = Feature.objects.get(name='Point')
+        self.assertEqual(True, isinstance(f_1.geom, Point))
+        self.assertEqual((1.0, 1.0), f_1.geom.tuple)
+        f_2 = Feature.objects.get(name='LineString')
+        self.assertEqual(True, isinstance(f_2.geom, LineString))
+        self.assertEqual(((0.0, 0.0), (1.0, 1.0), (5.0, 5.0)), f_2.geom.tuple)
+
+        f_3 = Feature.objects.get(name='Polygon')
+        self.assertEqual(True, isinstance(f_3.geom, Polygon))
+        f_4 = Feature.objects.get(name='GeometryCollection')
+        self.assertEqual(True, isinstance(f_4.geom, GeometryCollection))
+        self.assertEqual(f_3.geom, f_4.geom[2])
     
 def suite():
     s = unittest.TestSuite()

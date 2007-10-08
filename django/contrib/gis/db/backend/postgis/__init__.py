@@ -7,6 +7,7 @@ from django.contrib.gis.db.backend.postgis.query import \
     MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2
 from django.contrib.gis.db.backend.postgis.creation import create_spatial_db
 from django.contrib.gis.db.backend.postgis.field import PostGISField
+from django.contrib.gis.db.backend.postgis.proxy import PostGISProxy
 
 # Functions used by GeoManager methods, and not via lookup types.
 if MAJOR_VERSION == 1:

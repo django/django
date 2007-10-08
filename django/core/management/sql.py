@@ -404,7 +404,7 @@ def custom_sql_for_model(model, style):
     # Post-creation SQL should come before any initial SQL data is loaded.
     for f in opts.fields:
         if hasattr(f, '_post_create_sql'):
-            output.append(f._post_create_sql(style, model._meta.db_table))
+            output.extend(f._post_create_sql(style, model._meta.db_table))
 
     # Some backends can't execute more than one SQL statement at a time,
     # so split into separate statements.

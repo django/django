@@ -44,9 +44,11 @@ class PostGISField(Field):
         return sql
 
     def _post_create_sql(self, style, db_table):
-        """Returns SQL that will be executed after the model has been
+        """
+        Returns SQL that will be executed after the model has been
         created. Geometry columns must be added after creation with the
-        PostGIS AddGeometryColumn() function."""
+        PostGIS AddGeometryColumn() function.
+        """
 
         # Getting the AddGeometryColumn() SQL necessary to create a PostGIS
         # geometry field.
@@ -54,9 +56,9 @@ class PostGISField(Field):
 
         # If the user wants to index this data, then get the indexing SQL as well.
         if self._index:
-            return '%s\n%s' % (post_sql, self._geom_index(style, db_table))
+            return (post_sql, self._geom_index(style, db_table))
         else:
-            return post_sql
+            return (post_sql,)
 
     def _post_delete_sql(self, style, db_table):
         "Drops the geometry column."
@@ -66,9 +68,18 @@ class PostGISField(Field):
             style.SQL_FIELD(quotename(self.column)) +  ');'
         return sql
 
+    def db_type(self):
+        """
+        PostGIS geometry columns are added by stored procedures, should be
+        None.
+        """
+        return None
+
     def get_db_prep_lookup(self, lookup_type, value):
-        """Returns field's value prepared for database lookup, accepts WKT and 
-        GEOS Geometries for the value."""
+        """
+        Returns field's value prepared for database lookup, accepts WKT and 
+        GEOS Geometries for the value.
+        """
         if lookup_type in POSTGIS_TERMS:
             if lookup_type == 'isnull': return [value] # special case for NULL geometries.
             if not bool(value): return [None] # If invalid value passed in.
@@ -100,6 +111,12 @@ class PostGISField(Field):
             return value
         else:
             raise TypeError('Geometry Proxy should only return GEOSGeometry objects.')
+
+    def get_internal_type(self):
+        """
+        Returns NoField because a stored procedure is used by PostGIS to create the
+        """
+        return 'NoField'
 
     def get_placeholder(self, value):
         """

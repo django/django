@@ -1,9 +1,9 @@
-from django.contrib.gis.db.backend import GeoBackendField # depends on the spatial database backend.
-from django.contrib.gis.db.models.proxy import GeometryProxy
+from django.conf import settings
+from django.contrib.gis.db.backend import GeoBackendField, GeometryProxy # these depend on the spatial database backend.
 from django.contrib.gis.oldforms import WKTField
-from django.utils.functional import curry
+from django.contrib.gis.geos import GEOSGeometry
 
-#TODO: Flesh out widgets.
+#TODO: Flesh out widgets; consider adding support for OGR Geometry proxies.
 class GeometryField(GeoBackendField):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
@@ -31,26 +31,9 @@ class GeometryField(GeoBackendField):
     def contribute_to_class(self, cls, name):
         super(GeometryField, self).contribute_to_class(cls, name)
 
-        # setup for lazy-instantiated GEOSGeometry objects
-        setattr(cls, self.attname, GeometryProxy(self))
-
-        # Adding needed accessor functions
-        setattr(cls, 'get_%s_geos' % self.name, curry(cls._get_GEOM_geos, field=self))
-        setattr(cls, 'get_%s_ogr' % self.name, curry(cls._get_GEOM_ogr, field=self, srid=self._srid))
-        setattr(cls, 'get_%s_srid' % self.name, curry(cls._get_GEOM_srid, srid=self._srid))
-        setattr(cls, 'get_%s_srs' % self.name, curry(cls._get_GEOM_srs, srid=self._srid))
-        setattr(cls, 'get_%s_wkt' % self.name, curry(cls._get_GEOM_wkt, field=self))
-        setattr(cls, 'get_%s_centroid' % self.name, curry(cls._get_GEOM_centroid, field=self))
-        setattr(cls, 'get_%s_area' % self.name, curry(cls._get_GEOM_area, field=self))
+        # Setup for lazy-instantiated GEOSGeometry object.
+        setattr(cls, self.attname, GeometryProxy(GEOSGeometry, self))
         
-    def get_internal_type(self):
-        return "NoField"
-
-    def db_type(self):
-        # Geometry columns are added by stored procedures, and thus should
-        #  be None.
-        return None
-                                                                
     def get_manipulator_field_objs(self):
         "Using the WKTField (defined above) to be our manipulator."
         return [WKTField]

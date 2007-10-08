@@ -1,15 +1,21 @@
 """
-  This module provides the backend for spatial SQL construction with Django.
+ This module provides the backend for spatial SQL construction with Django.
 
-  Specifically, this module will import the correct routines and modules
-    needed for GeoDjango
+ Specifically, this module will import the correct routines and modules
+ needed for GeoDjango.
+ 
+ (1) GeoBackEndField, a base class needed for GeometryField.
+ (2) GeometryProxy, for lazy-instantiated geometries from the 
+     database output.
+ (3) GIS_TERMS, a list of acceptable geographic lookup types for 
+     the backend.
+ (4) The `parse_lookup` function, used for spatial SQL construction by
+     the GeoQuerySet.
+ (5) The `create_spatial_db`, `geo_quotename`, and `get_geo_where_clause`
+     routines (needed by `parse_lookup`.
 
-   (1) GeoBackEndField, a base class needed for GeometryField.
-   (2) The parse_lookup() function, used for spatial SQL construction by
-       the GeoQuerySet.
-      
-  Currently only PostGIS is supported, but someday backends will be added for
-   additional spatial databases (e.g., Oracle, DB2).
+ Currently only PostGIS is supported, but someday backends will be added for
+ additional spatial databases (e.g., Oracle, DB2).
 """
 from django.conf import settings
 from django.db import connection
@@ -21,9 +27,11 @@ from django.utils.datastructures import SortedDict
 ASGML, ASKML, UNION = (False, False, False)
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
-    # PostGIS is the spatial database, getting the rquired modules, renaming as necessary.
+    # PostGIS is the spatial database, getting the rquired modules, 
+    # renaming as necessary.
     from django.contrib.gis.db.backend.postgis import \
         PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
+        PostGISProxy as GeometryProxy, \
         create_spatial_db, geo_quotename, get_geo_where_clause, \
         ASGML, ASKML, UNION
 else:
