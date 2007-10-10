@@ -1,6 +1,7 @@
 from django import oldforms, template
 from django import newforms as forms
 from django.newforms.formsets import all_valid
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -449,9 +450,31 @@ class ModelAdmin(BaseModelAdmin):
             request.user.message_set.create(message=msg)
             return HttpResponseRedirect("../")
 
+    def render_change_form(self, model, context, add=False, change=False, form_url=''):
+        opts = model._meta
+        app_label = opts.app_label
+        ordered_objects = opts.get_ordered_objects()
+        extra_context = {
+            'add': add,
+            'change': change,
+            'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
+            'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
+            'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
+            'has_absolute_url': hasattr(model, 'get_absolute_url'),
+            'ordered_objects': ordered_objects,
+            'form_url': form_url,
+            'opts': opts,
+            'content_type_id': ContentType.objects.get_for_model(model).id,
+            'save_on_top': self.save_on_top,
+        }
+        context.update(extra_context)
+        return render_to_response([
+            "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
+            "admin/%s/change_form.html" % app_label,
+            "admin/change_form.html"], context_instance=context)
+
     def add_view(self, request, form_url=''):
         "The 'add' admin view for this model."
-        from django.contrib.admin.views.main import render_change_form
         model = self.model
         opts = model._meta
         app_label = opts.app_label
@@ -500,11 +523,10 @@ class ModelAdmin(BaseModelAdmin):
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
         })
-        return render_change_form(self, model, model.AddManipulator(), c, add=True)
-
+        return self.render_change_form(model, c, add=True)
+    
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
-        from django.contrib.admin.views.main import render_change_form
         model = self.model
         opts = model._meta
         app_label = opts.app_label
@@ -576,7 +598,7 @@ class ModelAdmin(BaseModelAdmin):
             'media': media,
             'inline_admin_formsets': inline_admin_formsets,
         })
-        return render_change_form(self, model, model.ChangeManipulator(object_id), c, change=True)
+        return self.render_change_form(model, c, change=True)
 
     def changelist_view(self, request):
         "The 'change list' admin view for this model."

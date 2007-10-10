@@ -3,7 +3,6 @@ from django.contrib.admin.filterspecs import FilterSpec
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.cache import never_cache
-from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import render_to_response
 from django.db import models
@@ -109,32 +108,6 @@ class AdminBoundField(object):
             if callable(url_method):
                 return url_method()
         return ''
-
-def render_change_form(model_admin, model, manipulator, context, add=False, change=False, form_url=''):
-    opts = model._meta
-    app_label = opts.app_label
-    original = getattr(manipulator, 'original_object', None)
-    ordered_objects = opts.get_ordered_objects()
-    inline_related_objects = opts.get_followed_related_objects(manipulator.follow)
-    extra_context = {
-        'add': add,
-        'change': change,
-        'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
-        'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
-        'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
-        'has_absolute_url': hasattr(model, 'get_absolute_url'),
-        'ordered_objects': ordered_objects,
-        'inline_related_objects': inline_related_objects,
-        'form_url': form_url,
-        'opts': opts,
-        'content_type_id': ContentType.objects.get_for_model(model).id,
-        'save_on_top': model_admin.save_on_top,
-    }
-    context.update(extra_context)
-    return render_to_response([
-        "admin/%s/%s/change_form.html" % (app_label, opts.object_name.lower()),
-        "admin/%s/change_form.html" % app_label,
-        "admin/change_form.html"], context_instance=context)
 
 def index(request):
     return render_to_response('admin/index.html', {'title': ugettext('Site administration')}, context_instance=template.RequestContext(request))
