@@ -381,8 +381,8 @@ Methods
     ``mimetype``. Historically, the parameter was only called ``mimetype``,
     but since this is actually the value included in the HTTP ``Content-Type``
     header, it can also include the character set encoding, which makes it
-    more than just a MIME type specification. If ``mimetype`` is specifiedi
-    (not None), that value is used.  Otherwise, ``content_type`` is used. If
+    more than just a MIME type specification. If ``mimetype`` is specified
+    (not None), that value is used. Otherwise, ``content_type`` is used. If
     neither is given, the ``DEFAULT_CONTENT_TYPE`` setting is used.
 
 ``__setitem__(header, value)``
