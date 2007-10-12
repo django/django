@@ -3,6 +3,8 @@
 
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
+    // IE doesn't like periods in the window name, so convert temporarily.
+    name = name.replace(/\./g, '___');
     var href;
     if (triggeringLink.href.search(/\?/) >= 0) {
         href = triggeringLink.href + '&pop=1';
@@ -15,6 +17,7 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 }
 
 function dismissRelatedLookupPopup(win, chosenId) {
+    var name = win.name.replace(/___/g, '.');
     var elem = document.getElementById(win.name);
     if (elem.className.indexOf('vRawIdAdminField') != -1 && elem.value) {
         elem.value += ',' + chosenId;
