@@ -1,10 +1,10 @@
+import os
+import sys
+from optparse import make_option, OptionParser
+
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
-import itertools
-from optparse import make_option, OptionParser
-import sys
-import os
 
 class CommandError(Exception):
     pass
@@ -221,4 +221,3 @@ def _make_writeable(filename):
         st = os.stat(filename)
         new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
         os.chmod(filename, new_permissions)
-
