@@ -161,7 +161,7 @@ class NoArgsCommand(BaseCommand):
     args = ''
 
     def handle(self, *args, **options):
-        if len(args) != 0:
+        if args:
             raise CommandError("Command doesn't accept any arguments")
         return self.handle_noargs(**options)
 
