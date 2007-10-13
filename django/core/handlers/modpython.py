@@ -14,7 +14,7 @@ import os
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
-        self.path = force_unicode(req.uri)
+        self.path = force_unicode(req.uri, errors='ignore')
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
