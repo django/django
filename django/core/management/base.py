@@ -19,7 +19,7 @@ def handle_default_options(options):
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     if options.pythonpath:
         sys.path.insert(0, options.pythonpath)
-                
+
 class BaseCommand(object):
     # Metadata about this command.
     option_list = (
@@ -174,7 +174,7 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
     """
     Copies either a Django application layout template or a Django project
     layout template into the specified directory.
-    
+
     * style - A color style object (see django.core.management.color).
     * app_or_project - The string 'app' or 'project'.
     * name - The name of the application or project.
