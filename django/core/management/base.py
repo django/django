@@ -161,10 +161,8 @@ class NoArgsCommand(BaseCommand):
     args = ''
 
     def handle(self, *args, **options):
-        from django.db import models
         if len(args) != 0:
             raise CommandError("Command doesn't accept any arguments")
-
         return self.handle_noargs(**options)
 
     def handle_noargs(self, **options):
@@ -182,7 +180,6 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
     * other_name - When copying an application layout, this should be the name
                    of the project.
     """
-    import django
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]
