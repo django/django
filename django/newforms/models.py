@@ -311,25 +311,15 @@ class InlineFormset(BaseModelFormSet):
         new_obj = self.model(**kwargs)
         return save_instance(form, new_obj, commit=commit)
 
-def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orderable=False, deletable=True, formfield_callback=lambda f: f.formfield()):
+def get_foreign_key(parent_model, model, fk_name=None):
     """
-    Returns an ``InlineFormset`` for the given kwargs.
-
-    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
-    to ``parent_model``.
+    Finds and returns the ForeignKey from model to parent if there is one.
+    If fk_name is provided, assume it is the name of the ForeignKey field.
     """
+    # avoid circular import
     from django.db.models import ForeignKey
     opts = model._meta
-    # figure out what the ForeignKey from model to parent_model is
-    if fk_name is None:
-        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
-        if len(fks_to_parent) == 1:
-            fk = fks_to_parent[0]
-        elif len(fks_to_parent) == 0:
-            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
-        else:
-            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
-    else:
+    if fk_name:
         fks_to_parent = [f for f in opts.fields if f.name == fk_name]
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
@@ -337,6 +327,25 @@ def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orde
                 raise Exception("fk_name '%s' is not a ForeignKey to %s" % (fk_name, parent_model))
         elif len(fks_to_parent) == 0:
             raise Exception("%s has no field named '%s'" % (model, fk_name))
+    else:
+        # Try to discover what the ForeignKey from model to parent_model is
+        fks_to_parent = [f for f in opts.fields if isinstance(f, ForeignKey) and f.rel.to == parent_model]
+        if len(fks_to_parent) == 1:
+            fk = fks_to_parent[0]
+        elif len(fks_to_parent) == 0:
+            raise Exception("%s has no ForeignKey to %s" % (model, parent_model))
+        else:
+            raise Exception("%s has more than 1 ForeignKey to %s" % (model, parent_model))
+    return fk
+
+def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orderable=False, deletable=True, formfield_callback=lambda f: f.formfield()):
+    """
+    Returns an ``InlineFormset`` for the given kwargs.
+
+    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
+    to ``parent_model``.
+    """
+    fk = get_foreign_key(parent_model, model, fk_name=fk_name)
     # let the formset handle object deletion by default
     FormSet = formset_for_model(model, formset=InlineFormset, fields=fields,
                                 formfield_callback=formfield_callback,
