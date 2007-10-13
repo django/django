@@ -358,7 +358,5 @@ def inline_formset(parent_model, model, fk_name=None, fields=None, extra=3, orde
         del FormSet.form_class.base_fields[fk.name]
     except KeyError:
         pass
-    FormSet.parent_model = parent_model
-    FormSet.fk_name = fk.name
     FormSet.fk = fk
     return FormSet
