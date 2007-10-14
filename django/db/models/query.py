@@ -253,7 +253,6 @@ class _QuerySet(object):
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, _fields=fields)
 
-    # FIXME: Not converted yet!
     def dates(self, field_name, kind, order='ASC'):
         """
         Returns a list of datetime objects representing all available dates
@@ -265,8 +264,10 @@ class _QuerySet(object):
                 "'order' must be either 'ASC' or 'DESC'."
         # Let the FieldDoesNotExist exception propagate.
         field = self.model._meta.get_field(field_name, many_to_many=False)
-        assert isinstance(field, DateField), "%r isn't a DateField." % field_name
-        return self._clone(klass=DateQuerySet, _field=field, _kind=kind, _order=order)
+        assert isinstance(field, DateField), "%r isn't a DateField." \
+                % field_name
+        return self._clone(klass=DateQuerySet, _field=field, _kind=kind,
+                _order=order)
 
     ##################################################################
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
@@ -389,16 +390,8 @@ class ValuesQuerySet(QuerySet):
         self.query.select_related = False
 
     def iterator(self):
-        try:
-            select, sql, params = self._get_sql_clause()
-        except EmptyResultSet:
-            raise StopIteration
-
-        qn = connection.ops.quote_name
-
-        # self._select is a dictionary, and dictionaries' key order is
-        # undefined, so we convert it to a list of tuples.
-        extra_select = self._select.items()
+        extra_select = self.query.extra_select.keys()
+        extra_select.sort()
 
         # Construct two objects -- fields and field_names.
         # fields is a list of Field objects to fetch.
@@ -406,39 +399,30 @@ class ValuesQuerySet(QuerySet):
         # resulting dictionaries.
         if self._fields:
             if not extra_select:
-                fields = [self.model._meta.get_field(f, many_to_many=False) for f in self._fields]
+                fields = [self.model._meta.get_field(f, many_to_many=False)
+                        for f in self._fields]
                 field_names = self._fields
             else:
                 fields = []
                 field_names = []
                 for f in self._fields:
                     if f in [field.name for field in self.model._meta.fields]:
-                        fields.append(self.model._meta.get_field(f, many_to_many=False))
+                        fields.append(self.model._meta.get_field(f,
+                                many_to_many=False))
                         field_names.append(f)
-                    elif not self._select.has_key(f):
-                        raise FieldDoesNotExist('%s has no field named %r' % (self.model._meta.object_name, f))
+                    elif not self.query.extra_select.has_key(f):
+                        raise FieldDoesNotExist('%s has no field named %r'
+                                % (self.model._meta.object_name, f))
         else: # Default to all fields.
             fields = self.model._meta.fields
             field_names = [f.attname for f in fields]
 
-        columns = [f.column for f in fields]
-        select = ['%s.%s' % (qn(self.model._meta.db_table), qn(c)) for c in columns]
+        self.query.add_local_columns([f.column for f in fields])
         if extra_select:
-            select.extend(['(%s) AS %s' % (quote_only_if_word(s[1]), qn(s[0])) for s in extra_select])
-            field_names.extend([f[0] for f in extra_select])
+            field_names.extend([f for f in extra_select])
 
-        cursor = connection.cursor()
-        cursor.execute("SELECT " + (self._distinct and "DISTINCT " or "") + ",".join(select) + sql, params)
-
-        has_resolve_columns = hasattr(self, 'resolve_columns')
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                raise StopIteration
-            for row in rows:
-                if has_resolve_columns:
-                    row = self.resolve_columns(row, fields)
-                yield dict(zip(field_names, row))
+        for row in self.query.results_iter():
+            yield dict(zip(field_names, row))
 
     def _clone(self, klass=None, **kwargs):
         c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
@@ -447,60 +431,19 @@ class ValuesQuerySet(QuerySet):
 
 class DateQuerySet(QuerySet):
     def iterator(self):
-        from django.db.backends.util import typecast_timestamp
-        from django.db.models.fields import DateTimeField
-
-        qn = connection.ops.quote_name
-        self._order_by = () # Clear this because it'll mess things up otherwise.
+        self.query = self.query.clone(klass=sql.DateQuery)
+        self.query.select = []
+        self.query.add_date_select(self._field.column, self._kind, self._order)
         if self._field.null:
-            self._where.append('%s.%s IS NOT NULL' % \
-                (qn(self.model._meta.db_table), qn(self._field.column)))
-        try:
-            select, sql, params = self._get_sql_clause()
-        except EmptyResultSet:
-            raise StopIteration
-
-        table_name = qn(self.model._meta.db_table)
-        field_name = qn(self._field.column)
-
-        if connection.features.allows_group_by_ordinal:
-            group_by = '1'
-        else:
-            group_by = connection.ops.date_trunc_sql(self._kind, '%s.%s' % (table_name, field_name))
-
-        sql = 'SELECT %s %s GROUP BY %s ORDER BY 1 %s' % \
-            (connection.ops.date_trunc_sql(self._kind, '%s.%s' % (qn(self.model._meta.db_table),
-            qn(self._field.column))), sql, group_by, self._order)
-        cursor = connection.cursor()
-        cursor.execute(sql, params)
-
-        has_resolve_columns = hasattr(self, 'resolve_columns')
-        needs_datetime_string_cast = connection.features.needs_datetime_string_cast
-        dates = []
-        # It would be better to use self._field here instead of DateTimeField(),
-        # but in Oracle that will result in a list of datetime.date instead of
-        # datetime.datetime.
-        fields = [DateTimeField()]
-        while 1:
-            rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
-            if not rows:
-                return dates
-            for row in rows:
-                date = row[0]
-                if has_resolve_columns:
-                    date = self.resolve_columns([date], fields)[0]
-                elif needs_datetime_string_cast:
-                    date = typecast_timestamp(str(date))
-                dates.append(date)
+            self.query.add_filter(('%s__isnull' % self._field.name, True))
+        return self.query.results_iter()
 
     def _clone(self, klass=None, **kwargs):
         c = super(DateQuerySet, self)._clone(klass, **kwargs)
         c._field = self._field
         c._kind = self._kind
-        c._order = self._order
         return c
 
-# XXX; Everything below here is done.
 class EmptyQuerySet(QuerySet):
     def __init__(self, model=None):
         super(EmptyQuerySet, self).__init__(model)
@@ -516,6 +459,11 @@ class EmptyQuerySet(QuerySet):
         c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
         c._result_cache = []
         return c
+
+    def iterator(self):
+        # This slightly odd construction is because we need an empty generator
+        # (it should raise StopIteration immediately).
+        yield iter([]).next()
 
 # QOperator, QAnd and QOr are temporarily retained for backwards compatibility.
 # All the old functionality is now part of the 'Q' class.

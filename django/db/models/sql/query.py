@@ -11,8 +11,8 @@ import copy
 
 from django.utils import tree
 from django.db.models.sql.where import WhereNode, AND, OR
-from django.db.models.sql.datastructures import Count
-from django.db.models.fields import FieldDoesNotExist
+from django.db.models.sql.datastructures import Count, Date
+from django.db.models.fields import FieldDoesNotExist, Field
 from django.contrib.contenttypes import generic
 from datastructures import EmptyResultSet
 from utils import handle_legacy_orderlist
@@ -54,6 +54,7 @@ MULTI = 'multi'
 SINGLE = 'single'
 NONE = None
 
+# FIXME: Add quote_name() calls around all the tables.
 class Query(object):
     """
     A single SQL query.
@@ -77,8 +78,8 @@ class Query(object):
         self.select = []
         self.tables = []    # Aliases in the order they are created.
         self.where = WhereNode(self)
-        self.having = []
         self.group_by = []
+        self.having = []
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
@@ -103,12 +104,14 @@ class Query(object):
         sql, params = self.as_sql()
         return sql % params
 
-    def clone(self, **kwargs):
+    def clone(self, klass=None, **kwargs):
         """
         Creates a copy of the current instance. The 'kwargs' parameter can be
         used by clients to update attributes after copying has taken place.
         """
-        obj = self.__class__(self.model, self.connection)
+        if not klass:
+            klass = self.__class__
+        obj = klass(self.model, self.connection)
         obj.table_map = self.table_map.copy()
         obj.alias_map = copy.deepcopy(self.alias_map)
         obj.join_map = copy.deepcopy(self.join_map)
@@ -198,7 +201,16 @@ class Query(object):
         where, params = self.where.as_sql()
         if where:
             result.append('WHERE %s' % where)
-        result.append(' AND'.join(self.extra_where))
+        if self.extra_where:
+            if not where:
+                result.append('WHERE')
+            else:
+                result.append('AND')
+            result.append(' AND'.join(self.extra_where))
+
+        if self.group_by:
+            grouping = self.get_grouping()
+            result.append('GROUP BY %s' % ', '.join(grouping))
 
         ordering = self.get_ordering()
         if ordering:
@@ -312,12 +324,12 @@ class Query(object):
         """
         qn = self.connection.ops.quote_name
         result = []
-        if self.select:
+        if self.select or self.extra_select:
             for col in self.select:
                 if isinstance(col, (list, tuple)):
                     result.append('%s.%s' % (qn(col[0]), qn(col[1])))
                 else:
-                    result.append(col.as_sql())
+                    result.append(col.as_sql(quote_func=qn))
         else:
             table_alias = self.tables[0]
             result = ['%s.%s' % (table_alias, qn(f.column))
@@ -331,6 +343,21 @@ class Query(object):
                 for alias, col in extra_select])
         return result
 
+    def get_grouping(self):
+        """
+        Returns a tuple representing the SQL elements in the "group by" clause.
+        """
+        qn = self.connection.ops.quote_name
+        result = []
+        for col in self.group_by:
+            if isinstance(col, (list, tuple)):
+                result.append('%s.%s' % (qn(col[0]), qn(col[1])))
+            elif hasattr(col, 'as_sql'):
+                result.append(col.as_sql(qn))
+            else:
+                result.append(str(col))
+        return result
+
     def get_ordering(self):
         """
         Returns a tuple representing the SQL elements in the "order by" clause.
@@ -339,9 +366,17 @@ class Query(object):
         qn = self.connection.ops.quote_name
         opts = self.model._meta
         result = []
-        for field in handle_legacy_orderlist(ordering):
+        for field in ordering:
             if field == '?':
                 result.append(self.connection.ops.random_function_sql())
+                continue
+            if isinstance(field, int):
+                if field < 0:
+                    order = 'DESC'
+                    field = -field
+                else:
+                    order = 'ASC'
+                result.append('%s %s' % (field, order))
                 continue
             if field[0] == '-':
                 col = field[1:]
@@ -683,10 +718,28 @@ class Query(object):
         """
         self.low_mark, self.high_mark = 0, None
 
+    def can_filter(self):
+        """
+        Returns True if adding filters to this instance is still possible.
+
+        Typically, this means no limits or offsets have been put on the results.
+        """
+        return not (self.low_mark or self.high_mark)
+
+    def add_local_columns(self, columns):
+        """
+        Adds the given column names to the select set, assuming they come from
+        the root model (the one given in self.model).
+        """
+        table = self.model._meta.db_table
+        self.select.extend([(table, col) for col in columns])
+
     def add_ordering(self, *ordering):
         """
         Adds items from the 'ordering' sequence to the query's "order by"
-        clause.
+        clause. These items are either field names (not column names) --
+        possibly with a direction prefix ('-' or '?') -- or ordinals,
+        corresponding to column positions in the 'select' list.
         """
         self.order_by.extend(ordering)
 
@@ -695,14 +748,6 @@ class Query(object):
         Removes any ordering settings.
         """
         self.order_by = []
-
-    def can_filter(self):
-        """
-        Returns True if adding filters to this instance is still possible.
-
-        Typically, this means no limits or offsets have been put on the results.
-        """
-        return not (self.low_mark or self.high_mark)
 
     def add_count_column(self):
         """
@@ -713,12 +758,12 @@ class Query(object):
         # that it doesn't totally overwrite the select list.
         if not self.distinct:
             select = Count()
-            # Distinct handling is now done in Count(), so don't do it at this
-            # level.
-            self.distinct = False
         else:
             select = Count((self.table_map[self.model._meta.db_table][0],
                     self.model._meta.pk.column), True)
+            # Distinct handling is done in Count(), so don't do it at this
+            # level.
+            self.distinct = False
         self.select = [select]
         self.extra_select = {}
 
@@ -872,6 +917,47 @@ class UpdateQuery(Query):
                     AND)
             values = [(related_field.column, 'NULL')]
             self.do_query(self.model._meta.db_table, values, where)
+
+class DateQuery(Query):
+    """
+    A DateQuery is a normal query, except that it specifically selects a single
+    date field. This requires some special handling when converting the results
+    back to Python objects, so we put it in a separate class.
+    """
+    def results_iter(self):
+        """
+        Returns an iterator over the results from executing this query.
+        """
+        resolve_columns = hasattr(self, 'resolve_columns')
+        if resolve_columns:
+            from django.db.models.fields import DateTimeField
+            fields = [DateTimeField()]
+        else:
+            from django.db.backends.util import typecast_timestamp
+            needs_string_cast = self.connection.features.needs_datetime_string_cast
+
+        for rows in self.execute_sql(MULTI):
+            for row in rows:
+                date = row[0]
+                if resolve_columns:
+                    date = self.resolve_columns([date], fields)[0]
+                elif needs_string_cast:
+                    date = typecast_timestamp(str(date))
+                yield date
+
+    def add_date_select(self, column, lookup_type, order='ASC'):
+        """
+        Converts the query into a date extraction query.
+        """
+        alias = self.join((None, self.model._meta.db_table, None, None))
+        select = Date((alias, column), lookup_type,
+                self.connection.ops.date_trunc_sql)
+        self.select = [select]
+        self.order_by = order == 'ASC' and [1] or [-1]
+        if self.connection.features.allows_group_by_ordinal:
+            self.group_by = [1]
+        else:
+            self.group_by = [select]
 
 def find_field(name, field_list, related_query):
     """

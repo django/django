@@ -338,13 +338,15 @@ class Model(object):
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
         qn = connection.ops.quote_name
         op = is_next and '>' or '<'
-        where = '(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
+        where = ['(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
             (qn(field.column), op, qn(field.column),
-            qn(self._meta.db_table), qn(self._meta.pk.column), op)
+            qn(self._meta.db_table), qn(self._meta.pk.column), op)]
         param = smart_str(getattr(self, field.attname))
-        q = self.__class__._default_manager.filter(**kwargs).order_by((not is_next and '-' or '') + field.name, (not is_next and '-' or '') + self._meta.pk.name)
-        q.extra(where=where, params=[param, param,
-            getattr(self, self._meta.pk.attname)])
+        order_char = not is_next and '-' or ''
+        q = self.__class__._default_manager.filter(**kwargs).order_by(
+                order_char + field.name, order_char + self._meta.pk.name)
+        q = q.extra(where=where, params=[param, param,
+                getattr(self, self._meta.pk.attname)])
         try:
             return q[0]
         except IndexError:
