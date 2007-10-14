@@ -146,7 +146,6 @@ class _QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
-        clone.query.clear_ordering()
         obj_list = list(clone)
         if len(obj_list) < 1:
             raise self.model.DoesNotExist("%s matching query does not exist."
@@ -501,6 +500,7 @@ class DateQuerySet(QuerySet):
         c._order = self._order
         return c
 
+# XXX; Everything below here is done.
 class EmptyQuerySet(QuerySet):
     def __init__(self, model=None):
         super(EmptyQuerySet, self).__init__(model)
@@ -516,9 +516,6 @@ class EmptyQuerySet(QuerySet):
         c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
         c._result_cache = []
         return c
-
-    def _get_sql_clause(self):
-        raise EmptyResultSet
 
 # QOperator, QAnd and QOr are temporarily retained for backwards compatibility.
 # All the old functionality is now part of the 'Q' class.
