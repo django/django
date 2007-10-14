@@ -45,8 +45,6 @@ h
 b
 >>> print v.where
 2005-01-01
->>> Thing.objects.order_by('select.when')
-[<Thing: a>, <Thing: h>]
 
 >>> Thing.objects.dates('where', 'year')
 [datetime.datetime(2005, 1, 1, 0, 0), datetime.datetime(2006, 1, 1, 0, 0)]

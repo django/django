@@ -190,7 +190,10 @@ def get_validation_errors(outfile, app=None):
                     field_name = field_name[1:]
                 if opts.order_with_respect_to and field_name == '_order':
                     continue
-                if '.' in field_name: continue # Skip ordering in the format 'table.field'.
+                # Skip ordering in the format field1__field2 (FIXME: checking
+                # this format would be nice, but it's a little fiddly).
+                if '_' in field_name:
+                    continue
                 try:
                     opts.get_field(field_name, many_to_many=False)
                 except models.FieldDoesNotExist:

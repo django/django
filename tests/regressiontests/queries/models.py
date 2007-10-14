@@ -1,5 +1,5 @@
 """
-Various combination queries that have been problematic in the past.
+Various complex queries that have been problematic in the past.
 """
 
 from django.db import models
@@ -12,9 +12,29 @@ class Tag(models.Model):
     def __unicode__(self):
         return self.name
 
+class Note(models.Model):
+    note = models.CharField(maxlength=100)
+
+    class Meta:
+        ordering = ['note']
+
+    def __unicode__(self):
+        return self.note
+
+class ExtraInfo(models.Model):
+    info = models.CharField(maxlength=100)
+    note = models.ForeignKey(Note)
+
+    class Meta:
+        ordering = ['info']
+
+    def __unicode__(self):
+        return self.info
+
 class Author(models.Model):
     name = models.CharField(maxlength=10)
     num = models.IntegerField(unique=True)
+    extra = models.ForeignKey(ExtraInfo)
 
     def __unicode__(self):
         return self.name
@@ -23,6 +43,10 @@ class Item(models.Model):
     name = models.CharField(maxlength=10)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
+    note = models.ForeignKey(Note)
+
+    class Meta:
+        ordering = ['-note', 'name']
 
     def __unicode__(self):
         return self.name
@@ -34,6 +58,26 @@ class Report(models.Model):
     def __unicode__(self):
         return self.name
 
+class Ranking(models.Model):
+    rank = models.IntegerField()
+    author = models.ForeignKey(Author)
+
+    class Meta:
+        # A complex ordering specification. Should stress the system a bit.
+        ordering = ('author__extra__note', 'author__name', 'rank')
+
+    def __unicode__(self):
+        return '%d: %s' % (self.rank, self.author.name)
+
+class Cover(models.Model):
+    title = models.CharField(maxlength=50)
+    item = models.ForeignKey(Item)
+
+    class Meta:
+        ordering = ['item']
+
+    def __unicode__(self):
+        return self.title
 
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
@@ -47,25 +91,38 @@ __test__ = {'API_TESTS':"""
 >>> t5 = Tag(name='t5', parent=t3)
 >>> t5.save()
 
+>>> n1 = Note(note='n1')
+>>> n1.save()
+>>> n2 = Note(note='n2')
+>>> n2.save()
+>>> n3 = Note(note='n3')
+>>> n3.save()
 
->>> a1 = Author(name='a1', num=1001)
+Create these out of order so that sorting by 'id' will be different to sorting
+by 'info'. Helps detect some problems later.
+>>> e2 = ExtraInfo(info='e2', note=n2)
+>>> e2.save()
+>>> e1 = ExtraInfo(info='e1', note=n1)
+>>> e1.save()
+
+>>> a1 = Author(name='a1', num=1001, extra=e1)
 >>> a1.save()
->>> a2 = Author(name='a2', num=2002)
+>>> a2 = Author(name='a2', num=2002, extra=e1)
 >>> a2.save()
->>> a3 = Author(name='a3', num=3003)
+>>> a3 = Author(name='a3', num=3003, extra=e2)
 >>> a3.save()
->>> a4 = Author(name='a4', num=4004)
+>>> a4 = Author(name='a4', num=4004, extra=e2)
 >>> a4.save()
 
->>> i1 = Item(name='one', creator=a1)
+>>> i1 = Item(name='one', creator=a1, note=n3)
 >>> i1.save()
 >>> i1.tags = [t1, t2]
->>> i2 = Item(name='two', creator=a2)
+>>> i2 = Item(name='two', creator=a2, note=n2)
 >>> i2.save()
 >>> i2.tags = [t1, t3]
->>> i3 = Item(name='three', creator=a2)
+>>> i3 = Item(name='three', creator=a2, note=n3)
 >>> i3.save()
->>> i4 = Item(name='four', creator=a4)
+>>> i4 = Item(name='four', creator=a4, note=n3)
 >>> i4.save()
 >>> i4.tags = [t4]
 
@@ -73,6 +130,20 @@ __test__ = {'API_TESTS':"""
 >>> r1.save()
 >>> r2 = Report(name='r2', creator=a3)
 >>> r2.save()
+
+Ordering by 'rank' gives us rank2, rank1, rank3. Ordering by the Meta.ordering
+will be rank3, rank2, rank1.
+>>> rank1 = Ranking(rank=2, author=a2)
+>>> rank1.save()
+>>> rank2 = Ranking(rank=1, author=a3)
+>>> rank2.save()
+>>> rank3 = Ranking(rank=3, author=a1)
+>>> rank3.save()
+
+>>> c1 = Cover(title="first", item=i4)
+>>> c1.save()
+>>> c2 = Cover(title="second", item=i2)
+>>> c2.save()
 
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
@@ -119,7 +190,7 @@ Bug #1878, #2939
 
 # Create something with a duplicate 'name' so that we can test multi-column
 # cases (which require some tricky SQL transformations under the covers).
->>> xx = Item(name='four', creator=a2)
+>>> xx = Item(name='four', creator=a2, note=n1)
 >>> xx.save()
 >>> Item.objects.exclude(name='two').values('creator', 'name').distinct().count()
 4
@@ -206,5 +277,40 @@ Bug #2400
 Bug #2496
 >>> Item.objects.extra(tables=['queries_author']).select_related().order_by('name')[:1]
 [<Item: four>]
+
+Bug #2076
+# Ordering on related tables should be possible, even if the table is not
+# otherwise involved.
+>>> Item.objects.order_by('note__note', 'name')
+[<Item: two>, <Item: four>, <Item: one>, <Item: three>]
+
+# Ordering on a related field should use the remote model's default ordering as
+# a final step.
+>>> Author.objects.order_by('extra', '-name')
+[<Author: a2>, <Author: a1>, <Author: a4>, <Author: a3>]
+
+# If the remote model does not have a default ordering, we order by its 'id'
+# field.
+>>> Item.objects.order_by('creator', 'name')
+[<Item: one>, <Item: three>, <Item: two>, <Item: four>]
+
+# Cross model ordering is possible in Meta, too.
+>>> Ranking.objects.all()
+[<Ranking: 3: a1>, <Ranking: 2: a2>, <Ranking: 1: a3>]
+>>> Ranking.objects.all().order_by('rank')
+[<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
+
+>>> Cover.objects.all()
+[<Cover: first>, <Cover: second>]
+
+Bugs #2874, #3002
+>>> qs = Item.objects.select_related().order_by('note__note', 'name')
+>>> list(qs)
+[<Item: two>, <Item: four>, <Item: one>, <Item: three>]
+
+# This is also a good select_related() test because there are multiple Note
+# entries in the SQL. The two Note items should be different.
+>>> qs[0].note, qs[0].creator.extra.note
+(<Note: n2>, <Note: n1>)
 """}
 

@@ -8,6 +8,7 @@ all about the internals of models in order to get the information it needs.
 """
 
 import copy
+import re
 
 from django.utils import tree
 from django.db.models.sql.where import WhereNode, AND, OR
@@ -35,7 +36,7 @@ GET_ITERATOR_CHUNK_SIZE = 100
 # Separator used to split filter strings apart.
 LOOKUP_SEP = '__'
 
-# Constants to make looking up tuple values clearerer.
+# Constants to make looking up tuple values clearer.
 # Join lists
 TABLE_NAME = 0
 RHS_ALIAS = 1
@@ -43,7 +44,7 @@ JOIN_TYPE = 2
 LHS_ALIAS = 3
 LHS_JOIN_COL = 4
 RHS_JOIN_COL = 5
-# Alias maps lists
+# Alias map lists
 ALIAS_TABLE = 0
 ALIAS_REFCOUNT = 1
 ALIAS_JOIN = 2
@@ -53,6 +54,8 @@ ALIAS_MERGE_SEP = 3
 MULTI = 'multi'
 SINGLE = 'single'
 NONE = None
+
+ORDER_PATTERN = re.compile(r'\?|[-+]?\w+$')
 
 class Query(object):
     """
@@ -91,6 +94,7 @@ class Query(object):
         self.extra_tables = []
         self.extra_where = []
         self.extra_params = []
+        self.extra_order_by = []
 
     def __str__(self):
         """
@@ -140,6 +144,7 @@ class Query(object):
         obj.extra_tables = self.extra_tables[:]
         obj.extra_where = self.extra_where[:]
         obj.extra_params = self.extra_params[:]
+        obj.extra_order_by = self.extra_order_by[:]
         obj.__dict__.update(kwargs)
         return obj
 
@@ -189,19 +194,22 @@ class Query(object):
         in the query.
         """
         self.pre_sql_setup()
+        out_cols = self.get_columns()
+        ordering = self.get_ordering()
+        # This must come after 'select' and 'ordering' -- see docstring of
+        # get_from_clause() for details.
+        from_, f_params = self.get_from_clause()
+        where, w_params = self.where.as_sql()
+
         result = ['SELECT']
         if self.distinct:
             result.append('DISTINCT')
-        out_cols = self.get_columns()
         result.append(', '.join(out_cols))
 
         result.append('FROM')
-        from_, f_params = self.get_from_clause()
         result.extend(from_)
         params = list(f_params)
 
-        where, w_params = self.where.as_sql()
-        params.extend(w_params)
         if where:
             result.append('WHERE %s' % where)
         if self.extra_where:
@@ -210,12 +218,12 @@ class Query(object):
             else:
                 result.append('AND')
             result.append(' AND'.join(self.extra_where))
+        params.extend(w_params)
 
         if self.group_by:
             grouping = self.get_grouping()
             result.append('GROUP BY %s' % ', '.join(grouping))
 
-        ordering = self.get_ordering()
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
 
@@ -312,11 +320,14 @@ class Query(object):
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
         self.order_by = rhs.order_by and rhs.order_by[:] or self.order_by
+        self.extra_order_by = (rhs.extra_order_by and rhs.extra_order_by[:] or
+                self.extra_order_by)
 
     def pre_sql_setup(self):
         """
-        Does any necessary class setup prior to producing SQL. This is for
-        things that can't necessarily be done in __init__.
+        Does any necessary class setup immediately prior to producing SQL. This
+        is for things that can't necessarily be done in __init__ because we
+        might not have all the pieces in place at that time.
         """
         if not self.tables:
             self.join((None, self.model._meta.db_table, None, None))
@@ -356,9 +367,14 @@ class Query(object):
         "FROM" part of the query, as well as any extra parameters that need to
         be included. Sub-classes, can override this to create a from-clause via
         a "select", for example (e.g. CountQuery).
+
+        This should only be called after any SQL construction methods that
+        might change the tables we need. This means the select columns and
+        ordering must be done first.
         """
         result = []
         qn = self.quote_name_unless_alias
+        first = True
         for alias in self.tables:
             if not self.alias_map[alias][ALIAS_REFCOUNT]:
                 continue
@@ -370,12 +386,16 @@ class Query(object):
                         % (join_type, qn(name), alias_str, qn(lhs),
                             qn(lhs_col), qn(alias), qn(col)))
             else:
-                result.append('%s%s' % (qn(name), alias_str))
+                connector = not first and ', ' or ''
+                result.append('%s%s%s' % (connector, qn(name), alias_str))
+            first = False
         extra_tables = []
         for t in self.extra_tables:
             alias, created = self.table_alias(t)
             if created:
-                result.append(', %s' % alias)
+                connector = not first and ', ' or ''
+                result.append('%s%s' % (connector, alias))
+                first = False
         return result, []
 
     def get_grouping(self):
@@ -396,13 +416,20 @@ class Query(object):
     def get_ordering(self):
         """
         Returns a tuple representing the SQL elements in the "order by" clause.
+
+        Determining the ordering SQL can change the tables we need to include,
+        so this should be run *before* get_from_clause().
         """
-        if self.order_by is None:
+        if self.extra_order_by:
+            ordering = self.extra_order_by
+        elif self.order_by is None:
             ordering = []
         else:
+            # Note that self.order_by can be empty in two ways: [] ("use the
+            # default"), which is handled here, and None ("no ordering"), which
+            # is handled in the previous test.
             ordering = self.order_by or self.model._meta.ordering
         qn = self.quote_name_unless_alias
-        opts = self.model._meta
         result = []
         for field in ordering:
             if field == '?':
@@ -416,23 +443,61 @@ class Query(object):
                     order = 'ASC'
                 result.append('%s %s' % (field, order))
                 continue
-            if field[0] == '-':
-                col = field[1:]
-                order = 'DESC'
-            else:
-                col = field
-                order = 'ASC'
-            if '.' in col:
+            if '.' in field:
+                # This came in through an extra(ordering=...) addition. Pass it
+                # on verbatim, after mapping the table name to an alias, if
+                # necessary.
+                col, order = get_order_dir(field)
                 table, col = col.split('.', 1)
-                table = '%s.' % qn(self.table_alias(table)[0])
-            elif col not in self.extra_select:
-                # Use the root model's database table as the referenced table.
-                table = '%s.' % qn(self.tables[0])
+                result.append('%s.%s %s' % (qn(self.table_alias(table)[0]), col,
+                        order))
+            elif get_order_dir(field)[0] not in self.extra_select:
+                # 'col' is of the form 'field' or 'field1__field2' or
+                # 'field1__field2__field', etc.
+                for table, col, order in self.find_ordering_name(field,
+                        self.model._meta):
+                    result.append('%s.%s %s' % (qn(table), qn(col), order))
             else:
-                table = ''
-            result.append('%s%s %s' % (table,
-                    qn(orderfield_to_column(col, opts)), order))
+                col, order = get_order_dir(field)
+                result.append('%s %s' % (qn(col), order))
         return result
+
+    def find_ordering_name(self, name, opts, alias=None, default_order='ASC'):
+        """
+        Returns the table alias (the name might not be unambiguous, the alias
+        will be) and column name for ordering by the given 'name' parameter.
+        The 'name' is of the form 'field1__field2__...__fieldN'.
+        """
+        name, order = get_order_dir(name, default_order)
+        pieces = name.split(LOOKUP_SEP)
+        if not alias:
+            alias = self.join((None, opts.db_table, None, None))
+        for elt in pieces:
+            joins, opts, unused1, field, col, unused2 = \
+                    self.get_next_join(elt, opts, alias, False)
+            if joins:
+                alias = joins[-1]
+        col = col or field.column
+
+        # If we get to this point and the field is a relation to another model,
+        # append the default ordering for that model.
+        if joins and opts.ordering:
+            results = []
+            for item in opts.ordering:
+                results.extend(self.find_ordering_name(item, opts, alias,
+                        order))
+            return results
+
+        if alias:
+            # We have to do the same "final join" optimisation as in
+            # add_filter, since the final column might not otherwise be part of
+            # the select set (so we can't order on it).
+            join = self.alias_map[alias][ALIAS_JOIN]
+            if col == join[RHS_JOIN_COL]:
+                self.unref_alias(alias)
+                alias = join[LHS_ALIAS]
+                col = join[LHS_JOIN_COL]
+        return [(alias, col, order)]
 
     def table_alias(self, table_name, create=False):
         """
@@ -557,7 +622,7 @@ class Query(object):
             alias = self.join((root_alias, table, f.column,
                     f.rel.get_related_field().column), exclusions=used)
             used.append(alias)
-            self.select.extend([(table, f2.column)
+            self.select.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
                     used)
@@ -802,6 +867,12 @@ class Query(object):
         possibly with a direction prefix ('-' or '?') -- or ordinals,
         corresponding to column positions in the 'select' list.
         """
+        errors = []
+        for item in ordering:
+            if not ORDER_PATTERN.match(item):
+                errors.append(item)
+        if errors:
+            raise TypeError('Invalid order_by arguments: %s' % errors)
         self.order_by.extend(ordering)
 
     def clear_ordering(self, force_empty=False):
@@ -813,6 +884,7 @@ class Query(object):
             self.order_by = None
         else:
             self.order_by = []
+        self.extra_order_by = []
 
     def add_count_column(self):
         """
@@ -1043,6 +1115,9 @@ class CountQuery(Query):
         result, params = self._query.as_sql()
         return ['(%s) AS A1' % result], params
 
+    def get_ordering(self):
+        return ()
+
 def find_field(name, field_list, related_query):
     """
     Finds a field with a specific name in a list of field instances.
@@ -1077,14 +1152,16 @@ def get_legal_fields(opts):
             + field_choices(opts.get_all_related_objects(), True)
             + field_choices(opts.fields, False))
 
-def orderfield_to_column(name, opts):
+def get_order_dir(field, default='ASC'):
     """
-    For a field name specified in an "order by" clause, returns the database
-    column name. If 'name' is not a field in the current model, it is returned
-    unchanged.
+    Returns the field name and direction for an order specification. For
+    example, '-foo' is returned as ('foo', 'DESC').
+
+    The 'default' param is used to indicate which way no prefix (or a '+'
+    prefix) should sort. The '-' prefix always sorts the opposite way.
     """
-    try:
-        return opts.get_field(name, False).column
-    except FieldDoesNotExist:
-        return name
+    dirn = {'ASC': ('ASC', 'DESC'), 'DESC': ('DESC', 'ASC')}[default]
+    if field[0] == '-':
+        return field[1:], dirn[1]
+    return field, dirn[0]
 
