@@ -315,6 +315,8 @@ class Query(object):
         """
         if not self.tables:
             self.join((None, self.model._meta.db_table, None, None))
+        if self.select_related:
+            self.fill_related_selections()
 
     def get_columns(self):
         """
@@ -489,7 +491,7 @@ class Query(object):
         self.rev_join_map[alias] = t_ident
         return alias
 
-    def fill_table_cache(self, opts=None, root_alias=None, cur_depth=0,
+    def fill_related_selections(self, opts=None, root_alias=None, cur_depth=0,
             used=None):
         """
         Fill in the information needed for a select_related query.
@@ -500,7 +502,7 @@ class Query(object):
         if not opts:
             opts = self.model._meta
             root_alias = self.tables[0]
-            self.select.extend([(root_alias, f) for f in opts.fields])
+            self.select.extend([(root_alias, f.column) for f in opts.fields])
         if not used:
             used = []
 
@@ -509,11 +511,12 @@ class Query(object):
                 continue
             table = f.rel.to._meta.db_table
             alias = self.join((root_alias, table, f.column,
-                    f.rel.get_related_field().column), exclusion=used)
+                    f.rel.get_related_field().column), exclusions=used)
             used.append(alias)
             self.select.extend([(table, f2.column)
                     for f2 in f.rel.to._meta.fields])
-            self.fill_table_cache(f.rel.to._meta, alias, cur_depth + 1, used)
+            self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
+                    used)
 
     def add_filter(self, filter_expr, connection=AND, negate=False):
         """

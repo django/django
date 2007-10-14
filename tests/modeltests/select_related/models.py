@@ -27,13 +27,13 @@ class Phylum(models.Model):
     kingdom = models.ForeignKey(Kingdom)
     def __unicode__(self):
         return self.name
-    
+
 class Klass(models.Model):
     name = models.CharField(max_length=50)
     phylum = models.ForeignKey(Phylum)
     def __unicode__(self):
         return self.name
-    
+
 class Order(models.Model):
     name = models.CharField(max_length=50)
     klass = models.ForeignKey(Klass)
@@ -63,7 +63,7 @@ def create_tree(stringtree):
     names = stringtree.split()
     models = [Domain, Kingdom, Phylum, Klass, Order, Family, Genus, Species]
     assert len(names) == len(models), (names, models)
-    
+
     parent = None
     for name, model in zip(names, models):
         try:
