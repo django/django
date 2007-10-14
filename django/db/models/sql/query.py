@@ -161,7 +161,7 @@ class Query(object):
         Performs a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        obj.clear_ordering()
+        obj.clear_ordering(True)
         obj.clear_limits()
         obj.select_related = False
         if obj.distinct and len(obj.select) > 1:
@@ -394,7 +394,10 @@ class Query(object):
         """
         Returns a tuple representing the SQL elements in the "order by" clause.
         """
-        ordering = self.order_by or self.model._meta.ordering
+        if self.order_by is None:
+            ordering = []
+        else:
+            ordering = self.order_by or self.model._meta.ordering
         qn = self.quote_name_unless_alias
         opts = self.model._meta
         result = []
@@ -798,11 +801,15 @@ class Query(object):
         """
         self.order_by.extend(ordering)
 
-    def clear_ordering(self):
+    def clear_ordering(self, force_empty=False):
         """
-        Removes any ordering settings.
+        Removes any ordering settings. If 'force_empty' is True, there will be
+        no ordering in the resulting query (not even the model's default).
         """
-        self.order_by = []
+        if force_empty:
+            self.order_by = None
+        else:
+            self.order_by = []
 
     def add_count_column(self):
         """
