@@ -44,6 +44,8 @@ __test__ = {'API_TESTS':"""
 >>> t3.save()
 >>> t4 = Tag(name='t4', parent=t3)
 >>> t4.save()
+>>> t5 = Tag(name='t5', parent=t3)
+>>> t5.save()
 
 
 >>> a1 = Author(name='a1', num=1001)
@@ -194,5 +196,11 @@ AssertionError: Cannot combine queries on two different base models.
 Bug #3141
 >>> Author.objects.extra(select={'foo': '1'}).count()
 4
+
+Bug #2400
+>>> Author.objects.filter(item__isnull=True)
+[<Author: a3>]
+>>> Tag.objects.filter(item__isnull=True)
+[<Tag: t5>]
 """}
 
