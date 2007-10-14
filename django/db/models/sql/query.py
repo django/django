@@ -570,11 +570,10 @@ class Query(object):
             if name == 'pk':
                 name = target_field.name
             if joins is not None:
-                join_list.append(joins)
-                last = joins
-                alias = joins[-1]
-                if not null_point and nullable:
+                if null_point is None and nullable:
                     null_point = len(join_list)
+                join_list.append(joins)
+                alias = joins[-1]
                 if connection == OR and not split:
                     # FIXME: Document what's going on and why this is needed.
                     if self.alias_map[joins[0]][ALIAS_REFCOUNT] == 1:
@@ -616,12 +615,15 @@ class Query(object):
 
         self.where.add([alias, col, orig_field, lookup_type, value],
                 connection)
-        if negate and null_point:
-            if join_list:
-                for join in last:
-                    self.promote_alias(join)
-            self.where.negate()
-            self.where.add([alias, col, orig_field, 'isnull', True], OR)
+        if negate:
+            if join_list and null_point is not None:
+                for elt in join_list[null_point:]:
+                    for join in elt:
+                        self.promote_alias(join)
+                self.where.negate()
+                self.where.add([alias, col, orig_field, 'isnull', True], OR)
+            else:
+                self.where.negate()
 
     def add_q(self, q_object):
         """
