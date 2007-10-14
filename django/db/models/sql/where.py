@@ -91,7 +91,7 @@ class WhereNode(tree.Node):
         """
         table_alias, name, field, lookup_type, value = child
         conn = self.query.connection
-        qn = conn.ops.quote_name
+        qn = self.query.quote_name_unless_alias
         if table_alias:
             lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:

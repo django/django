@@ -104,6 +104,16 @@ class Query(object):
         sql, params = self.as_sql()
         return sql % params
 
+    def quote_name_unless_alias(self, name):
+        """
+        A wrapper around connection.ops.quote_name that doesn't quote aliases
+        for table names. This avoids problems with some SQL dialects that treat
+        quoted strings specially (e.g. PostgreSQL).
+        """
+        if name != self.alias_map.get(name, [name])[0]:
+            return name
+        return self.connection.ops.quote_name(name)
+
     def clone(self, klass=None, **kwargs):
         """
         Creates a copy of the current instance. The 'kwargs' parameter can be
@@ -119,6 +129,7 @@ class Query(object):
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = copy.deepcopy(self.where)
+        obj.where.query = obj
         obj.having = self.having[:]
         obj.group_by = self.group_by[:]
         obj.order_by = self.order_by[:]
@@ -319,7 +330,7 @@ class Query(object):
         columns have been specified, returns all columns relating to fields in
         the model.
         """
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name_unless_alias
         result = []
         if self.select or self.extra_select:
             for col in self.select:
@@ -348,7 +359,7 @@ class Query(object):
         a "select", for example (e.g. CountQuery).
         """
         result = []
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name_unless_alias
         for alias in self.tables:
             if not self.alias_map[alias][ALIAS_REFCOUNT]:
                 continue
@@ -368,7 +379,7 @@ class Query(object):
         """
         Returns a tuple representing the SQL elements in the "group by" clause.
         """
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name_unless_alias
         result = []
         for col in self.group_by:
             if isinstance(col, (list, tuple)):
@@ -384,7 +395,7 @@ class Query(object):
         Returns a tuple representing the SQL elements in the "order by" clause.
         """
         ordering = self.order_by or self.model._meta.ordering
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name_unless_alias
         opts = self.model._meta
         result = []
         for field in ordering:
@@ -942,7 +953,7 @@ class UpdateQuery(Query):
                 "Can only update one table at a time."
         result = ['UPDATE %s' % self.tables[0]]
         result.append('SET')
-        qn = self.connection.ops.quote_name
+        qn = self.quote_name_unless_alias
         values = ['%s = %s' % (qn(v[0]), v[1]) for v in self.values]
         result.append(', '.join(values))
         where, params = self.where.as_sql()
