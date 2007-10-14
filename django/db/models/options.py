@@ -3,7 +3,6 @@ from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
 from django.db.models.loading import get_models, app_cache_ready
-from django.db.models.query import orderlist2sql
 from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from django.utils.encoding import force_unicode, smart_str
@@ -129,12 +128,6 @@ class Options(object):
             if f.name == name:
                 return f
         raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
-
-    def get_order_sql(self, table_prefix=''):
-        "Returns the full 'ORDER BY' clause for this object, according to self.ordering."
-        if not self.ordering: return ''
-        pre = table_prefix and (table_prefix + '.') or ''
-        return 'ORDER BY ' + orderlist2sql(self.ordering, self, pre)
 
     def get_add_permission(self):
         return 'add_%s' % self.object_name.lower()
