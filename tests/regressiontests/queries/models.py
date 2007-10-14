@@ -81,11 +81,8 @@ Bug #1801
 [<Author: a2>]
 >>> Author.objects.filter(item=i3)
 [<Author: a2>]
-
-# FIXME: When we join these queries, we MUST NOT share the table joins. this is
-# the case for all m-to-m and 1-to-m joins (but m-to-1 is fine).
-# >>> Author.objects.filter(item=i2) & Author.objects.filter(item=i3)
-# [<Author: a2>]
+>>> Author.objects.filter(item=i2) & Author.objects.filter(item=i3)
+[<Author: a2>]
 
 Bug #2306
 Checking that no join types are "left outer" joins.

@@ -48,6 +48,7 @@ RHS_JOIN_COL = 5
 ALIAS_TABLE = 0
 ALIAS_REFCOUNT = 1
 ALIAS_JOIN = 2
+ALIAS_MERGE_SEP = 3
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
@@ -252,8 +253,10 @@ class Query(object):
                 continue
             promote = (rhs.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] ==
                     self.LOUTER)
+            merge_separate = (connection == AND)
             new_alias = self.join(rhs.rev_join_map[alias], exclusions=used,
-                    promote=promote, outer_if_first=True)
+                    promote=promote, outer_if_first=True,
+                    merge_separate=merge_separate)
             if self.alias_map[alias][ALIAS_REFCOUNT] == 1:
                 first_new_join = False
             used[new_alias] = None
@@ -417,7 +420,7 @@ class Query(object):
             alias = table_name
         else:
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
-        self.alias_map[alias] = [table_name, 1, None]
+        self.alias_map[alias] = [table_name, 1, None, False]
         self.table_map.setdefault(table_name, []).append(alias)
         self.tables.append(alias)
         return alias, True
@@ -435,7 +438,8 @@ class Query(object):
         self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
 
     def join(self, (lhs, table, lhs_col, col), always_create=False,
-            exclusions=(), promote=False, outer_if_first=False):
+            exclusions=(), promote=False, outer_if_first=False,
+            merge_separate=False):
         """
         Returns an alias for a join between 'table' and 'lhs' on the given
         columns, either reusing an existing alias for that join or creating a
@@ -456,6 +460,10 @@ class Query(object):
         If 'outer_if_first' is True and a new join is created, it will have the
         LOUTER join type. This is used when joining certain types of querysets
         and Q-objects together.
+
+        If the 'merge_separate' parameter is True, we create a new alias if we
+        would otherwise reuse an alias that also had 'merge_separate' set to
+        True when it was created.
         """
         if lhs not in self.alias_map:
             lhs_table = lhs
@@ -467,7 +475,9 @@ class Query(object):
         aliases = self.join_map.get(t_ident)
         if aliases and not always_create:
             for alias in aliases:
-                if alias not in exclusions:
+                if (alias not in exclusions and
+                        not (merge_separate and
+                            self.alias_map[alias][ALIAS_MERGE_SEP])):
                     self.ref_alias(alias)
                     if promote:
                         self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = \
@@ -487,6 +497,7 @@ class Query(object):
             # means the later columns are ignored.
             join[JOIN_TYPE] = None
         self.alias_map[alias][ALIAS_JOIN] = join
+        self.alias_map[alias][ALIAS_MERGE_SEP] = merge_separate
         self.join_map.setdefault(t_ident, []).append(alias)
         self.rev_join_map[alias] = t_ident
         return alias
@@ -647,7 +658,7 @@ class Query(object):
                     opts.pk.column, field.m2m_column_name()), dupe_multis)
             far_alias = self.join((int_alias, remote_opts.db_table,
                     field.m2m_reverse_name(), remote_opts.pk.column),
-                    dupe_multis)
+                    dupe_multis, merge_separate=True)
             return ([int_alias, far_alias], remote_opts, field, remote_opts.pk,
                     None)
 
@@ -661,7 +672,7 @@ class Query(object):
                     opts.pk.column, field.m2m_reverse_name()), dupe_multis)
             far_alias = self.join((int_alias, remote_opts.db_table,
                     field.m2m_column_name(), remote_opts.pk.column),
-                    dupe_multis)
+                    dupe_multis, merge_separate=True)
             # XXX: Why is the final component able to be None here?
             return ([int_alias, far_alias], remote_opts, field, remote_opts.pk,
                     None)
@@ -673,7 +684,8 @@ class Query(object):
             field = field.field
             local_field = opts.get_field(field.rel.field_name)
             alias = self.join((root_alias, remote_opts.db_table,
-                    local_field.column, field.column), dupe_multis)
+                    local_field.column, field.column), dupe_multis,
+                    merge_separate=True)
             return ([alias], remote_opts, field, field, remote_opts.pk.column)
 
 
