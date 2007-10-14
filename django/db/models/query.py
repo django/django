@@ -22,33 +22,6 @@ except NameError:
 # when deleting objects).
 CHUNK_SIZE = 100
 
-####################
-# HELPER FUNCTIONS #
-####################
-
-# FIXME
-def orderlist2sql(order_list, opts, prefix=''):
-    raise NotImplementedError
-##def orderlist2sql(order_list, opts, prefix=''):
-##    qn = connection.ops.quote_name
-##    if prefix.endswith('.'):
-##        prefix = qn(prefix[:-1]) + '.'
-##    output = []
-##    for f in handle_legacy_orderlist(order_list):
-##        if f.startswith('-'):
-##            output.append('%s%s DESC' % (prefix, qn(orderfield2column(f[1:], opts))))
-##        elif f == '?':
-##            output.append(connection.ops.random_function_sql())
-##        else:
-##            output.append('%s%s ASC' % (prefix, qn(orderfield2column(f, opts))))
-##    return ', '.join(output)
-
-##def quote_only_if_word(word):
-##    if re.search('\W', word): # Don't quote if there are spaces or non-word chars.
-##        return word
-##    else:
-##        return connection.ops.quote_name(word)
-
 class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
     def __init__(self, model=None):

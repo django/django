@@ -15,7 +15,6 @@ from django.db.models.sql.datastructures import Count, Date
 from django.db.models.fields import FieldDoesNotExist, Field
 from django.contrib.contenttypes import generic
 from datastructures import EmptyResultSet
-from utils import handle_legacy_orderlist
 
 try:
     reversed
