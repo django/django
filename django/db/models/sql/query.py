@@ -546,7 +546,7 @@ class Query(object):
         opts = self.model._meta
         alias = self.join((None, opts.db_table, None, None))
         dupe_multis = (connection == AND)
-        seen_aliases = []
+        join_list = []
         done_split = not self.where
 
         # FIXME: Using enumerate() here is expensive. We only need 'i' to
@@ -558,20 +558,21 @@ class Query(object):
             if name == 'pk':
                 name = target_field.name
             if joins is not None:
-                seen_aliases.extend(joins)
+                join_list.append(joins)
                 last = joins
                 alias = joins[-1]
                 if connection == OR and not done_split:
                     if self.alias_map[joins[0]][ALIAS_REFCOUNT] == 1:
                         done_split = True
                         self.promote_alias(joins[0])
+                        all_aliases = []
+                        for a in join_list:
+                            all_aliases.extend(a)
                         for t in self.tables[1:]:
-                            if t in seen_aliases:
+                            if t in all_aliases:
                                 continue
                             self.promote_alias(t)
                             break
-                    else:
-                        seen_aliases.extend(joins)
             else:
                 # Normal field lookup must be the last field in the filter.
                 if i != len(parts) - 1:
@@ -580,13 +581,13 @@ class Query(object):
 
         col = target_col or target_field.column
 
-        if target_field is opts.pk and seen_aliases:
+        if target_field is opts.pk and join_list:
             # An optimization: if the final join is against a primary key,
             # we can go back one step in the join chain and compare against
             # the lhs of the join instead. The result (potentially) involves
             # one less table join.
             self.unref_alias(alias)
-            join = self.alias_map[seen_aliases[-1]][ALIAS_JOIN]
+            join = self.alias_map[join_list[-1][-1]][ALIAS_JOIN]
             alias = join[LHS_ALIAS]
             col = join[LHS_JOIN_COL]
 
@@ -595,12 +596,12 @@ class Query(object):
             # join when connecting to the previous model. We make that
             # adjustment here. We don't do this unless needed because it's less
             # efficient at the database level.
-            self.promote_alias(joins[0])
+            self.promote_alias(join_list[-1][0])
 
         self.where.add([alias, col, orig_field, lookup_type, value],
                 connection)
         if negate:
-            if seen_aliases:
+            if join_list:
                 self.promote_alias(last[0])
             self.where.negate()
 

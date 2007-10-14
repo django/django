@@ -74,10 +74,8 @@ __test__ = {'API_TESTS':"""
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
 [<Item: three>]
-
-# FIXME: Crashes! :-(
-# >>> Item.objects.filter(tags__id__isnull=True)
-# [<Item: three>]
+>>> Item.objects.filter(tags__id__isnull=True)
+[<Item: three>]
 
 Bug #1801
 >>> Author.objects.filter(item=i2)
