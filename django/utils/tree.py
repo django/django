@@ -80,7 +80,8 @@ class Node(object):
         Interpreting the meaning of this negate is up to client code. This
         method is useful for implementing "not" arrangements.
         """
-        self.children = [NegatedNode(self.children, self.connection)]
+        self.children = [NegatedNode(self.children, self.connection,
+                old_state=self.negated)]
         self.connection = self.default
 
     def start_subtree(self, conn_type):
@@ -117,7 +118,7 @@ class NegatedNode(Node):
     A class that indicates the connection type should be negated (whatever that
     means -- it's up to the client) when used by the client code.
     """
-    def __init__(self, children=None, connection=None):
+    def __init__(self, children=None, connection=None, old_state=True):
         super(NegatedNode, self).__init__(children, connection)
-        self.negated = True
+        self.negated = not old_state
 
