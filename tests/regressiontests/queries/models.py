@@ -3,7 +3,7 @@ Various combination queries that have been problematic in the past.
 """
 
 from django.db import models
-from django.db.models.query import Q, QNot
+from django.db.models.query import Q
 
 class Tag(models.Model):
     name = models.CharField(maxlength=10)
