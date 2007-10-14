@@ -3,7 +3,7 @@ Various combination queries that have been problematic in the past.
 """
 
 from django.db import models
-from django.db.models.query import Q
+from django.db.models.query import Q, QNot
 
 class Tag(models.Model):
     name = models.CharField(maxlength=10)
@@ -14,7 +14,7 @@ class Tag(models.Model):
 
 class Author(models.Model):
     name = models.CharField(maxlength=10)
-    num = models.IntegerField()
+    num = models.IntegerField(unique=True)
 
     def __unicode__(self):
         return self.name
@@ -69,6 +69,8 @@ __test__ = {'API_TESTS':"""
 
 >>> r1 = Report(name='r1', creator=a1)
 >>> r1.save()
+>>> r2 = Report(name='r2', creator=a3)
+>>> r2.save()
 
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
@@ -149,11 +151,26 @@ Bug #4510
 Bug #5324
 >>> Item.objects.filter(tags__name='t4')
 [<Item: four>]
+>>> Item.objects.exclude(tags__name='t4').order_by('name').distinct()
+[<Item: one>, <Item: three>, <Item: two>]
+>>> Author.objects.exclude(item__name='one').distinct().order_by('name')
+[<Author: a2>, <Author: a3>, <Author: a4>]
 
-# FIXME: We seem to be constructing the right SQL here, but maybe a NULL test
-# for the pk of Tag is needed or something?
-# >>> Item.objects.exclude(tags__name='t4').order_by('name').distinct()
-# [<Item: one>, <Item: three>, <Item: two>]
+# Excluding from a relation that cannot be NULL should not use outer joins.
+>>> query = Item.objects.exclude(creator__in=[a1, a2]).query
+>>> query.LOUTER not in [x[2][2] for x in query.alias_map.values()]
+True
+
+# When only one of the joins is nullable (here, the Author -> Item join), we
+# should only get outer joins after that point (one, in this case). We also
+# show that three tables (so, two joins) are involved.
+>>> qs = Report.objects.exclude(creator__item__name='one')
+>>> list(qs)
+[<Report: r2>]
+>>> len([x[2][2] for x in qs.query.alias_map.values() if x[2][2] == query.LOUTER])
+1
+>>> len(qs.query.alias_map)
+3
 
 Bug #2091
 >>> t = Tag.objects.get(name='t4')
