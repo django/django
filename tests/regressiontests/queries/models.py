@@ -202,5 +202,9 @@ Bug #2400
 [<Author: a3>]
 >>> Tag.objects.filter(item__isnull=True)
 [<Tag: t5>]
+
+Bug #2496
+>>> Item.objects.extra(tables=['queries_author']).select_related().order_by('name')[:1]
+[<Item: four>]
 """}
 

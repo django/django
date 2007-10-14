@@ -371,7 +371,11 @@ class Query(object):
                             qn(lhs_col), qn(alias), qn(col)))
             else:
                 result.append('%s%s' % (qn(name), alias_str))
-        result.extend(self.extra_tables)
+        extra_tables = []
+        for t in self.extra_tables:
+            alias, created = self.table_alias(t)
+            if created:
+                result.append(', %s' % alias)
         return result, []
 
     def get_grouping(self):
