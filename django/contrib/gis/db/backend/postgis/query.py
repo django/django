@@ -1,11 +1,11 @@
 """
-  This module contains the spatial lookup types, and the get_geo_where_clause()
-  routine for PostGIS.
+ This module contains the spatial lookup types, and the get_geo_where_clause()
+ routine for PostGIS.
 """
 from django.db import connection
 from django.contrib.gis.db.backend.postgis.management import postgis_version_tuple
 from types import StringType, UnicodeType
-quote_name = connection.ops.quote_name
+qn = connection.ops.quote_name
 
 # Getting the PostGIS version information
 POSTGIS_VERSION, MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2 = postgis_version_tuple()
@@ -121,21 +121,16 @@ def get_geom_func(lookup_type):
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
     if table_prefix.endswith('.'):
-        table_prefix = quote_name(table_prefix[:-1])+'.'
-    field_name = quote_name(field_name)
+        table_prefix = qn(table_prefix[:-1])+'.'
+    field_name = qn(field_name)
 
     # See if a PostGIS operator matches the lookup type first
-    try:
+    if lookup_type in POSTGIS_OPERATORS:
         return '%s%s %s %%s' % (table_prefix, field_name, POSTGIS_OPERATORS[lookup_type])
-    except KeyError:
-        pass
 
     # See if a PostGIS Geometry function matches the lookup type next
-    try:
+    if lookup_type in POSTGIS_GEOMETRY_FUNCTIONS:
         lookup_info = POSTGIS_GEOMETRY_FUNCTIONS[lookup_type]
-    except KeyError:
-        pass
-    else:
         # Lookup types that are tuples take tuple arguments, e.g., 'relate' and 
         #  'dwithin' lookup types.
         if isinstance(lookup_info, tuple):
@@ -145,7 +140,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
 
             # Ensuring that a tuple _value_ was passed in from the user
             if not isinstance(value, tuple) or len(value) != 2: 
-                raise TypeError('2-element tuple required for %s lookup type.' % lookup_type)
+                raise TypeError('2-element tuple required for `%s` lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
             if not isinstance(value[1], arg_type):
@@ -154,7 +149,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
             return "%s(%s%s, %%s, %%s)" % (func, table_prefix, field_name)
         else:
             # Returning the SQL necessary for the geometry function call. For example: 
-            #  ST_Contains("geoapp_country"."poly", ST_GeomFromText(..))
+            #  ST_Contains("geoapp_country"."poly", ST_GeomFromWKB(..))
             return '%s(%s%s, %%s)' % (lookup_info, table_prefix, field_name)
     
     # Handling 'isnull' lookup type
@@ -163,10 +158,35 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
 
-def geo_quotename(value, dbl=False):
-    "Returns the quotation used for PostGIS on a given value (uses single quotes by default)."
-    if isinstance(value, (StringType, UnicodeType)):
-        if dbl: return '"%s"' % value
-        else: return "'%s'" % value
-    else:
-        return str(value)
+# Functions that we define manually.
+if MAJOR_VERSION == 1:
+    if MINOR_VERSION1 == 3:
+        # PostGIS versions 1.3.x
+        ASKML = 'ST_AsKML'
+        ASGML = 'ST_AsGML'
+        GEOM_FROM_TEXT = 'ST_GeomFromText'
+        GEOM_FROM_WKB = 'ST_GeomFromWKB'
+        UNION = 'ST_Union'
+        TRANSFORM = 'ST_Transform'
+    elif MINOR_VERSION1 == 2 and MINOR_VERSION2 >= 1:
+        # PostGIS versions 1.2.x
+        ASKML = 'AsKML'
+        ASGML = 'AsGML'
+        GEOM_FROM_TEXT = 'GeomFromText'
+        GEOM_FROM_WKB = 'GeomFromWKB'
+        UNION = 'GeomUnion'
+        TRANSFORM = 'Transform'
+    elif MINOR_VERSION1 == 1 and MINOR_VERSION2 >= 0:
+        # PostGIS versions 1.1.x
+        ASKML = False
+        ASGML = 'AsGML'
+        GEOM_FROM_TEXT = 'GeomFromText'
+        GEOM_FROM_WKB = 'GeomFromWKB'
+        TRANSFORM = 'Transform'
+        UNION = 'GeomUnion'
+
+# Custom selection not needed for PostGIS since GEOS geometries may be
+# instantiated directly from the HEXEWKB returned by default.  If
+# WKT is needed for some reason in the future, this value may be changed,
+# 'AsText(%s)'
+GEOM_SELECT = None

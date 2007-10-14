@@ -12,7 +12,7 @@ from types import StringType, UnicodeType, IntType, FloatType, BufferType
 import re
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq, create_cs
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
-from django.contrib.gis.geos.libgeos import lgeos, HAS_NUMPY, ISQLQuote
+from django.contrib.gis.geos.libgeos import lgeos, HAS_NUMPY
 from django.contrib.gis.geos.pointer import GEOSPointer, NULL_GEOM
 
 # Trying to import GDAL libraries, if available.  Have to place in
@@ -47,14 +47,15 @@ class GEOSGeometry(object):
         
         The `srid` keyword is used to specify the Source Reference Identifier
          (SRID) number for this Geometry.  If not set, the SRID will be None.
-        """
-
+        """ 
+        from_hex = False
         if isinstance(geo_input, UnicodeType):
             # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
             geo_input = geo_input.encode('ascii')
         if isinstance(geo_input, StringType):
             if hex_regex.match(geo_input):
                 # If the regex matches, the geometry is in HEX form.
+                from_hex = True
                 sz = c_size_t(len(geo_input))
                 buf = create_string_buffer(geo_input)
                 g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
@@ -62,7 +63,7 @@ class GEOSGeometry(object):
                 # Otherwise, the geometry is in WKT form.
                 g = lgeos.GEOSGeomFromWKT(c_char_p(geo_input))
             else:
-                raise GEOSException, 'given string input "%s" unrecognized as WKT or HEXEWKB.' % geo_input
+                raise GEOSException('String or unicode input unrecognized as WKT or HEXEWKB.')
         elif isinstance(geo_input, (IntType, GEOSPointer)):
             # When the input is either a memory address (an integer), or a 
             #  GEOSPointer object.
@@ -84,6 +85,10 @@ class GEOSGeometry(object):
 
         # Setting the SRID, if given.
         if srid and isinstance(srid, int): self.srid = srid
+
+        # Exported HEX from other GEOS geometries will have -1 SRID -- 
+        # set here to 0, when the SRID is not explicitly given.
+        if not srid and from_hex: self.srid = 0
 
         # Setting the class type (e.g., 'Point', 'Polygon', etc.)
         self.__class__ = GEOS_CLASSES[self.geom_type]
@@ -207,19 +212,6 @@ class GEOSGeometry(object):
         self.__class__ = GEOS_CLASSES[gtype]
         if isinstance(self, (Polygon, GeometryCollection)): self._populate()
 
-    #### Psycopg2 database adaptor routines ####
-    def __conform__(self, proto):
-        # Does the given protocol conform to what Psycopg2 expects?
-        if proto == ISQLQuote: 
-            return self
-        else:
-            raise GEOSException, 'Error implementing psycopg2 protocol. Is psycopg2 installed?'
-
-    def getquoted(self):
-        "Returns a properly quoted string for use in PostgreSQL/PostGIS."
-        # Using ST_GeomFromText(), corresponds to SQL/MM ISO standard.
-        return "ST_GeomFromText('%s', %s)" % (self.wkt, self.srid or -1)
-    
     #### Coordinate Sequence Routines ####
     @property
     def has_cs(self):
@@ -425,7 +417,11 @@ class GEOSGeometry(object):
 
     @property
     def hex(self):
-        "Returns the HEXEWKB of the Geometry."
+        """
+        Returns the HEX of the Geometry -- please note that the SRID is not
+        included in this representation, because the GEOS C library uses
+        -1 by default, even if the SRID is set.
+        """
         sz = c_size_t()
         h = lgeos.GEOSGeomToHEX_buf(self._ptr(), byref(sz))
         return string_at(h, sz.value)

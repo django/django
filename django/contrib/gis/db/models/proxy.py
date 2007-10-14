@@ -8,7 +8,7 @@
 
 from types import NoneType, StringType, UnicodeType
 
-class PostGISProxy(object): 
+class GeometryProxy(object): 
     def __init__(self, klass, field): 
         """
         Proxy initializes on the given Geometry class (not an instance) and 

@@ -18,12 +18,6 @@ try:
 except ImportError:
     HAS_NUMPY = False
 
-# Is psycopg2 available?
-try:
-    from psycopg2.extensions import ISQLQuote
-except (ImportError, EnvironmentError):
-    ISQLQuote = None
-
 # Setting the appropriate name for the GEOS-C library, depending on which
 # OS and POSIX platform we're running.
 if os.name == 'nt':

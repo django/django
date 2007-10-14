@@ -6,7 +6,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
 # parse_lookup depends on the spatial database backend.
-from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, UNION
+from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, GEOM_SELECT, TRANSFORM, UNION
 from django.contrib.gis.geos import GEOSGeometry
 
 class GeoQ(Q):
@@ -28,6 +28,11 @@ class GeoQuerySet(QuerySet):
 
         # For replacement fields in the SELECT.
         self._custom_select = {}
+
+        # If GEOM_SELECT is defined in the backend, then it will be used
+        # for the selection format of the geometry column.
+        if GEOM_SELECT: self._geo_fmt = GEOM_SELECT
+        else: self._geo_fmt = '%s'
 
     def _filter_or_exclude(self, mapper, *args, **kwargs):
         # mapper is a callable used to transform Q objects,
@@ -57,10 +62,21 @@ class GeoQuerySet(QuerySet):
         #  GeoQuerySet. Specifically, this allows operations to be done on fields 
         #  in the SELECT, overriding their values -- this is different from using 
         #  QuerySet.extra(select=foo) because extra() adds an  an _additional_ 
-        #  field to be selected.  Used in returning transformed geometries.
+        #  field to be selected.  Used in returning transformed geometries, and
+        #  handling the selection of native database geometry formats.
         for f in opts.fields:
-            if f.column in self._custom_select: select.append(self._custom_select[f.column])
-            else: select.append(self._field_column(f))
+            # Getting the selection format string.
+            if hasattr(f, '_geom'): sel_fmt = self._geo_fmt
+            else: sel_fmt = '%s'
+                
+            # Getting the field selection substitution string
+            if f.column in self._custom_select:
+                fld_sel = self._custom_select[f.column]
+            else:
+                fld_sel = self._field_column(f)
+
+            # Appending the selection 
+            select.append(sel_fmt % fld_sel)
 
         tables = [quote_only_if_word(t) for t in self._tables]
         joins = SortedDict()
@@ -204,13 +220,16 @@ class GeoQuerySet(QuerySet):
         # Is the given field name a geographic field?
         field = self.model._meta.get_field(field_name)
         if not isinstance(field, GeometryField):
-            raise TypeError('ST_Transform() only available for GeometryFields')
+            raise TypeError('%s() only available for GeometryFields' % TRANSFORM)
+
+        # If there's already custom select SQL.
+        col = self._custom_select.get(field.column, self._field_column(field))
 
         # Setting the key for the field's column with the custom SELECT SQL to 
         #  override the geometry column returned from the database.
         self._custom_select[field.column] = \
-            '(ST_Transform(%s, %s)) AS %s' % (self._field_column(field), srid, 
-                                              connection.ops.quote_name(field.column))
+            '(%s(%s, %s)) AS %s' % (TRANSFORM, col, srid,
+                                    connection.ops.quote_name(field.column))
         return self._clone()
 
     def union(self, field_name):

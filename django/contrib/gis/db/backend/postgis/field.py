@@ -1,7 +1,17 @@
+from types import StringType, UnicodeType
+from django.db import connection
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry, GEOSException 
-from django.contrib.gis.db.backend.postgis.query import POSTGIS_TERMS, geo_quotename as quotename
-from types import StringType
+from django.contrib.gis.db.backend.util import GeoFieldSQL
+from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
+from django.contrib.gis.db.backend.postgis.query import POSTGIS_TERMS, TRANSFORM
+from psycopg2 import Binary
+
+# Quotename & geographic quotename, respectively
+qn = connection.ops.quote_name
+def gqn(value):
+    if isinstance(value, UnicodeType): value = value.encode('ascii')
+    return "'%s'" % value
 
 class PostGISField(Field):
     def _add_geom(self, style, db_table):
@@ -10,23 +20,23 @@ class PostGISField(Field):
         AddGeometryColumn(...) PostGIS (and OGC standard) stored procedure.
 
         Takes the style object (provides syntax highlighting) and the
-         database table as parameters.
+        database table as parameters.
         """
         sql = style.SQL_KEYWORD('SELECT ') + \
               style.SQL_TABLE('AddGeometryColumn') + '(' + \
-              style.SQL_TABLE(quotename(db_table)) + ', ' + \
-              style.SQL_FIELD(quotename(self.column)) + ', ' + \
+              style.SQL_TABLE(gqn(db_table)) + ', ' + \
+              style.SQL_FIELD(gqn(self.column)) + ', ' + \
               style.SQL_FIELD(str(self._srid)) + ', ' + \
-              style.SQL_COLTYPE(quotename(self._geom)) + ', ' + \
+              style.SQL_COLTYPE(gqn(self._geom)) + ', ' + \
               style.SQL_KEYWORD(str(self._dim)) + ');'
 
         if not self.null:
             # Add a NOT NULL constraint to the field
             sql += '\n' + \
                    style.SQL_KEYWORD('ALTER TABLE ') + \
-                   style.SQL_TABLE(quotename(db_table, dbl=True)) + \
+                   style.SQL_TABLE(qn(db_table)) + \
                    style.SQL_KEYWORD(' ALTER ') + \
-                   style.SQL_FIELD(quotename(self.column, dbl=True)) + \
+                   style.SQL_FIELD(qn(self.column)) + \
                    style.SQL_KEYWORD(' SET NOT NULL') + ';'
         return sql
     
@@ -34,12 +44,12 @@ class PostGISField(Field):
                     index_type='GIST', index_opts='GIST_GEOMETRY_OPS'):
         "Creates a GiST index for this geometry field."
         sql = style.SQL_KEYWORD('CREATE INDEX ') + \
-              style.SQL_TABLE(quotename('%s_%s_id' % (db_table, self.column), dbl=True)) + \
+              style.SQL_TABLE(qn('%s_%s_id' % (db_table, self.column))) + \
               style.SQL_KEYWORD(' ON ') + \
-              style.SQL_TABLE(quotename(db_table, dbl=True)) + \
+              style.SQL_TABLE(qn(db_table)) + \
               style.SQL_KEYWORD(' USING ') + \
               style.SQL_COLTYPE(index_type) + ' ( ' + \
-              style.SQL_FIELD(quotename(self.column, dbl=True)) + ' ' + \
+              style.SQL_FIELD(qn(self.column)) + ' ' + \
               style.SQL_KEYWORD(index_opts) + ' );'
         return sql
 
@@ -64,8 +74,8 @@ class PostGISField(Field):
         "Drops the geometry column."
         sql = style.SQL_KEYWORD('SELECT ') + \
             style.SQL_KEYWORD('DropGeometryColumn') + '(' + \
-            style.SQL_TABLE(quotename(db_table)) + ', ' + \
-            style.SQL_FIELD(quotename(self.column)) +  ');'
+            style.SQL_TABLE(gqn(db_table)) + ', ' + \
+            style.SQL_FIELD(gqn(self.column)) +  ');'
         return sql
 
     def db_type(self):
@@ -81,26 +91,37 @@ class PostGISField(Field):
         GEOS Geometries for the value.
         """
         if lookup_type in POSTGIS_TERMS:
-            if lookup_type == 'isnull': return [value] # special case for NULL geometries.
-            if not bool(value): return [None] # If invalid value passed in.
+            # special case for isnull lookup
+            if lookup_type == 'isnull':
+                return GeoFieldSQL([], [value])
+
+            # When the input is not a GEOS geometry, attempt to construct one
+            # from the given string input.
             if isinstance(value, GEOSGeometry):
-                # GEOSGeometry instance passed in.
-                if value.srid != self._srid:
-                    # Returning a dictionary instructs the parse_lookup() to add 
-                    # what's in the 'where' key to the where parameters, since we 
-                    # need to transform the geometry in the query.
-                    return {'where' : ["ST_Transform(%s,%s)"],
-                            'params' : [value, self._srid]
-                            }
-                else:
-                    # Just return the GEOSGeometry, it has its own psycopg2 adaptor.
-                    return [value]
-            elif isinstance(value, StringType):
-                # String instance passed in, assuming WKT.
-                # TODO: Any validation needed here to prevent SQL injection?
-                return ["SRID=%d;%s" % (self._srid, value)]
+                pass
+            elif isinstance(value, (StringType, UnicodeType)):
+                try:
+                    value = GEOSGeometry(value)
+                except GEOSException:
+                    raise TypeError("Could not create geometry from lookup value: %s" % str(value))
             else:
-                raise TypeError("Invalid type (%s) used for field lookup value." % str(type(value)))
+                raise TypeError('Cannot use parameter of %s type as lookup parameter.' % type(value))
+
+            # Getting the SRID of the geometry, or defaulting to that of the field if
+            # it is None.
+            if value.srid is None: srid = self._srid
+            else: srid = value.srid
+
+            # The adaptor will be used by psycopg2 for quoting the WKB.
+            adapt = PostGISAdaptor(value, srid)
+
+            if srid != self._srid:
+                # Adding the necessary string substitutions and parameters
+                # to perform a geometry transformation.
+                return GeoFieldSQL(['%s(%%s,%%s)' % TRANSFORM],
+                                       [adapt, self._srid])
+            else:
+                return GeoFieldSQL(['%s'], [adapt])
         else:
             raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
@@ -108,24 +129,25 @@ class PostGISField(Field):
         "Prepares the value for saving in the database."
         if not bool(value): return None
         if isinstance(value, GEOSGeometry):
-            return value
+            return PostGISAdaptor(value, value.srid)
         else:
             raise TypeError('Geometry Proxy should only return GEOSGeometry objects.')
 
     def get_internal_type(self):
         """
-        Returns NoField because a stored procedure is used by PostGIS to create the
+        Returns NoField because a stored procedure is used by PostGIS to create
+        the Geometry Fields.
         """
         return 'NoField'
 
     def get_placeholder(self, value):
         """
         Provides a proper substitution value for Geometries that are not in the
-         SRID of the field.  Specifically, this routine will substitute in the
-         ST_Transform() function call.
+        SRID of the field.  Specifically, this routine will substitute in the
+        ST_Transform() function call.
         """
         if isinstance(value, GEOSGeometry) and value.srid != self._srid:
             # Adding Transform() to the SQL placeholder.
-            return 'ST_Transform(%%s, %s)' % self._srid
+            return '%s(%%s, %s)' % (TRANSFORM, self._srid)
         else:
             return '%s'

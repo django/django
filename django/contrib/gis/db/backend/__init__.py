@@ -11,31 +11,40 @@
      the backend.
  (4) The `parse_lookup` function, used for spatial SQL construction by
      the GeoQuerySet.
- (5) The `create_spatial_db`, `geo_quotename`, and `get_geo_where_clause`
-     routines (needed by `parse_lookup`.
+ (5) The `create_spatial_db`, and `get_geo_where_clause`
+     routines (needed by `parse_lookup`).
 
  Currently only PostGIS is supported, but someday backends will be added for
  additional spatial databases (e.g., Oracle, DB2).
 """
+from types import StringType, UnicodeType
 from django.conf import settings
 from django.db import connection
 from django.db.models.query import field_choices, find_field, get_where_clause, \
     FieldFound, LOOKUP_SEPARATOR, QUERY_TERMS
 from django.utils.datastructures import SortedDict
+from django.contrib.gis.geos import GEOSGeometry
 
-# These routines default to False
-ASGML, ASKML, UNION = (False, False, False)
+# These routines (needed by GeoManager), default to False.
+ASGML, ASKML, TRANSFORM, UNION= (False, False, False, False)
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, 
     # renaming as necessary.
     from django.contrib.gis.db.backend.postgis import \
         PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
-        PostGISProxy as GeometryProxy, \
-        create_spatial_db, geo_quotename, get_geo_where_clause, \
-        ASGML, ASKML, UNION
+        create_spatial_db, get_geo_where_clause, gqn, \
+        ASGML, ASKML, GEOM_SELECT, TRANSFORM, UNION
 else:
     raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_NAME)
+
+def geo_quotename(value):
+    """
+    Returns the quotation used on a given Geometry value using the geometry
+    quoting from the backend (the `gqn` function).
+    """
+    if isinstance(value, (StringType, UnicodeType)): return gqn(value)
+    else: return str(value)
 
 ####    query.py overloaded functions    ####
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py
@@ -263,38 +272,29 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # If the field is a geometry field, then the WHERE clause will need to be obtained
         # with the get_geo_where_clause()
         if hasattr(field, '_geom'):
-            # Do we have multiple arguments, e.g., ST_Relate, ST_DWithin lookup types
-            #  need more than argument.
+            # Do we have multiple arguments, e.g., `relate`, `dwithin` lookup types
+            # need more than argument.
             multiple_args = isinstance(value, tuple)
 
-            # Getting the geographic where clause.
-            gwc = get_geo_where_clause(lookup_type, current_table + '.', column, value)
-
-            # Getting the geographic parameters from the field.
+            # Getting the preparation SQL object from the field.
             if multiple_args:
-                geo_params = field.get_db_prep_lookup(lookup_type, value[0])
+                geo_prep = field.get_db_prep_lookup(lookup_type, value[0])
             else:
-                geo_params = field.get_db_prep_lookup(lookup_type, value)
-     
-            # If a dictionary was passed back from the field modify the where clause.
-            param_dict = isinstance(geo_params, dict)
-            if param_dict:
-                subst_list = geo_params['where']
-                if multiple_args: subst_list += map(geo_quotename, value[1:])
-                geo_params = geo_params['params']  
-                gwc = gwc % tuple(subst_list)
-            elif multiple_args:
-                # Modify the where clause if we have multiple arguments -- the 
-                #  first substitution will be for another placeholder (for the 
-                #  geometry) since it is already apart of geo_params.
-                subst_list = ['%s']
-                subst_list += map(geo_quotename, value[1:])
-                gwc = gwc % tuple(subst_list)
-                
-            # Finally, appending onto the WHERE clause, and extending with any 
-            #  additional parameters.
+                geo_prep = field.get_db_prep_lookup(lookup_type, value)
+
+            # Getting the adapted geometry from the field.
+            gwc = get_geo_where_clause(lookup_type, current_table + '.', column, value)
+            
+            # A GeoFieldSQL object is returned by `get_db_prep_lookup` -- 
+            # getting the substitution list and the geographic parameters.
+            subst_list = geo_prep.where
+            if multiple_args: subst_list += map(geo_quotename, value[1:])
+            gwc = gwc % tuple(subst_list)
+            
+            # Finally, appending onto the WHERE clause, and extending with
+            # the additional parameters.
             where.append(gwc)
-            params.extend(geo_params)
+            params.extend(geo_prep.params)
         else:
             where.append(get_where_clause(lookup_type, current_table + '.', column, value, db_type))
             params.extend(field.get_db_prep_lookup(lookup_type, value))

@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.contrib.gis.db.backend import GeoBackendField, GeometryProxy # these depend on the spatial database backend.
+from django.contrib.gis.db.backend import GeoBackendField # these depend on the spatial database backend.
+from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.oldforms import WKTField
 from django.contrib.gis.geos import GEOSGeometry
 
