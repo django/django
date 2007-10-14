@@ -36,6 +36,7 @@ class WhereNode(tree.Node):
         """
         obj = super(WhereNode, self).__deepcopy__(memodict)
         obj.query = self.query
+        memodict[id(obj)] = obj
         return obj
 
     def as_sql(self, node=None):
