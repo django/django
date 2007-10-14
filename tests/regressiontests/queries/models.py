@@ -21,7 +21,6 @@ class Author(models.Model):
 
 class Item(models.Model):
     name = models.CharField(maxlength=10)
-    data_ = models.CharField(maxlength=10, blank=True, null=True)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
 
@@ -62,7 +61,7 @@ __test__ = {'API_TESTS':"""
 >>> i2 = Item(name='two', creator=a2)
 >>> i2.save()
 >>> i2.tags = [t1, t3]
->>> i3 = Item(name='three', data_='x', creator=a2)
+>>> i3 = Item(name='three', creator=a2)
 >>> i3.save()
 >>> i4 = Item(name='four', creator=a4)
 >>> i4.save()
@@ -129,12 +128,6 @@ Bug #2253
 [<Item: four>, <Item: one>, <Item: three>, <Item: two>]
 >>> (q1 & q2).order_by('name')
 [<Item: one>]
-
-Bug #3265
-# FIXME: Currently causes a crash. Probably not worth fixing, but must make it
-# a validation error in that case.
-# >>> Item.objects.get(data___exact='x')
-# <Item: three>
 
 Bugs #4088 & #4306
 >>> Report.objects.filter(creator=1001)
