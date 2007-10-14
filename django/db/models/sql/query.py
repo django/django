@@ -576,6 +576,7 @@ class Query(object):
                 if not null_point and nullable:
                     null_point = len(join_list)
                 if connection == OR and not split:
+                    # FIXME: Document what's going on and why this is needed.
                     if self.alias_map[joins[0]][ALIAS_REFCOUNT] == 1:
                         split = True
                         self.promote_alias(joins[0])
@@ -595,15 +596,16 @@ class Query(object):
 
         col = target_col or target_field.column
 
-        if target_field is opts.pk and join_list:
-            # An optimization: if the final join is against a primary key,
-            # we can go back one step in the join chain and compare against
-            # the lhs of the join instead. The result (potentially) involves
-            # one less table join.
-            self.unref_alias(alias)
+        if join_list:
+            # An optimization: if the final join is against the same column as
+            # we are comparing against, we can go back one step in the join
+            # chain and compare against the lhs of the join instead. The result
+            # (potentially) involves one less table join.
             join = self.alias_map[join_list[-1][-1]][ALIAS_JOIN]
-            alias = join[LHS_ALIAS]
-            col = join[LHS_JOIN_COL]
+            if col == join[RHS_JOIN_COL]:
+                self.unref_alias(alias)
+                alias = join[LHS_ALIAS]
+                col = join[LHS_JOIN_COL]
 
         if (lookup_type == 'isnull' and value is True):
             # If the comparison is against NULL, we need to use a left outer

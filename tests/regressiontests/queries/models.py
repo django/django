@@ -128,19 +128,15 @@ Bug #2253
 >>> (q1 & q2).order_by('name')
 [<Item: one>]
 
-Bugs #4088 & #4306
+Bugs #4088, #4306
 >>> Report.objects.filter(creator=1001)
 [<Report: r1>]
 >>> Report.objects.filter(creator__num=1001)
 [<Report: r1>]
-
-# FIXME: The "removing final pk comparison" optimization is biting us here.
-# Need to only remove it if the join was also on the pk value.
-# >>> Report.objects.filter(creator__id=1001)
-# []
-# >>> Report.objects.filter(creator__id=a1.id)
-# [<Report: r1>]
-
+>>> Report.objects.filter(creator__id=1001)
+[]
+>>> Report.objects.filter(creator__id=a1.id)
+[<Report: r1>]
 >>> Report.objects.filter(creator__name='a1')
 [<Report: r1>]
 
