@@ -300,7 +300,7 @@ class _QuerySet(object):
         if kwargs:
             clone.query.add_q(mapper(Q(**kwargs)))
         for arg in args:
-            clone.query.add_q(arg)
+            clone.query.add_q(mapper(arg))
         return clone
 
     def complex_filter(self, filter_obj):
@@ -515,7 +515,7 @@ def delete_objects(seen_objs):
         update_query = sql.UpdateQuery(cls, connection)
         for field in cls._meta.fields:
             if field.rel and field.null and field.rel.to in seen_objs:
-                update_query.clear_related(field.column, pk_list)
+                update_query.clear_related(field, pk_list)
 
     # Now delete the actual data
     for cls in ordered_classes:

@@ -54,7 +54,6 @@ MULTI = 'multi'
 SINGLE = 'single'
 NONE = None
 
-# FIXME: Add quote_name() calls around all the tables.
 class Query(object):
     """
     A single SQL query.
@@ -176,6 +175,7 @@ class Query(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
+        qn = self.connection.ops.quote_name
         self.pre_sql_setup()
         result = ['SELECT']
         if self.distinct:
@@ -192,10 +192,10 @@ class Query(object):
             alias_str = (alias != name and ' AS %s' % alias or '')
             if join_type:
                 result.append('%s %s%s ON (%s.%s = %s.%s)'
-                        % (join_type, name, alias_str, lhs, lhs_col, alias,
-                            col))
+                        % (join_type, qn(name), alias_str, qn(lhs),
+                            qn(lhs_col), qn(alias), qn(col)))
             else:
-                result.append('%s%s' % (name, alias_str))
+                result.append('%s%s' % (qn(name), alias_str))
         result.extend(self.extra_tables)
 
         where, params = self.where.as_sql()
@@ -282,12 +282,12 @@ class Query(object):
         elif self.where:
             # rhs has an empty where clause. Make it match everything (see
             # above for reasoning).
-            w = WhereNode()
+            w = WhereNode(self)
             alias = self.join((None, self.model._meta.db_table, None, None))
             pk = self.model._meta.pk
             w.add((alias, pk.column, pk, 'isnull', False), AND)
         else:
-            w = WhereNode()
+            w = WhereNode(self)
         self.where.add(w, connection)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
@@ -334,7 +334,7 @@ class Query(object):
                     result.append(col.as_sql(quote_func=qn))
         else:
             table_alias = self.tables[0]
-            result = ['%s.%s' % (table_alias, qn(f.column))
+            result = ['%s.%s' % (qn(table_alias), qn(f.column))
                     for f in self.model._meta.fields]
 
         # We sort extra_select so that the result columns are in a well-defined
@@ -388,10 +388,10 @@ class Query(object):
                 order = 'ASC'
             if '.' in col:
                 table, col = col.split('.', 1)
-                table = '%s.' % self.table_alias[table]
+                table = '%s.' % qn(self.table_alias(table)[0])
             elif col not in self.extra_select:
                 # Use the root model's database table as the referenced table.
-                table = '%s.' % self.tables[0]
+                table = '%s.' % qn(self.tables[0])
             else:
                 table = ''
             result.append('%s%s %s' % (table,
@@ -685,9 +685,9 @@ class Query(object):
         if field.rel:
             # One-to-one or many-to-one field
             remote_opts = field.rel.to._meta
+            target = field.rel.get_related_field()
             alias = self.join((root_alias, remote_opts.db_table, field.column,
-                    field.rel.field_name))
-            target = remote_opts.get_field(field.rel.field_name)
+                    target.column))
             return [alias], remote_opts, field, target, target.column
 
         # Only remaining possibility is a normal (direct lookup) field. No
@@ -838,8 +838,8 @@ class DeleteQuery(Query):
             if not isinstance(related.field, generic.GenericRelation):
                 for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
                     where = WhereNode(self)
-                    where.add((None, related.field.m2m_reverse_name(), None,
-                            'in',
+                    where.add((None, related.field.m2m_reverse_name(),
+                            related.field, 'in',
                             pk_list[offset : offset+GET_ITERATOR_CHUNK_SIZE]),
                             AND)
                     self.do_query(related.field.m2m_db_table(), where)
@@ -913,9 +913,9 @@ class UpdateQuery(Query):
         This is used by the QuerySet.delete_objects() method.
         """
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            where = WhereNode()
+            where = WhereNode(self)
             f = self.model._meta.pk
-            where.add((None, f, f.db_type(), 'in',
+            where.add((None, f.column, f, 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
             values = [(related_field.column, 'NULL')]

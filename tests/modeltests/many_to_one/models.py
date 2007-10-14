@@ -145,18 +145,18 @@ False
 [<Article: John's second story>, <Article: This is a test>]
 
 # The underlying query only makes one join when a related table is referenced twice.
->>> query = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
->>> null, sql, null = query._get_sql_clause()
+>>> queryset = Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+>>> sql = queryset.query.as_sql()[0]
 >>> sql.count('INNER JOIN')
 1
 
 # The automatically joined table has a predictable name.
->>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='Smith'"])
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_reporter.last_name='Smith'"])
 [<Article: John's second story>, <Article: This is a test>]
 
 # And should work fine with the unicode that comes out of
 # newforms.Form.cleaned_data
->>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_article__reporter.last_name='%s'" % u'Smith'])
+>>> Article.objects.filter(reporter__first_name__exact='John').extra(where=["many_to_one_reporter.last_name='%s'" % u'Smith'])
 [<Article: John's second story>, <Article: This is a test>]
 
 # Find all Articles for the Reporter whose ID is 1.

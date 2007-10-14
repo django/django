@@ -70,11 +70,10 @@ class WhereNode(tree.Node):
                     params = child[2].get_db_prep_lookup(child[3], child[4])
                     format = '%s'
                 except EmptyResultSet:
-                    if node.negated:
-                        # If this is a "not" atom, being empty means it has no
-                        # effect on the result, so we can ignore it.
-                        continue
-                    raise
+                    if self.connection == AND and not node.negated:
+                        # We can bail out early in this particular case (only).
+                        raise
+                    sql = None
             if sql:
                 result.append(format % sql)
                 result_params.extend(params)
@@ -92,10 +91,11 @@ class WhereNode(tree.Node):
         """
         table_alias, name, field, lookup_type, value = child
         conn = self.query.connection
+        qn = conn.ops.quote_name
         if table_alias:
-            lhs = '%s.%s' % (table_alias, conn.ops.quote_name(name))
+            lhs = '%s.%s' % (qn(table_alias), qn(name))
         else:
-            lhs = conn.ops.quote_name(name)
+            lhs = qn(name)
         db_type = field and field.db_type() or None
         field_sql = conn.ops.field_cast_sql(db_type) % lhs
 
