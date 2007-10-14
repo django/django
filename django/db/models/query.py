@@ -251,7 +251,7 @@ class _QuerySet(object):
     ##################################################
 
     def values(self, *fields):
-        return self._clone(klass=ValuesQuerySet, _fields=fields)
+        return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
 
     def dates(self, field_name, kind, order='ASC'):
         """
@@ -266,8 +266,8 @@ class _QuerySet(object):
         field = self.model._meta.get_field(field_name, many_to_many=False)
         assert isinstance(field, DateField), "%r isn't a DateField." \
                 % field_name
-        return self._clone(klass=DateQuerySet, _field=field, _kind=kind,
-                _order=order)
+        return self._clone(klass=DateQuerySet, setup=True, _field=field,
+                _kind=kind, _order=order)
 
     ##################################################################
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
@@ -363,13 +363,15 @@ class _QuerySet(object):
     # PRIVATE METHODS #
     ###################
 
-    def _clone(self, klass=None, **kwargs):
+    def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
             klass = self.__class__
         c = klass()
         c.model = self.model
         c.query = self.query.clone()
         c.__dict__.update(kwargs)
+        if setup and hasattr(c, '_setup_query'):
+            c._setup_query()
         return c
 
     def _get_data(self):
@@ -389,16 +391,33 @@ class ValuesQuerySet(QuerySet):
         # select_related isn't supported in values().
         self.query.select_related = False
 
+        # QuerySet.clone() will also set up the _fields attribute with the
+        # names of the model fields to select.
+
     def iterator(self):
         extra_select = self.query.extra_select.keys()
         extra_select.sort()
+        if extra_select:
+            self.field_names.extend([f for f in extra_select])
 
-        # Construct two objects -- fields and field_names.
-        # fields is a list of Field objects to fetch.
-        # field_names is a list of field names, which will be the keys in the
-        # resulting dictionaries.
+        for row in self.query.results_iter():
+            yield dict(zip(self.field_names, row))
+
+    def _setup_query(self):
+        """
+        Sets up any special features of the query attribute.
+
+        Called by the _clone() method after initialising the rest of the
+        instance.
+        """
+        # Construct two objects:
+        #   - fields is a list of Field objects to fetch.
+        #   - field_names is a list of field names, which will be the keys in
+        #   the resulting dictionaries.
+        # 'fields' is used to configure the query, whilst field_names is stored
+        # in this object for use by iterator().
         if self._fields:
-            if not extra_select:
+            if not self.query.extra_select:
                 fields = [self.model._meta.get_field(f, many_to_many=False)
                         for f in self._fields]
                 field_names = self._fields
@@ -418,30 +437,42 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in fields]
 
         self.query.add_local_columns([f.column for f in fields])
-        if extra_select:
-            field_names.extend([f for f in extra_select])
+        self.field_names = field_names
 
-        for row in self.query.results_iter():
-            yield dict(zip(field_names, row))
-
-    def _clone(self, klass=None, **kwargs):
+    def _clone(self, klass=None, setup=False, **kwargs):
+        """
+        Cloning a ValuesQuerySet preserves the current fields.
+        """
         c = super(ValuesQuerySet, self)._clone(klass, **kwargs)
         c._fields = self._fields[:]
+        c.field_names = self.field_names[:]
+        if setup and hasattr(c, '_setup_query'):
+            c._setup_query()
         return c
 
 class DateQuerySet(QuerySet):
     def iterator(self):
-        self.query = self.query.clone(klass=sql.DateQuery)
+        return self.query.results_iter()
+
+    def _setup_query(self):
+        """
+        Sets up any special features of the query attribute.
+
+        Called by the _clone() method after initialising the rest of the
+        instance.
+        """
+        self.query = self.query.clone(klass=sql.DateQuery, setup=True)
         self.query.select = []
         self.query.add_date_select(self._field.column, self._kind, self._order)
         if self._field.null:
             self.query.add_filter(('%s__isnull' % self._field.name, True))
-        return self.query.results_iter()
 
-    def _clone(self, klass=None, **kwargs):
-        c = super(DateQuerySet, self)._clone(klass, **kwargs)
+    def _clone(self, klass=None, setup=False, **kwargs):
+        c = super(DateQuerySet, self)._clone(klass, False, **kwargs)
         c._field = self._field
         c._kind = self._kind
+        if setup and hasattr(c, '_setup_query'):
+            c._setup_query()
         return c
 
 class EmptyQuerySet(QuerySet):
@@ -455,14 +486,14 @@ class EmptyQuerySet(QuerySet):
     def delete(self):
         pass
 
-    def _clone(self, klass=None, **kwargs):
+    def _clone(self, klass=None, setup=False, **kwargs):
         c = super(EmptyQuerySet, self)._clone(klass, **kwargs)
         c._result_cache = []
         return c
 
     def iterator(self):
         # This slightly odd construction is because we need an empty generator
-        # (it should raise StopIteration immediately).
+        # (it raises StopIteration immediately).
         yield iter([]).next()
 
 # QOperator, QAnd and QOr are temporarily retained for backwards compatibility.

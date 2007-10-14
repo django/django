@@ -32,12 +32,12 @@ class Count(Aggregate):
     """
     Perform a count on the given column.
     """
-    def __init__(self, col=None, distinct=False):
+    def __init__(self, col='*', distinct=False):
         """
         Set the column to count on (defaults to '*') and set whether the count
         should be distinct or not.
         """
-        self.col = col and col or '*'
+        self.col = col
         self.distinct = distinct
 
     def relabel_aliases(self, change_map):
@@ -49,13 +49,13 @@ class Count(Aggregate):
         if not quote_func:
             quote_func = lambda x: x
         if isinstance(self.col, (list, tuple)):
-            col = '%s.%s' % tuple([quote_func(c) for c in self.col])
+            col = ('%s.%s' % tuple([quote_func(c) for c in self.col]))
         else:
             col = self.col
         if self.distinct:
-            return 'COUNT(DISTINCT(%s))' % col
+            return 'COUNT(DISTINCT %s)' % col
         else:
-            return 'COUNT(%s)' % col
+            return 'COUNT(%s)' % self.col
 
 class Date(object):
     """

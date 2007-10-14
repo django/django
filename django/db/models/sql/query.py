@@ -147,15 +147,17 @@ class Query(object):
 
     def get_count(self):
         """
-        Performs a COUNT() or COUNT(DISTINCT()) query, as appropriate, using
-        the current filter constraints.
+        Performs a COUNT() query using the current filter constraints.
         """
-        counter = self.clone()
-        counter.clear_ordering()
-        counter.clear_limits()
-        counter.select_related = False
-        counter.add_count_column()
-        data = counter.execute_sql(SINGLE)
+        obj = self.clone()
+        obj.clear_ordering()
+        obj.clear_limits()
+        obj.select_related = False
+        if obj.distinct and len(obj.select) > 1:
+            obj = self.clone(CountQuery, _query=obj, where=WhereNode(self),
+                    distinct=False)
+        obj.add_count_column()
+        data = obj.execute_sql(SINGLE)
         if not data:
             return 0
         number = data[0]
@@ -176,7 +178,6 @@ class Query(object):
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
-        qn = self.connection.ops.quote_name
         self.pre_sql_setup()
         result = ['SELECT']
         if self.distinct:
@@ -185,21 +186,12 @@ class Query(object):
         result.append(', '.join(out_cols))
 
         result.append('FROM')
-        for alias in self.tables:
-            if not self.alias_map[alias][ALIAS_REFCOUNT]:
-                continue
-            name, alias, join_type, lhs, lhs_col, col = \
-                    self.alias_map[alias][ALIAS_JOIN]
-            alias_str = (alias != name and ' AS %s' % alias or '')
-            if join_type:
-                result.append('%s %s%s ON (%s.%s = %s.%s)'
-                        % (join_type, qn(name), alias_str, qn(lhs),
-                            qn(lhs_col), qn(alias), qn(col)))
-            else:
-                result.append('%s%s' % (qn(name), alias_str))
-        result.extend(self.extra_tables)
+        from_, f_params = self.get_from_clause()
+        result.extend(from_)
+        params = list(f_params)
 
-        where, params = self.where.as_sql()
+        where, w_params = self.where.as_sql()
+        params.extend(w_params)
         if where:
             result.append('WHERE %s' % where)
         if self.extra_where:
@@ -347,6 +339,30 @@ class Query(object):
         result.extend(['(%s) AS %s' % (col, alias)
                 for alias, col in extra_select])
         return result
+
+    def get_from_clause(self):
+        """
+        Returns a list of strings that are joined together to go after the
+        "FROM" part of the query, as well as any extra parameters that need to
+        be included. Sub-classes, can override this to create a from-clause via
+        a "select", for example (e.g. CountQuery).
+        """
+        result = []
+        qn = self.connection.ops.quote_name
+        for alias in self.tables:
+            if not self.alias_map[alias][ALIAS_REFCOUNT]:
+                continue
+            name, alias, join_type, lhs, lhs_col, col = \
+                    self.alias_map[alias][ALIAS_JOIN]
+            alias_str = (alias != name and ' AS %s' % alias or '')
+            if join_type:
+                result.append('%s %s%s ON (%s.%s = %s.%s)'
+                        % (join_type, qn(name), alias_str, qn(lhs),
+                            qn(lhs_col), qn(alias), qn(col)))
+            else:
+                result.append('%s%s' % (qn(name), alias_str))
+        result.extend(self.extra_tables)
+        return result, []
 
     def get_grouping(self):
         """
@@ -787,8 +803,17 @@ class Query(object):
         if not self.distinct:
             select = Count()
         else:
-            select = Count((self.table_map[self.model._meta.db_table][0],
-                    self.model._meta.pk.column), True)
+            opts = self.model._meta
+            if not self.select:
+                select = Count((self.join((None, opts.db_table, None, None)),
+                        opts.pk.column), True)
+            else:
+                # Because of SQL portability issues, multi-column, distinct
+                # counts need a sub-query -- see get_count() for details.
+                assert len(self.select) == 1, \
+                        "Cannot add count col with multiple cols in 'select'."
+                select = Count(self.select[0], True)
+
             # Distinct handling is done in Count(), so don't do it at this
             # level.
             self.distinct = False
@@ -986,6 +1011,16 @@ class DateQuery(Query):
             self.group_by = [1]
         else:
             self.group_by = [select]
+
+class CountQuery(Query):
+    """
+    A CountQuery knows how to take a normal query which would select over
+    multiple distinct columns and turn it into SQL that can be used on a
+    variety of backends (it requires a select in the FROM clause).
+    """
+    def get_from_clause(self):
+        result, params = self._query.as_sql()
+        return ['(%s) AS A1' % result], params
 
 def find_field(name, field_list, related_query):
     """

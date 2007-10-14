@@ -111,10 +111,17 @@ Bug #2080, #3592
 >>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
 [<Author: a1>, <Author: a3>]
 
-Bug #2939
-# FIXME: ValueQuerySets don't work yet.
-# >>> Item.objects.values('creator').distinct().count()
-# 2
+Bug #1878, #2939
+>>> Item.objects.values('creator').distinct().count()
+3
+
+# Create something with a duplicate 'name' so that we can test multi-column
+# cases (which require some tricky SQL transformations under the covers).
+>>> xx = Item(name='four', creator=a2)
+>>> xx.save()
+>>> Item.objects.exclude(name='two').values('creator', 'name').distinct().count()
+4
+>>> xx.delete()
 
 Bug #2253
 >>> q1 = Item.objects.order_by('name')
