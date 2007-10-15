@@ -100,7 +100,7 @@ __test__ = {'API_TESTS':"""
 
 # However, a select_related() call will fill in those related objects without any extra queries:
 >>> db.reset_queries()
->>> person = Species.objects.select_related().get(name="sapiens")
+>>> person = Species.objects.select_related(depth=10).get(name="sapiens")
 >>> person.genus.family.order.klass.phylum.kingdom.domain
 <Domain: Eukaryota>
 >>> len(db.connection.queries)
