@@ -514,10 +514,24 @@ like so::
 Note: ``order_by('?')`` queries may be expensive and slow, depending on the
 database backend you're using.
 
-To order by a field in a different table, add the other table's name and a dot,
-like so::
+To order by a field in a different model, use the same syntax as when you are
+querying across model relations. That is, the name of the field, followed by a
+double underscore (``__``), followed by the name of the field in the new model,
+and so on for as many models as you want to join. For example::
 
-    Entry.objects.order_by('blogs_blog.name', 'headline')
+    Entry.objects.order_by('blog__name', 'headline')
+
+If you try to order by a field that is a relation to another model, Django will
+use the default ordering on the related model (or order by the related model's
+primary key if there is no ``Meta.ordering`` specified. For example::
+
+    Entry.objects.order_by('blog')
+
+...is identical to::
+
+    Entry.objects.order_by('blog__id')
+
+...since the ``Blog`` model has no default ordering specified.
 
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
@@ -705,8 +719,8 @@ follow::
 
 The ``depth`` argument is new in the Django development version.
 
-``extra(select=None, where=None, params=None, tables=None)``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+``extra(select=None, where=None, params=None, tables=None, order_by=None)``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sometimes, the Django query syntax by itself can't easily express a complex
 ``WHERE`` clause. For these edge cases, Django provides the ``extra()``
@@ -778,6 +792,27 @@ of the arguments is required, but you should use at least one of them.
     ...translates (roughly) into the following SQL::
 
         SELECT * FROM blog_entry WHERE id IN (3, 4, 5, 20);
+
+``order_by``
+    If you need to order the resulting queryset using some of the new fields
+    or tables you have included via ``extra()`` use the ``order_by`` parameter
+    to ``extra()`` and pass in a sequence of strings. These strings should
+    either be model fields (as in the normal ``order_by()`` method on
+    querysets), of the form ``table_name.column_name`` or an alias for a column
+    that you specified in the ``select`` parameter to ``extra()``.
+
+    For example::
+
+        q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+        q = q.extra(order_by = ['-is_recent'])
+
+    This would sort all the items for which ``is_recent`` is true to the front
+    of the result set (``True`` sorts before ``False`` in a descending
+    ordering).
+
+    This shows, by the way, that you can make multiple calls to
+    ``extra()`` and it will behave as you expect (adding new constraints each
+    time).
 
 ``params``
     The ``select`` and ``where`` parameters described above may use standard
