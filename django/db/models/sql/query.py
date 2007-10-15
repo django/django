@@ -75,6 +75,7 @@ class Query(object):
         self.table_map = {}     # Maps table names to list of aliases.
         self.join_map = {}      # Maps join_tuple to list of aliases.
         self.rev_join_map = {}  # Reverse of join_map.
+        self.default_cols = True
 
         # SQL-related attributes
         self.select = []
@@ -129,6 +130,7 @@ class Query(object):
         obj.alias_map = copy.deepcopy(self.alias_map)
         obj.join_map = copy.deepcopy(self.join_map)
         obj.rev_join_map = copy.deepcopy(self.rev_join_map)
+        obj.default_cols = self.default_cols
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = copy.deepcopy(self.where)
@@ -353,7 +355,7 @@ class Query(object):
                     result.append(col.as_sql(quote_func=qn))
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
-        else:
+        elif self.default_cols:
             table_alias = self.tables[0]
             result = ['%s.%s' % (qn(table_alias), qn(f.column))
                     for f in self.model._meta.fields]

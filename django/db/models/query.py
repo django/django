@@ -416,6 +416,7 @@ class ValuesQuerySet(QuerySet):
             field_names = [f.attname for f in fields]
 
         self.query.add_local_columns([f.column for f in fields])
+        self.query.default_cols = False
         self.field_names = field_names
 
     def _clone(self, klass=None, setup=False, **kwargs):
