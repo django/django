@@ -533,6 +533,11 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 
 ...since the ``Blog`` model has no default ordering specified.
 
+**New in Django development version:** The syntax for ordering across related
+models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
+
+.. _Django 0.96 documentation: http://www.djangoproject.com/documentation/0.96/model-api/#floatfield
+
 There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
@@ -606,6 +611,9 @@ A couple of subtleties that are worth mentioning:
 
         >>> Entry.objects.values('blog_id')
         [{'blog_id': 1}, ...]
+
+**New in Django development version:** Previously, it was not possible to pass
+``blog_id`` to ``values()`` in the above example, only ``blog``.
 
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
@@ -1563,9 +1571,9 @@ This is equivalent to the following SQL ``WHERE`` clause::
 You can compose statements of arbitrary complexity by combining ``Q`` objects
 with the ``&`` and ``|`` operators. You can also use parenthetical grouping.
 
-``Q`` objects can also be negated using the ``~`` operator, allowing for
-combined lookups that combine both a normal query and a negated (``NOT``)
-query::
+**New in Django development version:** ``Q`` objects can also be negated using
+the ``~`` operator, allowing for combined lookups that combine both a normal
+query and a negated (``NOT``) query::
 
     Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
