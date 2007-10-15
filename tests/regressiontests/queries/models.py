@@ -353,5 +353,9 @@ True
 >>> ExtraInfo.objects.values('note')
 [{'note': 1}, {'note': 2}]
 
+# Bug 5261
+>>> Note.objects.exclude(Q())
+[<Note: n1>, <Note: n2>, <Note: n3>]
+
 """}
 
