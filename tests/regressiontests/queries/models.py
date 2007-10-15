@@ -14,6 +14,7 @@ class Tag(models.Model):
 
 class Note(models.Model):
     note = models.CharField(maxlength=100)
+    misc = models.CharField(maxlength=10)
 
     class Meta:
         ordering = ['note']
@@ -91,11 +92,11 @@ __test__ = {'API_TESTS':"""
 >>> t5 = Tag(name='t5', parent=t3)
 >>> t5.save()
 
->>> n1 = Note(note='n1')
+>>> n1 = Note(note='n1', misc='foo')
 >>> n1.save()
->>> n2 = Note(note='n2')
+>>> n2 = Note(note='n2', misc='bar')
 >>> n2.save()
->>> n3 = Note(note='n3')
+>>> n3 = Note(note='n3', misc='foo')
 >>> n3.save()
 
 Create these out of order so that sorting by 'id' will be different to sorting
@@ -329,5 +330,9 @@ Bugs #2874, #3002
 Bug #3037
 >>> Item.objects.filter(Q(creator__name='a3', name='two')|Q(creator__name='a4', name='four'))
 [<Item: four>]
+
+Bug #5321
+>>> Note.objects.values('misc').distinct().order_by('note', '-misc')
+[{'misc': u'foo'}, {'misc': u'bar'}]
 """}
 

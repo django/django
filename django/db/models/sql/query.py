@@ -342,16 +342,22 @@ class Query(object):
         """
         qn = self.quote_name_unless_alias
         result = []
+        aliases = []
         if self.select:
             for col in self.select:
                 if isinstance(col, (list, tuple)):
-                    result.append('%s.%s' % (qn(col[0]), qn(col[1])))
+                    r = '%s.%s' % (qn(col[0]), qn(col[1]))
+                    result.append(r)
+                    aliases.append(r)
                 else:
                     result.append(col.as_sql(quote_func=qn))
+                    if hasattr(col, 'alias'):
+                        aliases.append(col.alias)
         else:
             table_alias = self.tables[0]
             result = ['%s.%s' % (qn(table_alias), qn(f.column))
                     for f in self.model._meta.fields]
+            aliases = result[:]
 
         # We sort extra_select so that the result columns are in a well-defined
         # order (and thus QuerySet.iterator can extract them correctly).
@@ -359,6 +365,9 @@ class Query(object):
         extra_select.sort()
         result.extend(['(%s) AS %s' % (col, alias)
                 for alias, col in extra_select])
+        aliases.extend(self.extra_select.keys())
+
+        self._select_aliases = dict.fromkeys(aliases)
         return result
 
     def get_from_clause(self):
@@ -435,6 +444,8 @@ class Query(object):
             # is handled in the previous test.
             ordering = self.order_by or self.model._meta.ordering
         qn = self.quote_name_unless_alias
+        distinct = self.distinct
+        select_aliases = self._select_aliases
         result = []
         for field in ordering:
             if field == '?':
@@ -454,17 +465,22 @@ class Query(object):
                 # necessary.
                 col, order = get_order_dir(field)
                 table, col = col.split('.', 1)
-                result.append('%s.%s %s' % (qn(self.table_alias(table)[0]), col,
-                        order))
+                elt = '%s.%s' % (qn(self.table_alias(table)[0]), col)
+                if not distinct or elt in select_aliases:
+                    result.append('%s %s' % (elt, order))
             elif get_order_dir(field)[0] not in self.extra_select:
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # 'field1__field2__field', etc.
                 for table, col, order in self.find_ordering_name(field,
                         self.model._meta):
-                    result.append('%s.%s %s' % (qn(table), qn(col), order))
+                    elt = '%s.%s' % (qn(table), qn(col))
+                    if not distinct or elt in select_aliases:
+                        result.append('%s %s' % (elt, order))
             else:
                 col, order = get_order_dir(field)
-                result.append('%s %s' % (qn(col), order))
+                elt = qn(col)
+                if not distinct or elt in select_aliases:
+                    result.append('%s %s' % (elt, order))
         return result
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC'):
