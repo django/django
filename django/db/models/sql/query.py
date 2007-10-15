@@ -87,7 +87,10 @@ class Query(object):
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
         self.select_related = False
-        self.max_depth = 0
+
+        # Arbitrary maximum limit for select_related to prevent infinite
+        # recursion. Can be changed by the depth parameter to select_related().
+        self.max_depth = 5
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.

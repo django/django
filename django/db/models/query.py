@@ -294,7 +294,8 @@ class _QuerySet(object):
         """Returns a new QuerySet instance that will select related objects."""
         obj = self._clone()
         obj.query.select_related = true_or_false
-        obj.query.max_depth = depth
+        if depth:
+            obj.query.max_depth = depth
         return obj
 
     def order_by(self, *field_names):

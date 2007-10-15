@@ -80,6 +80,14 @@ class Cover(models.Model):
     def __unicode__(self):
         return self.title
 
+# Some funky cross-linked models for testing a couple of infinite recursion
+# cases.
+class X(models.Model):
+    y = models.ForeignKey('Y')
+
+class Y(models.Model):
+    x1 = models.ForeignKey(X, related_name='y1')
+
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
 >>> t1.save()
@@ -353,9 +361,18 @@ True
 >>> ExtraInfo.objects.values('note')
 [{'note': 1}, {'note': 2}]
 
-# Bug 5261
+Bug #5261
 >>> Note.objects.exclude(Q())
 [<Note: n1>, <Note: n2>, <Note: n3>]
+
+Bug #3045, #3288
+Once upon a time, select_related() with circular relations would loop
+infinitely if you forgot to specify "depth". Now we set an arbitrary default
+upper bound.
+>>> X.objects.all()
+[]
+>>> X.objects.select_related()
+[]
 
 """}
 
