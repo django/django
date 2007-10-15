@@ -334,5 +334,24 @@ Bug #3037
 Bug #5321
 >>> Note.objects.values('misc').distinct().order_by('note', '-misc')
 [{'misc': u'foo'}, {'misc': u'bar'}]
+
+Bug #4358
+If you don't pass any fields to values(), relation fields are returned as
+"foo_id" keys, not "foo". For consistency, you should be able to pass "foo_id"
+in the fields list and have it work, too. We actually allow both "foo" and
+"foo_id".
+
+# The *_id version is returned by default.
+>>> 'note_id' in ExtraInfo.objects.values()[0]
+True
+
+# You can also pass it in explicitly.
+>>> ExtraInfo.objects.values('note_id')
+[{'note_id': 1}, {'note_id': 2}]
+
+# ...or use the field name.
+>>> ExtraInfo.objects.values('note')
+[{'note': 1}, {'note': 2}]
+
 """}
 

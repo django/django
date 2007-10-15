@@ -583,6 +583,30 @@ Example::
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
+A couple of subtleties that are worth mentioning:
+
+    * The ``values()`` method does not return anything for ``ManyToManyField``
+      attributes and will raise an error if you try to pass in this type of
+      field to it.
+    * If you have a field called ``foo`` that is a ``ForeignKey``, the default
+      ``values()`` call will return a dictionary key called ``foo_id``, since
+      this is the name of the hidden model attribute that stores the actual
+      value (the ``foo`` attribute refers to the related model). When you are
+      calling ``values()`` and passing in field names, you can pass in either
+      ``foo`` or ``foo_id`` and you will get back the same thing (the
+      dictionary key will match the field name you passed in).
+
+      For example::
+
+        >>> Entry.objects.values()
+        [{'blog_id: 1, 'headline': u'First Entry', ...}, ...]
+
+        >>> Entry.objects.values('blog')
+        [{'blog': 1}, ...]
+
+        >>> Entry.objects.values('blog_id')
+        [{'blog_id': 1}, ...]
+
 A ``ValuesQuerySet`` is useful when you know you're only going to need values
 from a small number of the available fields and you won't need the
 functionality of a model instance object. It's more efficient to select only

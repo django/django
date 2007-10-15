@@ -391,17 +391,22 @@ class ValuesQuerySet(QuerySet):
         # 'fields' is used to configure the query, whilst field_names is stored
         # in this object for use by iterator().
         if self._fields:
+            opts = self.model._meta
+            all = dict([(field.column, field) for field in opts.fields])
+            all.update([(field.name, field) for field in opts.fields])
             if not self.query.extra_select:
-                fields = [self.model._meta.get_field(f, many_to_many=False)
-                        for f in self._fields]
+                try:
+                    fields = [all[f] for f in self._fields]
+                except KeyError, e:
+                    raise FieldDoesNotExist('%s has no field named %r'
+                                % (opts.object_name, e.args[0]))
                 field_names = self._fields
             else:
                 fields = []
                 field_names = []
                 for f in self._fields:
-                    if f in [field.name for field in self.model._meta.fields]:
-                        fields.append(self.model._meta.get_field(f,
-                                many_to_many=False))
+                    if f in all:
+                        fields.append(all[f])
                         field_names.append(f)
                     elif not self.query.extra_select.has_key(f):
                         raise FieldDoesNotExist('%s has no field named %r'
