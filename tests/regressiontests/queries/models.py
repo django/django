@@ -325,5 +325,9 @@ Bugs #2874, #3002
 # entries in the SQL. The two Note items should be different.
 >>> qs[0].note, qs[0].creator.extra.note
 (<Note: n2>, <Note: n1>)
+
+Bug #3037
+>>> Item.objects.filter(Q(creator__name='a3', name='two')|Q(creator__name='a4', name='four'))
+[<Item: four>]
 """}
 
