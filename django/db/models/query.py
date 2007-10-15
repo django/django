@@ -96,7 +96,7 @@ class _QuerySet(object):
             else:
                 obj = self.model(*row[:index_end])
             for i, k in enumerate(extra_select):
-                setattr(obj, k[0], row[index_end + i])
+                setattr(obj, k, row[index_end + i])
             yield obj
 
     def count(self):

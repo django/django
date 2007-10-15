@@ -342,7 +342,7 @@ class Query(object):
         """
         qn = self.quote_name_unless_alias
         result = []
-        if self.select or self.extra_select:
+        if self.select:
             for col in self.select:
                 if isinstance(col, (list, tuple)):
                     result.append('%s.%s' % (qn(col[0]), qn(col[1])))
