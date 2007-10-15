@@ -289,6 +289,11 @@ Bug #2076
 >>> Author.objects.order_by('extra', '-name')
 [<Author: a2>, <Author: a1>, <Author: a4>, <Author: a3>]
 
+# Using remote model default ordering can span multiple models (in this case,
+# Cover is ordered by Item's default, which uses Note's default).
+>>> Cover.objects.all()
+[<Cover: first>, <Cover: second>]
+
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.
 >>> Item.objects.order_by('creator', 'name')
@@ -300,8 +305,10 @@ Bug #2076
 >>> Ranking.objects.all().order_by('rank')
 [<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
 
->>> Cover.objects.all()
-[<Cover: first>, <Cover: second>]
+# Ordering of extra() pieces is possible, too and you can mix extra fields and
+# model fields in the ordering.
+>>> Ranking.objects.extra(tables=['django_site'], order_by=['-django_site.id', 'rank'])
+[<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
 
 Bugs #2874, #3002
 >>> qs = Item.objects.select_related().order_by('note__note', 'name')

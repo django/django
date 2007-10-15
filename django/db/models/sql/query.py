@@ -378,9 +378,14 @@ class Query(object):
         for alias in self.tables:
             if not self.alias_map[alias][ALIAS_REFCOUNT]:
                 continue
-            name, alias, join_type, lhs, lhs_col, col = \
-                    self.alias_map[alias][ALIAS_JOIN]
-            alias_str = (alias != name and ' AS %s' % alias or '')
+            join = self.alias_map[alias][ALIAS_JOIN]
+            if join:
+                name, alias, join_type, lhs, lhs_col, col = join
+                alias_str = (alias != name and ' AS %s' % alias or '')
+            else:
+                join_type = None
+                alias_str = ''
+                name = alias
             if join_type:
                 result.append('%s %s%s ON (%s.%s = %s.%s)'
                         % (join_type, qn(name), alias_str, qn(lhs),
@@ -464,8 +469,8 @@ class Query(object):
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC'):
         """
-        Returns the table alias (the name might not be unambiguous, the alias
-        will be) and column name for ordering by the given 'name' parameter.
+        Returns the table alias (the name might be ambiguous, the alias will
+        not be) and column name for ordering by the given 'name' parameter.
         The 'name' is of the form 'field1__field2__...__fieldN'.
         """
         name, order = get_order_dir(name, default_order)

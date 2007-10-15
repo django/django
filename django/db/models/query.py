@@ -313,11 +313,10 @@ class _QuerySet(object):
         obj.query.distinct = true_or_false
         return obj
 
-    def extra(self, select=None, where=None, params=None, tables=None):
+    def extra(self, select=None, where=None, params=None, tables=None,
+            order_by=None):
         """
-        Add extra SQL fragments to the query. These are applied more or less
-        verbatim (no quoting, no alias renaming, etc), so care should be taken
-        when using extra() with other complex filters and combinations.
+        Add extra SQL fragments to the query.
         """
         assert self.query.can_filter(), \
                 "Cannot change a query once a slice has been taken"
@@ -330,6 +329,8 @@ class _QuerySet(object):
             clone.query.extra_params.extend(params)
         if tables:
             clone.query.extra_tables.extend(tables)
+        if order_by:
+            clone.query.extra_order_by.extend(order_by)
         return clone
 
     ###################
