@@ -90,6 +90,17 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.filter(Q(headline__contains='bye'), headline__startswith='Hello')
 [<Article: Hello and goodbye>]
 
+# Q objects can be negated
+>>> Article.objects.filter(Q(pk=1) | ~Q(pk=2))
+[<Article: Hello>, <Article: Hello and goodbye>]
+>>> Article.objects.filter(~Q(pk=1) & ~Q(pk=2))
+[<Article: Hello and goodbye>]
+
+# This allows for more complex queries than filter() and exclude() alone would
+# allow
+>>> Article.objects.filter(Q(pk=1) & (~Q(pk=2) | Q(pk=3)))
+[<Article: Hello>]
+
 # Try some arg queries with operations other than get_list
 >>> Article.objects.get(Q(headline__startswith='Hello'), Q(headline__contains='bye'))
 <Article: Hello and goodbye>

@@ -40,6 +40,9 @@ class Q(tree.Node):
     def __and__(self, other):
         return self._combine(other, self.AND)
 
+    def __invert__(self):
+        return QNot(self)
+
 class QNot(Q):
     """
     Encapsulates the negation of a Q object.
@@ -49,4 +52,7 @@ class QNot(Q):
         super(QNot, self).__init__()
         self.add(q, self.AND)
         self.negate()
+
+    def __invert__(self):
+        return self.children[0]
 

@@ -211,11 +211,11 @@ Saving ForeignKey and ManyToManyField fields
 --------------------------------------------
 
 Updating ``ForeignKey`` fields works exactly the same way as saving a normal
-field; simply assign an object of the right type to the field in question:: 
+field; simply assign an object of the right type to the field in question::
 
-    cheese_blog = Blog.objects.get(name="Cheddar Talk") 
-    entry.blog = cheese_blog 
-    entry.save() 
+    cheese_blog = Blog.objects.get(name="Cheddar Talk")
+    entry.blog = cheese_blog
+    entry.save()
 
 Updating a ``ManyToManyField`` works a little differently; use the ``add()``
 method on the field to add a record to the relation::
@@ -1562,6 +1562,12 @@ This is equivalent to the following SQL ``WHERE`` clause::
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
 with the ``&`` and ``|`` operators. You can also use parenthetical grouping.
+
+``Q`` objects can also be negated using the ``~`` operator, allowing for
+combined lookups that combine both a normal query and a negated (``NOT``)
+query::
+
+    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
 Each lookup function that takes keyword-arguments (e.g. ``filter()``,
 ``exclude()``, ``get()``) can also be passed one or more ``Q`` objects as
