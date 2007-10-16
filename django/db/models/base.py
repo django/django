@@ -228,10 +228,11 @@ class Model(object):
             # If it does already exist, do an UPDATE.
             if cursor.fetchone():
                 db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
+                placeholders = [f.get_placeholder(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
                 if db_values:
                     cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
                         (qn(self._meta.db_table),
-                        ','.join(['%s=%%s' % qn(f.column) for f in non_pks]),
+                        ','.join(['%s=%s' % (qn(f.column), placeholders[i]) for i, f in enumerate(non_pks)]),
                         qn(self._meta.pk.column)),
                         db_values + self._meta.pk.get_db_prep_lookup('exact', pk_val))
             else:

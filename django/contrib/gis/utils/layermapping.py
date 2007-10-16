@@ -99,6 +99,7 @@ Example:
 """
 from types import StringType, TupleType
 from datetime import datetime
+from django.contrib.gis.db.backend import SPATIAL_BACKEND
 from django.contrib.gis.gdal import \
      OGRGeometry, OGRGeomType, SpatialReference, CoordTransform, \
      DataSource, OGRException
@@ -176,19 +177,19 @@ def check_feature(feat, model_fields, mapping):
         elif model_field[:-3] in model_fields: #foreign key
             model_type = model_fields[model_field[:-3]]
         else:
-            raise Exception, 'Given mapping field "%s" not in given Model fields!' % model_field
+            raise Exception('Given mapping field "%s" not in given Model fields!' % model_field)
 
         ### Handling if we get a geometry in the Field ###
         if ogr_field in ogc_types:
             # At this time, no more than one geographic field per model =(
             if HAS_GEO:
-                raise Exception, 'More than one geographic field in mapping not allowed (yet).'
+                raise Exception('More than one geographic field in mapping not allowed (yet).')
             else:
                 HAS_GEO = ogr_field
 
             # Making sure this geometry field type is a valid Django GIS field.
             if not model_type in gis_fields:
-                raise Exception, 'Unknown Django GIS field type "%s"' % model_type
+                raise Exception('Unknown Django GIS field type "%s"' % model_type)
             
             # Getting the OGRGeometry, it's type (an integer) and it's name (a string)
             geom  = feat.geom
@@ -202,20 +203,20 @@ def check_feature(feat, model_fields, mapping):
                 # The geometry type otherwise was expected
                 pass
             else:
-                raise Exception, 'Invalid mapping geometry; model has %s, feature has %s' % (model_type, gtype)
+                raise Exception('Invalid mapping geometry; model has %s, feature has %s' % (model_type, gtype))
 
         ## Handling other fields 
         else:
             # Making sure the model field is
             if not model_type in field_types:
-                raise Exception, 'Django field type "%s" has no OGR mapping (yet).' % model_type
+                raise Exception('Django field type "%s" has no OGR mapping (yet).' % model_type)
 
             # Otherwise, we've got an OGR Field.  Making sure that an
             # index exists for the mapping OGR field.
             try:
                 fi = feat.index(ogr_field)
             except:
-                raise Exception, 'Given mapping OGR field "%s" not in given OGR layer feature!' % ogr_field
+                raise Exception('Given mapping OGR field "%s" not in given OGR layer feature!' % ogr_field)
                     
 def check_layer(layer, fields, mapping):
     "Checks the OGR layer by incrementing through and checking each feature."
@@ -234,7 +235,7 @@ def check_srs(layer, source_srs):
     else:
         sr = layer.srs
     if not sr:
-        raise Exception, 'No source reference system defined.'
+        raise Exception('No source reference system defined.')
     else:
         return sr
 
@@ -280,9 +281,12 @@ class LayerMapping:
 
         # Getting the GeometryColumn object.
         try:
-            geo_col = GeometryColumns.objects.get(f_table_name=self.model._meta.db_table)
+            db_table = self.model._meta.db_table
+            if SPATIAL_BACKEND == 'oracle': db_table = db_table.upper()
+            gc_kwargs = {GeometryColumns.table_name_col() : db_table}
+            geo_col = GeometryColumns.objects.get(**gc_kwargs)
         except:
-            raise Exception, 'Geometry column does not exist. (did you run syncdb?)'
+            raise Exception('Geometry column does not exist. (did you run syncdb?)')
         
         # Getting the coordinate system needed for transformation (with CoordTransform)  
         try:
@@ -292,7 +296,7 @@ class LayerMapping:
             # Creating the CoordTransform object
             ct = CoordTransform(self.source_srs, target_srs)
         except Exception, msg:
-            raise Exception, 'Could not translate between the data source and model geometry: %s' % msg
+            raise Exception('Could not translate between the data source and model geometry: %s' % msg)
 
         for feat in self.layer:
             # The keyword arguments for model construction

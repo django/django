@@ -6,7 +6,7 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
 # parse_lookup depends on the spatial database backend.
-from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, GEOM_SELECT, TRANSFORM, UNION
+from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION
 from django.contrib.gis.geos import GEOSGeometry
 
 class GeoQ(Q):
@@ -51,7 +51,7 @@ class GeoQuerySet(QuerySet):
             clone._filters = clone._filters & reduce(operator.and_, map(mapper, args))
         return clone
 
-    def _get_sql_clause(self):
+    def _get_sql_clause(self, get_full_query=False):
         qn = connection.ops.quote_name
         opts = self.model._meta
 
@@ -147,12 +147,61 @@ class GeoQuerySet(QuerySet):
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
-        if self._limit is not None:
-            sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
-        else:
-            assert self._offset is None, "'offset' is not allowed without 'limit'"
+        if SPATIAL_BACKEND != 'oracle':
+            if self._limit is not None:
+                sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
+            else:
+                assert self._offset is None, "'offset' is not allowed without 'limit'"
 
-        return select, " ".join(sql), params
+            return select, " ".join(sql), params
+        else:
+            # To support limits and offsets, Oracle requires some funky rewriting of an otherwise normal looking query.
+            select_clause = ",".join(select)
+            distinct = (self._distinct and "DISTINCT " or "")
+
+            if order_by:
+                order_by_clause = " OVER (ORDER BY %s )" % (", ".join(order_by))
+            else:
+                #Oracle's row_number() function always requires an order-by clause.
+                #So we need to define a default order-by, since none was provided.
+                order_by_clause = " OVER (ORDER BY %s.%s)" % \
+                                  (qn(opts.db_table), qn(opts.fields[0].db_column or opts.fields[0].column))
+            # limit_and_offset_clause
+            if self._limit is None:
+                assert self._offset is None, "'offset' is not allowed without 'limit'"
+
+            if self._offset is not None:
+                offset = int(self._offset)
+            else:
+                offset = 0
+            if self._limit is not None:
+                limit = int(self._limit)
+            else:
+                limit = None
+
+            limit_and_offset_clause = ''
+            if limit is not None:
+                limit_and_offset_clause = "WHERE rn > %s AND rn <= %s" % (offset, limit+offset)
+            elif offset:
+                limit_and_offset_clause = "WHERE rn > %s" % (offset)
+
+            if len(limit_and_offset_clause) > 0:
+                fmt = \
+    """SELECT * FROM
+      (SELECT %s%s,
+              ROW_NUMBER()%s AS rn
+       %s)
+    %s"""
+                full_query = fmt % (distinct, select_clause,
+                                        order_by_clause, ' '.join(sql).strip(),
+                                        limit_and_offset_clause)
+            else:
+                full_query = None
+
+            if get_full_query:
+                return select, " ".join(sql), params, full_query
+            else:
+                return select, " ".join(sql), params
 
     def _clone(self, klass=None, **kwargs):
         c = super(GeoQuerySet, self)._clone(klass, **kwargs)
@@ -192,8 +241,13 @@ class GeoQuerySet(QuerySet):
         if not field_col:
             raise TypeError('GML output only available on GeometryFields')
 
-        # Adding AsGML function call to SELECT part of the SQL.
-        return self.extra(select={'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)})
+        if SPATIAL_BACKEND == 'oracle':
+            gml_select = {'gml':'%s(%s)' % (ASGML, field_col)}
+        else:
+            gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)}
+
+        # Adding GML function call to SELECT part of the SQL.
+        return self.extra(select=gml_select)
 
     def kml(self, field_name, precision=8):
         """
@@ -227,15 +281,19 @@ class GeoQuerySet(QuerySet):
 
         # Setting the key for the field's column with the custom SELECT SQL to 
         #  override the geometry column returned from the database.
-        self._custom_select[field.column] = \
-            '(%s(%s, %s)) AS %s' % (TRANSFORM, col, srid,
-                                    connection.ops.quote_name(field.column))
+        if SPATIAL_BACKEND == 'oracle':
+            custom_sel = '%s(%s, %s)' % (TRANSFORM, col, srid)
+        else:
+            custom_sel = '(%s(%s, %s)) AS %s' % \
+                         (TRANSFORM, col, srid, connection.ops.quote_name(field.column))
+        self._custom_select[field.column] = custom_sel
         return self._clone()
 
-    def union(self, field_name):
+    def union(self, field_name, tolerance=0.0005):
         """
         Performs an aggregate union on the given geometry field.  Returns
-        None if the GeoQuerySet is empty.
+        None if the GeoQuerySet is empty.  The `tolerance` keyword is for
+        Oracle backends only.
         """
         # Making sure backend supports the Union stored procedure
         if not UNION:
@@ -254,11 +312,24 @@ class GeoQuerySet(QuerySet):
 
         # Replacing the select with a call to the ST_Union stored procedure
         #  on the geographic field column.
-        union_sql = ('SELECT %s(%s)' % (UNION, field_col)) + sql
+        if SPATIAL_BACKEND == 'oracle':
+            union_sql = 'SELECT %s' % self._geo_fmt
+            union_sql = union_sql % ('%s(SDOAGGRTYPE(%s,%s))' % (UNION, field_col, tolerance))
+            union_sql += sql
+        else:
+            union_sql = ('SELECT %s(%s)' % (UNION, field_col)) + sql
+
+        # Getting a cursor, executing the query.
         cursor = connection.cursor()
         cursor.execute(union_sql, params)
 
-        # Pulling the HEXEWKB from the returned cursor.
-        hex = cursor.fetchone()[0]
-        if hex: return GEOSGeometry(hex)
+        if SPATIAL_BACKEND == 'oracle':
+            # On Oracle have to read out WKT from CLOB first.
+            clob = cursor.fetchone()[0]
+            if clob: u = clob.read()
+            else: u = None
+        else:
+            u = cursor.fetchone()[0]
+
+        if u: return GEOSGeometry(u)
         else: return None

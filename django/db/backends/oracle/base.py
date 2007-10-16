@@ -445,14 +445,24 @@ class FormatStylePlaceholderCursor(Database.Cursor):
     charset = 'utf-8'
 
     def _format_params(self, params):
+        sz_kwargs = {}
         if isinstance(params, dict):
             result = {}
             charset = self.charset
             for key, value in params.items():
                 result[smart_str(key, charset)] = smart_str(value, charset)
-            return result
+                if hasattr(value, 'oracle_type'): sz_kwargs[key] = value.oracle_type()
         else:
-            return tuple([smart_str(p, self.charset, True) for p in params])
+            result = {}
+            for i in xrange(len(params)):
+                key = 'arg%d' % i
+                result[key] = smart_str(params[i], self.charset, True)
+                if hasattr(params[i], 'oracle_type'): sz_kwargs[key] = params[i].oracle_type()
+
+        # If any of the parameters had an `oracle_type` method, then we set
+        # the inputsizes for those parameters using the returned type
+        if sz_kwargs: self.setinputsizes(**sz_kwargs)
+        return result
 
     def execute(self, query, params=None):
         if params is None:
@@ -471,7 +481,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
 
     def executemany(self, query, params=None):
         try:
-          args = [(':arg%d' % i) for i in range(len(params[0]))]
+            args = [(':arg%d' % i) for i in range(len(params[0]))]
         except (IndexError, TypeError):
           # No params given, nothing to do
           return None

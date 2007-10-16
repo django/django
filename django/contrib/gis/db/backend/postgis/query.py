@@ -105,8 +105,8 @@ MISC_TERMS = ['isnull']
 
 # These are the PostGIS-customized QUERY_TERMS -- a list of the lookup types
 #  allowed for geographic queries.
-POSTGIS_TERMS = list(POSTGIS_OPERATORS.keys()) # Getting the operators first
-POSTGIS_TERMS += list(POSTGIS_GEOMETRY_FUNCTIONS.keys()) # Adding on the Geometry Functions
+POSTGIS_TERMS = POSTGIS_OPERATORS.keys() # Getting the operators first
+POSTGIS_TERMS += POSTGIS_GEOMETRY_FUNCTIONS.keys() # Adding on the Geometry Functions
 POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnull')
 POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
 

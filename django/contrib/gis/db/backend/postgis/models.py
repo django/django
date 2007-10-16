@@ -26,8 +26,8 @@ class GeometryColumns(models.Model):
         db_table = 'geometry_columns'
 
     @classmethod
-    def table_name(self):
-        "Class method for returning the table name field for this model."
+    def table_name_col(self):
+        "Class method for returning the table name column for this model."
         return 'f_table_name'
 
     def __unicode__(self):

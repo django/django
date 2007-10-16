@@ -35,8 +35,16 @@ if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
         PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
         create_spatial_db, get_geo_where_clause, gqn, \
         ASGML, ASKML, GEOM_SELECT, TRANSFORM, UNION
+    SPATIAL_BACKEND = 'postgis'
+elif settings.DATABASE_ENGINE == 'oracle':
+    from django.contrib.gis.db.backend.oracle import \
+         OracleSpatialField as GeoBackendField, \
+         ORACLE_SPATIAL_TERMS as GIS_TERMS, \
+         create_spatial_db, get_geo_where_clause, gqn, \
+         ASGML, GEOM_SELECT, TRANSFORM, UNION
+    SPATIAL_BACKEND = 'oracle'
 else:
-    raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_NAME)
+    raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_ENGINE)
 
 def geo_quotename(value):
     """

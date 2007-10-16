@@ -29,11 +29,24 @@
      http://zcologia.com/news/429/geometries-for-python-update/
 """
 
-from django.contrib.gis.geos.base import GEOSGeometry
+from django.contrib.gis.geos.base import GEOSGeometry, wkt_regex, hex_regex
 from django.contrib.gis.geos.geometries import Point, LineString, LinearRing, Polygon, HAS_NUMPY
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
 from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
 from django.contrib.gis.geos.libgeos import geos_version
+
+def fromfile(file_name):
+    """
+    Given a string file name, returns a GEOSGeometry. The file may contain WKB,
+    WKT, or HEX.
+    """
+    fh = open(file_name, 'rb')
+    buf = fh.read()
+    fh.close()
+    if wkt_regex.match(buf) or hex_regex.match(buf):
+        return GEOSGeometry(buf)
+    else:
+        return GEOSGeometry(buffer(buf))
 
 def fromstr(wkt_or_hex, **kwargs):
     "Given a string value (wkt or hex), returns a GEOSGeometry object."

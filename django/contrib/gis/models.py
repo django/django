@@ -120,5 +120,7 @@ class SpatialRefSysMixin(object):
 # The SpatialRefSys and GeometryColumns models
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     from django.contrib.gis.db.backend.postgis.models import GeometryColumns, SpatialRefSys
+elif settings.DATABASE_ENGINE == 'oracle':
+    from django.contrib.gis.db.backend.oracle.models import GeometryColumns, SpatialRefSys
 else:
     raise NotImplementedError('No SpatialRefSys or GeometryColumns models for backend: %s' % settings.DATABASE_ENGINE)

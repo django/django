@@ -119,7 +119,7 @@ class PostGISField(Field):
                 # Adding the necessary string substitutions and parameters
                 # to perform a geometry transformation.
                 return GeoFieldSQL(['%s(%%s,%%s)' % TRANSFORM],
-                                       [adapt, self._srid])
+                                   [adapt, self._srid])
             else:
                 return GeoFieldSQL(['%s'], [adapt])
         else:
