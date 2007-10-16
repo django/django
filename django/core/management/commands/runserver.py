@@ -20,7 +20,7 @@ class Command(BaseCommand):
         import django
         from django.core.servers.basehttp import run, AdminMediaHandler, WSGIServerException
         from django.core.handlers.wsgi import WSGIHandler
-        if len(args) != 0:
+        if args:
             raise CommandError('Usage is runserver %s' % self.args)
         if not addrport:
             addr = ''

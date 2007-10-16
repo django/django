@@ -516,9 +516,3 @@ def templatize(src):
                 out.write(blankout(t.contents, 'X'))
     return out.getvalue()
 
-def string_concat(*strings):
-    """"
-    Lazy variant of string concatenation, needed for translations that are
-    constructed from multiple parts.
-    """
-    return u''.join([force_unicode(s) for s in strings])

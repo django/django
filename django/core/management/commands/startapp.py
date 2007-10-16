@@ -16,7 +16,7 @@ class Command(LabelCommand):
             directory = os.getcwd()
         # Determine the project_name a bit naively -- by looking at the name of
         # the parent directory.
-        project_dir = os.path.normpath(os.path.join(directory, '..'))
+        project_dir = os.path.normpath(os.path.join(directory, os.pardir))
         parent_dir = os.path.basename(project_dir)
         project_name = os.path.basename(directory)
         if app_name == project_name:

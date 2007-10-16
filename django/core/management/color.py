@@ -2,12 +2,14 @@
 Sets up the terminal color scheme.
 """
 
-from django.utils import termcolors
 import sys
 
+from django.utils import termcolors
+
 def color_style():
-    "Returns a Style object with the Django color scheme."
-    if sys.platform == 'win32' or sys.platform == 'Pocket PC' or sys.platform.startswith('java') or not sys.stdout.isatty():
+    """Returns a Style object with the Django color scheme."""
+    if (sys.platform == 'win32' or sys.platform == 'Pocket PC'
+        or sys.platform.startswith('java') or not sys.stdout.isatty()):
         return no_style()
     class dummy: pass
     style = dummy()
@@ -21,7 +23,7 @@ def color_style():
     return style
 
 def no_style():
-    "Returns a Style object that has no colors."
+    """Returns a Style object that has no colors."""
     class dummy:
         def __getattr__(self, attr):
             return lambda x: x

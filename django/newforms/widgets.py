@@ -7,7 +7,9 @@ try:
 except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
+import copy
 from itertools import chain
+
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import ugettext
@@ -31,6 +33,12 @@ class Widget(object):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
+
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.attrs = self.attrs.copy()
+        memo[id(self)] = obj
+        return obj
 
     def render(self, name, value, attrs=None):
         """
@@ -88,7 +96,7 @@ class PasswordInput(Input):
     input_type = 'password'
 
     def __init__(self, attrs=None, render_value=True):
-        self.attrs = attrs or {}
+        super(PasswordInput, self).__init__(attrs)
         self.render_value = render_value
 
     def render(self, name, value, attrs=None):
@@ -105,8 +113,8 @@ class MultipleHiddenInput(HiddenInput):
     of values.
     """
     def __init__(self, attrs=None, choices=()):
+        super(MultipleHiddenInput, self).__init__(attrs)
         # choices can be any iterable
-        self.attrs = attrs or {}
         self.choices = choices
 
     def render(self, name, value, attrs=None, choices=()):
@@ -145,9 +153,9 @@ class Textarea(Widget):
 
 class CheckboxInput(Widget):
     def __init__(self, attrs=None, check_test=bool):
+        super(CheckboxInput, self).__init__(attrs)
         # check_test is a callable that takes a value and returns True
         # if the checkbox should be checked for that value.
-        self.attrs = attrs or {}
         self.check_test = check_test
 
     def render(self, name, value, attrs=None):
@@ -164,7 +172,7 @@ class CheckboxInput(Widget):
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
-        self.attrs = attrs or {}
+        super(Select, self).__init__(attrs)
         # choices can be any iterable, but we may need to render this widget
         # multiple times. Thus, collapse it into a list so it can be consumed
         # more than once.
@@ -203,8 +211,8 @@ class NullBooleanSelect(Select):
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
+        super(SelectMultiple, self).__init__(attrs)
         # choices can be any iterable
-        self.attrs = attrs or {}
         self.choices = choices
 
     def render(self, name, value, attrs=None, choices=()):

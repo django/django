@@ -500,7 +500,7 @@ class SelectField(FormField):
             selected_html = u''
             if smart_unicode(value) == str_data:
                 selected_html = u' selected="selected"'
-            output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, escape(display_name)))
+            output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, force_unicode(escape(display_name))))
         output.append(u'  </select>')
         return u'\n'.join(output)
 
@@ -612,7 +612,7 @@ class SelectMultipleField(SelectField):
             selected_html = u''
             if smart_unicode(value) in str_data_list:
                 selected_html = u' selected="selected"'
-            output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, escape(choice)))
+            output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, force_unicode(escape(choice))))
         output.append(u'  </select>')
         return u'\n'.join(output)
 

@@ -54,7 +54,10 @@ class SortedDict(dict):
     def __init__(self, data=None):
         if data is None: data = {}
         dict.__init__(self, data)
-        self.keyOrder = data.keys()
+        if isinstance(data, dict):
+            self.keyOrder = data.keys()
+        else:
+            self.keyOrder=[key for key, value in data]
 
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)

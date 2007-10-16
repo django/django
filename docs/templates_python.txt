@@ -316,7 +316,7 @@ optional, third positional argument, ``processors``. In this example, the
         }, [ip_address_processor])
         return t.render(c)
 
-Note::
+.. note::
     If you're using Django's ``render_to_response()`` shortcut to populate a
     template with the contents of a dictionary, your template will be passed a
     ``Context`` instance by default (not a ``RequestContext``). To use a

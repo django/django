@@ -30,4 +30,12 @@ True
 >>> s4 = ugettext_lazy('Some other string')
 >>> s == s4
 False
+
+unicode(string_concat(...)) should not raise a TypeError - #4796
+
+>>> import django.utils.translation
+>>> reload(django.utils.translation)
+<module 'django.utils.translation' from ...>
+>>> unicode(django.utils.translation.string_concat("dja", "ngo"))
+u'django'
 """

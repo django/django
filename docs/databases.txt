@@ -175,9 +175,9 @@ operators.  You will also need the `cx_Oracle`_ driver, version 4.3.1 or newer.
 .. _`cx_Oracle`: http://cx-oracle.sourceforge.net/
 
 To run ``python manage.py syncdb``, you'll need to create an Oracle database
-user with CREATE TABLE, CREATE SEQUENCE, and CREATE PROCEDURE privileges.  To
-run Django's test suite, the user also needs CREATE and DROP DATABASE and
-CREATE and DROP TABLESPACE privileges.
+user with CREATE TABLE, CREATE SEQUENCE, CREATE PROCEDURE, and CREATE TRIGGER
+privileges.  To run Django's test suite, the user also needs 
+CREATE and DROP DATABASE and CREATE and DROP TABLESPACE privileges.
 
 Connecting to the Database
 --------------------------

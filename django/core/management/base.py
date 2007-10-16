@@ -1,10 +1,10 @@
+import os
+import sys
+from optparse import make_option, OptionParser
+
 import django
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style
-import itertools
-from optparse import make_option, OptionParser
-import sys
-import os
 
 class CommandError(Exception):
     pass
@@ -19,7 +19,7 @@ def handle_default_options(options):
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
     if options.pythonpath:
         sys.path.insert(0, options.pythonpath)
-                
+
 class BaseCommand(object):
     # Metadata about this command.
     option_list = (
@@ -161,17 +161,25 @@ class NoArgsCommand(BaseCommand):
     args = ''
 
     def handle(self, *args, **options):
-        from django.db import models
-        if len(args) != 0:
+        if args:
             raise CommandError("Command doesn't accept any arguments")
-
         return self.handle_noargs(**options)
 
     def handle_noargs(self, **options):
         raise NotImplementedError()
 
 def copy_helper(style, app_or_project, name, directory, other_name=''):
-    import django
+    """
+    Copies either a Django application layout template or a Django project
+    layout template into the specified directory.
+
+    * style - A color style object (see django.core.management.color).
+    * app_or_project - The string 'app' or 'project'.
+    * name - The name of the application or project.
+    * directory - The directory to copy the layout template to.
+    * other_name - When copying an application layout, this should be the name
+                   of the project.
+    """
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]
@@ -221,4 +229,3 @@ def _make_writeable(filename):
         st = os.stat(filename)
         new_permissions = stat.S_IMODE(st.st_mode) | stat.S_IWUSR
         os.chmod(filename, new_permissions)
-

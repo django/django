@@ -75,7 +75,7 @@ def safe_copyfileobj(fsrc, fdst, length=16*1024, size=0):
 class WSGIRequest(http.HttpRequest):
     def __init__(self, environ):
         self.environ = environ
-        self.path = force_unicode(environ['PATH_INFO'])
+        self.path = force_unicode(environ['PATH_INFO'], errors='ignore')
         self.META = environ
         self.method = environ['REQUEST_METHOD'].upper()
 
