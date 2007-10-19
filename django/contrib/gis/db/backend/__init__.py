@@ -43,6 +43,13 @@ elif settings.DATABASE_ENGINE == 'oracle':
          create_spatial_db, get_geo_where_clause, gqn, \
          ASGML, GEOM_SELECT, TRANSFORM, UNION
     SPATIAL_BACKEND = 'oracle'
+elif settings.DATABASE_ENGINE == 'mysql':
+    from django.contrib.gis.db.backend.mysql import \
+        MySQLGeoField as GeoBackendField, \
+        MYSQL_GIS_TERMS as GIS_TERMS, \
+        create_spatial_db, get_geo_where_clause, gqn, \
+        GEOM_SELECT
+    SPATIAL_BACKEND = 'mysql'
 else:
     raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_ENGINE)
 

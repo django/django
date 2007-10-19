@@ -1,6 +1,7 @@
 import unittest
-from django.contrib.gis.models import SpatialRefSys
-from django.contrib.gis.tests.utils import oracle, postgis
+from django.contrib.gis.tests.utils import mysql, no_mysql, oracle, postgis
+if not mysql:
+    from django.contrib.gis.models import SpatialRefSys
 
 test_srs = ({'srid' : 4326,
              'auth_name' : ('EPSG', True),
@@ -26,6 +27,7 @@ test_srs = ({'srid' : 4326,
 
 class SpatialRefSysTest(unittest.TestCase):
 
+    @no_mysql
     def test01_retrieve(self):
         "Testing retrieval of SpatialRefSys model objects."
         for sd in test_srs:
@@ -46,6 +48,7 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertEqual(sd['srtext'], srs.wkt)
                 self.assertEqual(sd['proj4'], srs.proj4text)
 
+    @no_mysql
     def test02_osr(self):
         "Testing getting OSR objects from SpatialRefSys model objects."
         for sd in test_srs:
@@ -61,6 +64,7 @@ class SpatialRefSysTest(unittest.TestCase):
                 self.assertEqual(sd['proj4'], srs.proj4)
                 self.assertEqual(sd['srtext'], srs.wkt)
 
+    @no_mysql
     def test03_ellipsoid(self):
         "Testing the ellipsoid property."
         for sd in test_srs:

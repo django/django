@@ -2,6 +2,7 @@ import sys
 from copy import copy
 from unittest import TestSuite, TextTestRunner
 from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.tests.utils import mysql
 
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = [
@@ -84,8 +85,12 @@ def run_tests(module_list, verbosity=1, interactive=True):
     test_suite = suite()
     for test_model in test_models:
         module_name = 'django.contrib.gis.tests.%s' % test_model
+        if mysql:
+            test_module_name = 'tests_mysql'
+        else:
+            test_module_name = 'tests'
         settings.INSTALLED_APPS.append(module_name)
-        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), ['tests']), 'tests')
+        tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), test_module_name)
         test_suite.addTest(tsuite.suite())
 
     # Resetting the loaded flag to take into account what we appended to the INSTALLED_APPS

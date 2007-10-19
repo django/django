@@ -1,8 +1,10 @@
 """
  The Oracle spatial database backend module.
 
- Please note that WKT support is broken on the XE version, and this will
- not work.
+ Please note that WKT support is broken on the XE version, and thus
+ this backend will not work on such platforms.  Specifically, XE lacks 
+ support for an internal JVM, and Java libraries are required to use 
+ the WKT constructors.
 """
 from django.contrib.gis.db.backend.oracle.creation import create_spatial_db
 from django.contrib.gis.db.backend.oracle.field import OracleSpatialField, gqn

@@ -35,7 +35,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
         table_prefix = qn(table_prefix[:-1])+'.'
     field_name = qn(field_name)
 
-    # See if a PostGIS Geometry function matches the lookup type next
+    # See if a Oracle Geometry function matches the lookup type next
     lookup_info = ORACLE_GEOMETRY_FUNCTIONS.get(lookup_type, False)
     if lookup_info:
         # Lookup types that are tuples take tuple arguments, e.g., 'relate' and 
