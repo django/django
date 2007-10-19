@@ -172,7 +172,7 @@ of the case of the actual model class name.
 ADMIN_FOR
 ---------
 
-Default: ``()`` (Empty list)
+Default: ``()`` (Empty tuple)
 
 Used for admin-site settings modules, this should be a tuple of settings
 modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
@@ -580,6 +580,8 @@ any code that uses ``LANGUAGES`` at runtime.
 
 LOCALE_PATHS
 ------------
+
+Default: ``()`` (Empty tuple)
 
 A list of directories where Django looks for translation files.
 See the `internationalization docs section`_ explaining the variable and the
