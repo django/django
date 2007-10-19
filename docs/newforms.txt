@@ -860,6 +860,23 @@ classes::
     <li>Instrument: <input type="text" name="instrument" /></li>
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
+
+Prefixes for forms
+------------------
+
+You can put several Django forms inside one ``<form>`` tag. To give each
+``Form`` its own namespace you need to use the ``prefix`` keyword argument::
+
+    >>> mother = PersonForm(prefix="mother")
+    >>> father = PersonForm(prefix="father")
+    >>> print mother.as_ul()
+    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" /></li>
+    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" /></li>
+    >>> print father.as_ul()
+    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
+    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
+
+
 Fields
 ======
 
