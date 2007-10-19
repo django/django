@@ -578,6 +578,15 @@ strings for translation, but the translation won't happen at runtime -- so
 you'll have to remember to wrap the languages in the *real* ``gettext()`` in
 any code that uses ``LANGUAGES`` at runtime.
 
+LOCALE_PATHS
+------------
+
+A list of directories where Django looks for translation files.
+See the `internationalization docs section`_ explaining the variable and the
+default behavior.
+
+.. _internationalization docs section: ../i18n/#using-translations-in-your-own-projects
+
 LOGIN_REDIRECT_URL
 ------------------
 
