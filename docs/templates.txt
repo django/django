@@ -2,11 +2,16 @@
 The Django template language: For template authors
 ==================================================
 
+This document explains the language syntax of the Django template system.  If
+you're looking for a more technical perspective on how it works and how to
+extend it, see `The Django template language: For Python programmers`_.
+
 Django's template language is designed to strike a balance between power and
 ease. It's designed to feel comfortable to those used to working with HTML. If
 you have any exposure to other text-based template languages, such as Smarty_
 or CheetahTemplate_, you should feel right at home with Django's templates.
 
+.. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: http://smarty.php.net/
 .. _CheetahTemplate: http://www.cheetahtemplate.org/
 
@@ -1438,12 +1443,3 @@ A collection of template tags that can be useful while designing a website,
 such as a generator of Lorem Ipsum text. See the `webdesign documentation`_.
 
 .. _webdesign documentation: ../webdesign/
-
-Next steps
-==========
-
-Read the document `The Django template language: For Python programmers`_ if
-you're interested in learning the template system from a technical
-perspective -- how it works and how to extend it.
-
-.. _The Django template language\: For Python programmers: ../templates_python/
