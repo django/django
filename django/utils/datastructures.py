@@ -42,22 +42,25 @@ class MergeDict(object):
             if key in dict:
                 return True
         return False
-    
+
     __contains__ = has_key
 
     def copy(self):
-        """ returns a copy of this object"""
+        """Returns a copy of this object."""
         return self.__copy__()
 
 class SortedDict(dict):
-    "A dictionary that keeps its keys in the order in which they're inserted."
+    """
+    A dictionary that keeps its keys in the order in which they're inserted.
+    """
     def __init__(self, data=None):
-        if data is None: data = {}
+        if data is None:
+            data = {}
         dict.__init__(self, data)
         if isinstance(data, dict):
             self.keyOrder = data.keys()
         else:
-            self.keyOrder=[key for key, value in data]
+            self.keyOrder = [key for key, value in data]
 
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
@@ -102,20 +105,21 @@ class SortedDict(dict):
         return dict.setdefault(self, key, default)
 
     def value_for_index(self, index):
-        "Returns the value of the item at the given zero-based index."
+        """Returns the value of the item at the given zero-based index."""
         return self[self.keyOrder[index]]
 
     def insert(self, index, key, value):
-        "Inserts the key, value pair before the item with the given index."
+        """Inserts the key, value pair before the item with the given index."""
         if key in self.keyOrder:
             n = self.keyOrder.index(key)
             del self.keyOrder[n]
-            if n < index: index -= 1
+            if n < index:
+                index -= 1
         self.keyOrder.insert(index, key)
         dict.__setitem__(self, key, value)
 
     def copy(self):
-        "Returns a copy of this object."
+        """Returns a copy of this object."""
         # This way of initializing the copy means it works for subclasses, too.
         obj = self.__class__(self)
         obj.keyOrder = self.keyOrder
@@ -133,7 +137,8 @@ class MultiValueDictKeyError(KeyError):
 
 class MultiValueDict(dict):
     """
-    A subclass of dictionary customized to handle multiple values for the same key.
+    A subclass of dictionary customized to handle multiple values for the
+    same key.
 
     >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
     >>> d['name']
@@ -176,15 +181,17 @@ class MultiValueDict(dict):
 
     def __deepcopy__(self, memo=None):
         import copy
-        if memo is None: memo = {}
+        if memo is None:
+            memo = {}
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
-            dict.__setitem__(result, copy.deepcopy(key, memo), copy.deepcopy(value, memo))
+            dict.__setitem__(result, copy.deepcopy(key, memo),
+                             copy.deepcopy(value, memo))
         return result
 
     def get(self, key, default=None):
-        "Returns the default value if the requested data doesn't exist"
+        """Returns the default value if the requested data doesn't exist."""
         try:
             val = self[key]
         except KeyError:
@@ -194,7 +201,7 @@ class MultiValueDict(dict):
         return val
 
     def getlist(self, key):
-        "Returns an empty list if the requested data doesn't exist"
+        """Returns an empty list if the requested data doesn't exist."""
         try:
             return dict.__getitem__(self, key)
         except KeyError:
@@ -214,7 +221,7 @@ class MultiValueDict(dict):
         return self.getlist(key)
 
     def appendlist(self, key, value):
-        "Appends an item to the internal list associated with key"
+        """Appends an item to the internal list associated with key."""
         self.setlistdefault(key, [])
         dict.__setitem__(self, key, self.getlist(key) + [value])
 
@@ -226,19 +233,22 @@ class MultiValueDict(dict):
         return [(key, self[key]) for key in self.keys()]
 
     def lists(self):
-        "Returns a list of (key, list) pairs."
+        """Returns a list of (key, list) pairs."""
         return dict.items(self)
 
     def values(self):
-        "Returns a list of the last value on every key list."
+        """Returns a list of the last value on every key list."""
         return [self[key] for key in self.keys()]
 
     def copy(self):
-        "Returns a copy of this object."
+        """Returns a copy of this object."""
         return self.__deepcopy__()
 
     def update(self, *args, **kwargs):
-        "update() extends rather than replaces existing key lists. Also accepts keyword args."
+        """
+        update() extends rather than replaces existing key lists.
+        Also accepts keyword args.
+        """
         if len(args) > 1:
             raise TypeError, "update expected at most 1 arguments, got %d" % len(args)
         if args:
@@ -299,4 +309,3 @@ class FileDict(dict):
             d = dict(self, content='<omitted>')
             return dict.__repr__(d)
         return dict.__repr__(self)
-
