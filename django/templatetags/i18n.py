@@ -1,3 +1,5 @@
+import re
+
 from django.template import Node, Variable
 from django.template import TemplateSyntaxError, TokenParser, Library
 from django.template import TOKEN_TEXT, TOKEN_VAR
@@ -68,9 +70,11 @@ class BlockTranslateNode(Node):
             count = self.counter.resolve(context)
             context[self.countervar] = count
             plural = self.render_token_list(self.plural)
-            result = translation.ungettext(singular, plural, count) % context
+            result = translation.ungettext(singular, plural, count)
         else:
-            result = translation.ugettext(singular) % context
+            result = translation.ugettext(singular)
+        # Escape all isolated '%' before substituting in the context.
+        result = re.sub('%(?!\()', '%%', result) % context
         context.pop()
         return result
 
