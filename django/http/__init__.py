@@ -308,13 +308,8 @@ class HttpResponse(object):
                 self.cookies[key][var.replace('_', '-')] = val
 
     def delete_cookie(self, key, path='/', domain=None):
-        self.cookies[key] = ''
-        if path is not None:
-            self.cookies[key]['path'] = path
-        if domain is not None:
-            self.cookies[key]['domain'] = domain
-        self.cookies[key]['expires'] = 0
-        self.cookies[key]['max-age'] = 0
+        self.set_cookie(key, max_age=0, path=path, domain=domain,
+                expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
     def _get_content(self):
         if self.has_header('Content-Encoding'):
