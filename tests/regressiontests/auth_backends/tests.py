@@ -1,4 +1,9 @@
-"""
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
+__test__ = {'API_TESTS': """
 >>> from django.contrib.auth.models import User, Group, Permission
 >>> from django.contrib.contenttypes.models import ContentType
 
@@ -28,10 +33,10 @@ False
 # reloading user to purge the _perm_cache
 
 >>> user = User.objects.get(username="test")
->>> user.get_all_permissions()
-set([u'auth.test'])
->>> user.get_group_permissions()
-set([])
+>>> user.get_all_permissions() == set([u'auth.test'])
+True
+>>> user.get_group_permissions() == set([])
+True
 >>> user.has_module_perms("Group")
 False
 >>> user.has_module_perms("auth")
@@ -43,8 +48,8 @@ True
 >>> user.user_permissions.add(perm)
 >>> user.save()
 >>> user = User.objects.get(username="test")
->>> user.get_all_permissions()
-set([u'auth.test2', u'auth.test', u'auth.test3'])
+>>> user.get_all_permissions() == set([u'auth.test2', u'auth.test', u'auth.test3'])
+True
 >>> user.has_perm('test')
 False
 >>> user.has_perm('auth.test')
@@ -57,10 +62,11 @@ True
 >>> group.save()
 >>> user.groups.add(group)
 >>> user = User.objects.get(username="test")
->>> user.get_all_permissions()
-set([u'auth.test2', u'auth.test', u'auth.test3', u'auth.test_group'])
->>> user.get_group_permissions()
-set([u'auth.test_group'])
+>>> exp = set([u'auth.test2', u'auth.test', u'auth.test3', u'auth.test_group'])
+>>> user.get_all_permissions() == exp
+True
+>>> user.get_group_permissions() == set([u'auth.test_group'])
+True
 >>> user.has_perms(['auth.test3', 'auth.test_group'])
 True
-"""
+"""}
