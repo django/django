@@ -276,6 +276,12 @@ u'<input type="checkbox" name="greeting" />'
 >>> w.render('greeting', None)
 u'<input type="checkbox" name="greeting" />'
 
+The CheckboxInput widget will return False if the key is not found in the data
+dictionary (because HTML form submission doesn't send any result for unchecked
+checkboxes).
+>>> w.value_from_datadict({}, {}, 'testing')
+False
+
 # Select Widget ###############################################################
 
 >>> w = Select()

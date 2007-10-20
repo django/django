@@ -170,6 +170,13 @@ class CheckboxInput(Widget):
             final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
 
+    def value_from_datadict(self, data, files, name):
+        if name not in data:
+            # A missing value means False because HTML form submission does not
+            # send results for unselected checkboxes.
+            return False
+        return super(CheckboxInput, self).value_from_datadict(data, files, name)
+
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
         super(Select, self).__init__(attrs)
