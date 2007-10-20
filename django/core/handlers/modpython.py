@@ -14,7 +14,7 @@ import os
 class ModPythonRequest(http.HttpRequest):
     def __init__(self, req):
         self._req = req
-        self.path = force_unicode(req.uri, errors='ignore')
+        self.path = force_unicode(req.uri)
 
     def __repr__(self):
         # Since this is called as part of error handling, we need to be very
@@ -136,6 +136,8 @@ class ModPythonRequest(http.HttpRequest):
     method = property(_get_method)
 
 class ModPythonHandler(BaseHandler):
+    request_class = ModPythonRequest
+
     def __call__(self, req):
         # mod_python fakes the environ, and thus doesn't process SetEnv.  This fixes that
         os.environ.update(req.subprocess_env)
@@ -150,13 +152,16 @@ class ModPythonHandler(BaseHandler):
 
         dispatcher.send(signal=signals.request_started)
         try:
-            request = ModPythonRequest(req)
-            response = self.get_response(request)
+            try:
+                request = self.request_class(req)
+            except UnicodeDecodeError:
+                response = http.HttpResponseBadRequest()
+            else:
+                response = self.get_response(request)
 
-            # Apply response middleware
-            for middleware_method in self._response_middleware:
-                response = middleware_method(request, response)
-
+                # Apply response middleware
+                for middleware_method in self._response_middleware:
+                    response = middleware_method(request, response)
         finally:
             dispatcher.send(signal=signals.request_finished)
 
