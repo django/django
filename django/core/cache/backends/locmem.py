@@ -14,6 +14,13 @@ class CacheClass(SimpleCacheClass):
         SimpleCacheClass.__init__(self, host, params)
         self._lock = RWLock()
 
+    def add(self, key, value, timeout=None):
+        self._lock.writer_enters()
+        try:
+            SimpleCacheClass.add(self, key, value, timeout)
+        finally:
+            self._lock.writer_leaves()
+
     def get(self, key, default=None):
         should_delete = False
         self._lock.reader_enters()

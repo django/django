@@ -21,6 +21,15 @@ class CacheClass(BaseCache):
         except (ValueError, TypeError):
             self._cull_frequency = 3
 
+    def add(self, key, value, timeout=None):
+        if len(self._cache) >= self._max_entries:
+            self._cull()
+        if timeout is None:
+            timeout = self.default_timeout
+        if key not in self._cache.keys():
+            self._cache[key] = value
+            self._expire_info[key] = time.time() + timeout
+
     def get(self, key, default=None):
         now = time.time()
         exp = self._expire_info.get(key)
