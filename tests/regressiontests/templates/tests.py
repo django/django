@@ -341,7 +341,10 @@ class Templates(unittest.TestCase):
             'firstof03': ('{% firstof a b c %}', {'a':0,'b':2,'c':0}, '2'),
             'firstof04': ('{% firstof a b c %}', {'a':0,'b':0,'c':3}, '3'),
             'firstof05': ('{% firstof a b c %}', {'a':1,'b':2,'c':3}, '1'),
-            'firstof06': ('{% firstof %}', {}, template.TemplateSyntaxError),
+            'firstof06': ('{% firstof a b c %}', {'b':0,'c':3}, '3'),
+            'firstof07': ('{% firstof a b "c" %}', {'a':0}, 'c'),
+            'firstof08': ('{% firstof a b "c and d" %}', {'a':0,'b':0}, 'c and d'),
+            'firstof09': ('{% firstof %}', {}, template.TemplateSyntaxError),
 
             ### FOR TAG ###############################################################
             'for-tag01': ("{% for val in values %}{{ val }}{% endfor %}", {"values": [1, 2, 3]}, "123"),

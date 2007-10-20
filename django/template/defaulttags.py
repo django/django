@@ -517,8 +517,14 @@ def firstof(parser, token):
         {% endif %}{% endif %}{% endif %}
 
     but obviously much cleaner!
+
+    You can also use a literal string as a fallback value in case all
+    passed variables are False::
+
+        {% firstof var1 var2 var3 "fallback value" %}
+
     """
-    bits = token.contents.split()[1:]
+    bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError, "'firstof' statement requires at least one argument"
     return FirstOfNode(bits)
