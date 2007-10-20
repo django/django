@@ -45,7 +45,7 @@ class SyndicationFeed(object):
     "Base class for all syndication feeds. Subclasses should provide write()"
     def __init__(self, title, link, description, language=None, author_email=None,
             author_name=None, author_link=None, subtitle=None, categories=None,
-            feed_url=None, feed_copyright=None, feed_guid=None):
+            feed_url=None, feed_copyright=None, feed_guid=None, ttl=None):
         to_unicode = lambda s: force_unicode(s, strings_only=True)
         if categories:
             categories = [force_unicode(c) for c in categories]
@@ -62,12 +62,13 @@ class SyndicationFeed(object):
             'feed_url': iri_to_uri(feed_url),
             'feed_copyright': to_unicode(feed_copyright),
             'id': feed_guid or link,
+            'ttl': ttl,
         }
         self.items = []
 
     def add_item(self, title, link, description, author_email=None,
         author_name=None, author_link=None, pubdate=None, comments=None,
-        unique_id=None, enclosure=None, categories=(), item_copyright=None):
+        unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None):
         """
         Adds an item to the feed. All args are expected to be Python Unicode
         objects except pubdate, which is a datetime.datetime object, and
@@ -89,6 +90,7 @@ class SyndicationFeed(object):
             'enclosure': enclosure,
             'categories': categories or (),
             'item_copyright': to_unicode(item_copyright),
+            'ttl': ttl,
         })
 
     def num_items(self):
@@ -146,6 +148,8 @@ class RssFeed(SyndicationFeed):
         if self.feed['feed_copyright'] is not None:
             handler.addQuickElement(u"copyright", self.feed['feed_copyright'])
         handler.addQuickElement(u"lastBuildDate", rfc2822_date(self.latest_post_date()).decode('ascii'))
+        if self.feed['ttl'] is not None:
+            handler.addQuickElement(u"ttl", self.feed['ttl'])
         self.write_items(handler)
         self.endChannelElement(handler)
         handler.endElement(u"rss")
@@ -190,6 +194,8 @@ class Rss201rev2Feed(RssFeed):
                 handler.addQuickElement(u"comments", item['comments'])
             if item['unique_id'] is not None:
                 handler.addQuickElement(u"guid", item['unique_id'])
+            if item['ttl'] is not None:
+                handler.addQuickElement(u"ttl", item['ttl'])
 
             # Enclosure.
             if item['enclosure'] is not None:
