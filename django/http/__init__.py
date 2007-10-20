@@ -261,19 +261,23 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self._headers = {'content-type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
 
+        # _headers is a mapping of the lower-case name to the original case of
+        # the header (required for working with legacy systems) and the header
+        # value.
+        self._headers = {'content-type': ('Content-Type', content_type)}
+
     def __str__(self):
         "Full HTTP message, including headers"
         return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self._headers.items()]) \
+            for key, value in self._headers.values()]) \
             + '\n\n' + self.content
 
     def __setitem__(self, header, value):
-        self._headers[header.lower()] = value
+        self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
         try:
@@ -282,7 +286,7 @@ class HttpResponse(object):
             pass
 
     def __getitem__(self, header):
-        return self._headers[header.lower()]
+        return self._headers[header.lower()][1]
 
     def has_header(self, header):
         "Case-insensitive check for a header"
@@ -291,10 +295,10 @@ class HttpResponse(object):
     __contains__ = has_header
 
     def items(self):
-        return self._headers.items()
+        return self._headers.values()
 
     def get(self, header, alternate):
-        return self._headers.get(header.lower(), alternate)
+        return self._headers.get(header.lower(), (None, alternate))[1]
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
