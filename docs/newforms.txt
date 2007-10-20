@@ -100,7 +100,7 @@ Start with this basic ``Form`` subclass, which we'll call ``ContactForm``::
         subject = forms.CharField(max_length=100)
         message = forms.CharField()
         sender = forms.EmailField()
-        cc_myself = forms.BooleanField()
+        cc_myself = forms.BooleanField(required=False)
 
 A form is composed of ``Field`` objects. In this case, our form has four
 fields: ``subject``, ``message``, ``sender`` and ``cc_myself``. We'll explain
@@ -1060,7 +1060,7 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
     ...     message = forms.CharField()
     ...     sender = forms.EmailField(help_text='A valid e-mail address, please.')
-    ...     cc_myself = forms.BooleanField()
+    ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print f.as_table()
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" /><br />100 characters max.</td></tr>
@@ -1139,9 +1139,20 @@ For each field, we describe the default widget used if you don't specify
 ~~~~~~~~~~~~~~~~
 
     * Default widget: ``CheckboxInput``
-    * Empty value: ``None``
+    * Empty value: ``False``
     * Normalizes to: A Python ``True`` or ``False`` value.
-    * Validates nothing (i.e., it never raises a ``ValidationError``).
+    * Validates that the check box is checked (i.e. the value is ``True``) if
+      the field has ``required=True``.
+
+**New in Django development version:** The empty value for a ``CheckboxInput``
+(and hence the standard ``BooleanField``) has changed to return ``False``
+instead of ``None`` in the development version.
+
+.. note::
+    Since all ``Field`` subclasses have ``required=True`` by default, the
+    validation condition here is important. If you want to include a checkbox
+    in your form that can be either checked or unchecked, you must remember to
+    pass in ``required=False`` when creating the ``BooleanField``.
 
 ``CharField``
 ~~~~~~~~~~~~~
@@ -1149,7 +1160,8 @@ For each field, we describe the default widget used if you don't specify
     * Default widget: ``TextInput``
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
-    * Validates nothing, unless ``max_length`` or ``min_length`` is provided.
+    * Validates ``max_length`` or ``min_length``, if they are provided.
+      Otherwise, all inputs are valid.
 
 Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
@@ -1525,7 +1537,7 @@ like so::
         subject = forms.CharField(max_length=100)
         message = forms.CharField()
         senders = MultiEmailField()
-        cc_myself = forms.BooleanField()
+        cc_myself = forms.BooleanField(required=False)
 
 Widgets
 =======
@@ -2050,7 +2062,7 @@ have a ``Message`` model that holds each contact submission. Something like::
         subject = models.CharField(max_length=100)
         message = models.TextField()
         sender = models.EmailField()
-        cc_myself = models.BooleanField()
+        cc_myself = models.BooleanField(required=False)
 
 You could use this model to create a form (using ``form_for_model()``). You
 could also use existing ``Message`` instances to create a form for editing
