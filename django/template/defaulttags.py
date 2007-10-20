@@ -675,7 +675,7 @@ def do_if(parser, token):
         {% if athlete_list and coach_list or cheerleader_list %}
 
     If you need to combine ``and`` and ``or`` to do advanced logic, just use
-    nested if tags. For example:
+    nested if tags. For example::
 
         {% if athlete_list %}
             {% if coach_list or cheerleader_list %}
