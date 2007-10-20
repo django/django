@@ -289,12 +289,12 @@ class HttpResponse(object):
         return self._headers.has_key(header.lower())
 
     __contains__ = has_header
-    
+
     def items(self):
         return self._headers.items()
-    
+
     def get(self, header, alternate):
-        return self._headers.get(header, alternate)
+        return self._headers.get(header.lower(), alternate)
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
