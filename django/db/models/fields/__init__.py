@@ -391,6 +391,8 @@ class Field(object):
         defaults = {'required': not self.blank, 'label': capfirst(self.verbose_name), 'help_text': self.help_text}
         if self.choices:
             defaults['widget'] = forms.Select(choices=self.get_choices())
+        if self.has_default():
+            defaults['initial'] = self.get_default()
         defaults.update(kwargs)
         return form_class(**defaults)
 
