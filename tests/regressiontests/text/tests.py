@@ -20,8 +20,12 @@ friends'
 >>> from django.utils.http import urlquote, urlquote_plus
 >>> urlquote(u'Paris & Orl\xe9ans')
 u'Paris%20%26%20Orl%C3%A9ans'
+>>> urlquote(u'Paris & Orl\xe9ans', safe="&")
+u'Paris%20&%20Orl%C3%A9ans'
 >>> urlquote_plus(u'Paris & Orl\xe9ans')
 u'Paris+%26+Orl%C3%A9ans'
+>>> urlquote_plus(u'Paris & Orl\xe9ans', safe="&")
+u'Paris+&+Orl%C3%A9ans'
 
 ### iri_to_uri ###########################################################
 >>> from django.utils.encoding import iri_to_uri

@@ -9,7 +9,8 @@ def urlquote(url, safe='/'):
     can safely be used as part of an argument to a subsequent iri_to_uri() call
     without double-quoting occurring.
     """
-    return force_unicode(urllib.quote(smart_str(url)))
+    return force_unicode(urllib.quote(smart_str(url), safe))
+
 urlquote = allow_lazy(urlquote, unicode)
 
 def urlquote_plus(url, safe=''):
