@@ -787,6 +787,8 @@ See the `session docs`_.
 SESSION_COOKIE_PATH
 -------------------
 
+**New in Django development version**
+
 Default: ``'/'``
 
 The path set on the session cookie. Should match the URL path of your Django
