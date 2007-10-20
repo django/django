@@ -48,6 +48,12 @@ var CZECH_MAP = {
     'ž':'z'
 }
 
+var POLISH_MAP = {
+    'ą':'a', 'ć':'c', 'ę':'e', 'ł':'l', 'ń':'n', 'ó':'o', 'ś':'s', 'ź':'z',
+    'ż':'z', 'Ą':'A', 'Ć':'C', 'Ę':'e', 'Ł':'L', 'Ń':'N', 'Ó':'o', 'Ś':'S',
+    'Ź':'Z', 'Ż':'Z'
+} 
+
 var ALL_DOWNCODE_MAPS=new Array()
 ALL_DOWNCODE_MAPS[0]=LATIN_MAP
 ALL_DOWNCODE_MAPS[1]=LATIN_SYMBOLS_MAP
@@ -56,6 +62,7 @@ ALL_DOWNCODE_MAPS[3]=TURKISH_MAP
 ALL_DOWNCODE_MAPS[4]=RUSSIAN_MAP
 ALL_DOWNCODE_MAPS[5]=UKRAINIAN_MAP
 ALL_DOWNCODE_MAPS[6]=CZECH_MAP
+ALL_DOWNCODE_MAPS[7]=POLISH_MAP
 
 var Downcoder = new Object();
 Downcoder.Initialize = function()
