@@ -8,6 +8,7 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 import copy
+import datetime
 from itertools import chain
 
 from django.utils.datastructures import MultiValueDict
@@ -19,7 +20,7 @@ from util import flatatt
 __all__ = (
     'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'Textarea', 'CheckboxInput',
+    'FileInput', 'DateTimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
 )
@@ -133,7 +134,7 @@ class FileInput(Input):
 
     def render(self, name, value, attrs=None):
         return super(FileInput, self).render(name, None, attrs=attrs)
-        
+
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
         return files.get(name, None)
@@ -150,6 +151,19 @@ class Textarea(Widget):
         value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
+
+class DateTimeInput(Input):
+    input_type = 'text'
+    format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
+
+    def __init__(self, attrs=None, format=None):
+        super(DateTimeInput, self).__init__(attrs)
+        if format:
+            self.format = format
+
+    def render(self, name, value, attrs=None):
+        return super(DateTimeInput, self).render(name,
+                value.strftime(self.format), attrs)
 
 class CheckboxInput(Widget):
     def __init__(self, attrs=None, check_test=bool):
@@ -432,5 +446,5 @@ class SplitDateTimeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
-            return [value.date(), value.time()]
+            return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]

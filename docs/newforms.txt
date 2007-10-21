@@ -1201,7 +1201,7 @@ If no ``input_formats`` argument is provided, the default input formats are::
 ``DateTimeField``
 ~~~~~~~~~~~~~~~~~
 
-    * Default widget: ``TextInput``
+    * Default widget: ``DateTimeInput``
     * Empty value: ``None``
     * Normalizes to: A Python ``datetime.datetime`` object.
     * Validates that the given value is either a ``datetime.datetime``,
@@ -1221,6 +1221,9 @@ If no ``input_formats`` argument is provided, the default input formats are::
     '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
     '%m/%d/%y',              # '10/25/06'
+
+**New in Django development version:** The ``DateTimeField`` used to use a
+``TextInput`` widget by default. This has now changed.
 
 ``DecimalField``
 ~~~~~~~~~~~~~~~~
@@ -1558,6 +1561,7 @@ commonly used groups of widgets:
     ``MultipleHiddenInput``       Multiple ``<input type='hidden' ...``
                                   instances.
     ``FileInput``                 ``<input type='file' ...``
+    ``DateTimeInput``             ``<input type='text' ...``
     ``Textarea``                  ``<textarea>...</textarea>``
     ``CheckboxInput``             ``<input type='checkbox' ...``
     ``Select``                    ``<select><option ...``
@@ -1570,6 +1574,9 @@ commonly used groups of widgets:
     ``SplitDateTimeWidget``       Wrapper around two ``TextInput`` widgets:
                                   one for the Date, and one for the Time.
     ============================  ===========================================
+
+**New in Django development version:** The ``DateTimeInput`` has been added
+since the last release.
 
 Specifying widgets
 ------------------
