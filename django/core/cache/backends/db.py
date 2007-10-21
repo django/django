@@ -24,9 +24,6 @@ class CacheClass(BaseCache):
         except (ValueError, TypeError):
             self._cull_frequency = 3
 
-    def add(self, key, value, timeout=None):
-        return self._base_set('add', key, value, timeout)
-
     def get(self, key, default=None):
         cursor = connection.cursor()
         cursor.execute("SELECT cache_key, value, expires FROM %s WHERE cache_key = %%s" % self._table, [key])
@@ -42,6 +39,9 @@ class CacheClass(BaseCache):
 
     def set(self, key, value, timeout=None):
         return self._base_set('set', key, value, timeout)
+
+    def add(self, key, value, timeout=None):
+        return self._base_set('add', key, value, timeout)
 
     def _base_set(self, mode, key, value, timeout=None):
         if timeout is None:
@@ -59,8 +59,7 @@ class CacheClass(BaseCache):
             if mode == 'set' and cursor.fetchone():
                 cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
             else:
-                if mode == 'add':
-                    cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
+                cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])
         except DatabaseError:
             # To be threadsafe, updates/inserts are allowed to fail silently
             pass
