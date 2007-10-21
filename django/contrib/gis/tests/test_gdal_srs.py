@@ -145,6 +145,18 @@ class SpatialRefTest(unittest.TestCase):
         for s in srlist:
             if s.proj:
                 ct = CoordTransform(SpatialReference(s.wkt), target)
+
+    def test13_attr_value(self):
+        "Testing the attr_value() method."
+        s1 = SpatialReference('WGS84')
+        self.assertRaises(TypeError, s1.__getitem__, 0)
+        self.assertRaises(TypeError, s1.__getitem__, ('GEOGCS', 'foo'))
+        self.assertEqual('WGS 84', s1['GEOGCS'])
+        self.assertEqual('WGS_1984', s1['DATUM'])
+        self.assertEqual('EPSG', s1['AUTHORITY'])
+        self.assertEqual(4326, int(s1['AUTHORITY', 1]))
+        for i in range(7): self.assertEqual(0, int(s1['TOWGS84', i]))
+        self.assertEqual(None, s1['FOOBAR'])
     
 def suite():
     s = unittest.TestSuite()

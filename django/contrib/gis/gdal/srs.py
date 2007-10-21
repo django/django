@@ -70,8 +70,8 @@ angular_units = units_func(lgdal.OSRGetAngularUnits)
 class SpatialReference(object):
     """
     A wrapper for the OGRSpatialReference object.  According to the GDAL website,
-     the SpatialReference object 'provide[s] services to represent coordinate 
-     systems (projections and datums) and to transform between them.'
+    the SpatialReference object 'provide[s] services to represent coordinate 
+    systems (projections and datums) and to transform between them.'
     """
 
     # Well-Known Geographical Coordinate System Name
@@ -135,8 +135,25 @@ class SpatialReference(object):
     def __getitem__(self, target):
         """
         Returns the value of the given string attribute node, None if the node 
-         doesn't exist.  Can also take a tuple as a parameter, (target, child), 
-         where child is the child index to get.
+        doesn't exist.  Can also take a tuple as a parameter, (target, child), 
+        where child is the index of the attribute in the WKT.  For example:
+
+        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
+        >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
+        >>> print srs['GEOGCS']
+        WGS 84
+        >>> print srs['DATUM']
+        WGS_1984
+        >>> print srs['AUTHORITY']
+        EPSG
+        >>> print srs['AUTHORITY', 1] # The authority value
+        4326
+        >>> print srs['TOWGS84', 4] # the fourth value in this wkt
+        0
+        >>> print srs['UNIT|AUTHORITY'] # For the units authority, have to use the pipe symbole.
+        EPSG
+        >>> print srs['UNIT|AUTHORITY', 1] # The authority value for the untis
+        9122
         """
         if isinstance(target, TupleType):
             return self.attr_value(*target)
@@ -158,7 +175,7 @@ class SpatialReference(object):
     def _string_ptr(self, ptr):
         """
         Returns the string at the pointer if it is valid, None if the pointer
-         is NULL.
+        is NULL.
         """
         if not ptr: return None
         else: return string_at(ptr)
@@ -177,8 +194,10 @@ class SpatialReference(object):
     def attr_value(self, target, index=0):
         """
         The attribute value for the given target node (e.g. 'PROJCS'). The index
-         keyword specifies an index of the child node to return.
+        keyword specifies an index of the child node to return.
         """
+        if not isinstance(target, str):
+            raise TypeError('Attribute target must be a string')
         ptr = lgdal.OSRGetAttrValue(self._srs, c_char_p(target), c_int(index))
         return self._string_ptr(ptr)
 
@@ -200,13 +219,10 @@ class SpatialReference(object):
 
     @property
     def srid(self):
-        """
-        Returns the EPSG SRID of this Spatial Reference, will be None if
-        if undefined.
-        """
+        "Returns the SRID of top-level authority, or None if undefined."
         try:
             return int(self.attr_value('AUTHORITY', 1))
-        except ValueError:
+        except (TypeError, ValueError):
             return None
         
     #### Unit Properties ####
