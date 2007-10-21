@@ -217,7 +217,8 @@ class ManagementUtility(object):
         # Special-cases: We want 'django-admin.py --version' and
         # 'django-admin.py --help' to work, for backwards compatibility.
         elif self.argv[1:] == ['--version']:
-            print django.get_version()
+            # LaxOptionParser already takes care of printing the version.
+            pass
         elif self.argv[1:] == ['--help']:
             sys.stderr.write(self.main_help_text() + '\n')
         else:
