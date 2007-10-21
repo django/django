@@ -178,8 +178,9 @@ request, before Django decides which view to execute.
 ``process_request()`` should return either ``None`` or an ``HttpResponse``
 object. If it returns ``None``, Django will continue processing this request,
 executing any other middleware and, then, the appropriate view. If it returns
-an ``HttpResponse`` object, Django won't bother calling ANY other middleware or
-the appropriate view; it'll return that ``HttpResponse``.
+an ``HttpResponse`` object, Django won't bother calling ANY other request,
+view or exception middleware, or the appropriate view; it'll return that
+``HttpResponse``. Response middleware is always called on every response.
 
 process_view
 ------------
@@ -197,8 +198,9 @@ arguments that will be passed to the view. Neither ``view_args`` nor
 return either ``None`` or an ``HttpResponse`` object. If it returns ``None``,
 Django will continue processing this request, executing any other
 ``process_view()`` middleware and, then, the appropriate view. If it returns an
-``HttpResponse`` object, Django won't bother calling ANY other middleware or
-the appropriate view; it'll return that ``HttpResponse``.
+``HttpResponse`` object, Django won't bother calling ANY other request, view
+or exception middleware, or the appropriate view; it'll return that
+``HttpResponse``. Response middleware is always called on every response.
 
 process_response
 ----------------
@@ -236,7 +238,8 @@ Guidelines
 
     * Feel free to look at Django's available middleware for examples. The
       core Django middleware classes are in ``django/middleware/`` in the
-      Django distribution. The session middleware is in ``django/contrib/sessions``.
+      Django distribution. The session middleware is in
+      ``django/contrib/sessions``.
 
     * If you write a middleware component that you think would be useful to
       other people, contribute to the community! Let us know, and we'll
