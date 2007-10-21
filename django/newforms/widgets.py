@@ -8,7 +8,6 @@ except NameError:
     from sets import Set as set   # Python 2.3 fallback
 
 import copy
-import datetime
 from itertools import chain
 
 from django.utils.datastructures import MultiValueDict
