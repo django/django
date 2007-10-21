@@ -300,6 +300,12 @@ class DateTimeField(Field):
             return value
         if isinstance(value, datetime.date):
             return datetime.datetime(value.year, value.month, value.day)
+        if isinstance(value, list):
+            # Input comes from a SplitDateTimeWidget, for example. So, it's two
+            # components: date and time.
+            if len(value) != 2:
+                raise ValidationError(ugettext(u'Enter a valid date/time.'))
+            value = '%s %s' % tuple(value)
         for format in self.input_formats:
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])
