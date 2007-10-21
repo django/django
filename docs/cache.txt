@@ -119,8 +119,8 @@ in your database that is in the proper format that Django's database-cache
 system expects.
 
 Once you've created that database table, set your ``CACHE_BACKEND`` setting to
-``"db://tablename/"``, where ``tablename`` is the name of the database table.
-In this example, the cache table's name is ``my_cache_table``:
+``"db://tablename"``, where ``tablename`` is the name of the database table.
+In this example, the cache table's name is ``my_cache_table``::
 
     CACHE_BACKEND = 'db://my_cache_table'
 
