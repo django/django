@@ -228,7 +228,7 @@ entire site. Just add ``'django.middleware.cache.CacheMiddleware'`` to your
         'django.middleware.common.CommonMiddleware',
     )
 
-(The order of ``MIDDLEWARE_CLASSES`` matters. See "Order of MIDDLEWARE_CLASSES"
+(The order of ``MIDDLEWARE_CLASSES`` matters. See `Order of MIDDLEWARE_CLASSES`_
 below.)
 
 Then, add the following required settings to your Django settings file:
@@ -533,7 +533,7 @@ the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
 
-If you want to use headers to disable caching altogether, 
+If you want to use headers to disable caching altogether,
 ``django.views.decorators.never_cache`` is a view decorator that adds
 headers to ensure the response won't be cached by browsers or other caches. Example::
 
@@ -565,8 +565,11 @@ within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
 to know which headers by which to vary the cache storage. Middleware always
 adds something to the ``Vary`` response header when it can.
 
-Put the ``CacheMiddleware`` after any middlewares that might add something to
-the ``Vary`` header. The following middlewares do so:
+Put the ``CacheMiddleware`` *before* any other middleware that might add
+something to the ``Vary`` header (response middleware is applied in reverse
+order). The following middleware modules do so:
 
     * ``SessionMiddleware`` adds ``Cookie``
     * ``GZipMiddleware`` adds ``Accept-Encoding``
+    * ``LocaleMiddleware`` adds ``Accept-Language``
+
