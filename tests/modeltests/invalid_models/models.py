@@ -14,6 +14,7 @@ class FieldErrors(models.Model):
     choices = models.CharField(max_length=10, choices='bad')
     choices2 = models.CharField(max_length=10, choices=[(1,2,3),(1,2,3)])
     index = models.CharField(max_length=10, db_index='bad')
+    field_ = models.CharField(max_length=10)
 
 class Target(models.Model):
     tgt_safe = models.CharField(max_length=10)
@@ -47,7 +48,7 @@ class Target2(models.Model):
 
 class Clash3(models.Model):
     src_safe = models.CharField(max_length=10, core=True)
-    
+
     foreign_1 = models.ForeignKey(Target2, related_name='foreign_tgt')
     foreign_2 = models.ForeignKey(Target2, related_name='m2m_tgt')
 
@@ -76,7 +77,7 @@ class ValidM2M(models.Model):
     # on self don't require a related accessor, so many potential
     # clashes are avoided.
     validm2m_set = models.ManyToManyField("ValidM2M")
-    
+
     m2m_1 = models.ManyToManyField("ValidM2M", related_name='id')
     m2m_2 = models.ManyToManyField("ValidM2M", related_name='src_safe')
 
@@ -116,6 +117,7 @@ invalid_models.fielderrors: "choices": "choices" should be iterable (e.g., a tup
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "choices2": "choices" should be a sequence of two-tuples.
 invalid_models.fielderrors: "index": "db_index" should be either None, True or False.
+invalid_models.fielderrors: "field_": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.
 invalid_models.clash1: Accessor for field 'foreign' clashes with field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Accessor for field 'foreign' clashes with related m2m field 'Target.clash1_set'. Add a related_name argument to the definition for 'foreign'.
 invalid_models.clash1: Reverse query name for field 'foreign' clashes with field 'Target.clash1'. Add a related_name argument to the definition for 'foreign'.
