@@ -165,7 +165,9 @@ class WSGIRequest(http.HttpRequest):
                 content_length = int(self.environ.get('CONTENT_LENGTH', 0))
             except ValueError: # if CONTENT_LENGTH was empty string or not an integer
                 content_length = 0
-            safe_copyfileobj(self.environ['wsgi.input'], buf, size=content_length)
+            if content_length > 0:
+                safe_copyfileobj(self.environ['wsgi.input'], buf,
+                        size=content_length)
             self._raw_post_data = buf.getvalue()
             buf.close()
             return self._raw_post_data
