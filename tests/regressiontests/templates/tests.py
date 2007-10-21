@@ -805,6 +805,20 @@ class Templates(unittest.TestCase):
             'url-fail01' : ('{% url %}', {}, template.TemplateSyntaxError),
             'url-fail02' : ('{% url no_such_view %}', {}, ''),
             'url-fail03' : ('{% url regressiontests.templates.views.client no_such_param="value" %}', {}, ''),
+
+            ### CACHE TAG ######################################################
+            'cache01' : ('{% load cache %}{% cache -1 test %}cache01{% endcache %}', {}, 'cache01'),
+            'cache02' : ('{% load cache %}{% cache -1 test %}cache02{% endcache %}', {}, 'cache02'),
+            'cache03' : ('{% load cache %}{% cache 2 test %}cache03{% endcache %}', {}, 'cache03'),
+            'cache04' : ('{% load cache %}{% cache 2 test %}cache04{% endcache %}', {}, 'cache03'),
+            'cache05' : ('{% load cache %}{% cache 2 test foo %}cache05{% endcache %}', {'foo': 1}, 'cache05'),
+            'cache06' : ('{% load cache %}{% cache 2 test foo %}cache06{% endcache %}', {'foo': 2}, 'cache06'),
+            'cache07' : ('{% load cache %}{% cache 2 test foo %}cache06{% endcache %}', {'foo': 1}, 'cache05'),
+
+            # Raise exception if we dont have at least 2 args, first one integer.
+            'cache08' : ('{% load cache %}{% cache %}{% endcache %}', {}, template.TemplateSyntaxError),
+            'cache09' : ('{% load cache %}{% cache 1 %}{% endcache %}', {}, template.TemplateSyntaxError),
+            'cache10' : ('{% load cache %}{% cache foo bar %}{% endcache %}', {}, template.TemplateSyntaxError),
         }
 
         # Register our custom template loader.
