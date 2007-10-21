@@ -140,13 +140,3 @@ class UserSettingsHolder(object):
 
 settings = LazySettings()
 
-# This function replaces itself with django.utils.translation.gettext() the
-# first time it's run. This is necessary because the import of
-# django.utils.translation requires a working settings module, and loading it
-# from within this file would cause a circular import.
-def first_time_gettext(*args):
-    from django.utils.translation import gettext
-    __builtins__['_'] = gettext
-    return gettext(*args)
-
-__builtins__['_'] = first_time_gettext

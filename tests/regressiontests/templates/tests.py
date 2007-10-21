@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from django import template
 from django.template import loader
 from django.template.loaders import app_directories, filesystem
-from django.utils.translation import activate, deactivate, install, ugettext as _
+from django.utils.translation import activate, deactivate, ugettext as _
 from django.utils.tzinfo import LocalTimezone
 
 from unicode import unicode_tests
@@ -844,8 +844,6 @@ class Templates(unittest.TestCase):
         expected_invalid_str = 'INVALID'
 
         for name, vals in tests:
-            install()
-
             if isinstance(vals[2], tuple):
                 normal_string_result = vals[2][0]
                 invalid_string_result = vals[2][1]

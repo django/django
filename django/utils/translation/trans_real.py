@@ -249,8 +249,10 @@ def catalog():
 
 def do_translate(message, translation_function):
     """
-    Translate 'message' using the given 'translation_function' name -- which
-    will be either gettext or ugettext.
+    Translates 'message' using the given 'translation_function' name -- which
+    will be either gettext or ugettext. It uses the current thread to find the
+    translation object to use. If no current translation is activated, the
+    message will be run through the default translation object.
     """
     global _default, _active
     t = _active.get(currentThread(), None)
@@ -262,12 +264,6 @@ def do_translate(message, translation_function):
     return getattr(_default, translation_function)(message)
 
 def gettext(message):
-    """
-    This function will be patched into the builtins module to provide the _
-    helper function. It will use the current thread as a discriminator to find
-    the translation object to use. If no current translation is activated, the
-    message will be run through the default translation object.
-    """
     return do_translate(message, 'gettext')
 
 def ugettext(message):
@@ -413,13 +409,6 @@ def get_partial_date_formats():
     if month_day_format == 'MONTH_DAY_FORMAT':
         month_day_format = settings.MONTH_DAY_FORMAT
     return year_month_format, month_day_format
-
-def install():
-    """
-    Installs the gettext function as the default translation function under
-    the name '_'.
-    """
-    __builtins__['_'] = gettext
 
 dot_re = re.compile(r'\S')
 def blankout(src, char):
