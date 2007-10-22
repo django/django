@@ -7,7 +7,7 @@ class BoundaryModel(models.Model):
 
 class Defaults(models.Model):
     name = models.CharField(max_length=256, default='class default value')
-    date = models.DateField(default = datetime.date(1980, 1, 1))
+    def_date = models.DateField(default = datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
 
 __test__ = {'API_TESTS': """
@@ -31,18 +31,18 @@ initial values.
 >>> DefaultsForm = form_for_model(Defaults)
 >>> DefaultsForm().fields['name'].initial
 u'class default value'
->>> DefaultsForm().fields['date'].initial
+>>> DefaultsForm().fields['def_date'].initial
 datetime.date(1980, 1, 1)
 >>> DefaultsForm().fields['value'].initial
 42
 
 In form_for_instance(), the initial values come from the instance's values, not
 the model's defaults.
->>> foo_instance = Defaults(name=u'instance value', date = datetime.date(1969, 4, 4), value = 12)
+>>> foo_instance = Defaults(name=u'instance value', def_date = datetime.date(1969, 4, 4), value = 12)
 >>> InstanceForm = form_for_instance(foo_instance)
 >>> InstanceForm().fields['name'].initial
 u'instance value'
->>> InstanceForm().fields['date'].initial
+>>> InstanceForm().fields['def_date'].initial
 datetime.date(1969, 4, 4)
 >>> InstanceForm().fields['value'].initial
 12
