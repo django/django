@@ -1,3 +1,7 @@
+"""
+Module for executing all of the GDAL tests.  None
+of these tests require the use of the database.
+"""
 from unittest import TestSuite, TextTestRunner
 
 # Importing the GDAL test modules.
@@ -20,5 +24,5 @@ def suite():
     return s
 
 def run(verbosity=1):
-    "Runs the tests that do not require geographic (GEOS, GDAL, etc.) models."
+    "Runs the GDAL tests."
     TextTestRunner(verbosity=verbosity).run(suite())

@@ -138,10 +138,12 @@ class GeoModelTest(unittest.TestCase):
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.
         if not oracle:
             h = City.objects.transform('point', srid=htown.srid).get(name='Houston')
+            self.assertEqual(3084, h.point.srid)
             self.assertAlmostEqual(htown.x, h.point.x, 8)
             self.assertAlmostEqual(htown.y, h.point.y, 8)
 
         p = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
+        self.assertEqual(2774, p.point.srid)
         self.assertAlmostEqual(ptown.x, p.point.x, 7)
         self.assertAlmostEqual(ptown.y, p.point.y, 7)
 

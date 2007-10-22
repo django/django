@@ -2,7 +2,7 @@ from types import StringType, UnicodeType
 from django.db import connection
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry, GEOSException 
-from django.contrib.gis.db.backend.util import GeoFieldSQL
+from django.contrib.gis.db.backend.util import get_srid, GeoFieldSQL
 from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
 from django.contrib.gis.db.backend.postgis.query import POSTGIS_TERMS, TRANSFORM
 from psycopg2 import Binary
@@ -109,8 +109,7 @@ class PostGISField(Field):
 
             # Getting the SRID of the geometry, or defaulting to that of the field if
             # it is None.
-            if value.srid is None: srid = self._srid
-            else: srid = value.srid
+            srid = get_srid(self, value)
 
             # The adaptor will be used by psycopg2 for quoting the WKB.
             adapt = PostGISAdaptor(value, srid)

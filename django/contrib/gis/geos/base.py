@@ -48,14 +48,12 @@ class GEOSGeometry(object):
         The `srid` keyword is used to specify the Source Reference Identifier
          (SRID) number for this Geometry.  If not set, the SRID will be None.
         """ 
-        from_hex = False
         if isinstance(geo_input, UnicodeType):
             # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
             geo_input = geo_input.encode('ascii')
         if isinstance(geo_input, StringType):
             if hex_regex.match(geo_input):
                 # If the regex matches, the geometry is in HEX form.
-                from_hex = True
                 sz = c_size_t(len(geo_input))
                 buf = create_string_buffer(geo_input)
                 g = lgeos.GEOSGeomFromHEX_buf(buf, sz)
@@ -85,10 +83,6 @@ class GEOSGeometry(object):
 
         # Setting the SRID, if given.
         if srid and isinstance(srid, int): self.srid = srid
-
-        # Exported HEX from other GEOS geometries will have -1 SRID -- 
-        # set here to 0, when the SRID is not explicitly given.
-        if not srid and from_hex: self.srid = 0
 
         # Setting the class type (e.g., 'Point', 'Polygon', etc.)
         self.__class__ = GEOS_CLASSES[self.geom_type]
@@ -422,6 +416,8 @@ class GEOSGeometry(object):
         included in this representation, because the GEOS C library uses
         -1 by default, even if the SRID is set.
         """
+        # A possible faster, all-python, implementation: 
+        #  str(self.wkb).encode('hex')
         sz = c_size_t()
         h = lgeos.GEOSGeomToHEX_buf(self._ptr(), byref(sz))
         return string_at(h, sz.value)

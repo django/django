@@ -607,6 +607,21 @@ class GEOSTest(unittest.TestCase):
         self.assertEqual(32021, gc.srid)
         for i in range(len(gc)): self.assertEqual(32021, gc[i].srid)
 
+        # GEOS may get the SRID from HEXEWKB
+        # 'POINT(5 23)' at SRID=4326 in hex form -- obtained from PostGIS
+        # using `SELECT GeomFromText('POINT (5 23)', 4326);`.
+        hex = '0101000020E610000000000000000014400000000000003740'
+        p1 = fromstr(hex)
+        self.assertEqual(4326, p1.srid)
+
+        # However, when HEX is exported, the SRID information is lost
+        # and set to -1.  Essentially, the 'E' of the EWKB is not
+        # encoded in HEX by the GEOS C library for some reason.
+        p2 = fromstr(p1.hex)
+        self.assertEqual(-1, p2.srid)
+        p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
+        self.assertEqual(-1, p3.srid)
+
     def test16_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."
         ### Testing the mutability of Polygons ###
