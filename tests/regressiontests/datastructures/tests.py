@@ -54,6 +54,17 @@
 True
 >>> print repr(d)
 {'one': 'not one', 'two': 'two', 'three': 'three'}
+>>> d.pop('one', 'missing')
+'not one'
+>>> d.pop('one', 'missing')
+'missing'
+
+We don't know which item will be popped in popitem(), so we'll just check that
+the number of keys has decreased.
+>>> l = len(d)
+>>> _ = d.popitem()
+>>> l - len(d)
+1
 
 Init from sequence of tuples
 >>> d = SortedDict((

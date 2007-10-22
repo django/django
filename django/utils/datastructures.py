@@ -62,6 +62,13 @@ class SortedDict(dict):
         else:
             self.keyOrder = [key for key, value in data]
 
+    def __deepcopy__(self,memo):
+        from copy import deepcopy
+        obj = self.__class__()
+        for k, v in self.items():
+            obj[k] = deepcopy(v, memo)
+        return obj
+
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)
         if key not in self.keyOrder:
@@ -74,6 +81,20 @@ class SortedDict(dict):
     def __iter__(self):
         for k in self.keyOrder:
             yield k
+
+    def pop(self, k, *args):
+        result = dict.pop(self, k, *args)
+        try:
+            self.keyOrder.remove(k)
+        except ValueError:
+            # Key wasn't in the dictionary in the first place. No problem.
+            pass
+        return result
+
+    def popitem(self):
+        result = dict.popitem(self)
+        self.keyOrder.remove(result[0])
+        return result
 
     def items(self):
         return zip(self.keyOrder, self.values())
