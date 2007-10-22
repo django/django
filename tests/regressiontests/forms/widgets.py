@@ -855,6 +855,8 @@ u'<input type="text" class="pretty" value="2006-01-10" name="date_0" /><input ty
 # DateTimeInput ###############################################################
 
 >>> w = DateTimeInput()
+>>> w.render('date', None)
+u'<input type="text" name="date" />'
 >>> d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
 >>> print d
 2007-09-17 12:51:34.482548

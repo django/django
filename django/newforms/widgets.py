@@ -161,8 +161,11 @@ class DateTimeInput(Input):
             self.format = format
 
     def render(self, name, value, attrs=None):
-        return super(DateTimeInput, self).render(name,
-                value.strftime(self.format), attrs)
+        if value is None:
+            value = ''
+        elif hasattr(value, 'strftime'):
+            value = value.strftime(self.format)
+        return super(DateTimeInput, self).render(name, value, attrs)
 
 class CheckboxInput(Widget):
     def __init__(self, attrs=None, check_test=bool):
