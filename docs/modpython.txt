@@ -87,17 +87,19 @@ lived under the ``weblog/`` directory, you would *also* need to add
 **parent directories** of anything you import directly must be on the Python
 path.
 
-.. caution::
+.. note::
 
-    If you're using Windows, remember that the path will contain backslashes.
-    This string is passed through Python's string parser twice, so you need to
-    escape each backslash **twice**::
+    If you're using Windows, it is still recommended that you use forward
+    slashes in the pathnames, even though Windows normally uses backslashes
+    for its native separator. Apache knows how to convert from the forward
+    slash format to the native format, so this approach is portable and easier
+    to read (it avoids tricky problems with having to double-escape
+    backslashes).
 
-        PythonPath "['c:\\\\path\\\\to\\\\project'] + sys.path"
+    This is valid even on a Windows system::
 
-    Or, use raw strings::
+        PythonPath "['c:/path/to/project'] + sys.path"
 
-        PythonPath "[r'c:\\path\\to\\project'] + sys.path"
 
 You can also add directives such as ``PythonAutoReload Off`` for performance.
 See the `mod_python documentation`_ for a full list of options.

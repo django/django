@@ -38,6 +38,12 @@ class CacheClass(BaseCache):
         return pickle.loads(base64.decodestring(row[1]))
 
     def set(self, key, value, timeout=None):
+        return self._base_set('set', key, value, timeout)
+
+    def add(self, key, value, timeout=None):
+        return self._base_set('add', key, value, timeout)
+
+    def _base_set(self, mode, key, value, timeout=None):
         if timeout is None:
             timeout = self.default_timeout
         cursor = connection.cursor()
@@ -50,7 +56,7 @@ class CacheClass(BaseCache):
         encoded = base64.encodestring(pickle.dumps(value, 2)).strip()
         cursor.execute("SELECT cache_key FROM %s WHERE cache_key = %%s" % self._table, [key])
         try:
-            if cursor.fetchone():
+            if mode == 'set' and cursor.fetchone():
                 cursor.execute("UPDATE %s SET value = %%s, expires = %%s WHERE cache_key = %%s" % self._table, [encoded, str(exp), key])
             else:
                 cursor.execute("INSERT INTO %s (cache_key, value, expires) VALUES (%%s, %%s, %%s)" % self._table, [key, encoded, str(exp)])

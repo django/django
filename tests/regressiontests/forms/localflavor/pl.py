@@ -35,11 +35,15 @@ u'41-403'
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX.']
->>> f.clean('43-34-234-323')
-u'43-34-234-323'
->>> f.clean('433-344-24-23')
-u'433-344-24-23'
-
+>>> f.clean('64-62-414-124')
+u'6462414124'
+>>> f.clean('646-241-41-24')
+u'6462414124'
+>>> f.clean('646-241-41-23')
+Traceback (most recent call last):
+...
+ValidationError: [u'Wrong checksum for the Tax Number (NIP).']
+ 
 # PLNationalIdentificationNumberField ############################################
 
 >>> from django.contrib.localflavor.pl.forms import PLNationalIdentificationNumberField
@@ -58,4 +62,20 @@ ValidationError: [u'National Identification Number consists of 11 digits.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'National Identification Number consists of 11 digits.']
+
+# PLNationalBusinessRegisterField ################################################
+
+>>> from django.contrib.localflavor.pl.forms import PLNationalBusinessRegisterField
+>>> f = PLNationalBusinessRegisterField()
+>>> f.clean('590096454')
+u'590096454'
+>>> f.clean('590096453')
+Traceback (most recent call last):
+...
+ValidationError: [u'Wrong checksum for the National Business Register Number (REGON).']
+>>> f.clean('590096')
+Traceback (most recent call last):
+...
+ValidationError: [u'National Business Register Number (REGON) consists of 7 or 9 digits.']
+
 """

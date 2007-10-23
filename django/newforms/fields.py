@@ -11,7 +11,7 @@ from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, smart_unicode
 
 from util import ErrorList, ValidationError
-from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple
+from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
 
 try:
     from decimal import Decimal, DecimalException
@@ -284,6 +284,8 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 )
 
 class DateTimeField(Field):
+    widget = DateTimeInput
+
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATETIME_INPUT_FORMATS
@@ -300,6 +302,12 @@ class DateTimeField(Field):
             return value
         if isinstance(value, datetime.date):
             return datetime.datetime(value.year, value.month, value.day)
+        if isinstance(value, list):
+            # Input comes from a SplitDateTimeWidget, for example. So, it's two
+            # components: date and time.
+            if len(value) != 2:
+                raise ValidationError(ugettext(u'Enter a valid date/time.'))
+            value = '%s %s' % tuple(value)
         for format in self.input_formats:
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])

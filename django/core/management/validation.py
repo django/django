@@ -35,6 +35,8 @@ def get_validation_errors(outfile, app=None):
         for f in opts.fields:
             if f.name == 'id' and not f.primary_key and opts.pk.name == 'id':
                 e.add(opts, '"%s": You can\'t use "id" as a field name, because each model automatically gets an "id" field if none of the fields have primary_key=True. You need to either remove/rename your "id" field or add primary_key=True to a field.' % f.name)
+            if f.name.endswith('_'):
+                e.add(opts, '"%s": Field names cannot end with underscores, because this would lead to ambiguous queryset filters.' % f.name)
             if isinstance(f, models.CharField) and f.max_length in (None, 0):
                 e.add(opts, '"%s": CharFields require a "max_length" attribute.' % f.name)
             if isinstance(f, models.DecimalField):

@@ -2,6 +2,8 @@
 Polish-specific form helpers
 """
 
+import re
+
 from django.newforms import ValidationError
 from django.newforms.fields import Select, RegexField
 from django.utils.translation import ugettext as _
@@ -34,20 +36,6 @@ class PLNationalIdentificationNumberField(RegexField):
     The algorithm is documented at http://en.wikipedia.org/wiki/PESEL.
     """
 
-    def has_valid_checksum(self, number):
-        """
-        Calculates a checksum with the provided algorithm.
-        """
-        multiple_table = (1, 3, 7, 9, 1, 3, 7, 9, 1, 3, 1)
-        result = 0
-        for i in range(len(number)):
-            result += int(number[i])*multiple_table[i]
-
-        if result % 10 == 0:
-            return True
-        else:
-            return False
-
     def __init__(self, *args, **kwargs):
         super(PLNationalIdentificationNumberField, self).__init__(r'^\d{11}$',
             max_length=None, min_length=None, error_message=_(u'National Identification Number consists of 11 digits.'),
@@ -59,17 +47,95 @@ class PLNationalIdentificationNumberField(RegexField):
             raise ValidationError(_(u'Wrong checksum for the National Identification Number.'))
         return u'%s' % value
 
+    def has_valid_checksum(self, number):
+        """
+        Calculates a checksum with the provided algorithm.
+        """
+        multiple_table = (1, 3, 7, 9, 1, 3, 7, 9, 1, 3, 1)
+        result = 0
+        for i in range(len(number)):
+            result += int(number[i]) * multiple_table[i]
+        return result % 10 == 0
 
 class PLTaxNumberField(RegexField):
     """
     A form field that validates as Polish Tax Number (NIP).
     Valid forms are: XXX-XXX-YY-YY or XX-XX-YYY-YYY.
+
+    Checksum algorithm based on documentation at
+    http://wipos.p.lodz.pl/zylla/ut/nip-rego.html
     """
+
     def __init__(self, *args, **kwargs):
         super(PLTaxNumberField, self).__init__(r'^\d{3}-\d{3}-\d{2}-\d{2}$|^\d{2}-\d{2}-\d{3}-\d{3}$',
             max_length=None, min_length=None,
             error_message=_(u'Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX.'),  *args, **kwargs)
 
+    def clean(self,value):
+        super(PLTaxNumberField, self).clean(value)
+        value = re.sub("[-]", "", value)
+        if not self.has_valid_checksum(value):
+            raise ValidationError(_(u'Wrong checksum for the Tax Number (NIP).'))
+        return u'%s' % value
+
+    def has_valid_checksum(self, number):
+        """
+        Calculates a checksum with the provided algorithm.
+        """
+        multiple_table = (6, 5, 7, 2, 3, 4, 5, 6, 7)
+        result = 0
+        for i in range(len(number)-1):
+            result += int(number[i]) * multiple_table[i]
+
+        result %= 11
+        if result == int(number[-1]):
+            return True
+        else:
+            return False
+
+class PLNationalBusinessRegisterField(RegexField):
+    """
+    A form field that validated as Polish National Official Business Register Number (REGON)
+    Valid forms are: 7 or 9 digits number
+
+    More on the field: http://www.stat.gov.pl/bip/regon_ENG_HTML.htm
+
+    The checksum algorithm is documented at http://wipos.p.lodz.pl/zylla/ut/nip-rego.html
+    """
+    def __init__(self, *args, **kwargs):
+        super(PLNationalBusinessRegisterField, self).__init__(r'^\d{7,9}$',
+            max_length=None, min_length=None, error_message=_(u'National Business Register Number (REGON) consists of 7 or 9 digits.'),
+            *args, **kwargs)
+
+    def clean(self,value):
+        super(PLNationalBusinessRegisterField, self).clean(value)
+        if not self.has_valid_checksum(value):
+            raise ValidationError(_(u'Wrong checksum for the National Business Register Number (REGON).'))
+        return u'%s' % value
+
+    def has_valid_checksum(self, number):
+        """
+        Calculates a checksum with the provided algorithm.
+        """
+        multiple_table_7 = (2, 3, 4, 5, 6, 7)
+        multiple_table_9 = (8, 9, 2, 3, 4, 5, 6, 7)
+        result = 0
+
+        if len(number) == 7:
+            multiple_table = multiple_table_7
+        else:
+            multiple_table = multiple_table_9
+
+        for i in range(len(number)-1):
+            result += int(number[i]) * multiple_table[i]
+
+        result %= 11
+        if result == 10:
+            result = 0
+        if result  == int(number[-1]):
+            return True
+        else:
+            return False
 
 class PLPostalCodeField(RegexField):
     """

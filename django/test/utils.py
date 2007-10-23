@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.dispatch import dispatcher
 from django.test import signals
 from django.template import Template
+from django.utils.translation import deactivate
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -43,7 +44,7 @@ def setup_test_environment():
 
         - Installing the instrumented test renderer
         - Diverting the email sending functions to a test buffer
-
+        - Setting the active locale to match the LANGUAGE_CODE setting.
     """
     Template.original_render = Template.render
     Template.render = instrumented_test_render
@@ -52,6 +53,8 @@ def setup_test_environment():
     mail.SMTPConnection = TestSMTPConnection
 
     mail.outbox = []
+
+    deactivate()
 
 def teardown_test_environment():
     """Perform any global post-test teardown. This involves:

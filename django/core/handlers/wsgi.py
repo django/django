@@ -165,7 +165,9 @@ class WSGIRequest(http.HttpRequest):
                 content_length = int(self.environ.get('CONTENT_LENGTH', 0))
             except ValueError: # if CONTENT_LENGTH was empty string or not an integer
                 content_length = 0
-            safe_copyfileobj(self.environ['wsgi.input'], buf, size=content_length)
+            if content_length > 0:
+                safe_copyfileobj(self.environ['wsgi.input'], buf,
+                        size=content_length)
             self._raw_post_data = buf.getvalue()
             buf.close()
             return self._raw_post_data
@@ -179,6 +181,7 @@ class WSGIRequest(http.HttpRequest):
 
 class WSGIHandler(BaseHandler):
     initLock = Lock()
+    request_class = WSGIRequest
 
     def __call__(self, environ, start_response):
         from django.conf import settings
@@ -194,13 +197,16 @@ class WSGIHandler(BaseHandler):
 
         dispatcher.send(signal=signals.request_started)
         try:
-            request = WSGIRequest(environ)
-            response = self.get_response(request)
+            try:
+                request = self.request_class(environ)
+            except UnicodeDecodeError:
+                response = http.HttpResponseBadRequest()
+            else:
+                response = self.get_response(request)
 
-            # Apply response middleware
-            for middleware_method in self._response_middleware:
-                response = middleware_method(request, response)
-
+                # Apply response middleware
+                for middleware_method in self._response_middleware:
+                    response = middleware_method(request, response)
         finally:
             dispatcher.send(signal=signals.request_finished)
 

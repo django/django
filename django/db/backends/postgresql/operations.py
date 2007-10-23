@@ -100,5 +100,5 @@ class DatabaseOperations(BaseDatabaseOperations):
                     style.SQL_FIELD(qn('id')),
                     style.SQL_KEYWORD('IS NOT'),
                     style.SQL_KEYWORD('FROM'),
-                    style.SQL_TABLE(f.m2m_db_table())))
+                    style.SQL_TABLE(qn(f.m2m_db_table()))))
         return output

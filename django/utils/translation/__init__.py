@@ -8,7 +8,7 @@ __all__ = ['gettext', 'gettext_noop', 'gettext_lazy', 'ngettext',
         'ngettext_lazy', 'string_concat', 'activate', 'deactivate',
         'get_language', 'get_language_bidi', 'get_date_formats',
         'get_partial_date_formats', 'check_for_language', 'to_locale',
-        'get_language_from_request', 'install', 'templatize', 'ugettext',
+        'get_language_from_request', 'templatize', 'ugettext',
         'ungettext', 'deactivate_all']
 
 # Here be dragons, so a short explanation of the logic won't hurt:
@@ -95,9 +95,6 @@ def to_locale(language):
 
 def get_language_from_request(request):
     return real_get_language_from_request(request)
-
-def install():
-    return real_install()
 
 def templatize(src):
     return real_templatize(src)

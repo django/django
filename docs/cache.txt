@@ -119,8 +119,8 @@ in your database that is in the proper format that Django's database-cache
 system expects.
 
 Once you've created that database table, set your ``CACHE_BACKEND`` setting to
-``"db://tablename/"``, where ``tablename`` is the name of the database table.
-In this example, the cache table's name is ``my_cache_table``:
+``"db://tablename"``, where ``tablename`` is the name of the database table.
+In this example, the cache table's name is ``my_cache_table``::
 
     CACHE_BACKEND = 'db://my_cache_table'
 
@@ -228,7 +228,7 @@ entire site. Just add ``'django.middleware.cache.CacheMiddleware'`` to your
         'django.middleware.common.CommonMiddleware',
     )
 
-(The order of ``MIDDLEWARE_CLASSES`` matters. See "Order of MIDDLEWARE_CLASSES"
+(The order of ``MIDDLEWARE_CLASSES`` matters. See `Order of MIDDLEWARE_CLASSES`_
 below.)
 
 Then, add the following required settings to your Django settings file:
@@ -288,6 +288,36 @@ Or, using Python 2.4's decorator syntax::
 above example, the result of the ``slashdot_this()`` view will be cached for 15
 minutes.
 
+Template fragment caching
+=========================
+
+If you're after even more control, you can also cache template fragments using
+the ``cache`` template tag. To give your template access to this tag, put ``{%
+load cache %}`` near the top of your template.
+
+The ``{% cache %}`` template tag caches the contents of the block for a given
+amount of time. It takes at least two arguments: the cache timeout, in
+seconds, and the name to give the cache fragment. For example::
+
+    {% load cache %}
+    {% cache 500 sidebar %}
+        .. sidebar ..
+    {% endcache %}
+
+Sometimes you might want to cache multiple copies of a fragment depending on
+some dynamic data that appears inside the fragment. For example you may want a
+separate cached copy of the sidebar used in the previous example for every user
+of your site. This can be easily achieved by passing additional arguments to
+the ``{% cache %}`` template tag to uniquely identify the cache fragment::
+
+    {% load cache %}
+    {% cache 500 sidebar request.user.username %}
+        .. sidebar for logged in user ..
+    {% endcache %}
+
+If you need more than one argument to identify the fragment that's fine, simply
+pass as many arguments to ``{% cache %}`` as you need!
+
 The low-level cache API
 =======================
 
@@ -325,6 +355,15 @@ get() can take a ``default`` argument::
 
     >>> cache.get('my_key', 'has expired')
     'has expired'
+
+To add a key only if it doesn't already exist, there is an add() method.  It
+takes the same parameters as set(), but will not attempt to update the cache
+if the key specified is already present::
+
+    >>> cache.set('add_key', 'Initial value')
+    >>> cache.add('add_key', 'New value')
+    >>> cache.get('add_key')
+    'Initial value'
 
 There's also a get_many() interface that only hits the cache once. get_many()
 returns a dictionary with all the keys you asked for that actually exist in the
@@ -524,7 +563,7 @@ the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
 ``max_age`` in a ``cache_control`` decorator, the decorator will take
 precedence, and the header values will be merged correctly.)
 
-If you want to use headers to disable caching altogether, 
+If you want to use headers to disable caching altogether,
 ``django.views.decorators.never_cache`` is a view decorator that adds
 headers to ensure the response won't be cached by browsers or other caches. Example::
 
@@ -556,8 +595,11 @@ within the ``MIDDLEWARE_CLASSES`` setting, because the cache middleware needs
 to know which headers by which to vary the cache storage. Middleware always
 adds something to the ``Vary`` response header when it can.
 
-Put the ``CacheMiddleware`` after any middlewares that might add something to
-the ``Vary`` header. The following middlewares do so:
+Put the ``CacheMiddleware`` *before* any other middleware that might add
+something to the ``Vary`` header (response middleware is applied in reverse
+order). The following middleware modules do so:
 
     * ``SessionMiddleware`` adds ``Cookie``
     * ``GZipMiddleware`` adds ``Accept-Encoding``
+    * ``LocaleMiddleware`` adds ``Accept-Language``
+

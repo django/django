@@ -172,7 +172,7 @@ of the case of the actual model class name.
 ADMIN_FOR
 ---------
 
-Default: ``()`` (Empty list)
+Default: ``()`` (Empty tuple)
 
 Used for admin-site settings modules, this should be a tuple of settings
 modules (in the format ``'foo.bar.baz'``) for which this site is an admin.
@@ -475,7 +475,7 @@ FIXTURE_DIRS
 Default: ``()`` (Empty tuple)
 
 List of locations of the fixture data files, in search order. Note that
-these paths should use Unix-style forward slashes, even on Windows. See 
+these paths should use Unix-style forward slashes, even on Windows. See
 `Testing Django Applications`_.
 
 .. _Testing Django Applications: ../testing/
@@ -577,6 +577,17 @@ With this arrangement, ``make-messages.py`` will still find and mark these
 strings for translation, but the translation won't happen at runtime -- so
 you'll have to remember to wrap the languages in the *real* ``gettext()`` in
 any code that uses ``LANGUAGES`` at runtime.
+
+LOCALE_PATHS
+------------
+
+Default: ``()`` (Empty tuple)
+
+A list of directories where Django looks for translation files.
+See the `internationalization docs section`_ explaining the variable and the
+default behavior.
+
+.. _internationalization docs section: ../i18n/#using-translations-in-your-own-projects
 
 LOGIN_REDIRECT_URL
 ------------------
@@ -720,8 +731,8 @@ SERIALIZATION_MODULES
 
 Default: Not defined.
 
-A dictionary of modules containing serializer definitions (provided as 
-strings), keyed by a string identifier for that serialization type. For 
+A dictionary of modules containing serializer definitions (provided as
+strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
     SERIALIZATION_MODULES = { 'yaml' : 'path.to.yaml_serializer' }
@@ -743,10 +754,10 @@ Default: ``django.contrib.sessions.backends.db``
 
 Controls where Django stores session data. Valid values are:
 
-    * ``'django.contrib.sessions.backends.db'``      
-    * ``'django.contrib.sessions.backends.file'``    
+    * ``'django.contrib.sessions.backends.db'``
+    * ``'django.contrib.sessions.backends.file'``
     * ``'django.contrib.sessions.backends.cache'``
-    
+
 See the `session docs`_ for more details.
 
 SESSION_COOKIE_AGE
@@ -772,6 +783,18 @@ Default: ``'sessionid'``
 
 The name of the cookie to use for sessions. This can be whatever you want.
 See the `session docs`_.
+
+SESSION_COOKIE_PATH
+-------------------
+
+**New in Django development version**
+
+Default: ``'/'``
+
+The path set on the session cookie. Should match the URL path of your Django
+installation (or be parent of that path). This is useful if you have multiple
+Django instances running under the same hostname; they can use different
+cookie paths and each instance will only see its own session cookie.
 
 SESSION_COOKIE_SECURE
 ---------------------
