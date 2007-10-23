@@ -303,6 +303,7 @@ class _QuerySet(object):
         assert self.query.can_filter(), \
                 "Cannot reorder a query once a slice has been taken."
         obj = self._clone()
+        obj.query.clear_ordering()
         obj.query.add_ordering(*field_names)
         return obj
 

@@ -64,4 +64,11 @@ __test__ = {'API_TESTS':"""
 # don't know what order the output will be in.
 >>> Article.objects.order_by('?')
 [...]
+
+# order_by() overrides any previous ordering, so only the last one has any
+# effect.
+>>> Article.objects.order_by('id')
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
+>>> Article.objects.order_by('id').order_by('-headline')
+[<Article: Article 4>, <Article: Article 3>, <Article: Article 2>, <Article: Article 1>]
 """}
