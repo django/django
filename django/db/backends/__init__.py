@@ -127,6 +127,27 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('Full-text search is not implemented for this database backend')
 
+    def last_executed_query(self, cursor, sql, params):
+        """
+        Returns a string of the query last executed by the given cursor, with
+        placeholders replaced with actual values.
+
+        `sql` is the raw query containing placeholders, and `params` is the
+        sequence of parameters. These are used by default, but this method
+        exists for database backends to provide a better implementation
+        according to their own quoting schemes.
+        """
+        from django.utils.encoding import smart_unicode, force_unicode
+
+        # Convert params to contain Unicode values.
+        to_unicode = lambda s: force_unicode(s, strings_only=True)
+        if isinstance(params, (list, tuple)):
+            u_params = tuple([to_unicode(val) for val in params])
+        else:
+            u_params = dict([(to_unicode(k), to_unicode(v)) for k, v in params.items()])
+
+        return smart_unicode(sql) % u_params
+
     def last_insert_id(self, cursor, table_name, pk_name):
         """
         Given a cursor object that has just performed an INSERT statement into
