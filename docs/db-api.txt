@@ -681,6 +681,17 @@ Examples::
     >>> Entry.objects.none()
     []
 
+``all()``
+~~~~~~~~~~
+
+**New in Django development version**
+
+Returns a ''copy'' of the current ``QuerySet`` (or ``QuerySet`` subclass you
+pass in). This can be useful in some situations where you might want to pass
+in either a model manager or a ``QuerySet`` and do further filtering on the
+result. You can safely call ``all()`` on either object and then you'll
+definitely have a ``QuerySet`` to work with.
+
 ``select_related()``
 ~~~~~~~~~~~~~~~~~~~~
 

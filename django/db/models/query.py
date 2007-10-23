@@ -246,6 +246,13 @@ class _QuerySet(object):
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
     ##################################################################
 
+    def all(self):
+        """
+        Returns a new QuerySet that is a copy of the current one. This allows a
+        QuerySet to proxy for a model manager in some cases.
+        """
+        return self._clone()
+
     def filter(self, *args, **kwargs):
         """
         Returns a new QuerySet instance with the args ANDed to the existing

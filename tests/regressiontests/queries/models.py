@@ -374,5 +374,10 @@ upper bound.
 >>> X.objects.select_related()
 []
 
+Bug #3739
+The all() method on querysets returns a copy of the queryset.
+>>> q1 = Item.objects.order_by('name')
+>>> id(q1) == id(q1.all())
+False
 """}
 
