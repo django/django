@@ -379,5 +379,20 @@ The all() method on querysets returns a copy of the queryset.
 >>> q1 = Item.objects.order_by('name')
 >>> id(q1) == id(q1.all())
 False
+
+Bug #2902
+Parameters can be given to extra_select, *if* you use a SortedDict.
+
+(First we need to know which order the keys fall in "naturally" on your system,
+so we can put things in the wrong way around from normal. A normal dict would
+thus fail.)
+>>> from django.utils.datastructures import SortedDict
+>>> s = [('a', '%s'), ('b', '%s')]
+>>> params = ['one', 'two']
+>>> if {'a': 1, 'b': 2}.keys() == ['a', 'b']:
+...     s.reverse()
+...     params.reverse()
+>>> Item.objects.extra(select=SortedDict(s), params=params).values('a','b')[0]
+{'a': u'one', 'b': u'two'}
 """}
 

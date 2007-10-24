@@ -88,7 +88,6 @@ class _QuerySet(object):
         max_depth = self.query.max_depth
         index_end = len(self.model._meta.fields)
         extra_select = self.query.extra_select.keys()
-        extra_select.sort()
         for row in self.query.results_iter():
             if fill_cache:
                 obj, index_end = get_cached_row(klass=self.model, row=row,
@@ -378,11 +377,7 @@ class ValuesQuerySet(QuerySet):
         # names of the model fields to select.
 
     def iterator(self):
-        extra_select = self.query.extra_select.keys()
-        extra_select.sort()
-        if extra_select:
-            self.field_names.extend([f for f in extra_select])
-
+        self.field_names.extend([f for f in self.query.extra_select.keys()])
         for row in self.query.results_iter():
             yield dict(zip(self.field_names, row))
 
@@ -409,7 +404,7 @@ class ValuesQuerySet(QuerySet):
                 except KeyError, e:
                     raise FieldDoesNotExist('%s has no field named %r'
                                 % (opts.object_name, e.args[0]))
-                field_names = self._fields
+                field_names = list(self._fields)
             else:
                 fields = []
                 field_names = []

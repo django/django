@@ -820,6 +820,34 @@ of the arguments is required, but you should use at least one of them.
     some database backends, such as some MySQL versions, don't support
     subqueries.
 
+    **New in Django development version**
+    In some rare cases, you might wish to pass parameters to the SQL fragments
+    in ``extra(select=...)```. Since the ``params`` attribute is a sequence
+    and the ``select`` attribute is a dictionary, some care is required so
+    that the parameters are matched up correctly with the extra select pieces.
+    Firstly, in this situation, you should use a
+    ``django.utils.datastructures.SortedDict`` for the ``select`` value, not
+    just a normal Python dictionary. Secondly, make sure that your parameters
+    for the ``select`` come first in the list and that you have not passed any
+    parameters to an earlier ``extra()`` call for this queryset.
+
+    This will work::
+
+        Blog.objects.extra(
+            select=SortedDict(('a', '%s'), ('b', '%s')),
+            params=('one', 'two'))
+
+    ... while this won't::
+
+        # Will not work!
+        Blog.objects.extra(where=['foo=%s'], params=('bar',)).extra(
+            select=SortedDict(('a', '%s'), ('b', '%s')),
+            params=('one', 'two'))
+
+    In the second example, the earlier ``params`` usage will mess up the later
+    one. So always put your extra select pieces in the first ``extra()`` call
+    if you need to use parameters in them.
+
 ``where`` / ``tables``
     You can define explicit SQL ``WHERE`` clauses -- perhaps to perform
     non-explicit joins -- by using ``where``. You can manually add tables to

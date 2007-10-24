@@ -10,7 +10,8 @@ all about the internals of models in order to get the information it needs.
 import copy
 import re
 
-from django.utils import tree
+from django.utils.tree import Node
+from django.utils.datastructures import SortedDict
 from django.db.models.sql.where import WhereNode, AND, OR
 from django.db.models.sql.datastructures import Count, Date
 from django.db.models.fields import FieldDoesNotExist, Field
@@ -94,7 +95,7 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra_select = {}  # Maps col_alias -> col_sql.
+        self.extra_select = SortedDict()  # Maps col_alias -> col_sql.
         self.extra_tables = []
         self.extra_where = []
         self.extra_params = []
@@ -364,12 +365,8 @@ class Query(object):
                     for f in self.model._meta.fields]
             aliases = result[:]
 
-        # We sort extra_select so that the result columns are in a well-defined
-        # order (and thus QuerySet.iterator can extract them correctly).
-        extra_select = self.extra_select.items()
-        extra_select.sort()
         result.extend(['(%s) AS %s' % (col, alias)
-                for alias, col in extra_select])
+                for alias, col in self.extra_select.items()])
         aliases.extend(self.extra_select.keys())
 
         self._select_aliases = dict.fromkeys(aliases)
@@ -761,7 +758,7 @@ class Query(object):
             return
 
         for child in q_object.children:
-            if isinstance(child, tree.Node):
+            if isinstance(child, Node):
                 self.where.start_subtree(q_object.connection)
                 self.add_q(child)
                 self.where.end_subtree()
@@ -937,7 +934,7 @@ class Query(object):
             # level.
             self.distinct = False
         self.select = [select]
-        self.extra_select = {}
+        self.extra_select = SortedDict()
 
     def execute_sql(self, result_type=MULTI):
         """
