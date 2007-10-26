@@ -1,9 +1,8 @@
 ===================================
-Django version 0.95.1 release notes
+Django version 0.95.2 release notes
 ===================================
 
-
-Welcome to the Django 0.95.1 release.
+Welcome to the Django 0.95.2 release.
 
 This represents a significant advance in Django development since the 0.91
 release in January 2006. The details of every change in this release would be
@@ -107,6 +106,10 @@ initial release of Django 0.95; these include:
     * A patch which disables debugging mode in the flup FastCGI
       package Django uses to launch its FastCGI server, which prevents
       tracebacks from bubbling up during production use.
+      
+    * A security fix to the i18n framework which could allow an 
+      attacker to send extremely large strings in the Accept-Language 
+      header and cause a denial of service by filling available memory.
 
 Because these problems weren't discovered and fixed until after the
 0.95 release, it's recommended that you use this release rather than
