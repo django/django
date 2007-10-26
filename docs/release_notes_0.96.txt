@@ -1,12 +1,12 @@
-=================================
-Django version 0.96 release notes
-=================================
+===================================
+Django version 0.96.1 release notes
+===================================
 
-Welcome to Django 0.96!
+Welcome to Django 0.96.1!
 
 The primary goal for 0.96 is a cleanup and stabilization of the features
 introduced in 0.95. There have been a few small `backwards-incompatible
-changes`_ since 0.95, but the upgrade process should be fairly simple
+changes since 0.95`_, but the upgrade process should be fairly simple
 and should not require major changes to existing applications.
 
 However, we're also releasing 0.96 now because we have a set of
@@ -17,8 +17,20 @@ next official release; then you'll be able to upgrade in one step
 instead of needing to make incremental changes to keep up with the
 development version of Django.
 
-Backwards-incompatible changes
+Changes since the 0.96 release
 ==============================
+
+This release contains fixes for a security vulnerability discovered after the
+initial release of Django 0.96. A bug in the i18n framework could allow an
+attacker to send extremely large strings in the Accept-Language header and
+cause a denial of service by filling available memory.
+
+Because this problems wasn't discovered and fixed until after the 0.96
+release, it's recommended that you use this release rather than the original
+0.96.
+
+Backwards-incompatible changes since 0.95
+=========================================
 
 The following changes may require you to update your code when you switch from
 0.95 to 0.96:

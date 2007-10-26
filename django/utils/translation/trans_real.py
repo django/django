@@ -1,6 +1,9 @@
 "Translation helper functions"
 
-import os, re, sys
+import locale
+import os
+import re
+import sys
 import gettext as gettext_module
 from cStringIO import StringIO
 from django.utils.functional import lazy
@@ -25,15 +28,25 @@ _active = {}
 # The default translation is based on the settings file.
 _default = None
 
-# This is a cache for accept-header to translation object mappings to prevent
-# the accept parser to run multiple times for one user.
+# This is a cache for normalised accept-header languages to prevent multiple
+# file lookups when checking the same locale on repeated requests.
 _accepted = {}
 
-def to_locale(language):
+# Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9.
+accept_language_re = re.compile(r'''
+        ([A-Za-z]{1,8}(?:-[A-Za-z]{1,8})*|\*)   # "en", "en-au", "x-y-z", "*"
+        (?:;q=(0(?:\.\d{,3})?|1(?:.0{,3})?))?   # Optional "q=1.00", "q=0.8"
+        (?:\s*,\s*|$)                            # Multiple accepts per header.
+        ''', re.VERBOSE)
+
+def to_locale(language, to_lower=False):
     "Turns a language name (en-us) into a locale name (en_US)."
     p = language.find('-')
     if p >= 0:
-        return language[:p].lower()+'_'+language[p+1:].upper()
+        if to_lower:
+            return language[:p].lower()+'_'+language[p+1:].lower()
+        else:
+            return language[:p].lower()+'_'+language[p+1:].upper()
     else:
         return language.lower()
 
@@ -309,46 +322,40 @@ def get_language_from_request(request):
         if lang_code in supported and lang_code is not None and check_for_language(lang_code):
             return lang_code
 
-    lang_code = request.COOKIES.get('django_language', None)
-    if lang_code in supported and lang_code is not None and check_for_language(lang_code):
+    lang_code = request.COOKIES.get('django_language')
+    if lang_code and lang_code in supported and check_for_language(lang_code):
         return lang_code
 
-    accept = request.META.get('HTTP_ACCEPT_LANGUAGE', None)
-    if accept is not None:
+    accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+    for lang, unused in parse_accept_lang_header(accept):
+        if lang == '*':
+            break
 
-        t = _accepted.get(accept, None)
-        if t is not None:
-            return t
+        # We have a very restricted form for our language files (no encoding
+        # specifier, since they all must be UTF-8 and only one possible
+        # language each time. So we avoid the overhead of gettext.find() and
+        # look up the MO file manually.
 
-        def _parsed(el):
-            p = el.find(';q=')
-            if p >= 0:
-                lang = el[:p].strip()
-                order = int(float(el[p+3:].strip())*100)
-            else:
-                lang = el
-                order = 100
-            p = lang.find('-')
-            if p >= 0:
-                mainlang = lang[:p]
-            else:
-                mainlang = lang
-            return (lang, mainlang, order)
+        normalized = locale.locale_alias.get(to_locale(lang, True))
+        if not normalized:
+            continue
 
-        langs = [_parsed(el) for el in accept.split(',')]
-        langs.sort(lambda a,b: -1*cmp(a[2], b[2]))
+        # Remove the default encoding from locale_alias
+        normalized = normalized.split('.')[0]
 
-        for lang, mainlang, order in langs:
-            if lang in supported or mainlang in supported:
-                langfile = gettext_module.find('django', globalpath, [to_locale(lang)])
-                if langfile:
-                    # reconstruct the actual language from the language
-                    # filename, because otherwise we might incorrectly
-                    # report de_DE if we only have de available, but
-                    # did find de_DE because of language normalization
-                    lang = langfile[len(globalpath):].split(os.path.sep)[1]
-                    _accepted[accept] = lang
-                    return lang
+        if normalized in _accepted:
+            # We've seen this locale before and have an MO file for it, so no
+            # need to check again.
+            return _accepted[normalized]
+
+        for lang in (normalized, normalized.split('_')[0]):
+            if lang not in supported:
+                continue
+            langfile = os.path.join(globalpath, lang, 'LC_MESSAGES',
+                    'django.mo')
+            if os.path.exists(langfile):
+                _accepted[normalized] = lang
+            return lang
 
     return settings.LANGUAGE_CODE
 
@@ -494,3 +501,24 @@ def string_concat(*strings):
     return ''.join([str(el) for el in strings])
 
 string_concat = lazy(string_concat, str)
+
+def parse_accept_lang_header(lang_string):
+    """
+    Parses the lang_string, which is the body of an HTTP Accept-Language
+    header, and returns a list of (lang, q-value), ordered by 'q' values.
+
+    Any format errors in lang_string results in an empty list being returned.
+    """
+    result = []
+    pieces = accept_language_re.split(lang_string)
+    if pieces[-1]:
+        return []
+    for i in range(0, len(pieces) - 1, 3):
+        first, lang, priority = pieces[i : i + 3]
+        if first:
+            return []
+        priority = priority and float(priority) or 1.0
+        result.append((lang, priority))
+    result.sort(lambda x, y: -cmp(x[1], y[1]))
+    return result
+
