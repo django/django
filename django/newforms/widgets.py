@@ -20,7 +20,7 @@ from urlparse import urljoin
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'PasswordInput',
     'HiddenInput', 'MultipleHiddenInput',
-    'FileInput', 'Textarea', 'CheckboxInput',
+    'FileInput', 'DateTimeInput', 'Textarea', 'CheckboxInput',
     'Select', 'NullBooleanSelect', 'SelectMultiple', 'RadioSelect',
     'CheckboxSelectMultiple', 'MultiWidget', 'SplitDateTimeWidget',
 )
@@ -235,7 +235,7 @@ class FileInput(Input):
 
     def render(self, name, value, attrs=None):
         return super(FileInput, self).render(name, None, attrs=attrs)
-        
+
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
         return files.get(name, None)
@@ -252,6 +252,22 @@ class Textarea(Widget):
         value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
+
+class DateTimeInput(Input):
+    input_type = 'text'
+    format = '%Y-%m-%d %H:%M:%S'     # '2006-10-25 14:30:59'
+
+    def __init__(self, attrs=None, format=None):
+        super(DateTimeInput, self).__init__(attrs)
+        if format:
+            self.format = format
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ''
+        elif hasattr(value, 'strftime'):
+            value = value.strftime(self.format)
+        return super(DateTimeInput, self).render(name, value, attrs)
 
 class CheckboxInput(Widget):
     def __init__(self, attrs=None, check_test=bool):
@@ -271,6 +287,13 @@ class CheckboxInput(Widget):
         if value not in ('', True, False, None):
             final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
         return u'<input%s />' % flatatt(final_attrs)
+
+    def value_from_datadict(self, data, files, name):
+        if name not in data:
+            # A missing value means False because HTML form submission does not
+            # send results for unselected checkboxes.
+            return False
+        return super(CheckboxInput, self).value_from_datadict(data, files, name)
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -535,5 +558,5 @@ class SplitDateTimeWidget(MultiWidget):
 
     def decompress(self, value):
         if value:
-            return [value.date(), value.time()]
+            return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]

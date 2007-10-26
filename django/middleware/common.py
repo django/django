@@ -1,8 +1,10 @@
+import md5
+import re
+
 from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
-import md5
-import re
+from django.utils.http import urlquote
 
 class CommonMiddleware(object):
     """
@@ -46,9 +48,9 @@ class CommonMiddleware(object):
         if new_url != old_url:
             # Redirect
             if new_url[0]:
-                newurl = "%s://%s%s" % (request.is_secure() and 'https' or 'http', new_url[0], new_url[1])
+                newurl = "%s://%s%s" % (request.is_secure() and 'https' or 'http', new_url[0], urlquote(new_url[1]))
             else:
-                newurl = new_url[1]
+                newurl = urlquote(new_url[1])
             if request.GET:
                 newurl += '?' + request.GET.urlencode()
             return http.HttpResponsePermanentRedirect(newurl)

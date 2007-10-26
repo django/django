@@ -73,7 +73,7 @@ class SafeMIMEText(MIMEText):
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
         try:
-            val = str(force_unicode(val))
+            val = force_unicode(val).encode('ascii')
         except UnicodeEncodeError:
             if name.lower() in ('to', 'from', 'cc'):
                 result = []
@@ -92,7 +92,7 @@ class SafeMIMEMultipart(MIMEMultipart):
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
         try:
-            val = str(force_unicode(val))
+            val = force_unicode(val).encode('ascii')
         except UnicodeEncodeError:
             if name.lower() in ('to', 'from', 'cc'):
                 result = []

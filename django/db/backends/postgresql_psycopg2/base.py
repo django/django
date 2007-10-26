@@ -5,7 +5,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 """
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures
-from django.db.backends.postgresql.operations import DatabaseOperations
+from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
 try:
     import psycopg2 as Database
     import psycopg2.extensions
@@ -20,6 +20,13 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False
+
+class DatabaseOperations(PostgresqlDatabaseOperations):
+    def last_executed_query(self, cursor, sql, params):
+        # With psycopg2, cursor objects have a "query" attribute that is the
+        # exact query sent to the database. See docs here:
+        # http://www.initd.org/tracker/psycopg/wiki/psycopg2_documentation#postgresql-status-message-and-executed-query
+        return cursor.query
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     features = DatabaseFeatures()

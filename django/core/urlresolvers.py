@@ -249,8 +249,9 @@ class RegexURLResolver(object):
         except AttributeError:
             try:
                 self._urlconf_module = __import__(self.urlconf_name, {}, {}, [''])
-            except ValueError, e:
-                # Invalid urlconf_name, such as "foo.bar." (note trailing period)
+            except Exception, e:
+                # Either an invalid urlconf_name, such as "foo.bar.", or some
+                # kind of problem during the actual import.
                 raise ImproperlyConfigured, "Error while importing URLconf %r: %s" % (self.urlconf_name, e)
             return self._urlconf_module
     urlconf_module = property(_get_urlconf_module)

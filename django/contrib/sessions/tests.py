@@ -3,6 +3,7 @@ r"""
 >>> from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 >>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 >>> from django.contrib.sessions.backends.file import SessionStore as FileSession
+>>> from django.contrib.sessions.backends.base import SessionBase
 
 >>> db_session = DatabaseSession()
 >>> db_session.modified
@@ -52,6 +53,28 @@ True
 >>> cache_session.delete(cache_session.session_key)
 >>> cache_session.exists(cache_session.session_key)
 False
+
+>>> s = SessionBase()
+>>> s._session['some key'] = 'exists' # Pre-populate the session with some data
+>>> s.accessed = False   # Reset to pretend this wasn't accessed previously
+
+>>> s.accessed, s.modified
+(False, False)
+
+>>> s.pop('non existant key', 'does not exist')
+'does not exist'
+>>> s.accessed, s.modified
+(True, False)
+
+>>> s.accessed = False  # Reset the accessed flag
+
+>>> s.pop('some key')
+'exists'
+>>> s.accessed, s.modified
+(True, True)
+
+>>> s.pop('some key', 'does not exist')
+'does not exist'
 """
 
 if __name__ == '__main__':

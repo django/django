@@ -41,7 +41,7 @@ From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the command ``django-admin.py startproject mysite``. This
 will create a ``mysite`` directory in your current directory.
 
-.. admonition:: Max OS X permissions
+.. admonition:: Mac OS X permissions
    
    If you're using Mac OS X, you may see the message "permission
    denied" when you try to run ``django-admin.py startproject``. This

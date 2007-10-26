@@ -1,5 +1,6 @@
 """Refactored "safe reference" from dispatcher.py"""
 import weakref, traceback
+from django.utils.functional import curry
 
 def safeRef(target, onDelete = None):
     """Return a *safe* weak reference to a callable target
@@ -17,7 +18,7 @@ def safeRef(target, onDelete = None):
             # Turn a bound method into a BoundMethodWeakref instance.
             # Keep track of these instances for lookup by disconnect().
             assert hasattr(target, 'im_func'), """safeRef target %r has im_self, but no im_func, don't know how to create reference"""%( target,)
-            reference = BoundMethodWeakref(
+            reference = get_bound_method_weakref(
                 target=target,
                 onDelete=onDelete
             )
@@ -163,3 +164,75 @@ class BoundMethodWeakref(object):
             if function is not None:
                 return function.__get__(target)
         return None
+
+class BoundNonDescriptorMethodWeakref(BoundMethodWeakref):
+    """A specialized BoundMethodWeakref, for platforms where instance methods
+    are not descriptors.
+
+    It assumes that the function name and the target attribute name are the
+    same, instead of assuming that the function is a descriptor. This approach
+    is equally fast, but not 100% reliable because functions can be stored on an
+    attribute named differenty than the function's name such as in:
+
+    class A: pass
+    def foo(self): return "foo"
+    A.bar = foo
+
+    But this shouldn't be a common use case. So, on platforms where methods
+    aren't descriptors (such as Jython) this implementation has the advantage
+    of working in the most cases.
+    """
+    def __init__(self, target, onDelete=None):
+        """Return a weak-reference-like instance for a bound method
+
+        target -- the instance-method target for the weak
+            reference, must have im_self and im_func attributes
+            and be reconstructable via:
+                target.im_func.__get__( target.im_self )
+            which is true of built-in instance methods.
+        onDelete -- optional callback which will be called
+            when this weak reference ceases to be valid
+            (i.e. either the object or the function is garbage
+            collected).  Should take a single argument,
+            which will be passed a pointer to this object.
+        """
+        assert getattr(target.im_self, target.__name__) == target, \
+               ("method %s isn't available as the attribute %s of %s" %
+                (target, target.__name__, target.im_self))
+        super(BoundNonDescriptorMethodWeakref, self).__init__(target, onDelete)
+
+    def __call__(self):
+        """Return a strong reference to the bound method
+
+        If the target cannot be retrieved, then will
+        return None, otherwise returns a bound instance
+        method for our object and function.
+
+        Note:
+            You may call this method any number of times,
+            as it does not invalidate the reference.
+        """
+        target = self.weakSelf()
+        if target is not None:
+            function = self.weakFunc()
+            if function is not None:
+                # Using curry() would be another option, but it erases the
+                # "signature" of the function. That is, after a function is
+                # curried, the inspect module can't be used to determine how
+                # many arguments the function expects, nor what keyword
+                # arguments it supports, and pydispatcher needs this
+                # information.
+                return getattr(target, function.__name__)
+        return None
+
+
+def get_bound_method_weakref(target, onDelete):
+    """Instantiates the appropiate BoundMethodWeakRef, depending on the details of
+    the underlying class method implementation"""
+    if hasattr(target, '__get__'):
+        # target method is a descriptor, so the default implementation works:
+        return BoundMethodWeakref(target=target, onDelete=onDelete)
+    else:
+        # no luck, use the alternative implementation:
+        return BoundNonDescriptorMethodWeakref(target=target, onDelete=onDelete)
+

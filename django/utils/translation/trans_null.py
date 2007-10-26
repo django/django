@@ -14,7 +14,7 @@ def ungettext(singular, plural, number):
     return force_unicode(ngettext(singular, plural, number))
 
 activate = lambda x: None
-deactivate = deactivate_all = install = lambda: None
+deactivate = deactivate_all = lambda: None
 get_language = lambda: settings.LANGUAGE_CODE
 get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
 get_date_formats = lambda: (settings.DATE_FORMAT, settings.DATETIME_FORMAT, settings.TIME_FORMAT)

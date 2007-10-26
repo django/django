@@ -517,8 +517,14 @@ def firstof(parser, token):
         {% endif %}{% endif %}{% endif %}
 
     but obviously much cleaner!
+
+    You can also use a literal string as a fallback value in case all
+    passed variables are False::
+
+        {% firstof var1 var2 var3 "fallback value" %}
+
     """
-    bits = token.contents.split()[1:]
+    bits = token.split_contents()[1:]
     if len(bits) < 1:
         raise TemplateSyntaxError, "'firstof' statement requires at least one argument"
     return FirstOfNode(bits)
@@ -675,7 +681,7 @@ def do_if(parser, token):
         {% if athlete_list and coach_list or cheerleader_list %}
 
     If you need to combine ``and`` and ``or`` to do advanced logic, just use
-    nested if tags. For example:
+    nested if tags. For example::
 
         {% if athlete_list %}
             {% if coach_list or cheerleader_list %}

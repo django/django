@@ -89,6 +89,7 @@ class Feed(object):
             categories = self.__get_dynamic_attr('categories', obj),
             feed_copyright = self.__get_dynamic_attr('feed_copyright', obj),
             feed_guid = self.__get_dynamic_attr('feed_guid', obj),
+            ttl = self.__get_dynamic_attr('ttl', obj),
         )
 
         try:
