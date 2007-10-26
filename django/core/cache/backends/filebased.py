@@ -17,6 +17,26 @@ class CacheClass(SimpleCacheClass):
         del self._cache
         del self._expire_info
 
+    def add(self, key, value, timeout=None):
+        fname = self._key_to_file(key)
+        if timeout is None:
+            timeout = self.default_timeout
+        try:
+            filelist = os.listdir(self._dir)
+        except (IOError, OSError):
+            self._createdir()
+            filelist = []
+        if len(filelist) > self._max_entries:
+            self._cull(filelist)
+        if os.path.basename(fname) not in filelist:
+            try:
+                f = open(fname, 'wb')
+                now = time.time()
+                pickle.dump(now + timeout, f, 2)
+                pickle.dump(value, f, 2)
+            except (IOError, OSError):
+                pass
+
     def get(self, key, default=None):
         fname = self._key_to_file(key)
         try:

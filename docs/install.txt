@@ -63,7 +63,10 @@ installed.
 * If you're using MySQL, you'll need MySQLdb_, version 1.2.1p2 or higher.
   You will also want to read the database-specific notes for the `MySQL backend`_.
 
-* If you're using SQLite, you'll need pysqlite_. Use version 2.0.3 or higher.
+* If you're using SQLite and either Python 2.3 or Python 2.4, you'll need
+  pysqlite_. Use version 2.0.3 or higher. Python 2.5 ships with an sqlite
+  wrapper in the standard library, so you don't need to install anything extra
+  in that case.
 
 * If you're using Oracle, you'll need cx_Oracle_, version 4.3.1 or higher.
   You will also want to read the database-specific notes for the `Oracle backend`_.

@@ -261,19 +261,23 @@ class HttpResponse(object):
         else:
             self._container = [content]
             self._is_string = True
-        self._headers = {'content-type': content_type}
         self.cookies = SimpleCookie()
         if status:
             self.status_code = status
 
+        # _headers is a mapping of the lower-case name to the original case of
+        # the header (required for working with legacy systems) and the header
+        # value.
+        self._headers = {'content-type': ('Content-Type', content_type)}
+
     def __str__(self):
         "Full HTTP message, including headers"
         return '\n'.join(['%s: %s' % (key, value)
-            for key, value in self._headers.items()]) \
+            for key, value in self._headers.values()]) \
             + '\n\n' + self.content
 
     def __setitem__(self, header, value):
-        self._headers[header.lower()] = value
+        self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
         try:
@@ -282,19 +286,19 @@ class HttpResponse(object):
             pass
 
     def __getitem__(self, header):
-        return self._headers[header.lower()]
+        return self._headers[header.lower()][1]
 
     def has_header(self, header):
         "Case-insensitive check for a header"
         return self._headers.has_key(header.lower())
 
     __contains__ = has_header
-    
+
     def items(self):
-        return self._headers.items()
-    
+        return self._headers.values()
+
     def get(self, header, alternate):
-        return self._headers.get(header, alternate)
+        return self._headers.get(header.lower(), (None, alternate))[1]
 
     def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
         self.cookies[key] = value
@@ -304,17 +308,13 @@ class HttpResponse(object):
                 self.cookies[key][var.replace('_', '-')] = val
 
     def delete_cookie(self, key, path='/', domain=None):
-        self.cookies[key] = ''
-        if path is not None:
-            self.cookies[key]['path'] = path
-        if domain is not None:
-            self.cookies[key]['domain'] = domain
-        self.cookies[key]['expires'] = 0
-        self.cookies[key]['max-age'] = 0
+        self.set_cookie(key, max_age=0, path=path, domain=domain,
+                expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
     def _get_content(self):
-        content = smart_str(''.join(self._container), self._charset)
-        return content
+        if self.has_header('Content-Encoding'):
+            return ''.join(self._container)
+        return smart_str(''.join(self._container), self._charset)
 
     def _set_content(self, value):
         self._container = [value]

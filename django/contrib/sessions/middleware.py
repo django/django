@@ -31,7 +31,7 @@ class SessionMiddleware(object):
                 else:
                     max_age = settings.SESSION_COOKIE_AGE
                     rfcdate = formatdate(time.time() + settings.SESSION_COOKIE_AGE)
-                    
+
                     # Fixed length date must have '-' separation in the format
                     # DD-MMM-YYYY for compliance with Netscape cookie standard
                     expires = datetime.datetime.strftime(datetime.datetime.utcnow() + \
@@ -39,8 +39,10 @@ class SessionMiddleware(object):
 
                 # Save the seesion data and refresh the client cookie.
                 request.session.save()
-                response.set_cookie(settings.SESSION_COOKIE_NAME, request.session.session_key,
-                    max_age=max_age, expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
-                    secure=settings.SESSION_COOKIE_SECURE or None)
-                    
+                response.set_cookie(settings.SESSION_COOKIE_NAME,
+                        request.session.session_key, max_age=max_age,
+                        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                        path=settings.SESSION_COOKIE_PATH,
+                        secure=settings.SESSION_COOKIE_SECURE or None)
+
         return response

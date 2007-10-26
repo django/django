@@ -53,7 +53,11 @@ def lazy(func, *resultclasses):
             self._delegate_unicode = unicode in resultclasses
             assert not (self._delegate_str and self._delegate_unicode), "Cannot call lazy() with both str and unicode return types."
             if self._delegate_unicode:
-                self.__unicode__ = self.__unicode_cast
+                # Each call to lazy() makes a new __proxy__ object, so this
+                # doesn't interfere with any other lazy() results.
+                __proxy__.__unicode__ = __proxy__.__unicode_cast
+            elif self._delegate_str:
+                __proxy__.__str__ = __proxy__.__str_cast
 
         def __promise__(self, klass, funcname, func):
             # Builds a wrapper around some magic method and registers that magic
@@ -72,14 +76,8 @@ def lazy(func, *resultclasses):
         def __unicode_cast(self):
             return self.__func(*self.__args, **self.__kw)
 
-        def __str__(self):
-            # As __str__ is always a method on the type (class), it is looked
-            # up (and found) there first. So we can't just assign to it on a
-            # per-instance basis in __init__.
-            if self._delegate_str:
-                return str(self.__func(*self.__args, **self.__kw))
-            else:
-                return Promise.__str__(self)
+        def __str_cast(self):
+            return str(self.__func(*self.__args, **self.__kw))
 
         def __cmp__(self, rhs):
             if self._delegate_str:

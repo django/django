@@ -17,10 +17,11 @@ class GZipMiddleware(object):
             return response
 
         patch_vary_headers(response, ('Accept-Encoding',))
-        
+
         # Avoid gzipping if we've already got a content-encoding or if the
-        # content-type is Javascript (silly IE...)
-        is_js = "javascript" in response.get('Content-Type', '').lower()
+        # content-type is Javascript and the user's browser is IE.
+        is_js = ("msie" in request.META.get('HTTP_USER_AGENT', '').lower() and
+                "javascript" in response.get('Content-Type', '').lower())
         if response.has_header('Content-Encoding') or is_js:
             return response
 

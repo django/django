@@ -48,7 +48,7 @@ with the given URL with a site ID that corresponds to the SITE_ID_ setting.
 If it finds a match, it follows this algorithm:
 
     * If the flatpage has a custom template, it loads that template. Otherwise,
-      it loads the template ``flatpages/default``.
+      it loads the template ``flatpages/default.html``.
     * It passes that template a single context variable, ``flatpage``, which is
       the flatpage object. It uses RequestContext_ in rendering the template.
 

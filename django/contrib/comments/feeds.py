@@ -4,7 +4,7 @@ from django.contrib.syndication.feeds import Feed
 from django.contrib.sites.models import Site
 
 class LatestFreeCommentsFeed(Feed):
-    "Feed of latest comments on the current site."
+    """Feed of latest free comments on the current site."""
 
     comments_class = FreeComment
 
@@ -30,7 +30,7 @@ class LatestFreeCommentsFeed(Feed):
         return self.get_query_set()[:40]
 
 class LatestCommentsFeed(LatestFreeCommentsFeed):
-    """Feed of latest free comments on the current site"""
+    """Feed of latest comments on the current site."""
 
     comments_class = Comment
 
