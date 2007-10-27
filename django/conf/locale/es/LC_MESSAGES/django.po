@@ -1016,7 +1016,7 @@ msgstr "Escoja %s para modificar"
 
 #: contrib/admin/views/main.py:780
 msgid "Database error"
-msgstr "Erorr en la base de datos"
+msgstr "Error en la base de datos"
 
 #: contrib/auth/forms.py:17
 #: contrib/auth/forms.py:138
