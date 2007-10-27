@@ -1,8 +1,10 @@
-from django.core.management.base import copy_helper, CommandError, LabelCommand
 import os
 
+from django.core.management.base import copy_helper, CommandError, LabelCommand
+
 class Command(LabelCommand):
-    help = "Creates a Django app directory structure for the given app name in the current directory."
+    help = ("Creates a Django app directory structure for the given app name"
+            " in the current directory.")
     args = "[appname]"
     label = 'application name'
 
@@ -19,11 +21,13 @@ class Command(LabelCommand):
         # current directory if no directory was passed).
         project_name = os.path.basename(directory)
         if app_name == project_name:
-            raise CommandError("You cannot create an app with the same name (%r) as your project." % app_name)
+            raise CommandError("You cannot create an app with the same name"
+                               " (%r) as your project." % app_name)
         copy_helper(self.style, 'app', app_name, directory, project_name)
 
 class ProjectCommand(Command):
-    help = "Creates a Django app directory structure for the given app name in this project's directory."
+    help = ("Creates a Django app directory structure for the given app name"
+            " in this project's directory.")
 
     def __init__(self, project_directory):
         super(ProjectCommand, self).__init__()
