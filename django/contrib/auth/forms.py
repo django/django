@@ -104,7 +104,7 @@ class PasswordResetForm(oldforms.Manipulator):
                 'site_name': site_name,
                 'user': user,
                 }
-            send_mail('Password reset on %s' % site_name, t.render(Context(c)), None, [user.email])
+            send_mail(_('Password reset on %s') % site_name, t.render(Context(c)), None, [user.email])
 
 class PasswordChangeForm(oldforms.Manipulator):
     "A form that lets a user change his password."
