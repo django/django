@@ -1,11 +1,20 @@
 """
-Field classes
+Field classes.
 """
 
 import copy
 import datetime
 import re
 import time
+# Python 2.3 fallbacks
+try:
+    from decimal import Decimal, DecimalException
+except ImportError:
+    from django.utils._decimal import Decimal, DecimalException
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, smart_unicode
@@ -13,18 +22,14 @@ from django.utils.encoding import StrAndUnicode, smart_unicode
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
 
-try:
-    from decimal import Decimal, DecimalException
-except ImportError:
-    from django.utils._decimal import Decimal, DecimalException
 
 __all__ = (
     'Field', 'CharField', 'IntegerField',
     'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
     'DEFAULT_TIME_INPUT_FORMATS', 'TimeField',
     'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField',
-    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField', 'BooleanField',
-    'ChoiceField', 'NullBooleanField', 'MultipleChoiceField',
+    'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField',
+    'BooleanField', 'NullBooleanField', 'ChoiceField', 'MultipleChoiceField',
     'ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
     'SplitDateTimeField', 'IPAddressField',
 )
@@ -32,15 +37,6 @@ __all__ = (
 # These values, if given to to_python(), will trigger the self.required check.
 EMPTY_VALUES = (None, '')
 
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
-
-try:
-    from decimal import Decimal
-except ImportError:
-    from django.utils._decimal import Decimal   # Python 2.3 fallback
 
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
