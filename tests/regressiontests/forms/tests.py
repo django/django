@@ -2,6 +2,7 @@
 from extra import tests as extra_tests
 from fields import tests as fields_tests
 from forms import tests as form_tests
+from error_messages import tests as custom_error_message_tests
 from localflavor.ar import tests as localflavor_ar_tests
 from localflavor.au import tests as localflavor_au_tests
 from localflavor.br import tests as localflavor_br_tests
@@ -29,6 +30,7 @@ __test__ = {
     'extra_tests': extra_tests,
     'fields_tests': fields_tests,
     'form_tests': form_tests,
+    'custom_error_message_tests': custom_error_message_tests,
     'localflavor_ar_tests': localflavor_ar_tests,
     'localflavor_au_tests': localflavor_au_tests,
     'localflavor_br_tests': localflavor_br_tests,

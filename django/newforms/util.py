@@ -42,13 +42,18 @@ class ErrorList(list, StrAndUnicode):
         if not self: return u''
         return u'\n'.join([u'* %s' % force_unicode(e) for e in self])
 
+    def __repr__(self):
+        return repr([force_unicode(e) for e in self])
+
 class ValidationError(Exception):
     def __init__(self, message):
-        "ValidationError can be passed a string or a list."
+        """
+        ValidationError can be passed any object that can be printed (usually
+        a string) or a list of objects.
+        """
         if isinstance(message, list):
             self.messages = ErrorList([smart_unicode(msg) for msg in message])
         else:
-            assert isinstance(message, (basestring, Promise)), ("%s should be a basestring or lazy translation" % repr(message))
             message = smart_unicode(message)
             self.messages = ErrorList([message])
 
@@ -58,4 +63,3 @@ class ValidationError(Exception):
         # AttributeError: ValidationError instance has no attribute 'args'
         # See http://www.python.org/doc/current/tut/node10.html#handling
         return repr(self.messages)
-

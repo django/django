@@ -42,4 +42,11 @@ u''
 # Can take a mixture in a list.
 >>> print ValidationError(["First error.", u"Not \u03C0.", ugettext_lazy("Error.")]).messages
 <ul class="errorlist"><li>First error.</li><li>Not π.</li><li>Error.</li></ul>
+
+>>> class VeryBadError:
+...     def __unicode__(self): return u"A very bad error."
+
+# Can take a non-string.
+>>> print ValidationError(VeryBadError()).messages
+<ul class="errorlist"><li>A very bad error.</li></ul>
 """
