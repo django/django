@@ -1,8 +1,9 @@
+import time
+import datetime
+from email.Utils import formatdate
+
 from django.conf import settings
 from django.utils.cache import patch_vary_headers
-from email.Utils import formatdate
-import datetime
-import time
 
 TEST_COOKIE_NAME = 'testcookie'
 TEST_COOKIE_VALUE = 'worked'
@@ -10,8 +11,9 @@ TEST_COOKIE_VALUE = 'worked'
 class SessionMiddleware(object):
 
     def process_request(self, request):
-      engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
-      request.session = engine.SessionStore(request.COOKIES.get(settings.SESSION_COOKIE_NAME, None))
+        engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
+        request.session = engine.SessionStore(session_key)
 
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
