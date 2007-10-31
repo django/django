@@ -23,7 +23,6 @@ class ConditionalGetMiddleware(object):
                 response['Content-Length'] = '0'
 
         if response.has_header('Last-Modified'):
-            last_mod = response['Last-Modified']
             if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
             if if_modified_since == response['Last-Modified']:
                 response.status_code = 304
