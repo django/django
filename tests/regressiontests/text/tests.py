@@ -27,6 +27,14 @@ u'Paris+%26+Orl%C3%A9ans'
 >>> urlquote_plus(u'Paris & Orl\xe9ans', safe="&")
 u'Paris+&+Orl%C3%A9ans'
 
+### cookie_date, http_date ###############################################
+>>> from django.utils.http import cookie_date, http_date
+>>> t = 1167616461.0
+>>> cookie_date(t)
+'Mon, 01-Jan-2007 01:54:21 GMT'
+>>> http_date(t)
+'Mon, 01 Jan 2007 01:54:21 GMT'
+
 ### iri_to_uri ###########################################################
 >>> from django.utils.encoding import iri_to_uri
 >>> iri_to_uri(u'red%09ros\xe9#red')

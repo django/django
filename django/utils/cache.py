@@ -20,11 +20,11 @@ An example: i18n middleware would need to distinguish caches by the
 import md5
 import re
 import time
-from email.Utils import formatdate
 
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import smart_str, iri_to_uri
+from django.utils.http import http_date
 
 cc_delim_re = re.compile(r'\s*,\s*')
 
@@ -89,9 +89,9 @@ def patch_response_headers(response, cache_timeout=None):
     if not response.has_header('ETag'):
         response['ETag'] = md5.new(response.content).hexdigest()
     if not response.has_header('Last-Modified'):
-        response['Last-Modified'] = formatdate()[:26] + "GMT"
+        response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
-        response['Expires'] = formatdate(time.time() + cache_timeout)[:26] + "GMT"
+        response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
 def add_never_cache_headers(response):
