@@ -291,13 +291,15 @@ minutes.
 Template fragment caching
 =========================
 
+**New in development version**.
+
 If you're after even more control, you can also cache template fragments using
-the ``cache`` template tag. To give your template access to this tag, put ``{%
-load cache %}`` near the top of your template.
+the ``cache`` template tag. To give your template access to this tag, put
+``{% load cache %}`` near the top of your template.
 
 The ``{% cache %}`` template tag caches the contents of the block for a given
-amount of time. It takes at least two arguments: the cache timeout, in
-seconds, and the name to give the cache fragment. For example::
+amount of time. It takes at least two arguments: the cache timeout, in seconds,
+and the name to give the cache fragment. For example::
 
     {% load cache %}
     {% cache 500 sidebar %}
