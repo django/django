@@ -1,5 +1,7 @@
 "Default tags used by the template system, available to all templates."
 
+from itertools import cycle as itertools_cycle
+
 from django.template import Node, NodeList, Template, Context, Variable
 from django.template import TemplateSyntaxError, VariableDoesNotExist, BLOCK_TAG_START, BLOCK_TAG_END, VARIABLE_TAG_START, VARIABLE_TAG_END, SINGLE_BRACE_START, SINGLE_BRACE_END, COMMENT_TAG_START, COMMENT_TAG_END
 from django.template import get_library, Library, InvalidTemplateLibrary
@@ -22,14 +24,11 @@ class CommentNode(Node):
 
 class CycleNode(Node):
     def __init__(self, cyclevars, variable_name=None):
-        self.cyclevars = cyclevars
-        self.cyclevars_len = len(cyclevars)
-        self.counter = -1
+        self.cycle_iter = itertools_cycle(cyclevars)
         self.variable_name = variable_name
 
     def render(self, context):
-        self.counter += 1
-        value = self.cyclevars[self.counter % self.cyclevars_len]
+        value = self.cycle_iter.next()
         value = Variable(value).resolve(context)
         if self.variable_name:
             context[self.variable_name] = value
