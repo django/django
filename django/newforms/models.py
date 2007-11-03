@@ -6,7 +6,6 @@ and database field objects.
 from django.utils.translation import ugettext
 from django.utils.encoding import smart_unicode
 
-
 from util import ValidationError
 from forms import BaseForm, SortedDictFromList
 from fields import Field, ChoiceField
@@ -17,7 +16,8 @@ __all__ = (
     'ModelChoiceField', 'ModelMultipleChoiceField'
 )
 
-def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True):
     """
     Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
 
@@ -27,15 +27,17 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
     from django.db import models
     opts = instance.__class__._meta
     if form.errors:
-        raise ValueError("The %s could not be %s because the data didn't validate." % (opts.object_name, fail_message))
+        raise ValueError("The %s could not be %s because the data didn't"
+                         " validate." % (opts.object_name, fail_message))
     cleaned_data = form.cleaned_data
     for f in opts.fields:
-        if not f.editable or isinstance(f, models.AutoField) or not f.name in cleaned_data:
+        if not f.editable or isinstance(f, models.AutoField) \
+                or not f.name in cleaned_data:
             continue
         if fields and f.name not in fields:
             continue
-        f.save_form_data(instance, cleaned_data[f.name])        
-    # Wrap up the saving of m2m data as a function
+        f.save_form_data(instance, cleaned_data[f.name])
+    # Wrap up the saving of m2m data as a function.
     def save_m2m():
         opts = instance.__class__._meta
         cleaned_data = form.cleaned_data
@@ -45,28 +47,29 @@ def save_instance(form, instance, fields=None, fail_message='saved', commit=True
             if f.name in cleaned_data:
                 f.save_form_data(instance, cleaned_data[f.name])
     if commit:
-        # If we are committing, save the instance and the m2m data immediately
+        # If we are committing, save the instance and the m2m data immediately.
         instance.save()
         save_m2m()
     else:
-        # We're not committing. Add a method to the form to allow deferred 
-        # saving of m2m data
+        # We're not committing. Add a method to the form to allow deferred
+        # saving of m2m data.
         form.save_m2m = save_m2m
     return instance
 
 def make_model_save(model, fields, fail_message):
-    "Returns the save() method for a Form."
+    """Returns the save() method for a Form."""
     def save(self, commit=True):
         return save_instance(self, model(), fields, fail_message, commit)
     return save
-    
+
 def make_instance_save(instance, fields, fail_message):
-    "Returns the save() method for a Form."
+    """Returns the save() method for a Form."""
     def save(self, commit=True):
         return save_instance(self, instance, fields, fail_message, commit)
     return save
 
-def form_for_model(model, form=BaseForm, fields=None, formfield_callback=lambda f: f.formfield()):
+def form_for_model(model, form=BaseForm, fields=None,
+                   formfield_callback=lambda f: f.formfield()):
     """
     Returns a Form class for the given Django model class.
 
@@ -87,10 +90,12 @@ def form_for_model(model, form=BaseForm, fields=None, formfield_callback=lambda 
         if formfield:
             field_list.append((f.name, formfield))
     base_fields = SortedDictFromList(field_list)
-    return type(opts.object_name + 'Form', (form,), 
-        {'base_fields': base_fields, '_model': model, 'save': make_model_save(model, fields, 'created')})
+    return type(opts.object_name + 'Form', (form,),
+        {'base_fields': base_fields, '_model': model,
+         'save': make_model_save(model, fields, 'created')})
 
-def form_for_instance(instance, form=BaseForm, fields=None, formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
+def form_for_instance(instance, form=BaseForm, fields=None,
+                      formfield_callback=lambda f, **kwargs: f.formfield(**kwargs)):
     """
     Returns a Form class for the given Django model instance.
 
@@ -115,16 +120,22 @@ def form_for_instance(instance, form=BaseForm, fields=None, formfield_callback=l
             field_list.append((f.name, formfield))
     base_fields = SortedDictFromList(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
-        {'base_fields': base_fields, '_model': model, 'save': make_instance_save(instance, fields, 'changed')})
+        {'base_fields': base_fields, '_model': model,
+         'save': make_instance_save(instance, fields, 'changed')})
 
 def form_for_fields(field_list):
-    "Returns a Form class for the given list of Django database field instances."
-    fields = SortedDictFromList([(f.name, f.formfield()) for f in field_list if f.editable])
+    """
+    Returns a Form class for the given list of Django database field instances.
+    """
+    fields = SortedDictFromList([(f.name, f.formfield())
+                                 for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
 class QuerySetIterator(object):
     def __init__(self, queryset, empty_label, cache_choices):
-        self.queryset, self.empty_label, self.cache_choices = queryset, empty_label, cache_choices
+        self.queryset = queryset
+        self.empty_label = empty_label
+        self.cache_choices = cache_choices
 
     def __iter__(self):
         if self.empty_label is not None:
@@ -136,11 +147,13 @@ class QuerySetIterator(object):
             self.queryset._result_cache = None
 
 class ModelChoiceField(ChoiceField):
-    "A ChoiceField whose choices are a model QuerySet."
+    """A ChoiceField whose choices are a model QuerySet."""
     # This class is a subclass of ChoiceField for purity, but it doesn't
     # actually use any of ChoiceField's implementation.
+
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
-            required=True, widget=Select, label=None, initial=None, help_text=None):
+                 required=True, widget=Select, label=None, initial=None,
+                 help_text=None):
         self.queryset = queryset
         self.empty_label = empty_label
         self.cache_choices = cache_choices
@@ -160,7 +173,8 @@ class ModelChoiceField(ChoiceField):
         # *each* time _get_choices() is called (and, thus, each time
         # self.choices is accessed) so that we can ensure the QuerySet has not
         # been consumed.
-        return QuerySetIterator(self.queryset, self.empty_label, self.cache_choices)
+        return QuerySetIterator(self.queryset, self.empty_label,
+                                self.cache_choices)
 
     def _set_choices(self, value):
         # This method is copied from ChoiceField._set_choices(). It's necessary
@@ -177,16 +191,20 @@ class ModelChoiceField(ChoiceField):
         try:
             value = self.queryset.model._default_manager.get(pk=value)
         except self.queryset.model.DoesNotExist:
-            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(ugettext(u'Select a valid choice. That'
+                                           u' choice is not one of the'
+                                           u' available choices.'))
         return value
 
 class ModelMultipleChoiceField(ModelChoiceField):
-    "A MultipleChoiceField whose choices are a model QuerySet."
+    """A MultipleChoiceField whose choices are a model QuerySet."""
     hidden_widget = MultipleHiddenInput
+
     def __init__(self, queryset, cache_choices=False, required=True,
-            widget=SelectMultiple, label=None, initial=None, help_text=None):
-        super(ModelMultipleChoiceField, self).__init__(queryset, None, cache_choices,
-            required, widget, label, initial, help_text)
+                 widget=SelectMultiple, label=None, initial=None,
+                 help_text=None):
+        super(ModelMultipleChoiceField, self).__init__(queryset, None,
+            cache_choices, required, widget, label, initial, help_text)
 
     def clean(self, value):
         if self.required and not value:
@@ -200,7 +218,9 @@ class ModelMultipleChoiceField(ModelChoiceField):
             try:
                 obj = self.queryset.model._default_manager.get(pk=val)
             except self.queryset.model.DoesNotExist:
-                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(ugettext(u'Select a valid choice. %s is'
+                                               u' not one of the available'
+                                               u' choices.') % val)
             else:
                 final_values.append(obj)
         return final_values

@@ -275,7 +275,7 @@ The class has the following methods:
       There are two ways to call ``attach()``:
 
        * You can pass it a single argument that is an
-         ``email.MIMBase.MIMEBase`` instance. This will be inserted directly
+         ``email.MIMEBase.MIMEBase`` instance. This will be inserted directly
          into the resulting message.
 
        * Alternatively, you can pass ``attach()`` three arguments:
