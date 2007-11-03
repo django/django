@@ -242,6 +242,8 @@ def setup_environ(settings_mod):
     """
     Configures the runtime environment. This can also be used by external
     scripts wanting to set up a similar environment to manage.py.
+    Returns the project directory (assuming the passed settings module is
+    directly in the project directory).
     """
     # Add this project to sys.path so that it's importable in the conventional
     # way. For example, if this file (manage.py) lives in a directory

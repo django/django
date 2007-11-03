@@ -1,6 +1,7 @@
 # coding: utf-8
+import misc
 
-ur"""
+regressions = ur"""
 Format string interpolation should work with *_lazy objects.
 
 >>> from django.utils.translation import ugettext_lazy, activate, deactivate, gettext_lazy
@@ -39,3 +40,8 @@ unicode(string_concat(...)) should not raise a TypeError - #4796
 >>> unicode(django.utils.translation.string_concat("dja", "ngo"))
 u'django'
 """
+
+__test__ = {
+    'regressions': regressions,
+    'misc': misc.tests,
+}
