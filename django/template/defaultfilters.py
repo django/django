@@ -54,22 +54,31 @@ fix_ampersands = stringfilter(fix_ampersands)
 
 def floatformat(text, arg=-1):
     """
-    If called without an argument, displays a floating point
-    number as 34.2 -- but only if there's a point to be displayed.
-    With a positive numeric argument, it displays that many decimal places
-    always.
-    With a negative numeric argument, it will display that many decimal
-    places -- but only if there's places to be displayed.
-    Examples:
+    Displays a float to a specified number of decimal places.
+
+    If called without an argument, it displays the floating point number with
+    one decimal place -- but only if there's a decimal place to be displayed:
 
     * num1 = 34.23234
     * num2 = 34.00000
-    * num1|floatformat results in 34.2
-    * num2|floatformat is 34
-    * num1|floatformat:3 is 34.232
-    * num2|floatformat:3 is 34.000
-    * num1|floatformat:-3 is 34.232
-    * num2|floatformat:-3 is 34
+    * num3 = 34.26000
+    * {{ num1|floatformat }} displays "34.2"
+    * {{ num2|floatformat }} displays "34"
+    * {{ num3|floatformat }} displays "34.3"
+
+    If arg is positive, it will always display exactly arg number of decimal
+    places:
+
+    * {{ num1|floatformat:3 }} displays "34.232"
+    * {{ num2|floatformat:3 }} displays "34.000"
+    * {{ num3|floatformat:3 }} displays "34.260"
+
+    If arg is negative, it will display arg number of decimal places -- but
+    only if there are places to be displayed:
+
+    * {{ num1|floatformat:"-3" }} displays "34.232"
+    * {{ num2|floatformat:"-3" }} displays "34"
+    * {{ num3|floatformat:"-3" }} displays "34.260"
     """
     try:
         f = float(text)
