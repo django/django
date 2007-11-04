@@ -582,10 +582,26 @@ def filesizeformat(bytes):
 
 def pluralize(value, arg=u's'):
     """
-    Returns a plural suffix if the value is not 1, for '1 vote' vs. '2 votes'
-    By default, 's' is used as a suffix; if an argument is provided, that string
-    is used instead. If the provided argument contains a comma, the text before
-    the comma is used for the singular case.
+    Returns a plural suffix if the value is not 1.  By default, 's' is used as
+    the suffix:
+
+    * If value is 0, vote{{ value|plurlize }} displays "0 votes".
+    * If value is 1, vote{{ value|plurlize }} displays "1 vote".
+    * If value is 2, vote{{ value|plurlize }} displays "2 votes".
+
+    If an argument is provided, that string is used instead:
+
+    * If value is 0, class{{ value|plurlize:"es" }} displays "0 classes".
+    * If value is 1, class{{ value|plurlize:"es" }} displays "1 class".
+    * If value is 2, class{{ value|plurlize:"es" }} displays "2 classes".
+
+    If the provided argument contains a comma, the text before the comma is
+    used for the singular case and the text after the comma is used for the
+    plural case:
+
+    * If value is 0, cand{{ value|plurlize:"y,ies" }} displays "0 candies".
+    * If value is 1, cand{{ value|plurlize:"y,ies" }} displays "1 candy".
+    * If value is 2, cand{{ value|plurlize:"y,ies" }} displays "2 candies".
     """
     if not u',' in arg:
         arg = u',' + arg
