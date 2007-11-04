@@ -16,7 +16,7 @@ try:
 except NameError:
     from sets import Set as set
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import StrAndUnicode, smart_unicode
 
 from util import ErrorList, ValidationError
@@ -42,8 +42,8 @@ class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
     default_error_messages = {
-        'required': ugettext_lazy(u'This field is required.'),
-        'invalid': ugettext_lazy(u'Enter a valid value.'),
+        'required': _(u'This field is required.'),
+        'invalid': _(u'Enter a valid value.'),
     }
 
     # Tracks each time a Field instance is created. Used to retain order.
@@ -87,11 +87,13 @@ class Field(object):
 
     def _build_error_messages(self, extra_error_messages):
         error_messages = {}
+
         def get_default_error_messages(klass):
             for base_class in klass.__bases__:
                 get_default_error_messages(base_class)
             if hasattr(klass, 'default_error_messages'):
                 error_messages.update(klass.default_error_messages)
+
         get_default_error_messages(self.__class__)
         if extra_error_messages:
             error_messages.update(extra_error_messages)
@@ -124,8 +126,8 @@ class Field(object):
 
 class CharField(Field):
     default_error_messages = {
-        'max_length': ugettext_lazy(u'Ensure this value has at most %(max)d characters (it has %(length)d).'),
-        'min_length': ugettext_lazy(u'Ensure this value has at least %(min)d characters (it has %(length)d).'),
+        'max_length': _(u'Ensure this value has at most %(max)d characters (it has %(length)d).'),
+        'min_length': _(u'Ensure this value has at least %(min)d characters (it has %(length)d).'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -152,9 +154,9 @@ class CharField(Field):
 
 class IntegerField(Field):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a whole number.'),
-        'max_value': ugettext_lazy(u'Ensure this value is less than or equal to %s.'),
-        'min_value': ugettext_lazy(u'Ensure this value is greater than or equal to %s.'),
+        'invalid': _(u'Enter a whole number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
@@ -181,9 +183,9 @@ class IntegerField(Field):
 
 class FloatField(Field):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a number.'),
-        'max_value': ugettext_lazy(u'Ensure this value is less than or equal to %s.'),
-        'min_value': ugettext_lazy(u'Ensure this value is greater than or equal to %s.'),
+        'invalid': _(u'Enter a number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
     }
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
@@ -210,12 +212,12 @@ class FloatField(Field):
 
 class DecimalField(Field):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a number.'),
-        'max_value': ugettext_lazy(u'Ensure this value is less than or equal to %s.'),
-        'min_value': ugettext_lazy(u'Ensure this value is greater than or equal to %s.'),
-        'max_digits': ugettext_lazy('Ensure that there are no more than %s digits in total.'),
-        'max_decimal_places': ugettext_lazy('Ensure that there are no more than %s decimal places.'),
-        'max_whole_digits': ugettext_lazy('Ensure that there are no more than %s digits before the decimal point.')
+        'invalid': _(u'Enter a number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+        'max_digits': _('Ensure that there are no more than %s digits in total.'),
+        'max_decimal_places': _('Ensure that there are no more than %s decimal places.'),
+        'max_whole_digits': _('Ensure that there are no more than %s digits before the decimal point.')
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
@@ -263,7 +265,7 @@ DEFAULT_DATE_INPUT_FORMATS = (
 
 class DateField(Field):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid date.'),
+        'invalid': _(u'Enter a valid date.'),
     }
 
     def __init__(self, input_formats=None, *args, **kwargs):
@@ -296,7 +298,7 @@ DEFAULT_TIME_INPUT_FORMATS = (
 
 class TimeField(Field):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid time.')
+        'invalid': _(u'Enter a valid time.')
     }
 
     def __init__(self, input_formats=None, *args, **kwargs):
@@ -335,7 +337,7 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 class DateTimeField(Field):
     widget = DateTimeInput
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid date/time.'),
+        'invalid': _(u'Enter a valid date/time.'),
     }
 
     def __init__(self, input_formats=None, *args, **kwargs):
@@ -403,7 +405,7 @@ email_re = re.compile(
 
 class EmailField(RegexField):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid e-mail address.'),
+        'invalid': _(u'Enter a valid e-mail address.'),
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
@@ -433,9 +435,9 @@ class UploadedFile(StrAndUnicode):
 class FileField(Field):
     widget = FileInput
     default_error_messages = {
-        'invalid': ugettext_lazy(u"No file was submitted. Check the encoding type on the form."),
-        'missing': ugettext_lazy(u"No file was submitted."),
-        'empty': ugettext_lazy(u"The submitted file is empty."),
+        'invalid': _(u"No file was submitted. Check the encoding type on the form."),
+        'missing': _(u"No file was submitted."),
+        'empty': _(u"The submitted file is empty."),
     }
 
     def __init__(self, *args, **kwargs):
@@ -457,7 +459,7 @@ class FileField(Field):
 
 class ImageField(FileField):
     default_error_messages = {
-        'invalid_image': ugettext_lazy(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
+        'invalid_image': _(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
     }
 
     def clean(self, data):
@@ -493,8 +495,8 @@ url_re = re.compile(
 
 class URLField(RegexField):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid URL.'),
-        'invalid_link': ugettext_lazy(u'This URL appears to be a broken link.'),
+        'invalid': _(u'Enter a valid URL.'),
+        'invalid_link': _(u'This URL appears to be a broken link.'),
     }
 
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
@@ -555,7 +557,7 @@ class NullBooleanField(BooleanField):
 class ChoiceField(Field):
     widget = Select
     default_error_messages = {
-        'invalid_choice': ugettext_lazy(u'Select a valid choice. That choice is not one of the available choices.'),
+        'invalid_choice': _(u'Select a valid choice. That choice is not one of the available choices.'),
     }
 
     def __init__(self, choices=(), required=True, widget=None, label=None,
@@ -594,8 +596,8 @@ class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple
     default_error_messages = {
-        'invalid_choice': ugettext_lazy(u'Select a valid choice. %(value)s is not one of the available choices.'),
-        'invalid_list': ugettext_lazy(u'Enter a list of values.'),
+        'invalid_choice': _(u'Select a valid choice. %(value)s is not one of the available choices.'),
+        'invalid_list': _(u'Enter a list of values.'),
     }
 
     def clean(self, value):
@@ -657,7 +659,7 @@ class MultiValueField(Field):
     You'll probably want to use this with MultiWidget.
     """
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a list of values.'),
+        'invalid': _(u'Enter a list of values.'),
     }
 
     def __init__(self, fields=(), *args, **kwargs):
@@ -719,8 +721,8 @@ class MultiValueField(Field):
 
 class SplitDateTimeField(MultiValueField):
     default_error_messages = {
-        'invalid_date': ugettext_lazy(u'Enter a valid date.'),
-        'invalid_time': ugettext_lazy(u'Enter a valid time.'),
+        'invalid_date': _(u'Enter a valid date.'),
+        'invalid_time': _(u'Enter a valid time.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -748,7 +750,7 @@ ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]
 
 class IPAddressField(RegexField):
     default_error_messages = {
-        'invalid': ugettext_lazy(u'Enter a valid IPv4 address.'),
+        'invalid': _(u'Enter a valid IPv4 address.'),
     }
 
     def __init__(self, *args, **kwargs):
