@@ -12,7 +12,7 @@ class Field(object):
     #### Python 'magic' routines ####
     def __init__(self, fld, val=''):
         "Needs a C pointer (Python integer in ctypes) in order to initialize."
-        self._fld = 0 # Initially NULL
+        self._fld = None # Initially NULL
 
         if not fld:
             raise OGRException('Cannot create OGR Field, invalid pointer given.')

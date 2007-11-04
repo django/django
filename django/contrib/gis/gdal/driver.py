@@ -27,7 +27,7 @@ class Driver(object):
 
         if isinstance(input, StringType):
             # If a string name of the driver was passed in
-            self._dr = 0 # Initially NULL
+            self._dr = None # Initially NULL
             self._register()
 
             # Checking the alias dictionary (case-insensitive) to see if an alias

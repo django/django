@@ -82,7 +82,7 @@ class SpatialReference(object):
     def __init__(self, srs_input='', srs_type='wkt'):
         "Creates a spatial reference object from the given OGC Well Known Text (WKT)."
 
-        self._srs = 0 # Initially NULL
+        self._srs = None # Initially NULL
 
         # Creating an initial empty string buffer.
         buf = c_char_p('')

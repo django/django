@@ -27,8 +27,8 @@ class Layer(object):
     #### Python 'magic' routines ####
     def __init__(self, l):
         "Needs a C pointer (Python/ctypes integer) in order to initialize."
-        self._layer = 0 # Initially NULL
-        self._ldefn = 0
+        self._layer = None # Initially NULL
+        self._ldefn = None
         if not l:
             raise OGRException, 'Cannot create Layer, invalid pointer given'
         self._layer = l
@@ -36,30 +36,27 @@ class Layer(object):
 
     def __getitem__(self, index):
         "Gets the Feature at the specified index."
-        def make_feature(offset):
-            return Feature(lgdal.OGR_L_GetFeature(self._layer,
-                                                  c_long(offset)))
-        end = self.num_feat
         if not isinstance(index, (slice, int)):
             raise TypeError
-       
+        end = self.num_feat
         if isinstance(index,int):
             # An integer index was given
             if index < 0:
                 index = end - index
             if index < 0 or index >= self.num_feat:
                 raise OGRIndexError, 'index out of range'
-            return make_feature(index)
+            return self._make_feature(index)
         else: 
             # A slice was given
             start, stop, stride = index.indices(end)
-            return [make_feature(offset) for offset in range(start,stop,stride)]
+            return [self._make_feature(offset) for offset in range(start,stop,stride)]
 
     def __iter__(self):
         "Iterates over each Feature in the Layer."
-        #TODO: is OGR's GetNextFeature faster here?
+        # ResetReading() must be called before iteration is to begin.
+        lgdal.OGR_L_ResetReading(self._layer)
         for i in range(self.num_feat):
-            yield self.__getitem__(i)
+            yield Feature(lgdal.OGR_L_GetNextFeature(self._layer), self._ldefn)
 
     def __len__(self):
         "The length is the number of features."
@@ -68,6 +65,10 @@ class Layer(object):
     def __str__(self):
         "The string name of the layer."
         return self.name
+
+    def _make_feature(self, offset):
+        "Helper routine for __getitem__ that makes a feature from an offset."
+        return Feature(lgdal.OGR_L_GetFeature(self._layer, c_long(offset)), self._ldefn)
 
     #### Layer properties ####
     @property
@@ -112,6 +113,18 @@ class Layer(object):
         return [ string_at(lgdal.OGR_Fld_GetNameRef(lgdal.OGR_FD_GetFieldDefn(self._ldefn, i)))
                  for i in xrange(self.num_fields) ]
     
+    @property 
+    def field_widths(self):
+        "Returns a list of the maximum field widths for the features."
+        return [ int(lgdal.OGR_Fld_GetWidth(lgdal.OGR_FD_GetFieldDefn(self._ldefn, i)))
+                 for i in xrange(self.num_fields) ]
+
+    @property 
+    def field_precisions(self):
+        "Returns the field precisions for the features."
+        return [ int(lgdal.OGR_Fld_GetPrecision(lgdal.OGR_FD_GetFieldDefn(self._ldefn, i)))
+                 for i in xrange(self.num_fields) ]
+
     #### Layer Methods ####
     def get_fields(self, field_name):
         """Returns a list containing the given field name for every Feature

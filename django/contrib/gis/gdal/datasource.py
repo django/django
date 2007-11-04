@@ -55,7 +55,7 @@ class DataSource(object):
     #### Python 'magic' routines ####
     def __init__(self, ds_input, ds_driver=False):
 
-        self._ds = 0 # Initially NULL
+        self._ds = None # Initially NULL
 
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.

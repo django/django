@@ -17,18 +17,18 @@ class Feature(object):
     "A class that wraps an OGR Feature, needs to be instantiated from a Layer object."
 
     #### Python 'magic' routines ####
-    def __init__(self, f):
+    def __init__(self, feat, fdefn):
         "Needs a C pointer (Python integer in ctypes) in order to initialize."
-        self._feat = 0 # Initially NULL
-        self._fdefn = 0 
-        if not f:
+        self._feat = None # Initially NULL
+        self._fdefn = None 
+        if not feat or not fdefn:
             raise OGRException('Cannot create OGR Feature, invalid pointer given.')
-        self._feat = f
-        self._fdefn = lgdal.OGR_F_GetDefnRef(f)
+        self._feat = feat
+        self._fdefn = fdefn
 
     def __del__(self):
         "Releases a reference to this object."
-        if self._fdefn: lgdal.OGR_FD_Release(self._fdefn)
+        if self._feat: lgdal.OGR_F_Destroy(self._feat)
 
     def __getitem__(self, index):
         "Gets the Field at the specified index."
@@ -91,7 +91,7 @@ class Feature(object):
             raise OGRException('Cannot retrieve Geometry from the feature.')
 
         # Attempting to retrieve the Spatial Reference for the geometry.
-        srs_ptr  = lgdal.OGR_G_GetSpatialReference(geom_ptr)
+        srs_ptr  = lgdal.OSRClone(lgdal.OGR_G_GetSpatialReference(geom_ptr))
         if srs_ptr:
             srs = SpatialReference(srs_ptr, 'ogr')
         else:
