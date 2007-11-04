@@ -1106,25 +1106,39 @@ floatformat
 When used without an argument, rounds a floating-point number to one decimal
 place -- but only if there's a decimal part to be displayed. For example:
 
-    * ``36.123`` gets converted to ``36.1``
-    * ``36.15`` gets converted to ``36.2``
-    * ``36`` gets converted to ``36``
+========  =======================  ======
+value     Template                 Output
+========  =======================  ======
+34.23234  {{ value|floatformat }}  34.2
+34.00000  {{ value|floatformat }}  34
+34.26000  {{ value|floatformat }}  34.3
+========  =======================  ======
 
-If used with a numeric integer argument, ``floatformat`` rounds a number to that
-many decimal places.  For example:
+If used with a numeric integer argument, ``floatformat`` rounds a number to
+that many decimal places.  For example:
 
-    * ``36.1234`` with floatformat:3 gets converted to ``36.123``
-    * ``36`` with floatformat:4 gets converted to ``36.0000``
+========  =========================  ======
+value     Template                   Output
+========  =========================  ======
+34.23234  {{ value|floatformat:3 }}  34.232
+34.00000  {{ value|floatformat:3 }}  34.000
+34.26000  {{ value|floatformat:3 }}  34.260
+========  =========================  ======
 
-If the argument passed to ``floatformat`` is negative, it will round a number to
-that many decimal places -- but only if there's a decimal part to be displayed.
-For example:
+If the argument passed to ``floatformat`` is negative, it will round a number
+to that many decimal places -- but only if there's a decimal part to be
+displayed. For example:
 
-    * ``36.1234`` with floatformat:-3 gets converted to ``36.123``
-    * ``36`` with floatformat:-4 gets converted to ``36``
+========  ============================  ======
+value     Template                      Output
+========  ============================  ======
+34.23234  {{ value|floatformat:"-3" }}  34.232
+34.00000  {{ value|floatformat:"-3" }}  34
+34.26000  {{ value|floatformat:"-3" }}  34.260
+========  ============================  ======
 
-Using ``floatformat`` with no argument is equivalent to using ``floatformat`` with
-an argument of ``-1``.
+Using ``floatformat`` with no argument is equivalent to using ``floatformat``
+with an argument of ``-1``.
 
 get_digit
 ~~~~~~~~~
