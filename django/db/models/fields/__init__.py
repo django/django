@@ -147,6 +147,8 @@ class Field(object):
         # exactly which wacky database column type you want to use.
         data_types = get_creation_module().DATA_TYPES
         internal_type = self.get_internal_type()
+        if internal_type not in data_types:
+            return None
         return data_types[internal_type] % self.__dict__
 
     def validate_full(self, field_data, all_data):
