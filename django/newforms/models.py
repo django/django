@@ -15,8 +15,8 @@ from widgets import Select, SelectMultiple, HiddenInput, MultipleHiddenInput
 
 __all__ = (
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
-    'ModelChoiceField', 'ModelMultipleChoiceField', 'formset_for_model',
-    'inline_formset'
+    'formset_for_model', 'formset_for_queryset', 'inline_formset',
+    'ModelChoiceField', 'ModelMultipleChoiceField',
 )
 
 def save_instance(form, instance, fields=None, fail_message='saved', commit=True):
@@ -237,16 +237,19 @@ def initial_data(instance, fields=None):
 
 class BaseModelFormSet(BaseFormSet):
     """
-    A ``FormSet`` attatched to a particular model or sequence of model instances.
+    A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
     model = None
+    queryset = None
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, instances=None):
-        self.instances = instances
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None):
         kwargs = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
-        if instances:
-            kwargs['initial'] = [initial_data(instance) for instance in instances]
+        if self.queryset:
+            kwargs['initial'] = [initial_data(obj) for obj in self.get_queryset()]
         super(BaseModelFormSet, self).__init__(**kwargs)
+
+    def get_queryset(self):
+        return self.queryset._clone()
 
     def save_new(self, form, commit=True):
         """Saves and returns a new model instance for the given form."""
@@ -260,25 +263,36 @@ class BaseModelFormSet(BaseFormSet):
         """Saves model instances for every form, adding and changing instances
         as necessary, and returns the list of instances.
         """
+        return self.save_existing_objects(commit) + self.save_new_objects(commit)
+
+    def save_existing_objects(self, commit=True):
+        if not self.queryset:
+            return []
+        # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
+        existing_objects = {}
+        for obj in self.get_queryset():
+            existing_objects[obj._get_pk_val()] = obj
         saved_instances = []
-        # put self.instances into a dict so they are easy to lookup by pk
-        instances = {}
-        for instance in self.instances:
-            instances[instance._get_pk_val()] = instance
-        if self.instances:
-            # update/save existing instances
-            for form in self.change_forms:
-                instance = instances[form.cleaned_data[self.model._meta.pk.attname]]
-                if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
-                    instance.delete()
-                else:
-                    saved_instances.append(self.save_instance(form, instance, commit=commit))
-        # create/save new instances
+        for form in self.change_forms:
+            obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
+            if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
+                obj.delete()
+            else:
+                saved_instances.append(self.save_instance(form, obj, commit=commit))
+        return saved_instances
+
+    def save_new_objects(self, commit=True):
+        new_objects = []
         for form in self.add_forms:
             if form.is_empty():
                 continue
-            saved_instances.append(self.save_new(form, commit=commit))
-        return saved_instances
+            # If someone has marked an add form for deletion, don't save the
+            # object. At some point it would be nice if we didn't display
+            # the deletion widget for add forms.
+            if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
+                continue
+            new_objects.append(self.save_new(form, commit=commit))
+        return new_objects
 
     def add_fields(self, form, index):
         """Add a hidden field for the object's primary key."""
@@ -286,25 +300,61 @@ class BaseModelFormSet(BaseFormSet):
         form.fields[self._pk_field_name] = IntegerField(required=False, widget=HiddenInput)
         super(BaseModelFormSet, self).add_fields(form, index)
 
-def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield(), formset=BaseModelFormSet, extra=1, orderable=False, deletable=False, fields=None):
-    form = form_for_model(model, form=form, fields=fields, formfield_callback=formfield_callback)
+def formset_for_queryset(queryset, form=BaseForm, formfield_callback=lambda f: f.formfield(),
+                         formset=BaseModelFormSet, extra=1, orderable=False, deletable=False, fields=None):
+    """
+    Returns a FormSet class for the given QuerySet. This FormSet will contain
+    change forms for every instance in the QuerySet as well as the number of
+    add forms specified by ``extra``.
+    
+    Provide ``extra`` to determine the number of add forms to display.
+    
+    Provide ``deletable`` if you want to allow the formset to delete any
+    objects in the given queryset.
+    
+    Provide ``form`` if you want to use a custom BaseForm subclass.
+    
+    Provide ``formfield_callback`` if you want to define different logic for
+    determining the formfield for a given database field. It's a callable that
+    takes a database Field instance and returns a form Field instance.
+    
+    Provide ``formset`` if you want to use a custom BaseModelFormSet subclass.
+    """
+    form = form_for_model(queryset.model, form=form, fields=fields, formfield_callback=formfield_callback)
     FormSet = formset_for_form(form, formset, extra, orderable, deletable)
-    FormSet.model = model
+    FormSet.model = queryset.model
+    FormSet.queryset = queryset
     return FormSet
+
+def formset_for_model(model, form=BaseForm, formfield_callback=lambda f: f.formfield(),
+                      formset=BaseModelFormSet, extra=1, orderable=False, deletable=False, fields=None):
+    """
+    Returns a FormSet class for the given Django model class. This FormSet
+    will contain change forms for every instance of the given model as well
+    as the number of add forms specified by ``extra``.
+    
+    This is essentially the same as ``formset_for_queryset``, but automatically
+    uses the model's default manager to determine the queryset.
+    """
+    qs = model._default_manager.all()
+    return formset_for_queryset(qs, form, formfield_callback, formset, extra, orderable, deletable, fields)
 
 class InlineFormset(BaseModelFormSet):
     """A formset for child objects related to a parent."""
-    def __init__(self, instance=None, data=None, files=None):
+    def __init__(self, instance, data=None, files=None):
         from django.db.models.fields.related import RelatedObject
         self.instance = instance
         # is there a better way to get the object descriptor?
         self.rel_name = RelatedObject(self.fk.rel.to, self.model, self.fk).get_accessor_name()
-        super(InlineFormset, self).__init__(data, files, instances=self.get_inline_objects(), prefix=self.rel_name)
+        super(InlineFormset, self).__init__(data, files, prefix=self.rel_name)
 
-    def get_inline_objects(self):
-        if self.instance is None:
-            return []
-        return getattr(self.instance, self.rel_name).all()
+    def get_queryset(self):
+        """
+        Returns this FormSet's queryset, but restricted to children of 
+        self.instance
+        """
+        kwargs = {self.fk.name: self.instance}
+        return self.queryset.filter(**kwargs)
 
     def save_new(self, form, commit=True):
         kwargs = {self.fk.get_attname(): self.instance._get_pk_val()}
