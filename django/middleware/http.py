@@ -1,4 +1,4 @@
-from email.Utils import formatdate
+from django.utils.http import http_date
 
 class ConditionalGetMiddleware(object):
     """
@@ -11,7 +11,7 @@ class ConditionalGetMiddleware(object):
     Also sets the Date and Content-Length response-headers.
     """
     def process_response(self, request, response):
-        response['Date'] = formatdate()[:26] + "GMT"
+        response['Date'] = http_date()
         if not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
@@ -23,7 +23,6 @@ class ConditionalGetMiddleware(object):
                 response['Content-Length'] = '0'
 
         if response.has_header('Last-Modified'):
-            last_mod = response['Last-Modified']
             if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
             if if_modified_since == response['Last-Modified']:
                 response.status_code = 304

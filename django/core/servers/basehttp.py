@@ -9,13 +9,13 @@ been reviewed for security issues. Don't use it for production use.
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from types import ListType, StringType
-from email.Utils import formatdate
 import mimetypes
 import os
 import re
 import sys
-import time
 import urllib
+
+from django.utils.http import http_date
 
 __version__ = "0.1"
 __all__ = ['WSGIServer','WSGIRequestHandler','demo_app']
@@ -376,7 +376,7 @@ class ServerHandler(object):
                 self._write('HTTP/%s %s\r\n' % (self.http_version,self.status))
                 if 'Date' not in self.headers:
                     self._write(
-                        'Date: %s\r\n' % (formatdate()[:26] + "GMT")
+                        'Date: %s\r\n' % http_date()
                     )
                 if self.server_software and 'Server' not in self.headers:
                     self._write('Server: %s\r\n' % self.server_software)

@@ -252,6 +252,7 @@ def sql_model_create(model, style, known_models=set()):
     table_output = []
     pending_references = {}
     qn = connection.ops.quote_name
+    inline_references = connection.features.inline_fk_references
     for f in opts.fields:
         col_type = f.db_type()
         tablespace = f.db_tablespace or opts.db_tablespace
@@ -272,7 +273,7 @@ def sql_model_create(model, style, known_models=set()):
             # won't be generating a CREATE INDEX statement for this field.
             field_output.append(connection.ops.tablespace_sql(tablespace, inline=True))
         if f.rel:
-            if f.rel.to in known_models:
+            if inline_references and f.rel.to in known_models:
                 field_output.append(style.SQL_KEYWORD('REFERENCES') + ' ' + \
                     style.SQL_TABLE(qn(f.rel.to._meta.db_table)) + ' (' + \
                     style.SQL_FIELD(qn(f.rel.to._meta.get_field(f.rel.field_name).column)) + ')' +
@@ -341,10 +342,12 @@ def sql_for_pending_references(model, style, pending_references):
 def many_to_many_sql_for_model(model, style):
     from django.db import connection, models
     from django.contrib.contenttypes import generic
+    from django.db.backends.util import truncate_name
 
     opts = model._meta
     final_output = []
     qn = connection.ops.quote_name
+    inline_references = connection.features.inline_fk_references
     for f in opts.many_to_many:
         if not isinstance(f.rel, generic.GenericRel):
             tablespace = f.db_tablespace or opts.db_tablespace
@@ -354,26 +357,43 @@ def many_to_many_sql_for_model(model, style):
                 tablespace_sql = ''
             table_output = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + \
                 style.SQL_TABLE(qn(f.m2m_db_table())) + ' (']
-            table_output.append('    %s %s %s%s,' % \
+            table_output.append('    %s %s %s%s,' %
                 (style.SQL_FIELD(qn('id')),
                 style.SQL_COLTYPE(models.AutoField(primary_key=True).db_type()),
                 style.SQL_KEYWORD('NOT NULL PRIMARY KEY'),
                 tablespace_sql))
-            table_output.append('    %s %s %s %s (%s)%s,' % \
-                (style.SQL_FIELD(qn(f.m2m_column_name())),
-                style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
-                style.SQL_KEYWORD('NOT NULL REFERENCES'),
-                style.SQL_TABLE(qn(opts.db_table)),
-                style.SQL_FIELD(qn(opts.pk.column)),
-                connection.ops.deferrable_sql()))
-            table_output.append('    %s %s %s %s (%s)%s,' % \
-                (style.SQL_FIELD(qn(f.m2m_reverse_name())),
-                style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
-                style.SQL_KEYWORD('NOT NULL REFERENCES'),
-                style.SQL_TABLE(qn(f.rel.to._meta.db_table)),
-                style.SQL_FIELD(qn(f.rel.to._meta.pk.column)),
-                connection.ops.deferrable_sql()))
-            table_output.append('    %s (%s, %s)%s' % \
+            if inline_references:
+                deferred = []
+                table_output.append('    %s %s %s %s (%s)%s,' %
+                    (style.SQL_FIELD(qn(f.m2m_column_name())),
+                    style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
+                    style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                    style.SQL_TABLE(qn(opts.db_table)),
+                    style.SQL_FIELD(qn(opts.pk.column)),
+                    connection.ops.deferrable_sql()))
+                table_output.append('    %s %s %s %s (%s)%s,' %
+                    (style.SQL_FIELD(qn(f.m2m_reverse_name())),
+                    style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
+                    style.SQL_KEYWORD('NOT NULL REFERENCES'),
+                    style.SQL_TABLE(qn(f.rel.to._meta.db_table)),
+                    style.SQL_FIELD(qn(f.rel.to._meta.pk.column)),
+                    connection.ops.deferrable_sql()))
+            else:
+                table_output.append('    %s %s %s,' %
+                    (style.SQL_FIELD(qn(f.m2m_column_name())),
+                    style.SQL_COLTYPE(models.ForeignKey(model).db_type()),
+                    style.SQL_KEYWORD('NOT NULL')))
+                table_output.append('    %s %s %s,' %
+                    (style.SQL_FIELD(qn(f.m2m_reverse_name())),
+                    style.SQL_COLTYPE(models.ForeignKey(f.rel.to).db_type()),
+                    style.SQL_KEYWORD('NOT NULL')))
+                deferred = [
+                    (f.m2m_db_table(), f.m2m_column_name(), opts.db_table,
+                        opts.pk.column),
+                    ( f.m2m_db_table(), f.m2m_reverse_name(),
+                        f.rel.to._meta.db_table, f.rel.to._meta.pk.column)
+                    ]
+            table_output.append('    %s (%s, %s)%s' %
                 (style.SQL_KEYWORD('UNIQUE'),
                 style.SQL_FIELD(qn(f.m2m_column_name())),
                 style.SQL_FIELD(qn(f.m2m_reverse_name())),
@@ -384,6 +404,15 @@ def many_to_many_sql_for_model(model, style):
                 table_output.append(connection.ops.tablespace_sql(opts.db_tablespace))
             table_output.append(';')
             final_output.append('\n'.join(table_output))
+
+            for r_table, r_col, table, col in deferred:
+                r_name = '%s_refs_%s_%x' % (r_col, col,
+                        abs(hash((r_table, table))))
+                final_output.append(style.SQL_KEYWORD('ALTER TABLE') + ' %s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s (%s)%s;' % 
+                (qn(r_table),
+                truncate_name(r_name, connection.ops.max_name_length()),
+                qn(r_col), qn(table), qn(col),
+                connection.ops.deferrable_sql()))
 
             # Add any extra SQL needed to support auto-incrementing PKs
             autoinc_sql = connection.ops.autoinc_sql(f.m2m_db_table(), 'id')

@@ -1,7 +1,18 @@
 import types
 import urllib
 import datetime
+
 from django.utils.functional import Promise
+
+class DjangoUnicodeDecodeError(UnicodeDecodeError):
+    def __init__(self, obj, *args):
+        self.obj = obj
+        UnicodeDecodeError.__init__(self, *args)
+
+    def __str__(self):
+        original = UnicodeDecodeError.__str__(self)
+        return '%s. You passed in %r (%s)' % (original, self.obj,
+                type(self.obj))
 
 class StrAndUnicode(object):
     """
@@ -33,13 +44,16 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     if strings_only and isinstance(s, (types.NoneType, int, long, datetime.datetime, datetime.date, datetime.time, float)):
         return s
-    if not isinstance(s, basestring,):
-        if hasattr(s, '__unicode__'):
-            s = unicode(s)
-        else:
-            s = unicode(str(s), encoding, errors)
-    elif not isinstance(s, unicode):
-        s = unicode(s, encoding, errors)
+    try:
+        if not isinstance(s, basestring,):
+            if hasattr(s, '__unicode__'):
+                s = unicode(s)
+            else:
+                s = unicode(str(s), encoding, errors)
+        elif not isinstance(s, unicode):
+            s = unicode(s, encoding, errors)
+    except UnicodeDecodeError, e:
+        raise DjangoUnicodeDecodeError(s, *e.args)
     return s
 
 def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):

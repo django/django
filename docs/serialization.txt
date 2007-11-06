@@ -47,14 +47,14 @@ This is useful if you want to serialize data directly to a file-like object
 Subset of fields
 ~~~~~~~~~~~~~~~~
 
-If you only want a subset of fields to be serialized, you can 
+If you only want a subset of fields to be serialized, you can
 specify a ``fields`` argument to the serializer::
 
     from django.core import serializers
     data = serializers.serialize('xml', SomeModel.objects.all(), fields=('name','size'))
 
 In this example, only the ``name`` and ``size`` attributes of each model will
-be serialized. 
+be serialized.
 
 .. note::
 
@@ -111,9 +111,9 @@ Django "ships" with a few included serializers:
     ``python``  Translates to and from "simple" Python objects (lists, dicts,
                 strings, etc.).  Not really all that useful on its own, but
                 used as a base for other serializers.
-    
-    ``yaml``    Serializes to YAML (Yet Another Markup Lanuage). This 
-                serializer is only available if PyYAML_ is installed. 
+
+    ``yaml``    Serializes to YAML (Yet Another Markup Lanuage). This
+                serializer is only available if PyYAML_ is installed.
     ==========  ==============================================================
 
 .. _json: http://json.org/
@@ -134,6 +134,23 @@ For example::
 
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
+
+Django ships with a copy of simplejson_ in the source. Be aware, that if
+you're using that for serializing directly that not all Django output can be
+passed unmodified to simplejson. In particular, `lazy translation objects`_
+need a `special encoder`_ written for them. Something like this will work::
+
+    from django.utils.functional import Promise
+    from django.utils.encoding import force_unicode
+
+    class LazyEncoder(simplejson.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, Promise):
+                return force_unicode(obj)
+            return obj
+
+.. _lazy translation objects: ../i18n/#lazy-translation
+.. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
 
 Writing custom serializers
 ``````````````````````````

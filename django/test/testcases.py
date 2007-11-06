@@ -146,7 +146,7 @@ class TestCase(unittest.TestCase):
                                         " context %d does not contain the"
                                         " error '%s' (actual errors: %s)" %
                                             (field, form, i, err,
-                                             list(field_errors)))
+                                             repr(field_errors)))
                     elif field in context[form].fields:
                         self.fail("The field '%s' on form '%s' in context %d"
                                   " contains no errors" % (field, form, i))

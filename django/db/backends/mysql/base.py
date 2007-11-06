@@ -61,6 +61,7 @@ server_version_re = re.compile(r'(\d{1,2})\.(\d{1,2})\.(\d{1,2})')
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     autoindexes_primary_keys = False
+    inline_fk_references = False
 
 class DatabaseOperations(BaseDatabaseOperations):
     def date_extract_sql(self, lookup_type, field_name):
