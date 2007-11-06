@@ -1,6 +1,6 @@
 """
-  This module houses the GEOS exceptions, specifically, GEOSException and
-   GEOSGeometryIndexError.
+ This module houses the GEOS exceptions, specifically, GEOSException and
+ GEOSGeometryIndexError.
 """
 
 class GEOSException(Exception):

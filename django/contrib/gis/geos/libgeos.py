@@ -1,15 +1,14 @@
 """
-  This module houses the ctypes initialization procedures, as well
-   as the notice and error handler function callbacks (get called
-   when an error occurs in GEOS).
+ This module houses the ctypes initialization procedures, as well
+ as the notice and error handler function callbacks (get called
+ when an error occurs in GEOS).
 
-  This module also houses GEOS Pointer utilities, including
-   get_pointer_arr(), and GEOM_PTR.
+ This module also houses GEOS Pointer utilities, including
+ get_pointer_arr(), and GEOM_PTR.
 """
-
-from django.contrib.gis.geos.error import GEOSException
-from ctypes import c_char_p, c_int, string_at, CDLL, CFUNCTYPE, POINTER, Structure
 import atexit, os, sys
+from ctypes import c_char_p, string_at, Structure, CDLL, CFUNCTYPE, POINTER
+from django.contrib.gis.geos.error import GEOSException
 
 # NumPy supported?
 try:
@@ -25,16 +24,14 @@ if os.name == 'nt':
     lib_name = 'libgeos_c-1.dll'
 elif os.name == 'posix':
     platform = os.uname()[0] # Using os.uname()
-    if platform in ('Linux', 'SunOS'):
-        # Linux or Solaris shared library
-        lib_name = 'libgeos_c.so'
-    elif platform == 'Darwin':
+    if platform == 'Darwin':
         # Mac OSX Shared Library (Thanks Matt!)
         lib_name = 'libgeos_c.dylib'
     else:
-        raise GEOSException, 'Unknown POSIX platform "%s"' % platform
+        # Attempting to use the .so extension for all other platforms
+        lib_name = 'libgeos_c.so'
 else:
-    raise GEOSException, 'Unsupported OS "%s"' % os.name
+    raise GEOSException('Unsupported OS "%s"' % os.name)
 
 # Getting the GEOS C library.  The C interface (CDLL) is used for
 #  both *NIX and Windows.
@@ -71,13 +68,13 @@ lgeos.initGEOS(notice_h, error_h)
 
 #### GEOS Geometry C data structures, and utility functions. ####
 
-# Opaque GEOS geometry structure
-class GEOSGeom_t(Structure): 
-    "Opaque structure used when arrays of geometries are needed as parameters."
-    pass
+# Opaque GEOS geometry structures, used for GEOM_PTR and CS_PTR
+class GEOSGeom_t(Structure): pass
+class GEOSCoordSeq_t(Structure): pass
 
-# Pointer to opaque geometry structure
+# Pointers to opaque GEOS geometry structures.
 GEOM_PTR = POINTER(GEOSGeom_t)
+CS_PTR = POINTER(GEOSCoordSeq_t)
 
 # Used specifically by the GEOSGeom_createPolygon and GEOSGeom_createCollection 
 #  GEOS routines
