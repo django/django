@@ -269,7 +269,7 @@ class BaseModelFormSet(BaseFormSet):
             # update/save existing instances
             for form in self.change_forms:
                 instance = instances[form.cleaned_data[self.model._meta.pk.attname]]
-                if form.cleaned_data[DELETION_FIELD_NAME]:
+                if self.deletable and form.cleaned_data[DELETION_FIELD_NAME]:
                     instance.delete()
                 else:
                     saved_instances.append(self.save_instance(form, instance, commit=commit))
