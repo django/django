@@ -250,6 +250,22 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    def test_view_with_method_login(self):
+        "Request a page that is protected with a @login_required method"
+        
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/test_client/login_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_method_view/')
+        
+        # Log in
+        login = self.client.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Request a page that requires a login
+        response = self.client.get('/test_client/login_protected_method_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
     def test_view_with_login_and_custom_redirect(self):
         "Request a page that is protected with @login_required(redirect_field_name='redirect_to')"
         
@@ -294,6 +310,40 @@ class ClientTest(TestCase):
         # Request a page that requires a login
         response = self.client.get('/test_client/login_protected_view/')
         self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/login_protected_view/')
+
+    def test_view_with_permissions(self):
+        "Request a page that is protected with @permission_required"
+        
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/test_client/permission_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_view/')
+        
+        # Log in
+        login = self.client.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Log in with wrong permissions. Should result in 302.
+        response = self.client.get('/test_client/permission_protected_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_view/')
+
+        # TODO: Log in with right permissions and request the page again
+
+    def test_view_with_method_permissions(self):
+        "Request a page that is protected with a @permission_required method"
+        
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/test_client/permission_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_method_view/')
+        
+        # Log in
+        login = self.client.login(username='testclient', password='password')
+        self.failUnless(login, 'Could not log in')
+
+        # Log in with wrong permissions. Should result in 302.
+        response = self.client.get('/test_client/permission_protected_method_view/')
+        self.assertRedirects(response, 'http://testserver/accounts/login/?next=/test_client/permission_protected_method_view/')
+
+        # TODO: Log in with right permissions and request the page again
 
     def test_session_modifying_view(self):
         "Request a page that modifies the session"
