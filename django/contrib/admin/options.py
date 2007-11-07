@@ -776,7 +776,7 @@ class InlineAdminFormSet(object):
         self.fieldsets = fieldsets
 
     def __iter__(self):
-        for form, original in zip(self.formset.change_forms, self.formset.get_inline_objects()):
+        for form, original in zip(self.formset.change_forms, self.formset.get_queryset()):
             yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, original)
         for form in self.formset.add_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets, self.opts.prepopulated_fields, None)
