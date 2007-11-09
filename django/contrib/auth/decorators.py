@@ -51,6 +51,7 @@ class _CheckLogin(object):
         self.test_func = test_func
         self.login_url = login_url
         self.redirect_field_name = redirect_field_name
+        self.__name__ = view_func.__name__
         
     def __get__(self, obj, cls=None):
         view_func = self.view_func.__get__(obj, cls)
