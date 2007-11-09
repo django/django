@@ -517,7 +517,7 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a list of values.']
 
-# Add a Category object *after* the ModelChoiceField has already been
+# Add a Category object *after* the ModelMultipleChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
 >>> Category.objects.create(id=6, name='Sixth', url='6th')
@@ -525,7 +525,7 @@ ValidationError: [u'Enter a list of values.']
 >>> f.clean([6])
 [<Category: Sixth>]
 
-# Delete a Category object *after* the ModelChoiceField has already been
+# Delete a Category object *after* the ModelMultipleChoiceField has already been
 # instantiated. This proves clean() checks the database during clean() rather
 # than caching it at time of instantiation.
 >>> Category.objects.get(url='6th').delete()
