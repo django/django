@@ -207,6 +207,7 @@ class WSGIHandler(BaseHandler):
                 # Apply response middleware
                 for middleware_method in self._response_middleware:
                     response = middleware_method(request, response)
+                response = self.apply_response_fixes(request, response)
         finally:
             dispatcher.send(signal=signals.request_finished)
 
@@ -220,3 +221,4 @@ class WSGIHandler(BaseHandler):
             response_headers.append(('Set-Cookie', str(c.output(header=''))))
         start_response(status, response_headers)
         return response
+

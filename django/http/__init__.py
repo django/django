@@ -5,6 +5,7 @@ from urllib import urlencode
 from urlparse import urljoin
 from django.utils.datastructures import MultiValueDict, FileDict
 from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+from utils import *
 
 RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
 

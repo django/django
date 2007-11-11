@@ -162,6 +162,7 @@ class ModPythonHandler(BaseHandler):
                 # Apply response middleware
                 for middleware_method in self._response_middleware:
                     response = middleware_method(request, response)
+                response = self.apply_response_fixes(request, response)
         finally:
             dispatcher.send(signal=signals.request_finished)
 
