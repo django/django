@@ -5,9 +5,10 @@ and database field objects.
 
 from django.utils.translation import ugettext
 from django.utils.encoding import smart_unicode
+from django.utils.datastructures import SortedDict
 
 from util import ValidationError
-from forms import BaseForm, SortedDictFromList
+from forms import BaseForm
 from fields import Field, ChoiceField
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
@@ -89,7 +90,7 @@ def form_for_model(model, form=BaseForm, fields=None,
         formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
-    base_fields = SortedDictFromList(field_list)
+    base_fields = SortedDict(field_list)
     return type(opts.object_name + 'Form', (form,),
         {'base_fields': base_fields, '_model': model,
          'save': make_model_save(model, fields, 'created')})
@@ -118,7 +119,7 @@ def form_for_instance(instance, form=BaseForm, fields=None,
         formfield = formfield_callback(f, initial=current_value)
         if formfield:
             field_list.append((f.name, formfield))
-    base_fields = SortedDictFromList(field_list)
+    base_fields = SortedDict(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
         {'base_fields': base_fields, '_model': model,
          'save': make_instance_save(instance, fields, 'changed')})
@@ -127,8 +128,8 @@ def form_for_fields(field_list):
     """
     Returns a Form class for the given list of Django database field instances.
     """
-    fields = SortedDictFromList([(f.name, f.formfield())
-                                 for f in field_list if f.editable])
+    fields = SortedDict([(f.name, f.formfield())
+                         for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
 class QuerySetIterator(object):

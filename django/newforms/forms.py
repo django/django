@@ -2,7 +2,7 @@
 Form classes
 """
 
-import copy
+from copy import deepcopy
 
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape
@@ -21,18 +21,6 @@ def pretty_name(name):
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
 
-class SortedDictFromList(SortedDict):
-    "A dictionary that keeps its keys in the order in which they're inserted."
-    # This is different than django.utils.datastructures.SortedDict, because
-    # this takes a list/tuple as the argument to __init__().
-    def __init__(self, data=None):
-        if data is None: data = []
-        self.keyOrder = [d[0] for d in data]
-        dict.__init__(self, dict(data))
-
-    def copy(self):
-        return SortedDictFromList([(k, copy.deepcopy(v)) for k, v in self.items()])
-
 class DeclarativeFieldsMetaclass(type):
     """
     Metaclass that converts Field attributes to a dictionary called
@@ -49,7 +37,7 @@ class DeclarativeFieldsMetaclass(type):
             if hasattr(base, 'base_fields'):
                 fields = base.base_fields.items() + fields
 
-        attrs['base_fields'] = SortedDictFromList(fields)
+        attrs['base_fields'] = SortedDict(fields)
         return type.__new__(cls, name, bases, attrs)
 
 class BaseForm(StrAndUnicode):
@@ -74,7 +62,7 @@ class BaseForm(StrAndUnicode):
         # alter self.fields, we create self.fields here by copying base_fields.
         # Instances should always modify self.fields; they should not modify
         # self.base_fields.
-        self.fields = self.base_fields.copy()
+        self.fields = deepcopy(self.base_fields)
 
     def __unicode__(self):
         return self.as_table()
