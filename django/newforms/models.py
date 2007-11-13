@@ -155,13 +155,21 @@ class ModelChoiceField(ChoiceField):
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
                  required=True, widget=Select, label=None, initial=None,
                  help_text=None):
-        self.queryset = queryset
         self.empty_label = empty_label
         self.cache_choices = cache_choices
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
         Field.__init__(self, required, widget, label, initial, help_text)
+        self.queryset = queryset
+
+    def _get_queryset(self):
+        return self._queryset
+
+    def _set_queryset(self, queryset):
+        self._queryset = queryset
         self.widget.choices = self.choices
+
+    queryset = property(_get_queryset, _set_queryset)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
@@ -190,7 +198,7 @@ class ModelChoiceField(ChoiceField):
         if value in ('', None):
             return None
         try:
-            value = self.queryset.model._default_manager.get(pk=value)
+            value = self.queryset.get(pk=value)
         except self.queryset.model.DoesNotExist:
             raise ValidationError(ugettext(u'Select a valid choice. That'
                                            u' choice is not one of the'
@@ -217,7 +225,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         final_values = []
         for val in value:
             try:
-                obj = self.queryset.model._default_manager.get(pk=val)
+                obj = self.queryset.get(pk=val)
             except self.queryset.model.DoesNotExist:
                 raise ValidationError(ugettext(u'Select a valid choice. %s is'
                                                u' not one of the available'

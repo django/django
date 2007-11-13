@@ -440,6 +440,8 @@ the data in the database when the form is instantiated.
 >>> from django.newforms import ModelChoiceField, ModelMultipleChoiceField
 
 >>> f = ModelChoiceField(Category.objects.all())
+>>> list(f.choices)
+[(u'', u'---------'), (1, u'Entertainment'), (2, u"It's a test"), (3, u'Third'), (4, u'Fourth')]
 >>> f.clean('')
 Traceback (most recent call last):
 ...
@@ -485,9 +487,23 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
 
+# queryset can be changed after the field is created.
+>>> f.queryset = Category.objects.exclude(name='Fourth')
+>>> list(f.choices)
+[(u'', u'---------'), (1, u'Entertainment'), (2, u"It's a test"), (3, u'Third')]
+>>> f.clean(3)
+<Category: Third>
+>>> f.clean(4)
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. That choice is not one of the available choices.']
+
+
 # ModelMultipleChoiceField ####################################################
 
 >>> f = ModelMultipleChoiceField(Category.objects.all())
+>>> list(f.choices)
+[(1, u'Entertainment'), (2, u"It's a test"), (3, u'Third'), (4, u'Fourth')]
 >>> f.clean(None)
 Traceback (most recent call last):
 ...
@@ -551,6 +567,22 @@ ValidationError: [u'Select a valid choice. 10 is not one of the available choice
 Traceback (most recent call last):
 ...
 ValidationError: [u'Select a valid choice. 10 is not one of the available choices.']
+
+# queryset can be changed after the field is created.
+>>> f.queryset = Category.objects.exclude(name='Fourth')
+>>> list(f.choices)
+[(1, u'Entertainment'), (2, u"It's a test"), (3, u'Third')]
+>>> f.clean([3])
+[<Category: Third>]
+>>> f.clean([4])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
+>>> f.clean(['3', '4'])
+Traceback (most recent call last):
+...
+ValidationError: [u'Select a valid choice. 4 is not one of the available choices.']
+
 
 # PhoneNumberField ############################################################
 
