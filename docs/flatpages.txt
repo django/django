@@ -113,3 +113,10 @@ Here's a sample ``flatpages/default.html`` template::
     {{ flatpage.content }}
     </body>
     </html>
+
+Since you're already entering raw HTML into the admin page for a flatpage,
+both ``flatpage.title`` and ``flatpage.content`` are marked as **not**
+requiring `automatic HTML escaping`_  in the template.
+
+.. _automatic HTML escaping: ../templates/#automatic-html-escaping
+
