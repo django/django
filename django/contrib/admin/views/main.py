@@ -159,7 +159,7 @@ class AdminBoundField(object):
         return repr(self.__dict__)
 
     def html_error_list(self):
-        return " ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors])
+        return mark_safe(" ".join([form_field.html_error_list() for form_field in self.form_fields if form_field.errors]))
 
     def original_url(self):
         if self.is_file_field and self.original and self.field.attname:
