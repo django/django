@@ -617,7 +617,7 @@ class Templates(unittest.TestCase):
             ### INHERITANCE ###########################################################
 
             # Standard template with no inheritance
-            'inheritance01': ("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}", {}, '1_3_'),
+            'inheritance01': ("1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}", {}, '1&3_'),
 
             # Standard two-level inheritance
             'inheritance02': ("{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'),
@@ -626,7 +626,7 @@ class Templates(unittest.TestCase):
             'inheritance03': ("{% extends 'inheritance02' %}", {}, '1234'),
 
             # Two-level with no redefinitions on second level
-            'inheritance04': ("{% extends 'inheritance01' %}", {}, '1_3_'),
+            'inheritance04': ("{% extends 'inheritance01' %}", {}, '1&3_'),
 
             # Two-level with double quotes instead of single quotes
             'inheritance05': ('{% extends "inheritance02" %}', {}, '1234'),
@@ -635,16 +635,16 @@ class Templates(unittest.TestCase):
             'inheritance06': ("{% extends foo %}", {'foo': 'inheritance02'}, '1234'),
 
             # Two-level with one block defined, one block not defined
-            'inheritance07': ("{% extends 'inheritance01' %}{% block second %}5{% endblock %}", {}, '1_35'),
+            'inheritance07': ("{% extends 'inheritance01' %}{% block second %}5{% endblock %}", {}, '1&35'),
 
             # Three-level with one block defined on this level, two blocks defined next level
             'inheritance08': ("{% extends 'inheritance02' %}{% block second %}5{% endblock %}", {}, '1235'),
 
             # Three-level with second and third levels blank
-            'inheritance09': ("{% extends 'inheritance04' %}", {}, '1_3_'),
+            'inheritance09': ("{% extends 'inheritance04' %}", {}, '1&3_'),
 
             # Three-level with space NOT in a block -- should be ignored
-            'inheritance10': ("{% extends 'inheritance04' %}      ", {}, '1_3_'),
+            'inheritance10': ("{% extends 'inheritance04' %}      ", {}, '1&3_'),
 
             # Three-level with both blocks defined on this level, but none on second level
             'inheritance11': ("{% extends 'inheritance04' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'),
@@ -656,7 +656,7 @@ class Templates(unittest.TestCase):
             'inheritance13': ("{% extends 'inheritance02' %}{% block first %}a{% endblock %}{% block second %}b{% endblock %}", {}, '1a3b'),
 
             # A block defined only in a child template shouldn't be displayed
-            'inheritance14': ("{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}", {}, '1_3_'),
+            'inheritance14': ("{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}", {}, '1&3_'),
 
             # A block within another block
             'inheritance15': ("{% extends 'inheritance01' %}{% block first %}2{% block inner %}inner{% endblock %}{% endblock %}", {}, '12inner3_'),
@@ -674,16 +674,16 @@ class Templates(unittest.TestCase):
             'inheritance19': ("{% extends 'inheritance01' %}{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'),
 
             # Two-level inheritance with {{ block.super }}
-            'inheritance20': ("{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+            'inheritance20': ("{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'),
 
             # Three-level inheritance with {{ block.super }} from parent
             'inheritance21': ("{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '12a34'),
 
             # Three-level inheritance with {{ block.super }} from grandparent
-            'inheritance22': ("{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+            'inheritance22': ("{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'),
 
             # Three-level inheritance with {{ block.super }} from parent and grandparent
-            'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
+            'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1&ab3_'),
 
             # Inheritance from local context without use of template loader
             'inheritance24': ("{% extends context_template %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")}, '1234'),

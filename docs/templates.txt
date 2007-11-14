@@ -280,7 +280,9 @@ Here are some tips for working with inheritance:
     * If you need to get the content of the block from the parent template,
       the ``{{ block.super }}`` variable will do the trick. This is useful
       if you want to add to the contents of a parent block instead of
-      completely overriding it.
+      completely overriding it. Data inserted using ``{{ block.super }}`` will
+      not be automatically escaped (see the `next section`_), since it was
+      already escaped, if necessary, in the parent template.
 
     * For extra readability, you can optionally give a *name* to your
       ``{% endblock %}`` tag. For example::
@@ -298,6 +300,8 @@ name in the same template. This limitation exists because a block tag works in
 it also defines the content that fills the hole in the *parent*. If there were
 two similarly-named ``{% block %}`` tags in a template, that template's parent
 wouldn't know which one of the blocks' content to use.
+
+.. _next section: #automatic-html-escaping
 
 Automatic HTML escaping
 =======================

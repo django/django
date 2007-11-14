@@ -2,6 +2,7 @@ from django.template import TemplateSyntaxError, TemplateDoesNotExist, Variable
 from django.template import Library, Node
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 register = Library()
 
@@ -26,7 +27,7 @@ class BlockNode(Node):
 
     def super(self):
         if self.parent:
-            return self.parent.render(self.context)
+            return mark_safe(self.parent.render(self.context))
         return ''
 
     def add_parent(self, nodelist):
