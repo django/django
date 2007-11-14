@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n %}
 {% block breadcrumbs %}
-<div class="breadcrumbs"><a href="../../../../">{% trans 'Home' %}</a> &rsaquo; <a href="../../">{{ module_name|escape }}</a> &rsaquo; <a href="../">{{ object|escape|truncatewords:"18" }}</a> &rsaquo; {% trans 'History' %}</div>
+<div class="breadcrumbs"><a href="../../../../">{% trans 'Home' %}</a> &rsaquo; <a href="../../">{{ module_name }}</a> &rsaquo; <a href="../">{{ object|truncatewords:"18" }}</a> &rsaquo; {% trans 'History' %}</div>
 {% endblock %}
 
 {% block content %}
@@ -23,8 +23,8 @@
         {% for action in action_list %}
         <tr>
             <th scope="row">{{ action.action_time|date:_("DATE_WITH_TIME_FULL") }}</th>
-            <td>{{ action.user.username }}{% if action.user.first_name %} ({{ action.user.first_name|escape }} {{ action.user.last_name|escape }}){% endif %}</td>
-            <td>{{ action.change_message|escape }}</td>
+            <td>{{ action.user.username }}{% if action.user.first_name %} ({{ action.user.first_name }} {{ action.user.last_name }}){% endif %}</td>
+            <td>{{ action.change_message }}</td>
         </tr>
         {% endfor %}
         </tbody>

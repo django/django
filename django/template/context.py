@@ -9,9 +9,11 @@ class ContextPopException(Exception):
 
 class Context(object):
     "A stack container for variable context"
-    def __init__(self, dict_=None):
+
+    def __init__(self, dict_=None, autoescape=True):
         dict_ = dict_ or {}
         self.dicts = [dict_]
+        self.autoescape = autoescape
 
     def __repr__(self):
         return repr(self.dicts)
@@ -97,3 +99,4 @@ class RequestContext(Context):
             processors = tuple(processors)
         for processor in get_standard_processors() + processors:
             self.update(processor(request))
+

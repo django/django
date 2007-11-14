@@ -14,6 +14,7 @@ from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
 import operator
 
 try:
@@ -136,7 +137,9 @@ class AdminBoundField(object):
         self._repr_filled = False
 
         if field.rel:
-            self.related_url = u'../../../%s/%s/' % (field.rel.to._meta.app_label, field.rel.to._meta.object_name.lower())
+            self.related_url = mark_safe(u'../../../%s/%s/'
+                    % (field.rel.to._meta.app_label,
+                        field.rel.to._meta.object_name.lower()))
 
     def original_value(self):
         if self.original:
@@ -216,7 +219,7 @@ def render_change_form(model, manipulator, context, add=False, change=False, for
         'javascript_imports': get_javascript_imports(opts, auto_populated_fields, field_sets),
         'ordered_objects': ordered_objects,
         'inline_related_objects': inline_related_objects,
-        'form_url': form_url,
+        'form_url': mark_safe(form_url),
         'opts': opts,
         'content_type_id': ContentType.objects.get_for_model(model).id,
     }
@@ -436,12 +439,14 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 if related.field.rel.edit_inline or not related.opts.admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
-                        sub_obj._get_pk_val(), sub_obj), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' %
+                        (escape(force_unicode(capfirst(related.opts.verbose_name))),
+                            related.opts.app_label,
+                            related.opts.object_name.lower(),
+                            sub_obj._get_pk_val(), sub_obj)), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
         else:
             has_related_objs = False
@@ -453,8 +458,8 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (escape(force_unicode(capfirst(related.opts.verbose_name))), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj))), []])
                 _get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -485,9 +490,9 @@ def _get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
-                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name)}) + \
+                        mark_safe((_('One or more %(fieldname)s in %(name)s:') % {'fieldname': escape(force_unicode(related.field.verbose_name)), 'name': escape(force_unicode(related.opts.verbose_name))}) + \
                         (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if related.opts.admin and has_related_objs:
@@ -507,7 +512,7 @@ def delete_stage(request, app_label, model_name, object_id):
 
     # Populate deleted_objects, a data structure of all related objects that
     # will also be deleted.
-    deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), force_unicode(object_id), escape(obj)), []]
+    deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), force_unicode(object_id), escape(obj))), []]
     perms_needed = set()
     _get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1)
 
@@ -604,7 +609,7 @@ class ChangeList(object):
                 del p[k]
             elif v is not None:
                 p[k] = v
-        return '?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
+        return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
 
     def get_results(self, request):
         paginator = ObjectPaginator(self.query_set, self.lookup_opts.admin.list_per_page)

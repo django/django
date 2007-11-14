@@ -1,6 +1,7 @@
 from django import template
 from django.db.models import get_models
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -38,7 +39,7 @@ class AdminApplistNode(template.Node):
                         if True in perms.values():
                             model_list.append({
                                 'name': force_unicode(capfirst(m._meta.verbose_name_plural)),
-                                'admin_url': u'%s/%s/' % (force_unicode(app_label), m.__name__.lower()),
+                                'admin_url': mark_safe(u'%s/%s/' % (force_unicode(app_label), m.__name__.lower())),
                                 'perms': perms,
                             })
 

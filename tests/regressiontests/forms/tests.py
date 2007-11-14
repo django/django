@@ -50,7 +50,7 @@ __test__ = {
     'localflavor_sk_tests': localflavor_sk_tests,
     'localflavor_uk_tests': localflavor_uk_tests,
     'localflavor_us_tests': localflavor_us_tests,
-    'regressions_tests': regression_tests,
+    'regression_tests': regression_tests,
     'util_tests': util_tests,
     'widgets_tests': widgets_tests,
 }

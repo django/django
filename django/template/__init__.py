@@ -57,6 +57,8 @@ from django.utils.functional import curry, Promise
 from django.utils.text import smart_split
 from django.utils.encoding import smart_unicode, force_unicode
 from django.utils.translation import ugettext as _
+from django.utils.safestring import SafeData, EscapeData, mark_safe, mark_for_escaping
+from django.utils.html import escape
 
 __all__ = ('Template', 'Context', 'RequestContext', 'compile_string')
 
@@ -595,7 +597,16 @@ class FilterExpression(object):
                     arg_vals.append(arg)
                 else:
                     arg_vals.append(arg.resolve(context))
-            obj = func(obj, *arg_vals)
+            if getattr(func, 'needs_autoescape', False):
+                new_obj = func(obj, autoescape=context.autoescape, *arg_vals)
+            else:
+                new_obj = func(obj, *arg_vals)
+            if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
+                obj = mark_safe(new_obj)
+            elif isinstance(obj, EscapeData):
+                obj = mark_for_escaping(new_obj)
+            else:
+                obj = new_obj
         return obj
 
     def args_check(name, func, provided):
@@ -637,7 +648,7 @@ def resolve_variable(path, context):
     """
     Returns the resolved variable, which may contain attribute syntax, within
     the given context.
-    
+
     Deprecated; use the Variable class instead.
     """
     return Variable(path).resolve(context)
@@ -647,7 +658,7 @@ class Variable(object):
     A template variable, resolvable against a given context. The variable may be
     a hard-coded string (if it begins and ends with single or double quote
     marks)::
-    
+
         >>> c = {'article': {'section':'News'}}
         >>> Variable('article.section').resolve(c)
         u'News'
@@ -662,25 +673,25 @@ class Variable(object):
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """
-    
+
     def __init__(self, var):
         self.var = var
         self.literal = None
         self.lookups = None
-        
+
         try:
             # First try to treat this variable as a number.
             #
-            # Note that this could cause an OverflowError here that we're not 
+            # Note that this could cause an OverflowError here that we're not
             # catching. Since this should only happen at compile time, that's
             # probably OK.
             self.literal = float(var)
-        
+
             # So it's a float... is it an int? If the original value contained a
             # dot or an "e" then it was a float, not an int.
             if '.' not in var and 'e' not in var.lower():
                 self.literal = int(self.literal)
-                
+
             # "2." is invalid
             if var.endswith('.'):
                 raise ValueError
@@ -691,12 +702,12 @@ class Variable(object):
             # we're also dealing with a literal.
             if var[0] in "\"'" and var[0] == var[-1]:
                 self.literal = var[1:-1]
-            
+
             else:
                 # Otherwise we'll set self.lookups so that resolve() knows we're
                 # dealing with a bonafide variable
                 self.lookups = tuple(var.split(VARIABLE_ATTRIBUTE_SEPARATOR))
-    
+
     def resolve(self, context):
         """Resolve this variable against a given context."""
         if self.lookups is not None:
@@ -705,18 +716,18 @@ class Variable(object):
         else:
             # We're dealing with a literal, so it's already been "resolved"
             return self.literal
-            
+
     def __repr__(self):
         return "<%s: %r>" % (self.__class__.__name__, self.var)
-    
+
     def __str__(self):
         return self.var
 
     def _resolve_lookup(self, context):
         """
         Performs resolution of a real variable (i.e. not a literal) against the
-        given context. 
-        
+        given context.
+
         As indicated by the method's name, this method is an implementation
         detail and shouldn't be called by external code. Use Variable.resolve()
         instead.
@@ -757,14 +768,7 @@ class Variable(object):
                         current = settings.TEMPLATE_STRING_IF_INVALID
                     else:
                         raise
-    
-        if isinstance(current, (basestring, Promise)):
-            try:
-                current = force_unicode(current)
-            except UnicodeDecodeError:
-                # Failing to convert to unicode can happen sometimes (e.g. debug
-                # tracebacks). So we allow it in this particular instance.
-                pass
+
         return current
 
 class Node(object):
@@ -838,16 +842,31 @@ class VariableNode(Node):
         return "<Variable Node: %s>" % self.filter_expression
 
     def render(self, context):
-        return self.filter_expression.resolve(context)
+        try:
+            output = force_unicode(self.filter_expression.resolve(context))
+        except UnicodeDecodeError:
+            # Unicode conversion can fail sometimes for reasons out of our
+            # control (e.g. exception rendering). In that case, we fail quietly.
+            return ''
+        if (context.autoescape and not isinstance(output, SafeData)) or isinstance(output, EscapeData):
+            return force_unicode(escape(output))
+        else:
+            return force_unicode(output)
 
 class DebugVariableNode(VariableNode):
     def render(self, context):
         try:
-            return self.filter_expression.resolve(context)
+            output = force_unicode(self.filter_expression.resolve(context))
         except TemplateSyntaxError, e:
             if not hasattr(e, 'source'):
                 e.source = self.source
             raise
+        except UnicodeDecodeError:
+            return ''
+        if (context.autoescape and not isinstance(output, SafeData)) or isinstance(output, EscapeData):
+            return escape(output)
+        else:
+            return output
 
 def generic_tag_compiler(params, defaults, name, node_class, parser, token):
     "Returns a template.Node subclass."
@@ -961,7 +980,8 @@ class Library(object):
                         else:
                             t = get_template(file_name)
                         self.nodelist = t.nodelist
-                    return self.nodelist.render(context_class(dict))
+                    return self.nodelist.render(context_class(dict,
+                            autoescape=context.autoescape))
 
             compile_func = curry(generic_tag_compiler, params, defaults, getattr(func, "_decorated_function", func).__name__, InclusionNode)
             compile_func.__doc__ = func.__doc__

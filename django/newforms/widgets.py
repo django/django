@@ -14,6 +14,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.html import escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
+from django.utils.safestring import mark_safe
 from util import flatatt
 
 __all__ = (
@@ -86,8 +87,10 @@ class Input(Widget):
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        if value != '': final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
-        return u'<input%s />' % flatatt(final_attrs)
+        if value != '':
+            # Only add the 'value' attribute if a value is non-empty.
+            final_attrs['value'] = force_unicode(value)
+        return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
 class TextInput(Input):
     input_type = 'text'
@@ -120,7 +123,9 @@ class MultipleHiddenInput(HiddenInput):
     def render(self, name, value, attrs=None, choices=()):
         if value is None: value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        return u'\n'.join([(u'<input%s />' % flatatt(dict(value=force_unicode(v), **final_attrs))) for v in value])
+        return mark_safe(u'\n'.join([(u'<input%s />' %
+            flatatt(dict(value=force_unicode(v), **final_attrs)))
+            for v in value]))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
@@ -149,7 +154,8 @@ class Textarea(Widget):
         if value is None: value = ''
         value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
-        return u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))
+        return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
+                escape(value)))
 
 class DateTimeInput(Input):
     input_type = 'text'
@@ -183,8 +189,9 @@ class CheckboxInput(Widget):
         if result:
             final_attrs['checked'] = 'checked'
         if value not in ('', True, False, None):
-            final_attrs['value'] = force_unicode(value) # Only add the 'value' attribute if a value is non-empty.
-        return u'<input%s />' % flatatt(final_attrs)
+            # Only add the 'value' attribute if a value is non-empty.
+            final_attrs['value'] = force_unicode(value)
+        return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -205,13 +212,14 @@ class Select(Widget):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<select%s>' % flatatt(final_attrs)]
-        str_value = force_unicode(value) # Normalize to string.
+        # Normalize to string.
+        str_value = force_unicode(value)
         for option_value, option_label in chain(self.choices, choices):
             option_value = force_unicode(option_value)
             selected_html = (option_value == str_value) and u' selected="selected"' or ''
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
         output.append(u'</select>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
 class NullBooleanSelect(Select):
     """
@@ -248,7 +256,7 @@ class SelectMultiple(Widget):
             selected_html = (option_value in str_values) and ' selected="selected"' or ''
             output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
         output.append(u'</select>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
@@ -269,7 +277,8 @@ class RadioInput(StrAndUnicode):
         self.index = index
 
     def __unicode__(self):
-        return u'<label>%s %s</label>' % (self.tag(), self.choice_label)
+        return mark_safe(u'<label>%s %s</label>' % (self.tag(),
+                self.choice_label))
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -280,7 +289,7 @@ class RadioInput(StrAndUnicode):
         final_attrs = dict(self.attrs, type='radio', name=self.name, value=self.choice_value)
         if self.is_checked():
             final_attrs['checked'] = 'checked'
-        return u'<input%s />' % flatatt(final_attrs)
+        return mark_safe(u'<input%s />' % flatatt(final_attrs))
 
 class RadioFieldRenderer(StrAndUnicode):
     """
@@ -304,7 +313,8 @@ class RadioFieldRenderer(StrAndUnicode):
 
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>' % force_unicode(w) for w in self])
+        return mark_safe(u'<ul>\n%s\n</ul>' % u'\n'.join([u'<li>%s</li>'
+                % force_unicode(w) for w in self]))
 
 class RadioSelect(Select):
 
@@ -341,7 +351,8 @@ class CheckboxSelectMultiple(SelectMultiple):
         has_id = attrs and 'id' in attrs
         final_attrs = self.build_attrs(attrs, name=name)
         output = [u'<ul>']
-        str_values = set([force_unicode(v) for v in value]) # Normalize to strings.
+        # Normalize to strings
+        str_values = set([force_unicode(v) for v in value])
         for i, (option_value, option_label) in enumerate(chain(self.choices, choices)):
             # If an ID attribute was given, add a numeric index as a suffix,
             # so that the checkboxes don't all have the same ID attribute.
@@ -352,7 +363,7 @@ class CheckboxSelectMultiple(SelectMultiple):
             rendered_cb = cb.render(name, option_value)
             output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(force_unicode(option_label))))
         output.append(u'</ul>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()
@@ -450,3 +461,4 @@ class SplitDateTimeWidget(MultiWidget):
         if value:
             return [value.date(), value.time().replace(microsecond=0)]
         return [None, None]
+

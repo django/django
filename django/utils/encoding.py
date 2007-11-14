@@ -3,6 +3,7 @@ import urllib
 import datetime
 
 from django.utils.functional import Promise
+from django.utils.safestring import SafeData, mark_safe
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -51,7 +52,10 @@ def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
             else:
                 s = unicode(str(s), encoding, errors)
         elif not isinstance(s, unicode):
-            s = unicode(s, encoding, errors)
+            # Note: We use .decode() here, instead of unicode(s, encoding,
+            # errors), so that if s is a SafeString, it ends up being a
+            # SafeUnicode at the end.
+            s = s.decode(encoding, errors)
     except UnicodeDecodeError, e:
         raise DjangoUnicodeDecodeError(s, *e.args)
     return s

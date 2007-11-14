@@ -14,8 +14,24 @@ from django.template import get_library, Library, InvalidTemplateLibrary
 from django.conf import settings
 from django.utils.encoding import smart_str, smart_unicode
 from django.utils.itercompat import groupby
+from django.utils.safestring import mark_safe
 
 register = Library()
+
+class AutoEscapeControlNode(Node):
+    """Implements the actions of the autoescape tag."""
+    def __init__(self, setting, nodelist):
+        self.setting, self.nodelist = setting, nodelist
+
+    def render(self, context):
+        old_setting = context.autoescape
+        context.autoescape = self.setting
+        output = self.nodelist.render(context)
+        context.autoescape = old_setting
+        if self.setting:
+            return mark_safe(output)
+        else:
+            return output
 
 class CommentNode(Node):
     def render(self, context):
@@ -393,6 +409,22 @@ class WithNode(Node):
         return output
 
 #@register.tag
+def autoescape(parser, token):
+    """
+    Force autoescape behaviour for this block.
+    """
+    args = token.contents.split()
+    if len(args) != 2:
+        raise TemplateSyntaxError("'Autoescape' tag requires exactly one argument.")
+    arg = args[1]
+    if arg not in (u'on', u'off'):
+        raise TemplateSyntaxError("'Autoescape' argument should be 'on' or 'off'")
+    nodelist = parser.parse(('endautoescape',))
+    parser.delete_first_token()
+    return AutoEscapeControlNode((arg == 'on'), nodelist)
+autoescape = register.tag(autoescape)
+
+#@register.tag
 def comment(parser, token):
     """
     Ignores everything between ``{% comment %}`` and ``{% endcomment %}``.
@@ -492,12 +524,15 @@ def do_filter(parser, token):
 
     Sample usage::
 
-        {% filter escape|lower %}
+        {% filter force_escape|lower %}
             This text will be HTML-escaped, and will appear in lowercase.
         {% endfilter %}
     """
     _, rest = token.contents.split(None, 1)
     filter_expr = parser.compile_filter("var|%s" % (rest))
+    for func, unused in filter_expr.filters:
+        if getattr(func, '_decorated_function', func).__name__ in ('escape', 'safe'):
+            raise TemplateSyntaxError('"filter %s" is not permitted.  Use the "autoescape" tag instead.' % func.__name__)
     nodelist = parser.parse(('endfilter',))
     parser.delete_first_token()
     return FilterNode(filter_expr, nodelist)

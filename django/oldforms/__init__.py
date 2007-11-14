@@ -1,6 +1,7 @@
 from django.core import validators
 from django.core.exceptions import PermissionDenied
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 from django.conf import settings
 from django.utils.translation import ugettext, ungettext
 from django.utils.encoding import smart_unicode, force_unicode
@@ -189,9 +190,9 @@ class FormFieldWrapper(object):
 
     def html_error_list(self):
         if self.errors():
-            return '<ul class="errorlist"><li>%s</li></ul>' % '</li><li>'.join([escape(e) for e in self.errors()])
+            return mark_safe('<ul class="errorlist"><li>%s</li></ul>' % '</li><li>'.join([escape(e) for e in self.errors()]))
         else:
-            return ''
+            return mark_safe('')
 
     def get_id(self):
         return self.formfield.get_id()
@@ -226,7 +227,7 @@ class FormFieldCollection(FormFieldWrapper):
         return bool(len(self.errors()))
 
     def html_combined_error_list(self):
-        return ''.join([field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')])
+        return mark_safe(''.join([field.html_error_list() for field in self.formfield_dict.values() if hasattr(field, 'errors')]))
 
 class InlineObjectCollection(object):
     "An object that acts like a sparse list of form field collections."
@@ -418,9 +419,9 @@ class TextField(FormField):
         max_length = u''
         if self.max_length:
             max_length = u'maxlength="%s" ' % self.max_length
-        return u'<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
+        return mark_safe(u'<input type="%s" id="%s" class="v%s%s" name="%s" size="%s" value="%s" %s/>' % \
             (self.input_type, self.get_id(), self.__class__.__name__, self.is_required and u' required' or '',
-            self.field_name, self.length, escape(data), max_length)
+            self.field_name, self.length, escape(data), max_length))
 
     def html2python(data):
         return data
@@ -442,9 +443,9 @@ class LargeTextField(TextField):
     def render(self, data):
         if data is None:
             data = ''
-        return u'<textarea id="%s" class="v%s%s" name="%s" rows="%s" cols="%s">%s</textarea>' % \
+        return mark_safe(u'<textarea id="%s" class="v%s%s" name="%s" rows="%s" cols="%s">%s</textarea>' % \
             (self.get_id(), self.__class__.__name__, self.is_required and u' required' or u'',
-            self.field_name, self.rows, self.cols, escape(data))
+            self.field_name, self.rows, self.cols, escape(data)))
 
 class HiddenField(FormField):
     def __init__(self, field_name, is_required=False, validator_list=None, max_length=None):
@@ -453,8 +454,8 @@ class HiddenField(FormField):
         self.validator_list = validator_list[:]
 
     def render(self, data):
-        return u'<input type="hidden" id="%s" name="%s" value="%s" />' % \
-            (self.get_id(), self.field_name, escape(data))
+        return mark_safe(u'<input type="hidden" id="%s" name="%s" value="%s" />' % \
+            (self.get_id(), self.field_name, escape(data)))
 
 class CheckboxField(FormField):
     def __init__(self, field_name, checked_by_default=False, validator_list=None, is_required=False):
@@ -468,9 +469,9 @@ class CheckboxField(FormField):
         checked_html = ''
         if data or (data is '' and self.checked_by_default):
             checked_html = ' checked="checked"'
-        return u'<input type="checkbox" id="%s" class="v%s" name="%s"%s />' % \
+        return mark_safe(u'<input type="checkbox" id="%s" class="v%s" name="%s"%s />' % \
             (self.get_id(), self.__class__.__name__,
-            self.field_name, checked_html)
+            self.field_name, checked_html))
 
     def html2python(data):
         "Convert value from browser ('on' or '') to a Python boolean"
@@ -502,7 +503,7 @@ class SelectField(FormField):
                 selected_html = u' selected="selected"'
             output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, force_unicode(escape(display_name))))
         output.append(u'  </select>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def isValidChoice(self, data, form):
         str_data = smart_unicode(data)
@@ -556,7 +557,7 @@ class RadioSelectField(FormField):
                 output = [u'<ul%s>' % (self.ul_class and u' class="%s"' % self.ul_class or u'')]
                 output.extend([u'<li>%s %s</li>' % (d['field'], d['label']) for d in self.datalist])
                 output.append(u'</ul>')
-                return u''.join(output)
+                return mark_safe(u''.join(output))
             def __iter__(self):
                 for d in self.datalist:
                     yield d
@@ -571,11 +572,11 @@ class RadioSelectField(FormField):
             datalist.append({
                 'value': value,
                 'name': display_name,
-                'field': u'<input type="radio" id="%s" name="%s" value="%s"%s/>' % \
-                    (self.get_id() + u'_' + unicode(i), self.field_name, value, selected_html),
-                'label': u'<label for="%s">%s</label>' % \
+                'field': mark_safe(u'<input type="radio" id="%s" name="%s" value="%s"%s/>' % \
+                    (self.get_id() + u'_' + unicode(i), self.field_name, value, selected_html)),
+                'label': mark_safe(u'<label for="%s">%s</label>' % \
                     (self.get_id() + u'_' + unicode(i), display_name),
-            })
+            )})
         return RadioFieldRenderer(datalist, self.ul_class)
 
     def isValidChoice(self, data, form):
@@ -614,7 +615,7 @@ class SelectMultipleField(SelectField):
                 selected_html = u' selected="selected"'
             output.append(u'    <option value="%s"%s>%s</option>' % (escape(value), selected_html, force_unicode(escape(choice))))
         output.append(u'  </select>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def isValidChoice(self, field_data, all_data):
         # data is something like ['1', '2', '3']
@@ -667,7 +668,7 @@ class CheckboxSelectMultipleField(SelectMultipleField):
                 (self.get_id() + escape(value), self.__class__.__name__, field_name, checked_html,
                 self.get_id() + escape(value), choice))
         output.append(u'</ul>')
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
 ####################
 # FILE UPLOADS     #
@@ -688,8 +689,8 @@ class FileUploadField(FormField):
             raise validators.CriticalValidationError, ugettext("The submitted file is empty.")
 
     def render(self, data):
-        return u'<input type="file" id="%s" class="v%s" name="%s" />' % \
-            (self.get_id(), self.__class__.__name__, self.field_name)
+        return mark_safe(u'<input type="file" id="%s" class="v%s" name="%s" />' % \
+            (self.get_id(), self.__class__.__name__, self.field_name))
 
     def html2python(data):
         if data is None:

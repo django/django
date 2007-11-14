@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.safestring import mark_safe
 import base64, datetime, md5
 import cPickle as pickle
 
@@ -22,7 +23,7 @@ def _display_login_form(request, error_message=''):
         post_data = _encode_post_data({})
     return render_to_response('admin/login.html', {
         'title': _('Log in'),
-        'app_path': request.path,
+        'app_path': mark_safe(request.path),
         'post_data': post_data,
         'error_message': error_message
     }, context_instance=template.RequestContext(request))
