@@ -9,6 +9,8 @@ certain test -- e.g. being a DateField or ForeignKey.
 from django.db import models
 from django.utils.encoding import smart_unicode, iri_to_uri
 from django.utils.translation import ugettext as _
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 import datetime
 
 class FilterSpec(object):
@@ -39,7 +41,7 @@ class FilterSpec(object):
     def output(self, cl):
         t = []
         if self.has_output():
-            t.append(_(u'<h3>By %s:</h3>\n<ul>\n') % self.title())
+            t.append(_(u'<h3>By %s:</h3>\n<ul>\n') % escape(self.title()))
 
             for choice in self.choices(cl):
                 t.append(u'<li%s><a href="%s">%s</a></li>\n' % \
@@ -47,7 +49,7 @@ class FilterSpec(object):
                      iri_to_uri(choice['query_string']),
                      choice['display']))
             t.append('</ul>\n\n')
-        return "".join(t)
+        return mark_safe("".join(t))
 
 class RelatedFilterSpec(FilterSpec):
     def __init__(self, f, request, params, model):

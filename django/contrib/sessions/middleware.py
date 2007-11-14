@@ -1,8 +1,8 @@
+import time
+
 from django.conf import settings
 from django.utils.cache import patch_vary_headers
-from email.Utils import formatdate
-import datetime
-import time
+from django.utils.http import cookie_date
 
 TEST_COOKIE_NAME = 'testcookie'
 TEST_COOKIE_VALUE = 'worked'
@@ -10,8 +10,9 @@ TEST_COOKIE_VALUE = 'worked'
 class SessionMiddleware(object):
 
     def process_request(self, request):
-      engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
-      request.session = engine.SessionStore(request.COOKIES.get(settings.SESSION_COOKIE_NAME, None))
+        engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
+        request.session = engine.SessionStore(session_key)
 
     def process_response(self, request, response):
         # If request.session was modified, or if response.session was set, save
@@ -30,13 +31,8 @@ class SessionMiddleware(object):
                     expires = None
                 else:
                     max_age = settings.SESSION_COOKIE_AGE
-                    rfcdate = formatdate(time.time() + settings.SESSION_COOKIE_AGE)
-
-                    # Fixed length date must have '-' separation in the format
-                    # DD-MMM-YYYY for compliance with Netscape cookie standard
-                    expires = datetime.datetime.strftime(datetime.datetime.utcnow() + \
-                              datetime.timedelta(seconds=settings.SESSION_COOKIE_AGE), "%a, %d-%b-%Y %H:%M:%S GMT")
-
+                    expires_time = time.time() + settings.SESSION_COOKIE_AGE
+                    expires = cookie_date(expires_time)
                 # Save the seesion data and refresh the client cookie.
                 request.session.save()
                 response.set_cookie(settings.SESSION_COOKIE_NAME,

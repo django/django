@@ -150,7 +150,7 @@ mess things up. Use the ``PythonInterpreter`` directive to give different
 
         <Location "/otherthing">
             SetEnv DJANGO_SETTINGS_MODULE mysite.other_settings
-            PythonInterpreter mysite_other
+            PythonInterpreter othersite
         </Location>
     </VirtualHost>
 

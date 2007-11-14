@@ -1,4 +1,4 @@
-from email.Utils import formatdate
+from django.utils.http import http_date
 
 class ConditionalGetMiddleware(object):
     """
@@ -6,32 +6,27 @@ class ConditionalGetMiddleware(object):
     Last-Modified header, and the request has If-None-Match or
     If-Modified-Since, the response is replaced by an HttpNotModified.
 
-    Removes the content from any response to a HEAD request.
-
     Also sets the Date and Content-Length response-headers.
     """
     def process_response(self, request, response):
-        response['Date'] = formatdate()[:26] + "GMT"
+        response['Date'] = http_date()
         if not response.has_header('Content-Length'):
             response['Content-Length'] = str(len(response.content))
 
         if response.has_header('ETag'):
             if_none_match = request.META.get('HTTP_IF_NONE_MATCH', None)
             if if_none_match == response['ETag']:
-                response.status_code = 304
-                response.content = ''
-                response['Content-Length'] = '0'
+                # Setting the status is enough here. The response handling path
+                # automatically removes content for this status code (in
+                # http.conditional_content_removal()).
+                response.status = 304
 
         if response.has_header('Last-Modified'):
-            last_mod = response['Last-Modified']
             if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE', None)
             if if_modified_since == response['Last-Modified']:
-                response.status_code = 304
-                response.content = ''
-                response['Content-Length'] = '0'
-
-        if request.method == 'HEAD':
-            response.content = ''
+                # Setting the status code is enough here (same reasons as
+                # above).
+                response.status = 304
 
         return response
 

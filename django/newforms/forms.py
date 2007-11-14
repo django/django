@@ -2,11 +2,12 @@
 Form classes
 """
 
-import copy
+from copy import deepcopy
 
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
+from django.utils.safestring import mark_safe
 
 from fields import Field
 from widgets import TextInput, Textarea
@@ -20,18 +21,6 @@ def pretty_name(name):
     "Converts 'first_name' to 'First name'"
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
-
-class SortedDictFromList(SortedDict):
-    "A dictionary that keeps its keys in the order in which they're inserted."
-    # This is different than django.utils.datastructures.SortedDict, because
-    # this takes a list/tuple as the argument to __init__().
-    def __init__(self, data=None):
-        if data is None: data = []
-        self.keyOrder = [d[0] for d in data]
-        dict.__init__(self, dict(data))
-
-    def copy(self):
-        return SortedDictFromList([(k, copy.deepcopy(v)) for k, v in self.items()])
 
 class DeclarativeFieldsMetaclass(type):
     """
@@ -49,7 +38,7 @@ class DeclarativeFieldsMetaclass(type):
             if hasattr(base, 'base_fields'):
                 fields = base.base_fields.items() + fields
 
-        attrs['base_fields'] = SortedDictFromList(fields)
+        attrs['base_fields'] = SortedDict(fields)
         return type.__new__(cls, name, bases, attrs)
 
 class BaseForm(StrAndUnicode):
@@ -74,7 +63,7 @@ class BaseForm(StrAndUnicode):
         # alter self.fields, we create self.fields here by copying base_fields.
         # Instances should always modify self.fields; they should not modify
         # self.base_fields.
-        self.fields = self.base_fields.copy()
+        self.fields = deepcopy(self.base_fields)
 
     def __unicode__(self):
         return self.as_table()
@@ -130,7 +119,8 @@ class BaseForm(StrAndUnicode):
                     output.append(error_row % force_unicode(bf_errors))
                 if bf.label:
                     label = escape(force_unicode(bf.label))
-                    # Only add the suffix if the label does not end in punctuation.
+                    # Only add the suffix if the label does not end in
+                    # punctuation.
                     if self.label_suffix:
                         if label[-1] not in ':?.!':
                             label += self.label_suffix
@@ -148,11 +138,14 @@ class BaseForm(StrAndUnicode):
             str_hidden = u''.join(hidden_fields)
             if output:
                 last_row = output[-1]
-                # Chop off the trailing row_ender (e.g. '</td></tr>') and insert the hidden fields.
+                # Chop off the trailing row_ender (e.g. '</td></tr>') and
+                # insert the hidden fields.
                 output[-1] = last_row[:-len(row_ender)] + str_hidden + row_ender
-            else: # If there aren't any rows in the output, just append the hidden fields.
+            else:
+                # If there aren't any rows in the output, just append the
+                # hidden fields.
                 output.append(str_hidden)
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def as_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
@@ -315,7 +308,7 @@ class BoundField(StrAndUnicode):
         if id_:
             attrs = attrs and flatatt(attrs) or ''
             contents = '<label for="%s"%s>%s</label>' % (widget.id_for_label(id_), attrs, contents)
-        return contents
+        return mark_safe(contents)
 
     def _is_hidden(self):
         "Returns True if this BoundField's widget is hidden."

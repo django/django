@@ -10,6 +10,7 @@ from django.core import urlresolvers
 from django.contrib.admin import utils
 from django.contrib.sites.models import Site
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
 import inspect, os, re
 
 # Exclude methods starting with these strings from documentation
@@ -29,7 +30,7 @@ def bookmarklets(request):
     # Hack! This couples this view to the URL it lives at.
     admin_root = request.path[:-len('doc/bookmarklets/')]
     return render_to_response('admin_doc/bookmarklets.html', {
-        'admin_url': "%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root),
+        'admin_url': mark_safe("%s://%s%s" % (request.is_secure() and 'https' or 'http', request.get_host(), admin_root)),
     }, context_instance=RequestContext(request))
 bookmarklets = staff_member_required(bookmarklets)
 

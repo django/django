@@ -1078,6 +1078,30 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     <p>Sender: <input type="text" name="sender" /> A valid e-mail address, please.</p>
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
+``error_messages``
+~~~~~~~~~~~~~~~~~~
+
+**New in Django development version**
+
+The ``error_messages`` argument lets you override the default messages which the
+field will raise. Pass in a dictionary with keys matching the error messages you
+want to override. For example::
+
+    >>> generic = forms.CharField()
+    >>> generic.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'This field is required.']
+
+    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
+    >>> name.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: [u'Please enter your name']
+
+In the `built-in Field classes`_ section below, each Field defines the error
+message keys it uses.  
+
 Dynamic initial values
 ----------------------
 
@@ -1143,6 +1167,7 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``True`` or ``False`` value.
     * Validates that the check box is checked (i.e. the value is ``True``) if
       the field has ``required=True``.
+    * Error message keys: ``required``
 
 **New in Django development version:** The empty value for a ``CheckboxInput``
 (and hence the standard ``BooleanField``) has changed to return ``False``
@@ -1162,6 +1187,7 @@ instead of ``None`` in the development version.
     * Normalizes to: A Unicode object.
     * Validates ``max_length`` or ``min_length``, if they are provided.
       Otherwise, all inputs are valid.
+    * Error message keys: ``required``, ``max_length``, ``min_length``
 
 Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
@@ -1174,6 +1200,7 @@ given length.
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value exists in the list of choices.
+    * Error message keys: ``required``, ``invalid_choice``
 
 Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
 tuple) of 2-tuples to use as choices for this field.
@@ -1186,6 +1213,7 @@ tuple) of 2-tuples to use as choices for this field.
     * Normalizes to: A Python ``datetime.date`` object.
     * Validates that the given value is either a ``datetime.date``,
       ``datetime.datetime`` or string formatted in a particular date format.
+    * Error message keys: ``required``, ``invalid``
 
 Takes one optional argument, ``input_formats``, which is a list of formats used
 to attempt to convert a string to a valid ``datetime.date`` object.
@@ -1206,6 +1234,7 @@ If no ``input_formats`` argument is provided, the default input formats are::
     * Normalizes to: A Python ``datetime.datetime`` object.
     * Validates that the given value is either a ``datetime.datetime``,
       ``datetime.date`` or string formatted in a particular datetime format.
+    * Error message keys: ``required``, ``invalid``
 
 Takes one optional argument, ``input_formats``, which is a list of formats used
 to attempt to convert a string to a valid ``datetime.datetime`` object.
@@ -1235,6 +1264,9 @@ If no ``input_formats`` argument is provided, the default input formats are::
     * Normalizes to: A Python ``decimal``.
     * Validates that the given value is a decimal. Leading and trailing
       whitespace is ignored.
+    * Error message keys: ``required``, ``invalid``, ``max_value``,
+      ``min_value``, ``max_digits``, ``max_decimal_places``,
+      ``max_whole_digits``
 
 Takes four optional arguments: ``max_value``, ``min_value``, ``max_digits``,
 and ``decimal_places``. The first two define the limits for the fields value.
@@ -1251,6 +1283,7 @@ decimal places permitted.
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid e-mail address, using a
       moderately complex regular expression.
+    * Error message keys: ``required``, ``invalid``
 
 Has two optional arguments for validation, ``max_length`` and ``min_length``.
 If provided, these arguments ensure that the string is at most or at least the
@@ -1266,6 +1299,7 @@ given length.
     * Normalizes to: An ``UploadedFile`` object that wraps the file content
       and file name into a single object.
     * Validates that non-empty file data has been bound to the form.
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``
 
 An ``UploadedFile`` object has two attributes:
 
@@ -1296,6 +1330,8 @@ When you use a ``FileField`` on a form, you must also remember to
       and file name into a single object.
     * Validates that file data has been bound to the form, and that the
       file is of an image format understood by PIL.
+    * Error message keys: ``required``, ``invalid``, ``missing``, ``empty``,
+      ``invalid_image``
 
 Using an ImageField requires that the `Python Imaging Library`_ is installed.
 
@@ -1312,6 +1348,8 @@ When you use a ``FileField`` on a form, you must also remember to
     * Normalizes to: A Python integer or long integer.
     * Validates that the given value is an integer. Leading and trailing
       whitespace is allowed, as in Python's ``int()`` function.
+    * Error message keys: ``required``, ``invalid``, ``max_value``,
+      ``min_value``
 
 Takes two optional arguments for validation, ``max_value`` and ``min_value``.
 These control the range of values permitted in the field.
@@ -1324,6 +1362,7 @@ These control the range of values permitted in the field.
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid IPv4 address, using a regular
       expression.
+    * Error message keys: ``required``, ``invalid``
 
 ``MultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1333,6 +1372,7 @@ These control the range of values permitted in the field.
     * Normalizes to: A list of Unicode objects.
     * Validates that every value in the given list of values exists in the list
       of choices.
+    * Error message keys: ``required``, ``invalid_choice``, ``invalid_list``
 
 Takes one extra argument, ``choices``, which is an iterable (e.g., a list or
 tuple) of 2-tuples to use as choices for this field.
@@ -1353,6 +1393,7 @@ tuple) of 2-tuples to use as choices for this field.
     * Normalizes to: A Unicode object.
     * Validates that the given value matches against a certain regular
       expression.
+    * Error message keys: ``required``, ``invalid``
 
 Takes one required argument, ``regex``, which is a regular expression specified
 either as a string or a compiled regular expression object.
@@ -1364,10 +1405,12 @@ Also takes the following optional arguments:
     ======================  =====================================================
     ``max_length``          Ensures the string has at most this many characters.
     ``min_length``          Ensures the string has at least this many characters.
-    ``error_message``       Error message to return for failed validation. If no
-                            message is provided, a generic error message will be
-                            used.
     ======================  =====================================================
+
+The optional argument ``error_message`` is also accepted for backwards
+compatibility. The preferred way to provide an error message is to use the
+``error_messages`` argument, passing a dictionary with ``'invalid'`` as a key
+and the error message as the value. 
 
 ``TimeField``
 ~~~~~~~~~~~~~
@@ -1377,6 +1420,7 @@ Also takes the following optional arguments:
     * Normalizes to: A Python ``datetime.time`` object.
     * Validates that the given value is either a ``datetime.time`` or string
       formatted in a particular time format.
+    * Error message keys: ``required``, ``invalid``
 
 Takes one optional argument, ``input_formats``, which is a list of formats used
 to attempt to convert a string to a valid ``datetime.time`` object.
@@ -1393,6 +1437,7 @@ If no ``input_formats`` argument is provided, the default input formats are::
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
     * Validates that the given value is a valid URL.
+    * Error message keys: ``required``, ``invalid``, ``invalid_link``
 
 Takes the following optional arguments:
 

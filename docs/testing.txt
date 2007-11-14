@@ -721,7 +721,6 @@ This means, instead of instantiating a ``Client`` in each test::
 ...you can just refer to ``self.client``, like so::
 
     from django.test import TestCase
-    from django.test.client import Client
 
     class SimpleTest(TestCase):
         def test_details(self):

@@ -45,7 +45,7 @@ How to use ``FormPreview``
 
     2. Create a ``FormPreview`` subclass that overrides the ``done()`` method::
 
-           from django.contrib.formtools import FormPreview
+           from django.contrib.formtools.preview import FormPreview
            from myapp.models import SomeModel
 
            class SomeModelFormPreview(FormPreview):

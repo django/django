@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 tests = r"""
 >>> from django.newforms import *
+>>> from django.utils.encoding import force_unicode
 >>> import datetime
 >>> import time
 >>> import re
@@ -362,7 +363,7 @@ u'sirrobin'
 ...         return self.as_divs()
 ...     def as_divs(self):
 ...         if not self: return u''
-...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % e for e in self])
+...         return u'<div class="errorlist">%s</div>' % ''.join([u'<div class="error">%s</div>' % force_unicode(e) for e in self])
 >>> class CommentForm(Form):
 ...     name = CharField(max_length=50, required=False)
 ...     email = EmailField()
