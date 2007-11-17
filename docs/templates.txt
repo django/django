@@ -401,6 +401,32 @@ auto-escaping is on, these extra filters won't change the output -- any
 variables that use the ``escape`` filter do not have further automatic
 escaping applied to them.
 
+String literals and automatic escaping
+--------------------------------------
+
+Sometimes you will pass a string literal as an argument to a filter. For
+example::
+
+    {{ data|default:"This is a string literal." }}
+
+All string literals are inserted **without** any automatic escaping into the
+template, if they are used (it's as if they were all passed through the
+``safe`` filter). The reasoning behind this is that the template author is in
+control of what goes into the string literal, so they can make sure the text
+is correctly escaped when the template is written.
+
+This means you would write ::
+
+    {{ data|default:"3 &gt; 2" }}
+
+...rather than ::
+
+    {{ data|default:"3 > 2" }}  <-- Bad! Don't do this.
+
+This doesn't affect what happens to data coming from the variable itself.
+The variable's contents are still automatically escaped, if necessary, since
+they're beyond the control of the template author.
+
 Using the built-in reference
 ============================
 

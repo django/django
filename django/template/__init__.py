@@ -594,7 +594,7 @@ class FilterExpression(object):
             arg_vals = []
             for lookup, arg in args:
                 if not lookup:
-                    arg_vals.append(arg)
+                    arg_vals.append(mark_safe(arg))
                 else:
                     arg_vals.append(arg.resolve(context))
             if getattr(func, 'needs_autoescape', False):
@@ -707,7 +707,7 @@ class Variable(object):
             # If it's wrapped with quotes (single or double), then
             # we're also dealing with a literal.
             if var[0] in "\"'" and var[0] == var[-1]:
-                self.literal = var[1:-1]
+                self.literal = mark_safe(var[1:-1])
             else:
                 # Otherwise we'll set self.lookups so that resolve() knows we're
                 # dealing with a bonafide variable

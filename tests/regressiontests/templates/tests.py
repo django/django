@@ -318,9 +318,9 @@ class Templates(unittest.TestCase):
             # Chained filters, with an argument to the first one
             'filter-syntax09': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
-            # Escaped string as argument
+            # Literal string as argument is always "safe" from auto-escaping..
             'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}',
-                    {"var": None}, ' endquote&quot; hah'),
+                    {"var": None}, ' endquote" hah'),
 
             # Variable as argument
             'filter-syntax11': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
@@ -735,9 +735,10 @@ class Templates(unittest.TestCase):
             'i18n12': ('{% load i18n %}{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
 
             # translation of constant strings
-            'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
+            'i18n13': ('{{ _("Password") }}', {'LANGUAGE_CODE': 'de'}, 'Passwort'),
             'i18n14': ('{% cycle "foo" _("Password") _(\'Password\') as c %} {% cycle c %} {% cycle c %}', {'LANGUAGE_CODE': 'de'}, 'foo Passwort Passwort'),
             'i18n15': ('{{ absent|default:_("Password") }}', {'LANGUAGE_CODE': 'de', 'absent': ""}, 'Passwort'),
+            'i18n16': ('{{ _("<") }}', {'LANGUAGE_CODE': 'de'}, '<'),
 
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
@@ -885,9 +886,9 @@ class Templates(unittest.TestCase):
             'autoescape-tag06': ("{{ first }}", {"first": mark_safe("<b>first</b>")}, "<b>first</b>"),
             'autoescape-tag07': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": mark_safe(u"<b>Apple</b>")}, u"<b>Apple</b>"),
 
-            # String arguments to filters, if used in the result, are escaped,
-            # too.
-            'basic-syntax08': (r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}', {"var": None}, ' endquote&quot; hah'),
+            # Literal string arguments to filters, if used in the result, are
+            # safe.
+            'basic-syntax08': (r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}', {"var": None}, ' endquote" hah'),
 
             # The "safe" and "escape" filters cannot work due to internal
             # implementation details (fortunately, the (no)autoescape block

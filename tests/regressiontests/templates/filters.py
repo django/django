@@ -177,18 +177,17 @@ def get_filter_tests():
         'filter-unordered_list04': ('{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}', {"a": ["x>", [[mark_safe("<y"), []]]]}, "\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>"),
         'filter-unordered_list05': ('{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}', {"a": ["x>", [["<y", []]]]}, "\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>"),
 
-        # If the input to "default" filter is marked as safe, then so is the
-        # output. However, if the default arg is used, auto-escaping kicks in
-        # (if enabled), because we cannot mark the default as safe.
+        # Literal string arguments to the default filter are always treated as
+        # safe strings, regardless of the auto-escaping state.
         #
         # Note: we have to use {"a": ""} here, otherwise the invalid template
         # variable string interferes with the test result.
-        'filter-default01': ('{{ a|default:"x<" }}', {"a": ""}, "x&lt;"),
+        'filter-default01': ('{{ a|default:"x<" }}', {"a": ""}, "x<"),
         'filter-default02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": ""}, "x<"),
         'filter-default03': ('{{ a|default:"x<" }}', {"a": mark_safe("x>")}, "x>"),
         'filter-default04': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": mark_safe("x>")}, "x>"),
 
-        'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x&lt;"),
+        'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x<"),
         'filter-default_if_none02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": None}, "x<"),
 
         'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
