@@ -6,6 +6,7 @@ import string
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
+from django.utils.http import urlquote
 
 # Configuration for urlize() function
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
@@ -101,14 +102,24 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
                     len(middle) > 0 and middle[0] in string.letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                middle = '<a href="http://%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
+                middle = '<a href="http://%s"%s>%s</a>' % (
+                        urlquote(middle, safe='/&=:;#?+'),  nofollow_attr,
+                        trim_url(middle))
             if middle.startswith('http://') or middle.startswith('https://'):
-                middle = '<a href="%s"%s>%s</a>' % (middle, nofollow_attr, trim_url(middle))
-            if '@' in middle and not middle.startswith('www.') and not ':' in middle \
-                and simple_email_re.match(middle):
+                middle = '<a href="%s"%s>%s</a>' % (
+                        urlquote(middle, safe='/&=:;#?+'), nofollow_attr,
+                        trim_url(middle))
+            if '@' in middle and not middle.startswith('www.') and \
+                    not ':' in middle and simple_email_re.match(middle):
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
                 words[i] = lead + middle + trail
+            elif autoescape and not safe_input:
+                words[i] = escape(word)
+        elif safe_input:
+            words[i] = mark_safe(word)
+        elif autoescape:
+            words[i] = escape(word)
     return u''.join(words)
 urlize = allow_lazy(urlize, unicode)
 
