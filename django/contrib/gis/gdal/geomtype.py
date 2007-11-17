@@ -1,4 +1,3 @@
-from types import StringType
 from django.contrib.gis.gdal.error import OGRException
 
 #### OGRGeomType ####
@@ -15,7 +14,7 @@ class OGRGeomType(object):
         "Figures out the correct OGR Type based upon the input."
         if isinstance(type_input, OGRGeomType):
             self._index = type_input._index
-        elif isinstance(type_input, StringType):
+        elif isinstance(type_input, basestring):
             idx = self._has_str(self.__ogr_str, type_input)
             if idx == None:
                 raise OGRException('Invalid OGR String Type "%s"' % type_input)
@@ -25,18 +24,20 @@ class OGRGeomType(object):
                 raise OGRException('Invalid OGR Integer Type: %d' % type_input)
             self._index =  self.__ogr_int.index(type_input)
         else:
-            raise TypeError('Invalid OGR Input type given!')
+            raise TypeError('Invalid OGR input type given.')
 
     def __str__(self):
         "Returns a short-hand string form of the OGR Geometry type."
         return self.__ogr_str[self._index]
 
     def __eq__(self, other):
-        """Does an equivalence test on the OGR type with the given
-        other OGRGeomType, the short-hand string, or the integer."""
+        """
+        Does an equivalence test on the OGR type with the given
+        other OGRGeomType, the short-hand string, or the integer.
+        """
         if isinstance(other, OGRGeomType):
             return self._index == other._index
-        elif isinstance(other, StringType):
+        elif isinstance(other, basestring):
             idx = self._has_str(self.__ogr_str, other)
             if not (idx == None): return self._index == idx
             return False

@@ -21,8 +21,8 @@
  SpatialReference: Represents OSR Spatial Reference objects.
 """
 # Attempting to import objects that depend on the GDAL library.  The
-#  HAS_GDAL flag will be set to True if the library is present on
-#  the system.
+# HAS_GDAL flag will be set to True if the library is present on
+# the system.
 try:
     from django.contrib.gis.gdal.driver import Driver
     from django.contrib.gis.gdal.datasource import DataSource

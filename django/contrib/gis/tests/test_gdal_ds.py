@@ -15,10 +15,10 @@ class TestSHP:
             setattr(self, key, value)
 
 # List of acceptable data sources.
-ds_list = (TestSHP('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, fields={'dbl' : OFTReal, 'int' : OFTReal, 'str' : OFTString,},
+ds_list = (TestSHP('test_point', nfeat=5, nfld=3, geom='POINT', gtype=1, fields={'dbl' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
                    extent=(-1.35011,0.166623,-0.524093,0.824508), # Got extent from QGIS
                    srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
-           TestSHP('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3, fields={'float' : OFTReal, 'int' : OFTReal, 'str' : OFTString,},
+           TestSHP('test_poly', nfeat=3, nfld=3, geom='POLYGON', gtype=3, fields={'float' : OFTReal, 'int' : OFTInteger, 'str' : OFTString,},
                    extent=(-1.01513,-0.558245,0.161876,0.839637), # Got extent from QGIS
                    srs_wkt='GEOGCS["GCS_WGS_1984",DATUM["WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]]'),
            )
@@ -101,17 +101,12 @@ class DataSourceTest(unittest.TestCase):
 
                     # Making sure the fields match to an appropriate OFT type.
                     for k, v in source.fields.items():
-                        fld = feat[k] # Indexing with string value
-
-                        # Asserting the string representation, and making sure we get
-                        #  the proper OGR Field instance.
-                        if isinstance(fld, OFTString): fmt = '%s ("%s")'
-                        else: fmt = '%s (%s)'
-                        self.assertEqual(fmt % (k, fld.value), str(fld))
-                        self.assertEqual(True, isinstance(fld, v))
+                        # Making sure we get the proper OGR Field instance, using
+                        # a string value index for the feature.
+                        self.assertEqual(True, isinstance(feat[k], v))
 
                     # Testing __iter__ on the Feature
-                    for fld in feat: self.assertEqual(fld.name in source.fields.keys(), True)
+                    for fld in feat: self.assertEqual(True, fld.name in source.fields.keys())
                         
     def test05_geometries(self):
         "Testing Geometries from Data Source Features."

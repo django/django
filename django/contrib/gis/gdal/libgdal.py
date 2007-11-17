@@ -1,5 +1,6 @@
 import os, sys
 from ctypes import CDLL, string_at
+from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException
 
 if os.name == 'nt':
@@ -7,16 +8,14 @@ if os.name == 'nt':
     lib_name = 'libgdal-1.dll'
 elif os.name == 'posix':
     platform = os.uname()[0]
-    if platform in ('Linux', 'SunOS'):
-        # Linux or Solaris shared library
-        lib_name = 'libgdal.so'
-    elif platform == 'Darwin':
+    if platform == 'Darwin':
         # Mac OSX shared library
         lib_name = 'libgdal.dylib'
-    else:
-        raise OGRException, 'Unknown POSIX platform "%s"' % platform
+    else: 
+        # Attempting to use .so extension for all other platforms.
+        lib_name = 'libgdal.so'
 else:
-    raise OGRException, 'Unsupported OS "%s"' % os.name
+    raise OGRException('Unsupported OS "%s"' % os.name)
 
 # This loads the GDAL/OGR C library
 lgdal = CDLL(lib_name)

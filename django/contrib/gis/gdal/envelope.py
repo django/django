@@ -1,15 +1,14 @@
 """
  The GDAL/OGR library uses an Envelope structure to hold the bounding
-  box information for a geometry.  The envelope (bounding box) contains
-  two pairs of coordinates, one for the lower left coordinate and one
-  for the upper right coordinate:
+ box information for a geometry.  The envelope (bounding box) contains
+ two pairs of coordinates, one for the lower left coordinate and one
+ for the upper right coordinate:
 
-                            +----------o Upper right; (max_x, max_y)
-                            |          |
-                            |          |
-                            |          |
-  Lower left (min_x, min_y) o----------+
-  
+                           +----------o Upper right; (max_x, max_y)
+                           |          |
+                           |          |
+                           |          |
+ Lower left (min_x, min_y) o----------+
 """
 from ctypes import Structure, c_double
 from types import TupleType, ListType
@@ -29,14 +28,14 @@ class OGREnvelope(Structure):
 class Envelope(object):
     """
     The Envelope object is a C structure that contains the minimum and
-     maximum X, Y coordinates for a rectangle bounding box.  The naming
-     of the variables is compatible with the OGR Envelope structure.
+    maximum X, Y coordinates for a rectangle bounding box.  The naming
+    of the variables is compatible with the OGR Envelope structure.
     """
 
     def __init__(self, *args):
         """
         The initialization function may take an OGREnvelope structure, 4-element
-         tuple or list, or 4 individual arguments.
+        tuple or list, or 4 individual arguments.
         """
         
         if len(args) == 1:

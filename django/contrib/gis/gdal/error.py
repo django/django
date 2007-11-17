@@ -1,10 +1,9 @@
 """
-  This module houses the OGR & SRS Exception objects, and the
-   check_err() routine which checks the status code returned by
-   OGR methods.
+ This module houses the OGR & SRS Exception objects, and the
+ check_err() routine which checks the status code returned by
+ OGR methods.
 """
-
-# OGR & SRS Exceptions
+#### OGR & SRS Exceptions ####
 class OGRException(Exception): pass
 class SRSException(Exception): pass
 class OGRIndexError(OGRException, KeyError):
@@ -15,6 +14,8 @@ class OGRIndexError(OGRException, KeyError):
     an Exception is raised.  Fixes ticket #4740.
     """
     silent_variable_failure = True
+
+#### OGR error checking codes and routine ####
 
 # OGR Error Codes
 OGRERR_DICT = { 1 : (OGRException, 'Not enough data.'),
@@ -36,4 +37,4 @@ def check_err(code):
         e, msg = OGRERR_DICT[code]
         raise e, msg
     else:
-        raise OGRException, 'Unknown error code: "%s"' % code
+        raise OGRException('Unknown error code: "%s"' % code)

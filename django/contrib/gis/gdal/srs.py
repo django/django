@@ -28,50 +28,18 @@
 """
 import re
 from types import StringType, UnicodeType, TupleType
-from ctypes import \
-     c_char_p, c_int, c_double, c_void_p, POINTER, \
-     byref, string_at, create_string_buffer
-
-# Getting the GDAL C Library
-from django.contrib.gis.gdal.libgdal import lgdal
+from ctypes import byref, c_char_p, c_int, c_void_p
 
 # Getting the error checking routine and exceptions
-from django.contrib.gis.gdal.error import check_err, OGRException, SRSException
-
-#### ctypes function prototypes ####
-def ellipsis_func(f):
-    """
-    Creates a ctypes function prototype for OSR ellipsis property functions, e.g., 
-     OSRGetSemiMajor, OSRGetSemiMinor, OSRGetInvFlattening.
-    """
-    f.restype = c_double
-    f.argtypes = [c_void_p, POINTER(c_int)]
-    return f
-
-# Getting the semi_major, semi_minor, and flattening functions.
-semi_major = ellipsis_func(lgdal.OSRGetSemiMajor)
-semi_minor = ellipsis_func(lgdal.OSRGetSemiMinor)
-invflattening = ellipsis_func(lgdal.OSRGetInvFlattening)
-
-def units_func(f):
-    """
-    Creates a ctypes function prototype for OSR units functions, e.g., 
-     OSRGetAngularUnits, OSRGetLinearUnits.
-    """
-    f.restype = c_double
-    f.argtypes = [c_void_p, POINTER(c_char_p)]
-    return f
-
-# Getting the angular_units, linear_units functions
-linear_units = units_func(lgdal.OSRGetLinearUnits)
-angular_units = units_func(lgdal.OSRGetAngularUnits)
+from django.contrib.gis.gdal.error import OGRException, SRSException
+from django.contrib.gis.gdal.prototypes.srs import *
 
 #### Spatial Reference class. ####
 class SpatialReference(object):
     """
     A wrapper for the OGRSpatialReference object.  According to the GDAL website,
-    the SpatialReference object 'provide[s] services to represent coordinate 
-    systems (projections and datums) and to transform between them.'
+    the SpatialReference object "provide[s] services to represent coordinate 
+    systems (projections and datums) and to transform between them."
     """
 
     # Well-Known Geographical Coordinate System Name
@@ -82,9 +50,8 @@ class SpatialReference(object):
     def __init__(self, srs_input='', srs_type='wkt'):
         "Creates a spatial reference object from the given OGC Well Known Text (WKT)."
 
-        self._srs = None # Initially NULL
-
-        # Creating an initial empty string buffer.
+        # Intializing pointer and string buffer.
+        self._ptr = None
         buf = c_char_p('')
 
         # Encoding to ASCII if unicode passed in.
@@ -92,37 +59,40 @@ class SpatialReference(object):
             srs_input = srs_input.encode('ascii')
 
         if isinstance(srs_input, StringType):
-            # Is this an EPSG well known name?
             m = self._epsg_regex.match(srs_input)
             if m:
+                # Is this an EPSG well known name?    
                 srs_type = 'epsg'
                 srs_input = int(m.group('epsg'))
-            # Is this a short-hand well known name?
             elif srs_input in self._well_known:
+                # Is this a short-hand well known name?  
                 srs_type = 'epsg'
                 srs_input = self._well_known[srs_input]
             elif srs_type == 'proj':
                 pass
             else:
+                # Setting the buffer with WKT, PROJ.4 string, etc.
                 buf = c_char_p(srs_input)
         elif isinstance(srs_input, int):
-            if srs_type == 'wkt': srs_type = 'epsg' # want to try epsg if only integer provided
-            if srs_type not in ('epsg', 'ogr'): 
-                raise SRSException('Integer input requires SRS type of "ogr" or "epsg".')
+            # EPSG integer code was input.
+            if srs_type != 'epsg': srs_type = 'epsg'
+        elif isinstance(srs_input, c_void_p):
+            srs_type = 'ogr'
         else:
             raise TypeError('Invalid SRS type "%s"' % srs_type)
 
-        # Calling OSRNewSpatialReference with the string buffer.
         if srs_type == 'ogr':
-            srs = srs_input # SRS input is OGR pointer
+            # SRS input is OGR pointer
+            srs = srs_input
         else:
-            srs = lgdal.OSRNewSpatialReference(buf)
+            # Creating a new pointer, using the string buffer.
+            srs = new_srs(buf)
 
         # If the pointer is NULL, throw an exception.
         if not srs:
             raise SRSException('Could not create spatial reference from: %s' % srs_input)
         else:
-            self._srs = srs
+            self._ptr = srs
 
         # Post-processing if in PROJ.4 or EPSG formats.
         if srs_type == 'proj': self.import_proj(srs_input)
@@ -130,7 +100,7 @@ class SpatialReference(object):
 
     def __del__(self):
         "Destroys this spatial reference."
-        if self._srs: lgdal.OSRRelease(self._srs)
+        if self._ptr: release_srs(self._ptr)
 
     def __getitem__(self, target):
         """
@@ -172,43 +142,48 @@ class SpatialReference(object):
         "The string representation uses 'pretty' WKT."
         return self.pretty_wkt
 
-    def _string_ptr(self, ptr):
-        """
-        Returns the string at the pointer if it is valid, None if the pointer
-        is NULL.
-        """
-        if not ptr: return None
-        else: return string_at(ptr)
-
     #### SpatialReference Methods ####
-    def auth_name(self, target):
-        "Getting the authority name for the target node."
-        ptr = lgdal.OSRGetAuthorityName(self._srs, c_char_p(target))
-        return self._string_ptr(ptr)
-    
-    def auth_code(self, target):
-        "Getting the authority code for the given target node."
-        ptr = lgdal.OSRGetAuthorityCode(self._srs, c_char_p(target))
-        return self._string_ptr(ptr)
-
     def attr_value(self, target, index=0):
         """
         The attribute value for the given target node (e.g. 'PROJCS'). The index
         keyword specifies an index of the child node to return.
         """
-        if not isinstance(target, str):
-            raise TypeError('Attribute target must be a string')
-        ptr = lgdal.OSRGetAttrValue(self._srs, c_char_p(target), c_int(index))
-        return self._string_ptr(ptr)
+        if not isinstance(target, str) or not isinstance(index, int):
+            raise TypeError
+        return get_attr_value(self._ptr, target, index)
+
+    def auth_name(self, target):
+        "Returns the authority name for the given string target node."
+        return get_auth_name(self._ptr, target)
+    
+    def auth_code(self, target):
+        "Returns the authority code for the given string target node."
+        return get_auth_code(self._ptr, target)
+
+    def clone(self):
+        "Returns a clone of this SpatialReference object."
+        return SpatialReference(clone_srs(self._ptr))
+
+    def from_esri(self):
+        "Morphs this SpatialReference from ESRI's format to EPSG."
+        morph_from_esri(self._ptr)
+
+    def identify_epsg(self):
+        """
+        This method inspects the WKT of this SpatialReference, and will
+        add EPSG authority nodes where an EPSG identifier is applicable.
+        """
+        identify_epsg(self._ptr)
+
+    def to_esri(self):
+        "Morphs this SpatialReference to ESRI's format."
+        morph_to_esri(self._ptr)
 
     def validate(self):
         "Checks to see if the given spatial reference is valid."
-        check_err(lgdal.OSRValidate(self._srs))
+        srs_validate(self._ptr)
     
-    def clone(self):
-        "Returns a clone of this Spatial Reference."
-        return SpatialReference(lgdal.OSRClone(self._srs), 'ogr')
-
+    #### Name & SRID properties ####
     @property
     def name(self):
         "Returns the name of this Spatial Reference."
@@ -226,43 +201,29 @@ class SpatialReference(object):
             return None
         
     #### Unit Properties ####
-    def _cache_linear(self):
-        "Caches the linear units value and name."
-        if not hasattr(self, '_linear_units') or not hasattr(self, '_linear_name'):
-            name_buf = c_char_p()
-            self._linear_units = linear_units(self._srs, byref(name_buf))
-            self._linear_name = string_at(name_buf)
-
     @property
     def linear_name(self):
         "Returns the name of the linear units."
-        self._cache_linear()
-        return self._linear_name
+        units, name = linear_units(self._ptr, byref(c_char_p()))
+        return name
 
     @property
     def linear_units(self):
         "Returns the value of the linear units."
-        self._cache_linear()
-        return self._linear_units
-
-    def _cache_angular(self):
-        "Caches the angular units value and name."
-        name_buf = c_char_p()
-        if not hasattr(self, '_angular_units') or not hasattr(self, '_angular_name'):
-            self._angular_units = angular_units(self._srs, byref(name_buf))
-            self._angular_name = string_at(name_buf)
+        units, name = linear_units(self._ptr, byref(c_char_p()))
+        return units
 
     @property
     def angular_name(self):
         "Returns the name of the angular units."
-        self._cache_angular()
-        return self._angular_name
+        units, name = angular_units(self._ptr, byref(c_char_p()))
+        return name
 
     @property
     def angular_units(self):
         "Returns the value of the angular units."
-        self._cache_angular()
-        return self._angular_units
+        units, name = angular_units(self._ptr, byref(c_char_p()))
+        return units
 
     #### Spheroid/Ellipsoid Properties ####
     @property
@@ -276,26 +237,17 @@ class SpatialReference(object):
     @property
     def semi_major(self):
         "Returns the Semi Major Axis for this Spatial Reference."
-        err = c_int(0)
-        sm = semi_major(self._srs, byref(err))
-        check_err(err.value)
-        return sm
+        return semi_major(self._ptr, byref(c_int()))
 
     @property
     def semi_minor(self):
         "Returns the Semi Minor Axis for this Spatial Reference."
-        err = c_int()
-        sm = semi_minor(self._srs, byref(err))
-        check_err(err.value)
-        return sm
+        return semi_minor(self._ptr, byref(c_int()))
 
     @property
     def inverse_flattening(self):
         "Returns the Inverse Flattening for this Spatial Reference."
-        err = c_int()
-        inv_flat = invflattening(self._srs, byref(err))
-        check_err(err.value)
-        return inv_flat
+        return invflattening(self._ptr, byref(c_int()))
 
     #### Boolean Properties ####
     @property
@@ -304,14 +256,12 @@ class SpatialReference(object):
         Returns True if this SpatialReference is geographic 
          (root node is GEOGCS).
         """
-        if lgdal.OSRIsGeographic(self._srs): return True
-        else: return False
+        return bool(isgeographic(self._ptr))
 
     @property
     def local(self):
         "Returns True if this SpatialReference is local (root node is LOCAL_CS)."
-        if lgdal.OSRIsLocal(self._srs): return True
-        else: return False
+        return bool(islocal(self._ptr))
 
     @property
     def projected(self):
@@ -319,48 +269,40 @@ class SpatialReference(object):
         Returns True if this SpatialReference is a projected coordinate system 
          (root node is PROJCS).
         """
-        if lgdal.OSRIsProjected(self._srs): return True
-        else: return False
+        return bool(isprojected(self._ptr))
 
     #### Import Routines #####
     def import_wkt(self, wkt):
         "Imports the Spatial Reference from OGC WKT (string)"
-        buf = create_string_buffer(wkt)
-        check_err(lgdal.OSRImportFromWkt(self._srs, byref(buf)))
+        from_wkt(self._ptr, byref(c_char_p(wkt)))
 
     def import_proj(self, proj):
         "Imports the Spatial Reference from a PROJ.4 string."
-        check_err(lgdal.OSRImportFromProj4(self._srs, create_string_buffer(proj)))
+        from_proj(self._ptr, proj)
 
     def import_epsg(self, epsg):
         "Imports the Spatial Reference from the EPSG code (an integer)."
-        check_err(lgdal.OSRImportFromEPSG(self._srs, c_int(epsg)))
+        from_epsg(self._ptr, epsg)
 
     def import_xml(self, xml):
         "Imports the Spatial Reference from an XML string."
-        check_err(lgdal.OSRImportFromXML(self._srs, create_string_buffer(xml)))
+        from_xml(self._ptr, xml)
 
     #### Export Properties ####
     @property
     def wkt(self):
         "Returns the WKT representation of this Spatial Reference."
-        w = c_char_p()
-        check_err(lgdal.OSRExportToWkt(self._srs, byref(w)))
-        if w: return string_at(w)
+        return to_wkt(self._ptr, byref(c_char_p()))
 
     @property
     def pretty_wkt(self, simplify=0):
         "Returns the 'pretty' representation of the WKT."
-        w = c_char_p()
-        check_err(lgdal.OSRExportToPrettyWkt(self._srs, byref(w), c_int(simplify)))
-        if w: return string_at(w)
+        return to_pretty_wkt(self._ptr, byref(c_char_p()), simplify)
 
     @property
     def proj(self):
         "Returns the PROJ.4 representation for this Spatial Reference."
-        w = c_char_p()
-        check_err(lgdal.OSRExportToProj4(self._srs, byref(w)))
-        if w: return string_at(w)
+        return to_proj(self._ptr, byref(c_char_p()))
 
     @property
     def proj4(self):
@@ -370,28 +312,34 @@ class SpatialReference(object):
     @property
     def xml(self, dialect=''):
         "Returns the XML representation of this Spatial Reference."
-        w = c_char_p()
-        check_err(lgdal.OSRExportToXML(self._srs, byref(w), create_string_buffer(dialect)))
-        return string_at(w)
+        # FIXME: This leaks memory, have to figure out why.
+        return to_xml(self._ptr, byref(c_char_p()), dialect)
+
+    def to_esri(self):
+        "Morphs this SpatialReference to ESRI's format."
+        morph_to_esri(self._ptr)
+
+    def from_esri(self):
+        "Morphs this SpatialReference from ESRI's format to EPSG."
+        morph_from_esri(self._ptr)
 
 class CoordTransform(object):
-    "A coordinate system transformation object."
+    "The coordinate system transformation object."
 
     def __init__(self, source, target):
         "Initializes on a source and target SpatialReference objects."
-        self._ct = 0 # Initially NULL 
+        self._ptr = None # Initially NULL 
         if not isinstance(source, SpatialReference) or not isinstance(target, SpatialReference):
             raise SRSException('source and target must be of type SpatialReference')
-        ct = lgdal.OCTNewCoordinateTransformation(source._srs, target._srs)
-        if not ct:
+        self._ptr = new_ct(source._ptr, target._ptr)
+        if not self._ptr:
             raise SRSException('could not intialize CoordTransform object')
-        self._ct = ct
         self._srs1_name = source.name
         self._srs2_name = target.name
 
     def __del__(self):
         "Deletes this Coordinate Transformation object."
-        if self._ct: lgdal.OCTDestroyCoordinateTransformation(self._ct)
+        if self._ptr: destroy_ct(self._ptr)
 
     def __str__(self):
-        return 'Transform from "%s" to "%s"' % (str(self._srs1_name), str(self._srs2_name))
+        return 'Transform from "%s" to "%s"' % (self._srs1_name, self._srs2_name)

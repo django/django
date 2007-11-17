@@ -1,13 +1,16 @@
-# types and ctypes
-from types import StringType
-from ctypes import c_char_p, c_int, c_void_p, string_at
-
 # The GDAL C library, OGR exception, and the Field object
-from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError
 from django.contrib.gis.gdal.field import Field
 from django.contrib.gis.gdal.geometries import OGRGeometry, OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference
+
+# ctypes function prototypes
+from django.contrib.gis.gdal.prototypes.ds import \
+    destroy_feature, feature_equal, get_fd_geom_type, get_feat_geom_ref, \
+    get_feat_name, get_feat_field_count, get_fid, get_field_defn, \
+    get_field_index
+from django.contrib.gis.gdal.prototypes.geom import clone_geom, get_geom_srs
+from django.contrib.gis.gdal.prototypes.srs import clone_srs
 
 # For more information, see the OGR C API source code:
 #  http://www.gdal.org/ogr/ogr__api_8h.html
@@ -18,33 +21,31 @@ class Feature(object):
 
     #### Python 'magic' routines ####
     def __init__(self, feat, fdefn):
-        "Needs a C pointer (Python integer in ctypes) in order to initialize."
-        self._feat = None # Initially NULL
-        self._fdefn = None 
+        "Initializes on the pointers for the feature and the layer definition."
+        self._ptr = None # Initially NULL
         if not feat or not fdefn:
             raise OGRException('Cannot create OGR Feature, invalid pointer given.')
-        self._feat = feat
+        self._ptr = feat
         self._fdefn = fdefn
 
     def __del__(self):
         "Releases a reference to this object."
-        if self._feat: lgdal.OGR_F_Destroy(self._feat)
+        if self._ptr: destroy_feature(self._ptr)
 
     def __getitem__(self, index):
         "Gets the Field at the specified index."
-        if isinstance(index, StringType):
+        if isinstance(index, basestring):
             i = self.index(index)
         else:
             if index < 0 or index > self.num_fields:
                 raise OGRIndexError('index out of range')
             i = index
-        return Field(lgdal.OGR_F_GetFieldDefnRef(self._feat, c_int(i)),
-                     string_at(lgdal.OGR_F_GetFieldAsString(self._feat, c_int(i))))
+        return Field(self._ptr, i)
     
     def __iter__(self):
         "Iterates over each field in the Feature."
         for i in xrange(self.num_fields):
-            yield self.__getitem__(i)
+            yield self[i]
 
     def __len__(self):
         "Returns the count of fields in this feature."
@@ -56,54 +57,49 @@ class Feature(object):
 
     def __eq__(self, other):
         "Does equivalence testing on the features."
-        if lgdal.OGR_F_Equal(self._feat, other._feat):
-            return True
-        else:
-            return False
+        return bool(feature_equal(self._ptr, other._ptr))
 
     #### Feature Properties ####
     @property
     def fid(self):
         "Returns the feature identifier."
-        return lgdal.OGR_F_GetFID(self._feat)
+        return get_fid(self._ptr)
         
     @property
     def layer_name(self):
         "Returns the name of the layer for the feature."
-        return string_at(lgdal.OGR_FD_GetName(self._fdefn))
+        return get_feat_name(self._fdefn)
 
     @property
     def num_fields(self):
         "Returns the number of fields in the Feature."
-        return lgdal.OGR_F_GetFieldCount(self._feat)
+        return get_feat_field_count(self._ptr)
 
     @property
     def fields(self):
         "Returns a list of fields in the Feature."
-        return [ string_at(lgdal.OGR_Fld_GetNameRef(lgdal.OGR_FD_GetFieldDefn(self._fdefn, i)))
-                 for i in xrange(self.num_fields) ]
+        return [get_field_name(get_field_defn(self._fdefn, i)) 
+                for i in xrange(self.num_fields)]
+
     @property
     def geom(self):
         "Returns the OGR Geometry for this Feature."
         # Retrieving the geometry pointer for the feature.
-        geom_ptr = lgdal.OGR_F_GetGeometryRef(self._feat)
-        if not geom_ptr:
-            raise OGRException('Cannot retrieve Geometry from the feature.')
+        geom_ptr = get_feat_geom_ref(self._ptr)
 
         # Attempting to retrieve the Spatial Reference for the geometry.
-        srs_ptr  = lgdal.OSRClone(lgdal.OGR_G_GetSpatialReference(geom_ptr))
-        if srs_ptr:
-            srs = SpatialReference(srs_ptr, 'ogr')
-        else:
+        try:
+            srs_ptr = get_geom_srs(geom_ptr)
+            srs = SpatialReference(clone_srs(srs_ptr)) 
+        except OGRException:
             srs = None
-
-        # Geometry is cloned so the feature isn't invalidated.
-        return OGRGeometry(c_void_p(lgdal.OGR_G_Clone(geom_ptr)), srs)
-
+        # Geometry is cloned so the feature isn't invalidated. 
+        return OGRGeometry(clone_geom(geom_ptr), srs)
+    
     @property
     def geom_type(self):
         "Returns the OGR Geometry Type for this Feture."
-        return OGRGeomType(lgdal.OGR_FD_GetGeomType(self._fdefn))
+        return OGRGeomType(get_fd_geom_type(self._fdefn))
     
     #### Feature Methods ####
     def get(self, field):
@@ -113,14 +109,10 @@ class Feature(object):
          parameters.
         """
         field_name = getattr(field, 'name', field)
-        return self.__getitem__(field_name).value
+        return self[field_name].value
 
     def index(self, field_name):
         "Returns the index of the given field name."
-        i = lgdal.OGR_F_GetFieldIndex(self._feat, c_char_p(field_name))
+        i = get_field_index(self._ptr, field_name)
         if i < 0: raise OGRIndexError('invalid OFT field name given: "%s"' % field_name)
         return i
-
-    def clone(self):
-        "Clones this Feature."
-        return Feature(lgdal.OGR_F_Clone(self._feat))

@@ -1,5 +1,6 @@
 import unittest
-from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, OGRException, SpatialReference
+from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
+    OGRException, OGRIndexError, SpatialReference
 from django.contrib.gis.tests.geometries import *
 
 class OGRGeomTest(unittest.TestCase):
@@ -94,41 +95,78 @@ class OGRGeomTest(unittest.TestCase):
                                                                             
     def test04_linestring(self):
         "Testing LineString objects."
+        prev = OGRGeometry('POINT(0 0)')
         for ls in linestrings:
             linestr = OGRGeometry(ls.wkt)
             self.assertEqual(2, linestr.geom_type)
             self.assertEqual('LINESTRING', linestr.geom_name)
             self.assertEqual(ls.n_p, linestr.point_count)
             self.assertEqual(ls.tup, linestr.tuple)
+            self.assertEqual(True, linestr == OGRGeometry(ls.wkt))
+            self.assertEqual(True, linestr != prev)
+            self.assertRaises(OGRIndexError, linestr.__getitem__, len(linestr))
+            prev = linestr
 
     def test05_multilinestring(self):
         "Testing MultiLineString objects."
+        prev = OGRGeometry('POINT(0 0)')
         for mls in multilinestrings:
             mlinestr = OGRGeometry(mls.wkt)
             self.assertEqual(5, mlinestr.geom_type)
             self.assertEqual('MULTILINESTRING', mlinestr.geom_name)
             self.assertEqual(mls.n_p, mlinestr.point_count)
             self.assertEqual(mls.tup, mlinestr.tuple)
+            self.assertEqual(True, mlinestr == OGRGeometry(mls.wkt))
+            self.assertEqual(True, mlinestr != prev)
+            prev = mlinestr
+            for ls in mlinestr:
+                self.assertEqual(2, ls.geom_type)
+                self.assertEqual('LINESTRING', ls.geom_name)
+            self.assertRaises(OGRIndexError, mlinestr.__getitem__, len(mlinestr)) 
 
-    def test06_polygons(self):
+    def test06_linearring(self):
+        "Testing LinearRing objects."
+        prev = OGRGeometry('POINT(0 0)')
+        for rr in linearrings:
+            lr = OGRGeometry(rr.wkt)
+            #self.assertEqual(101, lr.geom_type.num)
+            self.assertEqual('LINEARRING', lr.geom_name)
+            self.assertEqual(rr.n_p, len(lr))
+            self.assertEqual(True, lr == OGRGeometry(rr.wkt))
+            self.assertEqual(True, lr != prev)
+            prev = lr
+
+    def test07a_polygons(self):
         "Testing Polygon objects."
+        prev = OGRGeometry('POINT(0 0)')
         for p in polygons:
             poly = OGRGeometry(p.wkt)
             self.assertEqual(3, poly.geom_type)
             self.assertEqual('POLYGON', poly.geom_name)
             self.assertEqual(p.n_p, poly.point_count)
-            first = True
+            self.assertEqual(p.n_i + 1, len(poly))
+
+            # Testing area & centroid.
+            self.assertAlmostEqual(p.area, poly.area, 9)
+            x, y = poly.centroid.tuple
+            self.assertAlmostEqual(p.centroid[0], x, 9)
+            self.assertAlmostEqual(p.centroid[1], y, 9)
+
+            # Testing equivalence
+            self.assertEqual(True, poly == OGRGeometry(p.wkt))
+            self.assertEqual(True, poly != prev)
+            
+            if p.ext_ring_cs:
+                ring = poly[0]
+                self.assertEqual(p.ext_ring_cs, ring.tuple)
+                self.assertEqual(p.ext_ring_cs, poly[0].tuple)
+                self.assertEqual(len(p.ext_ring_cs), ring.point_count)
+            
             for r in poly:
-                if first and p.ext_ring_cs:
-                    first = False
-                    # Testing the equivilance of the exerior rings
-                    #   since the first iteration will be the exterior ring.
-                    self.assertEqual(len(p.ext_ring_cs), r.point_count)
-                    self.assertEqual(p.ext_ring_cs, r.tuple)
+                self.assertEqual('LINEARRING', r.geom_name)
 
-    def test07_closepolygons(self):
+    def test07b_closepolygons(self):
         "Testing closing Polygon objects."
-
         # Both rings in this geometry are not closed.
         poly = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5), (1 1, 2 1, 2 2, 2 1))')
         self.assertEqual(8, poly.point_count)
@@ -149,6 +187,7 @@ class OGRGeomTest(unittest.TestCase):
 
     def test08_multipolygons(self):
         "Testing MultiPolygon objects."
+        prev = OGRGeometry('POINT(0 0)')
         for mp in multipolygons:
             mpoly = OGRGeometry(mp.wkt)
             self.assertEqual(6, mpoly.geom_type)
@@ -156,27 +195,53 @@ class OGRGeomTest(unittest.TestCase):
             if mp.valid:
                 self.assertEqual(mp.n_p, mpoly.point_count)
                 self.assertEqual(mp.num_geom, len(mpoly))
+                self.assertRaises(OGRIndexError, mpoly.__getitem__, len(mpoly))
+                for p in mpoly:
+                    self.assertEqual('POLYGON', p.geom_name)
+                    self.assertEqual(3, p.geom_type)
+            self.assertEqual(mpoly.wkt, OGRGeometry(mp.wkt).wkt)
 
     def test09_srs(self):
         "Testing OGR Geometries with Spatial Reference objects."
         for mp in multipolygons:
+            # Creating a geometry w/spatial reference
             sr = SpatialReference('WGS84')
             mpoly = OGRGeometry(mp.wkt, sr)
             self.assertEqual(sr.wkt, mpoly.srs.wkt)
+          
+            # Ensuring that SRS is propagated to clones.
+            klone = mpoly.clone()
+            self.assertEqual(sr.wkt, klone.srs.wkt)
+  
+            # Ensuring all children geometries (polygons and their rings) all
+            # return the assigned spatial reference as well.
             for poly in mpoly:
                 self.assertEqual(sr.wkt, poly.srs.wkt)
                 for ring in poly:
                     self.assertEqual(sr.wkt, ring.srs.wkt)
 
+            # Ensuring SRS propagate in topological ops.
+            a, b = topology_geoms[0]
+            a, b = OGRGeometry(a.wkt, sr), OGRGeometry(b.wkt, sr)
+            diff = a.difference(b)
+            union = a.union(b)
+            self.assertEqual(sr.wkt, diff.srs.wkt)
+            self.assertEqual(sr.srid, union.srs.srid)
+
+            # Instantiating w/an integer SRID
             mpoly = OGRGeometry(mp.wkt, 4326)
             self.assertEqual(4326, mpoly.srid)
             mpoly.srs = SpatialReference(4269)
             self.assertEqual(4269, mpoly.srid)
             self.assertEqual('NAD83', mpoly.srs.name)
+          
+            # Incrementing through the multipolyogn after the spatial reference
+            # has been re-assigned.
             for poly in mpoly:
                 self.assertEqual(mpoly.srs.wkt, poly.srs.wkt)
                 poly.srs = 32140
                 for ring in poly:
+                    # Changing each ring in the polygon
                     self.assertEqual(32140, ring.srs.srid)
                     self.assertEqual('NAD83 / Texas South Central', ring.srs.name)
                     ring.srs = str(SpatialReference(4326)) # back to WGS84
@@ -186,8 +251,59 @@ class OGRGeomTest(unittest.TestCase):
                     ring.srid = 4322
                     self.assertEqual('WGS 72', ring.srs.name)
                     self.assertEqual(4322, ring.srid)
-            
 
+    def test10_difference(self):
+        "Testing difference()."
+        for i in xrange(len(topology_geoms)):
+            g_tup = topology_geoms[i]
+            a = OGRGeometry(g_tup[0].wkt)
+            b = OGRGeometry(g_tup[1].wkt)
+            d1 = OGRGeometry(diff_geoms[i].wkt)
+            d2 = a.difference(b)
+            self.assertEqual(d1, d2)
+            self.assertEqual(d1, a - b) # __sub__ is difference operator
+            a -= b # testing __isub__
+            self.assertEqual(d1, a)
+
+    def test11_intersection(self):
+        "Testing intersects() and intersection()."
+        for i in xrange(len(topology_geoms)):
+            g_tup = topology_geoms[i]
+            a = OGRGeometry(g_tup[0].wkt)
+            b = OGRGeometry(g_tup[1].wkt)
+            i1 = OGRGeometry(intersect_geoms[i].wkt)
+            self.assertEqual(True, a.intersects(b))
+            i2 = a.intersection(b)
+            self.assertEqual(i1, i2)
+            self.assertEqual(i1, a & b) # __and__ is intersection operator
+            a &= b # testing __iand__
+            self.assertEqual(i1, a)
+
+    def test12_symdifference(self):
+        "Testing sym_difference()."
+        for i in xrange(len(topology_geoms)):
+            g_tup = topology_geoms[i]
+            a = OGRGeometry(g_tup[0].wkt)
+            b = OGRGeometry(g_tup[1].wkt)
+            d1 = OGRGeometry(sdiff_geoms[i].wkt)
+            d2 = a.sym_difference(b)
+            self.assertEqual(d1, d2)
+            self.assertEqual(d1, a ^ b) # __xor__ is symmetric difference operator
+            a ^= b # testing __ixor__
+            self.assertEqual(d1, a)
+            
+    def test13_union(self):
+        "Testing union()."
+        for i in xrange(len(topology_geoms)):
+            g_tup = topology_geoms[i]
+            a = OGRGeometry(g_tup[0].wkt)
+            b = OGRGeometry(g_tup[1].wkt)
+            u1 = OGRGeometry(union_geoms[i].wkt)
+            u2 = a.union(b)
+            self.assertEqual(u1, u2)
+            self.assertEqual(u1, a | b) # __or__ is union operator
+            a |= b # testing __ior__
+            self.assertEqual(u1, a)
 
 def suite():
     s = unittest.TestSuite()
