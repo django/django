@@ -678,6 +678,7 @@ class Variable(object):
         self.var = var
         self.literal = None
         self.lookups = None
+        self.translate = False
 
         try:
             # First try to treat this variable as a number.
@@ -698,11 +699,15 @@ class Variable(object):
 
         except ValueError:
             # A ValueError means that the variable isn't a number.
+            if var.startswith('_(') and var.endswith(')'):
+                # The result of the lookup should be translated at rendering
+                # time.
+                self.translate = True
+                var = var[2:-1]
             # If it's wrapped with quotes (single or double), then
             # we're also dealing with a literal.
             if var[0] in "\"'" and var[0] == var[-1]:
                 self.literal = var[1:-1]
-
             else:
                 # Otherwise we'll set self.lookups so that resolve() knows we're
                 # dealing with a bonafide variable
@@ -712,10 +717,13 @@ class Variable(object):
         """Resolve this variable against a given context."""
         if self.lookups is not None:
             # We're dealing with a variable that needs to be resolved
-            return self._resolve_lookup(context)
+            value = self._resolve_lookup(context)
         else:
             # We're dealing with a literal, so it's already been "resolved"
-            return self.literal
+            value = self.literal
+        if self.translate:
+            return _(value)
+        return value
 
     def __repr__(self):
         return "<%s: %r>" % (self.__class__.__name__, self.var)
