@@ -77,7 +77,7 @@ class GeoModelTest(unittest.TestCase):
         inner = LinearRing((40, 40), (40, 60), (60, 60), (60, 40), (40, 40))
 
         # Creating a State object using a built Polygon
-        ply = Polygon(shell.clone(), inner.clone())
+        ply = Polygon(shell, inner)
         nullstate = State(name='NullState', poly=ply)
         self.assertEqual(4326, nullstate.poly.srid) # SRID auto-set from None
         nullstate.save()
@@ -94,12 +94,12 @@ class GeoModelTest(unittest.TestCase):
 
         # Changing the interior ring on the poly attribute.
         new_inner = LinearRing((30, 30), (30, 70), (70, 70), (70, 30), (30, 30))
-        nullstate.poly[1] = new_inner.clone()
+        ns.poly[1] = new_inner
         ply[1] = new_inner
-        self.assertEqual(4326, nullstate.poly.srid)
-        nullstate.save()
+        self.assertEqual(4326, ns.poly.srid)
+        ns.save()
         self.assertEqual(ply, State.objects.get(name='NullState').poly)
-        nullstate.delete()
+        ns.delete()
 
     @no_oracle # Oracle does not support KML.
     def test03a_kml(self):

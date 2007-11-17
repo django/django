@@ -33,12 +33,12 @@ def ogrinfo(data_source, num_features=10):
 
         width = max(*map(len,layer.fields))
         fmt = " %%%ss: %%s" % width
-        for i, feature in enumerate(layer[:num_features]):
-            print "=== Feature %s" % i
-            for field in layer.fields:
-                fld_typ = feature[field].__class__.__name__.replace('OFT', '')
-                output = fmt % (field, fld_typ)
-                val = feature.get(field)
+        for j, feature in enumerate(layer[:num_features]):
+            print "=== Feature %s" % j
+            for fld_name in layer.fields:
+                type_name = feature[fld_name].type_name
+                output = fmt % (fld_name, type_name)
+                val = feature.get(fld_name)
                 if val:
                     if isinstance(val, str):
                         val_fmt = ' ("%s")'

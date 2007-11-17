@@ -2,7 +2,13 @@ import sys
 from copy import copy
 from unittest import TestSuite, TextTestRunner
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.tests.utils import mysql
+try:
+    from django.contrib.gis.tests.utils import mysql
+except:
+    mysql = False
+
+# Tests that require use of a spatial database (e.g., creation of models)
+test_models = ['geoapp']
 
 # Tests that do not require setting up and tearing down a spatial database.
 test_suite_names = [
@@ -10,6 +16,7 @@ test_suite_names = [
     'test_measure',
 ]
 if HAS_GDAL:
+    test_models += ['layermap']
     test_suite_names += [
         'test_gdal_driver',
         'test_gdal_ds',
@@ -20,8 +27,6 @@ if HAS_GDAL:
         ]
 else:
     print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
-
-test_models = ['geoapp']
 
 def suite():
     "Builds a test suite for the GIS package."
@@ -40,8 +45,8 @@ def run_tests(module_list, verbosity=1, interactive=True):
     Run the tests that require creation of a spatial database.
     
     In order to run geographic model tests the DATABASE_USER will require
-     superuser priviliges.  To accomplish this outside the `postgres` user,
-     create your own PostgreSQL database as a user:
+    superuser priviliges.  To accomplish this outside the `postgres` user,
+    create your own PostgreSQL database as a user:
      (1) Initialize database: `initdb -D /path/to/user/db`
      (2) If there's already a Postgres instance on the machine, it will need
          to use a different TCP port than 5432. Edit postgresql.conf (in 
@@ -49,21 +54,21 @@ def run_tests(module_list, verbosity=1, interactive=True):
      (3) Start this database `pg_ctl -D /path/to/user/db start`
 
     On Windows platforms simply use the pgAdmin III utility to add superuser 
-     priviliges to your database user.
+    priviliges to your database user.
 
     Make sure your settings.py matches the settings of the user database. 
-     For example, set the same port number (`DATABASE_PORT=5433`).  
-     DATABASE_NAME or TEST_DATABSE_NAME must be set, along with DATABASE_USER.
+    For example, set the same port number (`DATABASE_PORT=5433`).  
+    DATABASE_NAME or TEST_DATABSE_NAME must be set, along with DATABASE_USER.
       
     In settings.py set TEST_RUNNER='django.contrib.gis.tests.run_tests'.
 
     Finally, this assumes that the PostGIS SQL files (lwpostgis.sql and 
-     spatial_ref_sys.sql) are installed in the directory specified by 
-     `pg_config --sharedir` (and defaults to /usr/local/share if that fails).
-     This behavior is overridden if `POSTGIS_SQL_PATH` is in your settings.
+    spatial_ref_sys.sql) are installed in the directory specified by 
+    `pg_config --sharedir` (and defaults to /usr/local/share if that fails).
+    This behavior is overridden if `POSTGIS_SQL_PATH` is in your settings.
     
-    Windows users should use the POSTGIS_SQL_PATH because the output
-     of `pg_config` uses paths like 'C:/PROGRA~1/POSTGR~1/..'.
+    Windows users should set POSTGIS_SQL_PATH manually because the output
+    of `pg_config` uses paths like 'C:/PROGRA~1/POSTGR~1/..'.
 
     Finally, the tests may be run by invoking `./manage.py test`.
     """
@@ -93,9 +98,10 @@ def run_tests(module_list, verbosity=1, interactive=True):
         tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), test_module_name)
         test_suite.addTest(tsuite.suite())
 
-    # Resetting the loaded flag to take into account what we appended to the INSTALLED_APPS
-    #  (since this routine is invoked through django/core/management, it caches the apps,
-    #   this ensures that syncdb will see our appended models)
+    # Resetting the loaded flag to take into account what we appended to 
+    # the INSTALLED_APPS (since this routine is invoked through 
+    # django/core/management, it caches the apps; this ensures that syncdb 
+    # will see our appended models)
     from django.db.models import loading
     loading._loaded = False
 
