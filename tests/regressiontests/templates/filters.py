@@ -213,10 +213,10 @@ def get_filter_tests():
 
         # Force to safe, then back (also showing why using force_escape too
         # early in a chain can lead to unexpected results).
-        'chaining07': ('{{ a|force_escape|cut:"b" }}', {"a": "a < b"}, "a &lt; "),
-        'chaining08': ('{% autoescape off %}{{ a|force_escape|cut:"b" }}{% endautoescape %}', {"a": "a < b"}, "a &lt; "),
-        'chaining09': ('{{ a|cut:"b"|force_escape }}', {"a": "a < b"}, "a &lt; "),
-        'chaining10': ('{% autoescape off %}{{ a|cut:"b"|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; "),
+        'chaining07': ('{{ a|force_escape|cut:";" }}', {"a": "a < b"}, "a &amp;lt b"),
+        'chaining08': ('{% autoescape off %}{{ a|force_escape|cut:";" }}{% endautoescape %}', {"a": "a < b"}, "a &lt b"),
+        'chaining09': ('{{ a|cut:";"|force_escape }}', {"a": "a < b"}, "a &lt; b"),
+        'chaining10': ('{% autoescape off %}{{ a|cut:";"|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; b"),
         'chaining11': ('{{ a|cut:"b"|safe }}', {"a": "a < b"}, "a < "),
         'chaining12': ('{% autoescape off %}{{ a|cut:"b"|safe }}{% endautoescape %}', {"a": "a < b"}, "a < "),
         'chaining13': ('{{ a|safe|force_escape }}', {"a": "a < b"}, "a &lt; b"),
