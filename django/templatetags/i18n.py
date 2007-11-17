@@ -1,9 +1,10 @@
 import re
 
-from django.template import Node, Variable
+from django.template import Node, Variable, VariableNode
 from django.template import TemplateSyntaxError, TokenParser, Library
 from django.template import TOKEN_TEXT, TOKEN_VAR
 from django.utils import translation
+from django.utils.encoding import force_unicode
 
 register = Library()
 
@@ -45,7 +46,8 @@ class TranslateNode(Node):
             return translation.ugettext(value)
 
 class BlockTranslateNode(Node):
-    def __init__(self, extra_context, singular, plural=None, countervar=None, counter=None):
+    def __init__(self, extra_context, singular, plural=None, countervar=None,
+            counter=None):
         self.extra_context = extra_context
         self.singular = singular
         self.plural = plural
@@ -54,29 +56,32 @@ class BlockTranslateNode(Node):
 
     def render_token_list(self, tokens):
         result = []
+        vars = []
         for token in tokens:
             if token.token_type == TOKEN_TEXT:
                 result.append(token.contents)
             elif token.token_type == TOKEN_VAR:
-                result.append('%%(%s)s' % token.contents)
-        return ''.join(result)
+                result.append(u'%%(%s)s' % token.contents)
+                vars.append(token.contents)
+        return ''.join(result), vars
 
     def render(self, context):
         context.push()
-        for var,val in self.extra_context.items():
-            context[var] = val.resolve(context)
-        singular = self.render_token_list(self.singular)
+        for var, val in self.extra_context.items():
+            context[var] = val.render(context)
+        singular, vars = self.render_token_list(self.singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
-            plural = self.render_token_list(self.plural)
+            plural = self.render_token_list(self.plural)[0]
             result = translation.ungettext(singular, plural, count)
         else:
             result = translation.ugettext(singular)
         # Escape all isolated '%' before substituting in the context.
-        result = re.sub('%(?!\()', '%%', result) % context
+        result = re.sub(u'%(?!\()', u'%%', result)
+        data = dict([(v, force_unicode(context[v])) for v in vars])
         context.pop()
-        return result
+        return result % data
 
 def do_get_available_languages(parser, token):
     """
@@ -198,7 +203,6 @@ def do_block_translate(parser, token):
     This is much like ngettext, only in template syntax.
     """
     class BlockTranslateParser(TokenParser):
-
         def top(self):
             countervar = None
             counter = None
@@ -209,7 +213,8 @@ def do_block_translate(parser, token):
                     value = self.value()
                     if self.tag() != 'as':
                         raise TemplateSyntaxError, "variable bindings in 'blocktrans' must be 'with value as variable'"
-                    extra_context[self.tag()] = parser.compile_filter(value)
+                    extra_context[self.tag()] = VariableNode(
+                            parser.compile_filter(value))
                 elif tag == 'count':
                     counter = parser.compile_filter(self.value())
                     if self.tag() != 'as':
@@ -241,7 +246,8 @@ def do_block_translate(parser, token):
     if token.contents.strip() != 'endblocktrans':
         raise TemplateSyntaxError, "'blocktrans' doesn't allow other block tags (seen %r) inside it" % token.contents
 
-    return BlockTranslateNode(extra_context, singular, plural, countervar, counter)
+    return BlockTranslateNode(extra_context, singular, plural, countervar,
+            counter)
 
 register.tag('get_available_languages', do_get_available_languages)
 register.tag('get_current_language', do_get_current_language)
