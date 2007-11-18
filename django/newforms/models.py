@@ -3,7 +3,7 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
 
@@ -151,15 +151,20 @@ class ModelChoiceField(ChoiceField):
     """A ChoiceField whose choices are a model QuerySet."""
     # This class is a subclass of ChoiceField for purity, but it doesn't
     # actually use any of ChoiceField's implementation.
+    default_error_messages = {
+        'invalid_choice': _(u'Select a valid choice. That choice is not one of'
+                            u' the available choices.'),
+    }
 
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
                  required=True, widget=Select, label=None, initial=None,
-                 help_text=None):
+                 help_text=None, *args, **kwargs):
         self.empty_label = empty_label
         self.cache_choices = cache_choices
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
-        Field.__init__(self, required, widget, label, initial, help_text)
+        Field.__init__(self, required, widget, label, initial, help_text,
+                       *args, **kwargs)
         self.queryset = queryset
 
     def _get_queryset(self):
@@ -200,36 +205,38 @@ class ModelChoiceField(ChoiceField):
         try:
             value = self.queryset.get(pk=value)
         except self.queryset.model.DoesNotExist:
-            raise ValidationError(ugettext(u'Select a valid choice. That'
-                                           u' choice is not one of the'
-                                           u' available choices.'))
+            raise ValidationError(self.error_messages['invalid_choice'])
         return value
 
 class ModelMultipleChoiceField(ModelChoiceField):
     """A MultipleChoiceField whose choices are a model QuerySet."""
     hidden_widget = MultipleHiddenInput
+    default_error_messages = {
+        'list': _(u'Enter a list of values.'),
+        'invalid_choice': _(u'Select a valid choice. %s is not one of the'
+                            u' available choices.'),
+    }
 
     def __init__(self, queryset, cache_choices=False, required=True,
                  widget=SelectMultiple, label=None, initial=None,
-                 help_text=None):
+                 help_text=None, *args, **kwargs):
         super(ModelMultipleChoiceField, self).__init__(queryset, None,
-            cache_choices, required, widget, label, initial, help_text)
+            cache_choices, required, widget, label, initial, help_text,
+            *args, **kwargs)
 
     def clean(self, value):
         if self.required and not value:
-            raise ValidationError(ugettext(u'This field is required.'))
+            raise ValidationError(self.error_messages['required'])
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(ugettext(u'Enter a list of values.'))
+            raise ValidationError(self.error_messages['list'])
         final_values = []
         for val in value:
             try:
                 obj = self.queryset.get(pk=val)
             except self.queryset.model.DoesNotExist:
-                raise ValidationError(ugettext(u'Select a valid choice. %s is'
-                                               u' not one of the available'
-                                               u' choices.') % val)
+                raise ValidationError(self.error_messages['invalid_choice'] % val)
             else:
                 final_values.append(obj)
         return final_values

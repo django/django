@@ -10,6 +10,10 @@ class Defaults(models.Model):
     def_date = models.DateField(default = datetime.date(1980, 1, 1))
     value = models.IntegerField(default=42)
 
+class ChoiceModel(models.Model):
+    """For ModelChoiceField and ModelMultipleChoiceField tests."""
+    name = models.CharField(max_length=10)
+
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model, form_for_instance
 

@@ -312,4 +312,49 @@ ValidationError: [u'REQUIRED']
 Traceback (most recent call last):
 ...
 ValidationError: [u'INVALID IP ADDRESS']
+
+###############################################################################
+
+# Create choices for the model choice field tests below.
+
+>>> from regressiontests.forms.models import ChoiceModel
+>>> ChoiceModel.objects.create(pk=1, name='a')
+<ChoiceModel: ChoiceModel object>
+>>> ChoiceModel.objects.create(pk=2, name='b')
+<ChoiceModel: ChoiceModel object>
+>>> ChoiceModel.objects.create(pk=3, name='c')
+<ChoiceModel: ChoiceModel object>
+
+# ModelChoiceField ############################################################
+
+>>> e = {'required': 'REQUIRED'}
+>>> e['invalid_choice'] = 'INVALID CHOICE'
+>>> f = ModelChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'REQUIRED']
+>>> f.clean('4')
+Traceback (most recent call last):
+...
+ValidationError: [u'INVALID CHOICE']
+
+# ModelMultipleChoiceField ####################################################
+
+>>> e = {'required': 'REQUIRED'}
+>>> e['invalid_choice'] = '%s IS INVALID CHOICE'
+>>> e['list'] = 'NOT A LIST OF VALUES'
+>>> f = ModelMultipleChoiceField(queryset=ChoiceModel.objects.all(), error_messages=e)
+>>> f.clean('')
+Traceback (most recent call last):
+...
+ValidationError: [u'REQUIRED']
+>>> f.clean('3')
+Traceback (most recent call last):
+...
+ValidationError: [u'NOT A LIST OF VALUES']
+>>> f.clean(['4'])
+Traceback (most recent call last):
+...
+ValidationError: [u'4 IS INVALID CHOICE']
 """
