@@ -49,7 +49,8 @@ class Field(object):
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
 
-    def __init__(self, required=True, widget=None, label=None, initial=None, help_text=None):
+    def __init__(self, required=True, widget=None, label=None, initial=None,
+                 help_text=None, error_messages=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -106,7 +107,7 @@ class Field(object):
         Raises ValidationError for any errors.
         """
         if self.required and value in EMPTY_VALUES:
-            raise ValidationError(ugettext(u'This field is required.'))
+            raise ValidationError(self.error_messages['required'])
         return value
 
     def widget_attrs(self, widget):
@@ -141,9 +142,9 @@ class CharField(Field):
         value = smart_unicode(value)
         value_length = len(value)
         if self.max_length is not None and value_length > self.max_length:
-            raise ValidationError(ugettext(u'Ensure this value has at most %(max)d characters (it has %(length)d).') % {'max': self.max_length, 'length': value_length})
+            raise ValidationError(self.error_messages['max_length'] % {'max': self.max_length, 'length': value_length})
         if self.min_length is not None and value_length < self.min_length:
-            raise ValidationError(ugettext(u'Ensure this value has at least %(min)d characters (it has %(length)d).') % {'min': self.min_length, 'length': value_length})
+            raise ValidationError(self.error_messages['min_length'] % {'min': self.min_length, 'length': value_length})
         return value
 
     def widget_attrs(self, widget):
@@ -173,11 +174,11 @@ class IntegerField(Field):
         try:
             value = int(str(value))
         except (ValueError, TypeError):
-            raise ValidationError(ugettext(u'Enter a whole number.'))
+            raise ValidationError(self.error_messages['invalid'])
         if self.max_value is not None and value > self.max_value:
-            raise ValidationError(ugettext(u'Ensure this value is less than or equal to %s.') % self.max_value)
+            raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
-            raise ValidationError(ugettext(u'Ensure this value is greater than or equal to %s.') % self.min_value)
+            raise ValidationError(self.error_messages['min_value'] % self.min_value)
         return value
 
 class FloatField(Field):
@@ -202,11 +203,11 @@ class FloatField(Field):
         try:
             value = float(value)
         except (ValueError, TypeError):
-            raise ValidationError(ugettext('Enter a number.'))
+            raise ValidationError(self.error_messages['invalid'])
         if self.max_value is not None and value > self.max_value:
-            raise ValidationError(ugettext('Ensure this value is less than or equal to %s.') % self.max_value)
+            raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
-            raise ValidationError(ugettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+            raise ValidationError(self.error_messages['min_value'] % self.min_value)
         return value
 
 class DecimalField(Field):
@@ -238,20 +239,20 @@ class DecimalField(Field):
         try:
             value = Decimal(value)
         except DecimalException:
-            raise ValidationError(ugettext('Enter a number.'))
+            raise ValidationError(self.error_messages['invalid'])
         pieces = str(value).lstrip("-").split('.')
         decimals = (len(pieces) == 2) and len(pieces[1]) or 0
         digits = len(pieces[0])
         if self.max_value is not None and value > self.max_value:
-            raise ValidationError(ugettext('Ensure this value is less than or equal to %s.') % self.max_value)
+            raise ValidationError(self.error_messages['max_value'] % self.max_value)
         if self.min_value is not None and value < self.min_value:
-            raise ValidationError(ugettext('Ensure this value is greater than or equal to %s.') % self.min_value)
+            raise ValidationError(self.error_messages['min_value'] % self.min_value)
         if self.max_digits is not None and (digits + decimals) > self.max_digits:
-            raise ValidationError(ugettext('Ensure that there are no more than %s digits in total.') % self.max_digits)
+            raise ValidationError(self.error_messages['max_digits'] % self.max_digits)
         if self.decimal_places is not None and decimals > self.decimal_places:
-            raise ValidationError(ugettext('Ensure that there are no more than %s decimal places.') % self.decimal_places)
+            raise ValidationError(self.error_messages['max_decimal_places'] % self.decimal_places)
         if self.max_digits is not None and self.decimal_places is not None and digits > (self.max_digits - self.decimal_places):
-            raise ValidationError(ugettext('Ensure that there are no more than %s digits before the decimal point.') % (self.max_digits - self.decimal_places))
+            raise ValidationError(self.error_messages['max_whole_digits'] % (self.max_digits - self.decimal_places))
         return value
 
 DEFAULT_DATE_INPUT_FORMATS = (
@@ -288,7 +289,7 @@ class DateField(Field):
                 return datetime.date(*time.strptime(value, format)[:3])
             except ValueError:
                 continue
-        raise ValidationError(ugettext(u'Enter a valid date.'))
+        raise ValidationError(self.error_messages['invalid'])
 
 DEFAULT_TIME_INPUT_FORMATS = (
     '%H:%M:%S',     # '14:30:59'
@@ -319,7 +320,7 @@ class TimeField(Field):
                 return datetime.time(*time.strptime(value, format)[3:6])
             except ValueError:
                 continue
-        raise ValidationError(ugettext(u'Enter a valid time.'))
+        raise ValidationError(self.error_messages['invalid'])
 
 DEFAULT_DATETIME_INPUT_FORMATS = (
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
@@ -359,14 +360,14 @@ class DateTimeField(Field):
             # Input comes from a SplitDateTimeWidget, for example. So, it's two
             # components: date and time.
             if len(value) != 2:
-                raise ValidationError(ugettext(u'Enter a valid date/time.'))
+                raise ValidationError(self.error_messages['invalid'])
             value = '%s %s' % tuple(value)
         for format in self.input_formats:
             try:
                 return datetime.datetime(*time.strptime(value, format)[:6])
             except ValueError:
                 continue
-        raise ValidationError(ugettext(u'Enter a valid date/time.'))
+        raise ValidationError(self.error_messages['invalid'])
 
 class RegexField(CharField):
     def __init__(self, regex, max_length=None, min_length=None, error_message=None, *args, **kwargs):
@@ -375,11 +376,15 @@ class RegexField(CharField):
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
+        # error_message is just kept for backwards compatibility:
+        if error_message:
+            error_messages = kwargs.get('error_messages') or {}
+            error_messages['invalid'] = error_message
+            kwargs['error_messages'] = error_messages
         super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
         if isinstance(regex, basestring):
             regex = re.compile(regex)
         self.regex = regex
-        self.error_message = error_message or ugettext(u'Enter a valid value.')
 
     def clean(self, value):
         """
@@ -390,7 +395,7 @@ class RegexField(CharField):
         if value == u'':
             return value
         if not self.regex.search(value):
-            raise ValidationError(self.error_message)
+            raise ValidationError(self.error_messages['invalid'])
         return value
 
 email_re = re.compile(
@@ -404,8 +409,8 @@ class EmailField(RegexField):
     }
 
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        RegexField.__init__(self, email_re, max_length, min_length,
-            ugettext(u'Enter a valid e-mail address.'), *args, **kwargs)
+        RegexField.__init__(self, email_re, max_length, min_length, *args,
+                            **kwargs)
 
 try:
     from django.conf import settings
@@ -445,11 +450,11 @@ class FileField(Field):
         try:
             f = UploadedFile(data['filename'], data['content'])
         except TypeError:
-            raise ValidationError(ugettext(u"No file was submitted. Check the encoding type on the form."))
+            raise ValidationError(self.error_messages['invalid'])
         except KeyError:
-            raise ValidationError(ugettext(u"No file was submitted."))
+            raise ValidationError(self.error_messages['missing'])
         if not f.content:
-            raise ValidationError(ugettext(u"The submitted file is empty."))
+            raise ValidationError(self.error_messages['empty'])
         return f
 
 class ImageField(FileField):
@@ -477,7 +482,7 @@ class ImageField(FileField):
             trial_image = Image.open(StringIO(f.content))
             trial_image.verify()
         except Exception: # Python Imaging Library doesn't recognize it as an image
-            raise ValidationError(ugettext(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."))
+            raise ValidationError(self.error_messages['invalid_image'])
         return f
 
 url_re = re.compile(
@@ -496,7 +501,8 @@ class URLField(RegexField):
 
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
-        super(URLField, self).__init__(url_re, max_length, min_length, ugettext(u'Enter a valid URL.'), *args, **kwargs)
+        super(URLField, self).__init__(url_re, max_length, min_length, *args,
+                                       **kwargs)
         self.verify_exists = verify_exists
         self.user_agent = validator_user_agent
 
@@ -521,9 +527,9 @@ class URLField(RegexField):
                 req = urllib2.Request(value, None, headers)
                 u = urllib2.urlopen(req)
             except ValueError:
-                raise ValidationError(ugettext(u'Enter a valid URL.'))
+                raise ValidationError(self.error_messages['invalid'])
             except: # urllib2.URLError, httplib.InvalidURL, etc.
-                raise ValidationError(ugettext(u'This URL appears to be a broken link.'))
+                raise ValidationError(self.error_messages['invalid_link'])
         return value
 
 class BooleanField(Field):
@@ -583,7 +589,7 @@ class ChoiceField(Field):
             return value
         valid_values = set([smart_unicode(k) for k, v in self.choices])
         if value not in valid_values:
-            raise ValidationError(ugettext(u'Select a valid choice. That choice is not one of the available choices.'))
+            raise ValidationError(self.error_messages['invalid_choice'] % {'value': value})
         return value
 
 class MultipleChoiceField(ChoiceField):
@@ -599,17 +605,17 @@ class MultipleChoiceField(ChoiceField):
         Validates that the input is a list or tuple.
         """
         if self.required and not value:
-            raise ValidationError(ugettext(u'This field is required.'))
+            raise ValidationError(self.error_messages['required'])
         elif not self.required and not value:
             return []
         if not isinstance(value, (list, tuple)):
-            raise ValidationError(ugettext(u'Enter a list of values.'))
+            raise ValidationError(self.error_messages['invalid_list'])
         new_value = [smart_unicode(val) for val in value]
         # Validate that each value in the value list is in self.choices.
         valid_values = set([smart_unicode(k) for k, v in self.choices])
         for val in new_value:
             if val not in valid_values:
-                raise ValidationError(ugettext(u'Select a valid choice. %s is not one of the available choices.') % val)
+                raise ValidationError(self.error_messages['invalid_choice'] % {'value': val})
         return new_value
 
 class ComboField(Field):
@@ -679,18 +685,18 @@ class MultiValueField(Field):
         if not value or isinstance(value, (list, tuple)):
             if not value or not [v for v in value if v not in EMPTY_VALUES]:
                 if self.required:
-                    raise ValidationError(ugettext(u'This field is required.'))
+                    raise ValidationError(self.error_messages['required'])
                 else:
                     return self.compress([])
         else:
-            raise ValidationError(ugettext(u'Enter a list of values.'))
+            raise ValidationError(self.error_messages['invalid'])
         for i, field in enumerate(self.fields):
             try:
                 field_value = value[i]
             except IndexError:
                 field_value = None
             if self.required and field_value in EMPTY_VALUES:
-                raise ValidationError(ugettext(u'This field is required.'))
+                raise ValidationError(self.error_messages['required'])
             try:
                 clean_data.append(field.clean(field_value))
             except ValidationError, e:
@@ -720,7 +726,13 @@ class SplitDateTimeField(MultiValueField):
     }
 
     def __init__(self, *args, **kwargs):
-        fields = (DateField(), TimeField())
+        errors = self.default_error_messages.copy()
+        if 'error_messages' in kwargs:
+            errors.update(kwargs['error_messages'])
+        fields = (
+            DateField(error_messages={'invalid': errors['invalid_date']}),
+            TimeField(error_messages={'invalid': errors['invalid_time']}),
+        )
         super(SplitDateTimeField, self).__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
@@ -728,9 +740,9 @@ class SplitDateTimeField(MultiValueField):
             # Raise a validation error if time or date is empty
             # (possible if SplitDateTimeField has required=False).
             if data_list[0] in EMPTY_VALUES:
-                raise ValidationError(ugettext(u'Enter a valid date.'))
+                raise ValidationError(self.error_messages['invalid_date'])
             if data_list[1] in EMPTY_VALUES:
-                raise ValidationError(ugettext(u'Enter a valid time.'))
+                raise ValidationError(self.error_messages['invalid_time'])
             return datetime.datetime.combine(*data_list)
         return None
 
@@ -742,7 +754,4 @@ class IPAddressField(RegexField):
     }
 
     def __init__(self, *args, **kwargs):
-        RegexField.__init__(self, ipv4_re,
-                            error_message=ugettext(u'Enter a valid IPv4 address.'),
-                            *args, **kwargs)
-
+        super(IPAddressField, self).__init__(ipv4_re, *args, **kwargs)
