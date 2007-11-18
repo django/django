@@ -14,9 +14,11 @@ from django import template
 from django.template import loader
 from django.template.loaders import app_directories, filesystem
 from django.utils.translation import activate, deactivate, ugettext as _
+from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
 from unicode import unicode_tests
+import filters
 
 # Some other tests we would like to run
 __test__ = {
@@ -120,20 +122,97 @@ class Templates(unittest.TestCase):
                                   ['/dir1/index.html'])
 
     def test_templates(self):
-        # NOW and NOW_tz are used by timesince tag tests.
-        NOW = datetime.now()
-        NOW_tz = datetime.now(LocalTimezone(datetime.now()))
+        template_tests = self.get_template_tests()
+        filter_tests = filters.get_filter_tests()
 
+        # Quickly check that we aren't accidentally using a name in both
+        # template and filter tests.
+        overlapping_names = [name for name in filter_tests if name in
+                template_tests]
+        assert not overlapping_names, 'Duplicate test name(s): %s' % ', '.join(overlapping_names)
+
+        template_tests.update(filter_tests)
+
+        # Register our custom template loader.
+        def test_template_loader(template_name, template_dirs=None):
+            "A custom template loader that loads the unit-test templates."
+            try:
+                return (template_tests[template_name][0] , "test:%s" % template_name)
+            except KeyError:
+                raise template.TemplateDoesNotExist, template_name
+
+        old_template_loaders = loader.template_source_loaders
+        loader.template_source_loaders = [test_template_loader]
+
+        failures = []
+        tests = template_tests.items()
+        tests.sort()
+
+        # Turn TEMPLATE_DEBUG off, because tests assume that.
+        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
+
+        # Set TEMPLATE_STRING_IF_INVALID to a known string
+        old_invalid = settings.TEMPLATE_STRING_IF_INVALID
+        expected_invalid_str = 'INVALID'
+
+        for name, vals in tests:
+            if isinstance(vals[2], tuple):
+                normal_string_result = vals[2][0]
+                invalid_string_result = vals[2][1]
+                if '%s' in invalid_string_result:
+                    expected_invalid_str = 'INVALID %s'
+                    invalid_string_result = invalid_string_result % vals[2][2]
+                    template.invalid_var_format_string = True
+            else:
+                normal_string_result = vals[2]
+                invalid_string_result = vals[2]
+
+            if 'LANGUAGE_CODE' in vals[1]:
+                activate(vals[1]['LANGUAGE_CODE'])
+            else:
+                activate('en-us')
+
+            for invalid_str, result in [('', normal_string_result),
+                                        (expected_invalid_str, invalid_string_result)]:
+                settings.TEMPLATE_STRING_IF_INVALID = invalid_str
+                try:
+                    test_template = loader.get_template(name)
+                    output = self.render(test_template, vals)
+                except Exception, e:
+                    if e.__class__ != result:
+                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s" % (invalid_str, name, e.__class__, e))
+                    continue
+                if output != result:
+                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
+
+            if 'LANGUAGE_CODE' in vals[1]:
+                deactivate()
+
+            if template.invalid_var_format_string:
+                expected_invalid_str = 'INVALID'
+                template.invalid_var_format_string = False
+
+        loader.template_source_loaders = old_template_loaders
+        deactivate()
+        settings.TEMPLATE_DEBUG = old_td
+        settings.TEMPLATE_STRING_IF_INVALID = old_invalid
+
+        self.assertEqual(failures, [], '\n'.join(failures))
+
+    def render(self, test_template, vals):
+        return test_template.render(template.Context(vals[1]))
+
+    def get_template_tests(self):
         # SYNTAX --
         # 'template_name': ('template contents', 'context dict', 'expected string output' or Exception class)
-        TEMPLATE_TESTS = {
-
-            ### BASIC SYNTAX ##########################################################
+        return {
+            ### BASIC SYNTAX ################################################
 
             # Plain text should go through the template parser untouched
             'basic-syntax01': ("something cool", {}, "something cool"),
 
-            # Variables should be replaced with their value in the current context
+            # Variables should be replaced with their value in the current
+            # context
             'basic-syntax02': ("{{ headline }}", {'headline':'Success'}, "Success"),
 
             # More than one replacement variable is allowed in a template
@@ -239,8 +318,9 @@ class Templates(unittest.TestCase):
             # Chained filters, with an argument to the first one
             'filter-syntax09': ('{{ var|removetags:"b i"|upper|lower }}', {"var": "<b><i>Yes</i></b>"}, "yes"),
 
-            # Escaped string as argument
-            'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}', {"var": None}, ' endquote" hah'),
+            # Literal string as argument is always "safe" from auto-escaping..
+            'filter-syntax10': (r'{{ var|default_if_none:" endquote\" hah" }}',
+                    {"var": None}, ' endquote" hah'),
 
             # Variable as argument
             'filter-syntax11': (r'{{ var|default_if_none:var2 }}', {"var": None, "var2": "happy"}, 'happy'),
@@ -537,7 +617,7 @@ class Templates(unittest.TestCase):
             ### INHERITANCE ###########################################################
 
             # Standard template with no inheritance
-            'inheritance01': ("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}", {}, '1_3_'),
+            'inheritance01': ("1{% block first %}&{% endblock %}3{% block second %}_{% endblock %}", {}, '1&3_'),
 
             # Standard two-level inheritance
             'inheritance02': ("{% extends 'inheritance01' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'),
@@ -546,7 +626,7 @@ class Templates(unittest.TestCase):
             'inheritance03': ("{% extends 'inheritance02' %}", {}, '1234'),
 
             # Two-level with no redefinitions on second level
-            'inheritance04': ("{% extends 'inheritance01' %}", {}, '1_3_'),
+            'inheritance04': ("{% extends 'inheritance01' %}", {}, '1&3_'),
 
             # Two-level with double quotes instead of single quotes
             'inheritance05': ('{% extends "inheritance02" %}', {}, '1234'),
@@ -555,16 +635,16 @@ class Templates(unittest.TestCase):
             'inheritance06': ("{% extends foo %}", {'foo': 'inheritance02'}, '1234'),
 
             # Two-level with one block defined, one block not defined
-            'inheritance07': ("{% extends 'inheritance01' %}{% block second %}5{% endblock %}", {}, '1_35'),
+            'inheritance07': ("{% extends 'inheritance01' %}{% block second %}5{% endblock %}", {}, '1&35'),
 
             # Three-level with one block defined on this level, two blocks defined next level
             'inheritance08': ("{% extends 'inheritance02' %}{% block second %}5{% endblock %}", {}, '1235'),
 
             # Three-level with second and third levels blank
-            'inheritance09': ("{% extends 'inheritance04' %}", {}, '1_3_'),
+            'inheritance09': ("{% extends 'inheritance04' %}", {}, '1&3_'),
 
             # Three-level with space NOT in a block -- should be ignored
-            'inheritance10': ("{% extends 'inheritance04' %}      ", {}, '1_3_'),
+            'inheritance10': ("{% extends 'inheritance04' %}      ", {}, '1&3_'),
 
             # Three-level with both blocks defined on this level, but none on second level
             'inheritance11': ("{% extends 'inheritance04' %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {}, '1234'),
@@ -576,7 +656,7 @@ class Templates(unittest.TestCase):
             'inheritance13': ("{% extends 'inheritance02' %}{% block first %}a{% endblock %}{% block second %}b{% endblock %}", {}, '1a3b'),
 
             # A block defined only in a child template shouldn't be displayed
-            'inheritance14': ("{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}", {}, '1_3_'),
+            'inheritance14': ("{% extends 'inheritance01' %}{% block newblock %}NO DISPLAY{% endblock %}", {}, '1&3_'),
 
             # A block within another block
             'inheritance15': ("{% extends 'inheritance01' %}{% block first %}2{% block inner %}inner{% endblock %}{% endblock %}", {}, '12inner3_'),
@@ -594,16 +674,16 @@ class Templates(unittest.TestCase):
             'inheritance19': ("{% extends 'inheritance01' %}{% block first %}{% load testtags %}{% echo 400 %}5678{% endblock %}", {}, '140056783_'),
 
             # Two-level inheritance with {{ block.super }}
-            'inheritance20': ("{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+            'inheritance20': ("{% extends 'inheritance01' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'),
 
             # Three-level inheritance with {{ block.super }} from parent
             'inheritance21': ("{% extends 'inheritance02' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '12a34'),
 
             # Three-level inheritance with {{ block.super }} from grandparent
-            'inheritance22': ("{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1_a3_'),
+            'inheritance22': ("{% extends 'inheritance04' %}{% block first %}{{ block.super }}a{% endblock %}", {}, '1&a3_'),
 
             # Three-level inheritance with {{ block.super }} from parent and grandparent
-            'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1_ab3_'),
+            'inheritance23': ("{% extends 'inheritance20' %}{% block first %}{{ block.super }}b{% endblock %}", {}, '1&ab3_'),
 
             # Inheritance from local context without use of template loader
             'inheritance24': ("{% extends context_template %}{% block first %}2{% endblock %}{% block second %}4{% endblock %}", {'context_template': template.Template("1{% block first %}_{% endblock %}3{% block second %}_{% endblock %}")}, '1234'),
@@ -625,10 +705,10 @@ class Templates(unittest.TestCase):
             'i18n02': ('{% load i18n %}{% trans "xxxyyyxxx" %}', {}, "xxxyyyxxx"),
 
             # simple translation of a variable
-            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': 'xxxyyyxxx'}, "xxxyyyxxx"),
+            'i18n03': ('{% load i18n %}{% blocktrans %}{{ anton }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u"Å"),
 
             # simple translation of a variable and filter
-            'i18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'XXXYYYXXX'}, "xxxyyyxxx"),
+            'i18n04': ('{% load i18n %}{% blocktrans with anton|lower as berta %}{{ berta }}{% endblocktrans %}', {'anton': '\xc3\x85'}, u'å'),
 
             # simple translation of a string with interpolation
             'i18n05': ('{% load i18n %}{% blocktrans %}xxx{{ anton }}xxx{% endblocktrans %}', {'anton': 'yyy'}, "xxxyyyxxx"),
@@ -637,10 +717,10 @@ class Templates(unittest.TestCase):
             'i18n06': ('{% load i18n %}{% trans "Page not found" %}', {'LANGUAGE_CODE': 'de'}, "Seite nicht gefunden"),
 
             # translation of singular form
-            'i18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 1}, "singular"),
+            'i18n07': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 1}, "singular"),
 
             # translation of plural form
-            'i18n08': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}plural{% endblocktrans %}', {'number': 2}, "plural"),
+            'i18n08': ('{% load i18n %}{% blocktrans count number as counter %}singular{% plural %}{{ counter }} plural{% endblocktrans %}', {'number': 2}, "2 plural"),
 
             # simple non-translation (only marking) of a string to german
             'i18n09': ('{% load i18n %}{% trans "Page not found" noop %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
@@ -654,8 +734,16 @@ class Templates(unittest.TestCase):
             # usage of the get_available_languages tag
             'i18n12': ('{% load i18n %}{% get_available_languages as langs %}{% for lang in langs %}{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}', {}, 'de'),
 
-            # translation of a constant string
-            'i18n13': ('{{ _("Page not found") }}', {'LANGUAGE_CODE': 'de'}, 'Seite nicht gefunden'),
+            # translation of constant strings
+            'i18n13': ('{{ _("Password") }}', {'LANGUAGE_CODE': 'de'}, 'Passwort'),
+            'i18n14': ('{% cycle "foo" _("Password") _(\'Password\') as c %} {% cycle c %} {% cycle c %}', {'LANGUAGE_CODE': 'de'}, 'foo Passwort Passwort'),
+            'i18n15': ('{{ absent|default:_("Password") }}', {'LANGUAGE_CODE': 'de', 'absent': ""}, 'Passwort'),
+            'i18n16': ('{{ _("<") }}', {'LANGUAGE_CODE': 'de'}, '<'),
+
+            # Escaping inside blocktrans works as if it was directly in the
+            # template.
+            'i18n17': ('{% load i18n %}{% blocktrans with anton|escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
+            'i18n18': ('{% load i18n %}{% blocktrans with anton|force_escape as berta %}{{ berta }}{% endblocktrans %}', {'anton': 'α & β'}, u'α &amp; β'),
 
             ### HANDLING OF TEMPLATE_STRING_IF_INVALID ###################################
 
@@ -760,38 +848,6 @@ class Templates(unittest.TestCase):
         #    'now03' : ('{% now "j \"n\" Y"%}', {}, str(datetime.now().day) + '"' + str(datetime.now().month) + '"' + str(datetime.now().year)),
         #    'now04' : ('{% now "j \nn\n Y"%}', {}, str(datetime.now().day) + '\n' + str(datetime.now().month) + '\n' + str(datetime.now().year))
 
-            ### TIMESINCE TAG ##################################################
-            # Default compare with datetime.now()
-            'timesince01' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=-1, seconds = -10)}, '1 minute'),
-            'timesince02' : ('{{ a|timesince }}', {'a':(datetime.now() - timedelta(days=1, minutes = 1))}, '1 day'),
-            'timesince03' : ('{{ a|timesince }}', {'a':(datetime.now() -
-                timedelta(hours=1, minutes=25, seconds = 10))}, '1 hour, 25 minutes'),
-
-            # Compare to a given parameter
-            'timesince04' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2), 'b':NOW + timedelta(days=1)}, '1 day'),
-            'timesince05' : ('{{ a|timesince:b }}', {'a':NOW + timedelta(days=2, minutes=1), 'b':NOW + timedelta(days=2)}, '1 minute'),
-
-            # Check that timezone is respected
-            'timesince06' : ('{{ a|timesince:b }}', {'a':NOW_tz + timedelta(hours=8), 'b':NOW_tz}, '8 hours'),
-
-            # Check times in the future.
-            'timesince07' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(minutes=1, seconds=10)}, '0 minutes'),
-            'timesince08' : ('{{ a|timesince }}', {'a':datetime.now() + timedelta(days=1, minutes=1)}, '0 minutes'),
-
-            ### TIMEUNTIL TAG ##################################################
-            # Default compare with datetime.now()
-            'timeuntil01' : ('{{ a|timeuntil }}', {'a':datetime.now() + timedelta(minutes=2, seconds = 10)}, '2 minutes'),
-            'timeuntil02' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(days=1, seconds = 10))}, '1 day'),
-            'timeuntil03' : ('{{ a|timeuntil }}', {'a':(datetime.now() + timedelta(hours=8, minutes=10, seconds = 10))}, '8 hours, 10 minutes'),
-
-            # Compare to a given parameter
-            'timeuntil04' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=1), 'b':NOW - timedelta(days=2)}, '1 day'),
-            'timeuntil05' : ('{{ a|timeuntil:b }}', {'a':NOW - timedelta(days=2), 'b':NOW - timedelta(days=2, minutes=1)}, '1 minute'),
-
-            # Check times in the past.
-            'timeuntil07' : ('{{ a|timeuntil }}', {'a':datetime.now() - timedelta(minutes=1, seconds=10)}, '0 minutes'),
-            'timeuntil08' : ('{{ a|timeuntil }}', {'a':datetime.now() - timedelta(days=1, minutes=1)}, '0 minutes'),
-
             ### URL TAG ########################################################
             # Successes
             'url01' : ('{% url regressiontests.templates.views.client client.id %}', {'client': {'id': 1}}, '/url_tag/client/1/'),
@@ -819,72 +875,31 @@ class Templates(unittest.TestCase):
             'cache08' : ('{% load cache %}{% cache %}{% endcache %}', {}, template.TemplateSyntaxError),
             'cache09' : ('{% load cache %}{% cache 1 %}{% endcache %}', {}, template.TemplateSyntaxError),
             'cache10' : ('{% load cache %}{% cache foo bar %}{% endcache %}', {}, template.TemplateSyntaxError),
+
+            ### AUTOESCAPE TAG ##############################################
+            'autoescape-tag01': ("{% autoescape off %}hello{% endautoescape %}", {}, "hello"),
+            'autoescape-tag02': ("{% autoescape off %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "<b>hello</b>"),
+            'autoescape-tag03': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": "<b>hello</b>"}, "&lt;b&gt;hello&lt;/b&gt;"),
+
+            # Autoescape disabling and enabling nest in a predictable way.
+            'autoescape-tag04': ("{% autoescape off %}{{ first }} {% autoescape  on%}{{ first }}{% endautoescape %}{% endautoescape %}", {"first": "<a>"}, "<a> &lt;a&gt;"),
+
+            'autoescape-tag05': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": "<b>first</b>"}, "&lt;b&gt;first&lt;/b&gt;"),
+
+            # Strings (ASCII or unicode) already marked as "safe" are not
+            # auto-escaped
+            'autoescape-tag06': ("{{ first }}", {"first": mark_safe("<b>first</b>")}, "<b>first</b>"),
+            'autoescape-tag07': ("{% autoescape on %}{{ first }}{% endautoescape %}", {"first": mark_safe(u"<b>Apple</b>")}, u"<b>Apple</b>"),
+
+            # Literal string arguments to filters, if used in the result, are
+            # safe.
+            'basic-syntax08': (r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}', {"var": None}, ' endquote" hah'),
+
+            # The "safe" and "escape" filters cannot work due to internal
+            # implementation details (fortunately, the (no)autoescape block
+            # tags can be used in those cases)
+            'autoescape-filtertag01': ("{{ first }}{% filter safe %}{{ first }} x<y{% endfilter %}", {"first": "<a>"}, template.TemplateSyntaxError),
         }
-
-        # Register our custom template loader.
-        def test_template_loader(template_name, template_dirs=None):
-            "A custom template loader that loads the unit-test templates."
-            try:
-                return (TEMPLATE_TESTS[template_name][0] , "test:%s" % template_name)
-            except KeyError:
-                raise template.TemplateDoesNotExist, template_name
-
-        old_template_loaders = loader.template_source_loaders
-        loader.template_source_loaders = [test_template_loader]
-
-        failures = []
-        tests = TEMPLATE_TESTS.items()
-        tests.sort()
-
-        # Turn TEMPLATE_DEBUG off, because tests assume that.
-        old_td, settings.TEMPLATE_DEBUG = settings.TEMPLATE_DEBUG, False
-
-        # Set TEMPLATE_STRING_IF_INVALID to a known string
-        old_invalid = settings.TEMPLATE_STRING_IF_INVALID
-        expected_invalid_str = 'INVALID'
-
-        for name, vals in tests:
-            if isinstance(vals[2], tuple):
-                normal_string_result = vals[2][0]
-                invalid_string_result = vals[2][1]
-                if '%s' in invalid_string_result:
-                    expected_invalid_str = 'INVALID %s'
-                    invalid_string_result = invalid_string_result % vals[2][2]
-                    template.invalid_var_format_string = True
-            else:
-                normal_string_result = vals[2]
-                invalid_string_result = vals[2]
-
-            if 'LANGUAGE_CODE' in vals[1]:
-                activate(vals[1]['LANGUAGE_CODE'])
-            else:
-                activate('en-us')
-
-            for invalid_str, result in [('', normal_string_result),
-                                        (expected_invalid_str, invalid_string_result)]:
-                settings.TEMPLATE_STRING_IF_INVALID = invalid_str
-                try:
-                    output = loader.get_template(name).render(template.Context(vals[1]))
-                except Exception, e:
-                    if e.__class__ != result:
-                        failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Got %s, exception: %s" % (invalid_str, name, e.__class__, e))
-                    continue
-                if output != result:
-                    failures.append("Template test (TEMPLATE_STRING_IF_INVALID='%s'): %s -- FAILED. Expected %r, got %r" % (invalid_str, name, result, output))
-
-            if 'LANGUAGE_CODE' in vals[1]:
-                deactivate()
-
-            if template.invalid_var_format_string:
-                expected_invalid_str = 'INVALID'
-                template.invalid_var_format_string = False
-
-        loader.template_source_loaders = old_template_loaders
-        deactivate()
-        settings.TEMPLATE_DEBUG = old_td
-        settings.TEMPLATE_STRING_IF_INVALID = old_invalid
-
-        self.assertEqual(failures, [], '\n'.join(failures))
 
 if __name__ == "__main__":
     unittest.main()

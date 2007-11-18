@@ -4,7 +4,7 @@ import misc
 regressions = ur"""
 Format string interpolation should work with *_lazy objects.
 
->>> from django.utils.translation import ugettext_lazy, activate, deactivate, gettext_lazy
+>>> from django.utils.translation import ugettext, ugettext_lazy, activate, deactivate, gettext_lazy
 >>> s = ugettext_lazy('Add %(name)s')
 >>> d = {'name': 'Ringo'}
 >>> s % d
@@ -39,6 +39,18 @@ unicode(string_concat(...)) should not raise a TypeError - #4796
 <module 'django.utils.translation' from ...>
 >>> unicode(django.utils.translation.string_concat("dja", "ngo"))
 u'django'
+
+Translating a string requiring no auto-escaping shouldn't change the "safe"
+status.
+
+>>> from django.utils.safestring import mark_safe
+>>> s = mark_safe('Password')
+>>> type(s)
+<class 'django.utils.safestring.SafeString'>
+>>> activate('de')
+>>> type(ugettext(s))
+<class 'django.utils.safestring.SafeUnicode'>
+>>> deactivate()
 """
 
 __test__ = {

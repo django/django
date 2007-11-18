@@ -3,6 +3,8 @@ from django.contrib.admin.views.main import AdminBoundField
 from django.template import loader
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
+from django.utils.html import escape
 from django.db import models
 from django.db.models.fields import Field
 from django.db.models.related import BoundRelatedObject
@@ -32,7 +34,8 @@ def include_admin_script(script_path):
     """
     if not absolute_url_re.match(script_path):
         script_path = '%s%s' % (settings.ADMIN_MEDIA_PREFIX, script_path)
-    return u'<script type="text/javascript" src="%s"></script>' % script_path
+    return mark_safe(u'<script type="text/javascript" src="%s"></script>'
+            % script_path)
 include_admin_script = register.simple_tag(include_admin_script)
 
 def submit_row(context):
@@ -63,8 +66,10 @@ def field_label(bound_field):
             class_names.append('inline')
         colon = ":"
     class_str = class_names and u' class="%s"' % u' '.join(class_names) or u''
-    return u'<label for="%s"%s>%s%s</label> ' % (bound_field.element_id, class_str, \
-        force_unicode(capfirst(bound_field.field.verbose_name)), colon)
+    return mark_safe(u'<label for="%s"%s>%s%s</label> ' %
+            (bound_field.element_id, class_str,
+            escape(force_unicode(capfirst(bound_field.field.verbose_name))),
+            colon))
 field_label = register.simple_tag(field_label)
 
 class FieldWidgetNode(template.Node):
@@ -193,15 +198,15 @@ def auto_populated_field_script(auto_pop_fields, change = False):
                      ' var e = document.getElementById("id_%s");' \
                      ' if(!e._changed) { e.value = URLify(%s, %s);} }; ' % (
                      f, field.name, add_values, field.max_length))
-    return u''.join(t)
+    return mark_safe(u''.join(t))
 auto_populated_field_script = register.simple_tag(auto_populated_field_script)
 
 def filter_interface_script_maybe(bound_field):
     f = bound_field.field
     if f.rel and isinstance(f.rel, models.ManyToManyRel) and f.rel.filter_interface:
-        return u'<script type="text/javascript">addEvent(window, "load", function(e) {' \
+        return mark_safe(u'<script type="text/javascript">addEvent(window, "load", function(e) {' \
               ' SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % (
-              f.name, f.verbose_name.replace('"', '\\"'), f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX)
+              f.name, escape(f.verbose_name.replace('"', '\\"')), f.rel.filter_interface-1, settings.ADMIN_MEDIA_PREFIX))
     else:
         return ''
 filter_interface_script_maybe = register.simple_tag(filter_interface_script_maybe)

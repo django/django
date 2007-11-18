@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+{% autoescape off %}<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {% spaceless %}
 {% for url in urlset %}
@@ -11,3 +11,4 @@
 {% endfor %}
 {% endspaceless %}
 </urlset>
+{% endautoescape %}

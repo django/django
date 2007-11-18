@@ -5,9 +5,10 @@ and database field objects.
 
 from django.utils.translation import ugettext
 from django.utils.encoding import smart_unicode
+from django.utils.datastructures import SortedDict
 
 from util import ValidationError
-from forms import BaseForm, SortedDictFromList
+from forms import BaseForm
 from fields import Field, ChoiceField
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
@@ -89,7 +90,7 @@ def form_for_model(model, form=BaseForm, fields=None,
         formfield = formfield_callback(f)
         if formfield:
             field_list.append((f.name, formfield))
-    base_fields = SortedDictFromList(field_list)
+    base_fields = SortedDict(field_list)
     return type(opts.object_name + 'Form', (form,),
         {'base_fields': base_fields, '_model': model,
          'save': make_model_save(model, fields, 'created')})
@@ -118,7 +119,7 @@ def form_for_instance(instance, form=BaseForm, fields=None,
         formfield = formfield_callback(f, initial=current_value)
         if formfield:
             field_list.append((f.name, formfield))
-    base_fields = SortedDictFromList(field_list)
+    base_fields = SortedDict(field_list)
     return type(opts.object_name + 'InstanceForm', (form,),
         {'base_fields': base_fields, '_model': model,
          'save': make_instance_save(instance, fields, 'changed')})
@@ -127,8 +128,8 @@ def form_for_fields(field_list):
     """
     Returns a Form class for the given list of Django database field instances.
     """
-    fields = SortedDictFromList([(f.name, f.formfield())
-                                 for f in field_list if f.editable])
+    fields = SortedDict([(f.name, f.formfield())
+                         for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
 class QuerySetIterator(object):
@@ -154,13 +155,21 @@ class ModelChoiceField(ChoiceField):
     def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
                  required=True, widget=Select, label=None, initial=None,
                  help_text=None):
-        self.queryset = queryset
         self.empty_label = empty_label
         self.cache_choices = cache_choices
         # Call Field instead of ChoiceField __init__() because we don't need
         # ChoiceField.__init__().
         Field.__init__(self, required, widget, label, initial, help_text)
+        self.queryset = queryset
+
+    def _get_queryset(self):
+        return self._queryset
+
+    def _set_queryset(self, queryset):
+        self._queryset = queryset
         self.widget.choices = self.choices
+
+    queryset = property(_get_queryset, _set_queryset)
 
     def _get_choices(self):
         # If self._choices is set, then somebody must have manually set
@@ -189,7 +198,7 @@ class ModelChoiceField(ChoiceField):
         if value in ('', None):
             return None
         try:
-            value = self.queryset.model._default_manager.get(pk=value)
+            value = self.queryset.get(pk=value)
         except self.queryset.model.DoesNotExist:
             raise ValidationError(ugettext(u'Select a valid choice. That'
                                            u' choice is not one of the'
@@ -216,7 +225,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         final_values = []
         for val in value:
             try:
-                obj = self.queryset.model._default_manager.get(pk=val)
+                obj = self.queryset.get(pk=val)
             except self.queryset.model.DoesNotExist:
                 raise ValidationError(ugettext(u'Select a valid choice. %s is'
                                                u' not one of the available'

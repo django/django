@@ -3,7 +3,7 @@ from xml.dom.minidom import parseString
 from django.core.mail import EmailMessage, SMTPConnection
 from django.template import Context, Template
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.newforms.forms import Form
 from django.newforms import fields
 from django.shortcuts import render_to_response
@@ -129,6 +129,38 @@ def login_protected_view_changed_redirect(request):
     
     return HttpResponse(t.render(c))
 login_protected_view_changed_redirect = login_required(redirect_field_name="redirect_to")(login_protected_view_changed_redirect)
+
+def permission_protected_view(request):
+    "A simple view that is permission protected."
+    t = Template('This is a permission protected test. '
+                 'Username is {{ user.username }}. '
+                 'Permissions are {{ user.get_all_permissions }}.' ,
+                 name='Permissions Template')
+    c = Context({'user': request.user})
+    return HttpResponse(t.render(c))
+permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
+
+class _ViewManager(object):
+    def login_protected_view(self, request):
+        t = Template('This is a login protected test using a method. '
+                     'Username is {{ user.username }}.',
+                     name='Login Method Template')
+        c = Context({'user': request.user})
+        return HttpResponse(t.render(c))
+    login_protected_view = login_required(login_protected_view)
+
+    def permission_protected_view(self, request):
+        t = Template('This is a permission protected test using a method. '
+                     'Username is {{ user.username }}. '
+                     'Permissions are {{ user.get_all_permissions }}.' ,
+                     name='Permissions Template')
+        c = Context({'user': request.user})
+        return HttpResponse(t.render(c))
+    permission_protected_view = permission_required('modeltests.test_perm')(permission_protected_view)
+
+_view_manager = _ViewManager()
+login_protected_method_view = _view_manager.login_protected_view
+permission_protected_method_view = _view_manager.permission_protected_view
 
 def session_view(request):
     "A view that modifies the session"

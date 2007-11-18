@@ -3,6 +3,7 @@
 import re
 from email.Parser import HeaderParser
 from email.Errors import HeaderParseError
+from django.utils.safestring import mark_safe
 try:
     import docutils.core
     import docutils.nodes
@@ -66,7 +67,7 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None, link_bas
     parts = docutils.core.publish_parts(text, source_path=thing_being_parsed,
                 destination_path=None, writer_name='html',
                 settings_overrides=overrides)
-    return parts['fragment']
+    return mark_safe(parts['fragment'])
 
 #
 # reST roles

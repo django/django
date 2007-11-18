@@ -16,7 +16,7 @@ try:
 except NameError:
     from sets import Set as set
 
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import StrAndUnicode, smart_unicode
 
 from util import ErrorList, ValidationError
@@ -41,6 +41,10 @@ EMPTY_VALUES = (None, '')
 class Field(object):
     widget = TextInput # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput # Default widget to use when rendering this as "hidden".
+    default_error_messages = {
+        'required': _(u'This field is required.'),
+        'invalid': _(u'Enter a valid value.'),
+    }
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
@@ -78,6 +82,22 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
+        self.error_messages = self._build_error_messages(error_messages)
+
+    def _build_error_messages(self, extra_error_messages):
+        error_messages = {}
+
+        def get_default_error_messages(klass):
+            for base_class in klass.__bases__:
+                get_default_error_messages(base_class)
+            if hasattr(klass, 'default_error_messages'):
+                error_messages.update(klass.default_error_messages)
+
+        get_default_error_messages(self.__class__)
+        if extra_error_messages:
+            error_messages.update(extra_error_messages)
+        return error_messages
+
     def clean(self, value):
         """
         Validates the given value and returns its "cleaned" value as an
@@ -104,6 +124,11 @@ class Field(object):
         return result
 
 class CharField(Field):
+    default_error_messages = {
+        'max_length': _(u'Ensure this value has at most %(max)d characters (it has %(length)d).'),
+        'min_length': _(u'Ensure this value has at least %(min)d characters (it has %(length)d).'),
+    }
+
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
         super(CharField, self).__init__(*args, **kwargs)
@@ -127,6 +152,12 @@ class CharField(Field):
             return {'maxlength': str(self.max_length)}
 
 class IntegerField(Field):
+    default_error_messages = {
+        'invalid': _(u'Enter a whole number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+    }
+
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
         super(IntegerField, self).__init__(*args, **kwargs)
@@ -150,6 +181,12 @@ class IntegerField(Field):
         return value
 
 class FloatField(Field):
+    default_error_messages = {
+        'invalid': _(u'Enter a number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+    }
+
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
         Field.__init__(self, *args, **kwargs)
@@ -173,6 +210,15 @@ class FloatField(Field):
         return value
 
 class DecimalField(Field):
+    default_error_messages = {
+        'invalid': _(u'Enter a number.'),
+        'max_value': _(u'Ensure this value is less than or equal to %s.'),
+        'min_value': _(u'Ensure this value is greater than or equal to %s.'),
+        'max_digits': _('Ensure that there are no more than %s digits in total.'),
+        'max_decimal_places': _('Ensure that there are no more than %s decimal places.'),
+        'max_whole_digits': _('Ensure that there are no more than %s digits before the decimal point.')
+    }
+
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
         self.max_digits, self.decimal_places = max_digits, decimal_places
@@ -217,6 +263,10 @@ DEFAULT_DATE_INPUT_FORMATS = (
 )
 
 class DateField(Field):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid date.'),
+    }
+
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_DATE_INPUT_FORMATS
@@ -246,6 +296,10 @@ DEFAULT_TIME_INPUT_FORMATS = (
 )
 
 class TimeField(Field):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid time.')
+    }
+
     def __init__(self, input_formats=None, *args, **kwargs):
         super(TimeField, self).__init__(*args, **kwargs)
         self.input_formats = input_formats or DEFAULT_TIME_INPUT_FORMATS
@@ -281,6 +335,9 @@ DEFAULT_DATETIME_INPUT_FORMATS = (
 
 class DateTimeField(Field):
     widget = DateTimeInput
+    default_error_messages = {
+        'invalid': _(u'Enter a valid date/time.'),
+    }
 
     def __init__(self, input_formats=None, *args, **kwargs):
         super(DateTimeField, self).__init__(*args, **kwargs)
@@ -342,6 +399,10 @@ email_re = re.compile(
     r')@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$', re.IGNORECASE)  # domain
 
 class EmailField(RegexField):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid e-mail address.'),
+    }
+
     def __init__(self, max_length=None, min_length=None, *args, **kwargs):
         RegexField.__init__(self, email_re, max_length, min_length,
             ugettext(u'Enter a valid e-mail address.'), *args, **kwargs)
@@ -368,6 +429,12 @@ class UploadedFile(StrAndUnicode):
 
 class FileField(Field):
     widget = FileInput
+    default_error_messages = {
+        'invalid': _(u"No file was submitted. Check the encoding type on the form."),
+        'missing': _(u"No file was submitted."),
+        'empty': _(u"The submitted file is empty."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(FileField, self).__init__(*args, **kwargs)
 
@@ -386,6 +453,10 @@ class FileField(Field):
         return f
 
 class ImageField(FileField):
+    default_error_messages = {
+        'invalid_image': _(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
+    }
+
     def clean(self, data):
         """
         Checks that the file-upload field data contains a valid image (GIF, JPG,
@@ -418,6 +489,11 @@ url_re = re.compile(
     r'(?:/?|/\S+)$', re.IGNORECASE)
 
 class URLField(RegexField):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid URL.'),
+        'invalid_link': _(u'This URL appears to be a broken link.'),
+    }
+
     def __init__(self, max_length=None, min_length=None, verify_exists=False,
             validator_user_agent=URL_VALIDATOR_USER_AGENT, *args, **kwargs):
         super(URLField, self).__init__(url_re, max_length, min_length, ugettext(u'Enter a valid URL.'), *args, **kwargs)
@@ -474,9 +550,14 @@ class NullBooleanField(BooleanField):
 
 class ChoiceField(Field):
     widget = Select
+    default_error_messages = {
+        'invalid_choice': _(u'Select a valid choice. That choice is not one of the available choices.'),
+    }
 
-    def __init__(self, choices=(), required=True, widget=None, label=None, initial=None, help_text=None):
-        super(ChoiceField, self).__init__(required, widget, label, initial, help_text)
+    def __init__(self, choices=(), required=True, widget=None, label=None,
+                 initial=None, help_text=None, *args, **kwargs):
+        super(ChoiceField, self).__init__(required, widget, label, initial,
+                                          help_text, *args, **kwargs)
         self.choices = choices
 
     def _get_choices(self):
@@ -508,6 +589,10 @@ class ChoiceField(Field):
 class MultipleChoiceField(ChoiceField):
     hidden_widget = MultipleHiddenInput
     widget = SelectMultiple
+    default_error_messages = {
+        'invalid_choice': _(u'Select a valid choice. %(value)s is not one of the available choices.'),
+        'invalid_list': _(u'Enter a list of values.'),
+    }
 
     def clean(self, value):
         """
@@ -567,6 +652,10 @@ class MultiValueField(Field):
 
     You'll probably want to use this with MultiWidget.
     """
+    default_error_messages = {
+        'invalid': _(u'Enter a list of values.'),
+    }
+
     def __init__(self, fields=(), *args, **kwargs):
         super(MultiValueField, self).__init__(*args, **kwargs)
         # Set 'required' to False on the individual fields, because the
@@ -625,6 +714,11 @@ class MultiValueField(Field):
         raise NotImplementedError('Subclasses must implement this method.')
 
 class SplitDateTimeField(MultiValueField):
+    default_error_messages = {
+        'invalid_date': _(u'Enter a valid date.'),
+        'invalid_time': _(u'Enter a valid time.'),
+    }
+
     def __init__(self, *args, **kwargs):
         fields = (DateField(), TimeField())
         super(SplitDateTimeField, self).__init__(fields, *args, **kwargs)
@@ -643,7 +737,12 @@ class SplitDateTimeField(MultiValueField):
 ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
 
 class IPAddressField(RegexField):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid IPv4 address.'),
+    }
+
     def __init__(self, *args, **kwargs):
         RegexField.__init__(self, ipv4_re,
                             error_message=ugettext(u'Enter a valid IPv4 address.'),
                             *args, **kwargs)
+

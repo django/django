@@ -3,6 +3,7 @@ from datetime import timedelta, date
 from django.template import Template, Context, add_to_builtins
 from django.utils.dateformat import DateFormat
 from django.utils.translation import ugettext as _
+from django.utils.html import escape
 
 add_to_builtins('django.contrib.humanize.templatetags.humanize')
 
@@ -15,7 +16,7 @@ class HumanizeTests(unittest.TestCase):
             test_content = test_list[index]
             t = Template('{{ test_content|%s }}' % method)
             rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, result_list[index],
+            self.assertEqual(rendered, escape(result_list[index]),
                              msg="%s test failed, produced %s, should've produced %s" % (method, rendered, result_list[index]))
 
     def test_ordinal(self):

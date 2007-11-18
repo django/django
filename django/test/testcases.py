@@ -1,6 +1,6 @@
 import re
 import unittest
-from urlparse import urlsplit
+from urlparse import urlsplit, urlunsplit
 
 from django.http import QueryDict
 from django.db import transaction
@@ -74,7 +74,7 @@ class TestCase(unittest.TestCase):
         super(TestCase, self).__call__(result)
 
     def assertRedirects(self, response, expected_url, status_code=302,
-                        target_status_code=200):
+                        target_status_code=200, host=None):
         """Asserts that a response redirected to a specific URL, and that the
         redirect URL can be loaded.
 
@@ -86,6 +86,10 @@ class TestCase(unittest.TestCase):
              " (expected %d)" % (response.status_code, status_code)))
         url = response['Location']
         scheme, netloc, path, query, fragment = urlsplit(url)
+        e_scheme, e_netloc, e_path, e_query, e_fragment = urlsplit(expected_url)
+        if not (e_scheme or e_netloc):
+            expected_url = urlunsplit(('http', host or 'testserver', e_path,
+                    e_query, e_fragment))
         self.assertEqual(url, expected_url,
             "Response redirected to '%s', expected '%s'" % (url, expected_url))
 

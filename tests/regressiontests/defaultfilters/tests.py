@@ -17,6 +17,10 @@ u'0'
 u'7.700'
 >>> floatformat(6.000000,3)
 u'6.000'
+>>> floatformat(6.200000, 3)
+u'6.200'
+>>> floatformat(6.200000, -3)
+u'6.200'
 >>> floatformat(13.1031,-3)
 u'13.103'
 >>> floatformat(11.1197, -2)
@@ -190,10 +194,10 @@ u'a stri to be maled'
 >>> cut(u'a string to be mangled', 'strings')
 u'a string to be mangled'
 
->>> escape(u'<some html & special characters > here')
+>>> force_escape(u'<some html & special characters > here')
 u'&lt;some html &amp; special characters &gt; here'
 
->>> escape(u'<some html & special characters > here ĐÅ€£')
+>>> force_escape(u'<some html & special characters > here ĐÅ€£')
 u'&lt;some html &amp; special characters &gt; here \xc4\x90\xc3\x85\xe2\x82\xac\xc2\xa3'
 
 >>> linebreaks(u'line 1')

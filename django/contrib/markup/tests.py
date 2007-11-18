@@ -1,8 +1,10 @@
 # Quick tests for the markup templatetags (django.contrib.markup)
 
-from django.template import Template, Context, add_to_builtins
 import re
 import unittest
+
+from django.template import Template, Context, add_to_builtins
+from django.utils.html import escape
 
 add_to_builtins('django.contrib.markup.templatetags.markup')
 
@@ -24,7 +26,7 @@ Paragraph 2 with "quotes" and @code@"""
 
 <p>Paragraph 2 with &#8220;quotes&#8221; and <code>code</code></p>""")
         else:
-            self.assertEqual(rendered, textile_content)
+            self.assertEqual(rendered, escape(textile_content))
 
     def test_markdown(self):
         try:

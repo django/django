@@ -170,7 +170,7 @@ class DateFormat(TimeFormat):
         return u"%+03d%02d" % (seconds // 3600, (seconds // 60) % 60)
 
     def r(self):
-        "RFC 822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
+        "RFC 2822 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
         return self.format('D, j M Y H:i:s O')
 
     def S(self):
