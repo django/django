@@ -73,7 +73,7 @@ class BlockTranslateNode(Node):
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)
             context[self.countervar] = count
-            plural = self.render_token_list(self.plural)[0]
+            plural, vars = self.render_token_list(self.plural)
             result = translation.ungettext(singular, plural, count)
         else:
             result = translation.ugettext(singular)
