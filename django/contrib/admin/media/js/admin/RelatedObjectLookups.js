@@ -1,6 +1,16 @@
 // Handles related-objects functionality: lookup link for raw_id_admin=True
 // and Add Another links.
 
+function html_unescape(text) {
+    // Unescape a string that was escaped using django.utils.html.escape.
+    text = text.replace(/&lt;/g, '<');
+    text = text.replace(/&gt;/g, '>');
+    text = text.replace(/&quot;/g, '"');
+    text = text.replace(/&#39;/g, "'");
+    text = text.replace(/&amp;/g, '&');
+    return text;
+}
+
 function showRelatedObjectLookupPopup(triggeringLink) {
     var name = triggeringLink.id.replace(/^lookup_/, '');
     // IE doesn't like periods in the window name, so convert temporarily.
@@ -42,6 +52,10 @@ function showAddAnotherPopup(triggeringLink) {
 }
 
 function dismissAddAnotherPopup(win, newId, newRepr) {
+    // newId and newRepr are expected to have previously been escaped by
+    // django.utils.html.escape.
+    newId = html_unescape(newId);
+    newRepr = html_unescape(newRepr);
     var name = win.name.replace(/___/g, '.');
     var elem = document.getElementById(name);
     if (elem) {
