@@ -20,6 +20,10 @@ An example: i18n middleware would need to distinguish caches by the
 import md5
 import re
 import time
+try:
+    set
+except NameError:
+    from sets import Set as set   # Python 2.3 fallback
 
 from django.conf import settings
 from django.core.cache import cache
@@ -107,14 +111,15 @@ def patch_vary_headers(response, newheaders):
     # Note that we need to keep the original order intact, because cache
     # implementations may rely on the order of the Vary contents in, say,
     # computing an MD5 hash.
-    vary = []
     if response.has_header('Vary'):
-        vary = cc_delim_re.split(response['Vary'])
-    oldheaders = dict([(el.lower(), 1) for el in vary])
-    for newheader in newheaders:
-        if not newheader.lower() in oldheaders:
-            vary.append(newheader)
-    response['Vary'] = ', '.join(vary)
+        vary_headers = cc_delim_re.split(response['Vary'])
+    else:
+        vary_headers = []
+    # Use .lower() here so we treat headers as case-insensitive.
+    existing_headers = set([header.lower() for header in vary_headers])
+    additional_headers = [newheader for newheader in newheaders
+                          if newheader.lower() not in existing_headers]
+    response['Vary'] = ', '.join(vary_headers + additional_headers)
 
 def _generate_cache_key(request, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
