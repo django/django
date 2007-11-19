@@ -583,7 +583,7 @@ LOCALE_PATHS
 
 Default: ``()`` (Empty tuple)
 
-A list of directories where Django looks for translation files.
+A tuple of directories where Django looks for translation files.
 See the `internationalization docs section`_ explaining the variable and the
 default behavior.
 
