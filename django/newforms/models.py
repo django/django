@@ -9,7 +9,7 @@ from django.utils.datastructures import SortedDict
 
 from util import ValidationError
 from forms import BaseForm
-from fields import Field, ChoiceField
+from fields import Field, ChoiceField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
 __all__ = (
@@ -200,7 +200,7 @@ class ModelChoiceField(ChoiceField):
 
     def clean(self, value):
         Field.clean(self, value)
-        if value in ('', None):
+        if value in EMPTY_VALUES:
             return None
         try:
             value = self.queryset.get(pk=value)
