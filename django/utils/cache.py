@@ -70,8 +70,6 @@ def patch_cache_control(response, **kwargs):
     cc = ', '.join([dictvalue(el) for el in cc.items()])
     response['Cache-Control'] = cc
 
-vary_delim_re = re.compile(r',\s*')
-
 def patch_response_headers(response, cache_timeout=None):
     """
     Adds some useful headers to the given HttpResponse object:
@@ -111,7 +109,7 @@ def patch_vary_headers(response, newheaders):
     # computing an MD5 hash.
     vary = []
     if response.has_header('Vary'):
-        vary = vary_delim_re.split(response['Vary'])
+        vary = cc_delim_re.split(response['Vary'])
     oldheaders = dict([(el.lower(), 1) for el in vary])
     for newheader in newheaders:
         if not newheader.lower() in oldheaders:
@@ -169,7 +167,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None):
                     key_prefix, iri_to_uri(request.path))
     if response.has_header('Vary'):
         headerlist = ['HTTP_'+header.upper().replace('-', '_')
-                      for header in vary_delim_re.split(response['Vary'])]
+                      for header in cc_delim_re.split(response['Vary'])]
         cache.set(cache_key, headerlist, cache_timeout)
         return _generate_cache_key(request, headerlist, key_prefix)
     else:
