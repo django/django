@@ -187,7 +187,7 @@ def items_for_result(cl, result):
             else:
                 result_repr = escape(field_val)
         if force_unicode(result_repr) == '':
-            result_repr = '&nbsp;'
+            result_repr = mark_safe('&nbsp;')
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.lookup_opts.admin.list_display_links) or field_name in cl.lookup_opts.admin.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
