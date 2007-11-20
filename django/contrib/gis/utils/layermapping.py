@@ -394,11 +394,27 @@ class LayerMapping(object):
                 d = Decimal(str(fld.value))
             except:
                 raise InvalidDecimal('Could not construct decimal from: %s' % fld)
+
+            # Getting the decimal value as a tuple.
             dtup = d.as_tuple()
-            if len(dtup[1]) > field_class.max_digits:
-                raise InvalidDecimal('More than the maximum # of digits encountered.')
-            elif len(dtup[1][dtup[2]:]) > field_class.decimal_places:
-                raise InvalidDecimal('More than the maximum # of decimal places encountered.')
+            digits = dtup[1]
+            d_idx = dtup[2] # index where the decimal is
+
+            # Maximum amount of precision, or digits to the left of the decimal.
+            max_prec = field_class.max_digits - field_class.decimal_places
+
+            # Getting the digits to the left of the decimal place for the 
+            # given decimal.
+            if d_idx < 0:
+                n_prec = len(digits[:d_idx])
+            else:
+                n_prec = len(digits) + d_idx
+
+            # If we have more than the maximum digits allowed, then throw an 
+            # InvalidDecimal exception.
+            if n_prec > max_prec:
+                raise InvalidDecimal('A DecimalField with max_digits %d, decimal_places %d must round to an absolute value less than 10^%d.' %
+                                     (field_class.max_digits, field_class.decimal_places, max_prec))
             val = d
         else:
             val = fld.value
@@ -467,7 +483,7 @@ class LayerMapping(object):
                     elif not self.silent: 
                         print 'Ignoring Feature ID %s because: %s' % (feat.fid, msg)
                 else:
-                    # Constructing the model using the constructed keyword args
+                    # Constructing the model using the keyword args
                     if all_prepped:
                         m = self.model(**kwargs)
                         try:

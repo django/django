@@ -88,17 +88,27 @@ class LayerMapTest(unittest.TestCase):
         lm = LayerMapping(Interstate, inter_shp, inter_mapping, silent=True)
         lm.save()
 
-        # Only one interstate should have imported correctly.
-        self.assertEqual(1, Interstate.objects.count())
+        # Two interstate should have imported correctly.
+        self.assertEqual(2, Interstate.objects.count())
         
-        # Verifying the values in the single feature w/the model.
+        # Verifying the values in the layer w/the model.
         ds = DataSource(inter_shp)
-        feat = ds[0][0]
-        istate = Interstate.objects.get(name=feat['Name'].value)
-        self.assertEqual(Decimal(str(feat['Length'])), istate.length)
-        for p1, p2 in zip(feat.geom, istate.path):
-            self.assertAlmostEqual(p1[0], p2[0], 6)
-            self.assertAlmostEqual(p1[1], p2[1], 6)
+
+        # Only the first two features of this shapefile are valid.
+        valid_feats = ds[0][:2]
+        for feat in valid_feats:
+            istate = Interstate.objects.get(name=feat['Name'].value)
+            
+            if feat.fid == 0:
+                self.assertEqual(Decimal(str(feat['Length'])), istate.length)
+            elif feat.fid == 1:
+                # Everything but the first two decimal digits were truncated,
+                # because the Interstate model's `length` field has decimal_places=2.
+                self.assertAlmostEqual(feat.get('Length'), float(istate.length), 2)
+
+            for p1, p2 in zip(feat.geom, istate.path):
+                self.assertAlmostEqual(p1[0], p2[0], 6)
+                self.assertAlmostEqual(p1[1], p2[1], 6)
 
 def suite():
     s = unittest.TestSuite()

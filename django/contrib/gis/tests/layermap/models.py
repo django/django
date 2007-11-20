@@ -10,7 +10,7 @@ class City(models.Model):
 
 class Interstate(models.Model):
     name = models.CharField(max_length=20)
-    length = models.DecimalField(max_digits=7, decimal_places=2)
+    length = models.DecimalField(max_digits=6, decimal_places=2)
     path = models.LineStringField()
     objects = models.GeoManager()
     
