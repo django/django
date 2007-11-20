@@ -5,7 +5,7 @@
 """
 from ctypes import c_char_p, c_int, c_long, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.libgdal import lgdal, errcheck_flag
 from django.contrib.gis.gdal.prototypes.generation import \
     const_string_output, double_output, geom_output, int_output, \
     srs_output, void_output, voidptr_output
@@ -47,7 +47,7 @@ get_field_defn = voidptr_output(lgdal.OGR_FD_GetFieldDefn, [c_void_p, c_int])
 
 ### Feature Routines ###
 clone_feature = voidptr_output(lgdal.OGR_F_Clone, [c_void_p])
-destroy_feature = void_output(lgdal.OGR_F_Destroy, [c_void_p])
+destroy_feature = void_output(lgdal.OGR_F_Destroy, [c_void_p], errcheck=errcheck_flag)
 feature_equal = int_output(lgdal.OGR_F_Equal, [c_void_p, c_void_p])
 get_feat_geom_ref = geom_output(lgdal.OGR_F_GetGeometryRef, [c_void_p])
 get_feat_field_count = int_output(lgdal.OGR_F_GetFieldCount, [c_void_p])

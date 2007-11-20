@@ -128,7 +128,10 @@ class OFTDate(Field):
     def value(self):
         "Returns a Python `date` object for the OFTDate field."
         yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-        return date(yy.value, mm.value, dd.value)
+        try:
+            return date(yy.value, mm.value, dd.value)
+        except ValueError:
+            return None
 
 class OFTDateTime(Field):
     @property
@@ -139,14 +142,20 @@ class OFTDateTime(Field):
         #  See http://lists.maptools.org/pipermail/gdal-dev/2006-February/007990.html
         #  The `tz` variable has values of: 0=unknown, 1=localtime (ambiguous), 
         #  100=GMT, 104=GMT+1, 80=GMT-5, etc.
-        return datetime(yy.value, mm.value, dd.value, hh.value, mn.value, ss.value)
+        try:
+            return datetime(yy.value, mm.value, dd.value, hh.value, mn.value, ss.value)
+        except ValueError:
+            return None
 
 class OFTTime(Field):
     @property
     def value(self):
         "Returns a Python `time` object for this OFTTime field."
         yy, mm, dd, hh, mn, ss, tz = self.as_datetime()
-        return time(hh.value, mn.value, ss.value)
+        try:
+            return time(hh.value, mn.value, ss.value)
+        except ValueError:
+            return None
 
 # List fields are also just subclasses
 class OFTIntegerList(Field): pass

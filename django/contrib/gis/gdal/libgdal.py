@@ -6,6 +6,7 @@ from django.contrib.gis.gdal.error import OGRException
 if os.name == 'nt':
     # Windows NT shared library
     lib_name = 'libgdal-1.dll'
+    errcheck_flag = False
 elif os.name == 'posix':
     platform = os.uname()[0]
     if platform == 'Darwin':
@@ -14,6 +15,7 @@ elif os.name == 'posix':
     else: 
         # Attempting to use .so extension for all other platforms.
         lib_name = 'libgdal.so'
+    errcheck_flag = True
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 

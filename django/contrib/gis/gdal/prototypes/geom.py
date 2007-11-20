@@ -1,6 +1,6 @@
 from ctypes import c_char, c_char_p, c_double, c_int, c_ubyte, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.libgdal import lgdal, errcheck_flag
 from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
 from django.contrib.gis.gdal.prototypes.generation import \
     const_string_output, double_output, geom_output, int_output, \
@@ -72,7 +72,7 @@ get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p])
 get_geom_type = int_output(lgdal.OGR_G_GetGeometryType, [c_void_p])
 get_point_count = int_output(lgdal.OGR_G_GetPointCount, [c_void_p])
 get_point = void_output(lgdal.OGR_G_GetPoint, [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False)
-geom_close_rings = void_output(lgdal.OGR_G_CloseRings, [c_void_p])
+geom_close_rings = void_output(lgdal.OGR_G_CloseRings, [c_void_p], errcheck=errcheck_flag)
 
 # Topology routines.
 ogr_contains = topology_func(lgdal.OGR_G_Contains)

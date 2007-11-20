@@ -33,7 +33,12 @@ class Feature(object):
         if self._ptr: destroy_feature(self._ptr)
 
     def __getitem__(self, index):
-        "Gets the Field at the specified index."
+        """
+        Gets the Field object at the specified index, which may be either
+        an integer or the Field's string label.  Note that the Field object
+        is not the field's _value_ -- use the `get` method instead to 
+        retrieve the value (e.g. an integer) instead of a Field instance.
+        """
         if isinstance(index, basestring):
             i = self.index(index)
         else:
@@ -86,16 +91,8 @@ class Feature(object):
         "Returns the OGR Geometry for this Feature."
         # Retrieving the geometry pointer for the feature.
         geom_ptr = get_feat_geom_ref(self._ptr)
+        return OGRGeometry(clone_geom(geom_ptr))
 
-        # Attempting to retrieve the Spatial Reference for the geometry.
-        try:
-            srs_ptr = get_geom_srs(geom_ptr)
-            srs = SpatialReference(clone_srs(srs_ptr)) 
-        except OGRException:
-            srs = None
-        # Geometry is cloned so the feature isn't invalidated. 
-        return OGRGeometry(clone_geom(geom_ptr), srs)
-    
     @property
     def geom_type(self):
         "Returns the OGR Geometry Type for this Feture."
@@ -105,8 +102,8 @@ class Feature(object):
     def get(self, field):
         """
         Returns the value of the field, instead of an instance of the Field
-         object.  May take a string of the field name or a Field object as
-         parameters.
+        object.  May take a string of the field name or a Field object as
+        parameters.
         """
         field_name = getattr(field, 'name', field)
         return self[field_name].value
