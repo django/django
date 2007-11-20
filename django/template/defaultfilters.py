@@ -106,6 +106,7 @@ floatformat.is_safe = True
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
     return force_unicode(iri_to_uri(value))
+iriencode.is_safe = True
 iriencode = stringfilter(iriencode)
 
 def linenumbers(value, autoescape=None):
