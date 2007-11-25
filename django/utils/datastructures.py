@@ -7,9 +7,9 @@ class MergeDict(object):
         self.dicts = dicts
 
     def __getitem__(self, key):
-        for dict in self.dicts:
+        for dict_ in self.dicts:
             try:
-                return dict[key]
+                return dict_[key]
             except KeyError:
                 pass
         raise KeyError
@@ -24,22 +24,22 @@ class MergeDict(object):
             return default
 
     def getlist(self, key):
-        for dict in self.dicts:
+        for dict_ in self.dicts:
             try:
-                return dict.getlist(key)
+                return dict_.getlist(key)
             except KeyError:
                 pass
         raise KeyError
 
     def items(self):
         item_list = []
-        for dict in self.dicts:
-            item_list.extend(dict.items())
+        for dict_ in self.dicts:
+            item_list.extend(dict_.items())
         return item_list
 
     def has_key(self, key):
-        for dict in self.dicts:
-            if key in dict:
+        for dict_ in self.dicts:
+            if key in dict_:
                 return True
         return False
 
@@ -114,8 +114,8 @@ class SortedDict(dict):
         for key in self.keyOrder:
             yield dict.__getitem__(self, key)
 
-    def update(self, dict):
-        for k, v in dict.items():
+    def update(self, dict_):
+        for k, v in dict_.items():
             self.__setitem__(k, v)
 
     def setdefault(self, key, default):
