@@ -56,7 +56,7 @@ class SortedDict(dict):
     def __init__(self, data=None):
         if data is None:
             data = {}
-        dict.__init__(self, data)
+        super(SortedDict, self).__init__(data)
         if isinstance(data, dict):
             self.keyOrder = data.keys()
         else:
@@ -68,12 +68,12 @@ class SortedDict(dict):
                                for key, value in self.iteritems()])
 
     def __setitem__(self, key, value):
-        dict.__setitem__(self, key, value)
+        super(SortedDict, self).__setitem__(key, value)
         if key not in self.keyOrder:
             self.keyOrder.append(key)
 
     def __delitem__(self, key):
-        dict.__delitem__(self, key)
+        super(SortedDict, self).__delitem__(key)
         self.keyOrder.remove(key)
 
     def __iter__(self):
@@ -81,7 +81,7 @@ class SortedDict(dict):
             yield k
 
     def pop(self, k, *args):
-        result = dict.pop(self, k, *args)
+        result = super(SortedDict, self).pop(k, *args)
         try:
             self.keyOrder.remove(k)
         except ValueError:
@@ -90,7 +90,7 @@ class SortedDict(dict):
         return result
 
     def popitem(self):
-        result = dict.popitem(self)
+        result = super(SortedDict, self).popitem()
         self.keyOrder.remove(result[0])
         return result
 
@@ -99,7 +99,7 @@ class SortedDict(dict):
 
     def iteritems(self):
         for key in self.keyOrder:
-            yield key, dict.__getitem__(self, key)
+            yield key, super(SortedDict, self).__getitem__(key)
 
     def keys(self):
         return self.keyOrder[:]
@@ -108,11 +108,11 @@ class SortedDict(dict):
         return iter(self.keyOrder)
 
     def values(self):
-        return [dict.__getitem__(self, k) for k in self.keyOrder]
+        return [super(SortedDict, self).__getitem__(k) for k in self.keyOrder]
 
     def itervalues(self):
         for key in self.keyOrder:
-            yield dict.__getitem__(self, key)
+            yield super(SortedDict, self).__getitem__(key)
 
     def update(self, dict_):
         for k, v in dict_.items():
@@ -121,7 +121,7 @@ class SortedDict(dict):
     def setdefault(self, key, default):
         if key not in self.keyOrder:
             self.keyOrder.append(key)
-        return dict.setdefault(self, key, default)
+        return super(SortedDict, self).setdefault(key, default)
 
     def value_for_index(self, index):
         """Returns the value of the item at the given zero-based index."""
@@ -135,7 +135,7 @@ class SortedDict(dict):
             if n < index:
                 index -= 1
         self.keyOrder.insert(index, key)
-        dict.__setitem__(self, key, value)
+        super(SortedDict, self).__setitem__(key, value)
 
     def copy(self):
         """Returns a copy of this object."""
@@ -173,10 +173,11 @@ class MultiValueDict(dict):
     single name-value pairs.
     """
     def __init__(self, key_to_list_mapping=()):
-        dict.__init__(self, key_to_list_mapping)
+        super(MultiValueDict, self).__init__(key_to_list_mapping)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, dict.__repr__(self))
+        return "<%s: %s>" % (self.__class__.__name__,
+                             super(MultiValueDict, self).__repr__())
 
     def __getitem__(self, key):
         """
@@ -184,7 +185,7 @@ class MultiValueDict(dict):
         raises KeyError if not found.
         """
         try:
-            list_ = dict.__getitem__(self, key)
+            list_ = super(MultiValueDict, self).__getitem__(key)
         except KeyError:
             raise MultiValueDictKeyError, "Key %r not found in %r" % (key, self)
         try:
@@ -193,10 +194,10 @@ class MultiValueDict(dict):
             return []
 
     def __setitem__(self, key, value):
-        dict.__setitem__(self, key, [value])
+        super(MultiValueDict, self).__setitem__(key, [value])
 
     def __copy__(self):
-        return self.__class__(dict.items(self))
+        return self.__class__(super(MultiValueDict, self).items())
 
     def __deepcopy__(self, memo=None):
         import copy
@@ -222,12 +223,12 @@ class MultiValueDict(dict):
     def getlist(self, key):
         """Returns an empty list if the requested data doesn't exist."""
         try:
-            return dict.__getitem__(self, key)
+            return super(MultiValueDict, self).__getitem__(key)
         except KeyError:
             return []
 
     def setlist(self, key, list_):
-        dict.__setitem__(self, key, list_)
+        super(MultiValueDict, self).__setitem__(key, list_)
 
     def setdefault(self, key, default=None):
         if key not in self:
@@ -242,7 +243,7 @@ class MultiValueDict(dict):
     def appendlist(self, key, value):
         """Appends an item to the internal list associated with key."""
         self.setlistdefault(key, [])
-        dict.__setitem__(self, key, self.getlist(key) + [value])
+        super(MultiValueDict, self).__setitem__(key, self.getlist(key) + [value])
 
     def items(self):
         """
@@ -253,7 +254,7 @@ class MultiValueDict(dict):
 
     def lists(self):
         """Returns a list of (key, list) pairs."""
-        return dict.items(self)
+        return super(MultiValueDict, self).items()
 
     def values(self):
         """Returns a list of the last value on every key list."""
