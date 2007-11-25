@@ -316,7 +316,7 @@ class DotExpandedDict(dict):
             try:
                 current[bits[-1]] = v
             except TypeError: # Special-case if current isn't a dict.
-                current = {bits[-1] : v}
+                current = {bits[-1]: v}
 
 class FileDict(dict):
     """
