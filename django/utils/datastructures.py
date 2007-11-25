@@ -211,7 +211,10 @@ class MultiValueDict(dict):
         return result
 
     def get(self, key, default=None):
-        """Returns the default value if the requested data doesn't exist."""
+        """
+        Returns the last data value for the passed key.  If key doesn't exist
+        or value is an empty list, then default is returned.
+        """
         try:
             val = self[key]
         except KeyError:
@@ -221,7 +224,10 @@ class MultiValueDict(dict):
         return val
 
     def getlist(self, key):
-        """Returns an empty list if the requested data doesn't exist."""
+        """
+        Returns the list of values for the passed key.  If key doesn't exist,
+        then an empty list is returned.
+        """
         try:
             return super(MultiValueDict, self).__getitem__(key)
         except KeyError:
