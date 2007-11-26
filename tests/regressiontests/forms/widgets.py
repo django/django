@@ -663,6 +663,16 @@ You can create your own custom renderers for RadioSelect to use.
 <label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
 <label><input type="radio" name="beatle" value="R" /> Ringo</label>
 
+Or you can use custom RadioSelect fields that use your custom renderer.
+>>> class CustomRadioSelect(RadioSelect):
+...    renderer = MyRenderer
+>>> w = CustomRadioSelect()
+>>> print w.render('beatle', 'G', choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo')))
+<label><input type="radio" name="beatle" value="J" /> John</label><br />
+<label><input type="radio" name="beatle" value="P" /> Paul</label><br />
+<label><input checked="checked" type="radio" name="beatle" value="G" /> George</label><br />
+<label><input type="radio" name="beatle" value="R" /> Ringo</label>
+
 A RadioFieldRenderer object also allows index access to individual RadioInput
 objects.
 >>> w = RadioSelect()

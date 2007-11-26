@@ -317,11 +317,13 @@ class RadioFieldRenderer(StrAndUnicode):
                 % force_unicode(w) for w in self]))
 
 class RadioSelect(Select):
+    renderer = RadioFieldRenderer
 
     def __init__(self, *args, **kwargs):
-        self.renderer = kwargs.pop('renderer', None)
-        if not self.renderer:
-            self.renderer = RadioFieldRenderer
+        # Override the default renderer if we were passed one.
+        renderer = kwargs.pop('renderer', None)
+        if renderer:
+            self.renderer = renderer
         super(RadioSelect, self).__init__(*args, **kwargs)
 
     def get_renderer(self, name, value, attrs=None, choices=()):
