@@ -2,6 +2,7 @@
 tests = r"""
 >>> from django.newforms import *
 >>> from django.newforms.widgets import RadioFieldRenderer
+>>> from django.utils.safestring import mark_safe
 >>> import datetime
 >>> import time
 >>> import re
@@ -205,6 +206,8 @@ u'<textarea rows="10" cols="40" name="msg"></textarea>'
 u'<textarea rows="10" cols="40" name="msg">value</textarea>'
 >>> w.render('msg', 'some "quoted" & ampersanded value')
 u'<textarea rows="10" cols="40" name="msg">some &quot;quoted&quot; &amp; ampersanded value</textarea>'
+>>> w.render('msg', mark_safe('pre &quot;quoted&quot; value'))
+u'<textarea rows="10" cols="40" name="msg">pre &quot;quoted&quot; value</textarea>'
 >>> w.render('msg', 'value', attrs={'class': 'pretty', 'rows': 20})
 u'<textarea class="pretty" rows="20" cols="40" name="msg">value</textarea>'
 
@@ -375,6 +378,17 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+# Choices are escaped correctly
+>>> print w.render('escape', None, choices=(('bad', 'you & me'), ('good', mark_safe('you &gt; me'))))
+<select name="escape">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="bad">you &amp; me</option>
+<option value="good">you &gt; me</option>
+</select>
+
+# Unicode choices are correctly rendered as HTML
 >>> w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select name="email">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
@@ -538,6 +552,17 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <option value="5">5</option>
 </select>
 
+# Choices are escaped correctly
+>>> print w.render('escape', None, choices=(('bad', 'you & me'), ('good', mark_safe('you &gt; me'))))
+<select multiple="multiple" name="escape">
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="bad">you &amp; me</option>
+<option value="good">you &gt; me</option>
+</select>
+
+# Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<select multiple="multiple" name="nums">\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" selected="selected">\u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</option>\n<option value="\u0107\u017e\u0161\u0111">abc\u0107\u017e\u0161\u0111</option>\n</select>'
 
@@ -692,6 +717,14 @@ Traceback (most recent call last):
 ...
 IndexError: list index out of range
 
+# Choices are escaped correctly
+>>> w = RadioSelect()
+>>> print w.render('escape', None, choices=(('bad', 'you & me'), ('good', mark_safe('you &gt; me'))))
+<ul>
+<li><label><input type="radio" name="escape" value="bad" /> you &amp; me</label></li>
+<li><label><input type="radio" name="escape" value="good" /> you &gt; me</label></li>
+</ul>
+
 # Unicode choices are correctly rendered as HTML
 >>> w = RadioSelect()
 >>> unicode(w.render('email', 'ŠĐĆŽćžšđ', choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')]))
@@ -821,6 +854,17 @@ If 'choices' is passed to both the constructor and render(), then they'll both b
 <li><label><input type="checkbox" name="nums" value="5" /> 5</label></li>
 </ul>
 
+# Choices are escaped correctly
+>>> print w.render('escape', None, choices=(('bad', 'you & me'), ('good', mark_safe('you &gt; me'))))
+<ul>
+<li><label><input type="checkbox" name="escape" value="1" /> 1</label></li>
+<li><label><input type="checkbox" name="escape" value="2" /> 2</label></li>
+<li><label><input type="checkbox" name="escape" value="3" /> 3</label></li>
+<li><label><input type="checkbox" name="escape" value="bad" /> you &amp; me</label></li>
+<li><label><input type="checkbox" name="escape" value="good" /> you &gt; me</label></li>
+</ul>
+
+# Unicode choices are correctly rendered as HTML
 >>> w.render('nums', ['ŠĐĆŽćžšđ'], choices=[('ŠĐĆŽćžšđ', 'ŠĐabcĆŽćžšđ'), ('ćžšđ', 'abcćžšđ')])
 u'<ul>\n<li><label><input type="checkbox" name="nums" value="1" /> 1</label></li>\n<li><label><input type="checkbox" name="nums" value="2" /> 2</label></li>\n<li><label><input type="checkbox" name="nums" value="3" /> 3</label></li>\n<li><label><input checked="checked" type="checkbox" name="nums" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111" /> \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></li>\n<li><label><input type="checkbox" name="nums" value="\u0107\u017e\u0161\u0111" /> abc\u0107\u017e\u0161\u0111</label></li>\n</ul>'
 

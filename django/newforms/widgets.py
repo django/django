@@ -11,7 +11,7 @@ import copy
 from itertools import chain
 
 from django.utils.datastructures import MultiValueDict
-from django.utils.html import escape
+from django.utils.html import escape, conditional_escape
 from django.utils.translation import ugettext
 from django.utils.encoding import StrAndUnicode, force_unicode
 from django.utils.safestring import mark_safe
@@ -155,7 +155,7 @@ class Textarea(Widget):
         value = force_unicode(value)
         final_attrs = self.build_attrs(attrs, name=name)
         return mark_safe(u'<textarea%s>%s</textarea>' % (flatatt(final_attrs),
-                escape(value)))
+                conditional_escape(force_unicode(value))))
 
 class DateTimeInput(Input):
     input_type = 'text'
@@ -217,7 +217,9 @@ class Select(Widget):
         for option_value, option_label in chain(self.choices, choices):
             option_value = force_unicode(option_value)
             selected_html = (option_value == str_value) and u' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
+            output.append(u'<option value="%s"%s>%s</option>' % (
+                    escape(option_value), selected_html,
+                    conditional_escape(force_unicode(option_label))))
         output.append(u'</select>')
         return mark_safe(u'\n'.join(output))
 
@@ -254,7 +256,9 @@ class SelectMultiple(Widget):
         for option_value, option_label in chain(self.choices, choices):
             option_value = force_unicode(option_value)
             selected_html = (option_value in str_values) and ' selected="selected"' or ''
-            output.append(u'<option value="%s"%s>%s</option>' % (escape(option_value), selected_html, escape(force_unicode(option_label))))
+            output.append(u'<option value="%s"%s>%s</option>' % (
+                    escape(option_value), selected_html,
+                    conditional_escape(force_unicode(option_label))))
         output.append(u'</select>')
         return mark_safe(u'\n'.join(output))
 
@@ -278,7 +282,7 @@ class RadioInput(StrAndUnicode):
 
     def __unicode__(self):
         return mark_safe(u'<label>%s %s</label>' % (self.tag(),
-                self.choice_label))
+                conditional_escape(force_unicode(self.choice_label))))
 
     def is_checked(self):
         return self.value == self.choice_value
@@ -363,7 +367,8 @@ class CheckboxSelectMultiple(SelectMultiple):
             cb = CheckboxInput(final_attrs, check_test=lambda value: value in str_values)
             option_value = force_unicode(option_value)
             rendered_cb = cb.render(name, option_value)
-            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb, escape(force_unicode(option_label))))
+            output.append(u'<li><label>%s %s</label></li>' % (rendered_cb,
+                    conditional_escape(force_unicode(option_label))))
         output.append(u'</ul>')
         return mark_safe(u'\n'.join(output))
 
