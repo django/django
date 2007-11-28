@@ -168,10 +168,9 @@ def translation(language):
                     res.merge(t)
             return res
 
-        if hasattr(settings, 'LOCALE_PATHS'):
-            for localepath in settings.LOCALE_PATHS:
-                if os.path.isdir(localepath):
-                    res = _merge(localepath)
+        for localepath in settings.LOCALE_PATHS:
+            if os.path.isdir(localepath):
+                res = _merge(localepath)
 
         if projectpath and os.path.isdir(projectpath):
             res = _merge(projectpath)

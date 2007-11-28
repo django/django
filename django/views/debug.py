@@ -422,11 +422,11 @@ TECHNICAL_500_TEMPLATE = """
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line }}</li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line }} <span>...</span></li></ol>
+              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
               {% if frame.post_context %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line }}</li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}
@@ -445,8 +445,8 @@ TECHNICAL_500_TEMPLATE = """
               <tbody>
                 {% for var in frame.vars|dictsort:"0" %}
                   <tr>
-                    <td>{{ var.0 }}</td>
-                    <td class="code"><div>{{ var.1|pprint }}</div></td>
+                    <td>{{ var.0|escape }}</td>
+                    <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -466,7 +466,7 @@ Traceback (most recent call last):<br/>
 {% for frame in frames %}
   File "{{ frame.filename }}" in {{ frame.function }}<br/>
   {% if frame.context_line %}
-    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line }}<br/>
+    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line|escape }}<br/>
   {% endif %}
 {% endfor %}<br/>
 &nbsp;&nbsp;{{ exception_type }} at {{ request.path|escape }}<br/>

@@ -658,7 +658,7 @@ message file. The choice is yours.
     of the settings file to determine this, and a settings file doesn't exist
     if you're manually configuring your settings.)
 
-.. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/#using-settings-without-setting-django-settings-module
 
 All message file repositories are structured the same way. They are:
 

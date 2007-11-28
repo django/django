@@ -268,6 +268,12 @@ class Templates(unittest.TestCase):
             # Embedded newlines make it not-a-tag.
             'basic-syntax24': ("{{ moo\n }}", {}, "{{ moo\n }}"),
 
+            # Literal strings are permitted inside variables, mostly for i18n
+            # purposes.
+            'basic-syntax25': ('{{ "fred" }}', {}, "fred"),
+            'basic-syntax26': (r'{{ "\"fred\"" }}', {}, "\"fred\""),
+            'basic-syntax27': (r'{{ _("\"fred\"") }}', {}, "\"fred\""),
+
             # List-index syntax allows a template to access a certain item of a subscriptable object.
             'list-index01': ("{{ var.1 }}", {"var": ["first item", "second item"]}, "second item"),
 

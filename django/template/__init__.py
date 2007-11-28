@@ -547,9 +547,9 @@ class FilterExpression(object):
             if var == None:
                 var, constant, i18n_constant = match.group("var", "constant", "i18n_constant")
                 if i18n_constant:
-                    var = '"%s"' %  _(i18n_constant)
+                    var = '"%s"' %  _(i18n_constant.replace(r'\"', '"'))
                 elif constant:
-                    var = '"%s"' % constant
+                    var = '"%s"' % constant.replace(r'\"', '"')
                 upto = match.end()
                 if var == None:
                     raise TemplateSyntaxError, "Could not find variable at start of %s" % token

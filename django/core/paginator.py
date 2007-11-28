@@ -91,7 +91,7 @@ class ObjectPaginator(object):
         a template for loop.
         """
         if self._page_range is None:
-            self._page_range = range(1, self._pages + 1)
+            self._page_range = range(1, self.pages + 1)
         return self._page_range
 
     hits = property(_get_hits)

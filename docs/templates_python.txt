@@ -755,61 +755,106 @@ inside the template code:
    ``EscapeString`` and ``EscapeUnicode``. You will not normally need to worry
    about these; they exist for the implementation of the ``escape`` filter.
 
-Inside your filter, you will need to think about three areas in order to be
-auto-escaping compliant:
+When you are writing a filter, your code will typically fall into one of two
+situations:
 
- 1. If your filter returns a string that is ready for direct output (it should
-    be considered a "safe" string), you should call
-    ``django.utils.safestring.mark_safe()`` on the result prior to returning.
-    This will turn the result into the appropriate ``SafeData`` type. This is
-    often the case when you are returning raw HTML, for example.
+ 1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
+    ``'``, ``"`` or ``&``) into the result that were not already present. In
+    this case, you can let Django take care of all the auto-escaping handling
+    for you. All you need to do is put the ``is_safe`` attribute on your
+    filter function and set it to ``True``. This attribute tells Django that
+    is a "safe" string is passed into your filter, the result will still be
+    "safe" and if a non-safe string is passed in, Django will automatically
+    escape it, if necessary. The reason ``is_safe`` is necessary is because
+    there are plenty of normal string operations that will turn a ``SafeData``
+    object back into a normal ``str`` or ``unicode`` object and, rather than
+    try to catch them all, which would be very difficult, Django repairs the
+    damage after the filter has completed.
 
- 2. If your filter is given a "safe" string, is it guaranteed to return a
-    "safe" string? If so, set the ``is_safe`` attribute on the function to be
-    ``True``. For example, a filter that replaced a word consisting only of
-    digits with the number spelt out in words is going to be
-    safe-string-preserving, since it cannot introduce any of the five dangerous
-    characters: <, >, ", ' or &. We can write::
+    For example, suppose you have a filter that adds the string ``xx`` to the
+    end of any input. Since this introduces no dangerous HTML characters into
+    the result (aside from any that were already present), you should mark
+    your filter with ``is_safe``::
 
         @register.filter
-        def convert_to_words(value):
-            # ... implementation here ...
-            return result
+        def add_xx(value):
+            return '%sxx' % value
+        add_xx.is_safe = True
 
-        convert_to_words.is_safe = True
+    When this filter is used in a template where auto-escaping is enabled,
+    Django will escape the output whenever the input is not already marked as
+    "safe".
 
-    Note that this filter does not return a universally safe result (it does
-    not return ``mark_safe(result)``) because if it is handed a raw string such
-    as '<a>', this will need further escaping in an auto-escape environment.
-    The ``is_safe`` attribute only talks about the the result when a safe
-    string is passed into the filter.
+    By default, ``is_safe`` defaults to ``False`` and you can omit it from
+    any filters where it isn't required.
 
- 3. Will your filter behave differently depending upon whether auto-escaping
-    is currently in effect or not? This is normally a concern when you are
-    returning mixed content (HTML elements mixed with user-supplied content).
-    For example, the ``ordered_list`` filter that ships with Django needs to
-    know whether to escape its content or not. It will always return a safe
-    string. Since it returns raw HTML, we cannot apply escaping to the
-    result -- it needs to be done in-situ.
+    Be careful when deciding if your filter really does leave safe strings
+    as safe. Sometimes if you are *removing* characters, you can
+    inadvertently leave unbalanced HTML tags or entities in the result.
+    For example, removing a ``>`` from the input might turn ``<a>`` into
+    ``<a``, which would need to be escaped on output to avoid causing
+    problems. Similarly, removing a semicolon (``;``) can turn ``&amp;``
+    into ``&amp``, which is no longer a valid entity and thus needs
+    further escaping. Most cases won't be nearly this tricky, but keep an
+    eye out for any problems like that when reviewing your code.
 
-    For these cases, the filter function needs to be told what the current
-    auto-escaping setting is. Set the ``needs_autoescape`` attribute on the
-    filter to ``True`` and have your function take an extra argument called
-    ``autoescape`` with a default value of ``None``. When the filter is called,
-    the ``autoescape`` keyword argument will be ``True`` if auto-escaping is in
-    effect. For example, the ``unordered_list`` filter is written as::
+ 2. Alternatively, your filter code can manually take care of any necessary
+    escaping. This is usually necessary when you are introducing new HTML
+    markup into the result. You want to mark the output as safe from further
+    escaping so that your HTML markup isn't escaped further, so you'll need to
+    handle the input yourself.
 
-        def unordered_list(value, autoescape=None):
-            # ... lots of code here ...
+    To mark the output as a safe string, use
+    ``django.utils.safestring.mark_safe()``.
 
-            return mark_safe(...)
+    Be careful, though. You need to do more than just mark the output as
+    safe. You need to ensure it really *is* safe and what you do will often
+    depend upon whether or not auto-escaping is in effect. The idea is to
+    write filters than can operate in templates where auto-escaping is either
+    on or off in order to make things easier for your template authors.
 
-        unordered_list.is_safe = True
-        unordered_list.needs_autoescape = True
+    In order for you filter to know the current auto-escaping state, set the
+    ``needs_autoescape`` attribute to ``True`` on your function (if you don't
+    specify this attribute, it defaults to ``False``). This attribute tells
+    Django that your filter function wants to be passed an extra keyword
+    argument, called ``autoescape`` that is ``True`` is auto-escaping is in
+    effect and ``False`` otherwise.
 
-By default, both the ``is_safe`` and ``needs_autoescape`` attributes are
-``False``. You do not need to specify them if ``False`` is an acceptable
-value.
+    An example might make this clearer. Let's write a filter that emphasizes
+    the first character of a string::
+
+        from django.utils.html import conditional_escape
+        from django.utils.safestring import mark_safe
+
+        def initial_letter_filter(text, autoescape=None):
+            first, other = text[0] ,text[1:]
+            if autoescape:
+                esc = conditional_escape
+            else:
+                esc = lambda x: x
+            result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+            return mark_safe(result)
+        initial_letter_filter.needs_autoescape = True
+
+    The ``needs_autoescape`` attribute on the filter function and the
+    ``autoescape`` keyword argument mean that our function will know whether
+    or not automatic escaping is in effect when the filter is called. We use
+    ``autoescape`` to decide whether the input data needs to be passed through
+    ``django.utils.html.conditional_escape`` or not (in the latter case, we
+    just use the identity function as the "escape" function). The
+    ``conditional_escape()`` function is like ``escape()`` except it only
+    escapes input that is **not** a ``SafeData`` instance. If a ``SafeData``
+    instance is passed to ``conditional_escape()``, the data is returned
+    unchanged.
+
+    Finally, in the above example, we remember to mark the result as safe
+    so that our HTML is inserted directly into the template without further
+    escaping.
+
+    There is no need to worry about the ``is_safe`` attribute in this case
+    (although including it wouldn't hurt anything). Whenever you are manually
+    handling the auto-escaping issues and returning a safe string, the
+    ``is_safe`` attribute won't change anything either way.
 
 Writing custom template tags
 ----------------------------
@@ -932,7 +977,9 @@ without having to be parsed multiple times.
 Auto-escaping considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The output from template tags is not automatically run through the
+**New in Django development version**
+
+The output from template tags is **not** automatically run through the
 auto-escaping filters. However, there are still a couple of things you should
 keep in mind when writing a template tag:
 

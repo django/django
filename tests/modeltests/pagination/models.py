@@ -78,7 +78,8 @@ True
 >>> paginator.pages
 2
 
-# The paginator can provide a list of all available pages
+# The paginator can provide a list of all available pages.
+>>> paginator = ObjectPaginator(Article.objects.all(), 10)
 >>> paginator.page_range
 [1, 2]
 """}

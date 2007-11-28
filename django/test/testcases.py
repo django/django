@@ -51,9 +51,9 @@ class TestCase(unittest.TestCase):
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:
 
-            * If the Test Case class has a 'fixtures' member, clearing the
-              database and installing the named fixtures at the start of each
-              test.
+            * Flushing the database.
+            * If the Test Case class has a 'fixtures' member, installing the 
+              named fixtures.
             * Clearing the mail test outbox.
         """
         call_command('flush', verbosity=0, interactive=False)

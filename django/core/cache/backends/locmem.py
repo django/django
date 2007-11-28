@@ -16,8 +16,12 @@ class CacheClass(SimpleCacheClass):
 
     def add(self, key, value, timeout=None):
         self._lock.writer_enters()
+        # Python 2.3 and 2.4 don't allow combined try-except-finally blocks.
         try:
-            SimpleCacheClass.add(self, key, value, timeout)
+            try:
+                super(CacheClass, self).add(key, pickle.dumps(value), timeout)
+            except pickle.PickleError:
+                pass
         finally:
             self._lock.writer_leaves()
 
@@ -49,6 +53,7 @@ class CacheClass(SimpleCacheClass):
 
     def set(self, key, value, timeout=None):
         self._lock.writer_enters()
+        # Python 2.3 and 2.4 don't allow combined try-except-finally blocks.
         try:
             try:
                 super(CacheClass, self).set(key, pickle.dumps(value), timeout)
