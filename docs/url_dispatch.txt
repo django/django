@@ -237,7 +237,7 @@ include
 -------
 
 A function that takes a full Python import path to another URLconf that should
-be "included" in this place. See _`Including other URLconfs` below.
+be "included" in this place. See `Including other URLconfs`_ below.
 
 Notes on capturing text in URLs
 ===============================

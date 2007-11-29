@@ -651,7 +651,7 @@ To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
 that it doesn't matter whether the options come before or after the fixture
 arguments.)
 
-To run on 1.2.3.4:7000 with a `test` fixture::
+To run on 1.2.3.4:7000 with a ``test`` fixture::
 
     django-admin.py testserver --addrport 1.2.3.4:7000 test
 

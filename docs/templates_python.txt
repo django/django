@@ -1183,7 +1183,7 @@ on the object being edited -- so they're a perfect case for using a small
 template that is filled with details from the current object. (In the admin's
 case, this is the ``submit_row`` tag.)
 
-These sorts of tags are called `inclusion tags`.
+These sorts of tags are called "inclusion tags".
 
 Writing inclusion tags is probably best demonstrated by example. Let's write a
 tag that outputs a list of choices for a given ``Poll`` object, such as was
