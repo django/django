@@ -187,10 +187,10 @@ latest bug fixes and improvements, follow these instructions:
    "Where are my ``site-packages`` stored?" section above.)
 
    Alternatively, you can define your ``PYTHONPATH`` environment variable
-   so that it includes the ``django`` subdirectory of ``django-trunk``.
-   This is perhaps the most convenient solution on Windows systems, which
-   don't support symbolic links. (Environment variables can be defined on
-   Windows systems `from the Control Panel`_.)
+   so that it includes the ``django-trunk`` directory. This is perhaps the
+   most convenient solution on Windows systems, which don't support symbolic
+   links. (Environment variables can be defined on Windows systems `from the
+   Control Panel`_.)
 
    .. admonition:: What about Apache and mod_python?
 
