@@ -395,7 +395,8 @@ class ValuesQuerySet(QuerySet):
         if self._fields:
             opts = self.model._meta
             all = dict([(field.column, field) for field in opts.fields])
-            all.update([(field.name, field) for field in opts.fields])
+            for field in opts.fields:
+                all[field.name] = field
             if not self.query.extra_select:
                 try:
                     fields = [all[f] for f in self._fields]

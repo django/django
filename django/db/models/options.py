@@ -173,11 +173,12 @@ class Options(object):
         Initialises the field name -> field object mapping.
         """
         cache = dict([(f.name, (f, True, False)) for f in self.fields])
-        cache.update([(f.name, (f, True, True)) for f in self.many_to_many])
-        cache.update([(f.field.related_query_name(), (f, False, True))
-                for f in self.get_all_related_many_to_many_objects()])
-        cache.update([(f.field.related_query_name(), (f, False, False))
-                for f in self.get_all_related_objects()])
+        for f in self.many_to_many:
+            cache[f.name] = (f, True, True)
+        for f in self.get_all_related_many_to_many_objects():
+            cache[f.field.related_query_name()] = (f, False, True)
+        for f in self.get_all_related_objects():
+            cache[f.field.related_query_name()] = (f, False, False)
         if app_cache_ready():
             self._name_map = cache
         return cache
