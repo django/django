@@ -790,8 +790,11 @@ class ManyToOneRel(object):
         self.multiple = True
 
     def get_related_field(self):
-        "Returns the Field in the 'to' object to which this relationship is tied."
-        return self.to._meta.get_field(self.field_name)
+        """
+        Returns the Field in the 'to' object to which this relationship is
+        tied.
+        """
+        return self.to._meta.get_field_by_name(self.field_name, True)[0]
 
 class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, edit_inline=False,

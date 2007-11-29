@@ -93,7 +93,8 @@ class Options(object):
     def add_field(self, field):
         # Insert the given field in the order in which it was created, using
         # the "creation_counter" attribute of the field.
-        # Move many-to-many related fields from self.fields into self.many_to_many.
+        # Move many-to-many related fields from self.fields into
+        # self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.many_to_many.insert(bisect(self.many_to_many, field), field)
         else:
@@ -128,6 +129,58 @@ class Options(object):
             if f.name == name:
                 return f
         raise FieldDoesNotExist, '%s has no field named %r' % (self.object_name, name)
+
+    def get_field_by_name(self, name, only_direct=False):
+        """
+        Returns the (field_object, direct, m2m), where field_object is the
+        Field instance for the given name, direct is True if the field exists
+        on this model, and m2m is True for many-to-many relations. When
+        'direct' is False, 'field_object' is the corresponding RelatedObject
+        for this field (since the field doesn't have an instance associated
+        with it).
+
+        If 'only_direct' is True, only forwards relations (and non-relations)
+        are considered in the result.
+
+        Uses a cache internally, so after the first access, this is very fast.
+        """
+        try:
+            result = self._name_map.get(name)
+        except AttributeError:
+            cache = self.init_name_map()
+            result = cache.get(name)
+
+        if not result or (not result[1] and only_direct):
+            raise FieldDoesNotExist('%s has no field named %r'
+                    % (self.object_name, name))
+        return result
+
+    def get_all_field_names(self):
+        """
+        Returns a list of all field names that are possible for this model
+        (including reverse relation names).
+        """
+        try:
+            cache = self._name_map
+        except AttributeError:
+            cache = self.init_name_map()
+        names = cache.keys()
+        names.sort()
+        return names
+
+    def init_name_map(self):
+        """
+        Initialises the field name -> field object mapping.
+        """
+        cache = dict([(f.name, (f, True, False)) for f in self.fields])
+        cache.update([(f.name, (f, True, True)) for f in self.many_to_many])
+        cache.update([(f.field.related_query_name(), (f, False, True))
+                for f in self.get_all_related_many_to_many_objects()])
+        cache.update([(f.field.related_query_name(), (f, False, False))
+                for f in self.get_all_related_objects()])
+        if app_cache_ready():
+            self._name_map = cache
+        return cache
 
     def get_add_permission(self):
         return 'add_%s' % self.object_name.lower()

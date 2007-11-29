@@ -24,9 +24,9 @@ CHUNK_SIZE = 100
 
 class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
-    def __init__(self, model=None):
+    def __init__(self, model=None, query=None):
         self.model = model
-        self.query = sql.Query(self.model, connection)
+        self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
 
     ########################
@@ -338,7 +338,7 @@ class _QuerySet(object):
         if tables:
             clone.query.extra_tables.extend(tables)
         if order_by:
-            clone.query.extra_order_by.extend(order_by)
+            clone.query.extra_order_by = order_by
         return clone
 
     ###################
@@ -348,9 +348,7 @@ class _QuerySet(object):
     def _clone(self, klass=None, setup=False, **kwargs):
         if klass is None:
             klass = self.__class__
-        c = klass()
-        c.model = self.model
-        c.query = self.query.clone()
+        c = klass(model=self.model, query=self.query.clone())
         c.__dict__.update(kwargs)
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
@@ -460,8 +458,8 @@ class DateQuerySet(QuerySet):
         return c
 
 class EmptyQuerySet(QuerySet):
-    def __init__(self, model=None):
-        super(EmptyQuerySet, self).__init__(model)
+    def __init__(self, model=None, query=None):
+        super(EmptyQuerySet, self).__init__(model, query)
         self._result_cache = []
 
     def count(self):

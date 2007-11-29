@@ -190,6 +190,10 @@ Bug #4464
 [<Item: two>]
 
 Bug #2080, #3592
+>>> Author.objects.filter(item__name='one') | Author.objects.filter(name='a3')
+[<Author: a1>, <Author: a3>]
+>>> Author.objects.filter(Q(item__name='one') | Q(name='a3'))
+[<Author: a1>, <Author: a3>]
 >>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
 [<Author: a1>, <Author: a3>]
 
@@ -216,6 +220,12 @@ Bug #2253
 [<Item: four>, <Item: one>, <Item: three>, <Item: two>]
 >>> (q1 & q2).order_by('name')
 [<Item: one>]
+
+>>> q1 = Item.objects.filter(tags=t1)
+>>> q2 = Item.objects.filter(note=n3, tags=t2)
+>>> q3 = Item.objects.filter(creator=a4)
+>>> ((q1 & q2) | q3).order_by('name')
+[<Item: four>, <Item: one>]
 
 Bugs #4088, #4306
 >>> Report.objects.filter(creator=1001)

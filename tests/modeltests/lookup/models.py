@@ -253,7 +253,7 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.filter(pub_date_year='2005').count()
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: id, headline, pub_date
+TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: headline, id, pub_date
 
 >>> Article.objects.filter(headline__starts='Article')
 Traceback (most recent call last):
