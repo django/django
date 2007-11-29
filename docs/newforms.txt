@@ -753,6 +753,30 @@ For example::
     </ul>
     </form>
 
+Highlighting required fields in templates
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You may wish to show a visitor which fields are required. Here is the above
+example modified to insert an asterix after the label of each required field::
+
+    <form method="post" action="">
+    <dl>
+    {% for field in form %}
+        <dt>{{ field.label_tag }}{{ field.label }}{% if field.field.required %}*{% endif %}</dt>
+        <dd>{{ field }}</dd>
+        {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
+        {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}
+    {% endfor %}
+    </dl>
+    <input type="submit" />
+    </form>
+
+The ``{% if field.field.required %}*{% endif %}`` fragment is the relevant
+addition here. It adds the asterix only if the field is required. Note that we
+check ``field.field.required`` and not ``field.required``. In the template,
+``field`` is a ``newforms.forms.BoundField`` instance, which holds the actual
+``Field`` instance in its ``field`` attribute.
+
 Binding uploaded files to a form
 --------------------------------
 
