@@ -91,7 +91,7 @@ def floatformat(text, arg=-1):
     """
     try:
         f = float(text)
-    except ValueError:
+    except (ValueError, TypeError):
         return u''
     try:
         d = int(arg)
