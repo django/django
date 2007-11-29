@@ -12,6 +12,15 @@ from datetime import datetime, timedelta
 from django.utils.tzinfo import LocalTimezone
 from django.utils.safestring import mark_safe
 
+# These two classes are used to test auto-escaping of __unicode__ output.
+class UnsafeClass:
+    def __unicode__(self):
+        return u'you & me'
+
+class SafeClass:
+    def __unicode__(self):
+        return mark_safe(u'you &gt; me')
+
 # RESULT SYNTAX --
 # 'template_name': ('template contents', 'context dict',
 #                   'expected string output' or Exception class)
@@ -227,4 +236,11 @@ def get_filter_tests():
         'chaining12': ('{% autoescape off %}{{ a|cut:"b"|safe }}{% endautoescape %}', {"a": "a < b"}, "a < "),
         'chaining13': ('{{ a|safe|force_escape }}', {"a": "a < b"}, "a &lt; b"),
         'chaining14': ('{% autoescape off %}{{ a|safe|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; b"),
+
+        # Filters decorated with stringfilter still respect is_safe. 
+        'autoescape-stringfilter01': (r'{{ unsafe|capfirst }}', {'unsafe': UnsafeClass()}, 'You &amp; me'),
+        'autoescape-stringfilter02': (r'{% autoescape off %}{{ unsafe|capfirst }}{% endautoescape %}', {'unsafe': UnsafeClass()}, 'You & me'),
+        'autoescape-stringfilter03': (r'{{ safe|capfirst }}', {'safe': SafeClass()}, 'You &gt; me'),
+        'autoescape-stringfilter04': (r'{% autoescape off %}{{ safe|capfirst }}{% endautoescape %}', {'safe': SafeClass()}, 'You &gt; me'),
     }
+
