@@ -469,5 +469,5 @@ def method_get_order(ordered_obj, self):
 # HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #
 ##############################################
 
-def get_absolute_url(opts, func, self):
-    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self)
+def get_absolute_url(opts, func, self, *args, **kwargs):
+    return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
