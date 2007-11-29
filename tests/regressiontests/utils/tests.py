@@ -6,7 +6,14 @@ from unittest import TestCase
 
 from django.utils import html, checksums
 
-from timesince import timesince_tests
+import timesince
+import datastructures
+
+# Extra tests
+__test__ = {
+    'timesince': timesince,
+    'datastructures': datastructures,
+}
 
 class TestUtilsHtml(TestCase):
 
@@ -141,10 +148,6 @@ class TestUtilsChecksums(TestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
-
-__test__ = {
-    'timesince_tests': timesince_tests,
-}
 
 if __name__ == "__main__":
     import doctest
