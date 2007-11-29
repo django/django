@@ -323,6 +323,10 @@ Decimal("3.14")
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a number.']
+>>> f.clean(u'łąść')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
 >>> f.clean('1.0 ')
 Decimal("1.0")
 >>> f.clean(' 1.0')

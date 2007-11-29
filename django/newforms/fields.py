@@ -17,7 +17,7 @@ except NameError:
     from sets import Set as set
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import StrAndUnicode, smart_unicode
+from django.utils.encoding import StrAndUnicode, smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
@@ -235,7 +235,7 @@ class DecimalField(Field):
         super(DecimalField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
             return None
-        value = str(value).strip()
+        value = smart_str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
