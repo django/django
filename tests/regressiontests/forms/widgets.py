@@ -129,6 +129,13 @@ u'<input type="hidden" class="fun" value="\u0160\u0110\u0106\u017d\u0107\u017e\u
 >>> w.render('email', '', attrs={'class': 'special'})
 u'<input type="hidden" class="special" name="email" />'
 
+Boolean values are rendered to their string forms ("True" and "False").
+>>> w = HiddenInput()
+>>> w.render('get_spam', False)
+u'<input type="hidden" name="get_spam" value="False" />'
+>>> w.render('get_spam', True)
+u'<input type="hidden" name="get_spam" value="True" />'
+
 # MultipleHiddenInput Widget ##################################################
 
 >>> w = MultipleHiddenInput()
