@@ -33,6 +33,8 @@ PROVINCES_NORMALIZED = {
     'british columbia': 'BC',
     'mb': 'MB',
     'manitoba': 'MB',
+    'nb': 'NB',
+    'new brunswick': 'NB',
     'nf': 'NF',
     'newfoundland': 'NF',
     'newfoundland and labrador': 'NF',

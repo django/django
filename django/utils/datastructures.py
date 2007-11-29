@@ -60,7 +60,10 @@ class SortedDict(dict):
         if isinstance(data, dict):
             self.keyOrder = data.keys()
         else:
-            self.keyOrder = [key for key, value in data]
+            self.keyOrder = []
+            for key, value in data:
+                if key not in self.keyOrder:
+                    self.keyOrder.append(key)
 
     def __deepcopy__(self, memo):
         from copy import deepcopy

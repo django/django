@@ -120,8 +120,12 @@ def javascript_catalog(request, domain='djangojs', packages=None):
         p = __import__(package, {}, {}, [''])
         path = os.path.join(os.path.dirname(p.__file__), 'locale')
         paths.append(path)
-        catalog = gettext_module.translation(domain, path, ['en'])
-        t.update(catalog._catalog)
+        try:
+            catalog = gettext_module.translation(domain, path, ['en'])
+            t.update(catalog._catalog)
+        except IOError:
+            # 'en' catalog was missing. This is harmless.
+            pass
     # next load the settings.LANGUAGE_CODE translations if it isn't english
     if default_locale != 'en':
         for path in paths:

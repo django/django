@@ -323,6 +323,10 @@ Decimal("3.14")
 Traceback (most recent call last):
 ...
 ValidationError: [u'Enter a number.']
+>>> f.clean(u'łąść')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a number.']
 >>> f.clean('1.0 ')
 Decimal("1.0")
 >>> f.clean(' 1.0')
@@ -914,6 +918,11 @@ False
 >>> f.clean('Django rocks')
 True
 
+>>> f.clean('True')
+True
+>>> f.clean('False')
+False
+
 >>> f = BooleanField(required=False)
 >>> f.clean('')
 False
@@ -929,6 +938,11 @@ True
 False
 >>> f.clean('Django rocks')
 True
+
+A form's BooleanField with a hidden widget will output the string 'False', so
+that should clean to the boolean value False:
+>>> f.clean('False')
+False
 
 # ChoiceField #################################################################
 

@@ -147,6 +147,10 @@ u'BC'
 u'NS'
 >>> f.clean('  manitoba ')
 u'MB'
+>>> f.clean(' new brunswick ')
+u'NB'
+>>> f.clean('NB')
+u'NB'
 >>> f.clean('T2S 2H7')
 Traceback (most recent call last):
 ...

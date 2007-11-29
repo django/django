@@ -74,6 +74,21 @@ def patch_cache_control(response, **kwargs):
     cc = ', '.join([dictvalue(el) for el in cc.items()])
     response['Cache-Control'] = cc
 
+def get_max_age(response):
+    """
+    Returns the max-age from the response Cache-Control header as an integer
+    (or ``None`` if it wasn't found or wasn't an integer.
+    """
+    if not response.has_header('Cache-Control'):
+        return
+    cc = dict([_to_tuple(el) for el in
+        cc_delim_re.split(response['Cache-Control'])])
+    if 'max-age' in cc:
+        try:
+            return int(cc['max-age'])
+        except (ValueError, TypeError):
+            pass
+
 def patch_response_headers(response, cache_timeout=None):
     """
     Adds some useful headers to the given HttpResponse object:
@@ -180,3 +195,10 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None):
         # for the request.path
         cache.set(cache_key, [], cache_timeout)
         return _generate_cache_key(request, [], key_prefix)
+
+
+def _to_tuple(s):
+    t = s.split('=',1)
+    if len(t) == 2:
+        return t[0].lower(), t[1]
+    return t[0].lower(), True

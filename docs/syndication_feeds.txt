@@ -201,6 +201,8 @@ the feed.
 
 An example makes this clear. Here's the code for these beat-specific feeds::
 
+    from django.contrib.syndication import FeedDoesNotExist
+
     class BeatFeed(Feed):
         def get_object(self, bits):
             # In case of "/rss/beats/0613/foo/bar/baz/", or other such clutter,
@@ -213,6 +215,8 @@ An example makes this clear. Here's the code for these beat-specific feeds::
             return "Chicagocrime.org: Crimes for beat %s" % obj.beat
 
         def link(self, obj):
+            if not obj:
+                raise FeedDoesNotExist
             return obj.get_absolute_url()
 
         def description(self, obj):
@@ -246,10 +250,17 @@ request to the URL ``/rss/beats/0613/``:
       each of ``title``, ``link`` and ``description``, Django follows this
       algorithm:
 
-          * First, it tries to call a method, passing the ``obj`` argument, where
-            ``obj`` is the object returned by ``get_object()``.
+          * First, it tries to call a method, passing the ``obj`` argument,
+            where ``obj`` is the object returned by ``get_object()``.
           * Failing that, it tries to call a method with no arguments.
           * Failing that, it uses the class attribute.
+
+      Inside the ``link()`` method, we handle the possibility that ``obj``
+      might be ``None``, which can occur when the URL isn't fully specified. In
+      some cases, you might want to do something else in this case, which would
+      mean you'd need to check for ``obj`` existing in other methods as well
+      (the ``link()`` method is called very early in the feed generation
+      process, so is a good place to bail out early).
 
     * Finally, note that ``items()`` in this example also takes the ``obj``
       argument. The algorithm for ``items`` is the same as described in the

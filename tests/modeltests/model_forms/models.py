@@ -30,6 +30,23 @@ ARTICLE_STATUS = (
     (3, 'Live'),
 )
 
+STEERING_TYPE = (
+    ('left', 'Left steering wheel'),
+    ('right', 'Right steering wheel'),
+)
+
+FUEL_TYPE = (
+    ('gas', 'Gasoline'),
+    ('diesel', 'Diesel'),
+    ('other', 'Other'),
+)
+
+TRANSMISSION_TYPE = (
+    ('at', 'Automatic'),
+    ('mt', 'Manual'),
+    ('cvt', 'CVT'),
+)
+
 class Category(models.Model):
     name = models.CharField(max_length=20)
     slug = models.SlugField(max_length=20)
@@ -69,6 +86,12 @@ class PhoneNumber(models.Model):
 
     def __unicode__(self):
         return self.phone
+
+class Car(models.Model):
+    name = models.CharField(max_length=50)
+    steering = models.CharField(max_length=5, choices=STEERING_TYPE, default='left')
+    fuel = models.CharField(max_length=10, choices=FUEL_TYPE)
+    transmission = models.CharField(max_length=3, choices=TRANSMISSION_TYPE, blank=True, help_text='Leave empty if not applicable.')
 
 __test__ = {'API_TESTS': """
 >>> from django.newforms import form_for_model, form_for_instance, save_instance, BaseForm, Form, CharField
@@ -592,4 +615,54 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 True
 >>> f.cleaned_data
 {'phone': u'312-555-1212', 'description': u'Assistance'}
+
+# form_for_* blank choices ####################################################
+
+Show the form for a new Car. Note that steering field doesn't include the blank choice,
+because the field is obligatory and has an explicit default.
+>>> CarForm = form_for_model(Car)
+>>> f = CarForm(auto_id=False)
+>>> print f
+<tr><th>Name:</th><td><input type="text" name="name" maxlength="50" /></td></tr>
+<tr><th>Steering:</th><td><select name="steering">
+<option value="left" selected="selected">Left steering wheel</option>
+<option value="right">Right steering wheel</option>
+</select></td></tr>
+<tr><th>Fuel:</th><td><select name="fuel">
+<option value="" selected="selected">---------</option>
+<option value="gas">Gasoline</option>
+<option value="diesel">Diesel</option>
+<option value="other">Other</option>
+</select></td></tr>
+<tr><th>Transmission:</th><td><select name="transmission">
+<option value="" selected="selected">---------</option>
+<option value="at">Automatic</option>
+<option value="mt">Manual</option>
+<option value="cvt">CVT</option>
+</select><br />Leave empty if not applicable.</td></tr>
+
+Create a Car, and display the form for modifying it. Note that now the fuel
+selector doesn't include the blank choice as well, since the field is
+obligatory and can not be changed to be blank.
+>>> honda = Car(name='Honda Accord Wagon', steering='right', fuel='gas', transmission='at')
+>>> honda.save()
+>>> HondaForm = form_for_instance(honda)
+>>> f = HondaForm(auto_id=False)
+>>> print f
+<tr><th>Name:</th><td><input type="text" name="name" value="Honda Accord Wagon" maxlength="50" /></td></tr>
+<tr><th>Steering:</th><td><select name="steering">
+<option value="left">Left steering wheel</option>
+<option value="right" selected="selected">Right steering wheel</option>
+</select></td></tr>
+<tr><th>Fuel:</th><td><select name="fuel">
+<option value="gas" selected="selected">Gasoline</option>
+<option value="diesel">Diesel</option>
+<option value="other">Other</option>
+</select></td></tr>
+<tr><th>Transmission:</th><td><select name="transmission">
+<option value="">---------</option>
+<option value="at" selected="selected">Automatic</option>
+<option value="mt">Manual</option>
+<option value="cvt">CVT</option>
+</select><br />Leave empty if not applicable.</td></tr>
 """}

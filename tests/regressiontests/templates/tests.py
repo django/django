@@ -899,7 +899,12 @@ class Templates(unittest.TestCase):
 
             # Literal string arguments to filters, if used in the result, are
             # safe.
-            'basic-syntax08': (r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}', {"var": None}, ' endquote" hah'),
+            'autoescape-tag08': (r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}', {"var": None}, ' endquote" hah'),
+
+            # Objects which return safe strings as their __unicode__ method
+            # won't get double-escaped.
+            'autoescape-tag09': (r'{{ unsafe }}', {'unsafe': filters.UnsafeClass()}, 'you &amp; me'),
+            'autoescape-tag10': (r'{{ safe }}', {'safe': filters.SafeClass()}, 'you &gt; me'),
 
             # The "safe" and "escape" filters cannot work due to internal
             # implementation details (fortunately, the (no)autoescape block

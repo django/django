@@ -44,7 +44,7 @@ to this::
     DATABASE_ENGINE = "mysql_old"
 
 However, we strongly encourage MySQL users to upgrade to a more recent
-version of `MySQLdb` as soon as possible, The "mysql_old" backend is
+version of ``MySQLdb`` as soon as possible, The "mysql_old" backend is
 provided only to ease this transition, and is considered deprecated;
 aside from any necessary security fixes, it will not be actively
 maintained, and it will be removed in a future release of Django.

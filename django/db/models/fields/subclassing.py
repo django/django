@@ -28,10 +28,10 @@ class Creator(object):
     def __get__(self, obj, type=None):
         if obj is None:
             raise AttributeError('Can only be accessed via an instance.')
-        return self.value
+        return obj.__dict__[self.field.name]        
 
     def __set__(self, obj, value):
-        self.value = self.field.to_python(value)
+        obj.__dict__[self.field.name] = self.field.to_python(value)
 
 def make_contrib(func=None):
     """
