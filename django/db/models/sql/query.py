@@ -634,10 +634,13 @@ class Query(object):
         self.rev_join_map[alias] = t_ident
         return alias
 
-    def fill_related_selections(self, opts=None, root_alias=None, cur_depth=0,
+    def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
             used=None):
         """
-        Fill in the information needed for a select_related query.
+        Fill in the information needed for a select_related query. The current
+        "depth" is measured as the number of connections away from the root
+        model (cur_depth == 1 means we are looking at models with direct
+        connections to the root model).
         """
         if self.max_depth and cur_depth > self.max_depth:
             # We've recursed too deeply; bail out.

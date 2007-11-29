@@ -147,6 +147,10 @@ __test__ = {'API_TESTS':"""
 >>> len(db.connection.queries)
 5
 
+>>> s = Species.objects.all().select_related(depth=1).extra(select={'a': 'select_related_species.id + 10'})[0]
+>>> s.id + 10 == s.a
+True
+
 # Reset DEBUG to where we found it.
 >>> settings.DEBUG = False
 """}
