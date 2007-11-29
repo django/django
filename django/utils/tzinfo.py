@@ -54,6 +54,12 @@ class LocalTimezone(tzinfo):
 
     def _isdst(self, dt):
         tt = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.weekday(), 0, -1)
-        stamp = time.mktime(tt)
+        try:
+            stamp = time.mktime(tt)
+        except OverflowError:
+            # 32 bit systems can't handle dates after Jan 2038, so we fake it
+            # in that case (since we only care about the DST flag here).
+            tt = (2037,) + tt[1:]
+            stamp = time.mktime(tt)
         tt = time.localtime(stamp)
         return tt.tm_isdst > 0
