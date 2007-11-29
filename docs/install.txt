@@ -204,11 +204,18 @@ latest bug fixes and improvements, follow these instructions:
 
       .. _How to use Django with mod_python: ../modpython/
 
-4. Copy the file ``django-trunk/django/bin/django-admin.py`` to somewhere on
-   your system path, such as ``/usr/local/bin`` (Unix) or ``C:\Python24\Scripts``
-   (Windows). This step simply lets you type ``django-admin.py`` from within
-   any directory, rather than having to qualify the command with the full path
-   to the file.
+4. On Unix-like systems, create a symbolic link to the file
+   ``django-trunk/django/bin/django-admin.py`` in a directory on your system
+   path, such as ``/usr/local/bin``. For example::
+
+       ln -s `pwd`/django-trunk/django/bin/django-admin.py /usr/local/bin
+
+   This simply lets you type ``django-admin.py`` from within any directory,
+   rather than having to qualify the command with the full path to the file.
+
+   On Windows systems, the same result can be achieved by copying the file
+   ``django-trunk/django/bin/django-admin.py`` to somewhere on your system
+   path, for example ``C:\Python24\Scripts``.
 
 You *don't* have to run ``python setup.py install``, because you've already
 carried out the equivalent actions in steps 3 and 4.
