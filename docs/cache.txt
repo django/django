@@ -263,6 +263,18 @@ See the `middleware documentation`_ for more on middleware.
 
 .. _`middleware documentation`: ../middleware/
 
+**New in Django development version**
+
+If a view sets its own cache expiry time (i.e. it has a ``max-age`` section in
+its ``Cache-Control`` header) then the page will be cached until the expiry
+time, rather than ``CACHE_MIDDLEWARE_SECONDS``. Using the decorators in
+``django.views.decorators.cache`` you can easily set a view's expiry time
+(using the ``cache_control`` decorator) or disable caching for a view (using
+the ``never_cache`` decorator). See the `using other headers`__ section for
+more on these decorators.
+
+__ `Controlling cache: Using other headers`_
+
 The per-view cache
 ==================
 
@@ -566,7 +578,7 @@ the value of the ``CACHE_MIDDLEWARE_SETTINGS`` setting. If you use a custom
 precedence, and the header values will be merged correctly.)
 
 If you want to use headers to disable caching altogether,
-``django.views.decorators.never_cache`` is a view decorator that adds
+``django.views.decorators.cache.never_cache`` is a view decorator that adds
 headers to ensure the response won't be cached by browsers or other caches. Example::
 
     from django.views.decorators.cache import never_cache

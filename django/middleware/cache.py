@@ -1,13 +1,17 @@
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers
+from django.utils.cache import get_cache_key, learn_cache_key, patch_response_headers, get_max_age
 
 class CacheMiddleware(object):
     """
     Cache middleware. If this is enabled, each Django-powered page will be
-    cached for CACHE_MIDDLEWARE_SECONDS seconds. Cache is based on URLs.
+    cached (based on URLs).
 
     Only parameter-less GET or HEAD-requests with status code 200 are cached.
+
+    The number of seconds each page is stored for is set by the
+    "max-age" section of the response's "Cache-Control" header, falling back to
+    the CACHE_MIDDLEWARE_SECONDS setting if the section was not found.
 
     If CACHE_MIDDLEWARE_ANONYMOUS_ONLY is set to True, only anonymous requests
     (i.e., those not made by a logged-in user) will be cached. This is a
@@ -78,7 +82,16 @@ class CacheMiddleware(object):
             return response
         if not response.status_code == 200:
             return response
-        patch_response_headers(response, self.cache_timeout)
-        cache_key = learn_cache_key(request, response, self.cache_timeout, self.key_prefix)
-        cache.set(cache_key, response, self.cache_timeout)
+        # Try to get the timeout from the "max-age" section of the "Cache-
+        # Control" header before reverting to using the default cache_timeout
+        # length.
+        timeout = get_max_age(response)
+        if timeout == None:
+            timeout = self.cache_timeout
+        elif timeout == 0:
+            # max-age was set to 0, don't bother caching.
+            return response
+        patch_response_headers(response, timeout)
+        cache_key = learn_cache_key(request, response, timeout, self.key_prefix)
+        cache.set(cache_key, response, timeout)
         return response
