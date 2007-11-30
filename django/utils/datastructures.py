@@ -62,12 +62,10 @@ class SortedDict(dict):
         else:
             self.keyOrder = [key for key, value in data]
 
-    def __deepcopy__(self,memo):
+    def __deepcopy__(self, memo):
         from copy import deepcopy
-        obj = self.__class__()
-        for k, v in self.items():
-            obj[k] = deepcopy(v, memo)
-        return obj
+        return self.__class__([(key, deepcopy(value, memo))
+                               for key, value in self.iteritems()])
 
     def __setitem__(self, key, value):
         dict.__setitem__(self, key, value)

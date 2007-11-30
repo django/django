@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-07-18 16:49+0200\n"
-"PO-Revision-Date: 2007-03-06 10:30+0100\n"
-"Last-Translator: Philip Lindborg <philip.lindborg@gmail.com>\n"
+"PO-Revision-Date: 2007-11-03 00:30+0100\n"
+"Last-Translator: Dmitri Fedortchenko <zeraien@gmail.com>\n"
 "Language-Team: Django I18N <Django-I18N@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -146,7 +146,7 @@ msgid_plural ""
 msgstr[0] ""
 "Var god och fyll giltiga %(self)s ID-nummer. Värdet %(value)r är ogiltigt."
 msgstr[1] ""
-"Var god och fyll giltiga %(self)s ID-nummer. Värdena %(value)r är ogiltiga."
+"Var god och fyll giltiga %(self)s ID-nummer. Värden %(value)r är ogiltiga."
 
 #: conf/global_settings.py:38
 msgid "Arabic"
@@ -318,20 +318,20 @@ msgstr "Traditionell Kinesiska"
 
 #: core/validators.py:71
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "Det här värdet får bara innehålla bokstäver, siffror och understreck."
+msgstr "Det här värdet får endast innehålla bokstäver, siffror och understreck."
 
 #: core/validators.py:75
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr ""
-"Det här värdet får bara innehålla bokstäver, siffror, understreck, "
+"Det här värdet får endast innehålla bokstäver, siffror, understreck, "
 "bindestreck eller snedstreck."
 
 #: core/validators.py:79
 msgid "This value must contain only letters, numbers, underscores or hyphens."
 msgstr ""
-"Det här värdet får bara innehålla bokstäver, siffror, understreck eller "
+"Det här värdet får endast innehålla bokstäver, siffror, understreck eller "
 "avstavningstecken."
 
 #: core/validators.py:83
@@ -352,7 +352,7 @@ msgstr "Fyll i giltiga e-postadresser avskilda med kommatecken."
 
 #: core/validators.py:110
 msgid "Please enter a valid IP address."
-msgstr "Var god fyll i en giltigt IP-adress."
+msgstr "Var god fyll i en giltig IP-adress."
 
 #: core/validators.py:114
 msgid "Empty values are not allowed here."
@@ -414,7 +414,7 @@ msgstr ""
 #: core/validators.py:204
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "URL:en %s pekar inte på en giltig QuickTime-video."
+msgstr "URL:en %s pekar inte mot en giltig QuickTime-video."
 
 #: core/validators.py:208
 msgid "A valid URL is required."
@@ -432,7 +432,7 @@ msgstr ""
 #: core/validators.py:229
 #, python-format
 msgid "Badly formed XML: %s"
-msgstr "Missformad XML: %s"
+msgstr "Felaktigt XML: %s"
 
 #: core/validators.py:246
 #, python-format
@@ -480,7 +480,7 @@ msgstr "Det här fältet måste anges om %(field)s inte är %(value)s"
 
 #: core/validators.py:359
 msgid "Duplicate values are not allowed."
-msgstr "Dubbelvärden är inte tillåtna."
+msgstr "Dubletter är inte tillåtna."
 
 #: core/validators.py:374
 #, python-format
@@ -544,12 +544,12 @@ msgstr "Fyll i ett giltigt decimaltal."
 #: core/validators.py:454
 #, python-format
 msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr "Se till att filen du laddade upp är minst %s bytes stor."
+msgstr "Se till att filen du laddade upp är minst %s byte stor."
 
 #: core/validators.py:455
 #, python-format
 msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr "Se till att filen du laddade upp är som mest %s bytes stor."
+msgstr "Se till att filen du laddade upp är som mest %s byte stor."
 
 #: core/validators.py:472
 msgid "The format for this field is wrong."
@@ -876,7 +876,7 @@ msgstr "är ett giltigt betyg"
 
 #: contrib/comments/models.py:83 contrib/comments/models.py:169
 msgid "date/time submitted"
-msgstr "datum/tid skickat"
+msgstr "skickat datum/tid"
 
 #: contrib/comments/models.py:84 contrib/comments/models.py:170
 msgid "is public"
@@ -915,7 +915,7 @@ msgid ""
 "\n"
 "http://%(domain)s%(url)s"
 msgstr ""
-"Postat av %(user)s %(date)s\n"
+"Inlagt av %(user)s %(date)s\n"
 "\n"
 "%(comment)s\n"
 "\n"
@@ -947,7 +947,7 @@ msgstr "poäng"
 
 #: contrib/comments/models.py:234
 msgid "score date"
-msgstr "poängdatum"
+msgstr "poängen tillsatt den"
 
 #: contrib/comments/models.py:237
 msgid "karma score"
@@ -960,7 +960,7 @@ msgstr "karmapoäng"
 #: contrib/comments/models.py:242
 #, python-format
 msgid "%(score)d rating by %(user)s"
-msgstr "Betyget %(score)d av %(user)s"
+msgstr "Poäng %(score)d av %(user)s"
 
 #: contrib/comments/models.py:258
 #, python-format
@@ -996,20 +996,20 @@ msgstr "borttagningsdatum"
 
 #: contrib/comments/models.py:280
 msgid "moderator deletion"
-msgstr "moderatorborttagning"
+msgstr "borttaget av moderator"
 
 #: contrib/comments/models.py:281
 msgid "moderator deletions"
-msgstr "moderatorborttagningar"
+msgstr "borttagna av moderator"
 
 #: contrib/comments/models.py:285
 #, python-format
 msgid "Moderator deletion by %r"
-msgstr "Moderatorborttagning av %r"
+msgstr "Borttaget av moderator %r"
 
 #: contrib/comments/views/karma.py:20
 msgid "Anonymous users cannot vote"
-msgstr "Anonyma användare kan inte rösta"
+msgstr "Anonyma användare får inte rösta"
 
 #: contrib/comments/views/karma.py:24
 msgid "Invalid comment ID"
@@ -1162,7 +1162,7 @@ msgstr "domännamn"
 
 #: contrib/sites/models.py:16
 msgid "display name"
-msgstr "visat namn"
+msgstr "visningsnamn"
 
 #: contrib/sites/models.py:20
 msgid "site"
@@ -1243,8 +1243,8 @@ msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
 msgstr ""
-"Var god ange ett korrekt användarnamn och lösenord. Observera att båda "
-"fälten är skiftlägeskänsliga."
+"Var god ange ett korrekt användarnamn och lösenord. Tänk på att "
+"skilja mellan gemener och versaler."
 
 #: contrib/admin/views/decorators.py:24
 #: contrib/admin/templates/admin/login.html:25
@@ -1474,12 +1474,12 @@ msgstr "Decimaltal"
 
 #: contrib/admin/views/doc.py:299
 msgid "E-mail address"
-msgstr "E-postadress:"
+msgstr "E-postadress"
 
 #: contrib/admin/views/doc.py:300 contrib/admin/views/doc.py:301
 #: contrib/admin/views/doc.py:304
 msgid "File path"
-msgstr "Filsökväg"
+msgstr "Sökväg till fil"
 
 #: contrib/admin/views/doc.py:302
 msgid "Floating point number"
@@ -1697,7 +1697,7 @@ msgstr "Sidan kunde inte hittas"
 
 #: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr "Vi är ledsna, men den efterfrågade sidan kunde inte hittas."
+msgstr "Vi beklagar, men den efterfrågade sidan kunde tyvärr inte hittas."
 
 #: contrib/admin/templates/admin/index.html:17
 #, python-format
@@ -2026,11 +2026,11 @@ msgstr "Python-modellklassnamn"
 
 #: contrib/contenttypes/models.py:40
 msgid "content type"
-msgstr "innehållstyp"
+msgstr "typ av innehåll"
 
 #: contrib/contenttypes/models.py:41
 msgid "content types"
-msgstr "innehållstyper"
+msgstr "typer av innehåll"
 
 #: contrib/auth/views.py:41
 msgid "Logged out"
@@ -2178,7 +2178,7 @@ msgstr "meddelande"
 
 #: contrib/auth/forms.py:17 contrib/auth/forms.py:138
 msgid "The two password fields didn't match."
-msgstr "De båda lösenorden stämde inte överens."
+msgstr "Lösenorden stämde inte överens."
 
 #: contrib/auth/forms.py:25
 msgid "A user with that username already exists."
@@ -2218,7 +2218,7 @@ msgstr "Fyll i ett postnummer. Du måste ha mellanslag mellan nummerdelarna."
 
 #: contrib/localflavor/br/forms.py:18
 msgid "Enter a zip code in the format XXXXX-XXX."
-msgstr "Fyll i zipkod på formatet XXXXX-XXX."
+msgstr "Fyll i ett postnummer på formatet XXXXX-XXX."
 
 #: contrib/localflavor/br/forms.py:30
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
@@ -2246,16 +2246,16 @@ msgstr "Ogiltigt CNPJ-nummer."
 
 #: contrib/localflavor/au/forms.py:18
 msgid "Enter a 4 digit post code."
-msgstr "Fyll i en fyrsiffrig postkod."
+msgstr "Fyll i ett fyrsiffrigt postnummer."
 
 #: contrib/localflavor/fr/forms.py:17 contrib/localflavor/de/forms.py:16
 #: contrib/localflavor/fi/forms.py:14
 msgid "Enter a zip code in the format XXXXX."
-msgstr "Fyll i en zipkod på formatet XXXXX."
+msgstr "Fyll i ett postnummer på formatet XXXXX."
 
 #: contrib/localflavor/us/forms.py:18
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr "Fyll i zipkod på formatet XXXXX eller XXXXX-XXXX."
+msgstr "Fyll i ett postnummer på formatet XXXXX eller XXXXX-XXXX."
 
 #: contrib/localflavor/us/forms.py:51
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
@@ -2335,7 +2335,7 @@ msgstr ""
 
 #: contrib/localflavor/jp/forms.py:21
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
-msgstr "Fyll i postkod på formatet XXXXXXX eller XXX-XXXX."
+msgstr "Fyll i ett postnummer på formatet XXXXXXX eller XXX-XXXX."
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
@@ -2631,7 +2631,7 @@ msgstr "Zürich"
 
 #: contrib/localflavor/ch/forms.py:18 contrib/localflavor/no/forms.py:14
 msgid "Enter a zip code in the format XXXX."
-msgstr "Fyll i zipkod på formatet XXXX."
+msgstr "Fyll i postnummer på formatet XXXX."
 
 #: contrib/localflavor/ch/forms.py:90
 msgid ""
@@ -2652,7 +2652,7 @@ msgstr "Det isländska personnumret är inte giltigt."
 
 #: contrib/localflavor/it/forms.py:16
 msgid "Enter a valid zip code."
-msgstr "Fyll i en giltigt zipkod."
+msgstr "Fyll i ett giltigt postnummer."
 
 #: contrib/localflavor/it/forms.py:41
 msgid "Enter a valid Social Security number."
@@ -2739,11 +2739,11 @@ msgstr ""
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr "flat sida"
+msgstr "statisk sida"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
-msgstr "flata sidor"
+msgstr "statiska sidor"
 
 #: utils/dates.py:6
 msgid "Monday"
@@ -3024,7 +3024,7 @@ msgstr "ja,nej,kanske"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
-msgstr[1] "%(size)d bytes"
+msgstr[1] "%(size)d byte"
 
 #: template/defaultfilters.py:516
 #, python-format

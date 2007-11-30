@@ -47,7 +47,7 @@ Initialization
 ==============
 
 To activate sitemap generation on your Django site, add this line to your
-URLconf_:
+URLconf_::
 
     (r'^sitemap.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': sitemaps})
 

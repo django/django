@@ -4,6 +4,10 @@ from django import http
 import sys
 
 class BaseHandler(object):
+    # Changes that are always applied to a response (in this order).
+    response_fixes = [http.fix_location_header,
+            http.conditional_content_removal]
+
     def __init__(self):
         self._request_middleware = self._view_middleware = self._response_middleware = self._exception_middleware = None
 
@@ -50,10 +54,6 @@ class BaseHandler(object):
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
-        response = self._real_get_response(request)
-        return fix_location_header(request, response)
-
-    def _real_get_response(self, request):
         from django.core import exceptions, urlresolvers
         from django.core.mail import mail_admins
         from django.conf import settings
@@ -134,15 +134,13 @@ class BaseHandler(object):
         import traceback
         return '\n'.join(traceback.format_exception(*(exc_info or sys.exc_info())))
 
-def fix_location_header(request, response):
-    """
-    Ensure that we always use an absolute URI in any location header in the
-    response. This is required by RFC 2616, section 14.30.
-
-    Code constructing response objects is free to insert relative paths and
-    this function converts them to absolute paths.
-    """
-    if 'Location' in response and request.get_host():
-        response['Location'] = request.build_absolute_uri(response['Location'])
-    return response
+    def apply_response_fixes(self, request, response):
+        """
+        Applies each of the functions in self.response_fixes to the request and
+        response, modifying the response in the process. Returns the new
+        response.
+        """
+        for func in self.response_fixes:
+            response = func(request, response)
+        return response
 
