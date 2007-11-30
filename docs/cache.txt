@@ -303,7 +303,7 @@ minutes.
 Template fragment caching
 =========================
 
-**New in development version**.
+**New in development version**
 
 If you're after even more control, you can also cache template fragments using
 the ``cache`` template tag. To give your template access to this tag, put
@@ -319,18 +319,18 @@ and the name to give the cache fragment. For example::
     {% endcache %}
 
 Sometimes you might want to cache multiple copies of a fragment depending on
-some dynamic data that appears inside the fragment. For example you may want a
+some dynamic data that appears inside the fragment. For example, you might want a
 separate cached copy of the sidebar used in the previous example for every user
-of your site. This can be easily achieved by passing additional arguments to
-the ``{% cache %}`` template tag to uniquely identify the cache fragment::
+of your site. Do this by passing additional arguments to the ``{% cache %}``
+template tag to uniquely identify the cache fragment::
 
     {% load cache %}
     {% cache 500 sidebar request.user.username %}
         .. sidebar for logged in user ..
     {% endcache %}
 
-If you need more than one argument to identify the fragment that's fine, simply
-pass as many arguments to ``{% cache %}`` as you need!
+It's perfectly fine to specify more than one argument to identify the fragment.
+Simply pass as many arguments to ``{% cache %}`` as you need.
 
 The low-level cache API
 =======================
