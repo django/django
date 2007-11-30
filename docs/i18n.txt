@@ -461,8 +461,8 @@ otherwise, they'll be tacked together without whitespace!
     you'll be using to edit the content. Due to the way the ``gettext`` tools
     work internally and because we want to allow non-ASCII source strings in
     Django's core and your applications, you **must** use UTF-8 as the encoding
-    for your PO file (this means that everybody will be using the same
-    encoding, which is important when Django processes the PO files).
+    for your PO file. This means that everybody will be using the same
+    encoding, which is important when Django processes the PO files.
 
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this::
@@ -658,7 +658,7 @@ message file. The choice is yours.
     of the settings file to determine this, and a settings file doesn't exist
     if you're manually configuring your settings.)
 
-.. _settings documentation: ../settings/#using-settings-without-the-django-settings-module-environment-variable
+.. _settings documentation: ../settings/#using-settings-without-setting-django-settings-module
 
 All message file repositories are structured the same way. They are:
 

@@ -90,6 +90,8 @@ LANGUAGES_BIDI = ("he", "ar", "fa")
 # to load the internationalization machinery.
 USE_I18N = True
 
+LOCALE_PATHS = ()
+
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.
 MANAGERS = ADMINS

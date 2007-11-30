@@ -25,11 +25,23 @@
 >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
 >>> d['name']
 'Simon'
+>>> d.get('name')
+'Simon'
 >>> d.getlist('name')
 ['Adrian', 'Simon']
+>>> d['lastname']
+Traceback (most recent call last):
+...
+MultiValueDictKeyError: "Key 'lastname' not found in <MultiValueDict: {'position': ['Developer'], 'name': ['Adrian', 'Simon']}>"
+>>> d.get('lastname')
+
 >>> d.get('lastname', 'nonexistent')
 'nonexistent'
+>>> d.getlist('lastname')
+[]
 >>> d.setlist('lastname', ['Holovaty', 'Willison'])
+>>> d.getlist('lastname')
+['Holovaty', 'Willison']
 
 ### SortedDict #################################################################
 

@@ -25,6 +25,8 @@ def stringfilter(func):
         if args:
             args = list(args)
             args[0] = force_unicode(args[0])
+            if isinstance(args[0], SafeData) and getattr(func, 'is_safe', False):
+                return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
     # Include a reference to the real function (used to check original
@@ -89,7 +91,7 @@ def floatformat(text, arg=-1):
     """
     try:
         f = float(text)
-    except ValueError:
+    except (ValueError, TypeError):
         return u''
     try:
         d = int(arg)
@@ -106,6 +108,7 @@ floatformat.is_safe = True
 def iriencode(value):
     """Escapes an IRI value for use in a URL."""
     return force_unicode(iri_to_uri(value))
+iriencode.is_safe = True
 iriencode = stringfilter(iriencode)
 
 def linenumbers(value, autoescape=None):

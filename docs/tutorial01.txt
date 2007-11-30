@@ -47,7 +47,7 @@ will create a ``mysite`` directory in your current directory.
    denied" when you try to run ``django-admin.py startproject``. This
    is because, on Unix-based systems like OS X, a file must be marked
    as "executable" before it can be run as a program. To do this, open
-   Terminal.app and navigate (using the `cd` command) to the directory
+   Terminal.app and navigate (using the ``cd`` command) to the directory
    where ``django-admin.py`` is installed, then run the command
    ``chmod +x django-admin.py``.
 

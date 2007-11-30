@@ -103,4 +103,14 @@ TypeError: Invalid lookup type: 'lt'
 >>> obj = list(serializers.deserialize("json", stream))[0]
 >>> obj.object == m
 True
+
+# Test retrieving custom field data
+>>> m.delete()
+>>> m1 = MyModel(name="1", data=Small(1, 2))
+>>> m1.save()
+>>> m2 = MyModel(name="2", data=Small(2, 3))
+>>> m2.save()
+>>> for m in MyModel.objects.all(): print unicode(m.data)
+12
+23
 """}

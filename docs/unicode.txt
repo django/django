@@ -136,7 +136,7 @@ for converting back and forth between Unicode and bytestrings.
     * ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
       is essentially the opposite of ``smart_unicode()``. It forces the first
       argument to a bytestring. The ``strings_only`` parameter has the same
-      behaviour as for ``smart_unicode()`` and ``force_unicode()``. This is
+      behavior as for ``smart_unicode()`` and ``force_unicode()``. This is
       slightly different semantics from Python's builtin ``str()`` function,
       but the difference is needed in a few places within Django's internals.
 

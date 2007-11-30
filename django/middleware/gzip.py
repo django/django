@@ -1,4 +1,5 @@
 import re
+
 from django.utils.text import compress_string
 from django.utils.cache import patch_vary_headers
 
@@ -11,18 +12,21 @@ class GZipMiddleware(object):
     on the Accept-Encoding header.
     """
     def process_response(self, request, response):
+        # It's not worth compressing non-OK or really short responses.
         if response.status_code != 200 or len(response.content) < 200:
-            # Not worth compressing really short responses or 304 status
-            # responses, etc.
             return response
 
         patch_vary_headers(response, ('Accept-Encoding',))
 
-        # Avoid gzipping if we've already got a content-encoding or if the
-        # content-type is Javascript and the user's browser is IE.
-        is_js = ("msie" in request.META.get('HTTP_USER_AGENT', '').lower() and
-                "javascript" in response.get('Content-Type', '').lower())
-        if response.has_header('Content-Encoding') or is_js:
+        # Avoid gzipping if we've already got a content-encoding.
+        if response.has_header('Content-Encoding'):
+            return response
+
+        # Older versions of IE have issues with gzipped javascript.
+        # See http://code.djangoproject.com/ticket/2449
+        is_ie = "msie" in request.META.get('HTTP_USER_AGENT', '').lower()
+        is_js = "javascript" in response.get('Content-Type', '').lower()
+        if is_ie and is_js:
             return response
 
         ae = request.META.get('HTTP_ACCEPT_ENCODING', '')

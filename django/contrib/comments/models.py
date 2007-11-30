@@ -92,7 +92,7 @@ class Comment(models.Model):
         verbose_name_plural = _('comments')
         ordering = ('-submit_date',)
 
-    def __repr__(self):
+    def __unicode__(self):
         return "%s: %s..." % (self.user.username, self.comment[:100])
 
     def get_absolute_url(self):
@@ -171,7 +171,7 @@ class FreeComment(models.Model):
         verbose_name_plural = _('free comments')
         ordering = ('-submit_date',)
 
-    def __repr__(self):
+    def __unicode__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
 
     def get_absolute_url(self):
@@ -226,7 +226,7 @@ class KarmaScore(models.Model):
         verbose_name_plural = _('karma scores')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.user}
 
 class UserFlagManager(models.Manager):
@@ -258,7 +258,7 @@ class UserFlag(models.Model):
         verbose_name_plural = _('user flags')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("Flag by %r") % self.user
 
 class ModeratorDeletion(models.Model):
@@ -271,7 +271,7 @@ class ModeratorDeletion(models.Model):
         verbose_name_plural = _('moderator deletions')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("Moderator deletion by %r") % self.user
 
 # Register the admin options for these models.

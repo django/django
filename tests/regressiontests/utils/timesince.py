@@ -1,4 +1,4 @@
-timesince_tests = """
+"""
 >>> from datetime import datetime, timedelta
 >>> from django.utils.timesince import timesince
 

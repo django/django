@@ -386,7 +386,8 @@ class ModelAdmin(BaseModelAdmin):
             if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
                 pk_value = '"%s"' % pk_value.replace('"', '\\"')
             return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
-                (pk_value, str(new_object).replace('"', '\\"')))
+                # escape() calls force_unicode.
+                (escape(pk_value), escape(new_object)))
         elif request.POST.has_key("_addanother"):
             request.user.message_set.create(message=msg + ' ' + (_("You may add another %s below.") % opts.verbose_name))
             return HttpResponseRedirect(request.path)

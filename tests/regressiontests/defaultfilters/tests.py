@@ -37,6 +37,8 @@ u''
 u'13.1031'
 >>> floatformat(u'foo', u'bar')
 u''
+>>> floatformat(None)
+u''
 
 >>> addslashes(u'"double quotes" and \'single quotes\'')
 u'\\"double quotes\\" and \\\'single quotes\\\''
