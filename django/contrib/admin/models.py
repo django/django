@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
+from django.utils.safestring import mark_safe
 
 ADDITION = 1
 CHANGE = 2
@@ -49,4 +50,4 @@ class LogEntry(models.Model):
         Returns the admin URL to edit the object represented by this log entry.
         This is relative to the Django admin index page.
         """
-        return u"%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id)
+        return mark_safe(u"%s/%s/%s/" % (self.content_type.app_label, self.content_type.model, self.object_id))

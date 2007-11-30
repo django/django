@@ -3,6 +3,7 @@
 import re
 import string
 
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 
@@ -27,16 +28,28 @@ del x # Temporary variable
 
 def escape(html):
     "Return the given HTML with ampersands, quotes and carets encoded."
-    return force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+    return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, unicode)
 
-def linebreaks(value):
-    "Convert newlines into <p> and <br />s."
+def conditional_escape(html):
+    """
+    Similar to escape(), except that it doesn't operate on pre-escaped strings.
+    """
+    if isinstance(html, SafeData):
+        return html
+    else:
+        return escape(html)
+
+def linebreaks(value, autoescape=False):
+    "Converts newlines into <p> and <br />s"
     value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
     paras = re.split('\n{2,}', value)
-    paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
+    if autoescape:
+        paras = [u'<p>%s</p>' % escape(p.strip()).replace('\n', '<br />') for p in paras]
+    else:
+        paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
     return u'\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, unicode)
+linebreaks = allow_lazy(linebreaks, unicode) 
 
 def strip_tags(value):
     "Return the given HTML with all tags stripped."
@@ -58,7 +71,7 @@ def fix_ampersands(value):
     return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
 fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
-def urlize(text, trim_url_limit=None, nofollow=False):
+def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Convert any URLs in text into clickable links.
 
@@ -72,13 +85,19 @@ def urlize(text, trim_url_limit=None, nofollow=False):
     If nofollow is True, the URLs in link text will get a rel="nofollow"
     attribute.
     """
-    trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    if autoescape:
+        trim_url = lambda x, limit=trim_url_limit: conditional_escape(limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x)
+    else:
+        trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
+    safe_input = isinstance(text, SafeData)
     words = word_split_re.split(force_unicode(text))
     nofollow_attr = nofollow and ' rel="nofollow"' or ''
     for i, word in enumerate(words):
         match = punctuation_re.match(word)
         if match:
             lead, middle, trail = match.groups()
+            if safe_input:
+                middle = mark_safe(middle)
             if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
                     len(middle) > 0 and middle[0] in string.letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):

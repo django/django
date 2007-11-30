@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.encoding import force_unicode
 
@@ -37,12 +38,14 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                 if related.field.rel.edit_inline or not has_admin:
                     # Don't display link to edit, because it either has no
                     # admin or is edited inline.
-                    nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(),
-                        sub_obj._get_pk_val(), sub_obj), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' %
+                        (escape(force_unicode(capfirst(related.opts.verbose_name))),
+                            related.opts.app_label,
+                            related.opts.object_name.lower(),
+                            sub_obj._get_pk_val(), sub_obj)), []])
                 get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
         else:
             has_related_objs = False
@@ -54,8 +57,8 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                     nh(deleted_objects, current_depth, [u'%s: %s' % (force_unicode(capfirst(related.opts.verbose_name)), escape(sub_obj)), []])
                 else:
                     # Display a link to the admin page.
-                    nh(deleted_objects, current_depth, [u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
-                        (force_unicode(capfirst(related.opts.verbose_name)), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj)), []])
+                    nh(deleted_objects, current_depth, [mark_safe(u'%s: <a href="../../../../%s/%s/%s/">%s</a>' % \
+                        (escape(force_unicode(capfirst(related.opts.verbose_name))), related.opts.app_label, related.opts.object_name.lower(), sub_obj._get_pk_val(), escape(sub_obj))), []])
                 get_deleted_objects(deleted_objects, perms_needed, user, sub_obj, related.opts, current_depth+2, admin_site)
             # If there were related objects, and the user doesn't have
             # permission to delete them, add the missing perm to perms_needed.
@@ -87,9 +90,9 @@ def get_deleted_objects(deleted_objects, perms_needed, user, obj, opts, current_
                 else:
                     # Display a link to the admin page.
                     nh(deleted_objects, current_depth, [
-                        (_('One or more %(fieldname)s in %(name)s:') % {'fieldname': force_unicode(related.field.verbose_name), 'name': force_unicode(related.opts.verbose_name)}) + \
+                        mark_safe((_('One or more %(fieldname)s in %(name)s:') % {'fieldname': escape(force_unicode(related.field.verbose_name)), 'name': escape(force_unicode(related.opts.verbose_name))}) + \
                         (u' <a href="../../../../%s/%s/%s/">%s</a>' % \
-                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj))), []])
+                            (related.opts.app_label, related.opts.module_name, sub_obj._get_pk_val(), escape(sub_obj)))), []])
         # If there were related objects, and the user doesn't have
         # permission to change them, add the missing perm to perms_needed.
         if has_admin and has_related_objs:

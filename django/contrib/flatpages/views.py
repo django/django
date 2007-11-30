@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.xheaders import populate_xheaders
+from django.utils.safestring import mark_safe
 
 DEFAULT_TEMPLATE = 'flatpages/default.html'
 
@@ -30,6 +31,13 @@ def flatpage(request, url):
         t = loader.select_template((f.template_name, DEFAULT_TEMPLATE))
     else:
         t = loader.get_template(DEFAULT_TEMPLATE)
+
+    # To avoid having to always use the "|safe" filter in flatpage templates,
+    # mark the title and content as already safe (since they are raw HTML
+    # content in the first place).
+    f.title = mark_safe(f.title)
+    f.content = mark_safe(f.content)
+
     c = RequestContext(request, {
         'flatpage': f,
     })

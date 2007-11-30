@@ -5,6 +5,7 @@ from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.encoding import smart_str, force_unicode
+from django.utils.safestring import mark_safe
 from django.views.generic import date_based
 import datetime
 import time
@@ -32,15 +33,16 @@ class FieldChoicePlugin(DatabrowsePlugin):
         fields = self.field_dict(model)
         if not fields:
             return u''
-        return u'<p class="filter"><strong>View by:</strong> %s</p>' % \
-            u', '.join(['<a href="fields/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()])
+        return mark_safe(u'<p class="filter"><strong>View by:</strong> %s</p>' % \
+            u', '.join(['<a href="fields/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
 
     def urls(self, plugin_name, easy_instance_field):
         if easy_instance_field.field in self.field_dict(easy_instance_field.model.model).values():
             field_value = smart_str(easy_instance_field.raw_value)
-            return [u'%s%s/%s/%s/' % (easy_instance_field.model.url(),
+            return [mark_safe(u'%s%s/%s/%s/' % (
+                easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
-                urllib.quote(field_value, safe=''))]
+                urllib.quote(field_value, safe='')))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

@@ -7,11 +7,12 @@ against request forgeries from other sites.
 """
 from django.conf import settings
 from django.http import HttpResponseForbidden
+from django.utils.safestring import mark_safe
 import md5
 import re
 import itertools
 
-_ERROR_MSG = '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><body><h1>403 Forbidden</h1><p>Cross Site Request Forgery detected. Request aborted.</p></body></html>'
+_ERROR_MSG = mark_safe('<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><body><h1>403 Forbidden</h1><p>Cross Site Request Forgery detected. Request aborted.</p></body></html>')
 
 _POST_FORM_RE = \
     re.compile(r'(<form\W[^>]*\bmethod=(\'|"|)POST(\'|"|)\b[^>]*>)', re.IGNORECASE)
@@ -82,10 +83,10 @@ class CsrfMiddleware(object):
                                             itertools.repeat(''))
             def add_csrf_field(match):
                 """Returns the matched <form> tag plus the added <input> element"""
-                return match.group() + "<div style='display:none;'>" + \
+                return mark_safe(match.group() + "<div style='display:none;'>" + \
                 "<input type='hidden' " + idattributes.next() + \
                 " name='csrfmiddlewaretoken' value='" + csrf_token + \
-                "' /></div>"
+                "' /></div>")
 
             # Modify any POST forms
             response.content = _POST_FORM_RE.sub(add_csrf_field, response.content)

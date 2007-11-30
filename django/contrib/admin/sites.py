@@ -3,6 +3,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.auth import authenticate, login
 from django.db.models.base import ModelBase
 from django.shortcuts import render_to_response
+from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, ugettext as _
 import base64
@@ -272,7 +273,7 @@ class AdminSite(object):
                 if True in perms.values():
                     model_dict = {
                         'name': capfirst(model._meta.verbose_name_plural),
-                        'admin_url': '%s/%s/' % (app_label, model.__name__.lower()),
+                        'admin_url': mark_safe('%s/%s/' % (app_label, model.__name__.lower())),
                         'perms': perms,
                     }
                     if app_label in app_dict:

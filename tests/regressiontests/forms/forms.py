@@ -1554,7 +1554,7 @@ does not have help text, nothing will be output.
 ... </form>''')
 >>> print t.render(Context({'form': UserRegistration(auto_id=False)}))
 <form action="">
-<p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn't already exist.</p>
+<p>Username: <input type="text" name="username" maxlength="10" /><br />Good luck picking a username that doesn&#39;t already exist.</p>
 <p>Password1: <input type="password" name="password1" /></p>
 <p>Password2: <input type="password" name="password2" /></p>
 <input type="submit" />

@@ -5,8 +5,9 @@ from django.contrib.databrowse.sites import DatabrowsePlugin
 from django.shortcuts import render_to_response
 from django.utils.text import capfirst
 from django.utils.translation import get_date_formats
-from django.views.generic import date_based
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe
+from django.views.generic import date_based
 import datetime
 import time
 
@@ -29,16 +30,17 @@ class CalendarPlugin(DatabrowsePlugin):
         fields = self.field_dict(model)
         if not fields:
             return u''
-        return u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
-            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()])
+        return mark_safe(u'<p class="filter"><strong>View calendar by:</strong> %s</p>' % \
+            u', '.join(['<a href="calendars/%s/">%s</a>' % (f.name, force_unicode(capfirst(f.verbose_name))) for f in fields.values()]))
 
     def urls(self, plugin_name, easy_instance_field):
         if isinstance(easy_instance_field.field, models.DateField):
-            return [u'%s%s/%s/%s/%s/%s/' % (easy_instance_field.model.url(),
+            return [mark_safe(u'%s%s/%s/%s/%s/%s/' % (
+                easy_instance_field.model.url(),
                 plugin_name, easy_instance_field.field.name,
                 easy_instance_field.raw_value.year,
                 easy_instance_field.raw_value.strftime('%b').lower(),
-                easy_instance_field.raw_value.day)]
+                easy_instance_field.raw_value.day))]
 
     def model_view(self, request, model_databrowse, url):
         self.model, self.site = model_databrowse.model, model_databrowse.site

@@ -173,7 +173,7 @@ class ChangeList(object):
                 del p[k]
             elif v is not None:
                 p[k] = v
-        return '?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20')
+        return mark_safe('?' + '&amp;'.join([u'%s=%s' % (k, v) for k, v in p.items()]).replace(' ', '%20'))
 
     def get_results(self, request):
         paginator = ObjectPaginator(self.query_set, self.list_per_page)

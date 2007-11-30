@@ -333,7 +333,6 @@ TECHNICAL_500_TEMPLATE = """
   </script>
 </head>
 <body>
-
 <div id="summary">
   <h1>{{ exception_type }} at {{ request.path|escape }}</h1>
   <h2>{{ exception_value|escape }}</h2>
@@ -395,7 +394,7 @@ TECHNICAL_500_TEMPLATE = """
 <div id="template">
    <h2>Template error</h2>
    <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
-   <h3>{{ template_info.message|escape }}</h3>
+   <h3>{{ template_info.message }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}{% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
    {% for source_line in template_info.source_lines %}
    {% ifequal source_line.0 template_info.line %}
@@ -413,6 +412,7 @@ TECHNICAL_500_TEMPLATE = """
   <h2>Traceback <span>(innermost last)</span></h2>
   <div class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></div>
   <br/>
+  {% autoescape off %}
   <div id="browserTraceback">
     <ul class="traceback">
       {% for frame in frames %}
@@ -422,11 +422,11 @@ TECHNICAL_500_TEMPLATE = """
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line }}</li>{% endfor %}</ol>
               {% endif %}
-              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
+              <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line }} <span>...</span></li></ol>
               {% if frame.post_context %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line }}</li>{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}
@@ -446,7 +446,7 @@ TECHNICAL_500_TEMPLATE = """
                 {% for var in frame.vars|dictsort:"0" %}
                   <tr>
                     <td>{{ var.0 }}</td>
-                    <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+                    <td class="code"><div>{{ var.1|pprint }}</div></td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -466,7 +466,7 @@ Traceback (most recent call last):<br/>
 {% for frame in frames %}
   File "{{ frame.filename }}" in {{ frame.function }}<br/>
   {% if frame.context_line %}
-    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line|escape }}<br/>
+    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line }}<br/>
   {% endif %}
 {% endfor %}<br/>
 &nbsp;&nbsp;{{ exception_type }} at {{ request.path|escape }}<br/>
@@ -476,6 +476,7 @@ Traceback (most recent call last):<br/>
       </tbody>
     </table>
   </div>
+  {% endautoescape %}
 </div>
 
 <div id="requestinfo">
@@ -494,7 +495,7 @@ Traceback (most recent call last):<br/>
         {% for var in request.GET.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+            <td class="code"><div>{{ var.1|pprint }}</div></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -516,7 +517,7 @@ Traceback (most recent call last):<br/>
         {% for var in request.POST.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+            <td class="code"><div>{{ var.1|pprint }}</div></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -538,7 +539,7 @@ Traceback (most recent call last):<br/>
         {% for var in request.COOKIES.items %}
           <tr>
             <td>{{ var.0 }}</td>
-            <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+            <td class="code"><div>{{ var.1|pprint }}</div></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -559,7 +560,7 @@ Traceback (most recent call last):<br/>
       {% for var in request.META.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
-          <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+          <td class="code"><div>{{ var.1|pprint }}</div></td>
         </tr>
       {% endfor %}
     </tbody>
@@ -578,7 +579,7 @@ Traceback (most recent call last):<br/>
       {% for var in settings.items|dictsort:"0" %}
         <tr>
           <td>{{ var.0 }}</td>
-          <td class="code"><div>{{ var.1|pprint|escape }}</div></td>
+          <td class="code"><div>{{ var.1|pprint }}</div></td>
         </tr>
       {% endfor %}
     </tbody>
@@ -593,7 +594,6 @@ Traceback (most recent call last):<br/>
     display a standard 500 page.
   </p>
 </div>
-
 </body>
 </html>
 """
@@ -645,12 +645,12 @@ TECHNICAL_404_TEMPLATE = """
       </p>
       <ol>
         {% for pattern in urlpatterns %}
-          <li>{{ pattern|escape }}</li>
+          <li>{{ pattern }}</li>
         {% endfor %}
       </ol>
       <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>
     {% else %}
-      <p>{{ reason|escape }}</p>
+      <p>{{ reason }}</p>
     {% endif %}
   </div>
 

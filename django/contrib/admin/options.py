@@ -9,6 +9,7 @@ from django.db import models
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.html import escape
+from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_unicode
@@ -462,7 +463,7 @@ class ModelAdmin(BaseModelAdmin):
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(model, 'get_absolute_url'),
             'ordered_objects': ordered_objects,
-            'form_url': form_url,
+            'form_url': mark_safe(form_url),
             'opts': opts,
             'content_type_id': ContentType.objects.get_for_model(model).id,
             'save_on_top': self.save_on_top,
@@ -652,7 +653,7 @@ class ModelAdmin(BaseModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        deleted_objects = [u'%s: <a href="../../%s/">%s</a>' % (force_unicode(capfirst(opts.verbose_name)), object_id, escape(str(obj))), []]
+        deleted_objects = [mark_safe(u'%s: <a href="../../%s/">%s</a>' % (escape(force_unicode(capfirst(opts.verbose_name))), force_unicode(object_id), escape(obj))), []]
         perms_needed = sets.Set()
         get_deleted_objects(deleted_objects, perms_needed, request.user, obj, opts, 1, self.admin_site)
 
