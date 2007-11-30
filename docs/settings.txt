@@ -791,10 +791,12 @@ SESSION_COOKIE_PATH
 
 Default: ``'/'``
 
-The path set on the session cookie. Should match the URL path of your Django
-installation (or be parent of that path). This is useful if you have multiple
-Django instances running under the same hostname; they can use different
-cookie paths and each instance will only see its own session cookie.
+The path set on the session cookie. This should either match the URL path of your
+Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
 
 SESSION_COOKIE_SECURE
 ---------------------
