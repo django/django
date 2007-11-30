@@ -370,16 +370,16 @@ get() can take a ``default`` argument::
     >>> cache.get('my_key', 'has expired')
     'has expired'
 
-To add a key only if it doesn't already exist, there is an add() method.  It
-takes the same parameters as set(), but will not attempt to update the cache
-if the key specified is already present::
+**New in Django development version:** To add a key only if it doesn't already
+exist, use the ``add()`` method. It takes the same parameters as ``set()``, but
+it will not attempt to update the cache if the key specified is already present::
 
     >>> cache.set('add_key', 'Initial value')
     >>> cache.add('add_key', 'New value')
     >>> cache.get('add_key')
     'Initial value'
 
-There's also a get_many() interface that only hits the cache once. get_many()
+There's also a ``get_many()`` interface that only hits the cache once. ``get_many()``
 returns a dictionary with all the keys you asked for that actually exist in the
 cache (and haven't expired)::
 
