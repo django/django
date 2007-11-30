@@ -10,6 +10,7 @@ from django.db.models.query import handle_legacy_orderlist, QuerySet
 from django.http import Http404
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext
+from django.utils.safestring import mark_safe
 import operator
 
 try:

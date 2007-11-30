@@ -101,7 +101,7 @@ class Fieldline(object):
             yield AdminField(self.form, field, is_first=(i == 0))
 
     def errors(self):
-        return u'\n'.join([self.form[f].errors.as_ul() for f in self.fields])
+        return mark_safe(u'\n'.join([self.form[f].errors.as_ul() for f in self.fields]))
 
 class AdminField(object):
     def __init__(self, form, field, is_first):

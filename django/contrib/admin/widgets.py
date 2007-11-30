@@ -6,6 +6,7 @@ from django import newforms as forms
 from django.utils.datastructures import MultiValueDict
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
 from django.conf import settings
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -28,7 +29,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         # API to determine the ID dynamically.
         output.append(u'SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n' % \
             (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), settings.ADMIN_MEDIA_PREFIX))
-        return u''.join(output)
+        return mark_safe(u''.join(output))
 
 class AdminDateWidget(forms.TextInput):
     class Media:
@@ -57,8 +58,8 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return u'<p class="datetime">%s %s<br />%s %s</p>' % \
-            (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1])
+        return mark_safe(u'<p class="datetime">%s %s<br />%s %s</p>' % \
+            (_('Date:'), rendered_widgets[0], _('Time:'), rendered_widgets[1]))
 
 class AdminFileWidget(forms.FileInput):
     """
@@ -73,7 +74,7 @@ class AdminFileWidget(forms.FileInput):
         if value:
             output.append('Currently: <a target="_blank" href="%s%s">%s</a> <br>Change: ' % (settings.MEDIA_URL, value, value))
         output.append(super(AdminFileWidget, self).render(name, value, attrs))
-        return u''.join(output)
+        return mark_safe(u''.join(output))
 
 class ForeignKeyRawIdWidget(forms.TextInput):
     """
@@ -99,7 +100,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
-        return u''.join(output)
+        return mark_safe(u''.join(output))
         #if self.change: # TODO
             #output.append('&nbsp;<strong>TODO</strong>')
             
@@ -148,7 +149,7 @@ class RelatedFieldWidgetWrapper(object):
             output.append(u'<a href="%sadd/" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                 (related_url, name))
             output.append(u'<img src="%simg/admin/icon_addlink.gif" width="10" height="10" alt="Add Another"/></a>' % settings.ADMIN_MEDIA_PREFIX)
-        return u''.join(output)
+        return mark_safe(u''.join(output))
 
     def __deepcopy__(self, memo):
         # There's no reason to deepcopy admin_site, etc, so just return self.

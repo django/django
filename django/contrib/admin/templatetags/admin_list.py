@@ -114,7 +114,7 @@ def result_headers(cl):
         yield {"text": header,
                "sortable": True,
                "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-               "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
+               "class_attrib": mark_safe((th_classes and ' class="%s"' % ' '.join(th_classes) or ''))}
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
@@ -148,8 +148,6 @@ def items_for_result(cl, result):
                 # function has an "allow_tags" attribute set to True.
                 if not allow_tags:
                     result_repr = escape(result_repr)
-                else:
-                    result_repr = mark_safe(result_repr)
         else:
             field_val = getattr(result, f.attname)
 
@@ -187,7 +185,7 @@ def items_for_result(cl, result):
             else:
                 result_repr = escape(field_val)
         if force_unicode(result_repr) == '':
-            result_repr = mark_safe('&nbsp;')
+            result_repr = '&nbsp;'
         # If list_display_links not defined, add the link tag to the first field
         if (first and not cl.list_display_links) or field_name in cl.list_display_links:
             table_tag = {True:'th', False:'td'}[first]
