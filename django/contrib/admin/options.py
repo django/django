@@ -522,7 +522,7 @@ class ModelAdmin(BaseModelAdmin):
             'adminform': adminForm,
             'is_popup': request.REQUEST.has_key('_popup'),
             'show_delete': False,
-            'media': media,
+            'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
         })
         return self.render_change_form(model, c, add=True)
@@ -597,7 +597,7 @@ class ModelAdmin(BaseModelAdmin):
             'object_id': object_id,
             'original': obj,
             'is_popup': request.REQUEST.has_key('_popup'),
-            'media': media,
+            'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
         })
         return self.render_change_form(model, c, change=True)
