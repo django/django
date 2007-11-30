@@ -8,7 +8,6 @@ been reviewed for security issues. Don't use it for production use.
 """
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-from types import ListType, StringType
 import mimetypes
 import os
 import re
@@ -72,7 +71,7 @@ def _formatparam(param, value=None, quote=1):
 class Headers(object):
     """Manage a collection of HTTP response headers"""
     def __init__(self,headers):
-        if type(headers) is not ListType:
+        if not isinstance(headers, list):
             raise TypeError("Headers must be a list of name/value tuples")
         self._headers = headers
 
@@ -327,7 +326,7 @@ class ServerHandler(object):
         """Compute Content-Length or switch to chunked encoding if possible"""
         try:
             blocks = len(self.result)
-        except (TypeError,AttributeError,NotImplementedError):
+        except (TypeError, AttributeError, NotImplementedError):
             pass
         else:
             if blocks==1:
@@ -356,14 +355,14 @@ class ServerHandler(object):
         elif self.headers is not None:
             raise AssertionError("Headers already set!")
 
-        assert type(status) is StringType,"Status must be a string"
+        assert isinstance(status, str),"Status must be a string"
         assert len(status)>=4,"Status must be at least 4 characters"
         assert int(status[:3]),"Status message must begin w/3-digit code"
         assert status[3]==" ", "Status message must have a space after code"
         if __debug__:
             for name,val in headers:
-                assert type(name) is StringType,"Header names must be strings"
-                assert type(val) is StringType,"Header values must be strings"
+                assert isinstance(name, str),"Header names must be strings"
+                assert isinstance(val, str),"Header values must be strings"
                 assert not is_hop_by_hop(name),"Hop-by-hop headers not allowed"
         self.status = status
         self.headers = self.headers_class(headers)
@@ -386,7 +385,7 @@ class ServerHandler(object):
     def write(self, data):
         """'write()' callable as specified by PEP 333"""
 
-        assert type(data) is StringType,"write() argument must be string"
+        assert isinstance(data, str), "write() argument must be string"
 
         if not self.status:
             raise AssertionError("write() before start_response()")

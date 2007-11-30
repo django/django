@@ -804,7 +804,7 @@ class NodeList(list):
                 bits.append(self.render_node(node, context))
             else:
                 bits.append(node)
-        return ''.join([force_unicode(b) for b in bits])
+        return mark_safe(''.join([force_unicode(b) for b in bits]))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
