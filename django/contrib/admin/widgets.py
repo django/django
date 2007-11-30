@@ -62,7 +62,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
 
 class AdminFileWidget(forms.FileInput):
     """
-    A FileField Widget that shows it's current value if it has one
+    A FileField Widget that shows its current value if it has one.
     """
     def __init__(self, attrs={}):
         super(AdminFileWidget, self).__init__(attrs)
