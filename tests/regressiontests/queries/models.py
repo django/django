@@ -404,5 +404,18 @@ thus fail.)
 ...     params.reverse()
 >>> Item.objects.extra(select=SortedDict(s), params=params).values('a','b')[0]
 {'a': u'one', 'b': u'two'}
+
+Bug #4002
+Attributes used in extra(select=...) are available for use in subsequent
+order_by() and filter() calls.
+
+# Order by the number of tags attached to an item.
+>>> l = Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).order_by('-count')
+>>> [o.count for o in l]
+[2, 2, 1, 0]
+
+# Filter those items that have exactly one tag attacjed.
+>>> Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).filter(count=1)
+[<Item: four>]
 """}
 

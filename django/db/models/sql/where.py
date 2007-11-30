@@ -5,6 +5,7 @@ import datetime
 
 from django.utils import tree
 from django.db import connection
+from django.db.models.fields import Field
 from datastructures import EmptyResultSet
 
 # Connection types
@@ -96,7 +97,10 @@ class WhereNode(tree.Node):
         else:
             format = '%s %s'
 
-        params = field.get_db_prep_lookup(lookup_type, value)
+        if field:
+            params = field.get_db_prep_lookup(lookup_type, value)
+        else:
+            params = Field().get_db_prep_lookup(lookup_type, value)
 
         if lookup_type in connection.operators:
             return (format % (field_sql,
