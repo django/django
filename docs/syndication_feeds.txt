@@ -564,15 +564,15 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         def ttl(self, obj):
             """
             Takes the object returned by get_object() and returns the feed's
-            TTL (Time to live) as a normal Python string.
+            TTL (Time To Live) as a normal Python string.
             """
 
         def ttl(self):
             """
-            Returns the feed's ttl as a normal Python string.
+            Returns the feed's TTL as a normal Python string.
             """
 
-        ttl = 600 # Hard-coded Time to live.
+        ttl = 600 # Hard-coded Time To Live.
 
         # ITEMS -- One of the following three is required. The framework looks
         # for them in this order.
