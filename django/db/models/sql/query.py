@@ -679,13 +679,13 @@ class Query(object):
         else:
             lookup_type = parts.pop()
 
-        # Interpret '__exact=None' as the sql '= NULL'; otherwise, reject all
+        # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
-        # FIXME: Weren't we going to change this so that '__exact=None' was the
-        # same as '__isnull=True'? Need to check the conclusion of the mailing
-        # list thread.
-        if value is None and lookup_type != 'exact':
-            raise ValueError("Cannot use None as a query value")
+        if value is None:
+            if lookup_type != 'exact':
+                raise ValueError("Cannot use None as a query value")
+            lookup_type = 'isnull'
+            value = True
         elif callable(value):
             value = value()
 
@@ -708,7 +708,8 @@ class Query(object):
                 alias = join[LHS_ALIAS]
                 col = join[LHS_JOIN_COL]
 
-        if (lookup_type == 'isnull' and value is True):
+        if lookup_type == 'isnull' and value is True and (len(join_list) > 1 or
+                len(join_list[0]) > 1):
             # If the comparison is against NULL, we need to use a left outer
             # join when connecting to the previous model. We make that
             # adjustment here. We don't do this unless needed because it's less

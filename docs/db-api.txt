@@ -1137,7 +1137,12 @@ Examples::
 SQL equivalents::
 
     SELECT ... WHERE id = 14;
-    SELECT ... WHERE id = NULL;
+    SELECT ... WHERE id IS NULL;
+
+**New in Django development version:** The semantics of ``id__exact=None`` have
+changed in the development version. Previously, it was (intentionally)
+converted to ``WHERE id = NULL`` at the SQL level, which would never match
+anything. It has now been changed to behave the same as ``id__isnull=True``.
 
 iexact
 ~~~~~~
@@ -1366,14 +1371,6 @@ Example::
 SQL equivalent::
 
     SELECT ... WHERE pub_date IS NULL;
-
-.. admonition:: ``__isnull=True`` vs ``__exact=None``
-
-    There is an important difference between ``__isnull=True`` and
-    ``__exact=None``. ``__exact=None`` will *always* return an empty result
-    set, because SQL requires that no value is equal to ``NULL``.
-    ``__isnull`` determines if the field is currently holding the value
-    of ``NULL`` without performing a comparison.
 
 search
 ~~~~~~

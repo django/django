@@ -80,6 +80,11 @@ None
 >>> Article.objects.filter(reporter__isnull=True)
 [<Article: Third>]
 
+# We can achieve the same thing by filtering for the case where the reporter is
+# None.
+>>> Article.objects.filter(reporter=None)
+[<Article: Third>]
+
 # Set the reporter for the Third article
 >>> r.article_set.add(a3)
 >>> r.article_set.all()

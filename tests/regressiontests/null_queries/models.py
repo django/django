@@ -24,9 +24,14 @@ __test__ = {'API_TESTS':"""
 >>> c2 = Choice(poll=p1, choice='Why Not?')
 >>> c2.save()
 
-# Exact query with value None returns nothing (=NULL in sql)
+# Exact query with value None returns nothing ("is NULL" in sql, but every 'id'
+# field has a value).
 >>> Choice.objects.filter(id__exact=None)
 []
+
+Excluding the previous result returns everything.
+>>> Choice.objects.exclude(id=None).order_by('id')
+[<Choice: Choice: Because. in poll Q: Why? >, <Choice: Choice: Why Not? in poll Q: Why? >]
 
 # Valid query, but fails because foo isn't a keyword
 >>> Choice.objects.filter(foo__exact=None)
