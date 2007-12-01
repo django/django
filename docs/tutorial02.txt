@@ -48,7 +48,7 @@ Recall from Tutorial 1 that you start the development server like so::
 Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
 http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin01.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin01.png
    :alt: Django admin login screen
 
 Enter the admin site
@@ -57,9 +57,9 @@ Enter the admin site
 Now, try logging in. (You created a superuser account in the first part of this
 tutorial, remember?) You should see the Django admin index page:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin02t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin02t.png
    :alt: Django admin index page
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin02.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin02.png
 
 You should see a few other types of editable content, including groups, users
 and sites. These are core features Django ships with by default.
@@ -95,23 +95,23 @@ Explore the free admin functionality
 Now that ``Poll`` has the inner ``Admin`` class, Django knows that it should be
 displayed on the admin index page:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin03t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin03t.png
    :alt: Django admin index page, now with polls displayed
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin03.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin03.png
 
 Click "Polls." Now you're at the "change list" page for polls. This page
 displays all the polls in the database and lets you choose one to change it.
 There's the "What's up?" poll we created in the first tutorial:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04t.png
    :alt: Polls change list page
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04.png
 
 Click the "What's up?" poll to edit it:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin05t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin05t.png
    :alt: Editing form for poll object
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin05.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin05.png
 
 Things to note here:
 
@@ -138,9 +138,9 @@ click "Save and continue editing." Then click "History" in the upper right.
 You'll see a page listing all changes made to this object via the Django admin,
 with the timestamp and username of the person who made the change:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin06t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin06t.png
    :alt: History page for poll object
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin06.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin06.png
 
 Customize the admin form
 ========================
@@ -157,7 +157,7 @@ Let's customize this a bit. We can reorder the fields by explicitly adding a
 
 That made the "Publication date" show up first instead of second:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin07.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin07.png
    :alt: Fields have been reordered
 
 This isn't impressive with only two fields, but for admin forms with dozens
@@ -175,9 +175,9 @@ up into fieldsets::
 The first element of each tuple in ``fields`` is the title of the fieldset.
 Here's what our form looks like now:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin08t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin08t.png
    :alt: Form has fieldsets now
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin08.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin08.png
 
 You can assign arbitrary HTML classes to each fieldset. Django provides a
 ``"collapse"`` class that displays a particular fieldset initially collapsed.
@@ -190,7 +190,7 @@ aren't commonly used::
                 ('Date information', {'fields': ('pub_date',), 'classes': 'collapse'}),
             )
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin09.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin09.png
    :alt: Fieldset is initially collapsed
 
 Adding related objects
@@ -213,7 +213,7 @@ that would look like::
 Now "Choices" is an available option in the Django admin. The "Add choice" form
 looks like this:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin10.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin10.png
    :alt: Choice admin page
 
 In that form, the "Poll" field is a select box containing every poll in the
@@ -250,9 +250,9 @@ deletion of that existing Choice object."
 
 Load the "Add poll" page to see how that looks:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin11t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin11t.png
    :alt: Add poll page now has choices on it
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin11.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin11.png
 
 It works like this: There are three slots for related Choices -- as specified
 by ``num_in_admin`` -- but each time you come back to the "Change" page for an
@@ -270,7 +270,7 @@ alternate way of displaying inline related objects::
 With that ``edit_inline=models.TABULAR`` (instead of ``models.STACKED``), the
 related objects are displayed in a more compact, table-based format:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin12.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin12.png
    :alt: Add poll page now has more compact choices
 
 Customize the admin change list
@@ -281,9 +281,9 @@ Now that the Poll admin page is looking good, let's make some tweaks to the
 
 Here's what it looks like at this point:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin04t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04t.png
    :alt: Polls change list page
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin04.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin04.png
 
 By default, Django displays the ``str()`` of each object. But sometimes it'd
 be more helpful if we could display individual fields. To do that, use the
@@ -303,9 +303,9 @@ method from Tutorial 1::
 
 Now the poll change list page looks like this:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin13t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin13t.png
    :alt: Polls change list page, updated
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin13.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin13.png
 
 You can click on the column headers to sort by those values -- except in the
 case of the ``was_published_today`` header, because sorting by the output of
@@ -327,9 +327,9 @@ following line to ``Poll.Admin``::
 That adds a "Filter" sidebar that lets people filter the change list by the
 ``pub_date`` field:
 
-.. image:: http://media.djangoproject.com/img/doc/tutorial/admin14t.png
+.. image:: http://media.djangoproject.com/img/doc/tutorial-trunk/admin14t.png
    :alt: Polls change list page, updated
-   :target: http://media.djangoproject.com/img/doc/tutorial/admin14.png
+   :target: http://media.djangoproject.com/img/doc/tutorial-trunk/admin14.png
 
 The type of filter displayed depends on the type of field you're filtering on.
 Because ``pub_date`` is a DateTimeField, Django knows to give the default
