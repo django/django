@@ -276,7 +276,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
 
-    def has_change_permission(self, request, obj):
+    def has_change_permission(self, request, obj=None):
         """
         Returns True if the given request has permission to change the given
         Django model instance.
@@ -287,7 +287,7 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.opts
         return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
 
-    def has_delete_permission(self, request, obj):
+    def has_delete_permission(self, request, obj=None):
         """
         Returns True if the given request has permission to change the given
         Django model instance.
@@ -452,15 +452,16 @@ class ModelAdmin(BaseModelAdmin):
             request.user.message_set.create(message=msg)
             return HttpResponseRedirect("../")
 
-    def render_change_form(self, model, context, add=False, change=False, form_url=''):
+    def render_change_form(self, request, model, context, add=False, change=False, form_url='', obj=None):
         opts = model._meta
         app_label = opts.app_label
         ordered_objects = opts.get_ordered_objects()
         extra_context = {
             'add': add,
             'change': change,
-            'has_delete_permission': context['perms'][app_label][opts.get_delete_permission()],
-            'has_change_permission': context['perms'][app_label][opts.get_change_permission()],
+            'has_add_permission': self.has_add_permission(request),
+            'has_change_permission': self.has_change_permission(request, obj),
+            'has_delete_permission': self.has_delete_permission(request, obj),
             'has_file_field': True, # FIXME - this should check if form or formsets have a FileField,
             'has_absolute_url': hasattr(model, 'get_absolute_url'),
             'ordered_objects': ordered_objects,
@@ -525,8 +526,8 @@ class ModelAdmin(BaseModelAdmin):
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
         })
-        return self.render_change_form(model, c, add=True)
-    
+        return self.render_change_form(request, model, c, add=True)
+
     def change_view(self, request, object_id):
         "The 'change' admin view for this model."
         model = self.model
@@ -600,7 +601,7 @@ class ModelAdmin(BaseModelAdmin):
             'media': mark_safe(media),
             'inline_admin_formsets': inline_admin_formsets,
         })
-        return self.render_change_form(model, c, change=True)
+        return self.render_change_form(request, model, c, change=True, obj=obj)
 
     def changelist_view(self, request):
         "The 'change list' admin view for this model."
@@ -626,7 +627,7 @@ class ModelAdmin(BaseModelAdmin):
             'is_popup': cl.is_popup,
             'cl': cl,
         })
-        c.update({'has_add_permission': c['perms'][app_label][opts.get_add_permission()]}),
+        c.update({'has_add_permission': self.has_add_permission(request)}),
         return render_to_response(['admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
                                 'admin/%s/change_list.html' % app_label,
                                 'admin/change_list.html'], context_instance=c)

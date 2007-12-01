@@ -263,9 +263,9 @@ class AdminSite(object):
 
             if has_module_perms:
                 perms = {
-                    'add': user.has_perm("%s.%s" % (app_label, model._meta.get_add_permission())),
-                    'change': user.has_perm("%s.%s" % (app_label, model._meta.get_change_permission())),
-                    'delete': user.has_perm("%s.%s" % (app_label, model._meta.get_delete_permission())),
+                    'add': model_admin.has_add_permission(request),
+                    'change': model_admin.has_change_permission(request),
+                    'delete': model_admin.has_delete_permission(request),
                 }
 
                 # Check whether user has any perm for this module.
