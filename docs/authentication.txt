@@ -154,10 +154,13 @@ custom methods:
 
     * ``get_profile()`` -- Returns a site-specific profile for this user.
       Raises ``django.contrib.auth.models.SiteProfileNotAvailable`` if the current site
-      doesn't allow profiles.
+      doesn't allow profiles. For information on how to define a
+      site-specific user profile, see the section on `storing additional
+      user information`_ below.
 
 .. _Django model: ../model-api/
 .. _DEFAULT_FROM_EMAIL: ../settings/#default-from-email
+.. _storing additional user information: #storing-additional-information-about-users
 
 Manager functions
 ~~~~~~~~~~~~~~~~~
@@ -268,6 +271,45 @@ you need to create a superuser after that via the command line, you can use the
 
 Make sure to substitute ``/path/to/`` with the path to the Django codebase on
 your filesystem.
+
+Storing additional information about users
+------------------------------------------
+
+If you'd like to store additional information related to your users,
+Django provides a method to specify a site-specific related model --
+termed a "user profile" -- for this purpose.
+
+To make use of this feature, define a model with fields for the
+additional information you'd like to store, or additional methods
+you'd like to have available, and also add a ``ForeignKey`` from your
+model to the ``User`` model, specified with ``unique=True`` to ensure
+only one instance of your model can be created for each ``User``.
+
+To indicate that this model is the user profile model for a given
+site, fill in the setting ``AUTH_PROFILE_MODULE`` with a string
+consisting of the following items, separated by a dot:
+
+1. The (normalized to lower-case) name of the application in which the
+   user profile model is defined (in other words, an all-lowercase
+   version of the name which was passed to ``manage.py startapp`` to
+   create the application).
+
+2. The (normalized to lower-case) name of the model class.
+
+For example, if the profile model was a class named ``UserProfile``
+and was defined inside an application named ``accounts``, the
+appropriate setting would be::
+
+    AUTH_PROFILE_MODULE = 'accounts.userprofile'
+
+When a user profile model has been defined and specified in this
+manner, each ``User`` object will have a method -- ``get_profile()``
+-- which returns the instance of the user profile model associated
+with that ``User``.
+
+For more information, see `Chapter 12 of the Django book`_.
+
+.. _Chapter 12 of the Django book: http://www.djangobook.com/en/beta/chapter12/#cn226
 
 Authentication in Web requests
 ==============================

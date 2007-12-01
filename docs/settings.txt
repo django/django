@@ -236,6 +236,16 @@ documentation`_ for details.
 
 .. _authentication backends documentation: ../authentication/#other-authentication-sources
 
+AUTH_PROFILE_MODULE
+-------------------
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See the
+`documentation on user profile models`_ for details.
+
+.. _documentation on user profile models: ../authentication/#storing-additional-information-about-users
+
 CACHE_BACKEND
 -------------
 
