@@ -225,6 +225,17 @@ Whether to append trailing slashes to URLs. This is only used if
 ``CommonMiddleware`` is installed (see the `middleware docs`_). See also
 ``PREPEND_WWW``.
 
+AUTHENTICATION_BACKENDS
+-----------------------
+
+Default: ``('django.contrib.auth.backends.ModelBackend',)``
+
+A tuple of authentication backend classes (as strings) to use when
+attempting to authenticate a user. See the `authentication backends
+documentation`_ for details.
+
+.. _authentication backends documentation: ../authentication/#other-authentication-sources
+
 CACHE_BACKEND
 -------------
 
