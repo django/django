@@ -337,6 +337,17 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
         else:
             # Return an 'invalid login' error message.
 
+.. admonition:: Calling ``authenticate()`` first
+    
+    When you're manually logging a user in, you *must* call
+    ``authenticate()`` before you call ``login()``; ``authenticate()``
+    sets an attribute on the ``User`` noting which authentication
+    backend successfully authenticated that user (see the `backends
+    documentation`_ for details), and this information is needed later
+    during the login process.
+    
+.. _backends documentation: #other-authentication-sources
+
 Manually checking a user's password
 -----------------------------------
 
