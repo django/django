@@ -257,7 +257,7 @@ web developers.
 
 See the `web design helpers documentation`_.
 
-.. _web design helpers documentaion`: ../webdesign/
+.. _web design helpers documentation: ../webdesign/
 
 Other add-ons
 =============
