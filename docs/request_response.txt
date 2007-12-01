@@ -555,10 +555,13 @@ Three things to note about 404 views:
     * The 404 view is also called if Django doesn't find a match after checking
       every regular expression in the URLconf.
 
-    * If you don't define your own 404 view -- and simply use the default,
-      which is recommended -- you still have one obligation: To create a
-      ``404.html`` template in the root of your template directory. The default
-      404 view will use that template for all 404 errors.
+    * If you don't define your own 404 view -- and simply use the
+      default, which is recommended -- you still have one obligation:
+      To create a ``404.html`` template in the root of your template
+      directory. The default 404 view will use that template for all
+      404 errors. The default 404 view will pass one variable to the
+      template: ``request_path``, which is the URL which resulted in
+      the 404.
 
     * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
       view will never be used, and the traceback will be displayed instead.
@@ -572,7 +575,8 @@ the view ``django.views.defaults.server_error``, which loads and renders the
 template ``500.html``.
 
 This means you need to define a ``500.html`` template in your root template
-directory. This template will be used for all server errors.
+directory. This template will be used for all server errors. The
+default 500 view passes no variables to this template.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
 you want to override the view, you can specify ``handler500`` in your
