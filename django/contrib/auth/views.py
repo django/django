@@ -1,13 +1,16 @@
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm
+from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm, AdminPasswordChangeForm
+from django.core.exceptions import PermissionDenied
 from django import oldforms
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.sites.models import Site, RequestSite
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
@@ -97,3 +100,33 @@ password_change = login_required(password_change)
 
 def password_change_done(request, template_name='registration/password_change_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))
+
+def user_change_password(request, id):
+    if not request.user.has_perm('auth.change_user'):
+        raise PermissionDenied
+    user = get_object_or_404(User, pk=id)
+    manipulator = AdminPasswordChangeForm(user)
+    if request.method == 'POST':
+        new_data = request.POST.copy()
+        errors = manipulator.get_validation_errors(new_data)
+        if not errors:
+            new_user = manipulator.save(new_data)
+            msg = _('Password changed successfully.')
+            request.user.message_set.create(message=msg)
+            return HttpResponseRedirect('..')
+    else:
+        errors = new_data = {}
+    form = oldforms.FormWrapper(manipulator, new_data, errors)
+    return render_to_response('admin/auth/user/change_password.html', {
+        'title': _('Change password: %s') % escape(user.username),
+        'form': form,
+        'is_popup': '_popup' in request.REQUEST,
+        'add': True,
+        'change': False,
+        'has_delete_permission': False,
+        'has_change_permission': True,
+        'has_absolute_url': False,
+        'opts': User._meta,
+        'original': user,
+        'show_save': True,
+    }, context_instance=RequestContext(request))

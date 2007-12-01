@@ -171,7 +171,7 @@ class AdminSite(object):
         """
         Handles the "user change password" task
         """
-        from django.contrib.admin.views.auth import user_change_password
+        from django.contrib.auth.views import user_change_password
         return user_change_password(request, id)
 
     def i18n_javascript(self, request):
