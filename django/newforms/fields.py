@@ -83,21 +83,15 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
-        self.error_messages = self._build_error_messages(error_messages)
-
-    def _build_error_messages(self, extra_error_messages):
-        error_messages = {}
-
-        def get_default_error_messages(klass):
+        def set_class_error_messages(messages, klass):
             for base_class in klass.__bases__:
-                get_default_error_messages(base_class)
-            if hasattr(klass, 'default_error_messages'):
-                error_messages.update(klass.default_error_messages)
+                set_class_error_messages(messages, base_class)
+            messages.update(getattr(klass, 'default_error_messages', {}))
 
-        get_default_error_messages(self.__class__)
-        if extra_error_messages:
-            error_messages.update(extra_error_messages)
-        return error_messages
+        messages = {}
+        set_class_error_messages(messages, self.__class__)
+        messages.update(error_messages or {})
+        self.error_messages = messages
 
     def clean(self, value):
         """
