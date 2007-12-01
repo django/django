@@ -58,6 +58,17 @@ See the `csrf documentation`_.
 
 .. _csrf documentation: ../csrf/
 
+flatpages
+=========
+
+A framework for managing simple "flat" HTML content in a database.
+
+See the `flatpages documentation`_.
+
+.. _flatpages documentation: ../flatpages/
+
+Requires the sites_ contrib package to be installed as well.
+
 formtools
 =========
 
@@ -162,17 +173,6 @@ Examples (when 'today' is 17 Feb 2007):
 
 .. _DATE_FORMAT: ../settings/#date_format
 
-flatpages
-=========
-
-A framework for managing simple "flat" HTML content in a database.
-
-See the `flatpages documentation`_.
-
-.. _flatpages documentation: ../flatpages/
-
-Requires the sites_ contrib package to be installed as well.
-
 localflavor
 ===========
 
@@ -211,6 +211,15 @@ See the `redirects documentation`_.
 
 .. _redirects documentation: ../redirects/
 
+sessions
+========
+
+A framework for storing data in anonymous sessions.
+
+See the `sessions documentation`_.
+
+.. _sessions documentation: ../sessions/
+
 sites
 =====
 
@@ -239,6 +248,16 @@ A framework for generating syndication feeds, in RSS and Atom, quite easily.
 See the `syndication documentation`_.
 
 .. _syndication documentation: ../syndication_feeds/
+
+webdesign
+=========
+
+Helpers and utilties targeted primarily at web designers rather than
+web developers.
+
+See the `web design helpers documentation`_.
+
+.. _web design helpers documentaion`: ../webdesign/
 
 Other add-ons
 =============
