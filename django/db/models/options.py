@@ -29,7 +29,7 @@ class Options(object):
         self.object_name, self.app_label = None, None
         self.get_latest_by = None
         self.order_with_respect_to = None
-        self.db_tablespace = None
+        self.db_tablespace = settings.DEFAULT_TABLESPACE
         self.admin = None
         self.meta = meta
         self.pk = None

@@ -253,6 +253,10 @@ TRANSACTIONS_MANAGED = False
 from django import get_version
 URL_VALIDATOR_USER_AGENT = "Django/%s (http://www.djangoproject.com)" % get_version()
 
+# The tablespaces to use for each model when not specified otherwise.
+DEFAULT_TABLESPACE = ''
+DEFAULT_INDEX_TABLESPACE = ''
+
 ##############
 # MIDDLEWARE #
 ##############

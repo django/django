@@ -404,6 +404,22 @@ Default: ``'webmaster@localhost'``
 Default e-mail address to use for various automated correspondence from the
 site manager(s).
 
+DEFAULT_TABLESPACE
+------------------
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for models that do not specify one, if the
+backend supports it.
+
+DEFAULT_INDEX_TABLESPACE
+------------------------
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for indexes on fields that do not specify
+one, if the backend supports it.
+
 DISALLOWED_USER_AGENTS
 ----------------------
 
