@@ -557,11 +557,11 @@ Three things to note about 404 views:
 
     * If you don't define your own 404 view -- and simply use the
       default, which is recommended -- you still have one obligation:
-      To create a ``404.html`` template in the root of your template
-      directory. The default 404 view will use that template for all
-      404 errors. The default 404 view will pass one variable to the
-      template: ``request_path``, which is the URL which resulted in
-      the 404.
+      you must create a ``404.html`` template in the root of your
+      template directory. The default 404 view will use that template
+      for all 404 errors. The default 404 view will pass one variable
+      to the template: ``request_path``, which is the URL which
+      resulted in the 404.
 
     * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
       view will never be used, and the traceback will be displayed instead.
