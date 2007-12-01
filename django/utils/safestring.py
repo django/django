@@ -41,9 +41,6 @@ class SafeString(str, SafeData):
         else:
             return super(SafeString, self).__add__(rhs)
 
-    def __str__(self):
-        return self
-
     def _proxy_method(self, *args, **kwargs):
         """
         Wrap a call to a normal unicode method up so that we return safe
