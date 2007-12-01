@@ -33,6 +33,7 @@ def user_add_stage(request):
         'is_popup': '_popup' in request.REQUEST,
         'add': True,
         'change': False,
+        'has_add_permission': True,
         'has_delete_permission': False,
         'has_change_permission': True,
         'has_file_field': False,
