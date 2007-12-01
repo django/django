@@ -603,8 +603,9 @@ This example illustrates all possible attributes and methods for a ``Feed`` clas
         # ITEM LINK -- One of these three is required. The framework looks for
         # them in this order.
 
-        # First, the framework tries the get_absolute_url() method on each item
-        # returned by items(). Failing that, it tries these two methods:
+        # First, the framework tries the two methods below, in
+        # order. Failing that, it falls back to the get_absolute_url()
+        # method on each item returned by items().
 
         def item_link(self, item):
             """
