@@ -50,7 +50,7 @@ The above ``Person`` model would create a database table like this::
 Some technical notes:
 
     * The name of the table, ``myapp_person``, is automatically derived from
-      some model metadata but can be overridden. See _`Table names` below.
+      some model metadata but can be overridden. See `Table names`_ below.
     * An ``id`` field is added automatically, but this behavior can be
       overriden. See `Automatic primary key fields`_ below.
     * The ``CREATE TABLE`` SQL in this example is formatted using PostgreSQL
@@ -1664,7 +1664,7 @@ Adding extra Manager methods
 
 Adding extra ``Manager`` methods is the preferred way to add "table-level"
 functionality to your models. (For "row-level" functionality -- i.e., functions
-that act on a single instance of a model object -- use _`Model methods`, not
+that act on a single instance of a model object -- use `Model methods`_, not
 custom ``Manager`` methods.)
 
 A custom ``Manager`` method can return anything you want. It doesn't have to

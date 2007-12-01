@@ -5,6 +5,6 @@
   {% if bound_field.has_label_first %}{% field_label bound_field %}{% endif %}
   {% field_widget bound_field %}
   {% if not bound_field.has_label_first %}{% field_label bound_field %}{% endif %}
-  {% if bound_field.field.help_text %}<p class="help">{{ bound_field.field.help_text }}</p>{% endif %}
+  {% if bound_field.field.help_text %}<p class="help">{{ bound_field.field.help_text|safe }}</p>{% endif %}
 {% endfor %}
 </div>

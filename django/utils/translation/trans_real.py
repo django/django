@@ -8,6 +8,7 @@ import gettext as gettext_module
 from cStringIO import StringIO
 
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe, SafeData
 
 try:
     import threading
@@ -167,10 +168,9 @@ def translation(language):
                     res.merge(t)
             return res
 
-        if hasattr(settings, 'LOCALE_PATHS'):
-            for localepath in settings.LOCALE_PATHS:
-                if os.path.isdir(localepath):
-                    res = _merge(localepath)
+        for localepath in settings.LOCALE_PATHS:
+            if os.path.isdir(localepath):
+                res = _merge(localepath)
 
         if projectpath and os.path.isdir(projectpath):
             res = _merge(projectpath)
@@ -271,11 +271,15 @@ def do_translate(message, translation_function):
     global _default, _active
     t = _active.get(currentThread(), None)
     if t is not None:
-        return getattr(t, translation_function)(message)
-    if _default is None:
-        from django.conf import settings
-        _default = translation(settings.LANGUAGE_CODE)
-    return getattr(_default, translation_function)(message)
+        result = getattr(t, translation_function)(message)
+    else:
+        if _default is None:
+            from django.conf import settings
+            _default = translation(settings.LANGUAGE_CODE)
+        result = getattr(_default, translation_function)(message)
+    if isinstance(message, SafeData):
+        return mark_safe(result)
+    return result
 
 def gettext(message):
     return do_translate(message, 'gettext')

@@ -102,7 +102,7 @@ class Comment(models.Model):
         date_hierarchy = 'submit_date'
         search_fields = ('comment', 'user__username')
 
-    def __repr__(self):
+    def __unicode__(self):
         return "%s: %s..." % (self.user.username, self.comment[:100])
 
     def get_absolute_url(self):
@@ -190,7 +190,7 @@ class FreeComment(models.Model):
         date_hierarchy = 'submit_date'
         search_fields = ('comment', 'person_name')
 
-    def __repr__(self):
+    def __unicode__(self):
         return "%s: %s..." % (self.person_name, self.comment[:100])
 
     def get_absolute_url(self):
@@ -244,7 +244,7 @@ class KarmaScore(models.Model):
         verbose_name_plural = _('karma scores')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.user}
 
 class UserFlagManager(models.Manager):
@@ -275,7 +275,7 @@ class UserFlag(models.Model):
         verbose_name_plural = _('user flags')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("Flag by %r") % self.user
 
 class ModeratorDeletion(models.Model):
@@ -287,5 +287,5 @@ class ModeratorDeletion(models.Model):
         verbose_name_plural = _('moderator deletions')
         unique_together = (('user', 'comment'),)
 
-    def __repr__(self):
+    def __unicode__(self):
         return _("Moderator deletion by %r") % self.user

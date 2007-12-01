@@ -17,7 +17,7 @@ except NameError:
     from sets import Set as set
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import StrAndUnicode, smart_unicode
+from django.utils.encoding import StrAndUnicode, smart_unicode, smart_str
 
 from util import ErrorList, ValidationError
 from widgets import TextInput, PasswordInput, HiddenInput, MultipleHiddenInput, FileInput, CheckboxInput, Select, NullBooleanSelect, SelectMultiple, DateTimeInput
@@ -235,7 +235,7 @@ class DecimalField(Field):
         super(DecimalField, self).clean(value)
         if not self.required and value in EMPTY_VALUES:
             return None
-        value = str(value).strip()
+        value = smart_str(value).strip()
         try:
             value = Decimal(value)
         except DecimalException:
@@ -536,11 +536,12 @@ class BooleanField(Field):
     widget = CheckboxInput
 
     def clean(self, value):
-        "Returns a Python boolean object."
+        """Returns a Python boolean object."""
         super(BooleanField, self).clean(value)
-        # Explicitly check for the string '0', which is what as hidden field
-        # will submit for False.
-        if value == '0':
+        # Explicitly check for the string 'False', which is what a hidden field
+        # will submit for False (since bool("True") == True we don't need to
+        # handle that explicitly).
+        if value == 'False':
             return False
         return bool(value)
 

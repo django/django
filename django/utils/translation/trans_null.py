@@ -4,6 +4,7 @@
 
 from django.conf import settings
 from django.utils.encoding import force_unicode
+from django.utils.safestring import mark_safe, SafeData
 
 def ngettext(singular, plural, number):
     if number == 1: return singular
@@ -31,7 +32,10 @@ TECHNICAL_ID_MAP = {
 }
 
 def gettext(message):
-    return TECHNICAL_ID_MAP.get(message, message)
+    result = TECHNICAL_ID_MAP.get(message, message)
+    if isinstance(message, SafeData):
+        return mark_safe(result)
+    return result
 
 def ugettext(message):
     return force_unicode(gettext(message))

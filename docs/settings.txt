@@ -583,7 +583,7 @@ LOCALE_PATHS
 
 Default: ``()`` (Empty tuple)
 
-A list of directories where Django looks for translation files.
+A tuple of directories where Django looks for translation files.
 See the `internationalization docs section`_ explaining the variable and the
 default behavior.
 
@@ -791,10 +791,12 @@ SESSION_COOKIE_PATH
 
 Default: ``'/'``
 
-The path set on the session cookie. Should match the URL path of your Django
-installation (or be parent of that path). This is useful if you have multiple
-Django instances running under the same hostname; they can use different
-cookie paths and each instance will only see its own session cookie.
+The path set on the session cookie. This should either match the URL path of your
+Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
 
 SESSION_COOKIE_SECURE
 ---------------------

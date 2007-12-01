@@ -12,6 +12,15 @@ from datetime import datetime, timedelta
 from django.utils.tzinfo import LocalTimezone
 from django.utils.safestring import mark_safe
 
+# These two classes are used to test auto-escaping of __unicode__ output.
+class UnsafeClass:
+    def __unicode__(self):
+        return u'you & me'
+
+class SafeClass:
+    def __unicode__(self):
+        return mark_safe(u'you &gt; me')
+
 # RESULT SYNTAX --
 # 'template_name': ('template contents', 'context dict',
 #                   'expected string output' or Exception class)
@@ -93,6 +102,11 @@ def get_filter_tests():
         'filter-urlize02': ('{{ a|urlize }} {{ b|urlize }}', {"a": "http://example.com/x=&y=", "b": mark_safe("http://example.com?x=&y=")}, u'<a href="http://example.com/x=&y=" rel="nofollow">http://example.com/x=&amp;y=</a> <a href="http://example.com?x=&y=" rel="nofollow">http://example.com?x=&y=</a>'),
         'filter-urlize03': ('{% autoescape off %}{{ a|urlize }}{% endautoescape %}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
         'filter-urlize04': ('{{ a|urlize }}', {"a": mark_safe("a &amp; b")}, 'a &amp; b'),
+
+        # This will lead to a nonsense result, but at least it won't be
+        # exploitable for XSS purposes when auto-escaping is on.
+        'filter-urlize05': ('{% autoescape off %}{{ a|urlize }}{% endautoescape %}', {"a": "<script>alert('foo')</script>"}, "<script>alert('foo')</script>"),
+        'filter-urlize06': ('{{ a|urlize }}', {"a": "<script>alert('foo')</script>"}, '&lt;script&gt;alert(&#39;foo&#39;)&lt;/script&gt;'),
 
         'filter-urlizetrunc01': ('{% autoescape off %}{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}{% endautoescape %}', {"a": "http://example.com/x=&y=", "b": mark_safe("http://example.com?x=&y=")}, u'<a href="http://example.com/x=&y=" rel="nofollow">http:...</a> <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'),
         'filter-urlizetrunc02': ('{{ a|urlizetrunc:"8" }} {{ b|urlizetrunc:"8" }}', {"a": "http://example.com/x=&y=", "b": mark_safe("http://example.com?x=&y=")}, u'<a href="http://example.com/x=&y=" rel="nofollow">http:...</a> <a href="http://example.com?x=&y=" rel="nofollow">http:...</a>'),
@@ -177,22 +191,27 @@ def get_filter_tests():
         'filter-unordered_list04': ('{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}', {"a": ["x>", [[mark_safe("<y"), []]]]}, "\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>"),
         'filter-unordered_list05': ('{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}', {"a": ["x>", [["<y", []]]]}, "\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>"),
 
-        # If the input to "default" filter is marked as safe, then so is the
-        # output. However, if the default arg is used, auto-escaping kicks in
-        # (if enabled), because we cannot mark the default as safe.
+        # Literal string arguments to the default filter are always treated as
+        # safe strings, regardless of the auto-escaping state.
         #
         # Note: we have to use {"a": ""} here, otherwise the invalid template
         # variable string interferes with the test result.
-        'filter-default01': ('{{ a|default:"x<" }}', {"a": ""}, "x&lt;"),
+        'filter-default01': ('{{ a|default:"x<" }}', {"a": ""}, "x<"),
         'filter-default02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": ""}, "x<"),
         'filter-default03': ('{{ a|default:"x<" }}', {"a": mark_safe("x>")}, "x>"),
         'filter-default04': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": mark_safe("x>")}, "x>"),
 
-        'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x&lt;"),
+        'filter-default_if_none01': ('{{ a|default:"x<" }}', {"a": None}, "x<"),
         'filter-default_if_none02': ('{% autoescape off %}{{ a|default:"x<" }}{% endautoescape %}', {"a": None}, "x<"),
 
         'filter-phone2numeric01': ('{{ a|phone2numeric }} {{ b|phone2numeric }}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "&lt;1-800-2255-63&gt; <1-800-2255-63>"),
         'filter-phone2numeric02': ('{% autoescape off %}{{ a|phone2numeric }} {{ b|phone2numeric }}{% endautoescape %}', {"a": "<1-800-call-me>", "b": mark_safe("<1-800-call-me>") }, "<1-800-2255-63> <1-800-2255-63>"),
+
+        # Ensure iriencode keeps safe strings:
+        'filter-iriencode01': ('{{ url|iriencode }}', {'url': '?test=1&me=2'}, '?test=1&amp;me=2'),
+        'filter-iriencode02': ('{% autoescape off %}{{ url|iriencode }}{% endautoescape %}', {'url': '?test=1&me=2'}, '?test=1&me=2'),
+        'filter-iriencode03': ('{{ url|iriencode }}', {'url': mark_safe('?test=1&me=2')}, '?test=1&me=2'),
+        'filter-iriencode04': ('{% autoescape off %}{{ url|iriencode }}{% endautoescape %}', {'url': mark_safe('?test=1&me=2')}, '?test=1&me=2'),
 
         # Chaining a bunch of safeness-preserving filters should not alter
         # the safe status either way.
@@ -209,12 +228,19 @@ def get_filter_tests():
 
         # Force to safe, then back (also showing why using force_escape too
         # early in a chain can lead to unexpected results).
-        'chaining07': ('{{ a|force_escape|cut:"b" }}', {"a": "a < b"}, "a &lt; "),
-        'chaining08': ('{% autoescape off %}{{ a|force_escape|cut:"b" }}{% endautoescape %}', {"a": "a < b"}, "a &lt; "),
-        'chaining09': ('{{ a|cut:"b"|force_escape }}', {"a": "a < b"}, "a &lt; "),
-        'chaining10': ('{% autoescape off %}{{ a|cut:"b"|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; "),
+        'chaining07': ('{{ a|force_escape|cut:";" }}', {"a": "a < b"}, "a &amp;lt b"),
+        'chaining08': ('{% autoescape off %}{{ a|force_escape|cut:";" }}{% endautoescape %}', {"a": "a < b"}, "a &lt b"),
+        'chaining09': ('{{ a|cut:";"|force_escape }}', {"a": "a < b"}, "a &lt; b"),
+        'chaining10': ('{% autoescape off %}{{ a|cut:";"|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; b"),
         'chaining11': ('{{ a|cut:"b"|safe }}', {"a": "a < b"}, "a < "),
         'chaining12': ('{% autoescape off %}{{ a|cut:"b"|safe }}{% endautoescape %}', {"a": "a < b"}, "a < "),
         'chaining13': ('{{ a|safe|force_escape }}', {"a": "a < b"}, "a &lt; b"),
         'chaining14': ('{% autoescape off %}{{ a|safe|force_escape }}{% endautoescape %}', {"a": "a < b"}, "a &lt; b"),
+
+        # Filters decorated with stringfilter still respect is_safe. 
+        'autoescape-stringfilter01': (r'{{ unsafe|capfirst }}', {'unsafe': UnsafeClass()}, 'You &amp; me'),
+        'autoescape-stringfilter02': (r'{% autoescape off %}{{ unsafe|capfirst }}{% endautoescape %}', {'unsafe': UnsafeClass()}, 'You & me'),
+        'autoescape-stringfilter03': (r'{{ safe|capfirst }}', {'safe': SafeClass()}, 'You &gt; me'),
+        'autoescape-stringfilter04': (r'{% autoescape off %}{{ safe|capfirst }}{% endautoescape %}', {'safe': SafeClass()}, 'You &gt; me'),
     }
+

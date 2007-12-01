@@ -66,6 +66,9 @@ u'1979 189 CET'
 
 >>> format(my_birthday, r'jS o\f F')
 u'8th of July'
+
+>>> format(the_future, r'Y')
+u'2100'
 """
 
 from django.utils import dateformat, translation
@@ -84,3 +87,4 @@ except AttributeError:
 my_birthday = datetime.datetime(1979, 7, 8, 22, 00)
 summertime = datetime.datetime(2005, 10, 30, 1, 00)
 wintertime = datetime.datetime(2005, 10, 30, 4, 00)
+the_future = datetime.datetime(2100, 10, 25, 0, 00)

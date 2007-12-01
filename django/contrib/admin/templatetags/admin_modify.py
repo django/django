@@ -118,7 +118,7 @@ class FieldWrapper(object):
         return not isinstance(self.field, models.AutoField)
 
     def header_class_attribute(self):
-        return self.field.blank and ' class="optional"' or ''
+        return self.field.blank and mark_safe(' class="optional"') or ''
 
     def use_raw_id_admin(self):
         return isinstance(self.field.rel, (models.ManyToOneRel, models.ManyToManyRel)) \

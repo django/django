@@ -56,7 +56,7 @@ would like to be able to things like this in our models (we assume the
 
 We assign to and retrieve from the ``hand`` attribute in our model just like
 any other Python class. The trick is to tell Django how to handle saving and
-loading such an object
+loading such an object.
 
 In order to use the ``Hand`` class in our models, we **do not** have to change
 this class at all. This is ideal, because it means you can easily write
@@ -98,7 +98,7 @@ For our ``Hand`` example, we could convert the card data to a string of 104
 characters by concatenating all the cards together in a pre-determined order.
 Say, all the *north* cards first, then the *east*, *south* and *west* cards, in
 that order. So ``Hand`` objects can be saved to text or character columns in
-the database
+the database.
 
 What does a field class do?
 ---------------------------
@@ -233,9 +233,9 @@ sure your field subclass uses ``django.db.models.SubfieldBase`` as its
 metaclass. This ensures that the ``to_python()`` method, documented below_,
 will always be called when the attribute is initialised.
 
-Our ``HandleField`` class now looks like this::
+Our ``HandField`` class now looks like this::
 
-    class HandleField(models.Field):
+    class HandField(models.Field):
         __metaclass__ = models.SubfieldBase
 
         def __init__(self, *args, **kwargs):
@@ -549,7 +549,7 @@ we can reuse some existing conversion code::
 Some general advice
 --------------------
 
-Writing a custom field can be a tricky process sometime, particularly if you
+Writing a custom field can be a tricky process sometimes, particularly if you
 are doing complex conversions between your Python types and your database and
 serialization formats. A couple of tips to make things go more smoothly:
 

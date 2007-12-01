@@ -3,8 +3,11 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 
-from django.core.cache import cache
 import time, unittest
+
+from django.core.cache import cache
+from django.utils.cache import patch_vary_headers
+from django.http import HttpResponse
 
 # functions/classes for complex data type tests
 def f():
@@ -86,6 +89,31 @@ class Cache(unittest.TestCase):
         for (key, value) in stuff.items():
             cache.set(key, value)
             self.assertEqual(cache.get(key), value)
+
+
+class CacheUtils(unittest.TestCase):
+    """TestCase for django.utils.cache functions."""
+    
+    def test_patch_vary_headers(self):
+        headers = ( 
+            # Initial vary, new headers, resulting vary.
+            (None, ('Accept-Encoding',), 'Accept-Encoding'),
+            ('Accept-Encoding', ('accept-encoding',), 'Accept-Encoding'),
+            ('Accept-Encoding', ('ACCEPT-ENCODING',), 'Accept-Encoding'),
+            ('Cookie', ('Accept-Encoding',), 'Cookie, Accept-Encoding'),
+            ('Cookie, Accept-Encoding', ('Accept-Encoding',), 'Cookie, Accept-Encoding'),
+            ('Cookie, Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+            (None, ('Accept-Encoding', 'COOKIE'), 'Accept-Encoding, COOKIE'),
+            ('Cookie,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+            ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+        )
+        for initial_vary, newheaders, resulting_vary in headers:
+            response = HttpResponse()
+            if initial_vary is not None:
+                response['Vary'] = initial_vary
+            patch_vary_headers(response, newheaders)
+            self.assertEqual(response['Vary'], resulting_vary)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -57,7 +57,6 @@ class SafeString(str, SafeData):
         else:
             return SafeUnicode(data)
 
-    encode = curry(_proxy_method, method = str.encode)
     decode = curry(_proxy_method, method = str.decode)
 
 class SafeUnicode(unicode, SafeData):
@@ -89,7 +88,6 @@ class SafeUnicode(unicode, SafeData):
             return SafeUnicode(data)
 
     encode = curry(_proxy_method, method = unicode.encode)
-    decode = curry(_proxy_method, method = unicode.decode)
 
 def mark_safe(s):
     """

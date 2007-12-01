@@ -6,6 +6,7 @@ import datetime
 
 from django.newforms.widgets import Widget, Select
 from django.utils.dates import MONTHS
+from django.utils.safestring import mark_safe
 
 __all__ = ('SelectDateWidget',)
 
@@ -51,7 +52,7 @@ class SelectDateWidget(Widget):
         select_html = Select(choices=year_choices).render(self.year_field % name, year_val)
         output.append(select_html)
 
-        return u'\n'.join(output)
+        return mark_safe(u'\n'.join(output))
 
     def value_from_datadict(self, data, files, name):
         y, m, d = data.get(self.year_field % name), data.get(self.month_field % name), data.get(self.day_field % name)
