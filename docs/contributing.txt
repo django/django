@@ -242,7 +242,7 @@ We've got two roles here:
     * Ticket triagers: community members who keep track of tickets, making
       sure the tickets are always categorized correctly.
 
-Second, note the four triage stages:
+Second, note the five triage stages:
 
     1. A ticket starts as "Unreviewed", meaning that a triager has yet to
        examine the ticket and move it along.
@@ -254,9 +254,14 @@ Second, note the four triage stages:
     3. Once a ticket is ruled to be approved for fixing, it's moved into the
        "Accepted" stage. This stage is where all the real work gets done.
 
-    4. If a ticket has an associated patch (see below), a triager will review the
-       patch. If the patch is complete, it'll be marked as "ready for checkin" so
-       that a core developer knows to review and check in the patches.
+    4. A ticket might be moved to the "Someday/Maybe" state if it's an
+       enhancement request we are willing to consider if a good patch is
+       written. Such tickets are not high priority.
+
+    5. If a ticket has an associated patch (see below), a triager will review
+       the patch. If the patch is complete, it'll be marked as "ready for
+       checkin" so that a core developer knows to review and check in the
+       patches.
 
 The second part of this workflow involves a set of flags the describe what the
 ticket has or needs in order to be "ready for checkin":
