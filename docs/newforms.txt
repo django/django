@@ -1105,9 +1105,9 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 
 **New in Django development version**
 
-The ``error_messages`` argument lets you override the default messages which the
+The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
-want to override. For example::
+want to override. For example, here is the default error message::
 
     >>> generic = forms.CharField()
     >>> generic.clean('')
@@ -1115,14 +1115,16 @@ want to override. For example::
       ...
     ValidationError: [u'This field is required.']
 
+And here is a custom error message::
+
     >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
     >>> name.clean('')
     Traceback (most recent call last):
       ...
     ValidationError: [u'Please enter your name']
 
-In the `built-in Field classes`_ section below, each Field defines the error
-message keys it uses.  
+In the `built-in Field classes`_ section below, each ``Field`` defines the
+error message keys it uses.
 
 Dynamic initial values
 ----------------------
