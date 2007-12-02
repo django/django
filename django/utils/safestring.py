@@ -34,13 +34,13 @@ class SafeString(str, SafeData):
         Concatenating a safe string with another safe string or safe unicode
         object is safe. Otherwise, the result is no longer safe.
         """
+        t = super(SafeString, self).__add__(rhs)
         if isinstance(rhs, SafeUnicode):
-            return SafeUnicode(self + rhs)
+            return SafeUnicode(t)
         elif isinstance(rhs, SafeString):
-            return SafeString(self + rhs)
-        else:
-            return super(SafeString, self).__add__(rhs)
-
+            return SafeString(t)
+        return t
+        
     def _proxy_method(self, *args, **kwargs):
         """
         Wrap a call to a normal unicode method up so that we return safe
@@ -66,11 +66,11 @@ class SafeUnicode(unicode, SafeData):
         Concatenating a safe unicode object with another safe string or safe
         unicode object is safe. Otherwise, the result is no longer safe.
         """
+        t = super(SafeUnicode, self).__add__(rhs)
         if isinstance(rhs, SafeData):
-            return SafeUnicode(self + rhs)
-        else:
-            return super(SafeUnicode, self).__add__(rhs)
-
+            return SafeUnicode(t)
+        return t
+    
     def _proxy_method(self, *args, **kwargs):
         """
         Wrap a call to a normal unicode method up so that we return safe
