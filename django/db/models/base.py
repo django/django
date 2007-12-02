@@ -1,7 +1,7 @@
 import django.db.models.manipulators
 import django.db.models.manager
 from django.core import validators
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
 from django.db.models.query import delete_objects
@@ -35,6 +35,8 @@ class ModelBase(type):
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
         new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
+        new_class.add_to_class('MultipleObjectsReturned',
+            types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
 
         # Build complete list of parents
         for base in bases:
