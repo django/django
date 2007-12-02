@@ -24,7 +24,7 @@ For example::
     ...         model = Article
 
     # Creating a form to add an article.
-    >>> article\ = Article()
+    >>> article = Article()
     >>> form = ArticleForm(article)
 
     # Creating a form to change an existing article.
