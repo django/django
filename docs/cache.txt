@@ -168,6 +168,10 @@ development or testing environments. For example::
 
     CACHE_BACKEND = 'simple:///'
 
+**New in Django development version:** This cache backend is deprecated and
+will be removed in a future release. New code should use the ``locmem`` backend
+instead.
+
 Dummy caching (for development)
 -------------------------------
 
