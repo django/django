@@ -367,7 +367,7 @@ class InlineFormset(BaseModelFormSet):
         return self.model._default_manager.filter(**kwargs)
 
     def save_new(self, form, commit=True):
-        kwargs = {self.fk.get_attname(): self.instance._get_pk_val()}
+        kwargs = {self.fk.get_attname(): self.instance.pk}
         new_obj = self.model(**kwargs)
         return save_instance(form, new_obj, commit=commit)
 
