@@ -340,7 +340,7 @@ That would result in a rendered template like this::
 Clearly, user-submitted data shouldn't be trusted blindly and inserted directly
 into your Web pages, because a malicious user could use this kind of hole to
 do potentially bad things. This type of security exploit is called a
-Cross Site Scripting`_ (XSS) attack.
+`Cross Site Scripting`_ (XSS) attack.
 
 To avoid this problem, you have two options:
 
@@ -366,6 +366,8 @@ are escaped:
 
 Again, we stress that this behavior is on by default. If you're using Django's
 template system, you're protected.
+
+.. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
 
 How to turn it off
 ------------------
