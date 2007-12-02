@@ -409,7 +409,7 @@ class EmailField(RegexField):
 try:
     from django.conf import settings
     URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
-except (ImportError, EnvironmentError):
+except ImportError:
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 

@@ -1166,12 +1166,12 @@ If you're not setting the ``DJANGO_SETTINGS_MODULE`` environment variable, you
 settings.
 
 If you don't set ``DJANGO_SETTINGS_MODULE`` and don't call ``configure()``,
-Django will raise an ``EnvironmentError`` exception the first time a setting
+Django will raise an ``ImportError`` exception the first time a setting
 is accessed.
 
 If you set ``DJANGO_SETTINGS_MODULE``, access settings values somehow, *then*
-call ``configure()``, Django will raise an ``EnvironmentError`` saying settings
-have already been configured.
+call ``configure()``, Django will raise a ``RuntimeError`` indicating
+that settings have already been configured.
 
 Also, it's an error to call ``configure()`` more than once, or to call
 ``configure()`` after any setting has been accessed.

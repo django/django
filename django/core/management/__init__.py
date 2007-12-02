@@ -84,7 +84,7 @@ def get_commands():
         try:
             from django.conf import settings
             apps = settings.INSTALLED_APPS
-        except (AttributeError, EnvironmentError):
+        except (AttributeError, ImportError):
             apps = []
 
         for app_name in apps:
@@ -99,7 +99,7 @@ def get_commands():
         try:
             from django.conf import settings
             project_directory = setup_environ(__import__(settings.SETTINGS_MODULE))
-        except (AttributeError, EnvironmentError, ImportError):
+        except (AttributeError, ImportError):
             project_directory = None
 
         if project_directory:
