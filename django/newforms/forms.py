@@ -182,12 +182,11 @@ class BaseForm(StrAndUnicode):
         for name, field in self.fields.items():
             if name in exceptions:
                 continue
-            # value_from_datadict() gets the data from the dictionary.
+            # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
             value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
-            # HACK: ['', ''] and [None, None] deal with SplitDateTimeWidget. This should be more robust.
-            if value not in (None, '', ['', ''], [None, None]):
+            if not field.widget.is_empty(value):
                 return False
         return True
 

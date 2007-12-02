@@ -292,6 +292,12 @@ checkboxes).
 >>> w.value_from_datadict({}, {}, 'testing')
 False
 
+The CheckboxInput widget will always be empty when there is a False value
+>>> w.is_empty(False)
+True
+>>> w.is_empty(True)
+False
+
 # Select Widget ###############################################################
 
 >>> w = Select()
@@ -452,6 +458,15 @@ over multiple times without getting consumed:
 <option value="2">Yes</option>
 <option value="3" selected="selected">No</option>
 </select>
+
+The NullBooleanSelect widget will always be empty when Unknown or No is selected
+as its value.  This is to stay compliant with the CheckboxInput behavior
+>>> w.is_empty(False)
+True
+>>> w.is_empty(None)
+True
+>>> w.is_empty(True)
+False
 
 """ + \
 r""" # [This concatenation is to keep the string below the jython's 32K limit].
@@ -894,6 +909,16 @@ u'<input id="foo_0" type="text" class="big" value="john" name="name_0" /><br /><
 >>> w = MyMultiWidget(widgets=(TextInput(attrs={'class': 'big'}), TextInput(attrs={'class': 'small'})), attrs={'id': 'bar'})
 >>> w.render('name', ['john', 'lennon'])
 u'<input id="bar_0" type="text" class="big" value="john" name="name_0" /><br /><input id="bar_1" type="text" class="small" value="lennon" name="name_1" />'
+
+The MultiWidget will be empty only when all widgets are considered empty.
+>>> w.is_empty(['john', 'lennon'])
+False
+>>> w.is_empty(['john', ''])
+False
+>>> w.is_empty(['', ''])
+True
+>>> w.is_empty([None, None])
+True
 
 # SplitDateTimeWidget #########################################################
 

@@ -165,6 +165,15 @@ class Widget(object):
         of this widget. Returns None if it's not provided.
         """
         return data.get(name, None)
+    
+    def is_empty(self, value):
+        """
+        Given a dictionary of data and this widget's name, return True if the
+        widget data is empty or False when not empty.
+        """
+        if value not in (None, ''):
+            return False
+        return True
 
     def id_for_label(self, id_):
         """
@@ -301,6 +310,11 @@ class CheckboxInput(Widget):
             # send results for unselected checkboxes.
             return False
         return super(CheckboxInput, self).value_from_datadict(data, files, name)
+    
+    def is_empty(self, value):
+        # this widget will always either be True or False, so always return the
+        # opposite value so False values will make the form empty
+        return not value
 
 class Select(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -343,6 +357,12 @@ class NullBooleanSelect(Select):
     def value_from_datadict(self, data, files, name):
         value = data.get(name, None)
         return {u'2': True, u'3': False, True: True, False: False}.get(value, None)
+    
+    def is_empty(self, value):
+        # this widget will always either be True, False or None, so always
+        # return the opposite value so False and None values will make the
+        # form empty.
+        return not value
 
 class SelectMultiple(Widget):
     def __init__(self, attrs=None, choices=()):
@@ -539,6 +559,12 @@ class MultiWidget(Widget):
 
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+    
+    def is_empty(self, value):
+        for widget, val in zip(self.widgets, value):
+            if not widget.is_empty(val):
+                return False
+        return True
 
     def format_output(self, rendered_widgets):
         """
