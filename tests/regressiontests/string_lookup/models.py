@@ -18,26 +18,26 @@ class Bar(models.Model):
         return "Bar %s" % self.place.name
 
 class Whiz(models.Model):
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return "Whiz %s" % self.name
 
 class Child(models.Model):
     parent = models.OneToOneField('Base')
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return "Child %s" % self.name
 
 class Base(models.Model):
-    name = models.CharField(max_length = 50)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return "Base %s" % self.name
 
 class Article(models.Model):
-    name = models.CharField(maxlength = 50)
+    name = models.CharField(max_length=50)
     text = models.TextField()
 
     def __str__(self):
