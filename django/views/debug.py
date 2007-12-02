@@ -131,7 +131,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         if start is not None and end is not None:
             unicode_str = exc_value.args[1]
             unicode_hint = smart_unicode(unicode_str[max(start-5, 0):min(end+5, len(unicode_str))], 'ascii', errors='replace')
-
+    from django import get_version
     t = Template(TECHNICAL_500_TEMPLATE, name='Technical 500 template')
     c = Context({
         'exception_type': exc_type.__name__,
@@ -144,6 +144,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'settings': get_safe_settings(),
         'sys_executable' : sys.executable,
         'sys_version_info' : '%d.%d.%d' % sys.version_info[0:3],
+        'django_version_info' : get_version(),
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -275,6 +276,8 @@ TECHNICAL_500_TEMPLATE = """
     #requestinfo h3 { margin-bottom:-1em; }
     .error { background: #ffc; }
     .specific { color:#cc3300; font-weight:bold; }
+    h2 span.commands { font-size:.7em;}
+    span.commands a:link {color:#5E5694;}
   </style>
   <script type="text/javascript">
   //<!--
@@ -409,9 +412,7 @@ TECHNICAL_500_TEMPLATE = """
 </div>
 {% endif %}
 <div id="traceback">
-  <h2>Traceback <span>(innermost last)</span></h2>
-  <div class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></div>
-  <br/>
+  <h2>Traceback <span class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">Switch to copy-and-paste view</a></span></h2>
   {% autoescape off %}
   <div id="browserTraceback">
     <ul class="traceback">
@@ -456,27 +457,51 @@ TECHNICAL_500_TEMPLATE = """
       {% endfor %}
     </ul>
   </div>
-  <div id="pastebinTraceback" class="pastebin">
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <code>
-Traceback (most recent call last):<br/>
-{% for frame in frames %}
-  File "{{ frame.filename }}" in {{ frame.function }}<br/>
-  {% if frame.context_line %}
-    &nbsp;&nbsp;{{ frame.lineno }}. {{ frame.context_line|escape }}<br/>
-  {% endif %}
-{% endfor %}<br/>
-&nbsp;&nbsp;{{ exception_type }} at {{ request.path|escape }}<br/>
-&nbsp;&nbsp;{{ exception_value|escape }}</code>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
   {% endautoescape %}
+  <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
+  <div id="pastebinTraceback" class="pastebin">
+    <input type="hidden" name="language" value="PythonConsole" />
+    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path|escape }}" />
+    <input type="hidden" name="source" value="Django Dpaste Agent" />
+    <input type="hidden" name="poster" value="Django" />
+    <textarea name="content" id="traceback_area" cols="140" rows="25">
+Environment:
+
+Request Method: {{ request.META.REQUEST_METHOD }}
+Request URL: {{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path|escape }}
+Django Version: {{ django_version_info }}
+Python Version: {{ sys_version_info }}
+Installed Applications: 
+   {{ settings.INSTALLED_APPS|pprint }}
+Installed Middleware: 
+   {{ settings.MIDDLEWARE_CLASSES|pprint }}
+
+{% if template_does_not_exist %}Template Loader Error:
+{% if loader_debug_info %}Django tried loading these templates, in this order:
+{% for loader in loader_debug_info %}Using loader {{ loader.loader }}:
+{% for t in loader.templates %}{{ t.name }} (File {% if t.exists %}exists{% else %}does not exist{% endif %})
+{% endfor %}{% endfor %}
+{% else %}Django couldn't find any templates because your TEMPLATE_LOADERS setting is empty!
+{% endif %}
+{% endif %}{% if template_info %}
+Template error:
+In template {{ template_info.name }}, error at line {{ template_info.line }}
+   {{ template_info.message }}{% for source_line in template_info.source_lines %}{% ifequal source_line.0 template_info.line %}
+   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
+{% else %}
+   {{ source_line.0 }} : {{ source_line.1 }}
+{% endifequal %}{% endfor %}{% endif %}
+Traceback:
+{% for frame in frames %}File "{{ frame.filename|escape }}" in {{ frame.function|escape }}
+{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line|escape }}{% endif %}
+{% endfor %}
+Exception Type: {{ exception_type|escape }} at {{ request.path|escape }}
+Exception Value: {{ exception_value|escape }}
+</textarea>
+  <br/><br/>
+  </div>
+<input type="submit" value="Send to DPaste"> 
+</form>
 </div>
 
 <div id="requestinfo">
