@@ -28,7 +28,7 @@ def save_instance(form, instance, fields=None, fail_message='saved',
     database. Returns ``instance``.
     """
     from django.db import models
-    opts = instance.__class__._meta
+    opts = instance._meta
     if form.errors:
         raise ValueError("The %s could not be %s because the data didn't"
                          " validate." % (opts.object_name, fail_message))
@@ -42,7 +42,7 @@ def save_instance(form, instance, fields=None, fail_message='saved',
         f.save_form_data(instance, cleaned_data[f.name])
     # Wrap up the saving of m2m data as a function.
     def save_m2m():
-        opts = instance.__class__._meta
+        opts = instance._meta
         cleaned_data = form.cleaned_data
         for f in opts.many_to_many:
             if fields and f.name not in fields:
@@ -256,8 +256,7 @@ def initial_data(instance, fields=None):
     """
     # avoid a circular import
     from django.db.models.fields.related import ManyToManyField
-    model = instance.__class__
-    opts = model._meta
+    opts = instance._meta
     initial = {}
     for f in opts.fields + opts.many_to_many:
         if not f.editable:
