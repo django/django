@@ -494,17 +494,18 @@ class ModelAdmin(BaseModelAdmin):
 
         ModelForm = self.form_add(request)
         inline_formsets = []
+        obj = self.model()
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES)
             for FormSet in self.formsets_add(request):
-                inline_formset = FormSet(data=request.POST, files=request.FILES)
+                inline_formset = FormSet(obj, data=request.POST, files=request.FILES)
                 inline_formsets.append(inline_formset)
             if all_valid(inline_formsets) and form.is_valid():
                 return self.save_add(request, model, form, inline_formsets, '../%s/')
         else:
             form = ModelForm(initial=request.GET)
             for FormSet in self.formsets_add(request):
-                inline_formset = FormSet()
+                inline_formset = FormSet(obj)
                 inline_formsets.append(inline_formset)
 
         adminForm = AdminForm(form, list(self.fieldsets_add(request)), self.prepopulated_fields)
