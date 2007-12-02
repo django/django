@@ -152,7 +152,7 @@ class Options(object):
             rel_objs = []
             for klass in get_models():
                 for f in klass._meta.fields:
-                    if f.rel and self == f.rel.to._meta:
+                    if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
                         rel_objs.append(RelatedObject(f.rel.to, klass, f))
             self._all_related_objects = rel_objs
             return rel_objs
@@ -186,7 +186,7 @@ class Options(object):
             rel_objs = []
             for klass in get_models():
                 for f in klass._meta.many_to_many:
-                    if f.rel and self == f.rel.to._meta:
+                    if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
                         rel_objs.append(RelatedObject(f.rel.to, klass, f))
             if app_cache_ready():
                 self._all_related_many_to_many_objects = rel_objs
