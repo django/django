@@ -66,6 +66,11 @@ False
 >>> s.accessed, s.modified
 (True, False)
 
+>>> s.setdefault('foo', 'bar')
+'bar'
+>>> s.setdefault('foo', 'baz')
+'bar'
+
 >>> s.accessed = False  # Reset the accessed flag
 
 >>> s.pop('some key')
