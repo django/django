@@ -144,7 +144,7 @@ class QuerySetIterator(object):
         if self.empty_label is not None:
             yield (u"", self.empty_label)
         for obj in self.queryset:
-            yield (obj._get_pk_val(), smart_unicode(obj))
+            yield (obj.pk, smart_unicode(obj))
         # Clear the QuerySet cache if required.
         if not self.cache_choices:
             self.queryset._result_cache = None
@@ -266,7 +266,7 @@ def initial_data(instance, fields=None):
             continue
         if isinstance(f, ManyToManyField):
             # MultipleChoiceWidget needs a list of ints, not object instances.
-            initial[f.name] = [obj._get_pk_val() for obj in f.value_from_object(instance)]
+            initial[f.name] = [obj.pk for obj in f.value_from_object(instance)]
         else:
             initial[f.name] = f.value_from_object(instance)
     return initial
@@ -304,7 +304,7 @@ class BaseModelFormSet(BaseFormSet):
         # Put the objects from self.get_queryset into a dict so they are easy to lookup by pk
         existing_objects = {}
         for obj in self.queryset:
-            existing_objects[obj._get_pk_val()] = obj
+            existing_objects[obj.pk] = obj
         saved_instances = []
         for form in self.change_forms:
             obj = existing_objects[form.cleaned_data[self.model._meta.pk.attname]]
@@ -367,7 +367,7 @@ class InlineFormset(BaseModelFormSet):
         return self.model._default_manager.filter(**kwargs)
 
     def save_new(self, form, commit=True):
-        kwargs = {self.fk.get_attname(): self.instance.pk}
+        kwargs = {self.fk.get_attname(): self.instance._get_pk_val()}
         new_obj = self.model(**kwargs)
         return save_instance(form, new_obj, commit=commit)
 
