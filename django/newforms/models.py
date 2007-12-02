@@ -6,13 +6,15 @@ and database field objects.
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
+from django.core.exceptions import ImproperlyConfigured
 
-from util import ValidationError
+from util import ValidationError, ErrorList
 from forms import BaseForm
 from fields import Field, ChoiceField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
 __all__ = (
+    'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
     'save_instance', 'form_for_model', 'form_for_instance', 'form_for_fields',
     'ModelChoiceField', 'ModelMultipleChoiceField'
 )
@@ -132,6 +134,155 @@ def form_for_fields(field_list):
                          for f in field_list if f.editable])
     return type('FormForFields', (BaseForm,), {'base_fields': fields})
 
+
+# ModelForms #################################################################
+
+def model_to_dict(instance, fields=None, exclude=None):
+    """
+    Returns a dict containing the data in ``instance`` suitable for passing as
+    a Form's ``initial`` keyword argument.
+    
+    ``fields`` is an optional list of field names. If provided, only the named
+    fields will be included in the returned dict.
+    
+    ``exclude`` is an optional list of field names. If provided, the named
+    fields will be excluded from the returned dict, even if they are listed in
+    the ``fields`` argument.
+    """
+    # avoid a circular import
+    from django.db.models.fields.related import ManyToManyField
+    opts = instance._meta
+    data = {}
+    for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
+        if fields and not f.name in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        if isinstance(f, ManyToManyField):
+            # If the object doesn't have a primry key yet, just use an empty
+            # list for its m2m fields. Calling f.value_from_object will raise
+            # an exception.
+            if instance.pk is None:
+                data[f.name] = []
+            else:
+                # MultipleChoiceWidget needs a list of pks, not object instances.
+                data[f.name] = [obj.pk for obj in f.value_from_object(instance)]
+        else:
+            data[f.name] = f.value_from_object(instance)
+    return data
+
+def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda f: f.formfield()):
+    """
+    Returns a ``SortedDict`` containing form fields for the given model.
+
+    ``fields`` is an optional list of field names. If provided, only the named
+    fields will be included in the returned fields.
+    
+    ``exclude`` is an optional list of field names. If provided, the named
+    fields will be excluded from the returned fields, even if they are listed
+    in the ``fields`` argument.
+    """
+    # TODO: if fields is provided, it would be nice to return fields in that order
+    field_list = []
+    opts = model._meta
+    for f in opts.fields + opts.many_to_many:
+        if not f.editable:
+            continue
+        if fields and not f.name in fields:
+            continue
+        if exclude and f.name in exclude:
+            continue
+        formfield = formfield_callback(f)
+        if formfield:
+            field_list.append((f.name, formfield))
+    return SortedDict(field_list)
+
+class ModelFormOptions(object):
+    def __init__(self, options=None):
+        self.model = getattr(options, 'model', None)
+        self.fields = getattr(options, 'fields', None)
+        self.exclude = getattr(options, 'exclude', None)
+
+class ModelFormMetaclass(type):
+    def __new__(cls, name, bases, attrs):
+        # TODO: no way to specify formfield_callback yet, do we need one, or
+        # should it be a special case for the admin?
+        fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
+        fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+
+        # If this class is subclassing another Form, add that Form's fields.
+        # Note that we loop over the bases in *reverse*. This is necessary in
+        # order to preserve the correct order of fields.
+        for base in bases[::-1]:
+            if hasattr(base, 'base_fields'):
+                fields = base.base_fields.items() + fields
+        declared_fields = SortedDict(fields)
+
+        opts = ModelFormOptions(attrs.get('Meta', None))
+        attrs['_meta'] = opts
+
+        # Don't allow more than one Meta model defenition in bases. The fields
+        # would be generated correctly, but the save method won't deal with
+        # more than one object.
+        base_models = []
+        for base in bases:
+            base_opts = getattr(base, '_meta', None)
+            base_model = getattr(base_opts, 'model', None)
+            if base_model is not None:
+                base_models.append(base_model)
+        if len(base_models) > 1:
+            raise ImproperlyConfigured("%s's base classes define more than one model." % name)
+
+        # If a model is defined, extract form fields from it and add them to base_fields
+        if attrs['_meta'].model is not None:
+            # Don't allow a subclass to define a Meta model if a parent class has.
+            # Technically the right fields would be generated, but the save 
+            # method will not deal with more than one model.
+            for base in bases:
+                base_opts = getattr(base, '_meta', None)
+                base_model = getattr(base_opts, 'model', None)
+                if base_model is not None:
+                    raise ImproperlyConfigured('%s defines more than one model.' % name)
+            model_fields = fields_for_model(opts.model, opts.fields, opts.exclude)
+            # fields declared in base classes override fields from the model
+            model_fields.update(declared_fields)
+            attrs['base_fields'] = model_fields
+        else:
+            attrs['base_fields'] = declared_fields
+        return type.__new__(cls, name, bases, attrs)
+
+class BaseModelForm(BaseForm):
+    def __init__(self, instance, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':'):
+        self.instance = instance
+        opts = self._meta
+        object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        # if initial was provided, it should override the values from instance
+        if initial is not None:
+            object_data.update(initial)
+        BaseForm.__init__(self, data, files, auto_id, prefix, object_data, error_class, label_suffix)
+
+    def save(self, commit=True):
+        """
+        Saves this ``form``'s cleaned_data into model instance ``self.instance``.
+
+        If commit=True, then the changes to ``instance`` will be saved to the
+        database. Returns ``instance``.
+        """
+        if self.instance.pk is None:
+            fail_message = 'created'
+        else:
+            fail_message = 'changed'
+        return save_instance(self, self.instance, self._meta.fields, fail_message, commit)
+
+class ModelForm(BaseModelForm):
+    __metaclass__ = ModelFormMetaclass
+
+
+# Fields #####################################################################
+
 class QuerySetIterator(object):
     def __init__(self, queryset, empty_label, cache_choices):
         self.queryset = queryset
@@ -142,7 +293,7 @@ class QuerySetIterator(object):
         if self.empty_label is not None:
             yield (u"", self.empty_label)
         for obj in self.queryset:
-            yield (obj._get_pk_val(), smart_unicode(obj))
+            yield (obj.pk, smart_unicode(obj))
         # Clear the QuerySet cache if required.
         if not self.cache_choices:
             self.queryset._result_cache = None

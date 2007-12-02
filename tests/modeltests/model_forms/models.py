@@ -1,25 +1,10 @@
 """
-36. Generating HTML forms from models
+XX. Generating HTML forms from models
 
-Django provides shortcuts for creating Form objects from a model class and a
-model instance.
-
-The function django.newforms.form_for_model() takes a model class and returns
-a Form that is tied to the model. This Form works just like any other Form,
-with one additional method: save(). The save() method creates an instance
-of the model and returns that newly created instance. It saves the instance to
-the database if save(commit=True), which is default. If you pass
-commit=False, then you'll get the object without committing the changes to the
-database.
-
-The function django.newforms.form_for_instance() takes a model instance and
-returns a Form that is tied to the instance. This form works just like any
-other Form, with one additional method: save(). The save()
-method updates the model instance. It also takes a commit=True parameter.
-
-The function django.newforms.save_instance() takes a bound form instance and a
-model instance and saves the form's cleaned_data into the instance. It also takes
-a commit=True parameter.
+This is mostly just a reworking of the form_for_model/form_for_instance tests
+to use ModelForm. As such, the text may not make sense in all cases, and the
+examples are probably a poor fit for the ModelForm syntax. In other words,
+most of these tests should be rewritten.
 """
 
 from django.db import models
@@ -28,23 +13,6 @@ ARTICLE_STATUS = (
     (1, 'Draft'),
     (2, 'Pending'),
     (3, 'Live'),
-)
-
-STEERING_TYPE = (
-    ('left', 'Left steering wheel'),
-    ('right', 'Right steering wheel'),
-)
-
-FUEL_TYPE = (
-    ('gas', 'Gasoline'),
-    ('diesel', 'Diesel'),
-    ('other', 'Other'),
-)
-
-TRANSMISSION_TYPE = (
-    ('at', 'Automatic'),
-    ('mt', 'Manual'),
-    ('cvt', 'CVT'),
 )
 
 class Category(models.Model):
@@ -87,21 +55,119 @@ class PhoneNumber(models.Model):
     def __unicode__(self):
         return self.phone
 
-class Car(models.Model):
-    name = models.CharField(max_length=50)
-    steering = models.CharField(max_length=5, choices=STEERING_TYPE, default='left')
-    fuel = models.CharField(max_length=10, choices=FUEL_TYPE)
-    transmission = models.CharField(max_length=3, choices=TRANSMISSION_TYPE, blank=True, help_text='Leave empty if not applicable.')
-
 __test__ = {'API_TESTS': """
->>> from django.newforms import form_for_model, form_for_instance, save_instance, BaseForm, Form, CharField
+>>> from django import newforms as forms
+>>> from django.newforms.models import ModelForm
+
+The bare bones, absolutely nothing custom, basic case.
+
+>>> class CategoryForm(ModelForm):
+...     class Meta:
+...         model = Category
+>>> CategoryForm.base_fields.keys()
+['name', 'slug', 'url']
+
+
+Extra fields.
+
+>>> class CategoryForm(ModelForm):
+...     some_extra_field = forms.BooleanField()
+...
+...     class Meta:
+...         model = Category
+
+>>> CategoryForm.base_fields.keys()
+['name', 'slug', 'url', 'some_extra_field']
+
+
+Replacing a field.
+
+>>> class CategoryForm(ModelForm):
+...     url = forms.BooleanField()
+...
+...     class Meta:
+...         model = Category
+
+>>> CategoryForm.base_fields['url'].__class__
+<class 'django.newforms.fields.BooleanField'>
+
+
+Using 'fields'.
+
+>>> class CategoryForm(ModelForm):
+...
+...     class Meta:
+...         model = Category
+...         fields = ['url']
+
+>>> CategoryForm.base_fields.keys()
+['url']
+
+
+Using 'exclude'
+
+>>> class CategoryForm(ModelForm):
+...
+...     class Meta:
+...         model = Category
+...         exclude = ['url']
+
+>>> CategoryForm.base_fields.keys()
+['name', 'slug']
+
+
+Using 'fields' *and* 'exclude'. Not sure why you'd want to do this, but uh,
+"be liberal in what you accept" and all.
+
+>>> class CategoryForm(ModelForm):
+...
+...     class Meta:
+...         model = Category
+...         fields = ['name', 'url']
+...         exclude = ['url']
+
+>>> CategoryForm.base_fields.keys()
+['name']
+
+Don't allow more than one 'model' definition in the inheritance hierarchy.
+Technically, it would generate a valid form, but the fact that the resulting
+save method won't deal with multiple objects is likely to trip up people not
+familiar with the mechanics.
+
+>>> class CategoryForm(ModelForm):
+...     class Meta:
+...         model = Category
+
+>>> class BadForm(CategoryForm):
+...     class Meta:
+...         model = Article
+Traceback (most recent call last):
+...
+ImproperlyConfigured: BadForm defines more than one model.
+
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+
+>>> class BadForm(ArticleForm, CategoryForm):
+...     pass
+Traceback (most recent call last):
+...
+ImproperlyConfigured: BadForm's base classes define more than one model.
+
+
+# Old form_for_x tests #######################################################
+
+>>> from django.newforms import ModelForm, CharField
 >>> import datetime
 
 >>> Category.objects.all()
 []
 
->>> CategoryForm = form_for_model(Category)
->>> f = CategoryForm()
+>>> class CategoryForm(ModelForm):
+...     class Meta:
+...         model = Category
+>>> f = CategoryForm(Category())
 >>> print f
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
@@ -113,13 +179,13 @@ __test__ = {'API_TESTS': """
 >>> print f['name']
 <input id="id_name" type="text" name="name" maxlength="20" />
 
->>> f = CategoryForm(auto_id=False)
+>>> f = CategoryForm(Category(), auto_id=False)
 >>> print f.as_ul()
 <li>Name: <input type="text" name="name" maxlength="20" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="20" /></li>
 <li>The URL: <input type="text" name="url" maxlength="40" /></li>
 
->>> f = CategoryForm({'name': 'Entertainment', 'slug': 'entertainment', 'url': 'entertainment'})
+>>> f = CategoryForm(Category(), {'name': 'Entertainment', 'slug': 'entertainment', 'url': 'entertainment'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
@@ -130,7 +196,7 @@ True
 >>> Category.objects.all()
 [<Category: Entertainment>]
 
->>> f = CategoryForm({'name': "It's a test", 'slug': 'its-test', 'url': 'test'})
+>>> f = CategoryForm(Category(), {'name': "It's a test", 'slug': 'its-test', 'url': 'test'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
@@ -144,7 +210,7 @@ True
 If you call save() with commit=False, then it will return an object that
 hasn't yet been saved to the database. In this case, it's up to you to call
 save() on the resulting model instance.
->>> f = CategoryForm({'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
+>>> f = CategoryForm(Category(), {'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
@@ -159,7 +225,7 @@ True
 [<Category: Entertainment>, <Category: It's a test>, <Category: Third test>]
 
 If you call save() with invalid data, you'll get a ValueError.
->>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
+>>> f = CategoryForm(Category(), {'name': '', 'slug': '', 'url': 'foo'})
 >>> f.errors
 {'name': [u'This field is required.'], 'slug': [u'This field is required.']}
 >>> f.cleaned_data
@@ -170,7 +236,7 @@ AttributeError: 'CategoryForm' object has no attribute 'cleaned_data'
 Traceback (most recent call last):
 ...
 ValueError: The Category could not be created because the data didn't validate.
->>> f = CategoryForm({'name': '', 'slug': '', 'url': 'foo'})
+>>> f = CategoryForm(Category(), {'name': '', 'slug': '', 'url': 'foo'})
 >>> f.save()
 Traceback (most recent call last):
 ...
@@ -184,8 +250,10 @@ Create a couple of Writers.
 
 ManyToManyFields are represented by a MultipleChoiceField, ForeignKeys and any
 fields with the 'choices' attribute are represented by a ChoiceField.
->>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm(auto_id=False)
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = ArticleForm(Article(), auto_id=False)
 >>> print f
 <tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Slug:</th><td><input type="text" name="slug" maxlength="50" /></td></tr>
@@ -214,28 +282,23 @@ model created with such a form, you need to ensure that the fields
 that are _not_ on the form have default values, or are allowed to have
 a value of None. If a field isn't specified on a form, the object created
 from the form can't provide a value for that field!
->>> PartialArticleForm = form_for_model(Article, fields=('headline','pub_date'))
->>> f = PartialArticleForm(auto_id=False)
+>>> class PartialArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+...         fields = ('headline','pub_date')
+>>> f = PartialArticleForm(Article(), auto_id=False)
 >>> print f
 <tr><th>Headline:</th><td><input type="text" name="headline" maxlength="50" /></td></tr>
 <tr><th>Pub date:</th><td><input type="text" name="pub_date" /></td></tr>
-
-You can pass a custom Form class to form_for_model. Make sure it's a
-subclass of BaseForm, not Form.
->>> class CustomForm(BaseForm):
-...     def say_hello(self):
-...         print 'hello'
->>> CategoryForm = form_for_model(Category, form=CustomForm)
->>> f = CategoryForm()
->>> f.say_hello()
-hello
 
 Use form_for_instance to create a Form from a model instance. The difference
 between this Form and one created via form_for_model is that the object's
 current values are inserted as 'initial' data in each Field.
 >>> w = Writer.objects.get(name='Mike Royko')
->>> RoykoForm = form_for_instance(w)
->>> f = RoykoForm(auto_id=False)
+>>> class RoykoForm(ModelForm):
+...     class Meta:
+...         model = Writer
+>>> f = RoykoForm(w, auto_id=False)
 >>> print f
 <tr><th>Name:</th><td><input type="text" name="name" value="Mike Royko" maxlength="50" /><br />Use both first and last names.</td></tr>
 
@@ -243,8 +306,10 @@ current values are inserted as 'initial' data in each Field.
 >>> art.save()
 >>> art.id
 1
->>> TestArticleForm = form_for_instance(art)
->>> f = TestArticleForm(auto_id=False)
+>>> class TestArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = TestArticleForm(art, auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="Test article" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="test-article" maxlength="50" /></li>
@@ -266,7 +331,7 @@ current values are inserted as 'initial' data in each Field.
 <option value="2">It&#39;s a test</option>
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
->>> f = TestArticleForm({'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
+>>> f = TestArticleForm(art, {'headline': u'Test headline', 'slug': 'test-headline', 'pub_date': u'1984-02-06', 'writer': u'1', 'article': 'Hello.'})
 >>> f.is_valid()
 True
 >>> test_art = f.save()
@@ -278,8 +343,11 @@ u'Test headline'
 
 You can create a form over a subset of the available fields
 by specifying a 'fields' argument to form_for_instance.
->>> PartialArticleForm = form_for_instance(art, fields=('headline', 'slug', 'pub_date'))
->>> f = PartialArticleForm({'headline': u'New headline', 'slug': 'new-headline', 'pub_date': u'1988-01-04'}, auto_id=False)
+>>> class PartialArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+...         fields=('headline', 'slug', 'pub_date')
+>>> f = PartialArticleForm(art, {'headline': u'New headline', 'slug': 'new-headline', 'pub_date': u'1988-01-04'}, auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
@@ -299,8 +367,10 @@ Add some categories and test the many-to-many form output.
 >>> new_art.categories.add(Category.objects.get(name='Entertainment'))
 >>> new_art.categories.all()
 [<Category: Entertainment>]
->>> TestArticleForm = form_for_instance(new_art)
->>> f = TestArticleForm(auto_id=False)
+>>> class TestArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = TestArticleForm(new_art, auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" value="New headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" value="new-headline" maxlength="50" /></li>
@@ -323,7 +393,7 @@ Add some categories and test the many-to-many form output.
 <option value="3">Third test</option>
 </select>  Hold down "Control", or "Command" on a Mac, to select more than one.</li>
 
->>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
+>>> f = TestArticleForm(new_art, {'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.', 'categories': [u'1', u'2']})
 >>> new_art = f.save()
 >>> new_art.id
@@ -333,7 +403,7 @@ Add some categories and test the many-to-many form output.
 [<Category: Entertainment>, <Category: It's a test>]
 
 Now, submit form data with no categories. This deletes the existing categories.
->>> f = TestArticleForm({'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
+>>> f = TestArticleForm(new_art, {'headline': u'New headline', 'slug': u'new-headline', 'pub_date': u'1988-01-04',
 ...     'writer': u'1', 'article': u'Hello.'})
 >>> new_art = f.save()
 >>> new_art.id
@@ -343,8 +413,10 @@ Now, submit form data with no categories. This deletes the existing categories.
 []
 
 Create a new article, with categories, via the form.
->>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = ArticleForm(Article(), {'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save()
 >>> new_art.id
@@ -354,8 +426,10 @@ Create a new article, with categories, via the form.
 [<Category: Entertainment>, <Category: It's a test>]
 
 Create a new article, with no categories, via the form.
->>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = ArticleForm(Article(), {'headline': u'The walrus was Paul', 'slug': u'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.'})
 >>> new_art = f.save()
 >>> new_art.id
@@ -366,8 +440,10 @@ Create a new article, with no categories, via the form.
 
 Create a new article, with categories, via the form, but use commit=False.
 The m2m data won't be saved until save_m2m() is invoked on the form.
->>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm({'headline': u'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': u'1967-11-01',
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = ArticleForm(Article(), {'headline': u'The walrus was Paul', 'slug': 'walrus-was-paul', 'pub_date': u'1967-11-01',
 ...     'writer': u'1', 'article': u'Test.', 'categories': [u'1', u'2']})
 >>> new_art = f.save(commit=False)
 
@@ -386,10 +462,10 @@ The m2m data won't be saved until save_m2m() is invoked on the form.
 >>> new_art.categories.order_by('name')
 [<Category: Entertainment>, <Category: It's a test>]
 
-Here, we define a custom Form. Because it happens to have the same fields as
-the Category model, we can use save_instance() to apply its changes to an
+Here, we define a custom ModelForm. Because it happens to have the same fields as
+the Category model, we can just call the form's save() to apply its changes to an
 existing Category instance.
->>> class ShortCategory(Form):
+>>> class ShortCategory(ModelForm):
 ...     name = CharField(max_length=5)
 ...     slug = CharField(max_length=5)
 ...     url = CharField(max_length=3)
@@ -398,8 +474,8 @@ existing Category instance.
 <Category: Third test>
 >>> cat.id
 3
->>> sc = ShortCategory({'name': 'Third', 'slug': 'third', 'url': '3rd'})
->>> save_instance(sc, cat)
+>>> form = ShortCategory(cat, {'name': 'Third', 'slug': 'third', 'url': '3rd'})
+>>> form.save()
 <Category: Third>
 >>> Category.objects.get(id=3)
 <Category: Third>
@@ -407,8 +483,10 @@ existing Category instance.
 Here, we demonstrate that choices for a ForeignKey ChoiceField are determined
 at runtime, based on the data in the database when the form is displayed, not
 the data in the database when the form is instantiated.
->>> ArticleForm = form_for_model(Article)
->>> f = ArticleForm(auto_id=False)
+>>> class ArticleForm(ModelForm):
+...     class Meta:
+...         model = Article
+>>> f = ArticleForm(Article(), auto_id=False)
 >>> print f.as_ul()
 <li>Headline: <input type="text" name="headline" maxlength="50" /></li>
 <li>Slug: <input type="text" name="slug" maxlength="50" /></li>
@@ -609,60 +687,12 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 
 # PhoneNumberField ############################################################
 
->>> PhoneNumberForm = form_for_model(PhoneNumber)
->>> f = PhoneNumberForm({'phone': '(312) 555-1212', 'description': 'Assistance'})
+>>> class PhoneNumberForm(ModelForm):
+...     class Meta:
+...         model = PhoneNumber
+>>> f = PhoneNumberForm(PhoneNumber(), {'phone': '(312) 555-1212', 'description': 'Assistance'})
 >>> f.is_valid()
 True
 >>> f.cleaned_data
 {'phone': u'312-555-1212', 'description': u'Assistance'}
-
-# form_for_* blank choices ####################################################
-
-Show the form for a new Car. Note that steering field doesn't include the blank choice,
-because the field is obligatory and has an explicit default.
->>> CarForm = form_for_model(Car)
->>> f = CarForm(auto_id=False)
->>> print f
-<tr><th>Name:</th><td><input type="text" name="name" maxlength="50" /></td></tr>
-<tr><th>Steering:</th><td><select name="steering">
-<option value="left" selected="selected">Left steering wheel</option>
-<option value="right">Right steering wheel</option>
-</select></td></tr>
-<tr><th>Fuel:</th><td><select name="fuel">
-<option value="" selected="selected">---------</option>
-<option value="gas">Gasoline</option>
-<option value="diesel">Diesel</option>
-<option value="other">Other</option>
-</select></td></tr>
-<tr><th>Transmission:</th><td><select name="transmission">
-<option value="" selected="selected">---------</option>
-<option value="at">Automatic</option>
-<option value="mt">Manual</option>
-<option value="cvt">CVT</option>
-</select><br />Leave empty if not applicable.</td></tr>
-
-Create a Car, and display the form for modifying it. Note that now the fuel
-selector doesn't include the blank choice as well, since the field is
-obligatory and can not be changed to be blank.
->>> honda = Car(name='Honda Accord Wagon', steering='right', fuel='gas', transmission='at')
->>> honda.save()
->>> HondaForm = form_for_instance(honda)
->>> f = HondaForm(auto_id=False)
->>> print f
-<tr><th>Name:</th><td><input type="text" name="name" value="Honda Accord Wagon" maxlength="50" /></td></tr>
-<tr><th>Steering:</th><td><select name="steering">
-<option value="left">Left steering wheel</option>
-<option value="right" selected="selected">Right steering wheel</option>
-</select></td></tr>
-<tr><th>Fuel:</th><td><select name="fuel">
-<option value="gas" selected="selected">Gasoline</option>
-<option value="diesel">Diesel</option>
-<option value="other">Other</option>
-</select></td></tr>
-<tr><th>Transmission:</th><td><select name="transmission">
-<option value="">---------</option>
-<option value="at" selected="selected">Automatic</option>
-<option value="mt">Manual</option>
-<option value="cvt">CVT</option>
-</select><br />Leave empty if not applicable.</td></tr>
 """}

@@ -1,0 +1,310 @@
+==========================
+Using newforms with models
+==========================
+
+``ModelForm``
+=============
+
+If you're building a database-driven app, chances are you'll have forms that
+map closely to Django models. For instance, you might have a ``BlogComment``
+model, and you want to create a form that lets people submit comments. In this
+case, it would be redundant to define the field types in your form, because
+you've already defined the fields in your model.
+
+For this reason, Django provides a helper class that let you create a ``Form``
+class from a Django model.
+
+For example::
+
+    >>> from django.newforms import ModelForm
+    
+    # Create the form class.
+    >>> class ArticleForm(ModelForm):
+    ...     class Meta:
+    ...         model = Article
+
+    # Creating a form to add an article.
+    >>> article\ = Article()
+    >>> form = ArticleForm(article)
+
+    # Creating a form to change an existing article.
+    >>> article = Article.objects.get(pk=1)
+    >>> form = ArticleForm(article)
+
+Field types
+-----------
+
+The generated ``Form`` class will have a form field for every model field. Each
+model field has a corresponding default form field. For example, a
+``CharField`` on a model is represented as a ``CharField`` on a form. A
+model ``ManyToManyField`` is represented as a ``MultipleChoiceField``. Here is
+the full list of conversions:
+
+    ===============================  ========================================
+    Model field                      Form field
+    ===============================  ========================================
+    ``AutoField``                    Not represented in the form
+    ``BooleanField``                 ``BooleanField``
+    ``CharField``                    ``CharField`` with ``max_length`` set to
+                                     the model field's ``max_length``
+    ``CommaSeparatedIntegerField``   ``CharField``
+    ``DateField``                    ``DateField``
+    ``DateTimeField``                ``DateTimeField``
+    ``DecimalField``                 ``DecimalField``
+    ``EmailField``                   ``EmailField``
+    ``FileField``                    ``FileField``
+    ``FilePathField``                ``CharField``
+    ``FloatField``                   ``FloatField``
+    ``ForeignKey``                   ``ModelChoiceField`` (see below)
+    ``ImageField``                   ``ImageField``
+    ``IntegerField``                 ``IntegerField``
+    ``IPAddressField``               ``IPAddressField``
+    ``ManyToManyField``              ``ModelMultipleChoiceField`` (see
+                                     below)
+    ``NullBooleanField``             ``CharField``
+    ``PhoneNumberField``             ``USPhoneNumberField``
+                                     (from ``django.contrib.localflavor.us``)
+    ``PositiveIntegerField``         ``IntegerField``
+    ``PositiveSmallIntegerField``    ``IntegerField``
+    ``SlugField``                    ``CharField``
+    ``SmallIntegerField``            ``IntegerField``
+    ``TextField``                    ``CharField`` with ``widget=Textarea``
+    ``TimeField``                    ``TimeField``
+    ``URLField``                     ``URLField`` with ``verify_exists`` set
+                                     to the model field's ``verify_exists``
+    ``USStateField``                 ``CharField`` with
+                                     ``widget=USStateSelect``
+                                     (``USStateSelect`` is from
+                                     ``django.contrib.localflavor.us``)
+    ``XMLField``                     ``CharField`` with ``widget=Textarea``
+    ===============================  ========================================
+
+
+.. note::
+    The ``FloatField`` form field and ``DecimalField`` model and form fields
+    are new in the development version.
+
+As you might expect, the ``ForeignKey`` and ``ManyToManyField`` model field
+types are special cases:
+
+    * ``ForeignKey`` is represented by ``django.newforms.ModelChoiceField``,
+      which is a ``ChoiceField`` whose choices are a model ``QuerySet``.
+
+    * ``ManyToManyField`` is represented by
+      ``django.newforms.ModelMultipleChoiceField``, which is a
+      ``MultipleChoiceField`` whose choices are a model ``QuerySet``.
+
+In addition, each generated form field has attributes set as follows:
+
+    * If the model field has ``blank=True``, then ``required`` is set to
+      ``False`` on the form field. Otherwise, ``required=True``.
+
+    * The form field's ``label`` is set to the ``verbose_name`` of the model
+      field, with the first character capitalized.
+
+    * The form field's ``help_text`` is set to the ``help_text`` of the model
+      field.
+
+    * If the model field has ``choices`` set, then the form field's ``widget``
+      will be set to ``Select``, with choices coming from the model field's
+      ``choices``. The choices will normally include the blank choice which is
+      selected by default. If the field is required, this forces the user to
+      make a selection. The blank choice will not be included if the model
+      field has ``blank=False`` and an explicit ``default`` value (the
+      ``default`` value will be initially selected instead).
+
+Finally, note that you can override the form field used for a given model
+field. See "Overriding the default field types" below.
+
+A full example
+--------------
+
+Consider this set of models::
+
+    from django.db import models
+
+    TITLE_CHOICES = (
+        ('MR', 'Mr.'),
+        ('MRS', 'Mrs.'),
+        ('MS', 'Ms.'),
+    )
+
+    class Author(models.Model):
+        name = models.CharField(max_length=100)
+        title = models.CharField(max_length=3, choices=TITLE_CHOICES)
+        birth_date = models.DateField(blank=True, null=True)
+
+        def __unicode__(self):
+            return self.name
+
+    class Book(models.Model):
+        name = models.CharField(max_length=100)
+        authors = models.ManyToManyField(Author)
+
+    class AuthorForm(ModelForm):
+        class Meta:
+            model = Author
+
+    class BookForm(ModelForm):
+        class Meta:
+            model = Book
+
+With these models, the ``ModelForm`` subclasses above would be roughly
+equivalent to this (the only difference being the ``save()`` method, which
+we'll discuss in a moment.)::
+
+    class AuthorForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        title = forms.CharField(max_length=3,
+                    widget=forms.Select(choices=TITLE_CHOICES))
+        birth_date = forms.DateField(required=False)
+
+    class BookForm(forms.Form):
+        name = forms.CharField(max_length=100)
+        authors = forms.ModelMultipleChoiceField(queryset=Author.objects.all())
+
+The ``save()`` method
+---------------------
+
+Every form produced by ``ModelForm`` also has a ``save()`` method. This
+method creates and saves a database object from the data bound to the form.
+A subclass of ``ModelForm`` also requires a model instance as the first
+arument to its constructor. For example::
+
+    # Create a form instance from POST data.
+    >>> a = Article()
+    >>> f = ArticleForm(a, request.POST)
+
+    # Save a new Article object from the form's data.
+    >>> new_article = f.save()
+
+Note that ``save()`` will raise a ``ValueError`` if the data in the form
+doesn't validate -- i.e., ``if form.errors``.
+
+This ``save()`` method accepts an optional ``commit`` keyword argument, which
+accepts either ``True`` or ``False``. If you call ``save()`` with
+``commit=False``, then it will return an object that hasn't yet been saved to
+the database. In this case, it's up to you to call ``save()`` on the resulting
+model instance. This is useful if you want to do custom processing on the
+object before saving it. ``commit`` is ``True`` by default.
+
+Another side effect of using ``commit=False`` is seen when your model has
+a many-to-many relation with another model. If your model has a many-to-many
+relation and you specify ``commit=False`` when you save a form, Django cannot
+immediately save the form data for the many-to-many relation. This is because
+it isn't possible to save many-to-many data for an instance until the instance
+exists in the database.
+
+To work around this problem, every time you save a form using ``commit=False``,
+Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
+you've manually saved the instance produced by the form, you can invoke
+``save_m2m()`` to save the many-to-many form data. For example::
+
+    # Create a form instance with POST data.
+    >>> a = Author()
+    >>> f = AuthorForm(a, request.POST)
+
+    # Create, but don't save the new author instance.
+    >>> new_author = f.save(commit=False)
+
+    # Modify the author in some way.
+    >>> new_author.some_field = 'some_value'
+
+    # Save the new instance.
+    >>> new_author.save()
+
+    # Now, save the many-to-many data for the form.
+    >>> f.save_m2m()
+
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
+When you use a simple ``save()`` on a form, all data -- including
+many-to-many data -- is saved without the need for any additional method calls.
+For example::
+
+    # Create a form instance with POST data.
+    >>> a = Author()
+    >>> f = AuthorForm(a, request.POST)
+
+    # Create and save the new author instance. There's no need to do anything else.
+    >>> new_author = f.save()
+
+Using a subset of fields on the form
+------------------------------------
+
+In some cases, you may not want all the model fields to appear on the generated
+form. There are three ways of telling ``ModelForm`` to use only a subset of the
+model fields:
+
+    1. Set ``editable=False`` on the model field. As a result, *any* form
+       created from the model via ``ModelForm`` will not include that
+       field.
+
+    2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta`` class.
+       This attribute, if given, should be a list of field names to include in
+       the form.
+
+    3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class.
+       This attribute, if given, should be a list of field names to exclude
+       the form.
+
+       For example, if you want a form for the ``Author`` model (defined above)
+       that includes only the ``name`` and ``title`` fields, you would specify
+       ``fields`` or  ``exclude`` like this::
+
+          class PartialAuthorForm(ModelForm):
+              class Meta:
+                  model = Author
+                  fields = ('name', 'title')
+
+          class PartialAuthorForm(ModelForm):
+              class Meta:
+                  model = Author
+                  exclude = ('birth_date',)
+
+        Since the Author model has only 3 fields, 'name', 'title', and
+        'birth_date', the forms above will contain exactly the same fields.
+
+.. note::
+
+    If you specify ``fields`` or ``exclude`` when creating a form with
+    ``ModelForm``, then the fields that are not in the resulting form will not
+    be set by the form's ``save()`` method. Django will prevent any attempt to
+    save an incomplete model, so if the model does not allow the missing fields
+    to be empty, and does not provide a default value for the missing fields,
+    any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
+    To avoid this failure, you must instantiate your model with initial values
+    for the missing, but required fields, or use ``save(commit=False)`` and
+    manually set anyextra required fields::
+    
+        instance = Instance(requiured_field='value')
+        form = InstanceForm(instance, request.POST)
+        new_instance = form.save()
+
+        instance = form.save(commit=False)
+        instance.required_field = 'new value'
+        new_instance = instance.save()
+
+    See the `section on saving forms`_ for more details on using
+    ``save(commit=False)``.
+
+.. _section on saving forms: `The save() method`_
+
+Overriding the default field types
+----------------------------------
+
+The default field types, as described in the "Field types" table above, are
+sensible defaults; if you have a ``DateField`` in your model, chances are you'd
+want that to be represented as a ``DateField`` in your form. But
+``ModelForm`` gives you the flexibility of changing the form field type
+for a given model field. You do this by declaratively specifying fields like
+you would in a regular ``Form``. Declared fields will override the default
+ones generated by using the ``model`` attribute.
+
+For example, if you wanted to use ``MyDateFormField`` for the ``pub_date``
+field, you could do the following::
+
+    >>> class ArticleForm(ModelForm):
+    ...     pub_date = MyDateFormField()
+    ...
+    ...     class Meta:
+    ...         model = Article
