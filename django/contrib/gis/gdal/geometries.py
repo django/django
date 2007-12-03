@@ -310,6 +310,9 @@ class OGRGeometry(object):
             geom_transform(self._ptr, coord_trans._ptr)
         elif isinstance(coord_trans, SpatialReference):
             geom_transform_to(self._ptr, coord_trans._ptr)
+        elif isinstance(coord_trans, (int, basestring)):
+            sr = SpatialReference(coord_trans)
+            geom_transform_to(self._ptr, sr._ptr)
         else:
             raise TypeError('Either a CoordTransform or a SpatialReference object required for transformation.')
 

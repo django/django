@@ -3,7 +3,16 @@ from ctypes import CDLL, string_at
 from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException
 
-if os.name == 'nt':
+# Custom library path set?
+try:
+    from django.conf import settings
+    lib_name = settings.GDAL_LIBRARY_PATH
+except (AttributeError, EnvironmentError):
+    lib_name = None
+
+if lib_name:
+    pass
+elif os.name == 'nt':
     # Windows NT shared library
     lib_name = 'libgdal-1.dll'
     errcheck_flag = False

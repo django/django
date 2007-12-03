@@ -225,6 +225,20 @@ class SpatialReference(object):
         units, name = angular_units(self._ptr, byref(c_char_p()))
         return units
 
+    @property
+    def units(self):
+        """
+        Returns a 2-tuple of the units value and the units name, 
+        and will automatically determines whether to return the linear
+        or angular units.
+        """
+        if self.projected or self.local:
+            return linear_units(self._ptr, byref(c_char_p()))
+        elif self.geographic:
+            return angular_units(self._ptr, byref(c_char_p()))
+        else:
+            return (None, None)
+
     #### Spheroid/Ellipsoid Properties ####
     @property
     def ellipsoid(self):

@@ -1,6 +1,6 @@
 import unittest
 from django.contrib.gis.gdal import OGRGeometry, OGRGeomType, \
-    OGRException, OGRIndexError, SpatialReference
+    OGRException, OGRIndexError, SpatialReference, CoordTransform
 from django.contrib.gis.tests.geometries import *
 
 class OGRGeomTest(unittest.TestCase):
@@ -201,7 +201,7 @@ class OGRGeomTest(unittest.TestCase):
                     self.assertEqual(3, p.geom_type)
             self.assertEqual(mpoly.wkt, OGRGeometry(mp.wkt).wkt)
 
-    def test09_srs(self):
+    def test09a_srs(self):
         "Testing OGR Geometries with Spatial Reference objects."
         for mp in multipolygons:
             # Creating a geometry w/spatial reference
@@ -251,6 +251,23 @@ class OGRGeomTest(unittest.TestCase):
                     ring.srid = 4322
                     self.assertEqual('WGS 72', ring.srs.name)
                     self.assertEqual(4322, ring.srid)
+
+    def test09b_srs_transform(self):
+        "Testing transform()."
+        orig = OGRGeometry('POINT (-104.609252 38.255001)', 4326)
+        trans = OGRGeometry('POINT(992363.390841912 481455.395105533)', 2774)
+
+        # Using an srid, a SpatialReference object, and a CoordTransform object
+        # or transformations.
+        t1, t2, t3 = orig.clone(), orig.clone(), orig.clone()
+        t1.transform(trans.srid)
+        t2.transform(SpatialReference('EPSG:2774'))
+        ct = CoordTransform(SpatialReference('WGS84'), SpatialReference(2774))
+        t3.transform(ct)
+
+        for p in (t1, t2, t3):
+            self.assertAlmostEqual(trans.x, p.x, 7)
+            self.assertAlmostEqual(trans.y, p.y, 7)
 
     def test10_difference(self):
         "Testing difference()."
