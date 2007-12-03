@@ -6,15 +6,15 @@ from django.db import models
 from django.db.models.query import Q
 
 class Tag(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True)
 
     def __unicode__(self):
         return self.name
 
 class Note(models.Model):
-    note = models.CharField(maxlength=100)
-    misc = models.CharField(maxlength=10)
+    note = models.CharField(max_length=100)
+    misc = models.CharField(max_length=10)
 
     class Meta:
         ordering = ['note']
@@ -23,7 +23,7 @@ class Note(models.Model):
         return self.note
 
 class ExtraInfo(models.Model):
-    info = models.CharField(maxlength=100)
+    info = models.CharField(max_length=100)
     note = models.ForeignKey(Note)
 
     class Meta:
@@ -33,7 +33,7 @@ class ExtraInfo(models.Model):
         return self.info
 
 class Author(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     num = models.IntegerField(unique=True)
     extra = models.ForeignKey(ExtraInfo)
 
@@ -41,7 +41,7 @@ class Author(models.Model):
         return self.name
 
 class Item(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
@@ -53,7 +53,7 @@ class Item(models.Model):
         return self.name
 
 class Report(models.Model):
-    name = models.CharField(maxlength=10)
+    name = models.CharField(max_length=10)
     creator = models.ForeignKey(Author, to_field='num')
 
     def __unicode__(self):
@@ -71,7 +71,7 @@ class Ranking(models.Model):
         return '%d: %s' % (self.rank, self.author.name)
 
 class Cover(models.Model):
-    title = models.CharField(maxlength=50)
+    title = models.CharField(max_length=50)
     item = models.ForeignKey(Item)
 
     class Meta:
