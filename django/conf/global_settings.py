@@ -253,6 +253,10 @@ TRANSACTIONS_MANAGED = False
 from django import get_version
 URL_VALIDATOR_USER_AGENT = "Django/%s (http://www.djangoproject.com)" % get_version()
 
+# The tablespaces to use for each model when not specified otherwise.
+DEFAULT_TABLESPACE = ''
+DEFAULT_INDEX_TABLESPACE = ''
+
 ##############
 # MIDDLEWARE #
 ##############
@@ -289,7 +293,7 @@ SESSION_FILE_PATH = '/tmp/'                             # Directory to store ses
 
 # The cache backend to use.  See the docstring in django.core.cache for the
 # possible values.
-CACHE_BACKEND = 'simple://'
+CACHE_BACKEND = 'locmem://'
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
 CACHE_MIDDLEWARE_SECONDS = 600
 

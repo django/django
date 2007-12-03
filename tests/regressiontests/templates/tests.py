@@ -18,11 +18,13 @@ from django.utils.safestring import mark_safe
 from django.utils.tzinfo import LocalTimezone
 
 from unicode import unicode_tests
+from context import context_tests
 import filters
 
 # Some other tests we would like to run
 __test__ = {
         'unicode': unicode_tests,
+        'context': context_tests,
 }
 
 #################################

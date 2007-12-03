@@ -135,8 +135,8 @@ For example::
     json_serializer = serializers.get_serializer("json")()
     json_serializer.serialize(queryset, ensure_ascii=False, stream=response)
 
-Django ships with a copy of simplejson_ in the source. Be aware, that if
-you're using that for serializing directly that not all Django output can be
+The Django source code includes the simplejson_ module. Be aware that if
+you're serializing using that module directly, not all Django output can be
 passed unmodified to simplejson. In particular, `lazy translation objects`_
 need a `special encoder`_ written for them. Something like this will work::
 
@@ -151,8 +151,3 @@ need a `special encoder`_ written for them. Something like this will work::
 
 .. _lazy translation objects: ../i18n/#lazy-translation
 .. _special encoder: http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html
-
-Writing custom serializers
-``````````````````````````
-
-XXX ...

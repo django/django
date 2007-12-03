@@ -58,11 +58,20 @@ Adds a few conveniences for perfectionists:
   which should be a list of strings.
 
 * Performs URL rewriting based on the ``APPEND_SLASH`` and ``PREPEND_WWW``
-  settings. If ``APPEND_SLASH`` is ``True``, URLs that lack a trailing
-  slash will be redirected to the same URL with a trailing slash, unless the
-  last component in the path contains a period. So ``foo.com/bar`` is
-  redirected to ``foo.com/bar/``, but ``foo.com/bar/file.txt`` is passed
-  through unchanged.
+  settings.
+
+  If ``APPEND_SLASH`` is ``True`` and the initial URL doesn't end with a slash,
+  and it is not found in urlpatterns, a new URL is formed by appending a slash
+  at the end. If this new URL is found in urlpatterns, then an HTTP-redirect is
+  returned to this new URL; otherwise the initial URL is processed as usual.
+
+  So ``foo.com/bar`` will be redirected to ``foo.com/bar/`` if you do not
+  have a valid urlpattern for ``foo.com/bar``, and do have a valid urlpattern
+  for ``foo.com/bar/``.
+
+  **New in Django development version:** The behaviour of ``APPEND_SLASH`` has
+  changed slightly in the development version (it didn't used to check to see
+  if the pattern was matched in the URL patterns).
 
   If ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
   redirected to the same URL with a leading "www."

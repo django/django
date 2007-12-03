@@ -354,7 +354,18 @@ class _OutputRedirectingPdb(pdb.Pdb):
     """
     def __init__(self, out):
         self.__out = out
+        self.__debugger_used = False
         pdb.Pdb.__init__(self)
+
+    def set_trace(self):
+        self.__debugger_used = True
+        pdb.Pdb.set_trace(self)
+
+    def set_continue(self):
+        # Calling set_continue unconditionally would break unit test coverage
+        # reporting, as Bdb.set_continue calls sys.settrace(None).
+        if self.__debugger_used:
+            pdb.Pdb.set_continue(self)
 
     def trace_dispatch(self, *args):
         # Redirect stdout to the given stream.

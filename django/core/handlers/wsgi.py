@@ -5,12 +5,12 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from django.core.handlers.base import BaseHandler
+from django import http
 from django.core import signals
+from django.core.handlers.base import BaseHandler
 from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
-from django import http
 
 # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 STATUS_CODE_TEXT = {

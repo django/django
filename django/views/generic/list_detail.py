@@ -5,7 +5,7 @@ from django.core.paginator import ObjectPaginator, InvalidPage
 from django.core.exceptions import ObjectDoesNotExist
 
 def object_list(request, queryset, paginate_by=None, page=None,
-        allow_empty=False, template_name=None, template_loader=loader,
+        allow_empty=True, template_name=None, template_loader=loader,
         extra_context=None, context_processors=None, template_object_name='object',
         mimetype=None):
     """

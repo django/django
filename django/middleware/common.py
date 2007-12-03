@@ -5,6 +5,7 @@ from django.conf import settings
 from django import http
 from django.core.mail import mail_managers
 from django.utils.http import urlquote
+from django.core import urlresolvers
 
 class CommonMiddleware(object):
     """
@@ -15,6 +16,12 @@ class CommonMiddleware(object):
         - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
           this middleware appends missing slashes and/or prepends missing
           "www."s.
+
+            - If APPEND_SLASH is set and the initial URL doesn't end with a
+              slash, and it is not found in urlpatterns, a new URL is formed by
+              appending a slash at the end. If this new URL is found in
+              urlpatterns, then an HTTP-redirect is returned to this new URL;
+              otherwise the initial URL is processed as usual. 
 
         - ETags: If the USE_ETAGS setting is set, ETags will be calculated from
           the entire page content and Not Modified responses will be returned
@@ -33,27 +40,48 @@ class CommonMiddleware(object):
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
 
-        # Check for a redirect based on settings.APPEND_SLASH and settings.PREPEND_WWW
+        # Check for a redirect based on settings.APPEND_SLASH
+        # and settings.PREPEND_WWW
         host = request.get_host()
         old_url = [host, request.path]
         new_url = old_url[:]
-        if settings.PREPEND_WWW and old_url[0] and not old_url[0].startswith('www.'):
+
+        if (settings.PREPEND_WWW and old_url[0] and
+                not old_url[0].startswith('www.')):
             new_url[0] = 'www.' + old_url[0]
-        # Append a slash if append_slash is set and the URL doesn't have a
-        # trailing slash or a file extension.
-        if settings.APPEND_SLASH and (not old_url[1].endswith('/')) and ('.' not in old_url[1].split('/')[-1]):
-            new_url[1] = new_url[1] + '/'
-            if settings.DEBUG and request.method == 'POST':
-                raise RuntimeError, "You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to %s%s (note the trailing slash), or set APPEND_SLASH=False in your Django settings." % (new_url[0], new_url[1])
+
+        # Append a slash if APPEND_SLASH is set and the URL doesn't have a
+        # trailing slash and there is no pattern for the current path
+        if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
+            try:
+                urlresolvers.resolve(request.path)
+            except urlresolvers.Resolver404:
+                new_url[1] = new_url[1] + '/'
+                if settings.DEBUG and request.method == 'POST':
+                    raise RuntimeError, (""
+                    "You called this URL via POST, but the URL doesn't end "
+                    "in a slash and you have APPEND_SLASH set. Django can't "
+                    "redirect to the slash URL while maintaining POST data. "
+                    "Change your form to point to %s%s (note the trailing "
+                    "slash), or set APPEND_SLASH=False in your Django "
+                    "settings.") % (new_url[0], new_url[1])
+
         if new_url != old_url:
-            # Redirect
-            if new_url[0]:
-                newurl = "%s://%s%s" % (request.is_secure() and 'https' or 'http', new_url[0], urlquote(new_url[1]))
+            # Redirect if the target url exists
+            try:
+                urlresolvers.resolve(new_url[1])
+            except urlresolvers.Resolver404:
+                pass
             else:
-                newurl = urlquote(new_url[1])
-            if request.GET:
-                newurl += '?' + request.GET.urlencode()
-            return http.HttpResponsePermanentRedirect(newurl)
+                if new_url[0]:
+                    newurl = "%s://%s%s" % (
+                        request.is_secure() and 'https' or 'http',
+                        new_url[0], urlquote(new_url[1]))
+                else:
+                    newurl = urlquote(new_url[1])
+                if request.GET:
+                    newurl += '?' + request.GET.urlencode()
+                return http.HttpResponsePermanentRedirect(newurl)
 
         return None
 

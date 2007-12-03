@@ -98,8 +98,8 @@ This example is equivalent to::
         except MyModel.DoesNotExist:
             raise Http404
 
-Note: As with ``get()``, an ``AssertionError`` will be raised if more than
-one object is found.
+Note: As with ``get()``, an ``MultipleObjectsReturned`` exception will be
+raised if more than one object is found.
 
 .. _get(): ../db-api/#get-kwargs
 

@@ -696,7 +696,7 @@ filesizeformat.is_safe = True
 
 def pluralize(value, arg=u's'):
     """
-    Returns a plural suffix if the value is not 1.  By default, 's' is used as
+    Returns a plural suffix if the value is not 1. By default, 's' is used as
     the suffix:
 
     * If value is 0, vote{{ value|pluralize }} displays "0 votes".

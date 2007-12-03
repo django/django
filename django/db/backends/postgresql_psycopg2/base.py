@@ -6,6 +6,7 @@ Requires psycopg 2: http://initd.org/projects/psycopg2
 
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures
 from django.db.backends.postgresql.operations import DatabaseOperations as PostgresqlDatabaseOperations
+from django.utils.safestring import SafeUnicode
 try:
     import psycopg2 as Database
     import psycopg2.extensions
@@ -17,6 +18,7 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+psycopg2.extensions.register_adapter(SafeUnicode, psycopg2.extensions.QuotedString)
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     needs_datetime_string_cast = False

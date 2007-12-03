@@ -43,7 +43,7 @@ u'django'
 Translating a string requiring no auto-escaping shouldn't change the "safe"
 status.
 
->>> from django.utils.safestring import mark_safe
+>>> from django.utils.safestring import mark_safe, SafeString
 >>> s = mark_safe('Password')
 >>> type(s)
 <class 'django.utils.safestring.SafeString'>
@@ -51,6 +51,19 @@ status.
 >>> type(ugettext(s))
 <class 'django.utils.safestring.SafeUnicode'>
 >>> deactivate()
+
+>>> SafeString('a') + s
+'aPassword'
+>>> s + SafeString('a')
+'Passworda'
+>>> s + mark_safe('a')
+'Passworda'
+>>> mark_safe('a') + s
+'aPassword'
+>>> mark_safe('a') + mark_safe('s')
+'as'
+>>> print s
+Password
 """
 
 __test__ = {

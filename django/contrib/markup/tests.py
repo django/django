@@ -61,8 +61,15 @@ Paragraph 2 with a link_
         t = Template("{{ rest_content|restructuredtext }}")
         rendered = t.render(Context(locals())).strip()
         if docutils:
-            self.assertEqual(rendered, """<p>Paragraph 1</p>
+            # Different versions of docutils return slightly different HTML
+            try:
+                # Docutils v0.4 and earlier
+                self.assertEqual(rendered, """<p>Paragraph 1</p>
 <p>Paragraph 2 with a <a class="reference" href="http://www.example.com/">link</a></p>""")
+            except AssertionError, e:
+                # Docutils from SVN (which will become 0.5)
+                self.assertEqual(rendered, """<p>Paragraph 1</p>
+<p>Paragraph 2 with a <a class="reference external" href="http://www.example.com/">link</a></p>""")
         else:
             self.assertEqual(rendered, rest_content)
 

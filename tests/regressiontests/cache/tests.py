@@ -72,6 +72,8 @@ class Cache(unittest.TestCase):
             'function'  : f,
             'class'     : C,
         }
+        cache.set("stuff", stuff)
+        self.assertEqual(cache.get("stuff"), stuff)
 
     def test_expiration(self):
         # expiration

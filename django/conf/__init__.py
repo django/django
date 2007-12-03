@@ -52,7 +52,7 @@ class LazySettings(object):
             if not settings_module: # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
-            raise EnvironmentError, "Environment variable %s is undefined." % ENVIRONMENT_VARIABLE
+            raise ImportError, "Environment variable %s is undefined so settings cannot be imported." % ENVIRONMENT_VARIABLE   # NOTE: This is arguably an EnvironmentError, but that causes problems with Python's interactive help
 
         self._target = Settings(settings_module)
 
@@ -63,7 +63,7 @@ class LazySettings(object):
         argument must support attribute access (__getattr__)).
         """
         if self._target != None:
-            raise EnvironmentError, 'Settings already configured.'
+            raise RuntimeError, 'Settings already configured.'
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
             setattr(holder, name, value)
@@ -82,7 +82,7 @@ class Settings(object):
         try:
             mod = __import__(self.SETTINGS_MODULE, {}, {}, [''])
         except ImportError, e:
-            raise EnvironmentError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
+            raise ImportError, "Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e)
 
         # Settings that should be converted into tuples if they're mistakenly entered
         # as strings.
