@@ -988,7 +988,10 @@ class Query(object):
         try:
             sql, params = self.as_sql()
         except EmptyResultSet:
-            raise StopIteration
+            if result_type == MULTI:
+                raise StopIteration
+            else:
+                return
 
         cursor = self.connection.cursor()
         cursor.execute(sql, params)
