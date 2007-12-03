@@ -11,25 +11,25 @@ class Node(object):
     connection (the root) with the children being either leaf nodes or other
     Node instances.
     """
-    # Standard connection type. Clients usually won't use this at all and
+    # Standard connector type. Clients usually won't use this at all and
     # subclasses will usually override the value.
     default = 'DEFAULT'
 
-    def __init__(self, children=None, connection=None):
+    def __init__(self, children=None, connector=None):
         self.children = children and children[:] or []
-        self.connection = connection or self.default
+        self.connector = connector or self.default
         self.subtree_parents = []
         self.negated = False
 
     def __str__(self):
-        return '(%s: %s)' % (self.connection, ', '.join([str(c) for c in
+        return '(%s: %s)' % (self.connector, ', '.join([str(c) for c in
             self.children]))
 
     def __deepcopy__(self, memodict):
         """
         Utility method used by copy.deepcopy().
         """
-        obj = self.__class__(connection=self.connection)
+        obj = self.__class__(connector=self.connector)
         obj.children = copy.deepcopy(self.children, memodict)
         obj.subtree_parents = copy.deepcopy(self.subtree_parents, memodict)
         obj.negated = self.negated
@@ -56,33 +56,33 @@ class Node(object):
     def add(self, node, conn_type):
         """
         Adds a new node to the tree. If the conn_type is the same as the root's
-        current connection type, the node is added to the first level.
+        current connector type, the node is added to the first level.
         Otherwise, the whole tree is pushed down one level and a new root
-        connection is created, connecting the existing tree and the new node.
+        connector is created, connecting the existing tree and the new node.
         """
         if len(self.children) < 2:
-            self.connection = conn_type
-        if self.connection == conn_type:
-            if isinstance(node, Node) and (node.connection == conn_type
+            self.connector = conn_type
+        if self.connector == conn_type:
+            if isinstance(node, Node) and (node.connector == conn_type
                     or len(node) == 1):
                 self.children.extend(node.children)
             else:
                 self.children.append(node)
         else:
-            obj = Node(self.children, self.connection)
-            self.connection = conn_type
+            obj = Node(self.children, self.connector)
+            self.connector = conn_type
             self.children = [obj, node]
 
     def negate(self):
         """
-        Negate the sense of the root connection.
+        Negate the sense of the root connector.
 
         Interpreting the meaning of this negate is up to client code. This
         method is useful for implementing "not" arrangements.
         """
-        self.children = [NegatedNode(self.children, self.connection,
+        self.children = [NegatedNode(self.children, self.connector,
                 old_state=self.negated)]
-        self.connection = self.default
+        self.connector = self.default
 
     def start_subtree(self, conn_type):
         """
@@ -91,13 +91,13 @@ class Node(object):
         connected correctly to any existing nodes in the tree.
         """
         if len(self.children) == 1:
-            self.connection = conn_type
-        elif self.connection != conn_type:
-            self.children = [Node(self.children, self.connection)]
-            self.connection = conn_type
+            self.connector = conn_type
+        elif self.connector != conn_type:
+            self.children = [Node(self.children, self.connector)]
+            self.connector = conn_type
 
-        self.subtree_parents.append(Node(self.children, self.connection))
-        self.connection = self.default
+        self.subtree_parents.append(Node(self.children, self.connector))
+        self.connector = self.default
         self.children = []
 
     def end_subtree(self):
@@ -108,17 +108,17 @@ class Node(object):
         the current instances state to be the parent.
         """
         obj = self.subtree_parents.pop()
-        node = Node(self.children, self.connection)
-        self.connection = obj.connection
+        node = Node(self.children, self.connector)
+        self.connector = obj.connector
         self.children = obj.children
         self.children.append(node)
 
 class NegatedNode(Node):
     """
-    A class that indicates the connection type should be negated (whatever that
+    A class that indicates the connector type should be negated (whatever that
     means -- it's up to the client) when used by the client code.
     """
-    def __init__(self, children=None, connection=None, old_state=True):
-        super(NegatedNode, self).__init__(children, connection)
+    def __init__(self, children=None, connector=None, old_state=True):
+        super(NegatedNode, self).__init__(children, connector)
         self.negated = not old_state
 

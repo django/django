@@ -257,13 +257,13 @@ class Query(object):
         params.extend(self.extra_params)
         return ' '.join(result), tuple(params)
 
-    def combine(self, rhs, connection):
+    def combine(self, rhs, connector):
         """
         Merge the 'rhs' query into the current one (with any 'rhs' effects
         being applied *after* (that is, "to the right of") anything in the
         current query. 'rhs' is not modified during a call to this function.
 
-        The 'connection' parameter describes how to connect filters from the
+        The 'connector' parameter describes how to connect filters from the
         'rhs' query.
         """
         assert self.model == rhs.model, \
@@ -276,7 +276,7 @@ class Query(object):
         # Work out how to relabel the rhs aliases, if necessary.
         change_map = {}
         used = {}
-        conjunction = (connection == AND)
+        conjunction = (connector == AND)
         first = True
         for alias in rhs.tables:
             if not rhs.alias_map[alias][ALIAS_REFCOUNT]:
@@ -321,7 +321,7 @@ class Query(object):
             w.add([alias, pk.column, pk, 'isnull', False], AND)
         else:
             w = WhereNode()
-        self.where.add(w, connection)
+        self.where.add(w, connector)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
         self.select = []
@@ -465,7 +465,7 @@ class Query(object):
         result = []
         for field in ordering:
             if field == '?':
-                result.append(self.connection.ops.random_function_sql())
+                result.append(self.connector.ops.random_function_sql())
                 continue
             if isinstance(field, int):
                 if field < 0:
@@ -664,7 +664,7 @@ class Query(object):
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
                     used)
 
-    def add_filter(self, filter_expr, connection=AND, negate=False):
+    def add_filter(self, filter_expr, connector=AND, negate=False):
         """
         Add a single filter to the query.
         """
@@ -694,13 +694,13 @@ class Query(object):
 
         try:
             field, target, unused, join_list, nullable = self.setup_joins(parts,
-                    opts, alias, (connection == AND))
+                    opts, alias, (connector == AND))
         except TypeError, e:
             if len(parts) != 1 or parts[0] not in self.extra_select:
                 raise e
             # Filtering on some alias from extra(select=...)
             self.where.add([None, parts[0], None, lookup_type, value],
-                    connection)
+                    connector)
             return
         col = target.column
         alias = join_list[-1][-1]
@@ -724,7 +724,7 @@ class Query(object):
             # efficient at the database level.
             self.promote_alias(join_list[-1][0])
 
-        self.where.add([alias, col, field, lookup_type, value], connection)
+        self.where.add([alias, col, field, lookup_type, value], connector)
         if negate:
             flag = False
             for pos, null in enumerate(nullable):
@@ -750,11 +750,11 @@ class Query(object):
 
         for child in q_object.children:
             if isinstance(child, Node):
-                self.where.start_subtree(q_object.connection)
+                self.where.start_subtree(q_object.connector)
                 self.add_q(child)
                 self.where.end_subtree()
             else:
-                self.add_filter(child, q_object.connection, q_object.negated)
+                self.add_filter(child, q_object.connector, q_object.negated)
 
     def setup_joins(self, names, opts, alias, dupe_multis):
         """

@@ -57,14 +57,14 @@ class WhereNode(tree.Node):
                     sql, params = self.make_atom(child, qn)
                     format = '%s'
                 except EmptyResultSet:
-                    if self.connection == AND and not node.negated:
+                    if self.connector == AND and not node.negated:
                         # We can bail out early in this particular case (only).
                         raise
                     sql = None
             if sql:
                 result.append(format % sql)
                 result_params.extend(params)
-        conn = ' %s ' % node.connection
+        conn = ' %s ' % node.connector
         return conn.join(result), result_params
 
     def make_atom(self, child, qn):
