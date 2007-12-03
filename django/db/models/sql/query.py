@@ -8,6 +8,7 @@ all about the internals of models in order to get the information it needs.
 """
 
 import copy
+import operator
 import re
 
 from django.utils.tree import Node
@@ -465,7 +466,7 @@ class Query(object):
         result = []
         for field in ordering:
             if field == '?':
-                result.append(self.connector.ops.random_function_sql())
+                result.append(self.connection.ops.random_function_sql())
                 continue
             if isinstance(field, int):
                 if field < 0:
@@ -724,7 +725,32 @@ class Query(object):
             # efficient at the database level.
             self.promote_alias(join_list[-1][0])
 
+        if connector == OR:
+            # Some joins may need to be promoted when adding a new filter to a
+            # disjunction. We walk the list of new joins and where it diverges
+            # from any previous joins (ref count is 1 in the table list), we
+            # make the new additions (and any existing ones not used in the new
+            # join list) an outer join.
+            join_it = nested_iter(join_list)
+            table_it = iter(self.tables)
+            join_it.next(), table_it.next()
+            for join in join_it:
+                table = table_it.next()
+                if join == table and self.alias_map[join][ALIAS_REFCOUNT] > 1:
+                    continue
+                self.promote_alias(join)
+                if table != join:
+                    self.promote_alias(table)
+                break
+            for join in join_it:
+                self.promote_alias(join)
+            for table in table_it:
+                # Some of these will have been promoted from the join_list, but
+                # that's harmless.
+                self.promote_alias(table)
+
         self.where.add([alias, col, field, lookup_type, value], connector)
+
         if negate:
             flag = False
             for pos, null in enumerate(nullable):
@@ -1197,6 +1223,15 @@ def results_iter(cursor):
         if not rows:
             raise StopIteration
         yield rows
+
+def nested_iter(nested):
+    """
+    An iterator over a sequence of sequences. Each element is returned in turn.
+    Only handles one level of nesting, since that's all we need here.
+    """
+    for seq in nested:
+        for elt in seq:
+            yield elt
 
 def setup_join_cache(sender):
     """

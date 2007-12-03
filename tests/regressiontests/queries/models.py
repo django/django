@@ -196,6 +196,8 @@ Bug #2080, #3592
 [<Author: a1>, <Author: a3>]
 >>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
 [<Author: a1>, <Author: a3>]
+>>> Author.objects.filter(Q(item__name='three') | Q(report__name='r3'))
+[<Author: a2>]
 
 Bug #6074
 Merging two empty result sets shouldn't leave a queryset with no constraints
