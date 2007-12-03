@@ -197,6 +197,14 @@ Bug #2080, #3592
 >>> Author.objects.filter(Q(name='a3') | Q(item__name='one'))
 [<Author: a1>, <Author: a3>]
 
+Bug #6074
+Merging two empty result sets shouldn't leave a queryset with no constraints
+(which would match everything).
+>>> Author.objects.filter(Q(id__in=[]))
+[]
+>>> Author.objects.filter(Q(id__in=[])|Q(id__in=[]))
+[]
+
 Bug #1878, #2939
 >>> Item.objects.values('creator').distinct().count()
 3
@@ -414,7 +422,7 @@ order_by() and filter() calls.
 >>> [o.count for o in l]
 [2, 2, 1, 0]
 
-# Filter those items that have exactly one tag attacjed.
+# Filter those items that have exactly one tag attached.
 >>> Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).filter(count=1)
 [<Item: four>]
 """}
