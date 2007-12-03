@@ -42,6 +42,7 @@ class WhereNode(tree.Node):
             return None, []
         result = []
         result_params = []
+        empty = True
         for child in node.children:
             if hasattr(child, 'as_sql'):
                 sql, params = child.as_sql(qn=qn)
@@ -60,10 +61,15 @@ class WhereNode(tree.Node):
                     if self.connector == AND and not node.negated:
                         # We can bail out early in this particular case (only).
                         raise
-                    sql = None
+                    elif node.negated:
+                        empty = False
+                    continue
+            empty = False
             if sql:
                 result.append(format % sql)
                 result_params.extend(params)
+        if empty:
+            raise EmptyResultSet
         conn = ' %s ' % node.connector
         return conn.join(result), result_params
 
