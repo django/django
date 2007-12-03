@@ -738,6 +738,10 @@ class Query(object):
                 table = table_it.next()
                 if join == table and self.alias_map[join][ALIAS_REFCOUNT] > 1:
                     continue
+                # FIXME: Don't have to promote here (and in the other places in
+                # this block) if the join isn't nullable. So I should be
+                # checking this before promoting (avoiding left outer joins is
+                # important).
                 self.promote_alias(join)
                 if table != join:
                     self.promote_alias(table)
