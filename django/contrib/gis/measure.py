@@ -39,15 +39,84 @@ from decimal import Decimal
 
 class Distance(object):
     UNITS = {
-        'm': 1.0,
-        'km': 1000.0,
-        'mi': 1609.344,
+        'chain' : 20.1168,
+        'chain_benoit' : 20.116782,
+        'chain_sears' : 20.1167645,
+        'british_chain_benoit' : 20.1167824944,
+        'british_chain_sears' : 20.1167651216,
+        'british_chain_sears_truncated' : 20.116756,
+        'cm' : 0.01,
+        'british_ft' : 0.304799471539,
+        'british_yd' : 0.914398414616,
+        'degree' : 0.0174532925199,
+        'clarke_ft' : 0.3047972654,
+        'clarke_link' : 0.201166195164,
+        'fathom' :  1.8288,
         'ft': 0.3048,
-        'yd': 0.9144,
+        'german_m' : 1.0000135965,
+        'grad' : 0.0157079632679,
+        'gold_coast_ft' : 0.304799710181508,
+        'indian_yd' : 0.914398530744,
+        'in' : 0.0254,
+        'km': 1000.0,
+        'link' : 0.201168,
+        'link_benoit' : 0.20116782,
+        'link_sears' : 0.20116765,
+        'm': 1.0,
+        'mi': 1609.344,
+        'mm' : 0.001,
         'nm': 1852.0,
-    }
+        'nm_uk' : 1853.184,
+        'rod' : 5.0292,
+        'sears_yd' : 0.91439841,
+        'survey_ft' : 0.304800609601,
+        'um' : 0.000001,
+        'yd': 0.9144,
+        }
+
+    # Unit aliases for `UNIT` terms encountered in Spatial Reference WKT.
+    ALIAS = {
+        'centimeter' : 'cm',
+        'foot' : 'ft',
+        'inches' : 'in',
+        'kilometer' : 'km',
+        'kilometre' : 'km',
+        'meter' : 'm',
+        'metre' : 'm',
+        'micrometer' : 'um',
+        'micrometre' : 'um',
+        'millimeter' : 'mm',
+        'millimetre' : 'mm',
+        'mile' : 'mi',
+        'yard' : 'yd',
+        'British chain (Benoit 1895 B)' : 'british_chain_benoit',
+        'British chain (Sears 1922)' : 'british_chain_sears',
+        'British chain (Sears 1922 truncated)' : 'british_chain_sears_truncated',
+        'British foot (Sears 1922)' : 'british_ft',
+        'British yard (Sears 1922)' : 'british_yd',
+        "Clarke's Foot" : 'clarke_ft',
+        "Clarke's foot" : 'clarke_ft',
+        "Clarke's link" : 'clarke_link',
+        'Chain (Benoit)' : 'chain_benoit',
+        'Chain (Sears)' : 'chain_sears',
+        'Decimal Degree' : 'degree',
+        'Foot (International)' : 'ft',
+        'German legal metre' : 'german_m',
+        'Gold Coast foot' : 'gold_coast_ft',
+        'Indian yard' : 'indian_yd',
+        'Link (Benoit)': 'link_benoit',
+        'Link (Sears)': 'link_sears',
+        'Nautical Mile' : 'nm',
+        'Nautical Mile (UK)' : 'nm_uk',
+        'US survey foot' : 'survey_ft',
+        'U.S. Foot' : 'survey_ft',
+        'Yard (Indian)' : 'indian_yd',
+        'Yard (Sears)' : 'sears_yd'
+        }
+    REV_ALIAS = dict((value, key) for key, value in ALIAS.items())
 
     def __init__(self, default_unit=None, **kwargs):
+        # The base unit is in meters.
         self.m = 0.0
         self._default_unit = 'm'
         
@@ -55,8 +124,21 @@ class Distance(object):
             if unit in self.UNITS:
                 self.m += self.UNITS[unit] * value
                 self._default_unit = unit
+            elif unit in self.ALIAS:
+                u = self.ALIAS[unit]
+                self.m += self.UNITS[u] * value
+                self._default_unit = u
             else:
-                raise AttributeError("Unknown unit type: " + unit)
+                lower = unit.lower()
+                if lower in self.UNITS:
+                    self.m += self.UNITS[lower] * value
+                    self._default_unit = lower
+                elif lower in self.ALIAS:
+                    u = self.ALIAS[lower]
+                    self.m += self.UNITS[u] * value
+                    self._default_unit = u
+                else:
+                    raise AttributeError('Unknown unit type: %s' % unit)
 
         if default_unit and isinstance(default_unit, str):
             self._default_unit = default_unit
@@ -65,13 +147,13 @@ class Distance(object):
         if name in self.UNITS:
             return self.m / self.UNITS[name]
         else:
-            raise AttributeError("Unknown unit type: " + name)
+            raise AttributeError('Unknown unit type: %s' % name)
     
     def __repr__(self):
-        return "Distance(%s=%s)" % (self._default_unit, getattr(self, self._default_unit))
+        return 'Distance(%s=%s)' % (self._default_unit, getattr(self, self._default_unit))
 
     def __str__(self):
-        return "%s %s" % (getattr(self, self._default_unit), self._default_unit)
+        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
         
     def __cmp__(self, other):
         if isinstance(other, Distance):
@@ -83,27 +165,27 @@ class Distance(object):
         if isinstance(other, Distance):
             return Distance(default_unit=self._default_unit, m=(self.m + other.m))
         else:
-            raise TypeError("Distance must be added with Distance")
+            raise TypeError('Distance must be added with Distance')
     
     def __iadd__(self, other):
         if isinstance(other, Distance):
             self.m += other.m
             return self
         else:
-            raise TypeError("Distance must be added with Distance")
+            raise TypeError('Distance must be added with Distance')
     
     def __sub__(self, other):
         if isinstance(other, Distance):
             return Distance(default_unit=self._default_unit, m=(self.m - other.m))
         else:
-            raise TypeError("Distance must be subtracted from Distance")
+            raise TypeError('Distance must be subtracted from Distance')
     
     def __isub__(self, other):
         if isinstance(other, Distance):
             self.m -= other.m
             return self
         else:
-            raise TypeError("Distance must be subtracted from Distance")
+            raise TypeError('Distance must be subtracted from Distance')
     
     def __mul__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
@@ -111,32 +193,53 @@ class Distance(object):
         elif isinstance(other, Distance):
             return Area(default_unit='sq_' + self._default_unit, sq_m=(self.m * other.m))
         else:
-            raise TypeError("Distance must be multiplied with number or Distance")
+            raise TypeError('Distance must be multiplied with number or Distance')
     
     def __imul__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             self.m *= float(other)
             return self
         else:
-            raise TypeError("Distance must be multiplied with number")
+            raise TypeError('Distance must be multiplied with number')
     
     def __div__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             return Distance(default_unit=self._default_unit, m=(self.m / float(other)))
         else:
-            raise TypeError("Distance must be divided with number")
+            raise TypeError('Distance must be divided with number')
 
     def __idiv__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             self.m /= float(other)
             return self
         else:
-            raise TypeError("Distance must be divided with number")
+            raise TypeError('Distance must be divided with number')
 
     def __nonzero__(self):
         return bool(self.m)
 
+    @classmethod
+    def unit_attname(cls, unit_str):
+        """
+        Retrieves the unit attribute name for the given unit string.  
+        For example, if the given unit string is 'metre', 'm' would be returned.  
+        An exception is raised if an attribute cannot be found.
+        """
+        lower = unit_str.lower()
+
+        if unit_str in cls.UNITS:
+            return unit_str
+        elif lower in cls.UNITS:
+            return lower
+        elif unit_str in cls.ALIAS:
+            return cls.ALIAS[unit_str]
+        elif lower in cls.ALIAS:
+            return cls.ALIAS[lower]
+        else:
+            raise Exception('Could not find a unit keyword associated with "%s"' % unit_str)
+
 class Area(object):
+    # TODO: Add units from above.
     UNITS = {
         'sq_m': 1.0,
         'sq_km': 1000000.0,
@@ -155,7 +258,7 @@ class Area(object):
                 self.sq_m += self.UNITS[unit] * value
                 self._default_unit = unit
             else:
-                raise AttributeError("Unknown unit type: " + unit)
+                raise AttributeError('Unknown unit type: ' + unit)
 
         if default_unit:
             self._default_unit = default_unit
@@ -164,13 +267,13 @@ class Area(object):
         if name in self.UNITS:
             return self.sq_m / self.UNITS[name]
         else:
-            raise AttributeError("Unknown unit type: " + name)
+            raise AttributeError('Unknown unit type: ' + name)
     
     def __repr__(self):
-        return "Area(%s=%s)" % (self._default_unit, getattr(self, self._default_unit))
+        return 'Area(%s=%s)' % (self._default_unit, getattr(self, self._default_unit))
 
     def __str__(self):
-        return "%s %s" % (getattr(self, self._default_unit), self._default_unit)
+        return '%s %s' % (getattr(self, self._default_unit), self._default_unit)
 
     def __cmp__(self, other):
         if isinstance(other, Area):
@@ -182,53 +285,53 @@ class Area(object):
         if isinstance(other, Area):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m + other.sq_m))
         else:
-            raise TypeError("Area must be added with Area")
+            raise TypeError('Area must be added with Area')
     
     def __iadd__(self, other):
         if isinstance(other, Area):
             self.sq_m += other.sq_m
             return self
         else:
-            raise TypeError("Area must be added with Area")
+            raise TypeError('Area must be added with Area')
     
     def __sub__(self, other):
         if isinstance(other, Area):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m - other.sq_m))
         else:
-            raise TypeError("Area must be subtracted from Area")
+            raise TypeError('Area must be subtracted from Area')
     
     def __isub__(self, other):
         if isinstance(other, Area):
             self.sq_m -= other.sq_m
             return self
         else:
-            raise TypeError("Area must be subtracted from Area")
+            raise TypeError('Area must be subtracted from Area')
     
     def __mul__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m * float(other)))
         else:
-            raise TypeError("Area must be multiplied with number")
+            raise TypeError('Area must be multiplied with number')
     
     def __imul__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             self.sq_m *= float(other)
             return self
         else:
-            raise TypeError("Area must be multiplied with number")
+            raise TypeError('Area must be multiplied with number')
     
     def __div__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             return Area(default_unit=self._default_unit, sq_m=(self.sq_m / float(other)))
         else:
-            raise TypeError("Area must be divided with number")
+            raise TypeError('Area must be divided with number')
 
     def __idiv__(self, other):
         if isinstance(other, (int, float, long, Decimal)):
             self.sq_m /= float(other)
             return self
         else:
-            raise TypeError("Area must be divided with number")
+            raise TypeError('Area must be divided with number')
 
     def __nonzero__(self):
         return bool(self.sq_m)
