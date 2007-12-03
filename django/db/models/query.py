@@ -122,7 +122,9 @@ class _QuerySet(object):
         if len(obj_list) < 1:
             raise self.model.DoesNotExist("%s matching query does not exist."
                     % self.model._meta.object_name)
-        assert len(obj_list) == 1, "get() returned more than one %s -- it returned %s! Lookup parameters were %s" % (self.model._meta.object_name, len(obj_list), kwargs)
+        elif len(obj_list) > 1:
+            raise self.model.MultipleObjectsReturned("get() returned more than one %s -- it returned %s! Lookup parameters were %s"
+                    % (self.model._meta.object_name, len(obj_list), kwargs))
         return obj_list[0]
 
     def create(self, **kwargs):

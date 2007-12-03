@@ -72,10 +72,14 @@ def get_validation_errors(outfile, app=None):
             # Check to see if the related field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
             if f.rel:
-                rel_opts = f.rel.to._meta
                 if f.rel.to not in models.get_models():
-                    e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, rel_opts.object_name))
+                    e.add(opts, "'%s' has relation with model %s, which has not been installed" % (f.name, f.rel.to))
+                # it is a string and we could not find the model it refers to
+                # so skip the next section
+                if isinstance(f.rel.to, (str, unicode)):
+                    continue
 
+                rel_opts = f.rel.to._meta
                 rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
                 rel_query_name = f.related_query_name()
                 for r in rel_opts.fields:
@@ -103,10 +107,14 @@ def get_validation_errors(outfile, app=None):
         for i, f in enumerate(opts.many_to_many):
             # Check to see if the related m2m field will clash with any
             # existing fields, m2m fields, m2m related objects or related objects
-            rel_opts = f.rel.to._meta
             if f.rel.to not in models.get_models():
-                e.add(opts, "'%s' has m2m relation with model %s, which has not been installed" % (f.name, rel_opts.object_name))
+                e.add(opts, "'%s' has m2m relation with model %s, which has not been installed" % (f.name, f.rel.to))
+                # it is a string and we could not find the model it refers to
+                # so skip the next section
+                if isinstance(f.rel.to, (str, unicode)):
+                    continue
 
+            rel_opts = f.rel.to._meta
             rel_name = RelatedObject(f.rel.to, cls, f).get_accessor_name()
             rel_query_name = f.related_query_name()
             # If rel_name is none, there is no reverse accessor.

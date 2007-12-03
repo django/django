@@ -172,14 +172,13 @@ def copy_helper(style, app_or_project, name, directory, other_name=''):
     """
     Copies either a Django application layout template or a Django project
     layout template into the specified directory.
-
-    * style - A color style object (see django.core.management.color).
-    * app_or_project - The string 'app' or 'project'.
-    * name - The name of the application or project.
-    * directory - The directory to copy the layout template to.
-    * other_name - When copying an application layout, this should be the name
-                   of the project.
     """
+    # style -- A color style object (see django.core.management.color).
+    # app_or_project -- The string 'app' or 'project'.
+    # name -- The name of the application or project.
+    # directory -- The directory to which the layout template should be copied.
+    # other_name -- When copying an application layout, this should be the name
+    #               of the project.
     import re
     import shutil
     other = {'project': 'app', 'app': 'project'}[app_or_project]

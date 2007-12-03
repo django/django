@@ -3,6 +3,7 @@
 unicode_tests = ur"""
 Templates can be created from unicode strings.
 >>> from django.template import *
+>>> from django.utils.safestring import SafeData
 >>> t1 = Template(u'ŠĐĆŽćžšđ {{ var }}')
 
 Templates can also be created from bytestrings. These are assumed by encoded
@@ -24,10 +25,13 @@ Contexts can be constructed from unicode or UTF-8 bytestrings.
 >>> c4 = Context({u'var': '\xc4\x90\xc4\x91'})
 
 Since both templates and all four contexts represent the same thing, they all
-render the same (and are returned as unicode objects).
+render the same (and are returned as unicode objects and "safe" objects as
+well, for auto-escaping purposes).
 
 >>> t1.render(c3) == t2.render(c3)
 True
->>> type(t1.render(c3))
-<type 'unicode'>
+>>> isinstance(t1.render(c3), unicode)
+True
+>>> isinstance(t1.render(c3), SafeData)
+True
 """

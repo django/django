@@ -1,7 +1,8 @@
+import sys
+
+from django import http
 from django.core import signals
 from django.dispatch import dispatcher
-from django import http
-import sys
 
 class BaseHandler(object):
     # Changes that are always applied to a response (in this order).

@@ -21,7 +21,7 @@ def legacy_maxlength(max_length, maxlength):
     """
     if maxlength is not None:
         warn("maxlength is deprecated, use max_length instead.",
-             PendingDeprecationWarning,
+             DeprecationWarning,
              stacklevel=3)
         if max_length is not None:
             raise TypeError("field can not take both the max_length"

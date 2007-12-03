@@ -225,6 +225,27 @@ Whether to append trailing slashes to URLs. This is only used if
 ``CommonMiddleware`` is installed (see the `middleware docs`_). See also
 ``PREPEND_WWW``.
 
+AUTHENTICATION_BACKENDS
+-----------------------
+
+Default: ``('django.contrib.auth.backends.ModelBackend',)``
+
+A tuple of authentication backend classes (as strings) to use when
+attempting to authenticate a user. See the `authentication backends
+documentation`_ for details.
+
+.. _authentication backends documentation: ../authentication/#other-authentication-sources
+
+AUTH_PROFILE_MODULE
+-------------------
+
+Default: Not defined
+
+The site-specific user profile model used by this site. See the
+`documentation on user profile models`_ for details.
+
+.. _documentation on user profile models: ../authentication/#storing-additional-information-about-users
+
 CACHE_BACKEND
 -------------
 
@@ -392,6 +413,22 @@ Default: ``'webmaster@localhost'``
 
 Default e-mail address to use for various automated correspondence from the
 site manager(s).
+
+DEFAULT_TABLESPACE
+------------------
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for models that do not specify one, if the
+backend supports it.
+
+DEFAULT_INDEX_TABLESPACE
+------------------------
+
+Default: ``''`` (Empty string)
+
+Default tablespace to use for indexes on fields that do not specify
+one, if the backend supports it.
 
 DISALLOWED_USER_AGENTS
 ----------------------
@@ -791,10 +828,12 @@ SESSION_COOKIE_PATH
 
 Default: ``'/'``
 
-The path set on the session cookie. Should match the URL path of your Django
-installation (or be parent of that path). This is useful if you have multiple
-Django instances running under the same hostname; they can use different
-cookie paths and each instance will only see its own session cookie.
+The path set on the session cookie. This should either match the URL path of your
+Django installation or be parent of that path.
+
+This is useful if you have multiple Django instances running under the same
+hostname. They can use different cookie paths, and each instance will only see
+its own session cookie.
 
 SESSION_COOKIE_SECURE
 ---------------------
@@ -1127,12 +1166,12 @@ If you're not setting the ``DJANGO_SETTINGS_MODULE`` environment variable, you
 settings.
 
 If you don't set ``DJANGO_SETTINGS_MODULE`` and don't call ``configure()``,
-Django will raise an ``EnvironmentError`` exception the first time a setting
+Django will raise an ``ImportError`` exception the first time a setting
 is accessed.
 
 If you set ``DJANGO_SETTINGS_MODULE``, access settings values somehow, *then*
-call ``configure()``, Django will raise an ``EnvironmentError`` saying settings
-have already been configured.
+call ``configure()``, Django will raise a ``RuntimeError`` indicating
+that settings have already been configured.
 
 Also, it's an error to call ``configure()`` more than once, or to call
 ``configure()`` after any setting has been accessed.

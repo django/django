@@ -47,7 +47,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                 BEGIN
                     SELECT %(sq_name)s.nextval
                     INTO :new.%(col_name)s FROM dual;
-                END;/""" % locals()
+                END;
+                /""" % locals()
         return sequence_sql, trigger_sql
 
     def date_extract_sql(self, lookup_type, field_name):

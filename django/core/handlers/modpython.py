@@ -1,11 +1,12 @@
-from django.core.handlers.base import BaseHandler
+import os
+from pprint import pformat
+
+from django import http
 from django.core import signals
+from django.core.handlers.base import BaseHandler
 from django.dispatch import dispatcher
 from django.utils import datastructures
 from django.utils.encoding import force_unicode
-from django import http
-from pprint import pformat
-import os
 
 # NOTE: do *not* import settings (or any module which eventually imports
 # settings) until after ModPythonHandler has been called; otherwise os.environ

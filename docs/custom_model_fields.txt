@@ -1,5 +1,5 @@
 ===================
-Custom Model Fields
+Custom model fields
 ===================
 
 **New in Django development version**
@@ -8,9 +8,10 @@ Introduction
 ============
 
 The `model reference`_ documentation explains how to use Django's standard
-field classes. For many purposes, those classes are all you'll need. Sometimes,
-though, the Django version won't meet your precise requirements, or you'll want
-to use a field that is entirely different from those shipped with Django.
+field classes -- ``CharField``, ``DateField``, etc. For many purposes, those
+classes are all you'll need. Sometimes, though, the Django version won't meet
+your precise requirements, or you'll want to use a field that is entirely
+different from those shipped with Django.
 
 Django's built-in field types don't cover every possible database column type --
 only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
@@ -27,10 +28,10 @@ Our example object
 Creating custom fields requires a bit of attention to detail. To make things
 easier to follow, we'll use a consistent example throughout this document.
 Suppose you have a Python object representing the deal of cards in a hand of
-Bridge_. It doesn't matter if you don't know how to play Bridge. You only need
-to know that 52 cards are dealt out equally to four players, who are
-traditionally called *north*, *east*, *south* and *west*. Our class looks
-something like this::
+Bridge_. (Don't worry, you don't know how to play Bridge to follow this
+example. You only need to know that 52 cards are dealt out equally to four
+players, who are traditionally called *north*, *east*, *south* and *west*.)
+Our class looks something like this::
 
     class Hand(object):
         def __init__(self, north, east, south, west):
@@ -42,10 +43,9 @@ something like this::
 
         # ... (other possibly useful methods omitted) ...
 
-This is just an ordinary Python class, nothing Django-specific about it. We
-would like to be able to things like this in our models (we assume the
-``hand`` attribute on the model is an instance of ``Hand``)::
-
+This is just an ordinary Python class, with nothing Django-specific about it.
+We'd like to be able to things like this in our models (we assume the ``hand``
+attribute on the model is an instance of ``Hand``)::
 
     example = MyModel.objects.get(pk=1)
     print example.hand.north
@@ -72,7 +72,7 @@ model support for existing classes where you cannot change the source code.
 .. _PostgreSQL custom types: http://www.postgresql.org/docs/8.2/interactive/sql-createtype.html
 .. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
 
-Background Theory
+Background theory
 =================
 
 Database storage
@@ -87,7 +87,7 @@ that falls out fairly naturally once you have the database side under control).
 Fields in a model must somehow be converted to fit into an existing database
 column type. Different databases provide different sets of valid column types,
 but the rule is still the same: those are the only types you have to work
-with.  Anything you want to store in the database must fit into one of
+with. Anything you want to store in the database must fit into one of
 those types.
 
 Normally, you're either writing a Django field to match a particular database
@@ -95,10 +95,9 @@ column type, or there's a fairly straightforward way to convert your data to,
 say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
-characters by concatenating all the cards together in a pre-determined order.
-Say, all the *north* cards first, then the *east*, *south* and *west* cards, in
-that order. So ``Hand`` objects can be saved to text or character columns in
-the database.
+characters by concatenating all the cards together in a pre-determined order --
+say, all the *north* cards first, then the *east*, *south* and *west* cards. So
+``Hand`` objects can be saved to text or character columns in the database.
 
 What does a field class do?
 ---------------------------
@@ -109,12 +108,12 @@ mean model fields and not `form fields`_) are subclasses of
 field is common to all fields -- name, help text, validator lists, uniqueness
 and so forth. Storing all that information is handled by ``Field``. We'll get
 into the precise details of what ``Field`` can do later on; for now, suffice it
-to say that everything descends from ``Field`` and then customises key pieces
-of the class behaviour.
+to say that everything descends from ``Field`` and then customizes key pieces
+of the class behavior.
 
 .. _form fields: ../newforms/#fields
 
-It's important to realise that a Django field class is not what is stored in
+It's important to realize that a Django field class is not what is stored in
 your model attributes. The model attributes contain normal Python objects. The
 field classes you define in a model are actually stored in the ``Meta`` class
 when the model class is created (the precise details of how this is done are
@@ -127,31 +126,35 @@ Keep this in mind when creating your own custom fields. The Django ``Field``
 subclass you write provides the machinery for converting between your Python
 instances and the database/serializer values in various ways (there are
 differences between storing a value and using a value for lookups, for
-example). If this sounds a bit tricky, don't worry. It will hopefully become
-clearer in the examples below. Just remember that you will often end up
-creating two classes when you want a custom field. The first class is the
-Python object that your users will manipulate. They will assign it to the model
-attribute, they will read from it for displaying purposes, things like that.
-This is the ``Hand`` class in our example. The second class is the ``Field``
-subclass. This is the class that knows how to convert your first class back and
-forth between its permanent storage form and the Python form.
+example). If this sounds a bit tricky, don't worry -- it will become clearer in
+the examples below. Just remember that you will often end up creating two
+classes when you want a custom field:
+
+    * The first class is the Python object that your users will manipulate.
+      They will assign it to the model attribute, they will read from it for
+      displaying purposes, things like that. This is the ``Hand`` class in our
+      example.
+
+    * The second class is the ``Field`` subclass. This is the class that knows
+      how to convert your first class back and forth between its permanent
+      storage form and the Python form.
 
 Writing a ``Field`` subclass
 =============================
 
-When you are planning your ``Field`` subclass, first give some thought to
-which existing field your new field is most similar to. Can you subclass an
-existing Django field and save yourself some work? If not, you should subclass the ``Field`` class, from which everything is descended.
+When planning your ``Field`` subclass, first give some thought to which
+existing ``Field`` class your new field is most similar to. Can you subclass an
+existing Django field and save yourself some work? If not, you should subclass
+the ``Field`` class, from which everything is descended.
 
-Initialising your new field is a matter of separating out any arguments that
+Initializing your new field is a matter of separating out any arguments that
 are specific to your case from the common arguments and passing the latter to
 the ``__init__()`` method of ``Field`` (or your parent class).
 
-In our example, the Django field we create is going to be called
-``HandField``. It's not a bad idea to use a similar naming scheme to Django's
-fields so that our new class is identifiable and yet clearly related to the
-``Hand`` class it is wrapping. It doesn't behave like any existing field, so
-we'll subclass directly from ``Field``::
+In our example, we'll call our field ``HandField``. (It's a good idea to call
+your ``Field`` subclass ``(Something)Field``, so it's easily identifiable as a
+``Field`` subclass.) It doesn't behave like any existing field, so we'll
+subclass directly from ``Field``::
 
     from django.db import models
 
@@ -160,7 +163,7 @@ we'll subclass directly from ``Field``::
             kwargs['max_length'] = 104
             super(HandField, self).__init__(*args, **kwargs)
 
-Our ``HandField`` will accept most of the standard field options (see the list
+Our ``HandField`` accept most of the standard field options (see the list
 below), but we ensure it has a fixed length, since it only needs to hold 52
 card values plus their suits; 104 characters in total.
 
@@ -171,40 +174,40 @@ card values plus their suits; 104 characters in total.
     (``auto_now`` being set implies ``editable=False``). No error is raised in
     this case.
 
-    This behaviour simplifies the field classes, because they don't need to
+    This behavior simplifies the field classes, because they don't need to
     check for options that aren't necessary. They just pass all the options to
-    the parent class and then don't use them later on. It is up to you whether
+    the parent class and then don't use them later on. It's up to you whether
     you want your fields to be more strict about the options they select, or
-    to use the simpler, more permissive behaviour of the current fields.
+    to use the simpler, more permissive behavior of the current fields.
 
 The ``Field.__init__()`` method takes the following parameters, in this
 order:
 
-    - ``verbose_name``
-    - ``name``
-    - ``primary_key``
-    - ``max_length``
-    - ``unique``
-    - ``blank``
-    - ``null``
-    - ``db_index``
-    - ``core``
-    - ``rel``: Used for related fields (like ``ForeignKey``). For advanced use
+    * ``verbose_name``
+    * ``name``
+    * ``primary_key``
+    * ``max_length``
+    * ``unique``
+    * ``blank``
+    * ``null``
+    * ``db_index``
+    * ``core``
+    * ``rel``: Used for related fields (like ``ForeignKey``). For advanced use
       only.
-    - ``default``
-    - ``editable``
-    - ``serialize``: If ``False``, the field will not be serialized when the
+    * ``default``
+    * ``editable``
+    * ``serialize``: If ``False``, the field will not be serialized when the
       model is passed to Django's serializers_. Defaults to ``True``.
-    - ``prepopulate_from``
-    - ``unique_for_date``
-    - ``unique_for_month``
-    - ``unique_for_year``
-    - ``validator_list``
-    - ``choices``
-    - ``radio_admin``
-    - ``help_text``
-    - ``db_column``
-    - ``db_tablespace``: Currently only used with the Oracle backend and only
+    * ``prepopulate_from``
+    * ``unique_for_date``
+    * ``unique_for_month``
+    * ``unique_for_year``
+    * ``validator_list``
+    * ``choices``
+    * ``radio_admin``
+    * ``help_text``
+    * ``db_column``
+    * ``db_tablespace``: Currently only used with the Oracle backend and only
       for index creation. You can usually ignore this option.
 
 All of the options without an explanation in the above list have the same
@@ -218,22 +221,19 @@ The ``SubfieldBase`` metaclass
 ------------------------------
 
 As we indicated in the introduction_, field subclasses are often needed for
-two reasons. Either to take advantage of a custom database column type, or to
-handle complex Python types. A combination of the two is obviously also
-possible. If you are only working with custom database column types and your
+two reasons: either to take advantage of a custom database column type, or to
+handle complex Python types. Obviously, a combination of the two is also
+possible. If you're only working with custom database column types and your
 model fields appear in Python as standard Python types direct from the
 database backend, you don't need to worry about this section.
 
-If you are handling custom Python types, such as our ``Hand`` class, we need
-to make sure that when Django initialises an instance of our model and assigns
-a database value to our custom field attribute we convert that value into the
+If you're handling custom Python types, such as our ``Hand`` class, we need
+to make sure that when Django initializes an instance of our model and assigns
+a database value to our custom field attribute, we convert that value into the
 appropriate Python object. The details of how this happens internally are a
-little complex. For the field writer, though, things are fairly simple. Make
-sure your field subclass uses ``django.db.models.SubfieldBase`` as its
-metaclass. This ensures that the ``to_python()`` method, documented below_,
-will always be called when the attribute is initialised.
-
-Our ``HandField`` class now looks like this::
+little complex, but the code you need to write in your ``Field`` class is
+simple: make sure your field subclass uses ``django.db.models.SubfieldBase`` as
+its metaclass::
 
     class HandField(models.Field):
         __metaclass__ = models.SubfieldBase
@@ -241,16 +241,18 @@ Our ``HandField`` class now looks like this::
         def __init__(self, *args, **kwargs):
             # ...
 
+This ensures that the ``to_python()`` method, documented below_, will always be
+called when the attribute is initialized.
+
 .. _below: #to-python-self-value
 
 Useful methods
 --------------
 
-Once you've created your ``Field`` subclass and setup up the
-``__metaclass__``, if necessary, there are a few standard methods you need to
-consider overriding. Which of these you need to implement will depend on you
-particular field behaviour. The list below is in approximately decreasing
-order of importance, so start from the top.
+Once you've created your ``Field`` subclass and set up up the
+``__metaclass__``, you might consider overriding a few standard methods,
+depending on your field's behavior. The list of methods below is in
+approximately decreasing order of importance, so start from the top.
 
 ``db_type(self)``
 ~~~~~~~~~~~~~~~~~
@@ -337,23 +339,32 @@ field. You are then responsible for creating the column in the right table in
 some other way, of course, but this gives you a way to tell Django to get out
 of the way.
 
-
 ``to_python(self, value)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Converts between all the ways your field can receive its initial value and the
-Python object you want to end up with. The default version just returns
-``value``, so is useful is the database backend returns the data already in
-the correct form (a Python string, for example).
+Converts a value as returned by your database (or a serializer) to a Python
+object.
 
-Normally, you will need to override this method. As a general rule, be
-prepared to accept an instance of the right type (e.g. ``Hand`` in our ongoing
-example), a string (from a deserializer, for example), and whatever the
-database wrapper returns for the column type you are using.
+The default implementation simply returns ``value``, for the common case in
+which the database backend already returns data in the correct format (as a
+Python string, for example).
 
-In our ``HandField`` class, we are storing the data in a character field in
-the database, so we need to be able to process strings and ``Hand`` instances
-in ``to_python()``::
+If your custom ``Field`` class deals with data structures that are more complex
+than strings, dates, integers or floats, then you'll need to override this
+method. As a general rule, the method should deal gracefully with any of the
+following arguments:
+
+    * An instance of the correct type (e.g., ``Hand`` in our ongoing example).
+
+    * A string (e.g., from a deserializer).
+
+    * Whatever the database returns for the column type you're using.
+
+In our ``HandField`` class, we're storing the data as a VARCHAR field in the
+database, so we need to be able to process strings and ``Hand`` instances in
+``to_python()``::
+
+    import re
 
     class HandField(models.Field):
         # ...
@@ -362,14 +373,14 @@ in ``to_python()``::
             if isinstance(value, Hand):
                 return value
 
-            # The string case
+            # The string case.
             p1 = re.compile('.{26}')
             p2 = re.compile('..')
             args = [p2.findall(x) for x in p1.findall(value)]
             return Hand(*args)
 
-Notice that we always return a ``Hand`` instance from this method. That is the
-Python object we want to store in the model's attribute.
+Notice that we always return a ``Hand`` instance from this method. That's the
+Python object type we want to store in the model's attribute.
 
 ``get_db_prep_save(self, value)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -377,7 +388,7 @@ Python object we want to store in the model's attribute.
 This is the reverse of ``to_python()`` when working with the database backends
 (as opposed to serialization). The ``value`` parameter is the current value of
 the model's attribute (a field has no reference to its containing model, so it
-cannot retrieve the value itself) and the method should return data in a
+cannot retrieve the value itself), and the method should return data in a
 format that can be used as a parameter in a query for the database backend.
 
 For example::
@@ -389,7 +400,6 @@ For example::
             return ''.join([''.join(l) for l in (self.north,
                     self.east, self.south, self.west)])
 
-
 ``pre_save(self, model_instance, add)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -399,10 +409,10 @@ The attribute name is in ``self.attname`` (this is set up by ``Field``). If
 the model is being saved to the database for the first time, the ``add``
 parameter will be ``True``, otherwise it will be ``False``.
 
-Often you won't need to override this method. However, at times it can be very
-useful. For example, the Django ``DateTimeField`` uses this method to set the
-attribute to the correct value before returning it in the cases when
-``auto_now`` or ``auto_now_add`` are set on the field.
+You only need to override this method if you want to preprocess the value
+somehow, just before saving. For example, Django's ``DateTimeField`` uses this
+method to set the attribute correctly in the case of ``auto_now`` or
+``auto_now_add``.
 
 If you do override this method, you must return the value of the attribute at
 the end. You should also update the model's attribute if you make any changes
@@ -460,9 +470,9 @@ All of the ``kwargs`` dictionary is passed directly to the form field's
 ``__init__()`` method. Normally, all you need to do is set up a good default
 for the ``form_class`` argument and then delegate further handling to the
 parent class. This might require you to write a custom form field (and even a
-form widget). See the `forms documentation`_ for information about this. Also
-have a look at ``django.contrib.localflavor`` for some examples of custom
-widgets.
+form widget). See the `forms documentation`_ for information about this, and
+take a look at the code in ``django.contrib.localflavor`` for some examples of
+custom widgets.
 
 Continuing our ongoing example, we can write the ``formfield()`` method as::
 
@@ -471,14 +481,14 @@ Continuing our ongoing example, we can write the ``formfield()`` method as::
 
         def formfield(self, **kwargs):
             # This is a fairly standard way to set up some defaults
-            # whilst letting the caller override them.
+            # while letting the caller override them.
             defaults = {'form_class': MyFormField}
             defaults.update(kwargs)
             return super(HandField, self).formfield(**defaults)
 
-This assumes we have some ``MyFormField`` field class (which has its own
-default widget) imported. This document doesn't cover the details of writing
-custom form fields.
+This assumes we're imported a ``MyFormField`` field class (which has its own
+default widget). This document doesn't cover the details of writing custom form
+fields.
 
 .. _helper functions: ../newforms/#generating-forms-for-models
 .. _forms documentation: ../newforms/
@@ -490,7 +500,7 @@ Returns a string giving the name of the ``Field`` subclass we are emulating at
 the database level. This is used to determine the type of database column for
 simple cases.
 
-If you have created a ``db_type()`` method, you do not need to worry about
+If you have created a ``db_type()`` method, you don't need to worry about
 ``get_internal_type()`` -- it won't be used much. Sometimes, though, your
 database storage is similar in type to some other field, so you can use that
 other field's logic to create the right column.
@@ -512,7 +522,7 @@ the database backend you are using -- that is, it doesn't appear in
 be used by the serializer, but the default ``db_type()`` method will return
 ``None``. See the documentation of ``db_type()`` above_ for reasons why this
 might be useful. Putting a descriptive string in as the type of the field for
-the serializer is a useful idea if you are ever going to be using the
+the serializer is a useful idea if you're ever going to be using the
 serializer output in some other place, outside of Django.
 
 .. _above: #db-type-self
@@ -528,7 +538,7 @@ serializer output in some other place, outside of Django.
 Returns a dictionary, mapping the field's attribute name to a flattened string
 version of the data. This method has some internal uses that aren't of
 interest to use here (mostly having to do with manipulators). For our
-purposes, it is sufficient to return a one item dictionary that maps the
+purposes, it's sufficient to return a one item dictionary that maps the
 attribute name to a string.
 
 This method is used by the serializers to convert the field into a string for
@@ -549,19 +559,20 @@ we can reuse some existing conversion code::
 Some general advice
 --------------------
 
-Writing a custom field can be a tricky process sometimes, particularly if you
-are doing complex conversions between your Python types and your database and
-serialization formats. A couple of tips to make things go more smoothly:
+Writing a custom field can be a tricky process, particularly if you're doing
+complex conversions between your Python types and your database and
+serialization formats. Here are a couple of tips to make things go more
+smoothly:
 
- 1. Look at the existing Django fields (in
- ``django/db/models/fields/__init__.py``) for inspiration. Try to find a field
- that is already close to what you want and extend it a little bit, in
- preference to creating an entirely new field from scratch.
+    1. Look at the existing Django fields (in
+       ``django/db/models/fields/__init__.py``) for inspiration. Try to find a
+       field that's similar to what you want and extend it a little bit,
+       instead of creating an entirely new field from scratch.
 
- 2. Put a ``__str__()`` or ``__unicode__()`` method on the class you are
- wrapping up as a field. There are a lot of places where the default behaviour
- of the field code is to call ``force_unicode()`` on the value (in our
- examples in this document, ``value`` would be a ``Hand`` instance, not a
- ``HandField``). So if your ``__unicode__()`` method automatically converts to
- the string form of your Python object, you can save yourself a lot of work.
-
+    2. Put a ``__str__()`` or ``__unicode__()`` method on the class you're
+       wrapping up as a field. There are a lot of places where the default
+       behavior of the field code is to call ``force_unicode()`` on the value.
+       (In our examples in this document, ``value`` would be a ``Hand``
+       instance, not a ``HandField``). So if your ``__unicode__()`` method
+       automatically converts to the string form of your Python object, you can
+       save yourself a lot of work.

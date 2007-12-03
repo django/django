@@ -84,7 +84,7 @@ def get_commands():
         try:
             from django.conf import settings
             apps = settings.INSTALLED_APPS
-        except (AttributeError, EnvironmentError):
+        except (AttributeError, ImportError):
             apps = []
 
         for app_name in apps:
@@ -99,7 +99,7 @@ def get_commands():
         try:
             from django.conf import settings
             project_directory = setup_environ(__import__(settings.SETTINGS_MODULE))
-        except (AttributeError, EnvironmentError, ImportError):
+        except (AttributeError, ImportError):
             project_directory = None
 
         if project_directory:
@@ -254,6 +254,8 @@ def setup_environ(settings_mod):
     # way. For example, if this file (manage.py) lives in a directory
     # "myproject", this code would add "/path/to/myproject" to sys.path.
     project_directory, settings_filename = os.path.split(settings_mod.__file__)
+    if not project_directory:
+        project_directory = os.getcwd()
     project_name = os.path.basename(project_directory)
     settings_name = os.path.splitext(settings_filename)[0]
     sys.path.append(os.path.join(project_directory, os.pardir))

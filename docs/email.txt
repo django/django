@@ -253,9 +253,11 @@ For example::
 
 The class has the following methods:
 
-    * ``send()`` sends the message, using either the connection that is
-      specified in the ``connection`` attribute, or creating a new connection
-      if none already exists.
+    * ``send(fail_silently=False)`` sends the message, using either
+      the connection that is specified in the ``connection``
+      attribute, or creating a new connection if none already
+      exists. If the keyword argument ``fail_silently`` is ``True``,
+      exceptions raised while sending the message will be quashed.
 
     * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
       subclass of Python's ``email.MIMEText.MIMEText`` class) or a

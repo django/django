@@ -23,12 +23,14 @@ class Context(object):
             yield d
 
     def push(self):
-        self.dicts = [{}] + self.dicts
+        d = {}
+        self.dicts = [d] + self.dicts
+        return d
 
     def pop(self):
         if len(self.dicts) == 1:
             raise ContextPopException
-        del self.dicts[0]
+        return self.dicts.pop(0)
 
     def __setitem__(self, key, value):
         "Set a variable in the current context"
@@ -62,6 +64,7 @@ class Context(object):
     def update(self, other_dict):
         "Like dict.update(). Pushes an entire dictionary's keys and values onto the context."
         self.dicts = [other_dict] + self.dicts
+        return other_dict
 
 # This is a function rather than module-level procedural code because we only
 # want it to execute if somebody uses RequestContext.

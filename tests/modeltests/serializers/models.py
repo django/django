@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-41. Serialization
+42. Serialization
 
 ``django.core.serializers`` provides interfaces to converting Django querysets
 to and from "flat" data (i.e. strings).

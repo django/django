@@ -1,21 +1,32 @@
 "File-based cache backend"
 
-from django.core.cache.backends.simple import CacheClass as SimpleCacheClass
-from django.utils.http import urlquote_plus
 import os, time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+from django.core.cache.backends.base import BaseCache
+from django.utils.http import urlquote_plus
 
-class CacheClass(SimpleCacheClass):
+class CacheClass(BaseCache):
     def __init__(self, dir, params):
+        BaseCache.__init__(self, params)
+        
+        max_entries = params.get('max_entries', 300)
+        try:
+            self._max_entries = int(max_entries)
+        except (ValueError, TypeError):
+            self._max_entries = 300
+            
+        cull_frequency = params.get('cull_frequency', 3)
+        try:
+            self._cull_frequency = int(cull_frequency)
+        except (ValueError, TypeError):
+            self._cull_frequency = 3
+            
         self._dir = dir
         if not os.path.exists(self._dir):
             self._createdir()
-        SimpleCacheClass.__init__(self, dir, params)
-        del self._cache
-        del self._expire_info
 
     def add(self, key, value, timeout=None):
         fname = self._key_to_file(key)

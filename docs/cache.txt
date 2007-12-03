@@ -168,6 +168,10 @@ development or testing environments. For example::
 
     CACHE_BACKEND = 'simple:///'
 
+**New in Django development version:** This cache backend is deprecated and
+will be removed in a future release. New code should use the ``locmem`` backend
+instead.
+
 Dummy caching (for development)
 -------------------------------
 
@@ -303,7 +307,7 @@ minutes.
 Template fragment caching
 =========================
 
-**New in development version**.
+**New in development version**
 
 If you're after even more control, you can also cache template fragments using
 the ``cache`` template tag. To give your template access to this tag, put
@@ -319,18 +323,18 @@ and the name to give the cache fragment. For example::
     {% endcache %}
 
 Sometimes you might want to cache multiple copies of a fragment depending on
-some dynamic data that appears inside the fragment. For example you may want a
+some dynamic data that appears inside the fragment. For example, you might want a
 separate cached copy of the sidebar used in the previous example for every user
-of your site. This can be easily achieved by passing additional arguments to
-the ``{% cache %}`` template tag to uniquely identify the cache fragment::
+of your site. Do this by passing additional arguments to the ``{% cache %}``
+template tag to uniquely identify the cache fragment::
 
     {% load cache %}
     {% cache 500 sidebar request.user.username %}
         .. sidebar for logged in user ..
     {% endcache %}
 
-If you need more than one argument to identify the fragment that's fine, simply
-pass as many arguments to ``{% cache %}`` as you need!
+It's perfectly fine to specify more than one argument to identify the fragment.
+Simply pass as many arguments to ``{% cache %}`` as you need.
 
 The low-level cache API
 =======================
@@ -370,16 +374,16 @@ get() can take a ``default`` argument::
     >>> cache.get('my_key', 'has expired')
     'has expired'
 
-To add a key only if it doesn't already exist, there is an add() method.  It
-takes the same parameters as set(), but will not attempt to update the cache
-if the key specified is already present::
+**New in Django development version:** To add a key only if it doesn't already
+exist, use the ``add()`` method. It takes the same parameters as ``set()``, but
+it will not attempt to update the cache if the key specified is already present::
 
     >>> cache.set('add_key', 'Initial value')
     >>> cache.add('add_key', 'New value')
     >>> cache.get('add_key')
     'Initial value'
 
-There's also a get_many() interface that only hits the cache once. get_many()
+There's also a ``get_many()`` interface that only hits the cache once. ``get_many()``
 returns a dictionary with all the keys you asked for that actually exist in the
 cache (and haven't expired)::
 

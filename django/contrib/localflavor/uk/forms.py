@@ -2,7 +2,7 @@
 UK-specific Form helpers
 """
 
-from django.newforms.fields import RegexField
+from django.newforms.fields import RegexField, Select
 from django.utils.translation import ugettext
 
 class UKPostcodeField(RegexField):
@@ -17,3 +17,19 @@ class UKPostcodeField(RegexField):
             max_length=None, min_length=None,
             error_message=ugettext(u'Enter a postcode. A space is required between the two postcode parts.'),
             *args, **kwargs)
+
+class UKCountySelect(Select):
+    """
+    A Select widget that uses a list of UK Counties/Regions as its choices.
+    """
+    def __init__(self, attrs=None):
+        from uk_regions import UK_REGION_CHOICES
+        super(UKCountySelect, self).__init__(attrs, choices=UK_REGION_CHOICES)
+
+class UKNationSelect(Select):
+    """
+    A Select widget that uses a list of UK Nations as its choices.
+    """
+    def __init__(self, attrs=None):
+        from uk_regions import UK_NATIONS_CHOICES
+        super(UKNationSelect, self).__init__(attrs, choices=UK_NATIONS_CHOICES)

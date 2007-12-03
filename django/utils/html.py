@@ -100,7 +100,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             if safe_input:
                 middle = mark_safe(middle)
             if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
-                    len(middle) > 0 and middle[0] in string.letters + string.digits and \
+                    len(middle) > 0 and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
                 middle = '<a href="http://%s"%s>%s</a>' % (
                         urlquote(middle, safe='/&=:;#?+'),  nofollow_attr,

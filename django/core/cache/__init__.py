@@ -22,11 +22,15 @@ from django.core.cache.backends.base import InvalidCacheBackendError
 BACKENDS = {
     # name for use in settings file --> name of module in "backends" directory
     'memcached': 'memcached',
-    'simple': 'simple',
     'locmem': 'locmem',
     'file': 'filebased',
     'db': 'db',
     'dummy': 'dummy',
+}
+
+DEPRECATED_BACKENDS = {
+    # deprecated backend --> replacement module
+    'simple': 'locmem',
 }
 
 def get_cache(backend_uri):
@@ -35,6 +39,11 @@ def get_cache(backend_uri):
     scheme, rest = backend_uri.split(':', 1)
     if not rest.startswith('//'):
         raise InvalidCacheBackendError, "Backend URI must start with scheme://"
+    if scheme in DEPRECATED_BACKENDS:
+        import warnings
+        warnings.warn("'%s' backend is deprecated. Use '%s' instead." % 
+            (scheme, DEPRECATED_BACKENDS[scheme]), DeprecationWarning)
+        scheme = DEPRECATED_BACKENDS[scheme]
     if scheme not in BACKENDS:
         raise InvalidCacheBackendError, "%r is not a valid cache backend" % scheme
 

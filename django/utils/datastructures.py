@@ -1,6 +1,6 @@
 class MergeDict(object):
     """
-    A simple class for creating new "virtual" dictionaries that actualy look
+    A simple class for creating new "virtual" dictionaries that actually look
     up values in more than one dictionary, passed in the constructor.
     """
     def __init__(self, *dicts):
@@ -215,7 +215,7 @@ class MultiValueDict(dict):
 
     def get(self, key, default=None):
         """
-        Returns the last data value for the passed key.  If key doesn't exist
+        Returns the last data value for the passed key. If key doesn't exist
         or value is an empty list, then default is returned.
         """
         try:
@@ -228,7 +228,7 @@ class MultiValueDict(dict):
 
     def getlist(self, key):
         """
-        Returns the list of values for the passed key.  If key doesn't exist,
+        Returns the list of values for the passed key. If key doesn't exist,
         then an empty list is returned.
         """
         try:
