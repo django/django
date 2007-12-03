@@ -276,7 +276,7 @@ model fields:
     for the missing, but required fields, or use ``save(commit=False)`` and
     manually set anyextra required fields::
     
-        instance = Instance(requiured_field='value')
+        instance = Instance(required_field='value')
         form = InstanceForm(instance, request.POST)
         new_instance = form.save()
 
