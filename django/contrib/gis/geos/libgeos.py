@@ -17,9 +17,18 @@ try:
 except ImportError:
     HAS_NUMPY = False
 
+# Custom library path set?
+try:
+    from django.conf import settings
+    lib_name = settings.GEOS_LIBRARY_PATH
+except (AttributeError, EnvironmentError):
+    lib_name = None
+
 # Setting the appropriate name for the GEOS-C library, depending on which
 # OS and POSIX platform we're running.
-if os.name == 'nt':
+if lib_name:
+    pass
+elif os.name == 'nt':
     # Windows NT library
     lib_name = 'libgeos_c-1.dll'
 elif os.name == 'posix':

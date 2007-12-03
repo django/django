@@ -31,7 +31,7 @@
 from django.contrib.gis.geos.base import GEOSGeometry, wkt_regex, hex_regex
 from django.contrib.gis.geos.geometries import Point, LineString, LinearRing, Polygon, HAS_NUMPY
 from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
-from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import geos_version
 
 def fromfile(file_name):

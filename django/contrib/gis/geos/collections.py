@@ -5,7 +5,7 @@
 from ctypes import c_int, c_uint, byref
 from types import TupleType, ListType
 from django.contrib.gis.geos.base import GEOSGeometry
-from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.geometries import Point, LineString, LinearRing, Polygon
 from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
 from django.contrib.gis.geos.prototypes import create_collection, destroy_geom, geom_clone, geos_typeid, get_cs, get_geomn
@@ -80,7 +80,7 @@ class GeometryCollection(GEOSGeometry):
     def _checkindex(self, index):
         "Checks the given geometry index."
         if index < 0 or index >= self.num_geom:
-            raise GEOSGeometryIndexError('invalid GEOS Geometry index: %s' % str(index))
+            raise GEOSIndexError('invalid GEOS Geometry index: %s' % str(index))
 
     @property
     def kml(self):

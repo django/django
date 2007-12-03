@@ -9,7 +9,7 @@ from types import StringType, UnicodeType, IntType, FloatType, BufferType
 
 # GEOS-related dependencies.
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
-from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 
 # All other functions in this module come from the ctypes 
@@ -121,19 +121,9 @@ class GEOSGeometry(object):
         "Returns the union of this Geometry and the other."
         return self.union(other)
 
-    # g1 |= g2
-    def __ior__(self, other):
-        "Reassigns this Geometry to the union of this Geometry and the other."
-        return self.union(other)
-
     # g = g1 & g2
     def __and__(self, other):
         "Returns the intersection of this Geometry and the other."
-        return self.intersection(other)
-
-    # g1 &= g2
-    def __iand__(self, other):
-        "Reassigns this Geometry to the intersection of this Geometry and the other."
         return self.intersection(other)
 
     # g = g1 - g2
@@ -141,22 +131,9 @@ class GEOSGeometry(object):
         "Return the difference this Geometry and the other."
         return self.difference(other)
 
-    # g1 -= g2
-    def __isub__(self, other):
-        "Reassigns this Geometry to the difference of this Geometry and the other."
-        return self.difference(other)
-
     # g = g1 ^ g2
     def __xor__(self, other):
         "Return the symmetric difference of this Geometry and the other."
-        return self.sym_difference(other)
-
-    # g1 ^= g2
-    def __ixor__(self, other):
-        """
-        Reassigns this Geometry to the symmetric difference of this Geometry 
-        and the other.
-        """
         return self.sym_difference(other)
 
     #### Coordinate Sequence Routines ####

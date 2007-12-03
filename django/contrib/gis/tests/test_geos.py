@@ -1,7 +1,7 @@
 import random, unittest, sys
 from ctypes import ArgumentError
 from django.contrib.gis.geos import \
-    GEOSException, GEOSGeometryIndexError, \
+    GEOSException, GEOSIndexError, \
     GEOSGeometry, Point, LineString, LinearRing, Polygon, \
     MultiPoint, MultiLineString, MultiPolygon, GeometryCollection, \
     fromstr, geos_version, HAS_NUMPY
@@ -144,7 +144,7 @@ class GEOSTest(unittest.TestCase):
             self.assertAlmostEqual(mp.centroid[0], mpnt.centroid.tuple[0], 9)
             self.assertAlmostEqual(mp.centroid[1], mpnt.centroid.tuple[1], 9)
 
-            self.assertRaises(GEOSGeometryIndexError, mpnt.__getitem__, len(mpnt))
+            self.assertRaises(GEOSIndexError, mpnt.__getitem__, len(mpnt))
             self.assertEqual(mp.centroid, mpnt.centroid.tuple)
             self.assertEqual(mp.points, tuple(m.tuple for m in mpnt))
             for p in mpnt:
@@ -169,7 +169,7 @@ class GEOSTest(unittest.TestCase):
                 
             self.assertEqual(True, ls == fromstr(l.wkt))
             self.assertEqual(False, ls == prev)
-            self.assertRaises(GEOSGeometryIndexError, ls.__getitem__, len(ls))
+            self.assertRaises(GEOSIndexError, ls.__getitem__, len(ls))
             prev = ls
 
             # Creating a LineString from a tuple, list, and numpy array
@@ -199,7 +199,7 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(ls.geom_typeid, 1)
                 self.assertEqual(ls.empty, False)
 
-            self.assertRaises(GEOSGeometryIndexError, ml.__getitem__, len(ml))
+            self.assertRaises(GEOSIndexError, ml.__getitem__, len(ml))
             self.assertEqual(ml.wkt, MultiLineString(*tuple(s.clone() for s in ml)).wkt)
             self.assertEqual(ml, MultiLineString(*tuple(LineString(s.tuple) for s in ml)))
 
@@ -252,9 +252,9 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(p.ext_ring_cs, poly[0].tuple) # Testing __getitem__
 
             # Testing __getitem__ and __setitem__ on invalid indices
-            self.assertRaises(GEOSGeometryIndexError, poly.__getitem__, len(poly))
-            #self.assertRaises(GEOSGeometryIndexError, poly.__setitem__, len(poly), False)
-            self.assertRaises(GEOSGeometryIndexError, poly.__getitem__, -1)
+            self.assertRaises(GEOSIndexError, poly.__getitem__, len(poly))
+            #self.assertRaises(GEOSIndexError, poly.__setitem__, len(poly), False)
+            self.assertRaises(GEOSIndexError, poly.__getitem__, -1)
 
             # Testing __iter__ 
             for r in poly:
@@ -283,7 +283,7 @@ class GEOSTest(unittest.TestCase):
                 self.assertEqual(mp.num_geom, mpoly.num_geom)
                 self.assertEqual(mp.n_p, mpoly.num_coords)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                self.assertRaises(GEOSGeometryIndexError, mpoly.__getitem__, len(mpoly))
+                self.assertRaises(GEOSIndexError, mpoly.__getitem__, len(mpoly))
                 for p in mpoly:
                     self.assertEqual(p.geom_type, 'Polygon')
                     self.assertEqual(p.geom_typeid, 3)
@@ -618,15 +618,15 @@ class GEOSTest(unittest.TestCase):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                self.assertRaises(GEOSGeometryIndexError, g.get_x)
+                self.assertRaises(GEOSIndexError, g.get_x)
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
                 self.assertEqual(0, len(lr))
                 self.assertEqual(True, lr.empty)
-                self.assertRaises(GEOSGeometryIndexError, lr.__getitem__, 0)
+                self.assertRaises(GEOSIndexError, lr.__getitem__, 0)
             else:
-                self.assertRaises(GEOSGeometryIndexError, g.__getitem__, 0)
+                self.assertRaises(GEOSIndexError, g.__getitem__, 0)
 
     def test21_test_gdal(self):
         "Testing `ogr` and `srs` properties."

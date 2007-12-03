@@ -7,7 +7,7 @@ from ctypes import c_uint, byref
 from types import FloatType, IntType, ListType, TupleType
 from django.contrib.gis.geos.base import GEOSGeometry
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
-from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR, HAS_NUMPY
 from django.contrib.gis.geos.prototypes import *
 if HAS_NUMPY: from numpy import ndarray, array
@@ -328,7 +328,7 @@ class Polygon(GEOSGeometry):
     def _checkindex(self, index):
         "Internal routine for checking the given ring index."
         if index < 0 or index >= len(self):
-            raise GEOSGeometryIndexError('invalid Polygon ring index: %s' % index)
+            raise GEOSIndexError('invalid Polygon ring index: %s' % index)
 
     def get_interior_ring(self, ring_i):
         """

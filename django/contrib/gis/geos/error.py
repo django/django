@@ -7,7 +7,7 @@ class GEOSException(Exception):
     "The base GEOS exception, indicates a GEOS-related error."
     pass
 
-class GEOSGeometryIndexError(GEOSException, KeyError):
+class GEOSIndexError(GEOSException, KeyError):
     """
     This exception is raised when an invalid index is encountered, and has
     the 'silent_variable_feature' attribute set to true.  This ensures that

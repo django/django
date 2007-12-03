@@ -5,7 +5,7 @@
 """
 from ctypes import c_double, c_uint, byref
 from types import ListType, TupleType
-from django.contrib.gis.geos.error import GEOSException, GEOSGeometryIndexError
+from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import CS_PTR, HAS_NUMPY
 from django.contrib.gis.geos.prototypes import cs_clone, cs_getdims, cs_getordinate, cs_getsize, cs_setordinate
 if HAS_NUMPY: from numpy import ndarray
@@ -69,7 +69,7 @@ class GEOSCoordSeq(object):
         "Checks the given index."
         sz = self.size
         if (sz < 1) or (index < 0) or (index >= sz):
-            raise GEOSGeometryIndexError('invalid GEOS Geometry index: %s' % str(index))
+            raise GEOSIndexError('invalid GEOS Geometry index: %s' % str(index))
 
     def _checkdim(self, dim):
         "Checks the given dimension."
