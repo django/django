@@ -218,3 +218,41 @@ None
 3.4
 
 """}
+
+try:
+    import yaml
+    __test__['YAML'] = """
+# Create some data:
+
+>>> articles = Article.objects.all().order_by("id")[:2]
+>>> from django.core import serializers
+
+# test if serial
+
+>>> serialized = serializers.serialize("yaml", articles)
+>>> print serialized
+- fields:
+    author: 2
+    categories: [3, 1]
+    headline: Just kidding; I love TV poker
+    pub_date: 2006-06-16 11:00:00
+  model: serializers.article
+  pk: 1
+- fields:
+    author: 1
+    categories: [2, 3]
+    headline: Time to reform copyright
+    pub_date: 2006-06-16 13:00:11
+  model: serializers.article
+  pk: 2
+<BLANKLINE>
+
+>>> obs = list(serializers.deserialize("yaml", serialized)) 
+>>> for i in obs: 
+...     print i
+<DeserializedObject: Just kidding; I love TV poker>
+<DeserializedObject: Time to reform copyright>
+
+"""
+except ImportError: pass
+    

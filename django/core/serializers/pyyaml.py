@@ -20,7 +20,7 @@ class Serializer(PythonSerializer):
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)
-        yaml.dump(self.objects, self.stream, **self.options)
+        yaml.safe_dump(self.objects, self.stream, **self.options)
 
     def getvalue(self):
         return self.stream.getvalue()
