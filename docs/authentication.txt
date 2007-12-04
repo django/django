@@ -382,7 +382,7 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
 .. admonition:: Calling ``authenticate()`` first
     
     When you're manually logging a user in, you *must* call
-    ``authenticate()`` before you call ``login()``; ``authenticate()``
+    ``authenticate()`` before you call ``login()``. ``authenticate()``
     sets an attribute on the ``User`` noting which authentication
     backend successfully authenticated that user (see the `backends
     documentation`_ for details), and this information is needed later
