@@ -533,8 +533,8 @@ class BooleanField(Field):
         """Returns a Python boolean object."""
         super(BooleanField, self).clean(value)
         # Explicitly check for the string 'False', which is what a hidden field
-        # will submit for False (since bool("True") == True we don't need to
-        # handle that explicitly).
+        # will submit for False. Because bool("True") == True, we don't need to
+        # handle that explicitly.
         if value == 'False':
             return False
         return bool(value)
