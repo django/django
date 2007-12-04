@@ -252,12 +252,12 @@ See the `syndication documentation`_.
 webdesign
 =========
 
-Helpers and utilties targeted primarily at web designers rather than
-web developers.
+Helpers and utilties targeted primarily at Web *designers* rather than
+Web *developers*.
 
-See the `web design helpers documentation`_.
+See the `Web design helpers documentation`_.
 
-.. _web design helpers documentation: ../webdesign/
+.. _Web design helpers documentation: ../webdesign/
 
 Other add-ons
 =============
