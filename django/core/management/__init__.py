@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand, CommandError, handle_defaul
 get_version = django.get_version
 
 # A cache of loaded commands, so that call_command
-# doesn't have to reload every time it is called
+# doesn't have to reload every time it's called.
 _commands = None
 
 def find_commands(management_dir):
@@ -29,8 +29,8 @@ def find_commands(management_dir):
 
 def find_management_module(app_name):
     """
-    Determines the path to the management module for the application named,
-    without acutally importing the application or the management module.
+    Determines the path to the management module for the given app_name,
+    without actually importing the application or the management module.
 
     Raises ImportError if the management module cannot be found for any reason.
     """
@@ -46,7 +46,7 @@ def find_management_module(app_name):
 def load_command_class(app_name, name):
     """
     Given a command name and an application name, returns the Command
-    class instance. All errors raised by the importation process
+    class instance. All errors raised by the import process
     (ImportError, AttributeError) are allowed to propagate.
     """
     return getattr(__import__('%s.management.commands.%s' % (app_name, name),
@@ -54,11 +54,11 @@ def load_command_class(app_name, name):
 
 def get_commands():
     """
-    Returns a dictionary of commands against the application in which
-    those commands can be found. This works by looking for a
-    management.commands package in django.core, and in each installed
-    application -- if a commands package exists, all commands in that
-    package are registered.
+    Returns a dictionary mapping command names to their callback applications.
+
+    This works by looking for a management.commands package in django.core, and
+    in each installed application -- if a commands package exists, all commands
+    in that package are registered.
 
     Core commands are always included. If a settings module has been
     specified, user-defined commands will also be included, the
@@ -73,13 +73,12 @@ def get_commands():
     startapp command), the instantiated module can be placed in the
     dictionary in place of the application name.
 
-    The dictionary is cached on the first call, and reused on subsequent
+    The dictionary is cached on the first call and reused on subsequent
     calls.
     """
     global _commands
     if _commands is None:
-        _commands = dict([(name, 'django.core')
-                          for name in find_commands(__path__[0])])
+        _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
         # Get commands from all installed apps.
         try:
             from django.conf import settings
@@ -90,8 +89,7 @@ def get_commands():
         for app_name in apps:
             try:
                 path = find_management_module(app_name)
-                _commands.update(dict([(name, app_name)
-                                       for name in find_commands(path)]))
+                _commands.update(dict([(name, app_name) for name in find_commands(path)]))
             except ImportError:
                 pass # No management module - ignore this app
 
@@ -163,10 +161,8 @@ class ManagementUtility(object):
         Returns the script's main help text, as a string.
         """
         usage = ['%s <subcommand> [options] [args]' % self.prog_name]
-        usage.append('Django command line tool,'
-                     ' version %s' % django.get_version())
-        usage.append("Type '%s help <subcommand>' for help on a specific"
-                     " subcommand." % self.prog_name)
+        usage.append('Django command line tool, version %s' % django.get_version())
+        usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
         usage.append('Available subcommands:')
         commands = get_commands().keys()
         commands.sort()
@@ -178,7 +174,7 @@ class ManagementUtility(object):
         """
         Tries to fetch the given subcommand, printing a message with the
         appropriate command called from the command line (usually
-        django-admin.py or manage.py) if it can't be found.
+        "django-admin.py" or "manage.py") if it can't be found.
         """
         try:
             app_name = get_commands()[subcommand]
@@ -188,8 +184,8 @@ class ManagementUtility(object):
             else:
                 klass = load_command_class(app_name, subcommand)
         except KeyError:
-            sys.stderr.write("Unknown command: %r\nType '%s help' for"
-                             " usage.\n" % (subcommand, self.prog_name))
+            sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" % \
+                (subcommand, self.prog_name))
             sys.exit(1)
         return klass
 
@@ -201,8 +197,7 @@ class ManagementUtility(object):
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
-        parser = LaxOptionParser(version=get_version(),
-                                 option_list=BaseCommand.option_list)
+        parser = LaxOptionParser(version=get_version(), option_list=BaseCommand.option_list)
         try:
             options, args = parser.parse_args(self.argv)
             handle_default_options(options)
@@ -263,8 +258,7 @@ def setup_environ(settings_mod):
     sys.path.pop()
 
     # Set DJANGO_SETTINGS_MODULE appropriately.
-    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name,
-                                                      settings_name)
+    os.environ['DJANGO_SETTINGS_MODULE'] = '%s.%s' % (project_name, settings_name)
     return project_directory
 
 def execute_from_command_line(argv=None):
