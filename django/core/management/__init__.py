@@ -52,7 +52,7 @@ def load_command_class(app_name, name):
     return getattr(__import__('%s.management.commands.%s' % (app_name, name),
                    {}, {}, ['Command']), 'Command')()
 
-def get_commands():
+def get_commands(load_user_commands=True, project_directory=None):
     """
     Returns a dictionary mapping command names to their callback applications.
 
@@ -79,26 +79,16 @@ def get_commands():
     global _commands
     if _commands is None:
         _commands = dict([(name, 'django.core') for name in find_commands(__path__[0])])
-        # Get commands from all installed apps.
-        try:
-            from django.conf import settings
-            apps = settings.INSTALLED_APPS
-        except (AttributeError, ImportError):
-            apps = []
 
-        for app_name in apps:
-            try:
-                path = find_management_module(app_name)
-                _commands.update(dict([(name, app_name) for name in find_commands(path)]))
-            except ImportError:
-                pass # No management module - ignore this app
-
-        # Try to determine the project directory
-        try:
+        if load_user_commands:
+            # Get commands from all installed apps.
             from django.conf import settings
-            project_directory = setup_environ(__import__(settings.SETTINGS_MODULE))
-        except (AttributeError, ImportError):
-            project_directory = None
+            for app_name in settings.INSTALLED_APPS:
+                try:
+                    path = find_management_module(app_name)
+                    _commands.update(dict([(name, app_name) for name in find_commands(path)]))
+                except ImportError:
+                    pass # No management module -- ignore this app.
 
         if project_directory:
             # Remove the "startproject" command from self.commands, because
@@ -155,6 +145,8 @@ class ManagementUtility(object):
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
+        self.project_directory = None
+        self.user_commands = False
 
     def main_help_text(self):
         """
@@ -164,7 +156,7 @@ class ManagementUtility(object):
         usage.append('Django command line tool, version %s' % django.get_version())
         usage.append("Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name)
         usage.append('Available subcommands:')
-        commands = get_commands().keys()
+        commands = get_commands(self.user_commands, self.project_directory).keys()
         commands.sort()
         for cmd in commands:
             usage.append('  %s' % cmd)
@@ -177,7 +169,7 @@ class ManagementUtility(object):
         "django-admin.py" or "manage.py") if it can't be found.
         """
         try:
-            app_name = get_commands()[subcommand]
+            app_name = get_commands(self.user_commands, self.project_directory)[subcommand]
             if isinstance(app_name, BaseCommand):
                 # If the command is already loaded, use it directly.
                 klass = app_name
@@ -237,6 +229,8 @@ class ProjectManagementUtility(ManagementUtility):
     """
     def __init__(self, argv, project_directory):
         super(ProjectManagementUtility, self).__init__(argv)
+        self.project_directory = project_directory
+        self.user_commands = True
 
 def setup_environ(settings_mod):
     """
