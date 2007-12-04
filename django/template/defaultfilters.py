@@ -43,7 +43,11 @@ def stringfilter(func):
 
 
 def addslashes(value):
-    """Adds slashes - useful for passing strings to JavaScript, for example."""
+    """
+    Adds slashes before quotes. Useful for escaping strings in CSV, for
+    example. Less useful for escaping JavaScript; use the ``escapejs``
+    filter instead.
+    """
     return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
 addslashes.is_safe = True
 addslashes = stringfilter(addslashes)
@@ -53,6 +57,25 @@ def capfirst(value):
     return value and value[0].upper() + value[1:]
 capfirst.is_safe=True
 capfirst = stringfilter(capfirst)
+
+_js_escapes = (
+    ('\\', '\\\\'),
+    ('"', '\\"'),
+    ("'", "\\'"),
+    ('\n', '\\n'),
+    ('\r', '\\r'),
+    ('\b', '\\b'),
+    ('\f', '\\f'),
+    ('\t', '\\t'),
+    ('\v', '\\v'),
+    ('</', '<\\/'),
+)
+def escapejs(value):
+    """Backslash-escapes characters for use in JavaScript strings."""
+    for bad, good in _js_escapes:
+        value = value.replace(bad, good)
+    return value
+escapejs = stringfilter(escapejs)
 
 def fix_ampersands(value):
     """Replaces ampersands with ``&amp;`` entities."""

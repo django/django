@@ -1227,8 +1227,10 @@ Adds the arg to the value.
 addslashes
 ~~~~~~~~~~
 
-Adds slashes. Useful for passing strings to JavaScript, for example.
+Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
+**New in Django development version**: for escaping data in JavaScript strings,
+use the `escapejs` filter instead.
 
 capfirst
 ~~~~~~~~
@@ -1301,6 +1303,15 @@ Applying ``escape`` to a variable that would normally have auto-escaping
 applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the ``force_escape`` filter.
+
+escapejs
+~~~~~~~~
+
+**New in Django development version**
+
+Escapes characters for use in JavaScript strings. This does *not* make the
+string safe for use in HTML, but does protect you from syntax errors when using
+templates to generate JavaScript/JSON.
 
 filesizeformat
 ~~~~~~~~~~~~~~
