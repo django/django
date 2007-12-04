@@ -1,14 +1,23 @@
 import os
+import tempfile
 from django.conf import settings
 from django.contrib.sessions.backends.base import SessionBase
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
 
 class SessionStore(SessionBase):
     """
     Implements a file based session store.
     """
     def __init__(self, session_key=None):
-        self.storage_path = settings.SESSION_FILE_PATH
+        self.storage_path = getattr(settings, "SESSION_FILE_PATH", tempfile.gettempdir())
+        
+        # Make sure the storage path is valid.
+        if not os.path.isdir(self.storage_path):
+            raise ImproperlyConfigured("The session storage path %r doesn't exist. "\
+                                       "Please set your SESSION_FILE_PATH setting "\
+                                       "to an existing directory in which Django "\
+                                       "can store session data." % self.storage_path)
+        
         self.file_prefix = settings.SESSION_COOKIE_NAME    
         super(SessionStore, self).__init__(session_key)
     
