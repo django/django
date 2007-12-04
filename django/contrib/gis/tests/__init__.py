@@ -3,9 +3,9 @@ from copy import copy
 from unittest import TestSuite, TextTestRunner
 from django.contrib.gis.gdal import HAS_GDAL
 try:
-    from django.contrib.gis.tests.utils import mysql
+    from django.contrib.gis.tests.utils import mysql, oracle
 except:
-    mysql = False
+    mysql, oracle = (False, False)
 
 # Tests that require use of a spatial database (e.g., creation of models)
 test_models = ['geoapp']
@@ -16,7 +16,12 @@ test_suite_names = [
     'test_measure',
 ]
 if HAS_GDAL:
-    test_models += ['layermap']
+    if oracle:
+        # TODO: There is a problem with the `syncdb` SQL for the LayerMapping
+        # tests on Oracle.
+        test_models += ['distapp']
+    else:
+        test_models += ['distapp', 'layermap']
     test_suite_names += [
         'test_gdal_driver',
         'test_gdal_ds',
@@ -54,7 +59,7 @@ def run_tests(module_list, verbosity=1, interactive=True):
      (3) Start this database `pg_ctl -D /path/to/user/db start`
 
     On Windows platforms simply use the pgAdmin III utility to add superuser 
-    priviliges to your database user.
+    privileges to your database user.
 
     Make sure your settings.py matches the settings of the user database. 
     For example, set the same port number (`DATABASE_PORT=5433`).  

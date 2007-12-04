@@ -16,17 +16,17 @@ class GeometryColumns(models.Model):
     """
     f_table_catalog = models.CharField(maxlength=256)
     f_table_schema = models.CharField(maxlength=256)
-    f_table_name = models.CharField(maxlength=256, primary_key=True)
+    f_table_name = models.CharField(maxlength=256)
     f_geometry_column = models.CharField(maxlength=256)
     coord_dimension = models.IntegerField()
-    srid = models.IntegerField()
+    srid = models.IntegerField(primary_key=True)
     type = models.CharField(maxlength=30)
 
     class Meta:
         db_table = 'geometry_columns'
 
     @classmethod
-    def table_name_col(self):
+    def table_name_col(cls):
         "Class method for returning the table name column for this model."
         return 'f_table_name'
 
@@ -52,3 +52,7 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.srtext
+
+    @classmethod
+    def wkt_col(cls):
+        return 'srtext'

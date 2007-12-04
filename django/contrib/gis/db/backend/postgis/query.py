@@ -2,9 +2,10 @@
  This module contains the spatial lookup types, and the get_geo_where_clause()
  routine for PostGIS.
 """
+from decimal import Decimal
 from django.db import connection
+from django.contrib.gis.measure import Distance
 from django.contrib.gis.db.backend.postgis.management import postgis_version_tuple
-from types import StringType, UnicodeType
 qn = connection.ops.quote_name
 
 # Getting the PostGIS version information
@@ -62,16 +63,38 @@ POSTGIS_OPERATORS = {
 # Versions of PostGIS >= 1.2.2 changed their naming convention to be
 #  'SQL-MM-centric' to conform with the ISO standard. Practically, this 
 #  means that 'ST_' is prefixes geometry function names.
-if MAJOR_VERSION > 1 or (MAJOR_VERSION == 1 and (MINOR_VERSION1 > 2 or (MINOR_VERSION1 == 2 and MINOR_VERSION2 >= 2))):
-    GEOM_FUNC_PREFIX = 'ST_'
+GEOM_FUNC_PREFIX = ''
+if MAJOR_VERSION >= 1:
+    if (MINOR_VERSION1 > 2 or 
+        (MINOR_VERSION1 == 2 and MINOR_VERSION2 >= 2)):
+        GEOM_FUNC_PREFIX = 'ST_'
+    
+    def get_func(func): return '%s%s' % (GEOM_FUNC_PREFIX, func)
+
+    # Functions used by the GeoManager & GeoQuerySet
+    ASKML = get_func('AsKML')
+    ASGML = get_func('AsGML')
+    DISTANCE = get_func('Distance')
+    GEOM_FROM_TEXT = get_func('GeomFromText')
+    GEOM_FROM_WKB = get_func('GeomFromWKB')
+    TRANSFORM = get_func('Transform')
+
+    # Special cases for union and KML methods.
+    if MINOR_VERSION1 < 3:
+        UNION = 'GeomUnion'
+    else:
+        UNION = 'ST_Union'
+
+    if MINOR_VERSION1 == 1:
+        ASKML = False
 else:
-    GEOM_FUNC_PREFIX = ''
+    raise NotImplementedError('PostGIS versions < 1.0 are not supported.')
 
 # For PostGIS >= 1.2.2 the following lookup types will do a bounding box query
-#  first before calling the more computationally expensive GEOS routines (called
-#  "inline index magic"):
-#    'touches', 'crosses', 'contains', 'intersects', 'within', 'overlaps', and
-#    'covers'.
+# first before calling the more computationally expensive GEOS routines (called
+# "inline index magic"):
+# 'touches', 'crosses', 'contains', 'intersects', 'within', 'overlaps', and
+# 'covers'.
 POSTGIS_GEOMETRY_FUNCTIONS = {
     'equals' : 'Equals',
     'disjoint' : 'Disjoint',
@@ -81,24 +104,35 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
     'overlaps' : 'Overlaps',
     'contains' : 'Contains',
     'intersects' : 'Intersects',
-    'relate' : ('Relate', str),
+    'relate' : ('Relate', basestring),
+    }
+
+# Valid distance types and substitutions
+dtypes = (Decimal, Distance, float, int)
+DISTANCE_FUNCTIONS = {
+    'distance_gt' : ('>', dtypes),
+    'distance_gte' : ('>=', dtypes),
+    'distance_lt' : ('<', dtypes),
+    'distance_lte' : ('<=', dtypes),
     }
 
 if GEOM_FUNC_PREFIX == 'ST_':
     # Adding the GEOM_FUNC_PREFIX to the lookup functions.
-    for lookup, func in POSTGIS_GEOMETRY_FUNCTIONS.items():
-        if isinstance(func, tuple):
-            POSTGIS_GEOMETRY_FUNCTIONS[lookup] = (GEOM_FUNC_PREFIX + func[0], func[1])
+    for lookup, f in POSTGIS_GEOMETRY_FUNCTIONS.items():
+        if isinstance(f, tuple):
+            POSTGIS_GEOMETRY_FUNCTIONS[lookup] = (get_func(f[0]), f[1])
         else:
-            POSTGIS_GEOMETRY_FUNCTIONS[lookup] = GEOM_FUNC_PREFIX + func
+            POSTGIS_GEOMETRY_FUNCTIONS[lookup] = get_func(f)
 
     # The ST_DWithin, ST_CoveredBy, and ST_Covers routines become available in 1.2.2+
     POSTGIS_GEOMETRY_FUNCTIONS.update(
-        {'dwithin' : ('ST_DWithin', float),
+        {'dwithin' : ('ST_DWithin', dtypes),
          'coveredby' : 'ST_CoveredBy',
          'covers' : 'ST_Covers',
          }
         )
+
+POSTGIS_GEOMETRY_FUNCTIONS.update(DISTANCE_FUNCTIONS)
 
 # Any other lookup types that do not require a mapping.
 MISC_TERMS = ['isnull']
@@ -139,51 +173,30 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
             func, arg_type = lookup_info
 
             # Ensuring that a tuple _value_ was passed in from the user
-            if not isinstance(value, tuple) or len(value) != 2: 
-                raise TypeError('2-element tuple required for `%s` lookup type.' % lookup_type)
+            if not isinstance(value, tuple): 
+                raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
+            if len(value) != 2:
+                raise ValueError('2-element tuple required or `%s` lookup type.' % lookup_type)
             
             # Ensuring the argument type matches what we expect.
             if not isinstance(value[1], arg_type):
                 raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
-            
-            return "%s(%s%s, %%s, %%s)" % (func, table_prefix, field_name)
+
+            if lookup_type in DISTANCE_FUNCTIONS:
+                op = DISTANCE_FUNCTIONS[lookup_type][0]
+                return '%s(%s%s, %%s) %s %%s' % (DISTANCE, table_prefix, field_name, op)
+            else:
+                return "%s(%s%s, %%s, %%s)" % (func, table_prefix, field_name)
         else:
             # Returning the SQL necessary for the geometry function call. For example: 
             #  ST_Contains("geoapp_country"."poly", ST_GeomFromWKB(..))
             return '%s(%s%s, %%s)' % (lookup_info, table_prefix, field_name)
-    
+
     # Handling 'isnull' lookup type
     if lookup_type == 'isnull':
         return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
-
-# Functions that we define manually.
-if MAJOR_VERSION == 1:
-    if MINOR_VERSION1 == 3:
-        # PostGIS versions 1.3.x
-        ASKML = 'ST_AsKML'
-        ASGML = 'ST_AsGML'
-        GEOM_FROM_TEXT = 'ST_GeomFromText'
-        GEOM_FROM_WKB = 'ST_GeomFromWKB'
-        UNION = 'ST_Union'
-        TRANSFORM = 'ST_Transform'
-    elif MINOR_VERSION1 == 2 and MINOR_VERSION2 >= 1:
-        # PostGIS versions 1.2.x
-        ASKML = 'AsKML'
-        ASGML = 'AsGML'
-        GEOM_FROM_TEXT = 'GeomFromText'
-        GEOM_FROM_WKB = 'GeomFromWKB'
-        UNION = 'GeomUnion'
-        TRANSFORM = 'Transform'
-    elif MINOR_VERSION1 == 1 and MINOR_VERSION2 >= 0:
-        # PostGIS versions 1.1.x
-        ASKML = False
-        ASGML = 'AsGML'
-        GEOM_FROM_TEXT = 'GeomFromText'
-        GEOM_FROM_WKB = 'GeomFromWKB'
-        TRANSFORM = 'Transform'
-        UNION = 'GeomUnion'
 
 # Custom selection not needed for PostGIS since GEOS geometries may be
 # instantiated directly from the HEXEWKB returned by default.  If

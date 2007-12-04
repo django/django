@@ -7,11 +7,11 @@ from psycopg2 import Binary
 from psycopg2.extensions import ISQLQuote
 
 class PostGISAdaptor(object):
-    def __init__(self, geom, srid):
+    def __init__(self, geom):
         "Initializes on the geometry and the SRID."
         # Getting the WKB and the SRID
         self.wkb = geom.wkb
-        self.srid = srid
+        self.srid = geom.srid
 
     def __conform__(self, proto):
         # Does the given protocol conform to what Psycopg2 expects?

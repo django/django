@@ -6,7 +6,7 @@ from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.backend.util import get_srid, GeoFieldSQL
 from django.contrib.gis.db.backend.oracle.adaptor import OracleSpatialAdaptor
-from django.contrib.gis.db.backend.oracle.query import ORACLE_SPATIAL_TERMS, TRANSFORM
+from django.contrib.gis.db.backend.oracle.query import ORACLE_SPATIAL_TERMS, DISTANCE_FUNCTIONS, TRANSFORM
 
 # Quotename & geographic quotename, respectively.
 qn = connection.ops.quote_name
@@ -21,12 +21,12 @@ class OracleSpatialField(Field):
 
     empty_strings_allowed = False
 
-    def __init__(self, extent=(-180.0, -90.0, 180.0, 90.0), tolerance=0.00005, **kwargs):
+    def __init__(self, extent=(-180.0, -90.0, 180.0, 90.0), tolerance=0.05, **kwargs):
         """
         Oracle Spatial backend needs to have the extent -- for projected coordinate
         systems _you must define the extent manually_, since the coordinates are
         for geodetic systems.  The `tolerance` keyword specifies the tolerance
-        for error (in meters).
+        for error (in meters), and defaults to 0.05 (5 centimeters).
         """
         # Oracle Spatial specific keyword arguments.
         self._extent = extent
@@ -104,32 +104,32 @@ class OracleSpatialField(Field):
             # special case for isnull lookup
             if lookup_type == 'isnull': return GeoFieldSQL([], [])
 
-            # When the input is not a GEOS geometry, attempt to construct one
-            # from the given string input.
-            if isinstance(value, GEOSGeometry):
-                pass
-            elif isinstance(value, (StringType, UnicodeType)):
-                try:
-                    value = GEOSGeometry(value)
-                except GEOSException:
-                    raise TypeError("Could not create geometry from lookup value: %s" % str(value))
-            else:
-                raise TypeError('Cannot use parameter of %s type as lookup parameter.' % type(value))
-
-            # Getting the SRID of the geometry, or defaulting to that of the field if
-            # it is None.
-            srid = get_srid(self, value)
+            # Get the geometry with SRID; defaults SRID to that
+            # of the field if it is None
+            geom = self.get_geometry(value)
             
             # The adaptor will be used by psycopg2 for quoting the WKT.
-            adapt = OracleSpatialAdaptor(value)
-            if srid != self._srid:
+            adapt = OracleSpatialAdaptor(geom)
+
+            if geom.srid != self._srid:
                 # Adding the necessary string substitutions and parameters
                 # to perform a geometry transformation.
-                return GeoFieldSQL(['%s(SDO_GEOMETRY(%%s, %s), %%s)' % (TRANSFORM, srid)],
-                                   [adapt, self._srid])
+                where = ['%s(SDO_GEOMETRY(%%s, %s), %%s)' % (TRANSFORM, geom.srid)]
+                params = [adapt, self._srid]
             else:
-                return GeoFieldSQL(['SDO_GEOMETRY(%%s, %s)' % srid], [adapt])
+                where = ['SDO_GEOMETRY(%%s, %s)' % geom.srid]
+                params = [adapt]
 
+            if isinstance(value, tuple):
+                if lookup_type in DISTANCE_FUNCTIONS or lookup_type == 'dwithin':
+                    # Getting the distance parameter in the units of the field
+                    where += [self.get_distance(value[1])]
+                elif lookup_type == 'relate':
+                    # No extra where parameters for SDO_RELATE queries.
+                    pass
+                else:
+                    where += map(gqn, value[1:])
+            return GeoFieldSQL(where, params)
         else:
             raise TypeError("Field has invalid lookup: %s" % lookup_type)
 

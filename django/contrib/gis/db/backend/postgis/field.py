@@ -1,19 +1,26 @@
-from types import StringType, UnicodeType
+from types import UnicodeType
 from django.db import connection
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry, GEOSException 
 from django.contrib.gis.db.backend.util import get_srid, GeoFieldSQL
 from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
-from django.contrib.gis.db.backend.postgis.query import POSTGIS_TERMS, TRANSFORM
-from psycopg2 import Binary
+from django.contrib.gis.db.backend.postgis.query import \
+    DISTANCE, DISTANCE_FUNCTIONS, POSTGIS_TERMS, TRANSFORM
 
 # Quotename & geographic quotename, respectively
 qn = connection.ops.quote_name
 def gqn(value):
-    if isinstance(value, UnicodeType): value = value.encode('ascii')
-    return "'%s'" % value
+    if isinstance(value, basestring):
+        if isinstance(value, UnicodeType): value = value.encode('ascii')
+        return "'%s'" % value
+    else: 
+        return str(value)
 
 class PostGISField(Field):
+    """
+    The backend-specific geographic field for PostGIS.
+    """
+
     def _add_geom(self, style, db_table):
         """
         Constructs the addition of the geometry to the table using the
@@ -92,52 +99,43 @@ class PostGISField(Field):
         """
         if lookup_type in POSTGIS_TERMS:
             # special case for isnull lookup
-            if lookup_type == 'isnull':
-                return GeoFieldSQL([], [value])
+            if lookup_type == 'isnull': return GeoFieldSQL([], [])
 
-            # When the input is not a GEOS geometry, attempt to construct one
-            # from the given string input.
-            if isinstance(value, GEOSGeometry):
-                pass
-            elif isinstance(value, (StringType, UnicodeType)):
-                try:
-                    value = GEOSGeometry(value)
-                except GEOSException:
-                    raise TypeError("Could not create geometry from lookup value: %s" % str(value))
-            else:
-                raise TypeError('Cannot use parameter of %s type as lookup parameter.' % type(value))
-
-            # Getting the SRID of the geometry, or defaulting to that of the field if
-            # it is None.
-            srid = get_srid(self, value)
+            # Get the geometry with SRID; defaults SRID to 
+            # that of the field if it is None.
+            geom = self.get_geometry(value)
 
             # The adaptor will be used by psycopg2 for quoting the WKB.
-            adapt = PostGISAdaptor(value, srid)
+            adapt = PostGISAdaptor(geom)
 
-            if srid != self._srid:
+            if geom.srid != self._srid:
                 # Adding the necessary string substitutions and parameters
                 # to perform a geometry transformation.
-                return GeoFieldSQL(['%s(%%s,%%s)' % TRANSFORM],
-                                   [adapt, self._srid])
+                where = ['%s(%%s,%%s)' % TRANSFORM]
+                params = [adapt, self._srid]
             else:
-                return GeoFieldSQL(['%s'], [adapt])
+                # Otherwise, the adaptor will take care of everything.
+                where = ['%s']
+                params = [adapt]
+
+            if isinstance(value, tuple):
+                if lookup_type in DISTANCE_FUNCTIONS or lookup_type == 'dwithin':
+                    # Getting the distance parameter in the units of the field.
+                    where += [self.get_distance(value[1])]
+                else:
+                    where += map(gqn, value[1:])
+            return GeoFieldSQL(where, params)
         else:
             raise TypeError("Field has invalid lookup: %s" % lookup_type)
+
 
     def get_db_prep_save(self, value):
         "Prepares the value for saving in the database."
         if not bool(value): return None
         if isinstance(value, GEOSGeometry):
-            return PostGISAdaptor(value, value.srid)
+            return PostGISAdaptor(value)
         else:
             raise TypeError('Geometry Proxy should only return GEOSGeometry objects.')
-
-    def get_internal_type(self):
-        """
-        Returns NoField because a stored procedure is used by PostGIS to create
-        the Geometry Fields.
-        """
-        return 'NoField'
 
     def get_placeholder(self, value):
         """

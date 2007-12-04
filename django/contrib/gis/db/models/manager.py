@@ -7,6 +7,9 @@ class GeoManager(Manager):
     def get_query_set(self):
         return GeoQuerySet(model=self.model)
 
+    def distance(self, *args, **kwargs):
+        return self.get_query_set().distance(*args, **kwargs)
+
     def gml(self, *args, **kwargs):
         return self.get_query_set().gml(*args, **kwargs)
 

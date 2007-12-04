@@ -10,5 +10,5 @@ from django.contrib.gis.db.backend.oracle.creation import create_spatial_db
 from django.contrib.gis.db.backend.oracle.field import OracleSpatialField, gqn
 from django.contrib.gis.db.backend.oracle.query import \
      get_geo_where_clause, ORACLE_SPATIAL_TERMS, \
-     ASGML, GEOM_SELECT, TRANSFORM, UNION
+     ASGML, DISTANCE, GEOM_SELECT, TRANSFORM, UNION
 

@@ -20,7 +20,7 @@ class GeometryColumns(models.Model):
         db_table = 'USER_SDO_GEOM_METADATA'
 
     @classmethod
-    def table_name_col(self):
+    def table_name_col(cls):
         return 'table_name'
 
     def __unicode__(self):
@@ -43,3 +43,7 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.wktext
+
+    @classmethod
+    def wkt_col(cls):
+        return 'wktext'

@@ -7,6 +7,9 @@ class GeoFieldSQL(object):
         self.where = where
         self.params = params
 
+    def __str__(self):
+        return self.where[0] % tuple(self.params)
+
 def get_srid(field, geom):
     """
     Gets the SRID depending on the value of the SRID setting of the field

@@ -2,12 +2,20 @@ import os, unittest
 from models import Country, City, State, Feature
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import *
+from django.contrib.gis.measure import Distance
 from django.contrib.gis.tests.utils import no_oracle, no_postgis, oracle, postgis
+
+# TODO: Some tests depend on the success/failure of previous tests, these should
+# be decoupled.  This flag is an artifact of this problem, and makes debugging easier;
+# specifically, the DISABLE flag will disables all tests, allowing problem tests to
+# be examined individually.
+DISABLE = False
 
 class GeoModelTest(unittest.TestCase):
     
     def test01_initial_sql(self):
         "Testing geographic initial SQL."
+        if DISABLE: return
         if oracle:
             # Oracle doesn't allow strings longer than 4000 characters
             # in SQL files, and I'm stumped on how to use Oracle BFILE's
@@ -31,10 +39,15 @@ class GeoModelTest(unittest.TestCase):
         # Ensuring that data was loaded from initial SQL.
         self.assertEqual(2, Country.objects.count())
         self.assertEqual(8, City.objects.count())
-        self.assertEqual(3, State.objects.count())
+
+        # Oracle cannot handle NULL geometry values w/certain queries.
+        if oracle: n_state = 2
+        else: n_state = 3
+        self.assertEqual(n_state, State.objects.count())
 
     def test02_proxy(self):
         "Testing Lazy-Geometry support (using the GeometryProxy)."
+        if DISABLE: return
         #### Testing on a Point
         pnt = Point(0, 0)
         nullcity = City(name='NullCity', point=pnt)
@@ -104,32 +117,41 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle # Oracle does not support KML.
     def test03a_kml(self):
         "Testing KML output from the database using GeoManager.kml()."
+        if DISABLE: return
         # Should throw a TypeError when trying to obtain KML from a
         #  non-geometry field.
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.kml, 'name')
 
         # Ensuring the KML is as expected.
-        ptown = City.objects.kml('point', precision=9).get(name='Pueblo')
-        self.assertEqual('<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>', ptown.kml)
+        ptown1 = City.objects.kml('point', precision=9).get(name='Pueblo')
+        ptown2 = City.objects.kml(precision=9).get(name='Pueblo')
+        for ptown in [ptown1, ptown2]:
+            self.assertEqual('<Point><coordinates>-104.609252,38.255001,0</coordinates></Point>', ptown.kml)
 
     def test03b_gml(self):
         "Testing GML output from the database using GeoManager.gml()."
+        if DISABLE: return
         # Should throw a TypeError when tyring to obtain GML from a
         #  non-geometry field.
         qs = City.objects.all()
         self.assertRaises(TypeError, qs.gml, 'name')
-        ptown = City.objects.gml('point', precision=9).get(name='Pueblo')
+        ptown1 = City.objects.gml('point', precision=9).get(name='Pueblo')
+        ptown2 = City.objects.gml(precision=9).get(name='Pueblo')
+
         if oracle:
             # No precision parameter for Oracle :-/
             import re
             gml_regex = re.compile(r'<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml"><gml:coordinates decimal="\." cs="," ts=" ">-104.60925199\d+,38.25500\d+ </gml:coordinates></gml:Point>')
-            self.assertEqual(True, bool(gml_regex.match(ptown.gml)))
+            for ptown in [ptown1, ptown2]:
+                self.assertEqual(True, bool(gml_regex.match(ptown.gml)))
         else:
-            self.assertEqual('<gml:Point srsName="EPSG:4326"><gml:coordinates>-104.609252,38.255001</gml:coordinates></gml:Point>', ptown.gml)
+            for ptown in [ptown1, ptown2]:
+                self.assertEqual('<gml:Point srsName="EPSG:4326"><gml:coordinates>-104.609252,38.255001</gml:coordinates></gml:Point>', ptown.gml)
 
     def test04_transform(self):
         "Testing the transform() GeoManager method."
+        if DISABLE: return
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
@@ -142,13 +164,31 @@ class GeoModelTest(unittest.TestCase):
             self.assertAlmostEqual(htown.x, h.point.x, 8)
             self.assertAlmostEqual(htown.y, h.point.y, 8)
 
-        p = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
-        self.assertEqual(2774, p.point.srid)
-        self.assertAlmostEqual(ptown.x, p.point.x, 7)
-        self.assertAlmostEqual(ptown.y, p.point.y, 7)
+        p1 = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
+        p2 = City.objects.transform(srid=ptown.srid).get(name='Pueblo')
+        for p in [p1, p2]:
+            self.assertEqual(2774, p.point.srid)
+            self.assertAlmostEqual(ptown.x, p.point.x, 7)
+            self.assertAlmostEqual(ptown.y, p.point.y, 7)
+
+    def test09_disjoint(self):
+        "Testing the `disjoint` lookup type."
+        if DISABLE: return
+        ptown = City.objects.get(name='Pueblo')
+        qs1 = City.objects.filter(point__disjoint=ptown.point)
+        self.assertEqual(7, qs1.count())
+
+        if not postgis:
+            # TODO: Do NULL columns bork queries on PostGIS?  The following
+            # error is encountered:
+            #  psycopg2.ProgrammingError: invalid memory alloc request size 4294957297
+            qs2 = State.objects.filter(poly__disjoint=ptown.point)
+            self.assertEqual(1, qs2.count())
+            self.assertEqual('Kansas', qs2[0].name)
 
     def test10_contains_contained(self):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
+        if DISABLE: return
         # Getting Texas, yes we were a country -- once ;)
         texas = Country.objects.get(name='Texas')
         
@@ -190,6 +230,7 @@ class GeoModelTest(unittest.TestCase):
 
     def test11_lookup_insert_transform(self):
         "Testing automatic transform for lookups and inserts."
+        if DISABLE: return
         # San Antonio in 'WGS84' (SRID 4326)
         sa_4326 = 'POINT (-98.493183 29.424170)'
         wgs_pnt = fromstr(sa_4326, srid=4326) # Our reference point in WGS84
@@ -225,8 +266,12 @@ class GeoModelTest(unittest.TestCase):
         self.assertAlmostEqual(wgs_pnt.x, sa.point.x, 6)
         self.assertAlmostEqual(wgs_pnt.y, sa.point.y, 6)
 
+    # Oracle does not support NULL geometries in its spatial index for
+    # some routines (e.g., SDO_GEOM.RELATE).
+    @no_oracle
     def test12_null_geometries(self):
         "Testing NULL geometry support, and the `isnull` lookup type."
+        if DISABLE: return
         # Querying for both NULL and Non-NULL values.
         nullqs = State.objects.filter(poly__isnull=True)
         validqs = State.objects.filter(poly__isnull=False)
@@ -250,6 +295,7 @@ class GeoModelTest(unittest.TestCase):
     @no_oracle # No specific `left` or `right` operators in Oracle.
     def test13_left_right(self):
         "Testing the 'left' and 'right' lookup types."
+        if DISABLE: return
         # Left: A << B => true if xmax(A) < xmin(B)
         # Right: A >> B => true if xmin(A) > xmax(B) 
         #  See: BOX2D_left() and BOX2D_right() in lwgeom_box2dfloat4.c in PostGIS source.
@@ -285,6 +331,7 @@ class GeoModelTest(unittest.TestCase):
         for c in qs: self.assertEqual(True, c.name in cities)
 
     def test14_equals(self):
+        if DISABLE: return
         "Testing the 'same_as' and 'equals' lookup types."
         pnt = fromstr('POINT (-95.363151 29.763374)', srid=4326)
         c1 = City.objects.get(point=pnt)
@@ -292,57 +339,73 @@ class GeoModelTest(unittest.TestCase):
         c3 = City.objects.get(point__equals=pnt)
         for c in [c1, c2, c3]: self.assertEqual('Houston', c.name)
 
-    @no_oracle # Oracle SDO_RELATE() uses a different system.
     def test15_relate(self):
         "Testing the 'relate' lookup type."
+        if DISABLE: return
         # To make things more interesting, we will have our Texas reference point in 
-        #  different SRIDs.
-        pnt1 = fromstr('POINT (649287.0363174345111474 4177429.4494686722755432)', srid=2847)
+        # different SRIDs.
+        pnt1 = fromstr('POINT (649287.0363174 4177429.4494686)', srid=2847)
         pnt2 = fromstr('POINT(-98.4919715741052 29.4333344025053)', srid=4326)
 
-        # Testing bad argument tuples that should return a TypeError
-        bad_args = [(pnt1, 0), (pnt2, 'T*T***FF*', 0), (23, 'foo')]
-        for args in bad_args:
-            try:
-                qs = Country.objects.filter(mpoly__relate=args)
-                cnt = qs.count()
-            except TypeError:
-                pass
-            else:
-                self.fail('Expected a TypeError')
+        # Testing bad argument tuples that should return a TypeError or
+        # a ValueError.
+        bad_args = [((pnt1, 0), TypeError),
+                    ((pnt2, 'T*T***FF*', 0), ValueError),
+                    ((23, 'foo'), TypeError),
+                    ]
+        for args, e in bad_args:
+            qs = Country.objects.filter(mpoly__relate=args)
+            self.assertRaises(e, qs.count)
 
-        # 'T*T***FF*' => Contains()
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, 'T*T***FF*')).name)
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, 'T*T***FF*')).name)
+        # Relate works differently for the different backends.
+        if postgis:
+            contains_mask = 'T*T***FF*'
+            within_mask = 'T*F**F***'
+            intersects_mask = 'T********'
+        elif oracle:
+            contains_mask = 'contains'
+            within_mask = 'inside'
+            # TODO: This is not quite the same as the PostGIS mask above
+            intersects_mask = 'overlapbdyintersect'
 
-        # 'T*F**F***' => Within()
+        # Testing contains relation mask.
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name)
+        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, contains_mask)).name)
+
+        # Testing within relation mask.
         ks = State.objects.get(name='Kansas')
-        self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, 'T*F**F***')).name)
+        self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, within_mask)).name)
 
-        # 'T********' => Intersects()
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, 'T********')).name)
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, 'T********')).name)
-        self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, 'T********')).name)
+        # Testing intersection relation mask.
+        if not oracle:
+            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
+            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
+            self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
     def test16_createnull(self):
         "Testing creating a model instance and the geometry being None"
+        if DISABLE: return
         c = City()
         self.assertEqual(c.point, None)
 
     def test17_union(self):
         "Testing the union() GeoManager method."
+        if DISABLE: return
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas, San Antonio
         union = fromstr('MULTIPOINT(-98.493183 29.424170,-96.801611 32.782057,-95.363151 29.763374)')
         qs = City.objects.filter(point__within=tx)
         self.assertRaises(TypeError, qs.union, 'name')
-        u = qs.union('point')
-        self.assertEqual(True, union.equals_exact(u, 10)) # Going up to 10 digits of precision.
+        u1 = qs.union('point')
+        u2 = qs.union()
+        self.assertEqual(True, union.equals_exact(u1, 10)) # Going up to 10 digits of precision.
+        self.assertEqual(True, union.equals_exact(u2, 10))
         qs = City.objects.filter(name='NotACity')
         self.assertEqual(None, qs.union('point'))
 
     def test18_geometryfield(self):
         "Testing GeometryField."
+        if DISABLE: return
         f1 = Feature(name='Point', geom=Point(1, 1))
         f2 = Feature(name='LineString', geom=LineString((0, 0), (1, 1), (5, 5)))
         f3 = Feature(name='Polygon', geom=Polygon(LinearRing((0, 0), (0, 5), (5, 5), (5, 0), (0, 0))))

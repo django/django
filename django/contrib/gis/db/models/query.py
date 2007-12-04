@@ -6,8 +6,12 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
 # parse_lookup depends on the spatial database backend.
-from django.contrib.gis.db.backend import parse_lookup, ASGML, ASKML, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION
+from django.contrib.gis.db.backend import parse_lookup, \
+    ASGML, ASKML, DISTANCE, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION
 from django.contrib.gis.geos import GEOSGeometry
+
+# Flag indicating whether the backend is Oracle.
+oracle = SPATIAL_BACKEND == 'oracle'
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
@@ -28,11 +32,23 @@ class GeoQuerySet(QuerySet):
 
         # For replacement fields in the SELECT.
         self._custom_select = {}
+        self._ewkt = None
 
         # If GEOM_SELECT is defined in the backend, then it will be used
         # for the selection format of the geometry column.
-        if GEOM_SELECT: self._geo_fmt = GEOM_SELECT
-        else: self._geo_fmt = '%s'
+        if GEOM_SELECT:
+            #if oracle and hasattr(self, '_ewkt'):
+            # Transformed geometries in Oracle use EWKT so that the SRID
+            # on the transformed lazy geometries is set correctly).
+            #print '-=' * 20
+            #print self._ewkt, GEOM_SELECT
+            #self._geo_fmt = "'SRID=%d;'||%s" % (self._ewkt, GEOM_SELECT)
+            #self._geo_fmt = GEOM_SELECT
+            #else:
+            #print '-=' * 20
+            self._geo_fmt = GEOM_SELECT
+        else:
+            self._geo_fmt = '%s'
 
     def _filter_or_exclude(self, mapper, *args, **kwargs):
         # mapper is a callable used to transform Q objects,
@@ -59,15 +75,23 @@ class GeoQuerySet(QuerySet):
         select = []
 
         # This is the only component of this routine that is customized for the 
-        #  GeoQuerySet. Specifically, this allows operations to be done on fields 
-        #  in the SELECT, overriding their values -- this is different from using 
-        #  QuerySet.extra(select=foo) because extra() adds an  an _additional_ 
-        #  field to be selected.  Used in returning transformed geometries, and
-        #  handling the selection of native database geometry formats.
+        # GeoQuerySet. Specifically, this allows operations to be done on fields 
+        # in the SELECT, overriding their values -- this is different from using 
+        # QuerySet.extra(select=foo) because extra() adds an  an _additional_ 
+        # field to be selected.  Used in returning transformed geometries, and
+        # handling the selection of native database geometry formats.
         for f in opts.fields:
             # Getting the selection format string.
-            if hasattr(f, '_geom'): sel_fmt = self._geo_fmt
-            else: sel_fmt = '%s'
+            if hasattr(f, '_geom'):
+                sel_fmt = self._geo_fmt
+
+                # If an SRID needs to specified other than what is in the field
+                # (like when `transform` is called), make sure to explicitly set
+                # the SRID by returning EWKT.
+                if self._ewkt and oracle:
+                    sel_fmt = "'SRID=%d;'||%s" % (self._ewkt, sel_fmt)
+            else:
+                sel_fmt = '%s'
                 
             # Getting the field selection substitution string
             if f.column in self._custom_select:
@@ -147,7 +171,7 @@ class GeoQuerySet(QuerySet):
             sql.append("ORDER BY " + ", ".join(order_by))
 
         # LIMIT and OFFSET clauses
-        if SPATIAL_BACKEND != 'oracle':
+        if not oracle:
             if self._limit is not None:
                 sql.append("%s " % connection.ops.limit_offset_sql(self._limit, self._offset))
             else:
@@ -206,6 +230,7 @@ class GeoQuerySet(QuerySet):
     def _clone(self, klass=None, **kwargs):
         c = super(GeoQuerySet, self)._clone(klass, **kwargs)
         c._custom_select = self._custom_select
+        c._ewkt = self._ewkt
         return c
 
     #### Methods specific to the GeoQuerySet ####
@@ -227,7 +252,60 @@ class GeoQuerySet(QuerySet):
         else:
             return False
 
-    def gml(self, field_name, precision=8, version=2):
+    def _get_geofield(self):
+        "Returns the name of the first Geometry field encountered."
+        for field in self.model._meta.fields:
+            if isinstance(field, GeometryField): 
+                return field.name
+        raise Exception('No GeometryFields in the model.')
+
+    def distance(self, *args, **kwargs):
+        """
+        Returns the distance from the given geographic field name to the
+        given geometry in a `distance` attribute on each element of the
+        GeoQuerySet.
+        """
+        if not DISTANCE:
+            raise ImproperlyConfigured('Distance() stored proecedure not available.')
+
+        # Getting the geometry field and GEOSGeometry object to base distance 
+        # calculations from.
+        nargs = len(args)
+        if nargs == 1:
+            field_name = self._get_geofield()
+            geom = args[0]
+        elif nargs == 2:
+            field_name, geom = args
+        else:
+            raise ValueError('Maximum two arguments allowed for `distance` aggregate.')
+
+        # Getting the quoted column.
+        field_col = self._geo_column(field_name)
+        if not field_col:
+            raise TypeError('Distance output only available on GeometryFields.')
+
+        # Getting the geographic field instance.
+        geo_field = self.model._meta.get_field(field_name)
+
+        # Using the field's get_db_prep_lookup() to get any needed 
+        # transformation SQL -- we pass in a 'dummy' `contains` lookup
+        # type.
+        geom_sql = geo_field.get_db_prep_lookup('contains', geom)
+        if oracle:
+            # The `tolerance` keyword may be used for Oracle.
+            tolerance = kwargs.get('tolerance', 0.05)
+
+            # More legwork here because the OracleSpatialAdaptor doesn't do
+            # quoting of the WKT.
+            params = ["'%s'" % geom_sql.params[0]]
+            params.extend(geom_sql.params[1:])
+            gsql = geom_sql.where[0] % tuple(params)
+            dist_select = {'distance' : '%s(%s, %s, %s)' % (DISTANCE, field_col, gsql, tolerance)}
+        else:
+            dist_select = {'distance' : '%s(%s, %s)' % (DISTANCE, field_col, geom_sql)}
+        return self.extra(select=dist_select)
+
+    def gml(self, field_name=None, precision=8, version=2):
         """
         Returns GML representation of the given field in a `gml` attribute
         on each element of the GeoQuerySet.
@@ -236,12 +314,16 @@ class GeoQuerySet(QuerySet):
         if not ASGML:
             raise ImproperlyConfigured('AsGML() stored procedure not available.')
 
-        # Is the given field name a geographic field?
+        # If no field name explicitly given, get the first GeometryField from
+        # the model.
+        if not field_name:
+            field_name = self._get_geofield()
+
         field_col = self._geo_column(field_name)
         if not field_col:
-            raise TypeError('GML output only available on GeometryFields')
-
-        if SPATIAL_BACKEND == 'oracle':
+            raise TypeError('GML output only available on GeometryFields.')
+        
+        if oracle:
             gml_select = {'gml':'%s(%s)' % (ASGML, field_col)}
         else:
             gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)}
@@ -249,7 +331,7 @@ class GeoQuerySet(QuerySet):
         # Adding GML function call to SELECT part of the SQL.
         return self.extra(select=gml_select)
 
-    def kml(self, field_name, precision=8):
+    def kml(self, field_name=None, precision=8):
         """
         Returns KML representation of the given field name in a `kml` 
         attribute on each element of the GeoQuerySet.
@@ -258,7 +340,10 @@ class GeoQuerySet(QuerySet):
         if not ASKML:
             raise ImproperlyConfigured('AsKML() stored procedure not available.')
 
-        # Is the given field name a geographic field?
+        # Getting the geographic field.
+        if not field_name:
+            field_name = self._get_geofield()
+
         field_col = self._geo_column(field_name)
         if not field_col:
             raise TypeError('KML output only available on GeometryFields.')
@@ -266,30 +351,40 @@ class GeoQuerySet(QuerySet):
         # Adding the AsKML function call to SELECT part of the SQL.
         return self.extra(select={'kml':'%s(%s,%s)' % (ASKML, field_col, precision)})
 
-    def transform(self, field_name, srid=4326):
+    def transform(self, field_name=None, srid=4326):
         """
         Transforms the given geometry field to the given SRID.  If no SRID is
         provided, the transformation will default to using 4326 (WGS84).
         """
-        # Is the given field name a geographic field?
+        # Getting the geographic field.
+        if not field_name:
+            field_name = self._get_geofield()
+        elif isinstance(field_name, int):
+            srid = field_name
+            field_name = self._get_geofield()
+
         field = self.model._meta.get_field(field_name)
         if not isinstance(field, GeometryField):
             raise TypeError('%s() only available for GeometryFields' % TRANSFORM)
 
-        # If there's already custom select SQL.
+        # Why cascading substitutions? Because spatial backends like
+        # Oracle and MySQL already require a function call to convert to text, thus
+        # when there's also a transformation we need to cascade the substitutions.
+        # For example, 'SDO_UTIL.TO_WKTGEOMETRY(SDO_CS.TRANSFORM( ... )'
         col = self._custom_select.get(field.column, self._field_column(field))
 
         # Setting the key for the field's column with the custom SELECT SQL to 
-        #  override the geometry column returned from the database.
-        if SPATIAL_BACKEND == 'oracle':
+        # override the geometry column returned from the database.
+        if oracle:
             custom_sel = '%s(%s, %s)' % (TRANSFORM, col, srid)
+            self._ewkt = srid
         else:
             custom_sel = '(%s(%s, %s)) AS %s' % \
                          (TRANSFORM, col, srid, connection.ops.quote_name(field.column))
         self._custom_select[field.column] = custom_sel
         return self._clone()
 
-    def union(self, field_name, tolerance=0.0005):
+    def union(self, field_name=None, tolerance=0.0005):
         """
         Performs an aggregate union on the given geometry field.  Returns
         None if the GeoQuerySet is empty.  The `tolerance` keyword is for
@@ -300,6 +395,9 @@ class GeoQuerySet(QuerySet):
             raise ImproperlyConfigured('Union stored procedure not available.')
 
         # Getting the geographic field column
+        if not field_name:
+            field_name = self._get_geofield()
+
         field_col = self._geo_column(field_name)
         if not field_col:
             raise TypeError('Aggregate Union only available on GeometryFields.')
@@ -312,7 +410,7 @@ class GeoQuerySet(QuerySet):
 
         # Replacing the select with a call to the ST_Union stored procedure
         #  on the geographic field column.
-        if SPATIAL_BACKEND == 'oracle':
+        if oracle:
             union_sql = 'SELECT %s' % self._geo_fmt
             union_sql = union_sql % ('%s(SDOAGGRTYPE(%s,%s))' % (UNION, field_col, tolerance))
             union_sql += sql
@@ -323,7 +421,7 @@ class GeoQuerySet(QuerySet):
         cursor = connection.cursor()
         cursor.execute(union_sql, params)
 
-        if SPATIAL_BACKEND == 'oracle':
+        if oracle:
             # On Oracle have to read out WKT from CLOB first.
             clob = cursor.fetchone()[0]
             if clob: u = clob.read()
