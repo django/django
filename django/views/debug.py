@@ -142,9 +142,9 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'request': request,
         'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
-        'sys_executable' : sys.executable,
-        'sys_version_info' : '%d.%d.%d' % sys.version_info[0:3],
-        'django_version_info' : get_version(),
+        'sys_executable': sys.executable,
+        'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
+        'django_version_info': get_version(),
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -230,8 +230,8 @@ TECHNICAL_500_TEMPLATE = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta name="robots" content="NONE,NOARCHIVE" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="robots" content="NONE,NOARCHIVE">
   <title>{{ exception_type }} at {{ request.path|escape }}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
@@ -460,10 +460,10 @@ TECHNICAL_500_TEMPLATE = """
   {% endautoescape %}
   <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
   <div id="pastebinTraceback" class="pastebin">
-    <input type="hidden" name="language" value="PythonConsole" />
-    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path|escape }}" />
-    <input type="hidden" name="source" value="Django Dpaste Agent" />
-    <input type="hidden" name="poster" value="Django" />
+    <input type="hidden" name="language" value="PythonConsole">
+    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path|escape }}">
+    <input type="hidden" name="source" value="Django Dpaste Agent">
+    <input type="hidden" name="poster" value="Django">
     <textarea name="content" id="traceback_area" cols="140" rows="25">
 Environment:
 
@@ -498,9 +498,9 @@ Traceback:
 Exception Type: {{ exception_type|escape }} at {{ request.path|escape }}
 Exception Value: {{ exception_value|escape }}
 </textarea>
-  <br/><br/>
+  <br><br>
+  <input type="submit" value="Post this traceback to a public Web site, for sharing with others">
   </div>
-<input type="submit" value="Send to DPaste"> 
 </form>
 </div>
 
@@ -627,9 +627,9 @@ TECHNICAL_404_TEMPLATE = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Page not found at {{ request.path|escape }}</title>
-  <meta name="robots" content="NONE,NOARCHIVE" />
+  <meta name="robots" content="NONE,NOARCHIVE">
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
