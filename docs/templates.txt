@@ -565,17 +565,17 @@ autoescape
 
 **New in Django development version**
 
-Control the current auto-escaping behaviour. This tag takes either ``on`` or
+Control the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block.
 
 When auto-escaping is in effect, all variable content has HTML escaping applied
 to it before placing the result into the output (but after any filters have
 been applied). This is equivalent to manually applying the ``escape`` filter
-attached to each variable.
+to each variable.
 
-The only exceptions are variables that are already marked as 'safe' from
-escaping, either by the code that populated the variable, or because it has
+The only exceptions are variables that are already marked as "safe" from
+escaping, either by the code that populated the variable, or because it has had
 the ``safe`` or ``escape`` filters applied.
 
 block

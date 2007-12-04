@@ -69,9 +69,9 @@ Adds a few conveniences for perfectionists:
   have a valid urlpattern for ``foo.com/bar``, and do have a valid urlpattern
   for ``foo.com/bar/``.
 
-  **New in Django development version:** The behaviour of ``APPEND_SLASH`` has
-  changed slightly in the development version (it didn't used to check to see
-  if the pattern was matched in the URL patterns).
+  **New in Django development version:** The behavior of ``APPEND_SLASH`` has
+  changed slightly in the development version. It didn't used to check to see
+  whether the pattern was matched in the URLconf.
 
   If ``PREPEND_WWW`` is ``True``, URLs that lack a leading "www." will be
   redirected to the same URL with a leading "www."
