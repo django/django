@@ -417,17 +417,21 @@ site manager(s).
 DEFAULT_TABLESPACE
 ------------------
 
+**New in Django development version**
+
 Default: ``''`` (Empty string)
 
-Default tablespace to use for models that do not specify one, if the
+Default tablespace to use for models that don't specify one, if the
 backend supports it.
 
 DEFAULT_INDEX_TABLESPACE
 ------------------------
 
+**New in Django development version**
+
 Default: ``''`` (Empty string)
 
-Default tablespace to use for indexes on fields that do not specify
+Default tablespace to use for indexes on fields that don't specify
 one, if the backend supports it.
 
 DISALLOWED_USER_AGENTS
