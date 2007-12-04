@@ -29,7 +29,7 @@ except:
 # to prevent potentially malicious input from reaching the underlying C
 # library.  Not a substitute for good web security programming practices.
 hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
-wkt_regex = re.compile(r'^(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+$', re.I)
+wkt_regex = re.compile(r'^(SRID=(?P<srid>\d+);)?(?P<wkt>(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+)$', re.I)
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
@@ -57,11 +57,13 @@ class GEOSGeometry(object):
             if hex_regex.match(geo_input):
                 # If the regex matches, the geometry is in HEX form.
                 g = from_hex(geo_input, len(geo_input))
-            elif wkt_regex.match(geo_input):
-                # Otherwise, the geometry is in WKT form.
-                g = from_wkt(geo_input)
             else:
-                raise ValueError('String or unicode input unrecognized as WKT or HEXEWKB.')
+                m = wkt_regex.match(geo_input)
+                if m:
+                    if m.group('srid'): srid = int(m.group('srid'))
+                    g = from_wkt(m.group('wkt'))
+                else:
+                    raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geomtry (GEOM_PTR).
             g = geo_input
@@ -304,6 +306,12 @@ class GEOSGeometry(object):
 
     #### Output Routines ####
     @property
+    def ewkt(self):
+        "Returns the EWKT (WKT + SRID) of the Geometry."
+        if self.get_srid(): return 'SRID=%s;%s' % (self.srid, self.wkt)
+        else: return self.wkt
+
+    @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) of the Geometry."
         return to_wkt(self._ptr)
@@ -355,6 +363,22 @@ class GEOSGeometry(object):
     def crs(self):
         "Alias for `srs` property."
         return self.srs
+
+    def transform(self, ct):
+        "Transforms this Geometry; only works with GDAL."
+        srid = self.srid
+        if HAS_GDAL and srid:
+            g = OGRGeometry(self.wkb, srid)
+            g.transform(ct)
+            wkb = str(g.wkb)
+            ptr = from_wkb(wkb, len(wkb))
+            if ptr:
+                # Reassigning pointer, and resetting the SRID.
+                destroy_geom(self._ptr)
+                self._ptr = ptr
+                self.srid = g.srid
+        else:
+            pass
 
     #### Topology Routines ####
     def _topology(self, gptr):

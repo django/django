@@ -78,6 +78,16 @@ class GEOSTest(unittest.TestCase):
             # we need to do this so decimal places get normalised
             geom_t = fromstr(g.wkt)
             self.assertEqual(geom_t.wkt, geom_h.wkt)
+
+    def test01h_ewkt(self):
+        "Testing EWKT."
+        srid = 32140
+        for p in polygons:
+            ewkt = 'SRID=%d;%s' % (srid, p.wkt)
+            poly = fromstr(ewkt)
+            self.assertEqual(srid, poly.srid)
+            self.assertEqual(srid, poly.shell.srid)
+            self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
     
     def test02a_points(self):
         "Testing Point objects."
