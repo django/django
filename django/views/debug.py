@@ -499,7 +499,7 @@ Exception Type: {{ exception_type|escape }} at {{ request.path|escape }}
 Exception Value: {{ exception_value|escape }}
 </textarea>
   <br><br>
-  <input type="submit" value="Post this traceback to a public Web site, for sharing with others">
+  <input type="submit" value="Share this traceback on public Web site">
   </div>
 </form>
 </div>
