@@ -331,7 +331,7 @@ class HttpResponse(object):
         chunk = self._iterator.next()
         if isinstance(chunk, unicode):
             chunk = chunk.encode(self._charset)
-        return chunk
+        return str(chunk)
 
     def close(self):
         if hasattr(self._container, 'close'):
