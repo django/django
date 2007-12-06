@@ -1,4 +1,6 @@
-"""
+from django.conf import settings
+
+WIDGET_TESTS = """
 >>> from datetime import datetime
 >>> from django.utils.html import escape, conditional_escape
 >>> from django.contrib.admin.widgets import FilteredSelectMultiple, AdminSplitDateTime
@@ -16,7 +18,7 @@ HTML escaped.
 >>> w = FilteredSelectMultiple('test', False)
 >>> print conditional_escape(w.render('test', 'test'))
 <select multiple="multiple" name="test">
-</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "/media/"); });</script>
+</select><script type="text/javascript">addEvent(window, "load", function(e) {SelectFilter.init("id_test", "test", 0, "%(ADMIN_MEDIA_PREFIX)s"); });</script>
 <BLANKLINE>
 
 >>> w = AdminSplitDateTime()
@@ -25,11 +27,14 @@ HTML escaped.
 
 >>> w = AdminFileWidget()
 >>> print conditional_escape(w.render('test', 'test'))
-Currently: <a target="_blank" href="test">test</a> <br>Change: <input type="file" name="test" />
+Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br>Change: <input type="file" name="test" />
 
 >>> rel = LogEntry._meta.get_field('user').rel
 >>> w = ForeignKeyRawIdWidget(rel)
 >>> print conditional_escape(w.render('test', 'test', attrs={}))
-<input type="text" name="test" value="test" class="vForeignKeyRawIdAdminField" /><a href="../../../auth/user/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="/media/img/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
+<input type="text" name="test" value="test" class="vForeignKeyRawIdAdminField" /><a href="../../../auth/user/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
 
-"""
+""" % {
+    'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
+    'MEDIA_URL': settings.MEDIA_URL
+}
