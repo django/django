@@ -382,6 +382,10 @@ database, so we need to be able to process strings and ``Hand`` instances in
 Notice that we always return a ``Hand`` instance from this method. That's the
 Python object type we want to store in the model's attribute.
 
+**Remember:** If your custom field needs the ``to_python()`` method to be
+called when it is created, you should be using `The SubfieldBase metaclass`_
+mentioned earlier. Otherwise ``to_python()`` won't be called automatically.
+
 ``get_db_prep_save(self, value)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
