@@ -80,6 +80,12 @@ class Cover(models.Model):
     def __unicode__(self):
         return self.title
 
+class Number(models.Model):
+    num = models.IntegerField()
+
+    def __unicode__(self):
+        return unicode(self.num)
+
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
 class X(models.Model):
@@ -154,6 +160,13 @@ will be rank3, rank2, rank1.
 >>> c2 = Cover(title="second", item=i2)
 >>> c2.save()
 
+>>> n1 = Number(num=4)
+>>> n1.save()
+>>> n2 = Number(num=8)
+>>> n2.save()
+>>> n3 = Number(num=12)
+>>> n3.save()
+
 Bug #1050
 >>> Item.objects.filter(tags__isnull=True)
 [<Item: three>]
@@ -198,6 +211,24 @@ Bug #2080, #3592
 [<Author: a1>, <Author: a3>]
 >>> Author.objects.filter(Q(item__name='three') | Q(report__name='r3'))
 [<Author: a2>]
+
+Bug #4289
+A slight variation on the above theme: restricting the choices by the lookup
+constraints.
+>>> Number.objects.filter(num__lt=4)
+[]
+>>> Number.objects.filter(num__gt=8, num__lt=12)
+[]
+>>> Number.objects.filter(num__gt=8, num__lt=13)
+[<Number: 12>]
+>>> Number.objects.filter(Q(num__lt=4) | Q(num__gt=8, num__lt=12))
+[]
+>>> Number.objects.filter(Q(num__gt=8, num__lt=12) | Q(num__lt=4))
+[]
+>>> Number.objects.filter(Q(num__gt=8) & Q(num__lt=12) | Q(num__lt=4))
+[]
+>>> Number.objects.filter(Q(num__gt=7) & Q(num__lt=12) | Q(num__lt=4))
+[<Number: 8>]
 
 Bug #6074
 Merging two empty result sets shouldn't leave a queryset with no constraints
@@ -427,5 +458,6 @@ order_by() and filter() calls.
 # Filter those items that have exactly one tag attached.
 >>> Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).filter(count=1)
 [<Item: four>]
+
 """}
 
