@@ -129,7 +129,7 @@ __test__ = {'API_TESTS':"""
 >>> pea.genus.family.order.klass.phylum.kingdom.domain
 <Domain: Eukaryota>
 
-# Notice: one few query than above because of depth=1
+# Notice: one fewer queries than above because of depth=1
 >>> len(db.connection.queries)
 7
 
@@ -151,6 +151,38 @@ __test__ = {'API_TESTS':"""
 >>> s.id + 10 == s.a
 True
 
-# Reset DEBUG to where we found it.
+# The optional fields passed to select_related() control which related models
+# we pull in. This allows for smaller queries and can act as an alternative
+# (or, in addition to) the depth parameter.
+
+# In the next two cases, we explicitly say to select the 'genus' and
+# 'genus.family' models, leading to the same number of queries as before.
+>>> db.reset_queries()
+>>> world = Species.objects.select_related('genus__family')
+>>> [o.genus.family for o in world]
+[<Family: Drosophilidae>, <Family: Hominidae>, <Family: Fabaceae>, <Family: Amanitacae>]
+>>> len(db.connection.queries)
+1
+
+>>> db.reset_queries()
+>>> world = Species.objects.filter(genus__name='Amanita').select_related('genus__family')
+>>> [o.genus.family.order for o in world]
+[<Order: Agaricales>]
+>>> len(db.connection.queries)
+2
+
+>>> db.reset_queries()
+>>> Species.objects.all().select_related('genus__family__order').order_by('id')[0:1].get().genus.family.order.name
+u'Diptera'
+>>> len(db.connection.queries)
+1
+
+# Specifying both "depth" and fields is an error.
+>>> Species.objects.select_related('genus__family__order', depth=4)
+Traceback (most recent call last):
+...
+TypeError: Cannot pass both "depth" and fields to select_related()
+
+# Reser DEBUG to where we found it.
 >>> settings.DEBUG = False
 """}

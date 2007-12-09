@@ -636,15 +636,15 @@ class Query(object):
         return alias
 
     def fill_related_selections(self, opts=None, root_alias=None, cur_depth=1,
-            used=None):
+            used=None, requested=None, restricted=None):
         """
         Fill in the information needed for a select_related query. The current
-        "depth" is measured as the number of connections away from the root
-        model (cur_depth == 1 means we are looking at models with direct
+        depth is measured as the number of connections away from the root model
+        (for example, cur_depth=1 means we are looking at models with direct
         connections to the root model).
         """
-        if self.max_depth and cur_depth > self.max_depth:
-            # We've recursed too deeply; bail out.
+        if not restricted and self.max_depth and cur_depth > self.max_depth:
+            # We've recursed far enough; bail out.
             return
         if not opts:
             opts = self.model._meta
@@ -653,8 +653,18 @@ class Query(object):
         if not used:
             used = []
 
+        # Setup for the case when only particular related fields should be
+        # included in the related selection.
+        if requested is None and restricted is not False:
+            if isinstance(self.select_related, dict):
+                requested = self.select_related
+                restricted = True
+            else:
+                restricted = False
+
         for f in opts.fields:
-            if not f.rel or f.null:
+            if (not f.rel or (restricted and f.name not in requested) or
+                    (not restricted and f.null)):
                 continue
             table = f.rel.to._meta.db_table
             alias = self.join((root_alias, table, f.column,
@@ -662,8 +672,12 @@ class Query(object):
             used.append(alias)
             self.select.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
+            if restricted:
+                next = requested.get(f.name, {})
+            else:
+                next = False
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
-                    used)
+                    used, next, restricted)
 
     def add_filter(self, filter_expr, connector=AND, negate=False):
         """
@@ -1005,6 +1019,19 @@ class Query(object):
             self.distinct = False
         self.select = [select]
         self.extra_select = SortedDict()
+
+    def add_select_related(self, fields):
+        """
+        Sets up the select_related data structure so that we only select
+        certain related models (as opposed to all models, when
+        self.select_related=True).
+        """
+        field_dict = {}
+        for field in fields:
+            d = field_dict
+            for part in field.split(LOOKUP_SEP):
+                d = d.setdefault(part, {})
+        self.select_related = field_dict
 
     def execute_sql(self, result_type=MULTI):
         """

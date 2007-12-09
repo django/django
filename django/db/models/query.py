@@ -85,13 +85,17 @@ class _QuerySet(object):
         database.
         """
         fill_cache = self.query.select_related
+        if isinstance(fill_cache, dict):
+            requested = fill_cache
+        else:
+            requested = None
         max_depth = self.query.max_depth
         index_end = len(self.model._meta.fields)
         extra_select = self.query.extra_select.keys()
         for row in self.query.results_iter():
             if fill_cache:
-                obj, index_end = get_cached_row(klass=self.model, row=row,
-                        index_start=0, max_depth=max_depth)
+                obj, index_end = get_cached_row(self.model, row, 0, max_depth,
+                        requested=requested)
             else:
                 obj = self.model(*row[:index_end])
             for i, k in enumerate(extra_select):
@@ -298,10 +302,25 @@ class _QuerySet(object):
         else:
             return self._filter_or_exclude(None, **filter_obj)
 
-    def select_related(self, true_or_false=True, depth=0):
-        """Returns a new QuerySet instance that will select related objects."""
+    def select_related(self, *fields, **kwargs):
+        """
+        Returns a new QuerySet instance that will select related objects. If
+        fields are specified, they must be ForeignKey fields and only those
+        related objects are included in the selection.
+        """
+        depth = kwargs.pop('depth', 0)
+        # TODO: Remove this? select_related(False) isn't really useful.
+        true_or_false = kwargs.pop('true_or_false', True)
+        if kwargs:
+            raise TypeError('Unexpected keyword arguments to select_related: %s'
+                    % (kwargs.keys(),))
         obj = self._clone()
-        obj.query.select_related = true_or_false
+        if fields:
+            if depth:
+                raise TypeError('Cannot pass both "depth" and fields to select_related()')
+            obj.query.add_select_related(fields)
+        else:
+            obj.query.select_related = true_or_false
         if depth:
             obj.query.max_depth = depth
         return obj
@@ -370,7 +389,7 @@ else:
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
         super(ValuesQuerySet, self).__init__(*args, **kwargs)
-        # select_related isn't supported in values().
+        # select_related isn't supported in values(). (FIXME -#3358)
         self.query.select_related = False
 
         # QuerySet.clone() will also set up the _fields attribute with the
@@ -490,18 +509,26 @@ class QOperator(Q):
 
 QOr = QAnd = QOperator
 
-def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0):
+def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
+        requested=None):
     """Helper function that recursively returns an object with cache filled"""
 
-    # If we've got a max_depth set and we've exceeded that depth, bail now.
-    if max_depth and cur_depth > max_depth:
+    if max_depth and requested is None and cur_depth > max_depth:
+        # We've recursed deeply enough; stop now.
         return None
 
+    restricted = requested is not None
     index_end = index_start + len(klass._meta.fields)
     obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
-        if f.rel and not f.null:
-            cached_row = get_cached_row(f.rel.to, row, index_end, max_depth, cur_depth+1)
+        if f.rel and ((not restricted and not f.null) or
+                (restricted and f.name in requested)):
+            if restricted:
+                next = requested[f.name]
+            else:
+                next = None
+            cached_row = get_cached_row(f.rel.to, row, index_end, max_depth,
+                    cur_depth+1, next)
             if cached_row:
                 rel_obj, index_end = cached_row
                 setattr(obj, f.get_cache_name(), rel_obj)
