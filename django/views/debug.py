@@ -1,9 +1,12 @@
+import os
+import re
+import sys
+
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode
-import os, re, sys
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
@@ -476,9 +479,9 @@ Request Method: {{ request.META.REQUEST_METHOD }}
 Request URL: {{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path|escape }}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
-Installed Applications: 
+Installed Applications:
    {{ settings.INSTALLED_APPS|pprint }}
-Installed Middleware: 
+Installed Middleware:
    {{ settings.MIDDLEWARE_CLASSES|pprint }}
 
 {% if template_does_not_exist %}Template Loader Error:
