@@ -145,6 +145,7 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'sys_executable': sys.executable,
         'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
         'django_version_info': get_version(),
+        'sys_path' : sys.path,
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -367,6 +368,10 @@ TECHNICAL_500_TEMPLATE = """
     <tr>
       <th>Python Version:</th>
       <td>{{ sys_version_info }}</td>
+    </tr>
+    <tr>
+      <th>Python Path:</th>
+      <td>{{ sys_path }}</td>
     </tr>
   </table>
 </div>
