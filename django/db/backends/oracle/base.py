@@ -455,6 +455,23 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         else:
             return tuple([smart_str(p, self.charset, True) for p in params])
 
+    def _guess_input_sizes(self, params_list):
+        # Mark any string parameter greater than 4000 characters as an NCLOB.
+        if isinstance(params_list[0], dict):
+            sizes = {}
+            iterators = [params.iteritems() for params in params_list]
+        else:
+            sizes = [None] * len(params_list[0])
+            iterators = [enumerate(params) for params in params_list]
+        for iterator in iterators:
+            for key, value in iterator:
+                if isinstance(value, basestring) and len(value) > 4000:
+                    sizes[key] = Database.NCLOB
+        if isinstance(sizes, dict):
+            self.setinputsizes(**sizes)
+        else:
+            self.setinputsizes(*sizes)
+
     def execute(self, query, params=None):
         if params is None:
             params = []
@@ -468,6 +485,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         if query.endswith(';') or query.endswith('/'):
             query = query[:-1]
         query = smart_str(query, self.charset) % tuple(args)
+        self._guess_input_sizes([params])
         return Database.Cursor.execute(self, query, params)
 
     def executemany(self, query, params=None):
@@ -484,6 +502,7 @@ class FormatStylePlaceholderCursor(Database.Cursor):
             query = query[:-1]
         query = smart_str(query, self.charset) % tuple(args)
         new_param_list = [self._format_params(i) for i in params]
+        self._guess_input_sizes(new_param_list)
         return Database.Cursor.executemany(self, query, new_param_list)
 
     def fetchone(self):
