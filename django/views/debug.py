@@ -480,9 +480,9 @@ Request URL: {{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.pat
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
 Installed Applications:
-   {{ settings.INSTALLED_APPS|pprint }}
+{{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-   {{ settings.MIDDLEWARE_CLASSES|pprint }}
+{{ settings.MIDDLEWARE_CLASSES|pprint }}
 
 {% if template_does_not_exist %}Template Loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
