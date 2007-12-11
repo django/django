@@ -7,7 +7,7 @@ from django.contrib.gis.gdal.error import OGRException
 try:
     from django.conf import settings
     lib_name = settings.GDAL_LIBRARY_PATH
-except (AttributeError, EnvironmentError):
+except (AttributeError, EnvironmentError, ImportError):
     lib_name = None
 
 if lib_name:
@@ -15,7 +15,6 @@ if lib_name:
 elif os.name == 'nt':
     # Windows NT shared library
     lib_name = 'libgdal-1.dll'
-    errcheck_flag = False
 elif os.name == 'posix':
     platform = os.uname()[0]
     if platform == 'Darwin':
@@ -24,7 +23,6 @@ elif os.name == 'posix':
     else: 
         # Attempting to use .so extension for all other platforms.
         lib_name = 'libgdal.so'
-    errcheck_flag = True
 else:
     raise OGRException('Unsupported OS "%s"' % os.name)
 

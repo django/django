@@ -1,5 +1,5 @@
 from ctypes import c_char_p, c_int, c_void_p, POINTER
-from django.contrib.gis.gdal.libgdal import lgdal, errcheck_flag
+from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.generation import \
     const_string_output, double_output, int_output, \
     srs_output, string_output, void_output
@@ -22,8 +22,8 @@ def units_func(f):
 # Creation & destruction.
 clone_srs = srs_output(lgdal.OSRClone, [c_void_p])
 new_srs = srs_output(lgdal.OSRNewSpatialReference, [c_char_p])
-release_srs = void_output(lgdal.OSRRelease, [c_void_p], errcheck=errcheck_flag)
-destroy_srs = void_output(lgdal.OSRDestroySpatialReference, [c_void_p], errcheck=errcheck_flag)
+release_srs = void_output(lgdal.OSRRelease, [c_void_p], errcheck=False)
+destroy_srs = void_output(lgdal.OSRDestroySpatialReference, [c_void_p], errcheck=False)
 srs_validate = void_output(lgdal.OSRValidate, [c_void_p])
 
 # Getting the semi_major, semi_minor, and flattening functions.
@@ -68,4 +68,4 @@ isprojected = int_output(lgdal.OSRIsProjected, [c_void_p])
 
 # Coordinate transformation
 new_ct= srs_output(lgdal.OCTNewCoordinateTransformation, [c_void_p, c_void_p])
-destroy_ct = void_output(lgdal.OCTDestroyCoordinateTransformation, [c_void_p], errcheck=errcheck_flag)
+destroy_ct = void_output(lgdal.OCTDestroyCoordinateTransformation, [c_void_p], errcheck=False)
