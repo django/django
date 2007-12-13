@@ -3,7 +3,7 @@ from ctypes import byref
 
 # Other GDAL imports.
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError
+from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.geometries import OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference
@@ -99,10 +99,10 @@ class Layer(object):
     @property
     def srs(self):
         "Returns the Spatial Reference used in this Layer."
-        ptr = get_layer_srs(self._ptr)
-        if ptr:
+        try:
+            ptr = get_layer_srs(self._ptr)
             return SpatialReference(clone_srs(ptr))
-        else:
+        except SRSException:
             return None
 
     @property
