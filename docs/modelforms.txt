@@ -24,12 +24,11 @@ For example::
     ...         model = Article
 
     # Creating a form to add an article.
-    >>> article = Article()
-    >>> form = ArticleForm(article)
+    >>> form = ArticleForm()
 
     # Creating a form to change an existing article.
     >>> article = Article.objects.get(pk=1)
-    >>> form = ArticleForm(article)
+    >>> form = ArticleForm(instance=article)
 
 Field types
 -----------
@@ -166,17 +165,22 @@ we'll discuss in a moment.)::
 The ``save()`` method
 ---------------------
 
-Every form produced by ``ModelForm`` also has a ``save()`` method. This
-method creates and saves a database object from the data bound to the form.
-A subclass of ``ModelForm`` also requires a model instance as the first
-arument to its constructor. For example::
+Every form produced by ``ModelForm`` also has a ``save()``
+method. This method creates and saves a database object from the data
+bound to the form. A subclass of ``ModelForm`` can accept an existing
+model instance as the keyword argument ``instance``; if this is
+supplied, ``save()`` will update that instance. If it's not supplied,
+``save()`` will create a new instance of the specified model::
 
     # Create a form instance from POST data.
-    >>> a = Article()
-    >>> f = ArticleForm(a, request.POST)
+    >>> f = ArticleForm(request.POST)
 
     # Save a new Article object from the form's data.
     >>> new_article = f.save()
+
+    # Create a form to edit an existing Article.
+    >>> a = Article.objects.get(pk=1)
+    >>> f = ArticleForm(instance=a)
 
 Note that ``save()`` will raise a ``ValueError`` if the data in the form
 doesn't validate -- i.e., ``if form.errors``.
@@ -201,8 +205,7 @@ you've manually saved the instance produced by the form, you can invoke
 ``save_m2m()`` to save the many-to-many form data. For example::
 
     # Create a form instance with POST data.
-    >>> a = Author()
-    >>> f = AuthorForm(a, request.POST)
+    >>> f = AuthorForm(request.POST)
 
     # Create, but don't save the new author instance.
     >>> new_author = f.save(commit=False)
@@ -277,7 +280,7 @@ model fields:
     manually set anyextra required fields::
     
         instance = Instance(required_field='value')
-        form = InstanceForm(instance, request.POST)
+        form = InstanceForm(request.POST, instance=instance)
         new_instance = form.save()
 
         instance = form.save(commit=False)

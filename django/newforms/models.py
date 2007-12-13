@@ -262,11 +262,16 @@ class ModelFormMetaclass(type):
         return type.__new__(cls, name, bases, attrs)
 
 class BaseModelForm(BaseForm):
-    def __init__(self, instance, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':'):
-        self.instance = instance
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':', instance=None):
         opts = self._meta
-        object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        if instance is None:
+            # if we didn't get an instance, instantiate a new one
+            self.instance = opts.model()
+            object_data = {}
+        else:
+            self.instance = instance
+            object_data = model_to_dict(instance, opts.fields, opts.exclude)
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)
