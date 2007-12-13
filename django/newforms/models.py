@@ -245,14 +245,14 @@ class ModelFormMetaclass(type):
 
         # If a model is defined, extract form fields from it and add them to base_fields
         if attrs['_meta'].model is not None:
-            # Don't allow a subclass to define a Meta model if a parent class has.
-            # Technically the right fields would be generated, but the save 
-            # method will not deal with more than one model.
+            # Don't allow a subclass to define a different Meta model than a
+            # parent class has. Technically the right fields would be generated,
+            # but the save method will not deal with more than one model.
             for base in bases:
                 base_opts = getattr(base, '_meta', None)
                 base_model = getattr(base_opts, 'model', None)
-                if base_model is not None:
-                    raise ImproperlyConfigured('%s defines more than one model.' % name)
+                if base_model and base_model is not opts.model:
+                    raise ImproperlyConfigured('%s defines a different model than its parent.' % name)
             model_fields = fields_for_model(opts.model, opts.fields, opts.exclude)
             # fields declared in base classes override fields from the model
             model_fields.update(declared_fields)

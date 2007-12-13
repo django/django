@@ -143,7 +143,7 @@ familiar with the mechanics.
 ...         model = Article
 Traceback (most recent call last):
 ...
-ImproperlyConfigured: BadForm defines more than one model.
+ImproperlyConfigured: BadForm defines a different model than its parent.
 
 >>> class ArticleForm(ModelForm):
 ...     class Meta:
@@ -154,6 +154,12 @@ ImproperlyConfigured: BadForm defines more than one model.
 Traceback (most recent call last):
 ...
 ImproperlyConfigured: BadForm's base classes define more than one model.
+
+This one is OK since the subclass specifies the same model as the parent.
+
+>>> class SubCategoryForm(CategoryForm):
+...     class Meta:
+...         model = Category
 
 
 # Old form_for_x tests #######################################################
