@@ -3,9 +3,12 @@ from copy import copy
 from unittest import TestSuite, TextTestRunner
 from django.contrib.gis.gdal import HAS_GDAL
 try:
-    from django.contrib.gis.tests.utils import mysql, oracle
+    from django.contrib.gis.tests.utils import mysql, oracle, postgis
 except:
-    mysql, oracle = (False, False)
+    mysql, oracle, postgis = (False, False, False)
+from django.contrib.gis.utils import HAS_GEOIP
+from django.conf import settings
+if not settings._target: settings.configure()
 
 # Tests that require use of a spatial database (e.g., creation of models)
 test_models = ['geoapp']
@@ -20,8 +23,9 @@ if HAS_GDAL:
         # TODO: There is a problem with the `syncdb` SQL for the LayerMapping
         # tests on Oracle.
         test_models += ['distapp']
-    else:
+    elif postgis:
         test_models += ['distapp', 'layermap']
+
     test_suite_names += [
         'test_gdal_driver',
         'test_gdal_ds',
@@ -32,6 +36,10 @@ if HAS_GDAL:
         ]
 else:
     print >>sys.stderr, "GDAL not available - no GDAL tests will be run."
+
+if HAS_GEOIP:
+    if hasattr(settings, 'GEOIP_PATH'):
+        test_suite_names.append('test_geoip')
 
 def suite():
     "Builds a test suite for the GIS package."
@@ -77,7 +85,6 @@ def run_tests(module_list, verbosity=1, interactive=True):
 
     Finally, the tests may be run by invoking `./manage.py test`.
     """
-    from django.conf import settings
     from django.contrib.gis.db.backend import create_spatial_db
     from django.db import connection
     from django.test.utils import destroy_test_db
@@ -86,9 +93,12 @@ def run_tests(module_list, verbosity=1, interactive=True):
     old_debug = settings.DEBUG
     old_name = copy(settings.DATABASE_NAME)
     old_installed = copy(settings.INSTALLED_APPS)
+    new_installed = copy(settings.INSTALLED_APPS)
 
     # Want DEBUG to be set to False.
     settings.DEBUG = False
+
+    from django.db.models import loading
 
     # Creating the test suite, adding the test models to INSTALLED_APPS, and
     #  adding the model test suites to our suite package.
@@ -99,16 +109,18 @@ def run_tests(module_list, verbosity=1, interactive=True):
             test_module_name = 'tests_mysql'
         else:
             test_module_name = 'tests'
-        settings.INSTALLED_APPS.append(module_name)
+        new_installed.append(module_name)
+
+        # Getting the test suite
         tsuite = getattr(__import__('django.contrib.gis.tests.%s' % test_model, globals(), locals(), [test_module_name]), test_module_name)
         test_suite.addTest(tsuite.suite())
-
+    
     # Resetting the loaded flag to take into account what we appended to 
     # the INSTALLED_APPS (since this routine is invoked through 
     # django/core/management, it caches the apps; this ensures that syncdb 
     # will see our appended models)
-    from django.db.models import loading
-    loading._loaded = False
+    settings.INSTALLED_APPS = new_installed
+    loading.cache.loaded = False
 
     # Creating the test spatial database.
     create_spatial_db(test=True, verbosity=verbosity)

@@ -15,7 +15,7 @@ if HAS_GDAL:
     
 # Attempting to import the GeoIP class.
 try:
-    from django.contrib.gis.utils.geoip import GeoIP
+    from django.contrib.gis.utils.geoip import GeoIP, GeoIPException
     HAS_GEOIP = True
 except:
     HAS_GEOIP = False
