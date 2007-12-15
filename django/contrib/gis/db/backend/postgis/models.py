@@ -14,13 +14,13 @@ class GeometryColumns(models.Model):
     The 'geometry_columns' table from the PostGIS. See the PostGIS
     documentation at Ch. 4.2.2.
     """
-    f_table_catalog = models.CharField(maxlength=256)
-    f_table_schema = models.CharField(maxlength=256)
-    f_table_name = models.CharField(maxlength=256)
-    f_geometry_column = models.CharField(maxlength=256)
+    f_table_catalog = models.CharField(max_length=256)
+    f_table_schema = models.CharField(max_length=256)
+    f_table_name = models.CharField(max_length=256)
+    f_geometry_column = models.CharField(max_length=256)
     coord_dimension = models.IntegerField()
     srid = models.IntegerField(primary_key=True)
-    type = models.CharField(maxlength=30)
+    type = models.CharField(max_length=30)
 
     class Meta:
         db_table = 'geometry_columns'
@@ -41,10 +41,10 @@ class SpatialRefSys(models.Model, SpatialRefSysMixin):
     documentaiton at Ch. 4.2.1.
     """
     srid = models.IntegerField(primary_key=True)
-    auth_name = models.CharField(maxlength=256)
+    auth_name = models.CharField(max_length=256)
     auth_srid = models.IntegerField()
-    srtext = models.CharField(maxlength=2048)
-    proj4text = models.CharField(maxlength=2048)
+    srtext = models.CharField(max_length=2048)
+    proj4text = models.CharField(max_length=2048)
 
     class Meta:
         db_table = 'spatial_ref_sys'

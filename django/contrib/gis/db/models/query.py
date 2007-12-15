@@ -7,11 +7,12 @@ from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
 # parse_lookup depends on the spatial database backend.
 from django.contrib.gis.db.backend import parse_lookup, \
-    ASGML, ASKML, DISTANCE, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION
+    ASGML, ASKML, DISTANCE, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION, VERSION
 from django.contrib.gis.geos import GEOSGeometry
 
-# Flag indicating whether the backend is Oracle.
+# Shortcut booleans for determining the backend.
 oracle = SPATIAL_BACKEND == 'oracle'
+postgis = SPATIAL_BACKEND == 'postgis'
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
@@ -325,8 +326,14 @@ class GeoQuerySet(QuerySet):
         
         if oracle:
             gml_select = {'gml':'%s(%s)' % (ASGML, field_col)}
-        else:
-            gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)}
+        elif postgis:
+            # PostGIS AsGML() aggregate function parameter order depends on the
+            # version -- uggh.
+            major, minor1, minor2 = VERSION
+            if major >= 1 and (minor1 > 3 or (minor1 == 3 and minor2 > 1)):
+                gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, version, field_col, precision)}
+            else:
+                gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, field_col, precision, version)}
 
         # Adding GML function call to SELECT part of the SQL.
         return self.extra(select=gml_select)

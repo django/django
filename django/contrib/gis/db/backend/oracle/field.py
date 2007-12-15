@@ -4,7 +4,7 @@ from django.db import connection
 from django.db.backends.util import truncate_name
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.db.backend.util import get_srid, GeoFieldSQL
+from django.contrib.gis.db.backend.util import GeoFieldSQL
 from django.contrib.gis.db.backend.oracle.adaptor import OracleSpatialAdaptor
 from django.contrib.gis.db.backend.oracle.query import ORACLE_SPATIAL_TERMS, DISTANCE_FUNCTIONS, TRANSFORM
 

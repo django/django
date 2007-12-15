@@ -5,6 +5,7 @@
 import re
 from decimal import Decimal
 from django.db import connection
+from django.contrib.gis.db.backend.util import SpatialFunction
 from django.contrib.gis.measure import Distance
 qn = connection.ops.quote_name
 
@@ -14,61 +15,44 @@ DISTANCE = 'SDO_GEOM.SDO_DISTANCE'
 TRANSFORM = 'SDO_CS.TRANSFORM'
 UNION = 'SDO_AGGR_UNION'
 
-class SDOOperation(object):
+# We want to get SDO Geometries as WKT because it is much easier to 
+# instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.  
+# However, this adversely affects performance (i.e., Java is called 
+# to convert to WKT on every query).  If someone wishes to write a 
+# SDO_GEOMETRY(...) parser in Python, let me know =)
+GEOM_SELECT = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
+
+#### Classes used in constructing Oracle spatial SQL ####
+class SDOOperation(SpatialFunction):
     "Base class for SDO* Oracle operations."
+    def __init__(self, func, end_subst=") %s '%s'"):
+        super(SDOOperation, self).__init__(func, end_subst=end_subst, operator='=', result='TRUE')
 
-    def __init__(self, lookup, subst='', operator='=', result="'TRUE'",
-                 beg_subst='%s(%s%s, %%s'):
-        self.lookup = lookup
-        self.subst = subst
-        self.operator = operator
-        self.result = result
-        self.beg_subst = beg_subst
-        self.end_subst = ') %s %s' % (self.operator, self.result)
-
-    @property
-    def sql_subst(self):
-        return ''.join([self.beg_subst, self.subst, self.end_subst])
-
-    def as_sql(self, table, field):
-        return self.sql_subst % self.params(table, field)
-
-    def params(self, table, field):
-        return (self.lookup, table, field)
-
-class SDODistance(SDOOperation):
+class SDODistance(SpatialFunction):
     "Class for Distance queries."
     def __init__(self, op, tolerance=0.05):
-        super(SDODistance, self).__init__(DISTANCE, subst=", %s", operator=op, result='%%s')
-        self.tolerance = tolerance
+        super(SDODistance, self).__init__(DISTANCE, end_subst=', %s) %%s %%s' % tolerance, 
+                                          operator=op, result='%%s')
 
-    def params(self, table, field):
-        return (self.lookup, table, field, self.tolerance)
-
-class SDOGeomRelate(SDOOperation):
+class SDOGeomRelate(SpatialFunction):
     "Class for using SDO_GEOM.RELATE."
     def __init__(self, mask, tolerance=0.05):
-        super(SDOGeomRelate, self).__init__('SDO_GEOM.RELATE',  beg_subst="%s(%s%s, '%s'",
-                                            subst=", %%s, %s", result="'%s'" % mask)
-        self.mask = mask
-        self.tolerance = tolerance
+        # SDO_GEOM.RELATE(...) has a peculiar argument order: column, mask, geom, tolerance.
+        # Moreover, the runction result is the mask (e.g., 'DISJOINT' instead of 'TRUE').
+        end_subst = "%s%s) %s '%s'" % (', %%s, ', tolerance, '=', mask)
+        beg_subst = "%%s(%%s, '%s'" % mask 
+        super(SDOGeomRelate, self).__init__('SDO_GEOM.RELATE', beg_subst=beg_subst, end_subst=end_subst)
 
-    def params(self, table, field):
-        return (self.lookup, table, field, self.mask, self.tolerance)
-
-class SDORelate(SDOOperation):
+class SDORelate(SpatialFunction):
     "Class for using SDO_RELATE."
     masks = 'TOUCH|OVERLAPBDYDISJOINT|OVERLAPBDYINTERSECT|EQUAL|INSIDE|COVEREDBY|CONTAINS|COVERS|ANYINTERACT|ON'
     mask_regex = re.compile(r'^(%s)(\+(%s))*$' % (masks, masks), re.I)
-    
-    def __init__(self, mask, **kwargs):
-        super(SDORelate, self).__init__('SDO_RELATE',  subst=", 'mask=%s'", **kwargs)
+    def __init__(self, mask):
         if not self.mask_regex.match(mask):
             raise ValueError('Invalid %s mask: "%s"' % (self.lookup, mask))
-        self.mask = mask
+        super(SDORelate, self).__init__('SDO_RELATE', end_subst=", 'mask=%s') = 'TRUE'" % mask)
 
-    def params(self, table, field):
-        return (self.lookup, table, field, self.mask)
+#### Lookup type mapping dictionaries of Oracle spatial operations ####
 
 # Valid distance types and substitutions
 dtypes = (Decimal, Distance, float, int)
@@ -84,7 +68,7 @@ ORACLE_GEOMETRY_FUNCTIONS = {
     'coveredby' : SDOOperation('SDO_COVEREDBY'),
     'covers' : SDOOperation('SDO_COVERS'),
     'disjoint' : SDOGeomRelate('DISJOINT'),
-    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE', "%%s, 'distance=%%s'"), dtypes),
+    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE', end_subst=", %%s, 'distance=%%s') %s '%s'"), dtypes),
     'intersects' : SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
     'equals' : SDOOperation('SDO_EQUAL'),
     'exact' : SDOOperation('SDO_EQUAL'),
@@ -104,20 +88,20 @@ ORACLE_SPATIAL_TERMS  = ORACLE_GEOMETRY_FUNCTIONS.keys()
 ORACLE_SPATIAL_TERMS += MISC_TERMS
 ORACLE_SPATIAL_TERMS = tuple(ORACLE_SPATIAL_TERMS) # Making immutable
 
+#### The `get_geo_where_clause` function for Oracle ####
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
-    if table_prefix.endswith('.'):
-        table_prefix = qn(table_prefix[:-1])+'.'
-    field_name = qn(field_name)
+    # Getting the quoted table name as `geo_col`.
+    geo_col = '%s.%s' % (qn(table_prefix), qn(field_name))
 
     # See if a Oracle Geometry function matches the lookup type next
     lookup_info = ORACLE_GEOMETRY_FUNCTIONS.get(lookup_type, False)
     if lookup_info:
         # Lookup types that are tuples take tuple arguments, e.g., 'relate' and 
-        #  'dwithin' lookup types.
+        # 'dwithin' lookup types.
         if isinstance(lookup_info, tuple):
             # First element of tuple is lookup type, second element is the type
-            #  of the expected argument (e.g., str, float)
+            # of the expected argument (e.g., str, float)
             sdo_op, arg_type = lookup_info
 
             # Ensuring that a tuple _value_ was passed in from the user
@@ -131,27 +115,19 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
                 raise TypeError('Argument type should be %s, got %s instead.' % (arg_type, type(value[1])))
 
             if lookup_type == 'relate':
-                # The SDORelate class handles construction for these queries, and verifies
-                # the mask argument.
-                return sdo_op(value[1]).as_sql(table_prefix, field_name)
-            elif lookup_type in DISTANCE_FUNCTIONS:
-                op = DISTANCE_FUNCTIONS[lookup_type][0]
-                return op.as_sql(table_prefix, field_name)
-                #    return '%s(%s%s, %%s) %s %%s' % (DISTANCE, table_prefix, field_name, op)
+                # The SDORelate class handles construction for these queries, 
+                # and verifies the mask argument.
+                return sdo_op(value[1]).as_sql(geo_col)
             else:
-                return sdo_op.as_sql(table_prefix, field_name)
+                # Otherwise, just call the `as_sql` method on the SDOOperation instance.
+                return sdo_op.as_sql(geo_col)
         else:
             # Lookup info is a SDOOperation instance, whos `as_sql` method returns
             # the SQL necessary for the geometry function call. For example:  
             #  SDO_CONTAINS("geoapp_country"."poly", SDO_GEOMTRY('POINT(5 23)', 4326)) = 'TRUE'
-            return lookup_info.as_sql(table_prefix, field_name)
-    
-    # Handling 'isnull' lookup type
-    if lookup_type == 'isnull':
-        return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
+            return lookup_info.as_sql(geo_col)
+    elif lookup_type == 'isnull':
+        # Handling 'isnull' lookup type
+        return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
-
-# Want to get SDO Geometries as WKT (much easier to instantiate GEOS proxies
-# from WKT than SDO_GEOMETRY(...) strings ;)
-GEOM_SELECT = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'

@@ -5,6 +5,11 @@
 from django.db import connection
 qn = connection.ops.quote_name
 
+# To ease implementation, WKT is passed to/from MySQL.
+GEOM_FROM_TEXT = 'GeomFromText'
+GEOM_FROM_WKB = 'GeomFromWKB'
+GEOM_SELECT = 'AsText(%s)'
+
 # WARNING: MySQL is NOT compliant w/the OpenGIS specification and
 # _every_ one of these lookup types is on the _bounding box_ only.
 MYSQL_GIS_FUNCTIONS = {
@@ -31,24 +36,18 @@ MYSQL_GIS_TERMS = tuple(MYSQL_GIS_TERMS) # Making immutable
 
 def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
     "Returns the SQL WHERE clause for use in MySQL spatial SQL construction."
-    if table_prefix.endswith('.'):
-        table_prefix = qn(table_prefix[:-1])+'.'
-    field_name = qn(field_name)
+    # Getting the quoted field as `geo_col`.
+    geo_col = '%s.%s' % (qn(table_prefix), qn(field_name))
 
     # See if a MySQL Geometry function matches the lookup type next
     lookup_info = MYSQL_GIS_FUNCTIONS.get(lookup_type, False)
     if lookup_info:
-        return "%s(%s, %%s)" % (lookup_info, table_prefix + field_name)
+        return "%s(%s, %%s)" % (lookup_info, geo_col)
     
     # Handling 'isnull' lookup type
     # TODO: Is this needed because MySQL cannot handle NULL
     # geometries in its spatial indices.
     if lookup_type == 'isnull':
-        return "%s%s IS %sNULL" % (table_prefix, field_name, (not value and 'NOT ' or ''))
+        return "%s IS %sNULL" % (geo_col, (not value and 'NOT ' or ''))
 
     raise TypeError("Got invalid lookup_type: %s" % repr(lookup_type))
-
-# To ease implementation, WKT is passed to/from MySQL.
-GEOM_FROM_TEXT = 'GeomFromText'
-GEOM_FROM_WKB = 'GeomFromWKB'
-GEOM_SELECT = 'AsText(%s)'

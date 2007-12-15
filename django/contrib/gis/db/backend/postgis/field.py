@@ -1,11 +1,11 @@
 from types import UnicodeType
 from django.db import connection
 from django.db.models.fields import Field # Django base Field class
-from django.contrib.gis.geos import GEOSGeometry, GEOSException 
-from django.contrib.gis.db.backend.util import get_srid, GeoFieldSQL
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.db.backend.util import GeoFieldSQL
 from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
 from django.contrib.gis.db.backend.postgis.query import \
-    DISTANCE, DISTANCE_FUNCTIONS, POSTGIS_TERMS, TRANSFORM
+    DISTANCE_FUNCTIONS, POSTGIS_TERMS, TRANSFORM
 
 # Quotename & geographic quotename, respectively
 qn = connection.ops.quote_name

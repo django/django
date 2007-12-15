@@ -26,7 +26,7 @@ from django.utils.datastructures import SortedDict
 from django.contrib.gis.geos import GEOSGeometry
 
 # These routines (needed by GeoManager), default to False.
-ASGML, ASKML, DISTANCE, TRANSFORM, UNION= (False, False, False, False, False)
+ASGML, ASKML, DISTANCE, TRANSFORM, UNION, VERSION = (False, False, False, False, False, False)
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, 
@@ -34,7 +34,9 @@ if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     from django.contrib.gis.db.backend.postgis import \
         PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
         create_spatial_db, get_geo_where_clause, \
-        ASGML, ASKML, DISTANCE, GEOM_SELECT, TRANSFORM, UNION
+        ASGML, ASKML, DISTANCE, GEOM_SELECT, TRANSFORM, UNION, \
+        MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2
+    VERSION = (MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2)
     SPATIAL_BACKEND = 'postgis'
 elif settings.DATABASE_ENGINE == 'oracle':
     from django.contrib.gis.db.backend.oracle import \
@@ -283,7 +285,7 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
             geo_prep = field.get_db_prep_lookup(lookup_type, value)
             
             # Getting the adapted geometry from the field.
-            gwc = get_geo_where_clause(lookup_type, current_table + '.', column, value)
+            gwc = get_geo_where_clause(lookup_type, current_table, column, value)
 
             # Substituting in the the where parameters into the geographic where
             # clause, and extending the parameters.

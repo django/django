@@ -45,6 +45,7 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
     try:
         # Trying to create the database first.
         cursor.execute(create_sql)
+        #print create_sql
     except Exception, e:
         # Drop and recreate, if necessary.
         if not autoclobber:
@@ -56,6 +57,7 @@ def _create_with_cursor(db_name, verbosity=1, autoclobber=False):
             cursor.execute(create_sql)
         else:
             raise Exception('Spatial Database Creation canceled.')
+foo = _create_with_cursor
     
 created_regex = re.compile(r'^createdb: database creation failed: ERROR:  database ".+" already exists')
 def _create_with_shell(db_name, verbosity=1, autoclobber=False):

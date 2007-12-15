@@ -12,8 +12,8 @@ from django.contrib.gis.models import SpatialRefSysMixin
 
 class GeometryColumns(models.Model):
     "Maps to the Oracle USER_SDO_GEOM_METADATA table."
-    table_name = models.CharField(maxlength=32)
-    column_name = models.CharField(maxlength=1024)
+    table_name = models.CharField(max_length=32)
+    column_name = models.CharField(max_length=1024)
     srid = models.IntegerField(primary_key=True)
     # TODO: Add support for `diminfo` column (type MDSYS.SDO_DIM_ARRAY).
     class Meta:
@@ -28,11 +28,11 @@ class GeometryColumns(models.Model):
 
 class SpatialRefSys(models.Model, SpatialRefSysMixin):
     "Maps to the Oracle MDSYS.CS_SRS table."
-    cs_name = models.CharField(maxlength=68)
+    cs_name = models.CharField(max_length=68)
     srid = models.IntegerField(primary_key=True)
     auth_srid = models.IntegerField()
-    auth_name = models.CharField(maxlength=256)
-    wktext = models.CharField(maxlength=2046)
+    auth_name = models.CharField(max_length=256)
+    wktext = models.CharField(max_length=2046)
     #cs_bounds = models.GeometryField()
 
     class Meta:
