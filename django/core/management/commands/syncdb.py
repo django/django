@@ -33,8 +33,9 @@ class Command(NoArgsCommand):
         for app_name in settings.INSTALLED_APPS:
             try:
                 __import__(app_name + '.management', {}, {}, [''])
-            except ImportError:
-                pass
+            except ImportError, exc:
+                if not exc.args[0].startswith('No module named management'):
+                    raise
 
         cursor = connection.cursor()
 

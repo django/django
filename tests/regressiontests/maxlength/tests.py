@@ -22,12 +22,12 @@ Don't print out the deprecation warnings during testing.
 >>> legacy_maxlength(10, 12)
 Traceback (most recent call last):
 ...
-TypeError: field can not take both the max_length argument and the legacy maxlength argument.
+TypeError: Field cannot take both the max_length argument and the legacy maxlength argument.
 
 >>> legacy_maxlength(0, 10)
 Traceback (most recent call last):
 ...
-TypeError: field can not take both the max_length argument and the legacy maxlength argument.
+TypeError: Field cannot take both the max_length argument and the legacy maxlength argument.
 
 >>> legacy_maxlength(0, None)
 0
@@ -48,7 +48,7 @@ TypeError: field can not take both the max_length argument and the legacy maxlen
 >>> fields.Field(maxlength=10, max_length=15)
 Traceback (most recent call last):
     ...
-TypeError: field can not take both the max_length argument and the legacy maxlength argument.
+TypeError: Field cannot take both the max_length argument and the legacy maxlength argument.
 
 # Test max_length
 >>> new.max_length

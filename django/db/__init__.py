@@ -34,8 +34,8 @@ except ImportError, e:
             raise # If there's some other error, this must be an error in Django itself.
 
 def _import_database_module(import_path='', module_name=''):
-    """Lazyily import a database module when requested."""
-    return __import__('%s%s.%s' % (_import_path, settings.DATABASE_ENGINE, module_name), {}, {}, [''])
+    """Lazily import a database module when requested."""
+    return __import__('%s%s.%s' % (import_path, settings.DATABASE_ENGINE, module_name), {}, {}, [''])
 
 # We don't want to import the introspect/creation modules unless 
 # someone asks for 'em, so lazily load them on demmand.

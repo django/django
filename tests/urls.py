@@ -14,4 +14,7 @@ urlpatterns = patterns('',
     
     # django built-in views
     (r'^views/', include('regressiontests.views.urls')),
+
+    # test urlconf for middleware tests
+    (r'^middleware/', include('regressiontests.middleware.urls')),
 )

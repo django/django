@@ -242,7 +242,7 @@ We've got two roles here:
     * Ticket triagers: community members who keep track of tickets, making
       sure the tickets are always categorized correctly.
 
-Second, note the four triage stages:
+Second, note the five triage stages:
 
     1. A ticket starts as "Unreviewed", meaning that a triager has yet to
        examine the ticket and move it along.
@@ -254,9 +254,15 @@ Second, note the four triage stages:
     3. Once a ticket is ruled to be approved for fixing, it's moved into the
        "Accepted" stage. This stage is where all the real work gets done.
 
-    4. If a ticket has an associated patch (see below), a triager will review the
-       patch. If the patch is complete, it'll be marked as "ready for checkin" so
-       that a core developer knows to review and check in the patches.
+    4. In some cases, a ticket might get moved to the "Someday/Maybe" state.
+       This means the ticket is an enhancement request that we might consider
+       adding to the framework if an excellent patch is submitted. These
+       tickets are not a high priority.
+
+    5. If a ticket has an associated patch (see below), a triager will review
+       the patch. If the patch is complete, it'll be marked as "ready for
+       checkin" so that a core developer knows to review and check in the
+       patches.
 
 The second part of this workflow involves a set of flags the describe what the
 ticket has or needs in order to be "ready for checkin":
@@ -654,9 +660,8 @@ To run the tests, ``cd`` to the ``tests/`` directory and type::
     ./runtests.py --settings=path.to.django.settings
 
 Yes, the unit tests need a settings module, but only for database connection
-info, with the ``DATABASE_ENGINE`` setting. You will also need a ``ROOT_URLCONF``
-setting (its value is ignored; it just needs to be present) and a ``SITE_ID``
-setting (any non-zero integer value will do) in order for all the tests to pass.
+info, with the ``DATABASE_ENGINE`` setting. You'll also need a ``ROOT_URLCONF``
+setting (its value is ignored; it just needs to be present).
 
 If you're using the ``sqlite3`` database backend, no further settings are
 needed. A temporary database will be created in memory when running the tests.

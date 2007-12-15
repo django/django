@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-05 17:33+0100\n"
-"PO-Revision-Date: 2007-11-05 17:34+0100\n"
-"Last-Translator: Marc Garcia <marc.garcia@accopensys.com>\n"
+"POT-Creation-Date: 2007-12-02 22:26+0100\n"
+"PO-Revision-Date: 2007-12-02 22:32+0100\n"
+"Last-Translator: Marc Fargas <telenieko@telenieko.com>\n"
 "Language-Team:  <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -194,7 +194,7 @@ msgstr "Xinés simplificat"
 msgid "Traditional Chinese"
 msgstr "Xinés tradicional"
 
-#: contrib/admin/filterspecs.py:42
+#: contrib/admin/filterspecs.py:44
 #, python-format
 msgid ""
 "<h3>By %s:</h3>\n"
@@ -203,71 +203,71 @@ msgstr ""
 "<h3>Per %s:</h3>\n"
 "<ul>\n"
 
-#: contrib/admin/filterspecs.py:72 contrib/admin/filterspecs.py:90
-#: contrib/admin/filterspecs.py:145 contrib/admin/filterspecs.py:171
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
 msgid "All"
 msgstr "Tots"
 
-#: contrib/admin/filterspecs.py:111
+#: contrib/admin/filterspecs.py:113
 msgid "Any date"
 msgstr "Qualsevol data"
 
-#: contrib/admin/filterspecs.py:112
+#: contrib/admin/filterspecs.py:114
 msgid "Today"
 msgstr "Avui"
 
-#: contrib/admin/filterspecs.py:115
+#: contrib/admin/filterspecs.py:117
 msgid "Past 7 days"
 msgstr "Últims 7 dies"
 
-#: contrib/admin/filterspecs.py:117
+#: contrib/admin/filterspecs.py:119
 msgid "This month"
 msgstr "Aquest mes"
 
-#: contrib/admin/filterspecs.py:119
+#: contrib/admin/filterspecs.py:121
 msgid "This year"
 msgstr "Aquest any"
 
-#: contrib/admin/filterspecs.py:145 newforms/widgets.py:221
-#: oldforms/__init__.py:591
+#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
+#: oldforms/__init__.py:592
 msgid "Yes"
 msgstr "Si"
 
-#: contrib/admin/filterspecs.py:145 newforms/widgets.py:221
-#: oldforms/__init__.py:591
+#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
+#: oldforms/__init__.py:592
 msgid "No"
 msgstr "No"
 
-#: contrib/admin/filterspecs.py:152 newforms/widgets.py:221
-#: oldforms/__init__.py:591
+#: contrib/admin/filterspecs.py:154 newforms/widgets.py:231
+#: oldforms/__init__.py:592
 msgid "Unknown"
 msgstr "Desconegut"
 
-#: contrib/admin/models.py:17
+#: contrib/admin/models.py:18
 msgid "action time"
 msgstr "moment de l'acció"
 
-#: contrib/admin/models.py:20
+#: contrib/admin/models.py:21
 msgid "object id"
 msgstr "id del objecte"
 
-#: contrib/admin/models.py:21
+#: contrib/admin/models.py:22
 msgid "object repr"
 msgstr "'repr' de l'objecte"
 
-#: contrib/admin/models.py:22
+#: contrib/admin/models.py:23
 msgid "action flag"
 msgstr "marca de l'acció"
 
-#: contrib/admin/models.py:23
+#: contrib/admin/models.py:24
 msgid "change message"
 msgstr "missatge del canvi"
 
-#: contrib/admin/models.py:26
+#: contrib/admin/models.py:27
 msgid "log entry"
 msgstr "entrada del registre"
 
-#: contrib/admin/models.py:27
+#: contrib/admin/models.py:28
 msgid "log entries"
 msgstr "entrades del registre"
 
@@ -469,7 +469,7 @@ msgid "Password:"
 msgstr "Contrasenya:"
 
 #: contrib/admin/templates/admin/login.html:25
-#: contrib/admin/views/decorators.py:24
+#: contrib/admin/views/decorators.py:25
 msgid "Log in"
 msgstr "Iniciar sessió"
 
@@ -769,17 +769,17 @@ msgstr "Actualment:"
 msgid "Change:"
 msgstr "Modificar:"
 
-#: contrib/admin/templatetags/admin_list.py:254
+#: contrib/admin/templatetags/admin_list.py:257
 msgid "All dates"
 msgstr "Totes les dates"
 
-#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:264
+#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:267
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "El/la %(name)s \"%(obj)s\".ha estat agregat/da amb èxit."
 
-#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:268
-#: contrib/admin/views/main.py:354
+#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
+#: contrib/admin/views/main.py:356
 msgid "You may edit it again below."
 msgstr "Pot editar-lo de nou abaix."
 
@@ -796,7 +796,7 @@ msgstr "Canvi de clau exitós"
 msgid "Change password: %s"
 msgstr "Canviar clau: %s"
 
-#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
+#: contrib/admin/views/decorators.py:11 contrib/auth/forms.py:60
 msgid ""
 "Please enter a correct username and password. Note that both fields are case-"
 "sensitive."
@@ -804,7 +804,7 @@ msgstr ""
 "Si us plau, introdueixi un nom d'usuari i contrasenya vàlids. Tingui en "
 "compte que tots dos camps son sensibles a majúscules i minúscules."
 
-#: contrib/admin/views/decorators.py:62
+#: contrib/admin/views/decorators.py:63
 msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
@@ -812,7 +812,7 @@ msgstr ""
 "Si us plau, identifiquis de nou doncs la seva sessió ha expirat. No es "
 "preocupi, el seu enviament està emmagatzemat."
 
-#: contrib/admin/views/decorators.py:69
+#: contrib/admin/views/decorators.py:70
 msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
@@ -821,247 +821,247 @@ msgstr ""
 "'cookies' (galetes). Si us plau, habiliti les 'cookies', recarregui aquesta "
 "pàgina i provi-ho de nou. "
 
-#: contrib/admin/views/decorators.py:83
+#: contrib/admin/views/decorators.py:84
 msgid "Usernames cannot contain the '@' character."
 msgstr "Els noms d'usuari no poden contenir el caracter '@'."
 
-#: contrib/admin/views/decorators.py:85
+#: contrib/admin/views/decorators.py:86
 #, python-format
 msgid "Your e-mail address is not your username. Try '%s' instead."
 msgstr ""
 "La seva adreça de correu no és el seu nom d'usuari. Provi '%s' en tot cas."
 
-#: contrib/admin/views/doc.py:47 contrib/admin/views/doc.py:49
-#: contrib/admin/views/doc.py:51
+#: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
+#: contrib/admin/views/doc.py:52
 msgid "tag:"
 msgstr "etiqueta:"
 
-#: contrib/admin/views/doc.py:78 contrib/admin/views/doc.py:80
-#: contrib/admin/views/doc.py:82
+#: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
+#: contrib/admin/views/doc.py:83
 msgid "filter:"
 msgstr "filtre:"
 
-#: contrib/admin/views/doc.py:136 contrib/admin/views/doc.py:138
-#: contrib/admin/views/doc.py:140
+#: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
+#: contrib/admin/views/doc.py:141
 msgid "view:"
 msgstr "vista:"
 
-#: contrib/admin/views/doc.py:165
+#: contrib/admin/views/doc.py:166
 #, python-format
 msgid "App %r not found"
 msgstr "La aplicació %r no s'ha pogut trobar"
 
-#: contrib/admin/views/doc.py:172
+#: contrib/admin/views/doc.py:173
 #, python-format
 msgid "Model %(name)r not found in app %(label)r"
 msgstr "El model %(name)r no s'ha trobat en la aplicació %(label)r"
 
-#: contrib/admin/views/doc.py:184
+#: contrib/admin/views/doc.py:185
 #, python-format
 msgid "the related `%(label)s.%(type)s` object"
 msgstr "el objecte relacionat `%(label)s.%(type)s`"
 
-#: contrib/admin/views/doc.py:184 contrib/admin/views/doc.py:206
-#: contrib/admin/views/doc.py:220 contrib/admin/views/doc.py:225
+#: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
+#: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
 msgid "model:"
 msgstr "model:"
 
-#: contrib/admin/views/doc.py:215
+#: contrib/admin/views/doc.py:216
 #, python-format
 msgid "related `%(label)s.%(name)s` objects"
 msgstr "objectes relacionats `%(label)s.%(name)s`"
 
-#: contrib/admin/views/doc.py:220
+#: contrib/admin/views/doc.py:221
 #, python-format
 msgid "all %s"
 msgstr "tots %s"
 
-#: contrib/admin/views/doc.py:225
+#: contrib/admin/views/doc.py:226
 #, python-format
 msgid "number of %s"
 msgstr "nombre de %s"
 
-#: contrib/admin/views/doc.py:230
+#: contrib/admin/views/doc.py:231
 #, python-format
 msgid "Fields on %s objects"
 msgstr "Camps en objectes %s"
 
-#: contrib/admin/views/doc.py:292 contrib/admin/views/doc.py:303
-#: contrib/admin/views/doc.py:305 contrib/admin/views/doc.py:311
-#: contrib/admin/views/doc.py:312 contrib/admin/views/doc.py:314
+#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
+#: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
+#: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
 msgid "Integer"
 msgstr "Enter"
 
-#: contrib/admin/views/doc.py:293
+#: contrib/admin/views/doc.py:294
 msgid "Boolean (Either True or False)"
 msgstr "Booleà (Verdader o Fals)"
 
-#: contrib/admin/views/doc.py:294 contrib/admin/views/doc.py:313
+#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (de fins a %(max_length)s)"
 
-#: contrib/admin/views/doc.py:295
+#: contrib/admin/views/doc.py:296
 msgid "Comma-separated integers"
 msgstr "Enters separats per comes"
 
-#: contrib/admin/views/doc.py:296
+#: contrib/admin/views/doc.py:297
 msgid "Date (without time)"
 msgstr "Data (sense hora)"
 
-#: contrib/admin/views/doc.py:297
+#: contrib/admin/views/doc.py:298
 msgid "Date (with time)"
 msgstr "Data (amb hora)"
 
-#: contrib/admin/views/doc.py:298
+#: contrib/admin/views/doc.py:299
 msgid "Decimal number"
 msgstr "Número decimal"
 
-#: contrib/admin/views/doc.py:299
+#: contrib/admin/views/doc.py:300
 msgid "E-mail address"
 msgstr "Adreça de correu electrònic"
 
-#: contrib/admin/views/doc.py:300 contrib/admin/views/doc.py:301
-#: contrib/admin/views/doc.py:304
+#: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
+#: contrib/admin/views/doc.py:305
 msgid "File path"
 msgstr "Ruta del fitxer"
 
-#: contrib/admin/views/doc.py:302
+#: contrib/admin/views/doc.py:303
 msgid "Floating point number"
 msgstr "Número amb punt de coma flotant"
 
-#: contrib/admin/views/doc.py:306 contrib/comments/models.py:85
+#: contrib/admin/views/doc.py:307 contrib/comments/models.py:85
 msgid "IP address"
 msgstr "Adreça IP"
 
-#: contrib/admin/views/doc.py:308
+#: contrib/admin/views/doc.py:309
 msgid "Boolean (Either True, False or None)"
 msgstr "Booleà (Verdader, Fals o 'None' (cap))"
 
-#: contrib/admin/views/doc.py:309
+#: contrib/admin/views/doc.py:310
 msgid "Relation to parent model"
 msgstr "Relació amb el model pare"
 
-#: contrib/admin/views/doc.py:310
+#: contrib/admin/views/doc.py:311
 msgid "Phone number"
 msgstr "Número de telèfon"
 
-#: contrib/admin/views/doc.py:315
+#: contrib/admin/views/doc.py:316
 msgid "Text"
 msgstr "Texte"
 
-#: contrib/admin/views/doc.py:316
+#: contrib/admin/views/doc.py:317
 msgid "Time"
 msgstr "Hora"
 
-#: contrib/admin/views/doc.py:317 contrib/flatpages/models.py:7
+#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:7
 msgid "URL"
 msgstr "URL"
 
-#: contrib/admin/views/doc.py:318
+#: contrib/admin/views/doc.py:319
 msgid "U.S. state (two uppercase letters)"
 msgstr "Estat dels E.U.A. (dos lletres majúscules)"
 
-#: contrib/admin/views/doc.py:319
+#: contrib/admin/views/doc.py:320
 msgid "XML text"
 msgstr "Texte XML"
 
-#: contrib/admin/views/doc.py:345
+#: contrib/admin/views/doc.py:346
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s no sembla ser un objecte 'urlpattern'"
 
-#: contrib/admin/views/main.py:230
+#: contrib/admin/views/main.py:233
 msgid "Site administration"
 msgstr "Lloc administratiu"
 
-#: contrib/admin/views/main.py:278 contrib/admin/views/main.py:363
+#: contrib/admin/views/main.py:280 contrib/admin/views/main.py:365
 #, python-format
 msgid "You may add another %s below."
 msgstr "Pot afegir un altre %s a baix."
 
-#: contrib/admin/views/main.py:296
+#: contrib/admin/views/main.py:298
 #, python-format
 msgid "Add %s"
 msgstr "Afegir %s"
 
-#: contrib/admin/views/main.py:342
+#: contrib/admin/views/main.py:344
 #, python-format
 msgid "Added %s."
 msgstr "Agregat %s."
 
-#: contrib/admin/views/main.py:342 contrib/admin/views/main.py:344
-#: contrib/admin/views/main.py:346 core/validators.py:283
+#: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
+#: contrib/admin/views/main.py:348 core/validators.py:283
 #: db/models/manipulators.py:309
 msgid "and"
 msgstr "i"
 
-#: contrib/admin/views/main.py:344
+#: contrib/admin/views/main.py:346
 #, python-format
 msgid "Changed %s."
 msgstr "Modificat %s."
 
-#: contrib/admin/views/main.py:346
+#: contrib/admin/views/main.py:348
 #, python-format
 msgid "Deleted %s."
 msgstr "Eliminat %s."
 
-#: contrib/admin/views/main.py:349
+#: contrib/admin/views/main.py:351
 msgid "No fields changed."
 msgstr "Cap camp canviat."
 
-#: contrib/admin/views/main.py:352
+#: contrib/admin/views/main.py:354
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "S'ha modificat amb èxist el/la %(name)s \"%(obj)s."
 
-#: contrib/admin/views/main.py:360
+#: contrib/admin/views/main.py:362
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "S'ha agregat amb èxit el/la %(name)s \"%(obj)s\". Pot editar-lo de nou abaix."
 
-#: contrib/admin/views/main.py:398
+#: contrib/admin/views/main.py:400
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
 
-#: contrib/admin/views/main.py:483
+#: contrib/admin/views/main.py:487
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr "Un o més %(fieldname)s en %(name)s: %(obj)s"
 
-#: contrib/admin/views/main.py:488
+#: contrib/admin/views/main.py:492
 #, python-format
 msgid "One or more %(fieldname)s in %(name)s:"
 msgstr "Un o més %(fieldname)s en %(name)s:"
 
-#: contrib/admin/views/main.py:520
+#: contrib/admin/views/main.py:524
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "El/la %(name)s \"%(obj)s\".ha estat eliminat amb èxit."
 
-#: contrib/admin/views/main.py:523
+#: contrib/admin/views/main.py:527
 msgid "Are you sure?"
 msgstr "Està segur?"
 
-#: contrib/admin/views/main.py:545
+#: contrib/admin/views/main.py:549
 #, python-format
 msgid "Change history: %s"
 msgstr "Modificar històric: %s"
 
-#: contrib/admin/views/main.py:579
+#: contrib/admin/views/main.py:583
 #, python-format
 msgid "Select %s"
 msgstr "Seleccioni %s"
 
-#: contrib/admin/views/main.py:579
+#: contrib/admin/views/main.py:583
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccioni %s per modificar"
 
-#: contrib/admin/views/main.py:780
+#: contrib/admin/views/main.py:784
 msgid "Database error"
 msgstr "Error de/en la base de dades"
 
@@ -1622,72 +1622,72 @@ msgstr "n"
 msgid "rd"
 msgstr "r"
 
-#: contrib/humanize/templatetags/humanize.py:50
+#: contrib/humanize/templatetags/humanize.py:52
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milió"
 msgstr[1] "%(value).1f  milions"
 
-#: contrib/humanize/templatetags/humanize.py:53
+#: contrib/humanize/templatetags/humanize.py:55
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f bilió"
 msgstr[1] "%(value).1f bilions"
 
-#: contrib/humanize/templatetags/humanize.py:56
+#: contrib/humanize/templatetags/humanize.py:58
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilió"
 msgstr[1] "%(value).1f trilions"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "one"
 msgstr "un"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "two"
 msgstr "dos"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "three"
 msgstr "tres"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "four"
 msgstr "cuatre"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "five"
 msgstr "cinc"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "six"
 msgstr "sis"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "seven"
 msgstr "set"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "eight"
 msgstr "vuit"
 
-#: contrib/humanize/templatetags/humanize.py:71
+#: contrib/humanize/templatetags/humanize.py:74
 msgid "nine"
 msgstr "nou"
 
-#: contrib/humanize/templatetags/humanize.py:90
+#: contrib/humanize/templatetags/humanize.py:94
 msgid "today"
 msgstr "avui"
 
-#: contrib/humanize/templatetags/humanize.py:92
+#: contrib/humanize/templatetags/humanize.py:96
 msgid "tomorrow"
 msgstr "demà"
 
-#: contrib/humanize/templatetags/humanize.py:94
+#: contrib/humanize/templatetags/humanize.py:98
 msgid "yesterday"
 msgstr "ahir"
 
@@ -3024,6 +3024,50 @@ msgstr ""
 "Introdueixi un número vàlid de la Seguretat Social dels E.U.A. en el format "
 "XXX-XX-XXXX."
 
+#: contrib/localflavor/za/forms.py:22
+msgid "Enter a valid South African ID number"
+msgstr "Introdueixi un número d'Identitat Sud Africà valid"
+
+#: contrib/localflavor/za/forms.py:57
+msgid "Enter a valid South African postal code"
+msgstr "Introdueixi un codi postal Sud Africà vàlid."
+
+#: contrib/localflavor/za/za_provinces.py:4
+msgid "Eastern Cape"
+msgstr "Eastern Cape"
+
+#: contrib/localflavor/za/za_provinces.py:5
+msgid "Free State"
+msgstr "Free State"
+
+#: contrib/localflavor/za/za_provinces.py:6
+msgid "Gauteng"
+msgstr "Gauteng"
+
+#: contrib/localflavor/za/za_provinces.py:7
+msgid "KwaZulu-Natal"
+msgstr "KwaZulu-Natal"
+
+#: contrib/localflavor/za/za_provinces.py:8
+msgid "Limpopo"
+msgstr "Limpopo"
+
+#: contrib/localflavor/za/za_provinces.py:9
+msgid "Mpumalanga"
+msgstr "Mpumalanga"
+
+#: contrib/localflavor/za/za_provinces.py:10
+msgid "Northern Cape"
+msgstr "Northern Cape"
+
+#: contrib/localflavor/za/za_provinces.py:11
+msgid "North West"
+msgstr "North West"
+
+#: contrib/localflavor/za/za_provinces.py:12
+msgid "Western Cape"
+msgstr "Western Cape"
+
 #: contrib/redirects/models.py:7
 msgid "redirect from"
 msgstr "redreçar des de"
@@ -3056,23 +3100,23 @@ msgstr "redreçament"
 msgid "redirects"
 msgstr "redreçaments"
 
-#: contrib/sessions/models.py:80
+#: contrib/sessions/models.py:46
 msgid "session key"
 msgstr "clau de la sessió"
 
-#: contrib/sessions/models.py:81
+#: contrib/sessions/models.py:47
 msgid "session data"
 msgstr "dades de la sessió"
 
-#: contrib/sessions/models.py:82
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr "data de caducitat"
 
-#: contrib/sessions/models.py:87
+#: contrib/sessions/models.py:53
 msgid "session"
 msgstr "sessió"
 
-#: contrib/sessions/models.py:88
+#: contrib/sessions/models.py:54
 msgid "sessions"
 msgstr "sessions"
 
@@ -3141,7 +3185,7 @@ msgstr "No s'admeten caracters no numèrics."
 msgid "This value can't be comprised solely of digits."
 msgstr "Aquest valor no pot contenir només dígits."
 
-#: core/validators.py:128 newforms/fields.py:157
+#: core/validators.py:128 newforms/fields.py:151
 msgid "Enter a whole number."
 msgstr "Introdueixi un número sencer."
 
@@ -3170,17 +3214,17 @@ msgstr "Introdueixi una hora vàlida en el format HH:MM."
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "Introdueixi un data/hora vàlida en format YYYY-MM-DD HH:MM."
 
-#: core/validators.py:170 newforms/fields.py:408
+#: core/validators.py:170 newforms/fields.py:402
 msgid "Enter a valid e-mail address."
 msgstr "Introdueixi una adreça de correu vàlida."
 
-#: core/validators.py:182 core/validators.py:474 newforms/fields.py:438
-#: oldforms/__init__.py:686
+#: core/validators.py:182 core/validators.py:474 newforms/fields.py:432
+#: oldforms/__init__.py:687
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "No s'ha enviat cap fitxer. Comprovi el tipus de codificació del formulari."
 
-#: core/validators.py:193 newforms/fields.py:462
+#: core/validators.py:193 newforms/fields.py:456
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -3431,7 +3475,7 @@ msgstr "Ja existeix  %(optname)s amb auqest %(fieldname)s."
 
 #: db/models/fields/__init__.py:161 db/models/fields/__init__.py:318
 #: db/models/fields/__init__.py:735 db/models/fields/__init__.py:746
-#: newforms/fields.py:45 newforms/models.py:211 oldforms/__init__.py:373
+#: newforms/fields.py:45 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "Aquest camp és obligatori."
 
@@ -3484,150 +3528,150 @@ msgstr[1] ""
 msgid "Enter a valid value."
 msgstr "Introdueixi un valor vàlid."
 
-#: newforms/fields.py:129
+#: newforms/fields.py:123
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
 msgstr ""
 "Asseguris de que el valor té com a màxim %(max)d caràcters (en té %(length)"
 "d)."
 
-#: newforms/fields.py:130
+#: newforms/fields.py:124
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 "Asseguris de que el valor té com a mínim %(min)d caràcters (en té %(length)"
 "d)."
 
-#: newforms/fields.py:158 newforms/fields.py:187 newforms/fields.py:216
+#: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
 #, python-format
 msgid "Ensure this value is less than or equal to %s."
 msgstr "Aquest valor ha de ser menor o igual a %s."
 
-#: newforms/fields.py:159 newforms/fields.py:188 newforms/fields.py:217
+#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
 #, python-format
 msgid "Ensure this value is greater than or equal to %s."
 msgstr "Asseguris de que aquest valor sigui superior o igual a %s."
 
-#: newforms/fields.py:186 newforms/fields.py:215
+#: newforms/fields.py:180 newforms/fields.py:209
 msgid "Enter a number."
 msgstr "Introdueixi un número."
 
-#: newforms/fields.py:218
+#: newforms/fields.py:212
 #, python-format
 msgid "Ensure that there are no more than %s digits in total."
 msgstr "Asseguris de que no hi ha més de %s dígits en total."
 
-#: newforms/fields.py:219
+#: newforms/fields.py:213
 #, python-format
 msgid "Ensure that there are no more than %s decimal places."
 msgstr "Asseguris de que no hi ha més de %s decimals."
 
-#: newforms/fields.py:220
+#: newforms/fields.py:214
 #, python-format
 msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr "Asseguris de que no hia ha més de %s dígits decimals."
 
-#: newforms/fields.py:268 newforms/fields.py:724
+#: newforms/fields.py:262 newforms/fields.py:719
 msgid "Enter a valid date."
 msgstr "Introdueixi una data vàlida."
 
-#: newforms/fields.py:301 newforms/fields.py:725
+#: newforms/fields.py:295 newforms/fields.py:720
 msgid "Enter a valid time."
 msgstr "Introdueixi una hora vàlida."
 
-#: newforms/fields.py:340
+#: newforms/fields.py:334
 msgid "Enter a valid date/time."
 msgstr "Introdueixi una data/hora vàlides."
 
-#: newforms/fields.py:439
+#: newforms/fields.py:433
 msgid "No file was submitted."
 msgstr "No s'ha enviat cap fitxer."
 
-#: newforms/fields.py:440 oldforms/__init__.py:688
+#: newforms/fields.py:434 oldforms/__init__.py:689
 msgid "The submitted file is empty."
 msgstr "El fitxer enviat està buit."
 
-#: newforms/fields.py:498
+#: newforms/fields.py:492
 msgid "Enter a valid URL."
 msgstr "Introdueixi una URL vàlida."
 
-#: newforms/fields.py:499
+#: newforms/fields.py:493
 msgid "This URL appears to be a broken link."
 msgstr "Aquesta URL sembla ser un enllaç trencat."
 
-#: newforms/fields.py:560 newforms/models.py:194
+#: newforms/fields.py:555 newforms/models.py:155
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Esculli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
 
-#: newforms/fields.py:599
+#: newforms/fields.py:594
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculli una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: newforms/fields.py:600 newforms/fields.py:662 newforms/models.py:215
+#: newforms/fields.py:595 newforms/fields.py:657 newforms/models.py:215
 msgid "Enter a list of values."
 msgstr "Introdueixi una llista de valors."
 
-#: newforms/fields.py:753
+#: newforms/fields.py:748
 msgid "Enter a valid IPv4 address."
 msgstr "Introdueixi una adreça IPv4 vàlida."
 
-#: newforms/models.py:221
+#: newforms/models.py:216
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Esculli una opció vàlida; %s' no és una de les opcions vàlides."
 
-#: oldforms/__init__.py:408
+#: oldforms/__init__.py:409
 #, python-format
 msgid "Ensure your text is less than %s character."
 msgid_plural "Ensure your text is less than %s characters."
 msgstr[0] "Asseguris de que el seu texte té menys de %s caracter."
 msgstr[1] "Asseguris de que el seu texte té menys de %s caracters."
 
-#: oldforms/__init__.py:413
+#: oldforms/__init__.py:414
 msgid "Line breaks are not allowed here."
 msgstr "No es permeten salts de línia."
 
-#: oldforms/__init__.py:511 oldforms/__init__.py:585 oldforms/__init__.py:624
+#: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr "Esculli una opció vàlida; %(data)s' no està dintre de %(choices)s."
 
-#: oldforms/__init__.py:744
+#: oldforms/__init__.py:745
 msgid "Enter a whole number between -32,768 and 32,767."
 msgstr "Introdueixi un número enter entre -32,768 i 32,767."
 
-#: oldforms/__init__.py:754
+#: oldforms/__init__.py:755
 msgid "Enter a positive number."
 msgstr "Introdueixi un número positiu."
 
-#: oldforms/__init__.py:764
+#: oldforms/__init__.py:765
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Introdueixi un número entre 0 i 32,767."
 
-#: template/defaultfilters.py:555
+#: template/defaultfilters.py:658
 msgid "yes,no,maybe"
 msgstr "si,no,potser"
 
-#: template/defaultfilters.py:585
+#: template/defaultfilters.py:689
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:587
+#: template/defaultfilters.py:691
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:589
+#: template/defaultfilters.py:693
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:590
+#: template/defaultfilters.py:694
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -3890,23 +3934,23 @@ msgstr "%(number)d %(type)s"
 msgid ", %(number)d %(type)s"
 msgstr ", %(number)d %(type)s"
 
-#: utils/translation/trans_real.py:395
+#: utils/translation/trans_real.py:399
 msgid "DATE_FORMAT"
 msgstr "F j, Y"
 
-#: utils/translation/trans_real.py:396
+#: utils/translation/trans_real.py:400
 msgid "DATETIME_FORMAT"
 msgstr "F j, Y, H:i"
 
-#: utils/translation/trans_real.py:397
+#: utils/translation/trans_real.py:401
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:413
+#: utils/translation/trans_real.py:417
 msgid "YEAR_MONTH_FORMAT"
 msgstr "j de/d' F del Y"
 
-#: utils/translation/trans_real.py:414
+#: utils/translation/trans_real.py:418
 msgid "MONTH_DAY_FORMAT"
 msgstr "j de/d' F del Y"
 
@@ -3924,43 +3968,3 @@ msgstr "El/La %(verbose_name)s s'ha actualtzat amb èxit."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "El %(verbose_name)s s'ha eliminat."
-
-#~ msgid ""
-#~ "This comment was posted by a user who has posted fewer than %(count)s "
-#~ "comment:\n"
-#~ "\n"
-#~ "%(text)sThis comment was posted by a user who has posted fewer than %"
-#~ "(count)s comments:\n"
-#~ "\n"
-#~ "%(text)s"
-#~ msgstr ""
-#~ "Aquest comentari el va enviar un usuari que ha enviat menys de %(count)s "
-#~ "comentari:\n"
-#~ "\n"
-#~ "%(text)sAquest comentari el va enviar un usuari que ha enviat menys de %"
-#~ "(count)s comentaris:\n"
-#~ "\n"
-#~ "%(text)s"
-
-#~ msgid "AnonymousUser"
-#~ msgstr "AnonymousUser"
-
-#~ msgid ""
-#~ "Please enter a valid decimal number with a whole part of at most %s digit."
-#~ "Please enter a valid decimal number with a whole part of at most %s "
-#~ "digits."
-#~ msgstr ""
-#~ "Si us plau, introdueixi un número decimal vàlid amb la part entera amb "
-#~ "com a màxim %s dígit.Si us plau, introdueixi un número decimal vàlid amb "
-#~ "la part entera amb com a màxim %s dígits."
-
-#~ msgid ""
-#~ "Please enter a valid decimal number with at most %s decimal place.Please "
-#~ "enter a valid decimal number with at most %s decimal places."
-#~ msgstr ""
-#~ "Si us plau, introdueixi un número decimal vàlid amb no més de %s dígit en "
-#~ "la part decimal.Si us plau, introdueixi un número decimal vàlid amb no "
-#~ "més de %s dígits en la part decimal."
-
-#~ msgid "%d milliseconds"
-#~ msgstr "%d milisegons"

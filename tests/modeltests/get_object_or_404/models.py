@@ -78,7 +78,7 @@ Http404: No Article matches the given query.
 >>> get_object_or_404(Author.objects.all())
 Traceback (most recent call last):
 ...
-AssertionError: get() returned more than one Author -- it returned ...! Lookup parameters were {}
+MultipleObjectsReturned: get() returned more than one Author -- it returned ...! Lookup parameters were {}
 
 # Using an EmptyQuerySet raises a Http404 error.
 >>> get_object_or_404(Article.objects.none(), title__contains="Run")

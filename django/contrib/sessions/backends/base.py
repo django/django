@@ -51,6 +51,14 @@ class SessionBase(object):
         self.modified = self.modified or key in self._session
         return self._session.pop(key, *args)
 
+    def setdefault(self, key, value):
+        if key in self._session:
+            return self._session[key]
+        else:
+            self.modified = True
+            self._session[key] = value
+            return value
+
     def set_test_cookie(self):
         self[self.TEST_COOKIE_NAME] = self.TEST_COOKIE_VALUE
 

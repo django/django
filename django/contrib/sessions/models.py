@@ -18,40 +18,6 @@ class SessionManager(models.Manager):
         pickled_md5 = md5.new(pickled + settings.SECRET_KEY).hexdigest()
         return base64.encodestring(pickled + pickled_md5)
 
-    def get_new_session_key(self):
-        "Returns session key that isn't being used."
-        # The random module is seeded when this Apache child is created.
-        # Use SECRET_KEY as added salt.
-        try:
-            pid = os.getpid()
-        except AttributeError:
-            # No getpid() in Jython, for example
-            pid = 1
-        while 1:
-            session_key = md5.new("%s%s%s%s" % (random.randint(0, sys.maxint - 1), pid, time.time(), settings.SECRET_KEY)).hexdigest()
-            try:
-                self.get(session_key=session_key)
-            except self.model.DoesNotExist:
-                break
-        return session_key
-
-    def get_new_session_object(self):
-        """
-        Returns a new session object.
-        """
-        # FIXME: There is a *small* chance of collision here, meaning we will
-        # return an existing object. That can be fixed when we add a way to
-        # validate (and guarantee) that non-auto primary keys are unique. For
-        # now, we save immediately in order to reduce the "window of
-        # misfortune" as much as possible.
-        created = False
-        while not created:
-            obj, created = self.get_or_create(session_key=self.get_new_session_key(),
-                    expire_date = datetime.datetime.now())
-            # Collision in key generation, so re-seed the generator
-            random.seed()
-        return obj
-
     def save(self, session_key, session_dict, expire_date):
         s = self.model(session_key, self.encode(session_dict), expire_date)
         if session_dict:

@@ -1,5 +1,6 @@
 r"""
 
+>>> from django.conf import settings
 >>> from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 >>> from django.contrib.sessions.backends.cache import SessionStore as CacheSession
 >>> from django.contrib.sessions.backends.file import SessionStore as FileSession
@@ -39,6 +40,13 @@ True
 >>> file_session.exists(file_session.session_key)
 False
 
+# Make sure the file backend checks for a good storage dir
+>>> settings.SESSION_FILE_PATH = "/if/this/directory/exists/you/have/a/weird/computer"
+>>> FileSession()
+Traceback (innermost last):
+    ...
+ImproperlyConfigured: The session storage path '/if/this/directory/exists/you/have/a/weird/computer' doesn't exist. Please set your SESSION_FILE_PATH setting to an existing directory in which Django can store session data.
+
 >>> cache_session = CacheSession()
 >>> cache_session.modified
 False
@@ -65,6 +73,11 @@ False
 'does not exist'
 >>> s.accessed, s.modified
 (True, False)
+
+>>> s.setdefault('foo', 'bar')
+'bar'
+>>> s.setdefault('foo', 'baz')
+'bar'
 
 >>> s.accessed = False  # Reset the accessed flag
 

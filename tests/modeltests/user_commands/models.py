@@ -1,5 +1,5 @@
 """
-37. User-registered management commands
+38. User-registered management commands
 
 The manage.py utility provides a number of useful commands for managing a
 Django project. If you want to add a utility command of your own, you can.

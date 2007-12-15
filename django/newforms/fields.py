@@ -83,21 +83,15 @@ class Field(object):
         self.creation_counter = Field.creation_counter
         Field.creation_counter += 1
 
-        self.error_messages = self._build_error_messages(error_messages)
-
-    def _build_error_messages(self, extra_error_messages):
-        error_messages = {}
-
-        def get_default_error_messages(klass):
+        def set_class_error_messages(messages, klass):
             for base_class in klass.__bases__:
-                get_default_error_messages(base_class)
-            if hasattr(klass, 'default_error_messages'):
-                error_messages.update(klass.default_error_messages)
+                set_class_error_messages(messages, base_class)
+            messages.update(getattr(klass, 'default_error_messages', {}))
 
-        get_default_error_messages(self.__class__)
-        if extra_error_messages:
-            error_messages.update(extra_error_messages)
-        return error_messages
+        messages = {}
+        set_class_error_messages(messages, self.__class__)
+        messages.update(error_messages or {})
+        self.error_messages = messages
 
     def clean(self, value):
         """
@@ -415,7 +409,7 @@ class EmailField(RegexField):
 try:
     from django.conf import settings
     URL_VALIDATOR_USER_AGENT = settings.URL_VALIDATOR_USER_AGENT
-except (ImportError, EnvironmentError):
+except ImportError:
     # It's OK if Django settings aren't configured.
     URL_VALIDATOR_USER_AGENT = 'Django (http://www.djangoproject.com/)'
 
@@ -539,8 +533,8 @@ class BooleanField(Field):
         """Returns a Python boolean object."""
         super(BooleanField, self).clean(value)
         # Explicitly check for the string 'False', which is what a hidden field
-        # will submit for False (since bool("True") == True we don't need to
-        # handle that explicitly).
+        # will submit for False. Because bool("True") == True, we don't need to
+        # handle that explicitly.
         if value == 'False':
             return False
         return bool(value)

@@ -108,6 +108,10 @@ class Car(models.Model):
     colour = models.CharField(max_length=5)
     model = models.ForeignKey(Model)
 
+class MissingRelations(models.Model):
+    rel1 = models.ForeignKey("Rel1")
+    rel2 = models.ManyToManyField("Rel2")
+
 model_errors = """invalid_models.fielderrors: "charfield": CharFields require a "max_length" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "decimal_places" attribute.
 invalid_models.fielderrors: "decimalfield": DecimalFields require a "max_digits" attribute.
@@ -191,4 +195,6 @@ invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related
 invalid_models.selfclashm2m: Accessor for m2m field 'm2m_4' clashes with related m2m field 'SelfClashM2M.selfclashm2m_set'. Add a related_name argument to the definition for 'm2m_4'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_3' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_3'.
 invalid_models.selfclashm2m: Reverse query name for m2m field 'm2m_4' clashes with field 'SelfClashM2M.selfclashm2m'. Add a related_name argument to the definition for 'm2m_4'.
+invalid_models.missingrelations: 'rel2' has m2m relation with model Rel2, which has not been installed
+invalid_models.missingrelations: 'rel1' has relation with model Rel1, which has not been installed
 """

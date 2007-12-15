@@ -48,4 +48,9 @@ u'Default headline'
 >>> d = now - a.pub_date
 >>> d.seconds < 5
 True
+
+# make sure that SafeUnicode fields work
+>>> from django.utils.safestring import SafeUnicode
+>>> a.headline = SafeUnicode(u'SafeUnicode Headline')
+>>> a.save()
 """}

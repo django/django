@@ -188,7 +188,7 @@ a date in the *future* are not included unless you set ``allow_future`` to
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
       the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+      default, this is ``True``.
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.
@@ -718,7 +718,7 @@ A page representing a list of objects.
     * ``allow_empty``: A boolean specifying whether to display the page if no
       objects are available. If this is ``False`` and no objects are available,
       the view will raise a 404 instead of displaying an empty page. By
-      default, this is ``False``.
+      default, this is ``True``.
 
     * ``context_processors``: A list of template-context processors to apply to
       the view's template. See the `RequestContext docs`_.

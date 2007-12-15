@@ -99,6 +99,8 @@ It implements the following standard dictionary methods:
 
     * ``items()``
 
+    * ``setdefault()``
+
 It also has these three methods:
 
     * ``set_test_cookie()``

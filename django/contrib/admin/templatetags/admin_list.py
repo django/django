@@ -114,7 +114,7 @@ def result_headers(cl):
         yield {"text": header,
                "sortable": True,
                "url": cl.get_query_string({ORDER_VAR: i, ORDER_TYPE_VAR: new_order_type}),
-               "class_attrib": (th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
+               "class_attrib": mark_safe(th_classes and ' class="%s"' % ' '.join(th_classes) or '')}
 
 def _boolean_icon(field_val):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}

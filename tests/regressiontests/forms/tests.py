@@ -22,6 +22,7 @@ from localflavor.pl import tests as localflavor_pl_tests
 from localflavor.sk import tests as localflavor_sk_tests
 from localflavor.uk import tests as localflavor_uk_tests
 from localflavor.us import tests as localflavor_us_tests
+from localflavor.za import tests as localflavor_za_tests
 from regressions import tests as regression_tests
 from util import tests as util_tests
 from widgets import tests as widgets_tests
@@ -50,6 +51,7 @@ __test__ = {
     'localflavor_sk_tests': localflavor_sk_tests,
     'localflavor_uk_tests': localflavor_uk_tests,
     'localflavor_us_tests': localflavor_us_tests,
+    'localflavor_za_tests': localflavor_za_tests,
     'regression_tests': regression_tests,
     'util_tests': util_tests,
     'widgets_tests': widgets_tests,

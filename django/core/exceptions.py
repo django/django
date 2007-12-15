@@ -4,6 +4,10 @@ class ObjectDoesNotExist(Exception):
     "The requested object does not exist"
     silent_variable_failure = True
 
+class MultipleObjectsReturned(Exception):
+    "The query returned multiple objects when only one was expected."
+    pass
+
 class SuspiciousOperation(Exception):
     "The user did something suspicious"
     pass
