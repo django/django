@@ -691,8 +691,8 @@ This way, you'll be able to pass, say, an integer to this filter, and it
 won't cause an ``AttributeError`` (because integers don't have ``lower()``
 methods).
 
-Registering a custom filters
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Registering custom filters
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language::
