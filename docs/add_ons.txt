@@ -47,7 +47,11 @@ contenttypes
 ============
 
 A light framework for hooking into "types" of content, where each installed
-Django model is a separate content type. This is not yet documented.
+Django model is a separate content type.
+
+See the `contenttypes documentation`_.
+
+.. _contenttypes documentation: ../contenttypes/
 
 csrf
 ====
