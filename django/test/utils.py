@@ -1,4 +1,4 @@
-import sys, time
+import sys, time, os
 from django.conf import settings
 from django.db import connection, get_creation_module
 from django.core import mail
@@ -106,9 +106,32 @@ def create_test_db(verbosity=1, autoclobber=False):
     if verbosity >= 1:
         print "Creating test database..."
     # If we're using SQLite, it's more convenient to test against an
-    # in-memory database.
+    # in-memory database. Using the TEST_DATABASE_NAME setting you can still choose
+    # to run on a physical database.
     if settings.DATABASE_ENGINE == "sqlite3":
-        TEST_DATABASE_NAME = ":memory:"
+        if settings.TEST_DATABASE_NAME and settings.TEST_DATABASE_NAME != ":memory:":
+            TEST_DATABASE_NAME = settings.TEST_DATABASE_NAME
+            # Erase the old test database
+            if verbosity >= 1:
+                print "Destroying old test database..."
+            if os.access(TEST_DATABASE_NAME, os.F_OK):
+                if not autoclobber:
+                    confirm = raw_input("Type 'yes' if you would like to try deleting the test database '%s', or 'no' to cancel: " % TEST_DATABASE_NAME)
+                if autoclobber or confirm == 'yes':
+                  try:
+                      if verbosity >= 1:
+                          print "Destroying old test database..."
+                      os.remove(TEST_DATABASE_NAME)
+                  except Exception, e:
+                      sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                      sys.exit(2)
+                else:
+                    print "Tests cancelled."
+                    sys.exit(1)
+            if verbosity >= 1:
+                print "Creating test database..."
+        else:
+            TEST_DATABASE_NAME = ":memory:"
     else:
         suffix = {
             'postgresql': get_postgresql_create_suffix,
@@ -171,17 +194,20 @@ def destroy_test_db(old_database_name, verbosity=1):
         creation_module.destroy_test_db(settings, connection, old_database_name, verbosity)
         return
 
-    # Unless we're using SQLite, remove the test database to clean up after
-    # ourselves. Connect to the previous database (not the test database)
-    # to do so, because it's not allowed to delete a database while being
-    # connected to it.
     if verbosity >= 1:
         print "Destroying test database..."
     connection.close()
     TEST_DATABASE_NAME = settings.DATABASE_NAME
     settings.DATABASE_NAME = old_database_name
-
-    if settings.DATABASE_ENGINE != "sqlite3":
+    if settings.DATABASE_ENGINE == "sqlite3":
+        if TEST_DATABASE_NAME and TEST_DATABASE_NAME != ":memory:":
+            # Remove the SQLite database file
+            os.remove(TEST_DATABASE_NAME)
+    else:
+        # Remove the test database to clean up after
+        # ourselves. Connect to the previous database (not the test database)
+        # to do so, because it's not allowed to delete a database while being
+        # connected to it.
         cursor = connection.cursor()
         _set_autocommit(connection)
         time.sleep(1) # To avoid "database is being accessed by other users" errors.
