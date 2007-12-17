@@ -59,10 +59,11 @@ def serve(request, path, document_root=None, show_indexes=False):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'),
                               statobj[stat.ST_MTIME], statobj[stat.ST_SIZE]):
         return HttpResponseNotModified()
-    mimetype = mimetypes.guess_type(fullpath)[0]
+    mimetype = mimetypes.guess_type(fullpath)[0] or 'application/octet-stream'
     contents = open(fullpath, 'rb').read()
     response = HttpResponse(contents, mimetype=mimetype)
     response["Last-Modified"] = http_date(statobj[stat.ST_MTIME])
+    response["Content-Length"] = len(contents)
     return response
 
 DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
