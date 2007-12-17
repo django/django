@@ -415,7 +415,9 @@ UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
 The response also converts unicode keys to strings. 
  
 >>> r[u'test'] = 'testing key' 
->>> list(sorted(r.items()))[1]
+>>> l = list(r.items())
+>>> l.sort()
+>>> l[1]
 ('test', 'testing key')
 
 It will also raise errors for keys with non-ascii data.
