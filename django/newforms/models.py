@@ -149,10 +149,10 @@ def model_to_dict(instance, fields=None, exclude=None):
     """
     Returns a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
-    
+
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned dict.
-    
+
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned dict, even if they are listed in
     the ``fields`` argument.
@@ -187,7 +187,7 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
 
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned fields.
-    
+
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned fields, even if they are listed
     in the ``fields`` argument.
@@ -214,9 +214,8 @@ class ModelFormOptions(object):
         self.exclude = getattr(options, 'exclude', None)
 
 class ModelFormMetaclass(type):
-    def __new__(cls, name, bases, attrs):
-        # TODO: no way to specify formfield_callback yet, do we need one, or
-        # should it be a special case for the admin?
+    def __new__(cls, name, bases, attrs,
+                formfield_callback=lambda f: f.formfield()):
         fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
         fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
 
@@ -253,7 +252,8 @@ class ModelFormMetaclass(type):
                 base_model = getattr(base_opts, 'model', None)
                 if base_model and base_model is not opts.model:
                     raise ImproperlyConfigured('%s defines a different model than its parent.' % name)
-            model_fields = fields_for_model(opts.model, opts.fields, opts.exclude)
+            model_fields = fields_for_model(opts.model, opts.fields,
+                    opts.exclude, formfield_callback)
             # fields declared in base classes override fields from the model
             model_fields.update(declared_fields)
             attrs['base_fields'] = model_fields
