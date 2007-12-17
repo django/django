@@ -611,6 +611,16 @@ A form field that validates input as a UK postcode. The regular
 expression used is sourced from the schema for British Standard BS7666
 address types at http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd.
 
+UKCountySelect
+--------------
+
+A ``Select`` widget that uses a list of UK counties/regions as its choices.
+
+UKNationSelect
+--------------
+
+A ``Select`` widget that uses a list of UK nations as its choices.
+
 
 United States of America (``django.contrib.localflavor.us``) 
 ============================================================

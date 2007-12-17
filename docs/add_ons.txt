@@ -181,8 +181,12 @@ localflavor
 ===========
 
 A collection of various Django snippets that are useful only for a particular
-country or culture. For example, ``django.contrib.localflavor.usa.forms``
+country or culture. For example, ``django.contrib.localflavor.us.forms``
 contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
+
+See the `localflavor documentation`_.
+
+.. _localflavor documentation: ../localflavor/
 
 markup
 ======
