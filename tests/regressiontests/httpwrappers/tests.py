@@ -391,9 +391,43 @@ u'\ufffd'
 >>> q.getlist('foo')
 [u'bar', u'\ufffd']
 
+
+###################################### 
+# HttpResponse with Unicode headers  # 
+###################################### 
+ 
+>>> r = HttpResponse() 
+ 
+If we insert a unicode value it will be converted to an ascii
+string. This makes sure we comply with the HTTP specifications.
+ 
+>>> r['value'] = u'test value' 
+>>> isinstance(r['value'], str) 
+True
+
+An error is raised When a unicode object with non-ascii is assigned.
+
+>>> r['value'] = u't\xebst value' # doctest:+ELLIPSIS
+Traceback (most recent call last):
+...
+UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
+ 
+The response also converts unicode keys to strings. 
+ 
+>>> r[u'test'] = 'testing key' 
+>>> list(sorted(r.items()))[1]
+('test', 'testing key')
+
+It will also raise errors for keys with non-ascii data.
+
+>>> r[u't\xebst'] = 'testing key'  # doctest:+ELLIPSIS
+Traceback (most recent call last):
+...
+UnicodeEncodeError: ..., HTTP response headers must be in US-ASCII format
+ 
 """
 
-from django.http import QueryDict
+from django.http import QueryDict, HttpResponse
 
 if __name__ == "__main__":
     import doctest
