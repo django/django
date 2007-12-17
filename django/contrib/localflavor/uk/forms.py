@@ -12,11 +12,13 @@ class UKPostcodeField(RegexField):
     The regular expression used is sourced from the schema for British Standard
     BS7666 address types: http://www.govtalk.gov.uk/gdsc/schemas/bs7666-v2-0.xsd
     """
+    default_error_messages = {
+        'invalid': ugettext(u'Enter a postcode. A space is required between the two postcode parts.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(UKPostcodeField, self).__init__(r'^(GIR 0AA|[A-PR-UWYZ]([0-9]{1,2}|([A-HIK-Y][0-9](|[0-9]|[ABEHMNPRVWXY]))|[0-9][A-HJKSTUW]) [0-9][ABD-HJLNP-UW-Z]{2})$',
-            max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a postcode. A space is required between the two postcode parts.'),
-            *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class UKCountySelect(Select):
     """

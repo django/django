@@ -13,10 +13,14 @@ class ISIdNumberField(RegexField):
     Icelandic identification number (kennitala). This is a number every citizen
     of Iceland has.
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.'),
+        'checksum': ugettext(u'The Icelandic identification number is not valid.'),
+    }
+
     def __init__(self, *args, **kwargs):
-        error_msg = ugettext('Enter a valid Icelandic identification number. The format is XXXXXX-XXXX.')
         kwargs['min_length'],kwargs['max_length'] = 10,11
-        super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$', error_message=error_msg, *args, **kwargs)
+        super(ISIdNumberField, self).__init__(r'^\d{6}(-| )?\d{4}$', *args, **kwargs)
 
     def clean(self, value):
         value = super(ISIdNumberField, self).clean(value)
@@ -28,7 +32,7 @@ class ISIdNumberField(RegexField):
         if self._validate(value):
             return self._format(value)
         else:
-            raise ValidationError(ugettext(u'The Icelandic identification number is not valid.'))
+            raise ValidationError(self.error_messages['checksum'])
 
     def _canonify(self, value):
         """

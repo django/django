@@ -12,14 +12,20 @@ PHONE_DIGITS_RE = re.compile(r'^(\d{10})$')
 
 class AUPostCodeField(RegexField):
     """Australian post code field."""
+    default_error_messages = {
+        'invalid': ugettext('Enter a 4 digit post code.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(AUPostCodeField, self).__init__(r'^\d{4}$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a 4 digit post code.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class AUPhoneNumberField(Field):
     """Australian phone number field."""
+    default_error_messages = {
+        'invalid': u'Phone numbers must contain 10 digits.',
+    }
+
     def clean(self, value):
         """
         Validate a phone number. Strips parentheses, whitespace and hyphens.
@@ -31,7 +37,7 @@ class AUPhoneNumberField(Field):
         phone_match = PHONE_DIGITS_RE.search(value)
         if phone_match:
             return u'%s' % phone_match.group(1)
-        raise ValidationError(u'Phone numbers must contain 10 digits.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class AUStateSelect(Select):
     """

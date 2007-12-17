@@ -41,7 +41,7 @@ Strict RUT usage (does not allow imposible values)
 >>> rut.clean('11-6')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+ValidationError: [u'Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
 
 # valid format, bad verifier.
 >>> rut.clean('11.111.111-0')
@@ -53,17 +53,17 @@ ValidationError: [u'The Chilean RUT is not valid.']
 >>> rut.clean('767484100')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+ValidationError: [u'Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
 >>> rut.clean('78.412.790-7')
 u'78.412.790-7'
 >>> rut.clean('8.334.6043')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+ValidationError: [u'Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
 >>> rut.clean('76793310-K')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.']
+ValidationError: [u'Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.']
 
 ## CLRegionSelect #########################################################
 >>> from django.contrib.localflavor.cl.forms import CLRegionSelect

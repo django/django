@@ -10,11 +10,12 @@ import re
 id_re = re.compile(r"^(?P<residence>\d{10})(?P<origin>\w{1,3})[-\ ]?(?P<birthday>\d{7})[-\ ]?(?P<validity>\d{7})[-\ ]?(?P<checksum>\d{1})$")
 
 class DEZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+    }
     def __init__(self, *args, **kwargs):
         super(DEZipCodeField, self).__init__(r'^\d{5}$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class DEStateSelect(Select):
     """
@@ -36,6 +37,10 @@ class DEIdentityCardNumberField(Field):
 
     Algorithm is documented at http://de.wikipedia.org/wiki/Personalausweis
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.'),
+    }
+
     def has_valid_checksum(self, number):
         given_number, given_checksum = number[:-1], number[-1]
         calculated_checksum = 0
@@ -57,23 +62,22 @@ class DEIdentityCardNumberField(Field):
 
     def clean(self, value):
         super(DEIdentityCardNumberField, self).clean(value)
-        error_msg = ugettext('Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X format.')
         if value in EMPTY_VALUES:
             return u''
         match = re.match(id_re, value)
         if not match:
-            raise ValidationError(error_msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         gd = match.groupdict()
         residence, origin = gd['residence'], gd['origin']
         birthday, validity, checksum = gd['birthday'], gd['validity'], gd['checksum']
 
         if residence == '0000000000' or birthday == '0000000' or validity == '0000000':
-            raise ValidationError(error_msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         all_digits = u"%s%s%s%s" % (residence, birthday, validity, checksum)
         if not self.has_valid_checksum(residence) or not self.has_valid_checksum(birthday) or \
             not self.has_valid_checksum(validity) or not self.has_valid_checksum(all_digits):
-                raise ValidationError(error_msg)
+                raise ValidationError(self.error_messages['invalid'])
 
         return u'%s%s-%s-%s-%s' % (residence, origin, birthday, validity, checksum)

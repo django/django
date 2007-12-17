@@ -8,11 +8,13 @@ from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext
 
 class NOZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(NOZipCodeField, self).__init__(r'^\d{4}$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class NOMunicipalitySelect(Select):
     """
@@ -27,14 +29,17 @@ class NOSocialSecurityNumber(Field):
     """
     Algorithm is documented at http://no.wikipedia.org/wiki/Personnummer
     """
+    default_error_messages = {
+        'invalid': ugettext(u'Enter a valid Norwegian social security number.'),
+    }
+
     def clean(self, value):
         super(NOSocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
 
-        msg = ugettext(u'Enter a valid Norwegian social security number.')
         if not re.match(r'^\d{11}$', value):
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         day = int(value[:2])
         month = int(value[2:4])
@@ -52,7 +57,7 @@ class NOSocialSecurityNumber(Field):
             if 900 <= inum < 1000 and year2 > 39:
                 self.birthday = datetime.date(1900+year2, month, day)
         except ValueError:
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         sexnum = int(value[8])
         if sexnum % 2 == 0:
@@ -68,9 +73,9 @@ class NOSocialSecurityNumber(Field):
             return sum([(a * b) for (a, b) in zip(aval, bval)])
 
         if multiply_reduce(digits, weight_1) % 11 != 0:
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
         if multiply_reduce(digits, weight_2) % 11 != 0:
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         return value
 

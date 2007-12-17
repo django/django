@@ -15,12 +15,14 @@ class ESPostalCodeField(RegexField):
     Spanish postal code is a five digits string, with two first digits
     between 01 and 52, assigned to provinces code.
     """
+    default_error_messages = {
+        'invalid': _('Enter a valid postal code in the range and format 01XXX - 52XXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ESPostalCodeField, self).__init__(
                 r'^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$',
-                max_length=None, min_length=None,
-                error_message=_('Enter a valid postal code in the range and format 01XXX - 52XXX.'),
-                *args, **kwargs)
+                max_length=None, min_length=None, *args, **kwargs)
 
 class ESPhoneNumberField(RegexField):
     """
@@ -33,11 +35,13 @@ class ESPhoneNumberField(RegexField):
 
     TODO: accept and strip characters like dot, hyphen... in phone number
     """
+    default_error_messages = {
+        'invalid': _('Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ESPhoneNumberField, self).__init__(r'^(6|8|9)\d{8}$',
-                max_length=None, min_length=None,
-                error_message=_('Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or 9XXXXXXXX.'),
-                *args, **kwargs)
+                max_length=None, min_length=None, *args, **kwargs)
 
 class ESIdentityCardNumberField(RegexField):
     """
@@ -58,19 +62,23 @@ class ESIdentityCardNumberField(RegexField):
     public, and different authors have different opinions on which ones allows
     letters, so both validations are assumed true for all types.
     """
+    default_error_messages = {
+        'invalid': _('Please enter a valid NIF, NIE, or CIF.'),
+        'invalid_only_nif': _('Please enter a valid NIF or NIE.'),
+        'invalid_nif': _('Invalid checksum for NIF.'),
+        'invalid_nie': _('Invalid checksum for NIE.'),
+        'invalid_cif': _('Invalid checksum for CIF.'),
+    }
+
     def __init__(self, only_nif=False, *args, **kwargs):
         self.only_nif = only_nif
         self.nif_control = 'TRWAGMYFPDXBNJZSQVHLCKE'
         self.cif_control = 'JABCDEFGHI'
         self.cif_types = 'ABCDEFGHKLMNPQS'
         self.nie_types = 'XT'
-        if self.only_nif:
-            self.id_types = 'NIF or NIE'
-        else:
-            self.id_types = 'NIF, NIE, or CIF'
         super(ESIdentityCardNumberField, self).__init__(r'^([%s]?)[ -]?(\d+)[ -]?([%s]?)$' % (self.cif_types + self.nie_types + self.cif_types.lower() + self.nie_types.lower(), self.nif_control + self.nif_control.lower()),
                 max_length=None, min_length=None,
-                error_message=_('Please enter a valid %s.' % self.id_types),
+                error_message=self.default_error_messages['invalid%s' % (self.only_nif and '_only_nif' or '')],
                 *args, **kwargs)
 
     def clean(self, value):
@@ -88,13 +96,13 @@ class ESIdentityCardNumberField(RegexField):
             if letter2 == nif_get_checksum(number):
                 return value
             else:
-                raise ValidationError, _('Invalid checksum for NIF.')
+                raise ValidationError, self.error_messages['invalid_nif']
         elif letter1 in self.nie_types and letter2:
             # NIE
             if letter2 == nif_get_checksum(number):
                 return value
             else:
-                raise ValidationError, _('Invalid checksum for NIE.')
+                raise ValidationError, self.error_messages['invalid_nie']
         elif not self.only_nif and letter1 in self.cif_types and len(number) in [7, 8]:
             # CIF
             if not letter2:
@@ -103,9 +111,9 @@ class ESIdentityCardNumberField(RegexField):
             if letter2 in [checksum, self.cif_control[checksum]]:
                 return value
             else:
-                raise ValidationError, _('Invalid checksum for CIF.')
+                raise ValidationError, self.error_messages['invalid_cif']
         else:
-            raise ValidationError, _('Please enter a valid %s.' % self.id_types)
+            raise ValidationError, self.error_messages['invalid']
 
 class ESCCCField(RegexField):
     """
@@ -130,11 +138,14 @@ class ESCCCField(RegexField):
 
         TODO: allow IBAN validation too
     """
+    default_error_messages = {
+        'invalid': _('Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX.'),
+        'checksum': _('Invalid checksum for bank account number.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ESCCCField, self).__init__(r'^\d{4}[ -]?\d{4}[ -]?\d{2}[ -]?\d{10}$',
-            max_length=None, min_length=None,
-            error_message=_('Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX.'),
-            *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
     def clean(self, value):
         super(ESCCCField, self).clean(value)
@@ -147,7 +158,7 @@ class ESCCCField(RegexField):
         if get_checksum('00' + entity + office) + get_checksum(account) == checksum:
             return value
         else:
-            raise ValidationError, _('Invalid checksum for bank account number.')
+            raise ValidationError, self.error_messages['checksum']
 
 class ESRegionSelect(Select):
     """

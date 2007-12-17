@@ -16,10 +16,9 @@ class ZAIDField(Field):
     using the Luhn checksum, and uses a simlistic (read: not entirely accurate)
     check for the birthdate
     """
-
-    def __init__(self, *args, **kwargs):
-        super(ZAIDField, self).__init__()
-        self.error_message = _(u'Enter a valid South African ID number')
+    default_error_messages = {
+        'invalid': _(u'Enter a valid South African ID number'),
+    }
 
     def clean(self, value):
         # strip spaces and dashes
@@ -31,9 +30,9 @@ class ZAIDField(Field):
             return u''
 
         match = re.match(id_re, value)
-        
+
         if not match:
-            raise ValidationError(self.error_message)
+            raise ValidationError(self.error_messages['invalid'])
 
         g = match.groupdict()
 
@@ -43,15 +42,18 @@ class ZAIDField(Field):
             # There is no way to guess the century of a ZA ID number
             d = date(int(g['yy']) + 2000, int(g['mm']), int(g['dd']))
         except ValueError:
-            raise ValidationError(self.error_message)
+            raise ValidationError(self.error_messages['invalid'])
 
         if not luhn(value):
-            raise ValidationError(self.error_message)
+            raise ValidationError(self.error_messages['invalid'])
 
         return value
 
 class ZAPostCodeField(RegexField):
+    default_error_messages = {
+        'invalid': _(u'Enter a valid South African postal code'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ZAPostCodeField, self).__init__(r'^\d{4}$',
-            max_length=None, min_length=None,
-            error_message=_(u'Enter a valid South African postal code'))
+            max_length=None, min_length=None)

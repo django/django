@@ -11,11 +11,13 @@ import re
 phone_digits_re = re.compile(r'^0\d(\s|\.)?(\d{2}(\s|\.)?){3}\d{2}$')
 
 class FRZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(FRZipCodeField, self).__init__(r'^\d{5}$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class FRPhoneNumberField(Field):
     """
@@ -24,6 +26,10 @@ class FRPhoneNumberField(Field):
     '0X.XX.XX.XX.XX' and '0XXXXXXXXX' validate but are corrected to
     '0X XX XX XX XX'.
     """
+    default_error_messages = {
+        'invalid': u'Phone numbers must be in 0X XX XX XX XX format.',
+    }
+
     def clean(self, value):
         super(FRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -32,7 +38,7 @@ class FRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s %s %s %s %s' % (value[0:2], value[2:4], value[4:6], value[6:8], value[8:10])
-        raise ValidationError(u'Phone numbers must be in 0X XX XX XX XX format.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class FRDepartmentSelect(Select):
     """
