@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
         format = options.get('format', 'json')
         indent = options.get('indent', None)
+        show_traceback = options.get('traceback', False)
 
         if len(app_labels) == 0:
             app_list = get_apps()
@@ -42,4 +43,6 @@ class Command(BaseCommand):
         try:
             return serializers.serialize(format, objects, indent=indent)
         except Exception, e:
+            if show_traceback:
+                raise
             raise CommandError("Unable to serialize database: %s" % e)
