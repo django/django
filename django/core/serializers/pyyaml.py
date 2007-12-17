@@ -19,6 +19,8 @@ class Serializer(PythonSerializer):
     Convert a queryset to YAML.
     """
     
+    internal_use_only = False
+    
     def handle_field(self, obj, field):
         # A nasty special case: base YAML doesn't support serialization of time
         # types (as opposed to dates or datetimes, which it does support). Since

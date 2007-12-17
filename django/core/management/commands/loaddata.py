@@ -50,10 +50,10 @@ class Command(BaseCommand):
             parts = fixture_label.split('.')
             if len(parts) == 1:
                 fixture_name = fixture_label
-                formats = serializers.get_serializer_formats()
+                formats = serializers.get_public_serializer_formats()
             else:
                 fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                if format in serializers.get_serializer_formats():
+                if format in serializers.get_public_serializer_formats():
                     formats = [format]
                 else:
                     formats = []
