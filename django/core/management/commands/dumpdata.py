@@ -38,7 +38,7 @@ class Command(BaseCommand):
         objects = []
         for app in app_list:
             for model in get_models(app):
-                objects.extend(model.objects.all())
+                objects.extend(model._default_manager.all())
         try:
             return serializers.serialize(format, objects, indent=indent)
         except Exception, e:

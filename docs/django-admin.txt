@@ -132,6 +132,13 @@ If no application name is provided, all installed applications will be dumped.
 
 The output of ``dumpdata`` can be used as input for ``loaddata``.
 
+Note that ``dumpdata`` uses the default manager on the mdoel for selecting the
+records to dump. If you're using a `custom manager`_ as the default manager
+and it filters some of the available records, not all of the objects will be
+dumped.
+
+.. _custom manager: ../model-api/#custom-managers
+
 --format
 ~~~~~~~~
 
