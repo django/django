@@ -25,16 +25,21 @@ class CLRutField(RegexField):
     Samples for testing are available from
     https://palena.sii.cl/cvc/dte/ee_empresas_emisoras.html
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid Chilean RUT.'),
+        'strict': ugettext('Enter a valid Chilean RUT. The format is XX.XXX.XXX-X.'),
+        'checksum': ugettext('The Chilean RUT is not valid.'),
+    }
+
     def __init__(self, *args, **kwargs):
         if 'strict' in kwargs:
             del kwargs['strict']
             super(CLRutField, self).__init__(r'^(\d{1,2}\.)?\d{3}\.\d{3}-[\dkK]$',
-                error_message=ugettext('Enter valid a Chilean RUT. The format is XX.XXX.XXX-X.'),
-                        *args, **kwargs)
+                error_message=self.default_error_messages['strict'], *args, **kwargs)
         else:
             # In non-strict mode, accept RUTs that validate but do not exist in
             # the real world.
-            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', error_message=ugettext('Enter valid a Chilean RUT'), *args, **kwargs)
+            super(CLRutField, self).__init__(r'^[\d\.]{1,11}-?[\dkK]$', *args, **kwargs)
 
     def clean(self, value):
         """
@@ -47,7 +52,7 @@ class CLRutField(RegexField):
         if self._algorithm(rut) == verificador:
             return self._format(rut, verificador)
         else:
-            raise ValidationError(u'The Chilean RUT is not valid.')
+            raise ValidationError(self.error_messages['checksum'])
 
     def _algorithm(self, rut):
         """

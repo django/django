@@ -234,6 +234,7 @@ request to the URL ``/rss/beats/0613/``:
       ``get_object()`` method, passing it the bits. In this case, bits is
       ``['0613']``. For a request to ``/rss/beats/0613/foo/bar/``, bits would
       be ``['0613', 'foo', 'bar']``.
+
     * ``get_object()`` is responsible for retrieving the given beat, from the
       given ``bits``. In this case, it uses the Django database API to retrieve
       the beat. Note that ``get_object()`` should raise
@@ -243,6 +244,7 @@ request to the URL ``/rss/beats/0613/``:
       raises ``Beat.DoesNotExist`` on failure, and ``Beat.DoesNotExist`` is a
       subclass of ``ObjectDoesNotExist``. Raising ``ObjectDoesNotExist`` in
       ``get_object()`` tells Django to produce a 404 error for that request.
+
     * To generate the feed's ``<title>``, ``<link>`` and ``<description>``,
       Django uses the ``title()``, ``link()`` and ``description()`` methods. In
       the previous example, they were simple string class attributes, but this
@@ -258,9 +260,9 @@ request to the URL ``/rss/beats/0613/``:
       Inside the ``link()`` method, we handle the possibility that ``obj``
       might be ``None``, which can occur when the URL isn't fully specified. In
       some cases, you might want to do something else in this case, which would
-      mean you'd need to check for ``obj`` existing in other methods as well
-      (the ``link()`` method is called very early in the feed generation
-      process, so is a good place to bail out early).
+      mean you'd need to check for ``obj`` existing in other methods as well.
+      (The ``link()`` method is called very early in the feed generation
+      process, so it's a good place to bail out early.)
 
     * Finally, note that ``items()`` in this example also takes the ``obj``
       argument. The algorithm for ``items`` is the same as described in the

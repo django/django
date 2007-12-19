@@ -8,11 +8,12 @@ from django.newforms.fields import Field, RegexField, Select, EMPTY_VALUES
 from django.utils.translation import ugettext
 
 class FIZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXXX.'),
+    }
     def __init__(self, *args, **kwargs):
         super(FIZipCodeField, self).__init__(r'^\d{5}$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class FIMunicipalitySelect(Select):
     """
@@ -23,6 +24,10 @@ class FIMunicipalitySelect(Select):
         super(FIMunicipalitySelect, self).__init__(attrs, choices=MUNICIPALITY_CHOICES)
 
 class FISocialSecurityNumber(Field):
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid Finnish social security number.'),
+    }
+
     def clean(self, value):
         super(FISocialSecurityNumber, self).clean(value)
         if value in EMPTY_VALUES:
@@ -37,9 +42,9 @@ class FISocialSecurityNumber(Field):
             (?P<serial>(\d{3}))
             (?P<checksum>[%s])$""" % checkmarks, value, re.VERBOSE | re.IGNORECASE)
         if not result:
-            raise ValidationError(ugettext('Enter a valid Finnish social security number.'))
+            raise ValidationError(self.error_messages['invalid'])
         gd = result.groupdict()
         checksum = int(gd['date'] + gd['serial'])
         if checkmarks[checksum % len(checkmarks)] == gd['checksum'].upper():
             return u'%s' % value.upper()
-        raise ValidationError(ugettext('Enter a valid Finnish social security number.'))
+        raise ValidationError(self.error_messages['invalid'])

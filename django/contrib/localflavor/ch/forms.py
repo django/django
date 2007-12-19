@@ -12,11 +12,13 @@ id_re = re.compile(r"^(?P<idnumber>\w{8})(?P<pos9>(\d{1}|<))(?P<checksum>\d{1})$
 phone_digits_re = re.compile(r'^0([1-9]{1})\d{8}$')
 
 class CHZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(CHZipCodeField, self).__init__(r'^\d{4}$',
-        max_length=None, min_length=None,
-        error_message=ugettext('Enter a zip code in the format XXXX.'),
-        *args, **kwargs)
+        max_length=None, min_length=None, *args, **kwargs)
 
 class CHPhoneNumberField(Field):
     """
@@ -25,6 +27,10 @@ class CHPhoneNumberField(Field):
     '0XX.XXX.XX.XX' and '0XXXXXXXXX' validate but are corrected to
     '0XX XXX XX XX'.
     """
+    default_error_messages = {
+        'invalid': 'Phone numbers must be in 0XX XXX XX XX format.',
+    }
+
     def clean(self, value):
         super(CHPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -33,7 +39,7 @@ class CHPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s %s %s %s' % (value[0:3], value[3:6], value[6:8], value[8:10])
-        raise ValidationError('Phone numbers must be in 0XX XXX XX XX format.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class CHStateSelect(Select):
     """
@@ -54,6 +60,10 @@ class CHIdentityCardNumberField(Field):
 
     Algorithm is documented at http://adi.kousz.ch/artikel/IDCHE.htm
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.'),
+    }
+
     def has_valid_checksum(self, number):
         given_number, given_checksum = number[:-1], number[-1]
         new_number = given_number
@@ -87,23 +97,22 @@ class CHIdentityCardNumberField(Field):
 
     def clean(self, value):
         super(CHIdentityCardNumberField, self).clean(value)
-        error_msg = ugettext('Enter a valid Swiss identity or passport card number in X1234567<0 or 1234567890 format.')
         if value in EMPTY_VALUES:
             return u''
 
         match = re.match(id_re, value)
         if not match:
-            raise ValidationError(error_msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         idnumber, pos9, checksum = match.groupdict()['idnumber'], match.groupdict()['pos9'], match.groupdict()['checksum']
 
         if idnumber == '00000000' or \
            idnumber == 'A0000000':
-            raise ValidationError(error_msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         all_digits = "%s%s%s" % (idnumber, pos9, checksum)
         if not self.has_valid_checksum(all_digits):
-            raise ValidationError(error_msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         return u'%s%s%s' % (idnumber, pos9, checksum)
 

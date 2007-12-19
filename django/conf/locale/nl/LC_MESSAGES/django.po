@@ -1,17 +1,12 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the django package.
-# Johan C. Stöver <johan@nilling.nl>, 2005.
-# Rudolph Froger <rfroger@estrate.nl>, 2006.
-#
+
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-12-09 15:51+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Johan C. Stöver <johan@nilling.nl>\n"
+"PO-Revision-Date: 2007-12-17 21:14+0100\n"
+"Last-Translator: I.S. van Oostveen\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -69,7 +64,7 @@ msgstr "De waarde moet een geheel getal zijn."
 
 #: db/models/fields/__init__.py:381
 msgid "This value must be either True or False."
-msgstr "De waarde moet of True (waar) of False (onwaar) zijn."
+msgstr "De waarde moet of True (Waar) of False (Onwaar) zijn."
 
 #: db/models/fields/__init__.py:397
 msgid "This field cannot be null."
@@ -279,7 +274,7 @@ msgstr "Alleen alfabetische karakters zijn toegestaan"
 
 #: core/validators.py:139
 msgid "Year must be 1900 or later."
-msgstr "Het jaartal moet 1900 of nieuwer zijn."
+msgstr "Het jaartal moet 1900 of later zijn."
 
 #: core/validators.py:143
 #, python-format
@@ -296,20 +291,20 @@ msgstr "Geef een geldig e-mailadres op."
 
 #: core/validators.py:173 core/validators.py:442 forms/__init__.py:667
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Er was geen bestand verstuurd. Controleer de encoding van het formulier."
+msgstr "Er was geen bestand verstuurd. Controleer het coderings type van het formulier."
 
 #: core/validators.py:177
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of was "
+"Bestand ongeldig. Het bestand dat is gegeven is geen afbeelding of is "
 "beschadigd."
 
 #: core/validators.py:184
 #, python-format
 msgid "The URL %s does not point to a valid image."
-msgstr "De URL %s wijst niet naar een afbeelding."
+msgstr "De URL %s wijst niet naar een geldige afbeelding."
 
 #: core/validators.py:188
 #, python-format
@@ -321,7 +316,7 @@ msgstr ""
 #: core/validators.py:196
 #, python-format
 msgid "The URL %s does not point to a valid QuickTime video."
-msgstr "De URL %s wijst niet naar een QuickTime video."
+msgstr "De URL %s wijst niet naar een geldige QuickTime video."
 
 #: core/validators.py:200
 msgid "A valid URL is required."
@@ -349,18 +344,18 @@ msgstr "Ongeldige URL: %s"
 #: core/validators.py:243 core/validators.py:245
 #, python-format
 msgid "The URL %s is a broken link."
-msgstr "De URL %s is een niet werkende link."
+msgstr "De URL %s is niet een werkende link."
 
 #: core/validators.py:251
 msgid "Enter a valid U.S. state abbreviation."
-msgstr "Geef een geldige afkorting van een VS staat."
+msgstr "Geef een geldige afkorting van een staat in de VS."
 
 #: core/validators.py:265
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] "Pas op uw taalgebruik! Gebruik van %s niet toegestaan."
-msgstr[1] "Pas op uw taalgebruik! Gebruik van de woorden %s niet toegestaan."
+msgstr[1] "Pas op uw taalgebruik! Gebruik van de woorden %s is niet toegestaan."
 
 #: core/validators.py:272
 #, python-format
@@ -373,7 +368,7 @@ msgstr "Voer tenminste één veld in."
 
 #: core/validators.py:300 core/validators.py:311
 msgid "Please enter both fields or leave them both empty."
-msgstr "Voer waarden in in beide velden of laat beide leeg."
+msgstr "Voer waarden in beide velden in of laat beide leeg."
 
 #: core/validators.py:318
 #, python-format
@@ -450,7 +445,7 @@ msgstr "Zorg ervoor dat het bestand hoogstens %s bytes groot is."
 
 #: core/validators.py:453
 msgid "The format for this field is wrong."
-msgstr "Het formaat van dit veld is fout."
+msgstr "Het formaat van dit veld is foutief."
 
 #: core/validators.py:468
 msgid "This field is invalid."
@@ -536,7 +531,7 @@ msgid ""
 "Your Web browser doesn't appear to have cookies enabled. Cookies are "
 "required for logging in."
 msgstr ""
-"Het lijkt erop dat uw browser geen cookies accepteerd. Om aan te melden "
+"Het lijkt erop dat uw browser geen cookies accepteert. Om aan te melden "
 "moeten cookies worden geaccepteerd."
 
 #: contrib/auth/forms.py:59 contrib/admin/views/decorators.py:10
@@ -645,7 +640,7 @@ msgstr "supergebruiker status"
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
-msgstr "Bepaald dat deze gebruiker alle rechten heeft, zonder deze expliciet toe te wijzen."
+msgstr "Bepaalt dat deze gebruiker alle rechten heeft, zonder deze expliciet toe te wijzen."
 
 #: contrib/auth/models.py:98
 msgid "last login"
@@ -685,7 +680,7 @@ msgstr "Rechten"
 
 #: contrib/auth/models.py:113
 msgid "Important dates"
-msgstr "Belangrijke data"
+msgstr "Belangrijke datums"
 
 #: contrib/auth/models.py:114
 msgid "Groups"
@@ -783,7 +778,7 @@ msgid ""
 "Please log in again, because your session has expired. Don't worry: Your "
 "submission has been saved."
 msgstr ""
-"Uw sessie is verlopen, meldt u opnieuw aan. Maakt u geen zorgen: Uw bijdrage "
+"Uw sessie is verlopen, meld u opnieuw aan. Maakt u zich geen zorgen: Uw bijdrage "
 "is opgeslagen."
 
 #: contrib/admin/views/decorators.py:69
@@ -791,7 +786,7 @@ msgid ""
 "Looks like your browser isn't configured to accept cookies. Please enable "
 "cookies, reload this page, and try again."
 msgstr ""
-"Het lijkt erop dat uw browser geen cookies accepteerd. Zet het gebruik van "
+"Het lijkt erop dat uw browser geen cookies accepteert. Zet het gebruik van "
 "cookies aan in uw browser, laad deze pagina nogmaals en probeer het opnieuw."
 
 #: contrib/admin/views/decorators.py:83
@@ -928,7 +923,7 @@ msgstr "Model %r niet gevonden in app %r"
 #: contrib/admin/views/doc.py:183
 #, python-format
 msgid "the related `%s.%s` object"
-msgstr "the related `%s.%s` object"
+msgstr "het gerelateerde `%s.%s` object"
 
 #: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
 #: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
@@ -938,7 +933,7 @@ msgstr "model:"
 #: contrib/admin/views/doc.py:214
 #, python-format
 msgid "related `%s.%s` objects"
-msgstr "related `%s.%s` objects"
+msgstr "de gerelateerde `%s.%s` objecten"
 
 #: contrib/admin/views/doc.py:219
 #, python-format
@@ -948,12 +943,12 @@ msgstr "alle %s"
 #: contrib/admin/views/doc.py:224
 #, python-format
 msgid "number of %s"
-msgstr "nummer van %s"
+msgstr "aantal %s"
 
 #: contrib/admin/views/doc.py:229
 #, python-format
 msgid "Fields on %s objects"
-msgstr "Velden van %s objects"
+msgstr "Velden van %s objecten"
 
 #: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:301
 #: contrib/admin/views/doc.py:303 contrib/admin/views/doc.py:309
@@ -1139,11 +1134,11 @@ msgid ""
 "All of the following related items will be deleted:"
 msgstr ""
 "Weet u zeker dat u %(object_name)s \"%(escaped_object)s\" wilt verwijderen? Alle "
-"volgende opjecten worden verwijderd:"
+"volgende objecten worden verwijderd:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:26
 msgid "Yes, I'm sure"
-msgstr "Ja, Ik weet het zeker"
+msgstr "Ja, ik weet het zeker"
 
 #: contrib/admin/templates/admin/404.html:4
 #: contrib/admin/templates/admin/404.html:8
@@ -1197,7 +1192,7 @@ msgstr "Opslaan en nieuw item"
 
 #: contrib/admin/templates/admin/submit_line.html:6
 msgid "Save and continue editing"
-msgstr "Opslaan en bewerk opnieuw"
+msgstr "Opslaan en opnieuw bewerken"
 
 #: contrib/admin/templates/admin/submit_line.html:7
 msgid "Save"
@@ -1224,7 +1219,7 @@ msgstr "Wijzigen"
 
 #: contrib/admin/templates/admin/index.html:44
 msgid "You don't have permission to edit anything."
-msgstr "U heeft geen rechten om iets te wijzigen"
+msgstr "U heeft geen rechten om iets te wijzigen."
 
 #: contrib/admin/templates/admin/index.html:52
 msgid "Recent Actions"
@@ -1380,7 +1375,7 @@ msgstr ""
 "de bookmarklet vanuit elke pagina op de site worden gekozen. Let erop dat "
 "het soms\n"
 "noodzakelijk is dat de computer van waaruit de pagina wordt bekeken intern "
-"is\n"
+"is.\n"
 "(Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
 "bevind).<p>\n"
 
@@ -1393,7 +1388,7 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
-"Spring vanuit elke pagina naar de documentatie voor de view die gegenereerd "
+"Springt vanuit elke pagina naar de documentatie voor de view die gegenereerd "
 "wordt door die pagina"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:22
@@ -1406,7 +1401,7 @@ msgid ""
 "object."
 msgstr ""
 "Toont de content-type en unieke ID voor pagina's die een enkel object "
-"voorsteld."
+"voorstellen."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Edit this object (current window)"
@@ -1414,7 +1409,7 @@ msgstr "Bewerk dit object (huidig venster)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:26
 msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "Ga naar de beheerpagina voor pagina's die een enkel object weergeven."
+msgstr "Gaat naar de beheerpagina voor pagina's die een enkel object weergeven."
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "Edit this object (new window)"
@@ -1527,7 +1522,7 @@ msgid ""
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Vanwege de beveiliging moet u uw oude en twee keer een nieuw "
-"wachtwoordinvoeren, zodat we kunnen controleren of er geen typefouten zijn "
+"wachtwoord invoeren, zodat we kunnen controleren of er geen typefouten zijn "
 "gemaakt."
 
 #: contrib/admin/templates/registration/password_change_form.html:17
@@ -1597,7 +1592,7 @@ msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Voorbeeld: 'flatpages/contact_page'. Als deze niet is opgegeven, dan wordt "
+"Voorbeeld: 'flatpages/contact_page.html'. Als deze niet is opgegeven, dan wordt "
 "'flatpages/default.html' gebruikt."
 
 #: contrib/flatpages/models.py:14
@@ -1894,7 +1889,7 @@ msgstr "Een of meerdere verplichte velden zijn niet ingevuld"
 #: contrib/comments/views/comments.py:196
 #: contrib/comments/views/comments.py:286
 msgid "Somebody tampered with the comment form (security violation)"
-msgstr "Iemand heeft het opmerkingenformulier gewijzigd (Beveilingsinbreuk)"
+msgstr "Iemand heeft het opmerkingenformulier gewijzigd (beveilingsinbreuk)"
 
 #: contrib/comments/views/comments.py:206
 #: contrib/comments/views/comments.py:292

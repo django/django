@@ -26,11 +26,13 @@ class SKPostalCodeField(RegexField):
     A form field that validates its input as Slovak postal code.
     Valid form is XXXXX or XXX XX, where X represents integer.
     """
+    default_error_messages = {
+        'invalid': ugettext(u'Enter a postal code in the format XXXXX or XXX XX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(SKPostalCodeField, self).__init__(r'^\d{5}$|^\d{3} \d{2}$',
-            max_length=None, min_length=None,
-            error_message=ugettext(u'Enter a postal code in the format XXXXX or XXX XX.'),
-            *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
     def clean(self, value):
         """

@@ -27,6 +27,7 @@ class Command(BaseCommand):
         self.style = no_style()
 
         verbosity = int(options.get('verbosity', 1))
+        show_traceback = options.get('traceback', False)
 
         # Keep a count of the installed objects and fixtures
         count = [0, 0]
@@ -50,15 +51,15 @@ class Command(BaseCommand):
             parts = fixture_label.split('.')
             if len(parts) == 1:
                 fixture_name = fixture_label
-                formats = serializers.get_serializer_formats()
+                formats = serializers.get_public_serializer_formats()
             else:
                 fixture_name, format = '.'.join(parts[:-1]), parts[-1]
-                if format in serializers.get_serializer_formats():
+                if format in serializers.get_public_serializer_formats():
                     formats = [format]
                 else:
                     formats = []
 
-            if verbosity > 0:
+            if verbosity > 2:
                 if formats:
                     print "Loading '%s' fixtures..." % fixture_name
                 else:
@@ -98,15 +99,17 @@ class Command(BaseCommand):
                                 label_found = True
                             except Exception, e:
                                 fixture.close()
+                                transaction.rollback()
+                                transaction.leave_transaction_management()
+                                if show_traceback:
+                                    raise
                                 sys.stderr.write(
                                     self.style.ERROR("Problem installing fixture '%s': %s\n" %
                                          (full_path, str(e))))
-                                transaction.rollback()
-                                transaction.leave_transaction_management()
                                 return
                             fixture.close()
                     except:
-                        if verbosity > 1:
+                        if verbosity > 2:
                             print "No %s fixture '%s' in %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
 
@@ -122,7 +125,7 @@ class Command(BaseCommand):
         transaction.leave_transaction_management()
 
         if count[0] == 0:
-            if verbosity > 0:
+            if verbosity > 2:
                 print "No fixtures found."
         else:
             if verbosity > 0:

@@ -763,7 +763,7 @@ label of each required field::
     <form method="post" action="">
     <dl>
     {% for field in form %}
-        <dt>{{ field.label_tag }}{{ field.label }}{% if field.field.required %}*{% endif %}</dt>
+        <dt>{{ field.label_tag }}{% if field.field.required %}*{% endif %}</dt>
         <dd>{{ field }}</dd>
         {% if field.help_text %}<dd>{{ field.help_text }}</dd>{% endif %}
         {% if field.errors %}<dd class="myerrors">{{ field.errors }}</dd>{% endif %}

@@ -156,6 +156,18 @@ Methods
    Returns ``True`` or ``False``, designating whether ``request.GET`` or
    ``request.POST`` has the given key.
 
+``get_host()``
+   **New in Django development version**
+
+   Returns the originating host of the request using information from the
+   ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
+   they don't provide a value, the method uses a combination of
+   ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+
+   .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+
+   Example: ``"127.0.0.1:8000"``
+
 ``get_full_path()``
    Returns the ``path``, plus an appended query string, if applicable.
 
@@ -452,7 +464,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 ``HttpResponseNotModified``
     The constructor doesn't take any arguments. Use this to designate that a
-    page hasn't been modified since the user's last request.
+    page hasn't been modified since the user's last request (status code 304).
 
 ``HttpResponseBadRequest``
     **New in Django development version.**
@@ -560,10 +572,10 @@ Three things to note about 404 views:
       you must create a ``404.html`` template in the root of your
       template directory. The default 404 view will use that template
       for all 404 errors. The default 404 view will pass one variable
-      to the template: ``request_path``, which is the URL which
-      resulted in the 404.
+      to the template: ``request_path``, which is the URL that resulted
+      in the 404.
 
-    * If ``DEBUG`` is set to ``True`` (in your settings module) then your 404
+    * If ``DEBUG`` is set to ``True`` (in your settings module), then your 404
       view will never be used, and the traceback will be displayed instead.
 
 The 500 (server error) view

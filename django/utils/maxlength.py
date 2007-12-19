@@ -1,6 +1,6 @@
 """
 Utilities for providing backwards compatibility for the maxlength argument,
-which has been replaced by max_length, see ticket #2101.
+which has been replaced by max_length. See ticket #2101.
 """
 
 from warnings import warn
@@ -15,17 +15,15 @@ def legacy_maxlength(max_length, maxlength):
     """
     Consolidates max_length and maxlength, providing backwards compatibilty
     for the legacy "maxlength" argument.
+
     If one of max_length or maxlength is given, then that value is returned.
-    If both are given, a TypeError is raised.
-    If maxlength is used at all, a deprecation warning is issued.
+    If both are given, a TypeError is raised. If maxlength is used at all, a
+    deprecation warning is issued.
     """
     if maxlength is not None:
-        warn("maxlength is deprecated, use max_length instead.",
-             DeprecationWarning,
-             stacklevel=3)
+        warn("maxlength is deprecated. Use max_length instead.", DeprecationWarning, stacklevel=3)
         if max_length is not None:
-            raise TypeError("field can not take both the max_length"
-                            " argument and the legacy maxlength argument.")
+            raise TypeError("Field cannot take both the max_length argument and the legacy maxlength argument.")
         max_length = maxlength
     return max_length
 
@@ -33,7 +31,8 @@ def remove_maxlength(func):
     """
     A decorator to be used on a class's __init__ that provides backwards
     compatibilty for the legacy "maxlength" keyword argument, i.e.
-      name = models.CharField(maxlength=20)
+        name = models.CharField(maxlength=20)
+
     It does this by changing the passed "maxlength" keyword argument
     (if it exists) into a "max_length" keyword argument.
     """
@@ -58,7 +57,6 @@ class LegacyMaxlength(type):
     Metaclass for providing backwards compatibility support for the
     "maxlength" keyword argument.
     """
-
     def __init__(cls, name, bases, attrs):
         super(LegacyMaxlength, cls).__init__(name, bases, attrs)
         # Decorate the class's __init__ to remove any maxlength keyword.

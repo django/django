@@ -10,11 +10,13 @@ import re
 
 
 class INZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': gettext(u'Enter a zip code in the format XXXXXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(INZipCodeField, self).__init__(r'^\d{6}$',
-            max_length=None, min_length=None,
-            error_message=gettext(u'Enter a zip code in the format XXXXXXX.'),
-            *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class INStateField(Field):
     """
@@ -22,6 +24,10 @@ class INStateField(Field):
     abbreviation. It normalizes the input to the standard two-letter vehicle
     registration abbreviation for the given state or union territory
     """
+    default_error_messages = {
+        'invalid': u'Enter a Indian state or territory.',
+    }
+
     def clean(self, value):
         from in_states import STATES_NORMALIZED
         super(INStateField, self).clean(value)
@@ -36,7 +42,7 @@ class INStateField(Field):
                 return smart_unicode(STATES_NORMALIZED[value.strip().lower()])
             except KeyError:
                 pass
-        raise ValidationError(u'Enter a Indian state or territory.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class INStateSelect(Select):
     """

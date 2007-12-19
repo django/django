@@ -322,7 +322,7 @@ class AnonymousUser(object):
     id = None
     username = ''
     is_staff = False
-    is_active = True
+    is_active = False
     is_superuser = False
     _groups = EmptyManager()
     _user_permissions = EmptyManager()

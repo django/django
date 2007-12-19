@@ -84,9 +84,8 @@ def form_for_model(model, form=BaseForm, fields=None,
     determining the formfield for a given database field. It's a callable that
     takes a database Field instance and returns a form Field instance.
     """
-    warn("form_for_model is deprecated, use ModelForm instead.",
-        PendingDeprecationWarning,
-        stacklevel=3)
+    warn("form_for_model is deprecated. Use ModelForm instead.",
+        PendingDeprecationWarning, stacklevel=3)
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
@@ -114,9 +113,8 @@ def form_for_instance(instance, form=BaseForm, fields=None,
     takes a database Field instance, plus **kwargs, and returns a form Field
     instance with the given kwargs (i.e. 'initial').
     """
-    warn("form_for_instance is deprecated, use ModelForm instead.",
-        PendingDeprecationWarning,
-        stacklevel=3)
+    warn("form_for_instance is deprecated. Use ModelForm instead.",
+        PendingDeprecationWarning, stacklevel=3)
     model = instance.__class__
     opts = model._meta
     field_list = []
@@ -149,10 +147,10 @@ def model_to_dict(instance, fields=None, exclude=None):
     """
     Returns a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
-    
+
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned dict.
-    
+
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned dict, even if they are listed in
     the ``fields`` argument.
@@ -187,7 +185,7 @@ def fields_for_model(model, fields=None, exclude=None, formfield_callback=lambda
 
     ``fields`` is an optional list of field names. If provided, only the named
     fields will be included in the returned fields.
-    
+
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned fields, even if they are listed
     in the ``fields`` argument.
@@ -214,9 +212,8 @@ class ModelFormOptions(object):
         self.exclude = getattr(options, 'exclude', None)
 
 class ModelFormMetaclass(type):
-    def __new__(cls, name, bases, attrs):
-        # TODO: no way to specify formfield_callback yet, do we need one, or
-        # should it be a special case for the admin?
+    def __new__(cls, name, bases, attrs,
+                formfield_callback=lambda f: f.formfield()):
         fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
         fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
 
@@ -245,15 +242,16 @@ class ModelFormMetaclass(type):
 
         # If a model is defined, extract form fields from it and add them to base_fields
         if attrs['_meta'].model is not None:
-            # Don't allow a subclass to define a Meta model if a parent class has.
-            # Technically the right fields would be generated, but the save 
-            # method will not deal with more than one model.
+            # Don't allow a subclass to define a different Meta model than a
+            # parent class has. Technically the right fields would be generated,
+            # but the save method will not deal with more than one model.
             for base in bases:
                 base_opts = getattr(base, '_meta', None)
                 base_model = getattr(base_opts, 'model', None)
-                if base_model is not None:
-                    raise ImproperlyConfigured('%s defines more than one model.' % name)
-            model_fields = fields_for_model(opts.model, opts.fields, opts.exclude)
+                if base_model and base_model is not opts.model:
+                    raise ImproperlyConfigured('%s defines a different model than its parent.' % name)
+            model_fields = fields_for_model(opts.model, opts.fields,
+                    opts.exclude, formfield_callback)
             # fields declared in base classes override fields from the model
             model_fields.update(declared_fields)
             attrs['base_fields'] = model_fields
@@ -262,11 +260,16 @@ class ModelFormMetaclass(type):
         return type.__new__(cls, name, bases, attrs)
 
 class BaseModelForm(BaseForm):
-    def __init__(self, instance, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':'):
-        self.instance = instance
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
+                 initial=None, error_class=ErrorList, label_suffix=':', instance=None):
         opts = self._meta
-        object_data = model_to_dict(instance, opts.fields, opts.exclude)
+        if instance is None:
+            # if we didn't get an instance, instantiate a new one
+            self.instance = opts.model()
+            object_data = {}
+        else:
+            self.instance = instance
+            object_data = model_to_dict(instance, opts.fields, opts.exclude)
         # if initial was provided, it should override the values from instance
         if initial is not None:
             object_data.update(initial)

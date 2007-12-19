@@ -277,7 +277,20 @@ class HttpResponse(object):
             for key, value in self._headers.values()]) \
             + '\n\n' + self.content
 
+    def _convert_to_ascii(self, *values):
+        "Convert all values to ascii strings"
+        for value in values:
+            if isinstance(value, unicode):
+                try:
+                    yield value.encode('us-ascii')
+                except UnicodeError, e:
+                    e.reason += ', HTTP response headers must be in US-ASCII format'
+                    raise
+            else:
+                yield str(value)
+
     def __setitem__(self, header, value):
+        header, value = self._convert_to_ascii(header, value)
         self._headers[header.lower()] = (header, value)
 
     def __delitem__(self, header):
@@ -331,7 +344,7 @@ class HttpResponse(object):
         chunk = self._iterator.next()
         if isinstance(chunk, unicode):
             chunk = chunk.encode(self._charset)
-        return chunk
+        return str(chunk)
 
     def close(self):
         if hasattr(self._container, 'close'):

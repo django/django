@@ -814,7 +814,7 @@ def ssi(parser, token):
     Outputs the contents of a given file into the page.
 
     Like a simple "include" tag, the ``ssi`` tag includes the contents
-    of another file -- which must be specified using an absolute page --
+    of another file -- which must be specified using an absolute path --
     in the current page::
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html %}

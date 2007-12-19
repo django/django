@@ -93,6 +93,7 @@ def django_tests(verbosity, interactive, test_labels):
     old_root_urlconf = settings.ROOT_URLCONF
     old_template_dirs = settings.TEMPLATE_DIRS
     old_use_i18n = settings.USE_I18N
+    old_login_url = settings.LOGIN_URL
     old_language_code = settings.LANGUAGE_CODE
     old_middleware_classes = settings.MIDDLEWARE_CLASSES
 
@@ -102,6 +103,7 @@ def django_tests(verbosity, interactive, test_labels):
     settings.TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), TEST_TEMPLATE_DIR),)
     settings.USE_I18N = True
     settings.LANGUAGE_CODE = 'en'
+    settings.LOGIN_URL = '/accounts/login/'
     settings.MIDDLEWARE_CLASSES = (
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -153,6 +155,7 @@ def django_tests(verbosity, interactive, test_labels):
     settings.TEMPLATE_DIRS = old_template_dirs
     settings.USE_I18N = old_use_i18n
     settings.LANGUAGE_CODE = old_language_code
+    settings.LOGIN_URL = old_login_url
     settings.MIDDLEWARE_CLASSES = old_middleware_classes
 
 if __name__ == "__main__":

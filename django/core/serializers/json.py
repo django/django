@@ -20,6 +20,8 @@ class Serializer(PythonSerializer):
     """
     Convert a queryset to JSON.
     """
+    internal_use_only = False
+    
     def end_serialization(self):
         self.options.pop('stream', None)
         self.options.pop('fields', None)

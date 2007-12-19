@@ -12,6 +12,7 @@ from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
 
 EMPTY_VALUE = '(None)'
+DISPLAY_SIZE = 100
 
 class EasyModel(object):
     def __init__(self, site, model):
@@ -93,8 +94,8 @@ class EasyInstance(object):
 
     def __unicode__(self):
         val = smart_unicode(self.instance)
-        if len(val) > 30:
-            return val[:30] + u'...'
+        if len(val) > DISPLAY_SIZE:
+            return val[:DISPLAY_SIZE] + u'...'
         return val
 
     def __str__(self):

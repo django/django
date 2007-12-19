@@ -12,13 +12,15 @@ u'BT32 4PX'
 >>> f.clean('GIR 0AA')
 u'GIR 0AA'
 >>> f.clean('BT324PX')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+u'BT32 4PX'
 >>> f.clean('1NV 4L1D')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+ValidationError: [u'Enter a valid postcode.']
+>>> f.clean('1NV4L1D')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid postcode.']
 >>> f.clean(None)
 Traceback (most recent call last):
 ...
@@ -27,7 +29,20 @@ ValidationError: [u'This field is required.']
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
-
+>>> f.clean(' so11aa ')
+u'SO1 1AA'
+>>> f.clean(' so1  1aa ')
+u'SO1 1AA'
+>>> f.clean('G2 3wt')
+u'G2 3WT'
+>>> f.clean('EC1A 1BB')
+u'EC1A 1BB'
+>>> f.clean('Ec1a1BB')
+u'EC1A 1BB'
+>>> f.clean(' b0gUS')
+Traceback (most recent call last):
+...
+ValidationError: [u'Enter a valid postcode.']
 >>> f = UKPostcodeField(required=False)
 >>> f.clean('BT32 4PX')
 u'BT32 4PX'
@@ -36,11 +51,9 @@ u'GIR 0AA'
 >>> f.clean('1NV 4L1D')
 Traceback (most recent call last):
 ...
-ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+ValidationError: [u'Enter a valid postcode.']
 >>> f.clean('BT324PX')
-Traceback (most recent call last):
-...
-ValidationError: [u'Enter a postcode. A space is required between the two postcode parts.']
+u'BT32 4PX'
 >>> f.clean(None)
 u''
 >>> f.clean('')

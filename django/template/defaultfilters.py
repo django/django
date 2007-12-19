@@ -43,7 +43,11 @@ def stringfilter(func):
 
 
 def addslashes(value):
-    """Adds slashes - useful for passing strings to JavaScript, for example."""
+    """
+    Adds slashes before quotes. Useful for escaping strings in CSV, for
+    example. Less useful for escaping JavaScript; use the ``escapejs``
+    filter instead.
+    """
     return value.replace('\\', '\\\\').replace('"', '\\"').replace("'", "\\'")
 addslashes.is_safe = True
 addslashes = stringfilter(addslashes)
@@ -53,6 +57,25 @@ def capfirst(value):
     return value and value[0].upper() + value[1:]
 capfirst.is_safe=True
 capfirst = stringfilter(capfirst)
+
+_js_escapes = (
+    ('\\', '\\\\'),
+    ('"', '\\"'),
+    ("'", "\\'"),
+    ('\n', '\\n'),
+    ('\r', '\\r'),
+    ('\b', '\\b'),
+    ('\f', '\\f'),
+    ('\t', '\\t'),
+    ('\v', '\\v'),
+    ('</', '<\\/'),
+)
+def escapejs(value):
+    """Backslash-escapes characters for use in JavaScript strings."""
+    for bad, good in _js_escapes:
+        value = value.replace(bad, good)
+    return value
+escapejs = stringfilter(escapejs)
 
 def fix_ampersands(value):
     """Replaces ampersands with ``&amp;`` entities."""
@@ -231,7 +254,7 @@ urlize.is_safe=True
 urlize.needs_autoescape = True
 urlize = stringfilter(urlize)
 
-def urlizetrunc(value, limit):
+def urlizetrunc(value, limit, autoescape=None):
     """
     Converts URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
@@ -239,8 +262,10 @@ def urlizetrunc(value, limit):
     Argument: Length to truncate URLs to.
     """
     from django.utils.html import urlize
-    return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True))
+    return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True,
+                            autoescape=autoescape))
 urlizetrunc.is_safe = True
+urlizetrunc.needs_autoescape = True
 urlizetrunc = stringfilter(urlizetrunc)
 
 def wordcount(value):
@@ -766,6 +791,7 @@ register.filter(dictsort)
 register.filter(dictsortreversed)
 register.filter(divisibleby)
 register.filter(escape)
+register.filter(escapejs)
 register.filter(filesizeformat)
 register.filter(first)
 register.filter(fix_ampersands)

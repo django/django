@@ -1,4 +1,4 @@
-"HTML utilities suitable for global use."
+"""HTML utilities suitable for global use."""
 
 import re
 import string
@@ -8,11 +8,11 @@ from django.utils.encoding import force_unicode
 from django.utils.functional import allow_lazy
 from django.utils.http import urlquote
 
-# Configuration for urlize() function
+# Configuration for urlize() function.
 LEADING_PUNCTUATION  = ['(', '<', '&lt;']
 TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
 
-# list of possible strings used for bullets in bulleted lists
+# List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\xe2\x80\xa2', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
@@ -28,7 +28,7 @@ trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\
 del x # Temporary variable
 
 def escape(html):
-    "Return the given HTML with ampersands, quotes and carets encoded."
+    """Returns the given HTML with ampersands, quotes and carets encoded."""
     return mark_safe(force_unicode(html).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
 escape = allow_lazy(escape, unicode)
 
@@ -42,7 +42,7 @@ def conditional_escape(html):
         return escape(html)
 
 def linebreaks(value, autoescape=False):
-    "Converts newlines into <p> and <br />s"
+    """Converts newlines into <p> and <br />s."""
     value = re.sub(r'\r\n|\r|\n', '\n', force_unicode(value)) # normalize newlines
     paras = re.split('\n{2,}', value)
     if autoescape:
@@ -50,31 +50,31 @@ def linebreaks(value, autoescape=False):
     else:
         paras = [u'<p>%s</p>' % p.strip().replace('\n', '<br />') for p in paras]
     return u'\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, unicode) 
+linebreaks = allow_lazy(linebreaks, unicode)
 
 def strip_tags(value):
-    "Return the given HTML with all tags stripped."
+    """Returns the given HTML with all tags stripped."""
     return re.sub(r'<[^>]*?>', '', force_unicode(value))
 strip_tags = allow_lazy(strip_tags)
 
 def strip_spaces_between_tags(value):
-    "Return the given HTML with spaces between tags removed."
+    """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_unicode(value))
 strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, unicode)
 
 def strip_entities(value):
-    "Return the given HTML with all entities (&something;) stripped."
+    """Returns the given HTML with all entities (&something;) stripped."""
     return re.sub(r'&(?:\w+|#\d+);', '', force_unicode(value))
 strip_entities = allow_lazy(strip_entities, unicode)
 
 def fix_ampersands(value):
-    "Return the given HTML with all unencoded ampersands encoded correctly."
+    """Returns the given HTML with all unencoded ampersands encoded correctly."""
     return unencoded_ampersands_re.sub('&amp;', force_unicode(value))
 fix_ampersands = allow_lazy(fix_ampersands, unicode)
 
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
-    Convert any URLs in text into clickable links.
+    Converts any URLs in text into clickable links.
 
     Works on http://, https://, and www. links.  Links can have trailing
     punctuation (periods, commas, close-parens) and leading punctuation

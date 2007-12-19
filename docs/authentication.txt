@@ -247,8 +247,8 @@ Anonymous users
 the ``django.contrib.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
-    * ``is_staff`` and ``is_superuser`` are always False.
-    * ``is_active`` is always True.
+    * ``is_staff`` and ``is_superuser`` are always ``False``.
+    * ``is_active`` is always ``False``.
     * ``groups`` and ``user_permissions`` are always empty.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
     * ``is_authenticated()`` returns ``False`` instead of ``True``.
@@ -382,7 +382,7 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
 .. admonition:: Calling ``authenticate()`` first
     
     When you're manually logging a user in, you *must* call
-    ``authenticate()`` before you call ``login()``; ``authenticate()``
+    ``authenticate()`` before you call ``login()``. ``authenticate()``
     sets an attribute on the ``User`` noting which authentication
     backend successfully authenticated that user (see the `backends
     documentation`_ for details), and this information is needed later

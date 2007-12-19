@@ -29,51 +29,38 @@ class CacheClass(BaseCache):
 
         self._lock = RWLock()
 
-    def _add(self, key, value, timeout=None):
-        if len(self._cache) >= self._max_entries:
-            self._cull()
-        if timeout is None:
-            timeout = self.default_timeout
-        if key not in self._cache.keys():
-            self._cache[key] = value
-            self._expire_info[key] = time.time() + timeout
-
     def add(self, key, value, timeout=None):
         self._lock.writer_enters()
-        # Python 2.3 and 2.4 don't allow combined try-except-finally blocks.
         try:
-            try:
-                self._add(key, pickle.dumps(value), timeout)
-            except pickle.PickleError:
-                pass
+            exp = self._expire_info.get(key)
+            if exp is None or exp <= time.time():
+                try:
+                    self._set(key, pickle.dumps(value), timeout)
+                except pickle.PickleError:
+                    pass
         finally:
             self._lock.writer_leaves()
 
     def get(self, key, default=None):
-        should_delete = False
         self._lock.reader_enters()
         try:
-            now = time.time()
             exp = self._expire_info.get(key)
             if exp is None:
                 return default
-            elif exp < now:
-                should_delete = True
-            else:
+            elif exp > time.time():
                 try:
                     return pickle.loads(self._cache[key])
                 except pickle.PickleError:
                     return default
         finally:
             self._lock.reader_leaves()
-        if should_delete:
-            self._lock.writer_enters()
-            try:
-                del self._cache[key]
-                del self._expire_info[key]
-                return default
-            finally:
-                self._lock.writer_leaves()
+        self._lock.writer_enters()
+        try:
+            del self._cache[key]
+            del self._expire_info[key]
+            return default
+        finally:
+            self._lock.writer_leaves()
 
     def _set(self, key, value, timeout=None):
         if len(self._cache) >= self._max_entries:
@@ -95,7 +82,23 @@ class CacheClass(BaseCache):
             self._lock.writer_leaves()
 
     def has_key(self, key):
-        return key in self._cache
+        self._lock.reader_enters()
+        try:
+            exp = self._expire_info.get(key)
+            if exp is None:
+                return False
+            elif exp > time.time():
+                return True
+        finally:
+            self._lock.reader_leaves()
+
+        self._lock.writer_enters()
+        try:
+            del self._cache[key]
+            del self._expire_info[key]
+            return False
+        finally:
+            self._lock.writer_leaves()
 
     def _cull(self):
         if self._cull_frequency == 0:

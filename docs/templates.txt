@@ -565,17 +565,17 @@ autoescape
 
 **New in Django development version**
 
-Control the current auto-escaping behaviour. This tag takes either ``on`` or
+Control the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block.
 
 When auto-escaping is in effect, all variable content has HTML escaping applied
 to it before placing the result into the output (but after any filters have
 been applied). This is equivalent to manually applying the ``escape`` filter
-attached to each variable.
+to each variable.
 
-The only exceptions are variables that are already marked as 'safe' from
-escaping, either by the code that populated the variable, or because it has
+The only exceptions are variables that are already marked as "safe" from
+escaping, either by the code that populated the variable, or because it has had
 the ``safe`` or ``escape`` filters applied.
 
 block
@@ -1227,8 +1227,10 @@ Adds the arg to the value.
 addslashes
 ~~~~~~~~~~
 
-Adds slashes. Useful for passing strings to JavaScript, for example.
+Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
+**New in Django development version**: for escaping data in JavaScript strings,
+use the `escapejs` filter instead.
 
 capfirst
 ~~~~~~~~
@@ -1302,6 +1304,15 @@ applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
 multiple escaping passes to be applied, use the ``force_escape`` filter.
 
+escapejs
+~~~~~~~~
+
+**New in Django development version**
+
+Escapes characters for use in JavaScript strings. This does *not* make the
+string safe for use in HTML, but does protect you from syntax errors when using
+templates to generate JavaScript/JSON.
+
 filesizeformat
 ~~~~~~~~~~~~~~
 
@@ -1324,36 +1335,36 @@ floatformat
 When used without an argument, rounds a floating-point number to one decimal
 place -- but only if there's a decimal part to be displayed. For example:
 
-========  =======================  ======
-value     Template                 Output
-========  =======================  ======
-34.23234  {{ value|floatformat }}  34.2
-34.00000  {{ value|floatformat }}  34
-34.26000  {{ value|floatformat }}  34.3
-========  =======================  ======
+============  ===========================  ========
+``value``     Template                     Output
+============  ===========================  ========
+``34.23234``  ``{{ value|floatformat }}``  ``34.2``
+``34.00000``  ``{{ value|floatformat }}``  ``34``
+``34.26000``  ``{{ value|floatformat }}``  ``34.3``
+============  ===========================  ========
 
 If used with a numeric integer argument, ``floatformat`` rounds a number to
 that many decimal places. For example:
 
-========  =========================  ======
-value     Template                   Output
-========  =========================  ======
-34.23234  {{ value|floatformat:3 }}  34.232
-34.00000  {{ value|floatformat:3 }}  34.000
-34.26000  {{ value|floatformat:3 }}  34.260
-========  =========================  ======
+============  =============================  ==========
+``value``     Template                       Output
+============  =============================  ==========
+``34.23234``  ``{{ value|floatformat:3 }}``  ``34.232``
+``34.00000``  ``{{ value|floatformat:3 }}``  ``34.000``
+``34.26000``  ``{{ value|floatformat:3 }}``  ``34.260``
+============  =============================  ==========
 
 If the argument passed to ``floatformat`` is negative, it will round a number
 to that many decimal places -- but only if there's a decimal part to be
 displayed. For example:
 
-========  ============================  ======
-value     Template                      Output
-========  ============================  ======
-34.23234  {{ value|floatformat:"-3" }}  34.232
-34.00000  {{ value|floatformat:"-3" }}  34
-34.26000  {{ value|floatformat:"-3" }}  34.260
-========  ============================  ======
+============  ================================  ==========
+``value``     Template                          Output
+============  ================================  ==========
+``34.23234``  ``{{ value|floatformat:"-3" }}``  ``34.232``
+``34.00000``  ``{{ value|floatformat:"-3" }}``  ``34``
+``34.26000``  ``{{ value|floatformat:"-3" }}``  ``34.260``
+============  ================================  ==========
 
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.

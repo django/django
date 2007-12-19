@@ -270,27 +270,21 @@ a test case, add the name of the test method to the label::
 
     $ ./manage.py test animals.AnimalTestCase.testFluffyAnimals
 
-Understanding the test output
------------------------------
+The test database
+-----------------
 
-When you run your tests, you'll see a number of messages as the test runner
-prepares itself::
+Tests that require a database (namely, model tests) will not use
+your "real" (production) database. A separate, blank database is created
+for the tests.
 
-    Creating test database...
-    Creating table myapp_animal
-    Creating table myapp_mineral
-    Loading 'initial_data' fixtures...
-    No fixtures found.
+Regardless of whether the tests pass or fail, the test database is destroyed
+when all the tests have been executed.
 
-This tells you that the test runner is creating a test database -- a blank,
-from-scratch database that it will use for any tests that happen to require a
-database (namely, model tests).
-
-Don't worry -- the test runner will not touch your "real" (production)
-database. It creates a separate database purely for the tests. This test
-database gets its name by prepending ``test_`` to the value of the
-``DATABASE_NAME`` setting. If you want to use a different name, specify the
-``TEST_DATABASE_NAME`` setting.
+By default this test database gets its name by prepending ``test_`` to the
+value of the ``DATABASE_NAME`` setting. When using the SQLite database engine
+the tests will by default use an in-memory database (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). If you want to use a
+different database name, specify the ``TEST_DATABASE_NAME`` setting.
 
 Aside from using a separate database, the test runner will otherwise use all of
 the same database settings you have in your settings file: ``DATABASE_ENGINE``,
@@ -305,6 +299,22 @@ setting to control the particular collation used by the test database. See the
 settings_ documentation for details of these advanced settings.
 
 .. _settings: ../settings/
+
+Understanding the test output
+-----------------------------
+
+When you run your tests, you'll see a number of messages as the test runner
+prepares itself. You can control the level of detail of these messages with the
+``verbosity`` option on the command line::
+
+    Creating test database...
+    Creating table myapp_animal
+    Creating table myapp_mineral
+    Loading 'initial_data' fixtures...
+    No fixtures found.
+
+This tells you that the test runner is creating a test database, as described
+in the previous section.
 
 Once the test database has been created, Django will run your tests.
 If everything goes well, you'll see something like this::
@@ -348,9 +358,6 @@ Note that the return code for the test-runner script is the total number of
 failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
-
-Regardless of whether the tests pass or fail, the test database is destroyed when
-all the tests have been executed.
 
 Testing tools
 =============

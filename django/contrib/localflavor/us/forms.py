@@ -12,13 +12,19 @@ phone_digits_re = re.compile(r'^(?:1-?)?(\d{3})[-\.]?(\d{3})[-\.]?(\d{4})$')
 ssn_re = re.compile(r"^(?P<area>\d{3})[-\ ]?(?P<group>\d{2})[-\ ]?(?P<serial>\d{4})$")
 
 class USZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(USZipCodeField, self).__init__(r'^\d{5}(?:-\d{4})?$',
-            max_length=None, min_length=None,
-            error_message=ugettext('Enter a zip code in the format XXXXX or XXXXX-XXXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class USPhoneNumberField(Field):
+    default_error_messages = {
+        'invalid': u'Phone numbers must be in XXX-XXX-XXXX format.',
+    }
+
     def clean(self, value):
         super(USPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -27,7 +33,7 @@ class USPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(u'Phone numbers must be in XXX-XXX-XXXX format.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class USSocialSecurityNumberField(Field):
     """
@@ -44,28 +50,31 @@ class USSocialSecurityNumberField(Field):
           promotional use or distribution (e.g., the Woolworth's number or the
           1962 promotional number).
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid U.S. Social Security number in XXX-XX-XXXX format.'),
+    }
+
     def clean(self, value):
         super(USSocialSecurityNumberField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
-        msg = ugettext('Enter a valid U.S. Social Security number in XXX-XX-XXXX format.')
         match = re.match(ssn_re, value)
         if not match:
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
         area, group, serial = match.groupdict()['area'], match.groupdict()['group'], match.groupdict()['serial']
 
         # First pass: no blocks of all zeroes.
         if area == '000' or \
            group == '00' or \
            serial == '0000':
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
 
         # Second pass: promotional and otherwise permanently invalid numbers.
         if area == '666' or \
            (area == '987' and group == '65' and 4320 <= int(serial) <= 4329) or \
            value == '078-05-1120' or \
            value == '219-09-9999':
-            raise ValidationError(msg)
+            raise ValidationError(self.error_messages['invalid'])
         return u'%s-%s-%s' % (area, group, serial)
 
 class USStateField(Field):
@@ -74,6 +83,10 @@ class USStateField(Field):
     It normalizes the input to the standard two-leter postal service
     abbreviation for the given state.
     """
+    default_error_messages = {
+        'invalid': u'Enter a U.S. state or territory.',
+    }
+
     def clean(self, value):
         from us_states import STATES_NORMALIZED
         super(USStateField, self).clean(value)
@@ -88,7 +101,7 @@ class USStateField(Field):
                 return STATES_NORMALIZED[value.strip().lower()].decode('ascii')
             except KeyError:
                 pass
-        raise ValidationError(u'Enter a U.S. state or territory.')
+        raise ValidationError(self.error_messages['invalid'])
 
 class USStateSelect(Select):
     """

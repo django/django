@@ -116,6 +116,7 @@ def sql_delete(app, style):
     "Returns a list of the DROP TABLE SQL statements for the given app."
     from django.db import connection, models, get_introspection_module
     from django.db.backends.util import truncate_name
+    from django.contrib.contenttypes import generic
     introspection = get_introspection_module()
 
     # This should work even if a connection isn't available
@@ -179,6 +180,8 @@ def sql_delete(app, style):
     for model in app_models:
         opts = model._meta
         for f in opts.many_to_many:
+            if isinstance(f.rel, generic.GenericRel):
+                continue
             if cursor and table_name_converter(f.m2m_db_table()) in table_names:
                 output.append("%s %s;" % (style.SQL_KEYWORD('DROP TABLE'),
                     style.SQL_TABLE(qn(f.m2m_db_table()))))

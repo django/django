@@ -11,6 +11,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
     status = models.IntegerField(blank=True, null=True, choices=CHOICES)
     misc_data = models.CharField(max_length=100, blank=True)
+    article_text = models.TextField()
 
     class Meta:
         ordering = ('pub_date','headline')
@@ -41,5 +42,14 @@ Empty strings should be returned as Unicode
 >>> a2 = Article.objects.get(pk=a.id)
 >>> a2.misc_data
 u''
+
+# TextFields can hold more than 4000 characters (this was broken in Oracle).
+>>> a3 = Article(headline="Really, really big", pub_date=datetime.now())
+>>> a3.article_text = "ABCDE" * 1000
+>>> a3.save()
+>>> a4 = Article.objects.get(pk=a3.id)
+>>> len(a4.article_text)
+5000
+
 """
 }

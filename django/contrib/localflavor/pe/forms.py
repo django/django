@@ -19,6 +19,11 @@ class PEDNIField(CharField):
     """
     A field that validates `Documento Nacional de IdentidadŽ (DNI) numbers.
     """
+    default_error_messages = {
+        'invalid': ugettext("This field requires only numbers."),
+        'max_digits': ugettext("This field requires 8 digits."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(PEDNIField, self).__init__(max_length=8, min_length=8, *args,
                 **kwargs)
@@ -31,9 +36,9 @@ class PEDNIField(CharField):
         if value in EMPTY_VALUES:
             return u''
         if not value.isdigit():
-            raise ValidationError(ugettext("This field requires only numbers."))
+            raise ValidationError(self.error_messages['invalid'])
         if len(value) != 8:
-            raise ValidationError(ugettext("This field requires 8 digits."))
+            raise ValidationError(self.error_messages['max_digits'])
 
         return value
 
@@ -42,6 +47,11 @@ class PERUCField(RegexField):
     This field validates a RUC (Registro Unico de Contribuyentes). A RUC is of
     the form XXXXXXXXXXX.
     """
+    default_error_messages = {
+        'invalid': ugettext("This field requires only numbers."),
+        'max_digits': ugettext("This field requires 11 digits."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(PERUCField, self).__init__(max_length=11, min_length=11, *args,
             **kwargs)
@@ -54,8 +64,8 @@ class PERUCField(RegexField):
         if value in EMPTY_VALUES:
             return u''
         if not value.isdigit():
-            raise ValidationError(ugettext("This field requires only numbers."))
+            raise ValidationError(self.error_messages['invalid'])
         if len(value) != 11:
-            raise ValidationError(ugettext("This field requires 11 digits."))
+            raise ValidationError(self.error_messages['max_digits'])
         return value
 
