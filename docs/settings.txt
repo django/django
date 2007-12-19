@@ -417,17 +417,21 @@ site manager(s).
 DEFAULT_TABLESPACE
 ------------------
 
+**New in Django development version**
+
 Default: ``''`` (Empty string)
 
-Default tablespace to use for models that do not specify one, if the
+Default tablespace to use for models that don't specify one, if the
 backend supports it.
 
 DEFAULT_INDEX_TABLESPACE
 ------------------------
 
+**New in Django development version**
+
 Default: ``''`` (Empty string)
 
-Default tablespace to use for indexes on fields that do not specify
+Default tablespace to use for indexes on fields that don't specify
 one, if the backend supports it.
 
 DISALLOWED_USER_AGENTS
@@ -977,8 +981,13 @@ TEST_DATABASE_NAME
 
 Default: ``None``
 
-The name of database to use when running the test suite. If a value of
-``None`` is specified, the test database will use the name ``'test_' + settings.DATABASE_NAME``. See `Testing Django Applications`_.
+The name of database to use when running the test suite.
+
+If the default value (``None``) is used with the SQLite database engine, the
+tests will use a memory resident database. For all other database engines the
+test database will use the name ``'test_' + settings.DATABASE_NAME``.
+
+See `Testing Django Applications`_.
 
 .. _Testing Django Applications: ../testing/
 

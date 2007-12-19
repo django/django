@@ -44,8 +44,8 @@ Our class looks something like this::
         # ... (other possibly useful methods omitted) ...
 
 This is just an ordinary Python class, with nothing Django-specific about it.
-We'd like to be able to things like this in our models (we assume the ``hand``
-attribute on the model is an instance of ``Hand``)::
+We'd like to be able to do things like this in our models (we assume the
+``hand`` attribute on the model is an instance of ``Hand``)::
 
     example = MyModel.objects.get(pk=1)
     print example.hand.north
@@ -381,6 +381,10 @@ database, so we need to be able to process strings and ``Hand`` instances in
 
 Notice that we always return a ``Hand`` instance from this method. That's the
 Python object type we want to store in the model's attribute.
+
+**Remember:** If your custom field needs the ``to_python()`` method to be
+called when it is created, you should be using `The SubfieldBase metaclass`_
+mentioned earlier. Otherwise ``to_python()`` won't be called automatically.
 
 ``get_db_prep_save(self, value)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

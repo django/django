@@ -49,6 +49,18 @@ u'\\\\ : backslashes, too'
 >>> capfirst(u'hello world')
 u'Hello world'
 
+>>> escapejs(u'"double quotes" and \'single quotes\'')
+u'\\"double quotes\\" and \\\'single quotes\\\''
+
+>>> escapejs(ur'\ : backslashes, too')
+u'\\\\ : backslashes, too'
+
+>>> escapejs(u'and lots of whitespace: \r\n\t\v\f\b')
+u'and lots of whitespace: \\r\\n\\t\\v\\f\\b'
+
+>>> escapejs(ur'<script>and this</script>')
+u'<script>and this<\\/script>'
+
 >>> fix_ampersands(u'Jack & Jill & Jeroboam')
 u'Jack &amp; Jill &amp; Jeroboam'
 

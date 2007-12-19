@@ -24,18 +24,20 @@ class ARPostalCodeField(RegexField):
 
     See http://www.correoargentino.com.ar/consulta_cpa/home.php
     """
+    default_error_messages = {
+        'invalid': ugettext("Enter a postal code in the format NNNN or ANNNNAAA."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ARPostalCodeField, self).__init__(r'^\d{4}$|^[A-HJ-NP-Za-hj-np-z]\d{4}\D{3}$',
-            min_length=4, max_length=8,
-            error_message=ugettext("Enter a postal code in the format NNNN or ANNNNAAA."),
-                    *args, **kwargs)
+            min_length=4, max_length=8, *args, **kwargs)
 
     def clean(self, value):
         value = super(ARPostalCodeField, self).clean(value)
         if value in EMPTY_VALUES:
             return u''
         if len(value) not in (4, 8):
-            raise ValidationError(ugettext("Enter a postal code in the format NNNN or ANNNNAAA."))
+            raise ValidationError(self.error_messages['invalid'])
         if len(value) == 8:
             return u'%s%s%s' % (value[0].upper(), value[1:5], value[5:].upper())
         return value
@@ -44,6 +46,11 @@ class ARDNIField(CharField):
     """
     A field that validates `Documento Nacional de Identidad´ (DNI) numbers.
     """
+    default_error_messages = {
+        'invalid': ugettext("This field requires only numbers."),
+        'max_digits': ugettext("This field requires 7 or 8 digits."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ARDNIField, self).__init__(max_length=10, min_length=7, *args,
                 **kwargs)
@@ -58,10 +65,9 @@ class ARDNIField(CharField):
         if not value.isdigit():
             value = value.replace('.', '')
         if not value.isdigit():
-            raise ValidationError(ugettext("This field requires only numbers."))
+            raise ValidationError(self.error_messages['invalid'])
         if len(value) not in (7, 8):
-            raise ValidationError(
-                    ugettext("This field requires 7 or 8 digits."))
+            raise ValidationError(self.error_messages['max_digits'])
 
         return value
 
@@ -70,9 +76,13 @@ class ARCUITField(RegexField):
     This field validates a CUIT (Código Único de Identificación Tributaria). A
     CUIT is of the form XX-XXXXXXXX-V. The last digit is a check digit.
     """
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
+        'checksum': ugettext("Invalid CUIT."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ARCUITField, self).__init__(r'^\d{2}-?\d{8}-?\d$',
-            error_message=ugettext('Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format.'),
             *args, **kwargs)
 
     def clean(self, value):
@@ -85,7 +95,7 @@ class ARCUITField(RegexField):
             return u''
         value, cd = self._canon(value)
         if self._calc_cd(value) != cd:
-            raise ValidationError(ugettext("Invalid CUIT."))
+            raise ValidationError(self.error_messages['checksum'])
         return self._format(value, cd)
 
     def _canon(self, cuit):

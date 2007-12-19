@@ -254,9 +254,10 @@ Second, note the five triage stages:
     3. Once a ticket is ruled to be approved for fixing, it's moved into the
        "Accepted" stage. This stage is where all the real work gets done.
 
-    4. A ticket might be moved to the "Someday/Maybe" state if it's an
-       enhancement request we are willing to consider if a good patch is
-       written. Such tickets are not high priority.
+    4. In some cases, a ticket might get moved to the "Someday/Maybe" state.
+       This means the ticket is an enhancement request that we might consider
+       adding to the framework if an excellent patch is submitted. These
+       tickets are not a high priority.
 
     5. If a ticket has an associated patch (see below), a triager will review
        the patch. If the patch is complete, it'll be marked as "ready for

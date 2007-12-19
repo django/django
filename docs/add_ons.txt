@@ -47,7 +47,11 @@ contenttypes
 ============
 
 A light framework for hooking into "types" of content, where each installed
-Django model is a separate content type. This is not yet documented.
+Django model is a separate content type.
+
+See the `contenttypes documentation`_.
+
+.. _contenttypes documentation: ../contenttypes/
 
 csrf
 ====
@@ -177,8 +181,12 @@ localflavor
 ===========
 
 A collection of various Django snippets that are useful only for a particular
-country or culture. For example, ``django.contrib.localflavor.usa.forms``
+country or culture. For example, ``django.contrib.localflavor.us.forms``
 contains a ``USZipCodeField`` that you can use to validate U.S. zip codes.
+
+See the `localflavor documentation`_.
+
+.. _localflavor documentation: ../localflavor/
 
 markup
 ======
@@ -252,12 +260,12 @@ See the `syndication documentation`_.
 webdesign
 =========
 
-Helpers and utilties targeted primarily at web designers rather than
-web developers.
+Helpers and utilties targeted primarily at Web *designers* rather than
+Web *developers*.
 
-See the `web design helpers documentation`_.
+See the `Web design helpers documentation`_.
 
-.. _web design helpers documentation: ../webdesign/
+.. _Web design helpers documentation: ../webdesign/
 
 Other add-ons
 =============

@@ -398,8 +398,20 @@ class ServerHandler(object):
             self.bytes_sent += len(data)
 
         # XXX check Content-Length and truncate if too many bytes written?
-        self._write(data)
-        self._flush()
+
+        # If data is too large, socket will choke, so write chunks no larger
+        # than 32MB at a time.
+        length = len(data)
+        if length > 33554432:
+            offset = 0
+            while offset < length:
+                chunk_size = min(33554432, length)
+                self._write(data[offset:offset+chunk_size])
+                self._flush()
+                offset += chunk_size
+        else:
+            self._write(data)
+            self._flush()
 
     def sendfile(self):
         """Platform-specific file transmission

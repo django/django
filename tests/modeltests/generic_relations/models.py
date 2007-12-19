@@ -18,42 +18,42 @@ class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    
+
     content_object = generic.GenericForeignKey()
-    
+
     class Meta:
         ordering = ["tag"]
-    
+
     def __unicode__(self):
         return self.tag
 
 class Animal(models.Model):
     common_name = models.CharField(max_length=150)
     latin_name = models.CharField(max_length=150)
-    
+
     tags = generic.GenericRelation(TaggedItem)
 
     def __unicode__(self):
         return self.common_name
-        
+
 class Vegetable(models.Model):
     name = models.CharField(max_length=150)
     is_yucky = models.BooleanField(default=True)
-    
+
     tags = generic.GenericRelation(TaggedItem)
-    
+
     def __unicode__(self):
         return self.name
-    
+
 class Mineral(models.Model):
     name = models.CharField(max_length=150)
     hardness = models.PositiveSmallIntegerField()
-    
+
     # note the lack of an explicit GenericRelation here...
-    
+
     def __unicode__(self):
         return self.name
-        
+
 __test__ = {'API_TESTS':"""
 # Create the world in 7 lines of code...
 >>> lion = Animal(common_name="Lion", latin_name="Panthera leo")
@@ -117,13 +117,13 @@ __test__ = {'API_TESTS':"""
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
 [(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
 
-# If Generic Relation is not explicitly defined, any related objects 
+# If Generic Relation is not explicitly defined, any related objects
 # remain after deletion of the source object.
 >>> quartz.delete()
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
 [(u'clearish', <ContentType: mineral>, 1), (u'fatty', <ContentType: vegetable>, 2), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
 
-# If you delete a tag, the objects using the tag are unaffected 
+# If you delete a tag, the objects using the tag are unaffected
 # (other than losing a tag)
 >>> tag = TaggedItem.objects.get(id=1)
 >>> tag.delete()
@@ -131,5 +131,9 @@ __test__ = {'API_TESTS':"""
 [<TaggedItem: salty>]
 >>> [(t.tag, t.content_type, t.object_id) for t in TaggedItem.objects.all()]
 [(u'clearish', <ContentType: mineral>, 1), (u'salty', <ContentType: vegetable>, 2), (u'shiny', <ContentType: animal>, 2)]
+
+>>> ctype = ContentType.objects.get_for_model(lion)
+>>> Animal.objects.filter(tags__content_type=ctype)
+[<Animal: Platypus>]
 
 """}

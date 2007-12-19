@@ -27,6 +27,8 @@ class BaseCommand(object):
             help='The Python path to a settings module, e.g. "myproject.settings.main". If this isn\'t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.'),
         make_option('--pythonpath',
             help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
+        make_option('--traceback', action='store_true',
+            help='Print traceback on exception'),
     )
     help = ''
     args = ''

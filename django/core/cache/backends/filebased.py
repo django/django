@@ -1,12 +1,12 @@
 "File-based cache backend"
 
+import md5
 import os, time
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
 from django.core.cache.backends.base import BaseCache
-from django.utils.http import urlquote_plus
 
 class CacheClass(BaseCache):
     def __init__(self, dir, params):
@@ -29,24 +29,10 @@ class CacheClass(BaseCache):
             self._createdir()
 
     def add(self, key, value, timeout=None):
-        fname = self._key_to_file(key)
-        if timeout is None:
-            timeout = self.default_timeout
-        try:
-            filelist = os.listdir(self._dir)
-        except (IOError, OSError):
-            self._createdir()
-            filelist = []
-        if len(filelist) > self._max_entries:
-            self._cull(filelist)
-        if os.path.basename(fname) not in filelist:
-            try:
-                f = open(fname, 'wb')
-                now = time.time()
-                pickle.dump(now + timeout, f, 2)
-                pickle.dump(value, f, 2)
-            except (IOError, OSError):
-                pass
+        if self.has_key(key):
+            return None
+        
+        self.set(key, value, timeout)
 
     def get(self, key, default=None):
         fname = self._key_to_file(key)
@@ -56,7 +42,7 @@ class CacheClass(BaseCache):
             now = time.time()
             if exp < now:
                 f.close()
-                os.remove(fname)
+                self._delete(fname)
             else:
                 return pickle.load(f)
         except (IOError, OSError, EOFError, pickle.PickleError):
@@ -65,40 +51,74 @@ class CacheClass(BaseCache):
 
     def set(self, key, value, timeout=None):
         fname = self._key_to_file(key)
+        dirname = os.path.dirname(fname)
+        
         if timeout is None:
             timeout = self.default_timeout
+            
+        self._cull()
+        
         try:
-            filelist = os.listdir(self._dir)
-        except (IOError, OSError):
-            self._createdir()
-            filelist = []
-        if len(filelist) > self._max_entries:
-            self._cull(filelist)
-        try:
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+
             f = open(fname, 'wb')
             now = time.time()
-            pickle.dump(now + timeout, f, 2)
-            pickle.dump(value, f, 2)
+            pickle.dump(now + timeout, f, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(value, f, pickle.HIGHEST_PROTOCOL)
         except (IOError, OSError):
             pass
 
     def delete(self, key):
         try:
-            os.remove(self._key_to_file(key))
+            self._delete(self._key_to_file(key))
+        except (IOError, OSError):
+            pass
+
+    def _delete(self, fname):
+        os.remove(fname)
+        try:
+            # Remove the 2 subdirs if they're empty
+            dirname = os.path.dirname(fname)
+            os.rmdir(dirname)
+            os.rmdir(os.path.dirname(dirname))
         except (IOError, OSError):
             pass
 
     def has_key(self, key):
-        return os.path.exists(self._key_to_file(key))
+        fname = self._key_to_file(key)
+        try:
+            f = open(fname, 'rb')
+            exp = pickle.load(f)
+            now = time.time()
+            if exp < now:
+                f.close()
+                self._delete(fname)
+                return False
+            else:
+                return True
+        except (IOError, OSError, EOFError, pickle.PickleError):
+            return False
 
-    def _cull(self, filelist):
+    def _cull(self):
+        if int(self._num_entries) < self._max_entries:
+            return
+        
+        try:
+            filelist = os.listdir(self._dir)
+        except (IOError, OSError):
+            return
+        
         if self._cull_frequency == 0:
             doomed = filelist
         else:
-            doomed = [k for (i, k) in enumerate(filelist) if i % self._cull_frequency == 0]
-        for fname in doomed:
+            doomed = [os.path.join(self._dir, k) for (i, k) in enumerate(filelist) if i % self._cull_frequency == 0]
+
+        for topdir in doomed:
             try:
-                os.remove(os.path.join(self._dir, fname))
+                for root, _, files in os.walk(topdir):
+                    for f in files:
+                        self._delete(os.path.join(root, f))
             except (IOError, OSError):
                 pass
 
@@ -109,4 +129,22 @@ class CacheClass(BaseCache):
             raise EnvironmentError, "Cache directory '%s' does not exist and could not be created'" % self._dir
 
     def _key_to_file(self, key):
-        return os.path.join(self._dir, urlquote_plus(key))
+        """
+        Convert the filename into an md5 string. We'll turn the first couple
+        bits of the path into directory prefixes to be nice to filesystems
+        that have problems with large numbers of files in a directory.
+        
+        Thus, a cache key of "foo" gets turnned into a file named
+        ``{cache-dir}ac/bd/18db4cc2f85cedef654fccc4a4d8``.
+        """
+        path = md5.new(key.encode('utf-8')).hexdigest()
+        path = os.path.join(path[:2], path[2:4], path[4:])
+        return os.path.join(self._dir, path)
+
+    def _get_num_entries(self):
+        count = 0
+        for _,_,files in os.walk(self._dir):
+            count += len(files)
+        return count
+    _num_entries = property(_get_num_entries)
+

@@ -3,8 +3,8 @@
 # Unit tests for cache framework
 # Uses whatever cache backend is set in the test settings file.
 
-import time, unittest
-
+import time
+import unittest
 from django.core.cache import cache
 from django.utils.cache import patch_vary_headers
 from django.http import HttpResponse
@@ -27,7 +27,7 @@ class Cache(unittest.TestCase):
         cache.add("addkey1", "value")
         cache.add("addkey1", "newvalue")
         self.assertEqual(cache.get("addkey1"), "value")
-
+        
     def test_non_existent(self):
         # get with non-existent keys
         self.assertEqual(cache.get("does_not_exist"), None)
@@ -76,10 +76,16 @@ class Cache(unittest.TestCase):
         self.assertEqual(cache.get("stuff"), stuff)
 
     def test_expiration(self):
-        # expiration
-        cache.set('expire', 'very quickly', 1)
-        time.sleep(2)
-        self.assertEqual(cache.get("expire"), None)
+        cache.set('expire1', 'very quickly', 1)
+        cache.set('expire2', 'very quickly', 1)
+        cache.set('expire3', 'very quickly', 1)
+
+        time.sleep(2)        
+        self.assertEqual(cache.get("expire1"), None)
+        
+        cache.add("expire2", "newvalue")
+        self.assertEqual(cache.get("expire2"), "newvalue")
+        self.assertEqual(cache.has_key("expire3"), False)
 
     def test_unicode(self):
         stuff = {
@@ -92,6 +98,44 @@ class Cache(unittest.TestCase):
             cache.set(key, value)
             self.assertEqual(cache.get(key), value)
 
+import os
+import md5
+import shutil
+import tempfile
+from django.core.cache.backends.filebased import CacheClass as FileCache
+
+class FileBasedCacheTests(unittest.TestCase):
+    """
+    Specific test cases for the file-based cache.
+    """
+    def setUp(self):
+        self.dirname = tempfile.mktemp()
+        os.mkdir(self.dirname)
+        self.cache = FileCache(self.dirname, {})
+        
+    def tearDown(self):
+        shutil.rmtree(self.dirname)
+        
+    def test_hashing(self):
+        """Test that keys are hashed into subdirectories correctly"""
+        self.cache.set("foo", "bar")
+        keyhash = md5.new("foo").hexdigest()
+        keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
+        self.assert_(os.path.exists(keypath))
+        
+    def test_subdirectory_removal(self):
+        """
+        Make sure that the created subdirectories are correctly removed when empty.
+        """
+        self.cache.set("foo", "bar")
+        keyhash = md5.new("foo").hexdigest()
+        keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
+        self.assert_(os.path.exists(keypath))
+
+        self.cache.delete("foo")
+        self.assert_(not os.path.exists(keypath))
+        self.assert_(not os.path.exists(os.path.dirname(keypath)))
+        self.assert_(not os.path.exists(os.path.dirname(os.path.dirname(keypath))))
 
 class CacheUtils(unittest.TestCase):
     """TestCase for django.utils.cache functions."""

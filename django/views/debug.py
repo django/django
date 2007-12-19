@@ -1,9 +1,12 @@
+import os
+import re
+import sys
+
 from django.conf import settings
 from django.template import Template, Context, TemplateDoesNotExist
 from django.utils.html import escape
 from django.http import HttpResponseServerError, HttpResponseNotFound
 from django.utils.encoding import smart_unicode
-import os, re, sys
 
 HIDDEN_SETTINGS = re.compile('SECRET|PASSWORD|PROFANITIES_LIST')
 
@@ -142,9 +145,10 @@ def technical_500_response(request, exc_type, exc_value, tb):
         'request': request,
         'request_protocol': request.is_secure() and "https" or "http",
         'settings': get_safe_settings(),
-        'sys_executable' : sys.executable,
-        'sys_version_info' : '%d.%d.%d' % sys.version_info[0:3],
-        'django_version_info' : get_version(),
+        'sys_executable': sys.executable,
+        'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
+        'django_version_info': get_version(),
+        'sys_path' : sys.path,
         'template_info': template_info,
         'template_does_not_exist': template_does_not_exist,
         'loader_debug_info': loader_debug_info,
@@ -230,8 +234,8 @@ TECHNICAL_500_TEMPLATE = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta name="robots" content="NONE,NOARCHIVE" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="robots" content="NONE,NOARCHIVE">
   <title>{{ exception_type }} at {{ request.path|escape }}</title>
   <style type="text/css">
     html * { padding:0; margin:0; }
@@ -368,6 +372,10 @@ TECHNICAL_500_TEMPLATE = """
       <th>Python Version:</th>
       <td>{{ sys_version_info }}</td>
     </tr>
+    <tr>
+      <th>Python Path:</th>
+      <td>{{ sys_path }}</td>
+    </tr>
   </table>
 </div>
 {% if unicode_hint %}
@@ -460,10 +468,10 @@ TECHNICAL_500_TEMPLATE = """
   {% endautoescape %}
   <form action="http://dpaste.com/" name="pasteform" id="pasteform" method="post">
   <div id="pastebinTraceback" class="pastebin">
-    <input type="hidden" name="language" value="PythonConsole" />
-    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path|escape }}" />
-    <input type="hidden" name="source" value="Django Dpaste Agent" />
-    <input type="hidden" name="poster" value="Django" />
+    <input type="hidden" name="language" value="PythonConsole">
+    <input type="hidden" name="title" value="{{ exception_type|escape }} at {{ request.path|escape }}">
+    <input type="hidden" name="source" value="Django Dpaste Agent">
+    <input type="hidden" name="poster" value="Django">
     <textarea name="content" id="traceback_area" cols="140" rows="25">
 Environment:
 
@@ -471,10 +479,10 @@ Request Method: {{ request.META.REQUEST_METHOD }}
 Request URL: {{ request_protocol }}://{{ request.META.HTTP_HOST }}{{ request.path|escape }}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
-Installed Applications: 
-   {{ settings.INSTALLED_APPS|pprint }}
-Installed Middleware: 
-   {{ settings.MIDDLEWARE_CLASSES|pprint }}
+Installed Applications:
+{{ settings.INSTALLED_APPS|pprint }}
+Installed Middleware:
+{{ settings.MIDDLEWARE_CLASSES|pprint }}
 
 {% if template_does_not_exist %}Template Loader Error:
 {% if loader_debug_info %}Django tried loading these templates, in this order:
@@ -498,9 +506,9 @@ Traceback:
 Exception Type: {{ exception_type|escape }} at {{ request.path|escape }}
 Exception Value: {{ exception_value|escape }}
 </textarea>
-  <br/><br/>
+  <br><br>
+  <input type="submit" value="Share this traceback on public Web site">
   </div>
-<input type="submit" value="Send to DPaste"> 
 </form>
 </div>
 
@@ -627,9 +635,9 @@ TECHNICAL_404_TEMPLATE = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Page not found at {{ request.path|escape }}</title>
-  <meta name="robots" content="NONE,NOARCHIVE" />
+  <meta name="robots" content="NONE,NOARCHIVE">
   <style type="text/css">
     html * { padding:0; margin:0; }
     body * { padding:10px 20px; }
