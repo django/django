@@ -209,8 +209,14 @@ class EmailMessage(object):
         bytestrings). The SafeMIMEText class will handle any necessary encoding
         conversions.
         """
-        self.to = to or []
-        self.bcc = bcc or []
+        if to:
+            self.to = list(to)
+        else:
+            self.to = []
+        if bcc:
+            self.bcc = list(bcc)
+        else:
+            self.bcc = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
         self.subject = subject
         self.body = body
