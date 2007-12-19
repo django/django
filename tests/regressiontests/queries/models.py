@@ -455,8 +455,13 @@ thus fail.)
 >>> if {'a': 1, 'b': 2}.keys() == ['a', 'b']:
 ...     s.reverse()
 ...     params.reverse()
->>> Item.objects.extra(select=SortedDict(s), params=params).values('a','b')[0]
-{'a': u'one', 'b': u'two'}
+
+# This slightly odd comparison works aorund the fact that PostgreSQL will
+# return 'one' and 'two' as strings, not Unicode objects. It's a side-effect of
+# using constants here and not a real concern.
+>>> d = Item.objects.extra(select=SortedDict(s), params=params).values('a', 'b')[0]
+>>> d == {'a': u'one', 'b': u'two'}
+True
 
 # Order by the number of tags attached to an item.
 >>> l = Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).order_by('-count')
