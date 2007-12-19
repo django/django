@@ -52,7 +52,9 @@ class LazySettings(object):
             if not settings_module: # If it's set but is an empty string.
                 raise KeyError
         except KeyError:
-            raise ImportError, "Environment variable %s is undefined so settings cannot be imported." % ENVIRONMENT_VARIABLE   # NOTE: This is arguably an EnvironmentError, but that causes problems with Python's interactive help
+            # NOTE: This is arguably an EnvironmentError, but that causes
+            # problems with Python's interactive help.
+            raise ImportError("Settings cannot be imported, because environment variable %s is undefined." % ENVIRONMENT_VARIABLE)
 
         self._target = Settings(settings_module)
 
