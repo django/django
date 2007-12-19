@@ -1,6 +1,13 @@
 Generating forms for models
 ===========================
 
+.. admonition:: Note
+
+    The APIs described in this document have been deprecated. If you're
+    developing new code, use `ModelForms`_ instead.
+
+.. _ModelForms: ../modelforms/
+
 If you're building a database-driven app, chances are you'll have forms that
 map closely to Django models. For instance, you might have a ``BlogComment``
 model, and you want to create a form that lets people submit comments. In this
