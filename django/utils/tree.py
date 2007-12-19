@@ -87,8 +87,8 @@ class Node(object):
     def start_subtree(self, conn_type):
         """
         Sets up internal state so that new nodes are added to a subtree of the
-        current node. The conn_type is required so that the new subtree is
-        connected correctly to any existing nodes in the tree.
+        current node. The conn_type specifies how the sub-tree is joined to the
+        existing children.
         """
         if len(self.children) == 1:
             self.connector = conn_type

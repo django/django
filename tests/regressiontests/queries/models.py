@@ -459,5 +459,12 @@ order_by() and filter() calls.
 >>> Item.objects.extra(select={'count': 'select count(*) from queries_item_tags where queries_item_tags.item_id = queries_item.id'}).filter(count=1)
 [<Item: four>]
 
+Bug #6154
+Multiple filter statements are joined using "AND" all the time.
+
+>>> Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
+[<Author: a1>]
+>>> Author.objects.filter(Q(extra__note=n1)|Q(item__note=n3)).filter(id=a1.id)
+[<Author: a1>]
 """}
 

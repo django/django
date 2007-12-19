@@ -792,6 +792,11 @@ class Query(object):
             q_object.add_to_query(self)
             return
 
+        if self.where and q_object.connector != AND and len(q_object) > 1:
+            self.where.start_subtree(AND)
+            subtree = True
+        else:
+            subtree = False
         for child in q_object.children:
             if isinstance(child, Node):
                 self.where.start_subtree(q_object.connector)
@@ -799,6 +804,8 @@ class Query(object):
                 self.where.end_subtree()
             else:
                 self.add_filter(child, q_object.connector, q_object.negated)
+        if subtree:
+            self.where.end_subtree()
 
     def setup_joins(self, names, opts, alias, dupe_multis):
         """
