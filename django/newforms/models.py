@@ -84,9 +84,8 @@ def form_for_model(model, form=BaseForm, fields=None,
     determining the formfield for a given database field. It's a callable that
     takes a database Field instance and returns a form Field instance.
     """
-    warn("form_for_model is deprecated, use ModelForm instead.",
-        PendingDeprecationWarning,
-        stacklevel=3)
+    warn("form_for_model is deprecated. Use ModelForm instead.",
+        PendingDeprecationWarning, stacklevel=3)
     opts = model._meta
     field_list = []
     for f in opts.fields + opts.many_to_many:
@@ -114,9 +113,8 @@ def form_for_instance(instance, form=BaseForm, fields=None,
     takes a database Field instance, plus **kwargs, and returns a form Field
     instance with the given kwargs (i.e. 'initial').
     """
-    warn("form_for_instance is deprecated, use ModelForm instead.",
-        PendingDeprecationWarning,
-        stacklevel=3)
+    warn("form_for_instance is deprecated. Use ModelForm instead.",
+        PendingDeprecationWarning, stacklevel=3)
     model = instance.__class__
     opts = model._meta
     field_list = []
