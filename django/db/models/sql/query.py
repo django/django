@@ -723,16 +723,8 @@ class Query(object):
         opts = self.model._meta
         alias = self.join((None, opts.db_table, None, None))
 
-        try:
-            field, target, unused, join_list = self.setup_joins(parts, opts,
-                    alias, (connector == AND))
-        except TypeError, e:
-            if len(parts) != 1 or parts[0] not in self.extra_select:
-                raise e
-            # Filtering on some alias from extra(select=...)
-            self.where.add([None, parts[0], None, lookup_type, value],
-                    connector)
-            return
+        field, target, unused, join_list, = self.setup_joins(parts, opts,
+                alias, (connector == AND))
         col = target.column
         alias = join_list[-1][-1]
 
