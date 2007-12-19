@@ -282,8 +282,9 @@ when all the tests have been executed.
 
 By default this test database gets its name by prepending ``test_`` to the
 value of the ``DATABASE_NAME`` setting. When using the SQLite database engine
-the tests will by default use a memory resident database. If you want to use
-a different database name, specify the ``TEST_DATABASE_NAME`` setting.
+the tests will by default use an in-memory database (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). If you want to use a
+different database name, specify the ``TEST_DATABASE_NAME`` setting.
 
 Aside from using a separate database, the test runner will otherwise use all of
 the same database settings you have in your settings file: ``DATABASE_ENGINE``,
