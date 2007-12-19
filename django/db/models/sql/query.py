@@ -130,7 +130,8 @@ class Query(object):
         """
         if name in self.quote_cache:
             return self.quote_cache[name]
-        if name in self.alias_map and name not in self.table_map:
+        if ((name in self.alias_map and name not in self.table_map) or
+                name in self.extra_select):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
