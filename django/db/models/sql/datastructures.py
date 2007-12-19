@@ -50,12 +50,14 @@ class Count(Aggregate):
             quote_func = lambda x: x
         if isinstance(self.col, (list, tuple)):
             col = ('%s.%s' % tuple([quote_func(c) for c in self.col]))
+        elif hasattr(self.col, 'as_sql'):
+            col = self.col.as_sql(quote_func)
         else:
             col = self.col
         if self.distinct:
             return 'COUNT(DISTINCT %s)' % col
         else:
-            return 'COUNT(%s)' % self.col
+            return 'COUNT(%s)' % col
 
 class Date(object):
     """

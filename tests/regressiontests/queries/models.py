@@ -2,6 +2,8 @@
 Various complex queries that have been problematic in the past.
 """
 
+import datetime
+
 from django.db import models
 from django.db.models.query import Q
 
@@ -42,6 +44,7 @@ class Author(models.Model):
 
 class Item(models.Model):
     name = models.CharField(max_length=10)
+    created = models.DateTimeField()
     tags = models.ManyToManyField(Tag, blank=True, null=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
@@ -129,15 +132,19 @@ by 'info'. Helps detect some problems later.
 >>> a4 = Author(name='a4', num=4004, extra=e2)
 >>> a4.save()
 
->>> i1 = Item(name='one', creator=a1, note=n3)
+>>> time1 = datetime.datetime(2007, 12, 19, 22, 25, 0)
+>>> time2 = datetime.datetime(2007, 12, 19, 21, 0, 0)
+>>> time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
+>>> time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
+>>> i1 = Item(name='one', created=time1, creator=a1, note=n3)
 >>> i1.save()
 >>> i1.tags = [t1, t2]
->>> i2 = Item(name='two', creator=a2, note=n2)
+>>> i2 = Item(name='two', created=time2, creator=a2, note=n2)
 >>> i2.save()
 >>> i2.tags = [t1, t3]
->>> i3 = Item(name='three', creator=a2, note=n3)
+>>> i3 = Item(name='three', created=time3, creator=a2, note=n3)
 >>> i3.save()
->>> i4 = Item(name='four', creator=a4, note=n3)
+>>> i4 = Item(name='four', created=time4, creator=a4, note=n3)
 >>> i4.save()
 >>> i4.tags = [t4]
 
@@ -244,7 +251,7 @@ Bug #1878, #2939
 
 # Create something with a duplicate 'name' so that we can test multi-column
 # cases (which require some tricky SQL transformations under the covers).
->>> xx = Item(name='four', creator=a2, note=n1)
+>>> xx = Item(name='four', created=time1, creator=a2, note=n1)
 >>> xx.save()
 >>> Item.objects.exclude(name='two').values('creator', 'name').distinct().count()
 4
@@ -471,5 +478,15 @@ Multiple filter statements are joined using "AND" all the time.
 [<Author: a1>]
 >>> Author.objects.filter(Q(extra__note=n1)|Q(item__note=n3)).filter(id=a1.id)
 [<Author: a1>]
+
+Bug #6203
+>>> Item.objects.count()
+4
+>>> Item.objects.dates('created', 'month').count()
+1
+>>> Item.objects.dates('created', 'day').count()
+2
+>>> len(Item.objects.dates('created', 'day'))
+2
 """}
 

@@ -193,6 +193,8 @@ class Query(object):
         if obj.distinct and len(obj.select) > 1:
             obj = self.clone(CountQuery, _query=obj, where=WhereNode(),
                     distinct=False)
+            obj.select = []
+            obj.extra_select = SortedDict()
         obj.add_count_column()
         data = obj.execute_sql(SINGLE)
         if not data:
@@ -1008,13 +1010,18 @@ class Query(object):
 
     def add_count_column(self):
         """
-        Converts the query to do count(*) or count(distinct(pk)) in order to
+        Converts the query to do count(...) or count(distinct(pk)) in order to
         get its size.
         """
         # TODO: When group_by support is added, this needs to be adjusted so
         # that it doesn't totally overwrite the select list.
         if not self.distinct:
-            select = Count()
+            if not self.select:
+                select = Count()
+            else:
+                assert len(self.select) == 1, \
+                        "Cannot add count col with multiple cols in 'select': %r" % self.select
+                select = Count(self.select[0])
         else:
             opts = self.model._meta
             if not self.select:
@@ -1229,11 +1236,8 @@ class DateQuery(Query):
         select = Date((alias, column), lookup_type,
                 self.connection.ops.date_trunc_sql)
         self.select = [select]
+        self.distinct = True
         self.order_by = order == 'ASC' and [1] or [-1]
-        if self.connection.features.allows_group_by_ordinal:
-            self.group_by = [1]
-        else:
-            self.group_by = [select]
 
 class CountQuery(Query):
     """
