@@ -308,6 +308,11 @@ True
 >>> len(qs.query.alias_map)
 3
 
+Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So hte following query should only involve one "left outer" join (Author -> Item is 0-to-many).
+>>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
+>>> len([x[2][2] for x in qs.query.alias_map.values() if x[2][2] == query.LOUTER])
+1
+
 Bug #2091
 >>> t = Tag.objects.get(name='t4')
 >>> Item.objects.filter(tags__in=[t])

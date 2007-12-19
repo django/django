@@ -52,6 +52,7 @@ RHS_JOIN_COL = 5
 ALIAS_TABLE = 0
 ALIAS_REFCOUNT = 1
 ALIAS_JOIN = 2
+ALIAS_NULLABLE=3
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
@@ -510,8 +511,8 @@ class Query(object):
         pieces = name.split(LOOKUP_SEP)
         if not alias:
             alias = self.join((None, opts.db_table, None, None))
-        field, target, opts, joins, unused2 = self.setup_joins(pieces, opts,
-                alias, False)
+        field, target, opts, joins = self.setup_joins(pieces, opts, alias,
+                False)
         alias = joins[-1][-1]
         col = target.column
 
@@ -568,11 +569,19 @@ class Query(object):
         self.alias_map[alias][ALIAS_REFCOUNT] -= 1
 
     def promote_alias(self, alias):
-        """ Promotes the join type of an alias to an outer join. """
-        self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+        """
+        Promotes the join type of an alias to an outer join if it's possible
+        for the join to contain NULL values on the left.
+
+        Returns True if the aliased join was promoted.
+        """
+        if self.alias_map[alias][ALIAS_NULLABLE]:
+            self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+            return True
+        return False
 
     def join(self, (lhs, table, lhs_col, col), always_create=False,
-            exclusions=(), promote=False, outer_if_first=False):
+            exclusions=(), promote=False, outer_if_first=False, nullable=False):
         """
         Returns an alias for a join between 'table' and 'lhs' on the given
         columns, either reusing an existing alias for that join or creating a
@@ -593,6 +602,9 @@ class Query(object):
         If 'outer_if_first' is True and a new join is created, it will have the
         LOUTER join type. This is used when joining certain types of querysets
         and Q-objects together.
+
+        If 'nullable' is True, the join can potentially involve NULL values and
+        is a candidate for promotion (to "left outer") when combining querysets.
         """
         if lhs is None:
             lhs_table = None
@@ -610,7 +622,7 @@ class Query(object):
                 for alias in aliases:
                     if alias not in exclusions:
                         self.ref_alias(alias)
-                        if promote:
+                        if promote and self.alias_map[alias][ALIAS_NULLABLE]:
                             self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = \
                                     self.LOUTER
                         return alias
@@ -631,6 +643,7 @@ class Query(object):
             # means the later columns are ignored.
             join[JOIN_TYPE] = None
         self.alias_map[alias][ALIAS_JOIN] = join
+        self.alias_map[alias][ALIAS_NULLABLE] = nullable
         self.join_map.setdefault(t_ident, []).append(alias)
         self.rev_join_map[alias] = t_ident
         return alias
@@ -708,8 +721,8 @@ class Query(object):
         alias = self.join((None, opts.db_table, None, None))
 
         try:
-            field, target, unused, join_list, nullable = self.setup_joins(parts,
-                    opts, alias, (connector == AND))
+            field, target, unused, join_list = self.setup_joins(parts, opts,
+                    alias, (connector == AND))
         except TypeError, e:
             if len(parts) != 1 or parts[0] not in self.extra_select:
                 raise e
@@ -752,10 +765,6 @@ class Query(object):
                 table = table_it.next()
                 if join == table and self.alias_map[join][ALIAS_REFCOUNT] > 1:
                     continue
-                # FIXME: Don't have to promote here (and in the other places in
-                # this block) if the join isn't nullable. So I should be
-                # checking this before promoting (avoiding left outer joins is
-                # important).
                 self.promote_alias(join)
                 if table != join:
                     self.promote_alias(table)
@@ -771,12 +780,10 @@ class Query(object):
 
         if negate:
             flag = False
-            for pos, null in enumerate(nullable):
-                if not null:
-                    continue
-                flag = True
-                for join in join_list[pos]:
-                    self.promote_alias(join)
+            for seq in join_list:
+                for join in seq:
+                    if self.promote_alias(join):
+                        flag = True
             self.where.negate()
             if flag:
                 self.where.add([alias, col, field, 'isnull', True], OR)
@@ -797,13 +804,15 @@ class Query(object):
             subtree = True
         else:
             subtree = False
+        connector = AND
         for child in q_object.children:
             if isinstance(child, Node):
-                self.where.start_subtree(q_object.connector)
+                self.where.start_subtree(connector)
                 self.add_q(child)
                 self.where.end_subtree()
             else:
-                self.add_filter(child, q_object.connector, q_object.negated)
+                self.add_filter(child, connector, q_object.negated)
+            connector = q_object.connector
         if subtree:
             self.where.end_subtree()
 
@@ -822,7 +831,6 @@ class Query(object):
         can be null.
         """
         joins = [[alias]]
-        nullable = [False]
         for pos, name in enumerate(names):
             if name == 'pk':
                 name = opts.pk.name
@@ -856,11 +864,10 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis)
+                            dupe_multis, nullable=True)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis)
+                            dupe_multis, nullable=True)
                     joins.append([int_alias, alias])
-                    nullable.append(field.null)
                 elif field.rel:
                     # One-to-one or many-to-one field
                     if cached_data:
@@ -874,16 +881,15 @@ class Query(object):
                         orig_opts._join_cache[name] = (table, from_col, to_col,
                                 opts, target)
 
-                    alias = self.join((alias, table, from_col, to_col))
+                    alias = self.join((alias, table, from_col, to_col),
+                            nullable=field.null)
                     joins.append([alias])
-                    nullable.append(field.null)
                 else:
                     target = field
                     break
             else:
                 orig_field = field
                 field = field.field
-                nullable.append(True)
                 if m2m:
                     # Many-to-many field defined on the target model.
                     if cached_data:
@@ -903,9 +909,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis)
+                            dupe_multis, nullable=True)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis)
+                            dupe_multis, nullable=True)
                     joins.append([int_alias, alias])
                 else:
                     # One-to-many field (ForeignKey defined on the target model)
@@ -923,13 +929,13 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                            dupe_multis)
+                            dupe_multis, nullable=True)
                     joins.append([alias])
 
         if pos != len(names) - 1:
             raise TypeError("Join on field %r not permitted." % name)
 
-        return field, target, opts, joins, nullable
+        return field, target, opts, joins
 
     def set_limits(self, low=None, high=None):
         """
