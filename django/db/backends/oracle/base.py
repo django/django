@@ -413,6 +413,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self.connection is not None
 
     def _cursor(self, settings):
+        cursor = None
         if not self._valid_connection():
             if len(settings.DATABASE_HOST.strip()) == 0:
                 settings.DATABASE_HOST = 'localhost'
@@ -422,16 +423,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             else:
                 conn_string = "%s/%s@%s" % (settings.DATABASE_USER, settings.DATABASE_PASSWORD, settings.DATABASE_NAME)
                 self.connection = Database.connect(conn_string, **self.options)
+            cursor = FormatStylePlaceholderCursor(self.connection)
+            # Set oracle date to ansi date format.  This only needs to execute
+            # once when we create a new connection.
+            cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD' "
+                           "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
             except ValueError:
                 pass
-        cursor = FormatStylePlaceholderCursor(self.connection)
+        if not cursor:
+            cursor = FormatStylePlaceholderCursor(self.connection)
         # Default arraysize of 1 is highly sub-optimal.
         cursor.arraysize = 100
-        # Set oracle date to ansi date format.
-        cursor.execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD'")
-        cursor.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
         return cursor
 
 class FormatStylePlaceholderCursor(Database.Cursor):
