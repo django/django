@@ -432,6 +432,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 self.oracle_version = int(self.connection.version.split('.')[0])
             except ValueError:
                 pass
+            try:
+                self.connection.stmtcachesize = 20
+            except:
+                # Django docs specify cx_Oracle version 4.3.1 or higher, but
+                # stmtcachesize is available only in 4.3.2 and up.
+                pass
         if not cursor:
             cursor = FormatStylePlaceholderCursor(self.connection)
         # Default arraysize of 1 is highly sub-optimal.
