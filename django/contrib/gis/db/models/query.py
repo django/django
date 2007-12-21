@@ -38,15 +38,8 @@ class GeoQuerySet(QuerySet):
         # If GEOM_SELECT is defined in the backend, then it will be used
         # for the selection format of the geometry column.
         if GEOM_SELECT:
-            #if oracle and hasattr(self, '_ewkt'):
             # Transformed geometries in Oracle use EWKT so that the SRID
             # on the transformed lazy geometries is set correctly).
-            #print '-=' * 20
-            #print self._ewkt, GEOM_SELECT
-            #self._geo_fmt = "'SRID=%d;'||%s" % (self._ewkt, GEOM_SELECT)
-            #self._geo_fmt = GEOM_SELECT
-            #else:
-            #print '-=' * 20
             self._geo_fmt = GEOM_SELECT
         else:
             self._geo_fmt = '%s'

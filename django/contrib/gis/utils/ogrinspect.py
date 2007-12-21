@@ -110,14 +110,17 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
     
     # Setting up the SRID parameter string.
     if srid is None:
-        srid = layer.srs.srid
-        if srid is None:
+        if layer.srs is None:
             srid_str = 'srid=-1'
-        elif srid == 4326:
-            # WGS84 is the default.
-            srid_str = ''
         else:
-            srid_str = 'srid=%s' % srid
+            srid = layer.srs.srid
+            if srid is None:
+                srid_str = 'srid=-1'
+            elif srid == 4326:
+                # WGS84 is the default.
+                srid_str = ''
+            else:
+                srid_str = 'srid=%s' % srid
     else:
         srid_str = 'srid=%s' % srid
 
