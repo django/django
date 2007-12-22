@@ -299,13 +299,13 @@ class Parser(object):
         return TemplateSyntaxError(msg)
 
     def empty_variable(self, token):
-        raise self.error( token, "Empty variable tag")
+        raise self.error(token, "Empty variable tag")
 
     def empty_block_tag(self, token):
-        raise self.error( token, "Empty block tag")
+        raise self.error(token, "Empty block tag")
 
     def invalid_block_tag(self, token, command):
-        raise self.error( token, "Invalid block tag: '%s'" % command)
+        raise self.error(token, "Invalid block tag: '%s'" % command)
 
     def unclosed_block_tag(self, parse_until):
         raise self.error(None, "Unclosed tags: %s " %  ', '.join(parse_until))
@@ -334,7 +334,7 @@ class Parser(object):
         if filter_name in self.filters:
             return self.filters[filter_name]
         else:
-            raise TemplateSyntaxError, "Invalid filter: '%s'" % filter_name
+            raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
 
 def lexer_factory(*args, **kwargs):
     if settings.TEMPLATE_DEBUG:
@@ -366,7 +366,7 @@ class TokenParser(object):
 
     def top(self):
         "Overload this method to do the actual parsing and return the result."
-        raise NotImplemented
+        raise NotImplementedError()
 
     def more(self):
         "Returns True if there is more stuff in the tag."
@@ -375,7 +375,7 @@ class TokenParser(object):
     def back(self):
         "Undoes the last microparser. Use this for lookahead and backtracking."
         if not len(self.backout):
-            raise TemplateSyntaxError, "back called without some previous parsing"
+            raise TemplateSyntaxError("back called without some previous parsing")
         self.pointer = self.backout.pop()
 
     def tag(self):
@@ -383,7 +383,7 @@ class TokenParser(object):
         subject = self.subject
         i = self.pointer
         if i >= len(subject):
-            raise TemplateSyntaxError, "expected another tag, found end of string: %s" % subject
+            raise TemplateSyntaxError("expected another tag, found end of string: %s" % subject)
         p = i
         while i < len(subject) and subject[i] not in (' ', '\t'):
             i += 1
@@ -399,14 +399,14 @@ class TokenParser(object):
         subject = self.subject
         i = self.pointer
         if i >= len(subject):
-            raise TemplateSyntaxError, "Searching for value. Expected another value but found end of string: %s" % subject
+            raise TemplateSyntaxError("Searching for value. Expected another value but found end of string: %s" % subject)
         if subject[i] in ('"', "'"):
             p = i
             i += 1
             while i < len(subject) and subject[i] != subject[p]:
                 i += 1
             if i >= len(subject):
-                raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % (i, subject)
+                raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
             i += 1
             res = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
@@ -423,7 +423,7 @@ class TokenParser(object):
                     while i < len(subject) and subject[i] != c:
                         i += 1
                     if i >= len(subject):
-                        raise TemplateSyntaxError, "Searching for value. Unexpected end of string in column %d: %s" % (i, subject)
+                        raise TemplateSyntaxError("Searching for value. Unexpected end of string in column %d: %s" % (i, subject))
                 i += 1
             s = subject[p:i]
             while i < len(subject) and subject[i] in (' ', '\t'):
@@ -482,8 +482,8 @@ class FilterExpression(object):
         for match in matches:
             start = match.start()
             if upto != start:
-                raise TemplateSyntaxError, "Could not parse some characters: %s|%s|%s"  % \
-                                           (token[:upto], token[upto:start], token[start:])
+                raise TemplateSyntaxError("Could not parse some characters: %s|%s|%s"  % \
+                                           (token[:upto], token[upto:start], token[start:]))
             if var == None:
                 var, constant, i18n_constant = match.group("var", "constant", "i18n_constant")
                 if i18n_constant:
@@ -492,9 +492,9 @@ class FilterExpression(object):
                     var = '"%s"' % constant.replace(r'\"', '"')
                 upto = match.end()
                 if var == None:
-                    raise TemplateSyntaxError, "Could not find variable at start of %s" % token
+                    raise TemplateSyntaxError("Could not find variable at start of %s" % token)
                 elif var.find(VARIABLE_ATTRIBUTE_SEPARATOR + '_') > -1 or var[0] == '_':
-                    raise TemplateSyntaxError, "Variables and attributes may not begin with underscores: '%s'" % var
+                    raise TemplateSyntaxError("Variables and attributes may not begin with underscores: '%s'" % var)
             else:
                 filter_name = match.group("filter_name")
                 args = []
@@ -510,7 +510,7 @@ class FilterExpression(object):
                 filters.append( (filter_func,args))
                 upto = match.end()
         if upto != len(token):
-            raise TemplateSyntaxError, "Could not parse the remainder: '%s' from '%s'" % (token[upto:], token)
+            raise TemplateSyntaxError("Could not parse the remainder: '%s' from '%s'" % (token[upto:], token))
         self.filters = filters
         self.var = Variable(var)
 
@@ -567,7 +567,7 @@ class FilterExpression(object):
                 provided.pop(0)
         except IndexError:
             # Not enough
-            raise TemplateSyntaxError, "%s requires %d arguments, %d provided" % (name, len(nondefs), plen)
+            raise TemplateSyntaxError("%s requires %d arguments, %d provided" % (name, len(nondefs), plen))
 
         # Defaults can be overridden.
         defaults = defaults and list(defaults) or []
@@ -576,7 +576,7 @@ class FilterExpression(object):
                 defaults.pop(0)
         except IndexError:
             # Too many.
-            raise TemplateSyntaxError, "%s requires %d arguments, %d provided" % (name, len(nondefs), plen)
+            raise TemplateSyntaxError("%s requires %d arguments, %d provided" % (name, len(nondefs), plen))
 
         return True
     args_check = staticmethod(args_check)
@@ -796,7 +796,7 @@ def generic_tag_compiler(params, defaults, name, node_class, parser, token):
             message = "%s takes %s arguments" % (name, bmin)
         else:
             message = "%s takes between %s and %s arguments" % (name, bmin, bmax)
-        raise TemplateSyntaxError, message
+        raise TemplateSyntaxError(message)
     return node_class(bits)
 
 class Library(object):
@@ -822,7 +822,7 @@ class Library(object):
             self.tags[name] = compile_function
             return compile_function
         else:
-            raise InvalidTemplateLibrary, "Unsupported arguments to Library.tag: (%r, %r)", (name, compile_function)
+            raise InvalidTemplateLibrary("Unsupported arguments to Library.tag: (%r, %r)", (name, compile_function))
 
     def tag_function(self,func):
         self.tags[getattr(func, "_decorated_function", func).__name__] = func
@@ -846,7 +846,7 @@ class Library(object):
             self.filters[name] = filter_func
             return filter_func
         else:
-            raise InvalidTemplateLibrary, "Unsupported arguments to Library.filter: (%r, %r)", (name, filter_func)
+            raise InvalidTemplateLibrary("Unsupported arguments to Library.filter: (%r, %r)", (name, filter_func))
 
     def filter_function(self, func):
         self.filters[getattr(func, "_decorated_function", func).__name__] = func
@@ -875,7 +875,7 @@ class Library(object):
                 if params[0] == 'context':
                     params = params[1:]
                 else:
-                    raise TemplateSyntaxError, "Any tag function decorated with takes_context=True must have a first argument of 'context'"
+                    raise TemplateSyntaxError("Any tag function decorated with takes_context=True must have a first argument of 'context'")
 
             class InclusionNode(Node):
                 def __init__(self, vars_to_resolve):
@@ -912,12 +912,12 @@ def get_library(module_name):
         try:
             mod = __import__(module_name, {}, {}, [''])
         except ImportError, e:
-            raise InvalidTemplateLibrary, "Could not load template library from %s, %s" % (module_name, e)
+            raise InvalidTemplateLibrary("Could not load template library from %s, %s" % (module_name, e))
         try:
             lib = mod.register
             libraries[module_name] = lib
         except AttributeError:
-            raise InvalidTemplateLibrary, "Template library %s does not have a variable named 'register'" % module_name
+            raise InvalidTemplateLibrary("Template library %s does not have a variable named 'register'" % module_name)
     return lib
 
 def add_to_builtins(module_name):
