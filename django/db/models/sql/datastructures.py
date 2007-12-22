@@ -6,6 +6,9 @@ the SQL domain.
 class EmptyResultSet(Exception):
     pass
 
+class FullResultSet(Exception):
+    pass
+
 class Aggregate(object):
     """
     Base class for all aggregate-related classes (min, max, avg, count, sum).

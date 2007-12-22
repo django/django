@@ -15,7 +15,7 @@ from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
 from django.dispatch import dispatcher
 from django.db.models import signals
-from django.db.models.sql.where import WhereNode, AND, OR
+from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count, Date
 from django.db.models.fields import FieldDoesNotExist, Field, related
 from django.contrib.contenttypes import generic
@@ -311,19 +311,18 @@ class Query(object):
             w.relabel_aliases(change_map)
             if not self.where:
                 # Since 'self' matches everything, add an explicit "include
-                # everything" (pk is not NULL) where-constraint so that
-                # connections between the where clauses won't exclude valid
-                # results.
+                # everything" where-constraint so that connections between the
+                # where clauses won't exclude valid results.
                 alias = self.join((None, self.model._meta.db_table, None, None))
                 pk = self.model._meta.pk
-                self.where.add([alias, pk.column, pk, 'isnull', False], AND)
+                self.where.add(EverythingNode(), AND)
         elif self.where:
             # rhs has an empty where clause. Make it match everything (see
             # above for reasoning).
             w = WhereNode()
             alias = self.join((None, self.model._meta.db_table, None, None))
             pk = self.model._meta.pk
-            w.add([alias, pk.column, pk, 'isnull', False], AND)
+            w.add(EverythingNode(), AND)
         else:
             w = WhereNode()
         self.where.add(w, connector)

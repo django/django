@@ -5,7 +5,7 @@ import datetime
 
 from django.utils import tree
 from django.db import connection
-from datastructures import EmptyResultSet
+from datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
 AND = 'AND'
@@ -43,26 +43,36 @@ class WhereNode(tree.Node):
         result_params = []
         empty = True
         for child in node.children:
-            if hasattr(child, 'as_sql'):
-                sql, params = child.as_sql(qn=qn)
-                format = '(%s)'
-            elif isinstance(child, tree.Node):
-                sql, params = self.as_sql(child, qn)
-                if child.negated:
-                    format = 'NOT (%s)'
-                else:
+            try:
+                if hasattr(child, 'as_sql'):
+                    sql, params = child.as_sql(qn=qn)
                     format = '(%s)'
-            else:
-                try:
+                elif isinstance(child, tree.Node):
+                    sql, params = self.as_sql(child, qn)
+                    if child.negated:
+                        format = 'NOT (%s)'
+                    else:
+                        format = '(%s)'
+                else:
                     sql, params = self.make_atom(child, qn)
                     format = '%s'
-                except EmptyResultSet:
-                    if self.connector == AND and not node.negated:
-                        # We can bail out early in this particular case (only).
-                        raise
-                    elif node.negated:
-                        empty = False
-                    continue
+            except EmptyResultSet:
+                if self.connector == AND and not node.negated:
+                    # We can bail out early in this particular case (only).
+                    raise
+                elif node.negated:
+                    empty = False
+                continue
+            except FullResultSet:
+                if self.connector == OR:
+                    if node.negated:
+                        empty = True
+                        break
+                    # We match everything. No need for any constraints.
+                    return '', []
+                if node.negated:
+                    empty = True
+                continue
             empty = False
             if sql:
                 result.append(format % sql)
@@ -156,3 +166,12 @@ class WhereNode(tree.Node):
                 val = child[0]
                 child[0] = change_map.get(val, val)
 
+class EverythingNode(object):
+    """
+    A node that matches everything.
+    """
+    def as_sql(self, qn=None):
+        raise FullResultSet
+
+    def relabel_aliases(self, change_map, node=None):
+        return
