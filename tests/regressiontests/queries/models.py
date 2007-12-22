@@ -269,6 +269,13 @@ Bug #2253
 >>> (q1 & q2).order_by('name')
 [<Item: one>]
 
+# FIXME: This is difficult to fix and very much an edge case, so punt for now.
+# # This is related to the order_by() tests, below, but the old bug exhibited
+# # itself here (q2 was pulling too many tables into the combined query with the
+# # new ordering, but only because we have evaluated q2 already).
+# >>> len((q1 & q2).order_by('name').query.tables)
+# 1
+
 >>> q1 = Item.objects.filter(tags=t1)
 >>> q2 = Item.objects.filter(note=n3, tags=t2)
 >>> q3 = Item.objects.filter(creator=a4)
@@ -376,6 +383,15 @@ Bug #2076
 [<Ranking: 3: a1>, <Ranking: 2: a2>, <Ranking: 1: a3>]
 >>> Ranking.objects.all().order_by('rank')
 [<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
+
+# If we replace the default ordering, Django adjusts the required tables
+# automatically. Item normally requires a join with Note to do the default
+# ordering, but that isn't needed here.
+>>> qs = Item.objects.order_by('name')
+>>> qs
+[<Item: four>, <Item: one>, <Item: three>, <Item: two>]
+>>> len(qs.query.tables)
+1
 
 # Ordering of extra() pieces is possible, too and you can mix extra fields and
 # model fields in the ordering.
