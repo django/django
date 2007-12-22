@@ -154,7 +154,6 @@ class StringOrigin(Origin):
 
 class Template(object):
     def __init__(self, template_string, origin=None, name='<Unknown Template>'):
-        "Compilation stage"
         try:
             template_string = smart_unicode(template_string)
         except UnicodeDecodeError:
@@ -186,7 +185,7 @@ def compile_string(template_string, origin):
 
 class Token(object):
     def __init__(self, token_type, contents):
-        "The token_type must be TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK or TOKEN_COMMENT"
+        # token_type must be TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK or TOKEN_COMMENT.
         self.token_type, self.contents = token_type, contents
 
     def __str__(self):
@@ -203,7 +202,7 @@ class Lexer(object):
         self.origin = origin
 
     def tokenize(self):
-        "Return a list of tokens from a given template_string"
+        "Return a list of tokens from a given template_string."
         in_tag = False
         result = []
         for bit in tag_re.split(self.template_string):
@@ -298,7 +297,7 @@ class Parser(object):
     def exit_command(self):
         pass
 
-    def error(self, token, msg ):
+    def error(self, token, msg):
         return TemplateSyntaxError(msg)
 
     def empty_variable(self, token):
