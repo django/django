@@ -175,8 +175,13 @@ class Template(object):
 
 def compile_string(template_string, origin):
     "Compiles template_string into NodeList ready for rendering"
-    lexer = lexer_factory(template_string, origin)
-    parser = parser_factory(lexer.tokenize())
+    if settings.TEMPLATE_DEBUG:
+        from debug import DebugLexer, DebugParser
+        lexer_class, parser_class = DebugLexer, DebugParser
+    else:
+        lexer_class, parser_class = Lexer, Parser
+    lexer = lexer_class(template_string, origin)
+    parser = parser_class(lexer.tokenize())
     return parser.parse()
 
 class Token(object):
@@ -333,20 +338,6 @@ class Parser(object):
             return self.filters[filter_name]
         else:
             raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
-
-def lexer_factory(*args, **kwargs):
-    if settings.TEMPLATE_DEBUG:
-        from debug import DebugLexer
-        return DebugLexer(*args, **kwargs)
-    else:
-        return Lexer(*args, **kwargs)
-
-def parser_factory(*args, **kwargs):
-    if settings.TEMPLATE_DEBUG:
-        from debug import DebugParser
-        return DebugParser(*args, **kwargs)
-    else:
-        return Parser(*args, **kwargs)
 
 class TokenParser(object):
     """
