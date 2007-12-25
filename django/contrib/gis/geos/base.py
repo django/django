@@ -90,6 +90,18 @@ class GEOSGeometry(object):
         # Setting the coordinate sequence for the geometry (will be None on 
         #  geometries that do not have coordinate sequences)
         self._set_cs()
+        
+    @property
+    def ptr(self):
+        """
+        Property for controlling access to the GEOS geometry pointer.  Using
+        this raises an exception when the pointer is NULL, thus preventing
+        the C library from attempting to access an invalid memory location.
+        """
+        if self._ptr: 
+            return self._ptr
+        else:
+            raise GEOSException('NULL GEOS pointer encountered; was this geometry modified?')
 
     def __del__(self):
         """
@@ -98,22 +110,43 @@ class GEOSGeometry(object):
         """
         if self._ptr: destroy_geom(self._ptr)
 
+    def __copy__(self):
+        """
+        Returns a clone because the copy of a GEOSGeometry may contain an
+        invalid pointer location if the original is garbage collected.
+        """
+        return self.clone()
+
+    def __deepcopy__(self, memodict):
+        """
+        The `deepcopy` routine is used by the `Node` class of django.utils.tree;
+        thus, the protocol routine needs to be implemented to return correct 
+        copies (clones) of these GEOS objects, which use C pointers.
+        """
+        return self.clone()
+
     def __str__(self):
         "WKT is used for the string representation."
         return self.wkt
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
-        return '<%s object at %s>' % (self.geom_type, hex(addressof(self._ptr)))
+        return '<%s object at %s>' % (self.geom_type, hex(addressof(self.ptr)))
 
     # Comparison operators
     def __eq__(self, other):
-        "Equivalence testing."
-        return self.equals_exact(other)
+        """
+        Equivalence testing, a Geometry may be compared with another Geometry
+        or a WKT representation.
+        """
+        if isinstance(other, basestring):
+            return self.wkt == other
+        else:
+            return self.equals_exact(other)
 
     def __ne__(self, other):
         "The not equals operator."
-        return not self.equals_exact(other)
+        return not (self == other)
 
     ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
@@ -151,7 +184,7 @@ class GEOSGeometry(object):
     def _set_cs(self):
         "Sets the coordinate sequence for this Geometry."
         if self.has_cs:
-            self._cs = GEOSCoordSeq(get_cs(self._ptr), self.hasz)
+            self._cs = GEOSCoordSeq(get_cs(self.ptr), self.hasz)
         else:
             self._cs = None
 
@@ -164,22 +197,22 @@ class GEOSGeometry(object):
     @property
     def geom_type(self):
         "Returns a string representing the Geometry type, e.g. 'Polygon'"
-        return geos_type(self._ptr)
+        return geos_type(self.ptr)
 
     @property
     def geom_typeid(self):
         "Returns an integer representing the Geometry type."
-        return geos_typeid(self._ptr)
+        return geos_typeid(self.ptr)
 
     @property
     def num_geom(self):
         "Returns the number of geometries in the Geometry."
-        return get_num_geoms(self._ptr)
+        return get_num_geoms(self.ptr)
 
     @property
     def num_coords(self):
         "Returns the number of coordinates in the Geometry."
-        return get_num_coords(self._ptr)
+        return get_num_coords(self.ptr)
 
     @property
     def num_points(self):
@@ -189,11 +222,11 @@ class GEOSGeometry(object):
     @property
     def dims(self):
         "Returns the dimension of this Geometry (0=point, 1=line, 2=surface)."
-        return get_dims(self._ptr)
+        return get_dims(self.ptr)
 
     def normalize(self):
         "Converts this Geometry to normal form (or canonical form)."
-        return geos_normalize(self._ptr)
+        return geos_normalize(self.ptr)
 
     #### Unary predicates ####
     @property
@@ -202,32 +235,32 @@ class GEOSGeometry(object):
         Returns a boolean indicating whether the set of points in this Geometry 
         are empty.
         """
-        return geos_isempty(self._ptr)
+        return geos_isempty(self.ptr)
 
     @property
     def hasz(self):
         "Returns whether the geometry has a 3D dimension."
-        return geos_hasz(self._ptr)
+        return geos_hasz(self.ptr)
 
     @property
     def ring(self):
         "Returns whether or not the geometry is a ring."
-        return geos_isring(self._ptr)
+        return geos_isring(self.ptr)
 
     @property
     def simple(self):
         "Returns false if the Geometry not simple."
-        return geos_issimple(self._ptr)
+        return geos_issimple(self.ptr)
 
     @property
     def valid(self):
         "This property tests the validity of this Geometry."
-        return geos_isvalid(self._ptr)
+        return geos_isvalid(self.ptr)
 
     #### Binary predicates. ####
     def contains(self, other):
         "Returns true if other.within(this) returns true."
-        return geos_contains(self._ptr, other._ptr)
+        return geos_contains(self.ptr, other.ptr)
 
     def crosses(self, other):
         """
@@ -235,39 +268,39 @@ class GEOSGeometry(object):
         is T*T****** (for a point and a curve,a point and an area or a line and
         an area) 0******** (for two curves).
         """
-        return geos_crosses(self._ptr, other._ptr)
+        return geos_crosses(self.ptr, other.ptr)
 
     def disjoint(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
         is FF*FF****.
         """
-        return geos_disjoint(self._ptr, other._ptr)
+        return geos_disjoint(self.ptr, other.ptr)
 
     def equals(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries 
         is T*F**FFF*.
         """
-        return geos_equals(self._ptr, other._ptr)
+        return geos_equals(self.ptr, other.ptr)
 
     def equals_exact(self, other, tolerance=0):
         """
         Returns true if the two Geometries are exactly equal, up to a
         specified tolerance.
         """
-        return geos_equalsexact(self._ptr, other._ptr, float(tolerance))
+        return geos_equalsexact(self.ptr, other.ptr, float(tolerance))
 
     def intersects(self, other):
         "Returns true if disjoint returns false."
-        return geos_intersects(self._ptr, other._ptr)
+        return geos_intersects(self.ptr, other.ptr)
 
     def overlaps(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
         is T*T***T** (for two points or two surfaces) 1*T***T** (for two curves).
         """
-        return geos_overlaps(self._ptr, other._ptr)
+        return geos_overlaps(self.ptr, other.ptr)
 
     def relate_pattern(self, other, pattern):
         """
@@ -276,32 +309,32 @@ class GEOSGeometry(object):
         """
         if not isinstance(pattern, StringType) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
-        return geos_relatepattern(self._ptr, other._ptr, pattern)
+        return geos_relatepattern(self.ptr, other.ptr, pattern)
 
     def touches(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
         is FT*******, F**T***** or F***T****.
         """
-        return geos_touches(self._ptr, other._ptr)
+        return geos_touches(self.ptr, other.ptr)
 
     def within(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
         is T*F**F***.
         """
-        return geos_within(self._ptr, other._ptr)
+        return geos_within(self.ptr, other.ptr)
 
     #### SRID Routines ####
     def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
-        s = geos_get_srid(self._ptr)
+        s = geos_get_srid(self.ptr)
         if s == 0: return None
         else: return s
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
-        geos_set_srid(self._ptr, srid)
+        geos_set_srid(self.ptr, srid)
     srid = property(get_srid, set_srid)
 
     #### Output Routines ####
@@ -314,7 +347,7 @@ class GEOSGeometry(object):
     @property
     def wkt(self):
         "Returns the WKT (Well-Known Text) of the Geometry."
-        return to_wkt(self._ptr)
+        return to_wkt(self.ptr)
 
     @property
     def hex(self):
@@ -325,12 +358,12 @@ class GEOSGeometry(object):
         """
         # A possible faster, all-python, implementation: 
         #  str(self.wkb).encode('hex')
-        return to_hex(self._ptr, byref(c_size_t()))
+        return to_hex(self.ptr, byref(c_size_t()))
 
     @property
     def wkb(self):
         "Returns the WKB of the Geometry as a buffer."
-        bin = to_wkb(self._ptr, byref(c_size_t()))
+        bin = to_wkb(self.ptr, byref(c_size_t()))
         return buffer(bin)
 
     @property
@@ -374,7 +407,7 @@ class GEOSGeometry(object):
             ptr = from_wkb(wkb, len(wkb))
             if ptr:
                 # Reassigning pointer, and resetting the SRID.
-                destroy_geom(self._ptr)
+                destroy_geom(self.ptr)
                 self._ptr = ptr
                 self.srid = g.srid
         else:
@@ -388,7 +421,7 @@ class GEOSGeometry(object):
     @property
     def boundary(self):
         "Returns the boundary as a newly allocated Geometry object."
-        return self._topology(geos_boundary(self._ptr))
+        return self._topology(geos_boundary(self.ptr))
 
     def buffer(self, width, quadsegs=8):
         """
@@ -398,7 +431,7 @@ class GEOSGeometry(object):
         the number of segment used to approximate a quarter circle (defaults to 8).
         (Text from PostGIS documentation at ch. 6.1.3)
         """
-        return self._topology(geos_buffer(self._ptr, width, quadsegs))
+        return self._topology(geos_buffer(self.ptr, width, quadsegs))
 
     @property
     def centroid(self):
@@ -407,7 +440,7 @@ class GEOSGeometry(object):
         of highest dimension (since the lower-dimension geometries contribute zero
         "weight" to the centroid).
         """
-        return self._topology(geos_centroid(self._ptr))
+        return self._topology(geos_centroid(self.ptr))
 
     @property
     def convex_hull(self):
@@ -415,32 +448,32 @@ class GEOSGeometry(object):
         Returns the smallest convex Polygon that contains all the points 
         in the Geometry.
         """
-        return self._topology(geos_convexhull(self._ptr))
+        return self._topology(geos_convexhull(self.ptr))
 
     def difference(self, other):
         """
         Returns a Geometry representing the points making up this Geometry
         that do not make up other.
         """
-        return self._topology(geos_difference(self._ptr, other._ptr))
+        return self._topology(geos_difference(self.ptr, other.ptr))
 
     @property
     def envelope(self):
         "Return the envelope for this geometry (a polygon)."
-        return self._topology(geos_envelope(self._ptr))
+        return self._topology(geos_envelope(self.ptr))
 
     def intersection(self, other):
         "Returns a Geometry representing the points shared by this Geometry and other."
-        return self._topology(geos_intersection(self._ptr, other._ptr))
+        return self._topology(geos_intersection(self.ptr, other.ptr))
 
     @property
     def point_on_surface(self):
         "Computes an interior point of this Geometry."
-        return self._topology(geos_pointonsurface(self._ptr))
+        return self._topology(geos_pointonsurface(self.ptr))
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this Geometry and the other."
-        return geos_relate(self._ptr, other._ptr)
+        return geos_relate(self.ptr, other.ptr)
 
     def simplify(self, tolerance=0.0, preserve_topology=False):
         """
@@ -455,26 +488,26 @@ class GEOSGeometry(object):
         input. This is significantly slower.         
         """
         if preserve_topology:
-            return self._topology(geos_preservesimplify(self._ptr, tolerance))
+            return self._topology(geos_preservesimplify(self.ptr, tolerance))
         else:
-            return self._topology(geos_simplify(self._ptr, tolerance))
+            return self._topology(geos_simplify(self.ptr, tolerance))
 
     def sym_difference(self, other):
         """
         Returns a set combining the points in this Geometry not in other,
         and the points in other not in this Geometry.
         """
-        return self._topology(geos_symdifference(self._ptr, other._ptr))
+        return self._topology(geos_symdifference(self.ptr, other.ptr))
 
     def union(self, other):
         "Returns a Geometry representing all the points in this Geometry and other."
-        return self._topology(geos_union(self._ptr, other._ptr))
+        return self._topology(geos_union(self.ptr, other.ptr))
 
     #### Other Routines ####
     @property
     def area(self):
         "Returns the area of the Geometry."
-        return geos_area(self._ptr, byref(c_double()))
+        return geos_area(self.ptr, byref(c_double()))
 
     def distance(self, other):
         """
@@ -484,7 +517,7 @@ class GEOSGeometry(object):
         """
         if not isinstance(other, GEOSGeometry): 
             raise TypeError('distance() works only on other GEOS Geometries.')
-        return geos_distance(self._ptr, other._ptr, byref(c_double()))
+        return geos_distance(self.ptr, other.ptr, byref(c_double()))
 
     @property
     def length(self):
@@ -492,11 +525,11 @@ class GEOSGeometry(object):
         Returns the length of this Geometry (e.g., 0 for point, or the
         circumfrence of a Polygon).
         """
-        return geos_length(self._ptr, byref(c_double()))
+        return geos_length(self.ptr, byref(c_double()))
     
     def clone(self):
         "Clones this Geometry."
-        return GEOSGeometry(geom_clone(self._ptr), srid=self.srid)
+        return GEOSGeometry(geom_clone(self.ptr), srid=self.srid)
 
 # Class mapping dictionary
 from django.contrib.gis.geos.geometries import Point, Polygon, LineString, LinearRing

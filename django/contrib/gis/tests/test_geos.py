@@ -1,10 +1,6 @@
 import random, unittest, sys
 from ctypes import ArgumentError
-from django.contrib.gis.geos import \
-    GEOSException, GEOSIndexError, \
-    GEOSGeometry, Point, LineString, LinearRing, Polygon, \
-    MultiPoint, MultiLineString, MultiPolygon, GeometryCollection, \
-    fromstr, geos_version, HAS_NUMPY
+from django.contrib.gis.geos import *
 from django.contrib.gis.geos.base import HAS_GDAL
 from django.contrib.gis.tests.geometries import *
     
@@ -89,6 +85,15 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(srid, poly.shell.srid)
             self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
     
+    def test01i_eq(self):
+        "Testing equivalence with WKT."
+        p = fromstr('POINT(5 23)')
+        self.assertEqual(p, p.wkt)
+        self.assertNotEqual(p, 'foo')
+        ls = fromstr('LINESTRING(0 0, 1 1, 5 5)')
+        self.assertEqual(ls, ls.wkt)
+        self.assertNotEqual(p, 'bar')
+
     def test02a_points(self):
         "Testing Point objects."
         prev = fromstr('POINT(0 0)')
@@ -478,9 +483,17 @@ class GEOSTest(unittest.TestCase):
 
         # However, when HEX is exported, the SRID information is lost
         # and set to -1.  Essentially, the 'E' of the EWKB is not
-        # encoded in HEX by the GEOS C library for some reason.
+        # encoded in HEX by the GEOS C library unless the GEOSWKBWriter
+        # method is used.  GEOS 3.0.0 will not encode -1 in the HEX
+        # as is done in the release candidates.
+        info = geos_version_info()
+        if info['version'] == '3.0.0' and info['release_candidate']:
+            exp_srid = -1
+        else:
+            exp_srid = None
+
         p2 = fromstr(p1.hex)
-        self.assertEqual(-1, p2.srid)
+        self.assertEqual(exp_srid, p2.srid)
         p3 = fromstr(p1.hex, srid=-1) # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
@@ -650,7 +663,16 @@ class GEOSTest(unittest.TestCase):
         self.assertEqual(True, isinstance(g2.srs, SpatialReference))
         self.assertEqual(g2.hex, g2.ogr.hex)
         self.assertEqual('WGS 84', g2.srs.name)
-        
+
+    def test22_copy(self):
+        "Testing use with the Python `copy` module."
+        import copy
+        poly = GEOSGeometry('POLYGON((0 0, 0 23, 23 23, 23 0, 0 0), (5 5, 5 10, 10 10, 10 5, 5 5))')
+        cpy1 = copy.copy(poly)
+        cpy2 = copy.deepcopy(poly)
+        self.assertNotEqual(poly._ptr, cpy1._ptr)
+        self.assertNotEqual(poly._ptr, cpy2._ptr)
+
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(GEOSTest))

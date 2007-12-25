@@ -38,14 +38,14 @@ class GeometryCollection(GEOSGeometry):
         # Creating the geometry pointer array.
         ngeoms = len(init_geoms)
         geoms = get_pointer_arr(ngeoms)
-        for i in xrange(ngeoms): geoms[i] = geom_clone(init_geoms[i]._ptr)
+        for i in xrange(ngeoms): geoms[i] = geom_clone(init_geoms[i].ptr)
         super(GeometryCollection, self).__init__(create_collection(c_int(self._typeid), byref(geoms), c_uint(ngeoms)), **kwargs)
 
     def __getitem__(self, index):
         "Returns the Geometry from this Collection at the given index (0-based)."
         # Checking the index and returning the corresponding GEOS geometry.
         self._checkindex(index)
-        return GEOSGeometry(geom_clone(get_geomn(self._ptr, index)), srid=self.srid)
+        return GEOSGeometry(geom_clone(get_geomn(self.ptr, index)), srid=self.srid)
 
     def __setitem__(self, index, geom):
         "Sets the Geometry at the specified index."
@@ -57,12 +57,12 @@ class GeometryCollection(GEOSGeometry):
         geoms = get_pointer_arr(ngeoms)
         for i in xrange(ngeoms):
             if i == index:
-                geoms[i] = geom_clone(geom._ptr)
+                geoms[i] = geom_clone(geom.ptr)
             else:
-                geoms[i] = geom_clone(get_geomn(self._ptr, i))
+                geoms[i] = geom_clone(get_geomn(self.ptr, i))
         
         # Creating a new collection, and destroying the contents of the previous poiner.
-        prev_ptr = self._ptr
+        prev_ptr = self.ptr
         srid = self.srid
         self._ptr = create_collection(c_int(self._typeid), byref(geoms), c_uint(ngeoms))
         if srid: self.srid = srid

@@ -6,7 +6,7 @@
  This module also houses GEOS Pointer utilities, including
  get_pointer_arr(), and GEOM_PTR.
 """
-import atexit, os, sys
+import atexit, os, re, sys
 from ctypes import c_char_p, string_at, Structure, CDLL, CFUNCTYPE, POINTER
 from django.contrib.gis.geos.error import GEOSException
 
@@ -21,7 +21,7 @@ except ImportError:
 try:
     from django.conf import settings
     lib_name = settings.GEOS_LIBRARY_PATH
-except (AttributeError, EnvironmentError):
+except (AttributeError, EnvironmentError, ImportError):
     lib_name = None
 
 # Setting the appropriate name for the GEOS-C library, depending on which
@@ -95,6 +95,21 @@ def get_pointer_arr(n):
 def geos_version():
     "Returns the string version of GEOS."
     return string_at(lgeos.GEOSversion())
+
+# Regular expression should be able to parse version strings such as
+# '3.0.0rc4-CAPI-1.3.3', or '3.0.0-CAPI-1.4.1'
+version_regex = re.compile(r'^(?P<version>\d+\.\d+\.\d+)(rc(?P<release_candidate>\d+))?-CAPI-(?P<capi_version>\d+\.\d+\.\d+)$')
+def geos_version_info():
+    """
+    Returns a dictionary containing the various version metadata parsed from
+    the GEOS version string, including the version number, whether the version
+    is a release candidate (and what number release candidate), and the C API
+    version.
+    """
+    ver = geos_version()
+    m = version_regex.match(ver)
+    if not m: raise GEOSException('Could not parse version info string "%s"' % ver)
+    return dict((key, m.group(key)) for key in ('version', 'release_candidate', 'capi_version'))
 
 # Calling the finishGEOS() upon exit of the interpreter.
 atexit.register(lgeos.finishGEOS)

@@ -76,18 +76,27 @@ class GEOSCoordSeq(object):
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
 
+    @property
+    def ptr(self):
+        """
+        Property for controlling access to coordinate sequence pointer,
+        preventing attempted access to a NULL memory location.
+        """
+        if self._ptr: return self._ptr
+        else: raise GEOSException('NULL coordinate sequence pointer encountered.')
+
     #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
         "Returns the value for the given dimension and index."
         self._checkindex(index)
         self._checkdim(dimension)
-        return cs_getordinate(self._ptr, index, dimension, byref(c_double()))
+        return cs_getordinate(self.ptr, index, dimension, byref(c_double()))
 
     def setOrdinate(self, dimension, index, value):
         "Sets the value for the given dimension and index."
         self._checkindex(index)
         self._checkdim(dimension)
-        cs_setordinate(self._ptr, index, dimension, value)
+        cs_setordinate(self.ptr, index, dimension, value)
 
     def getX(self, index):
         "Get the X value at the index."
@@ -117,12 +126,12 @@ class GEOSCoordSeq(object):
     @property
     def size(self):
         "Returns the size of this coordinate sequence."
-        return cs_getsize(self._ptr, byref(c_uint()))
+        return cs_getsize(self.ptr, byref(c_uint()))
 
     @property
     def dims(self):
         "Returns the dimensions of this coordinate sequence."
-        return cs_getdims(self._ptr, byref(c_uint()))
+        return cs_getdims(self.ptr, byref(c_uint()))
 
     @property
     def hasz(self):
@@ -135,7 +144,7 @@ class GEOSCoordSeq(object):
     ### Other Methods ###
     def clone(self):
         "Clones this coordinate sequence."
-        return GEOSCoordSeq(cs_clone(self._ptr), self.hasz)
+        return GEOSCoordSeq(cs_clone(self.ptr), self.hasz)
 
     @property
     def kml(self):

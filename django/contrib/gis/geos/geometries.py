@@ -166,7 +166,7 @@ class LineString(GEOSGeometry):
        
         # Calling the base geometry initialization with the returned pointer 
         #  from the function.
-        super(LineString, self).__init__(func(cs._ptr), srid=srid)
+        super(LineString, self).__init__(func(cs.ptr), srid=srid)
 
     def __getitem__(self, index):
         "Gets the point at the specified index."
@@ -263,10 +263,10 @@ class Polygon(GEOSGeometry):
         # Getting the holes array.
         nholes = len(init_holes)
         holes = get_pointer_arr(nholes)
-        for i in xrange(nholes): holes[i] = geom_clone(init_holes[i]._ptr)
+        for i in xrange(nholes): holes[i] = geom_clone(init_holes[i].ptr)
                       
         # Getting the shell pointer address, 
-        shell = geom_clone(ext_ring._ptr)
+        shell = geom_clone(ext_ring.ptr)
 
         # Calling with the GEOS createPolygon factory.
         super(Polygon, self).__init__(create_polygon(shell, byref(holes), c_uint(nholes)), **kwargs)
@@ -291,9 +291,9 @@ class Polygon(GEOSGeometry):
 
         # Getting the shell
         if index == 0:
-            shell = geom_clone(ring._ptr)
+            shell = geom_clone(ring.ptr)
         else:
-            shell = geom_clone(get_extring(self._ptr))
+            shell = geom_clone(get_extring(self.ptr))
 
         # Getting the interior rings (holes)
         nholes = len(self)-1
@@ -301,16 +301,16 @@ class Polygon(GEOSGeometry):
             holes = get_pointer_arr(nholes)
             for i in xrange(nholes):
                 if i == (index-1):
-                    holes[i] = geom_clone(ring._ptr)
+                    holes[i] = geom_clone(ring.ptr)
                 else:
-                    holes[i] = geom_clone(get_intring(self._ptr, i))
+                    holes[i] = geom_clone(get_intring(self.ptr, i))
             holes_param = byref(holes)
         else:
             holes_param = None
          
         # Getting the current pointer, replacing with the newly constructed
         # geometry, and destroying the old geometry.
-        prev_ptr = self._ptr
+        prev_ptr = self.ptr
         srid = self.srid
         self._ptr = create_polygon(shell, holes_param, c_uint(nholes))
         if srid: self.srid = srid
@@ -336,18 +336,18 @@ class Polygon(GEOSGeometry):
         interior ring, not the exterior ring.
         """
         self._checkindex(ring_i+1)
-        return GEOSGeometry(geom_clone(get_intring(self._ptr, ring_i)), srid=self.srid)
+        return GEOSGeometry(geom_clone(get_intring(self.ptr, ring_i)), srid=self.srid)
                                                         
     #### Polygon Properties ####
     @property
     def num_interior_rings(self):
         "Returns the number of interior rings."
         # Getting the number of rings
-        return get_nrings(self._ptr)
+        return get_nrings(self.ptr)
 
     def get_ext_ring(self):
         "Gets the exterior ring of the Polygon."
-        return GEOSGeometry(geom_clone(get_extring(self._ptr)), srid=self.srid)
+        return GEOSGeometry(geom_clone(get_extring(self.ptr)), srid=self.srid)
 
     def set_ext_ring(self, ring):
         "Sets the exterior ring of the Polygon."

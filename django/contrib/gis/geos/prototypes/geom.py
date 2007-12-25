@@ -49,6 +49,12 @@ def string_from_geom(func):
 
 ### ctypes prototypes ###
 
+# TODO: Tell all users to use GEOS 3.0.0, instead of the release 
+#  candidates, and use the new Reader and Writer APIs (e.g.,
+#  GEOSWKT[Reader|Writer], GEOSWKB[Reader|Writer]).  A good time
+#  to do this will be when Refractions releases a Windows PostGIS
+#  installer using GEOS 3.0.0.
+
 # Creation routines from WKB, HEX, WKT
 from_hex = bin_constructor(lgeos.GEOSGeomFromHEX_buf)
 from_wkb = bin_constructor(lgeos.GEOSGeomFromWKB_buf)
