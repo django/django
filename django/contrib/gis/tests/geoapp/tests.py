@@ -155,21 +155,22 @@ class GeoModelTest(unittest.TestCase):
         # Pre-transformed points for Houston and Pueblo.
         htown = fromstr('POINT(1947516.83115183 6322297.06040572)', srid=3084)
         ptown = fromstr('POINT(992363.390841912 481455.395105533)', srid=2774)
+        prec = 3 # Precision is low due to version variations in PROJ and GDAL.
 
         # Asserting the result of the transform operation with the values in
         #  the pre-transformed points.  Oracle does not have the 3084 SRID.
         if not oracle:
             h = City.objects.transform('point', srid=htown.srid).get(name='Houston')
             self.assertEqual(3084, h.point.srid)
-            self.assertAlmostEqual(htown.x, h.point.x, 8)
-            self.assertAlmostEqual(htown.y, h.point.y, 8)
+            self.assertAlmostEqual(htown.x, h.point.x, prec)
+            self.assertAlmostEqual(htown.y, h.point.y, prec)
 
         p1 = City.objects.transform('point', srid=ptown.srid).get(name='Pueblo')
         p2 = City.objects.transform(srid=ptown.srid).get(name='Pueblo')
         for p in [p1, p2]:
             self.assertEqual(2774, p.point.srid)
-            self.assertAlmostEqual(ptown.x, p.point.x, 7)
-            self.assertAlmostEqual(ptown.y, p.point.y, 7)
+            self.assertAlmostEqual(ptown.x, p.point.x, prec)
+            self.assertAlmostEqual(ptown.y, p.point.y, prec)
 
     def test09_disjoint(self):
         "Testing the `disjoint` lookup type."

@@ -254,8 +254,8 @@ class OGRGeomTest(unittest.TestCase):
 
     def test09b_srs_transform(self):
         "Testing transform()."
-        orig = OGRGeometry('POINT (-104.609252 38.255001)', 4326)
-        trans = OGRGeometry('POINT(992363.390841912 481455.395105533)', 2774)
+        orig = OGRGeometry('POINT (-104.609 38.255)', 4326)
+        trans = OGRGeometry('POINT (992385.4472045 481455.4944650)', 2774)
 
         # Using an srid, a SpatialReference object, and a CoordTransform object
         # or transformations.
@@ -266,8 +266,9 @@ class OGRGeomTest(unittest.TestCase):
         t3.transform(ct)
 
         for p in (t1, t2, t3):
-            self.assertAlmostEqual(trans.x, p.x, 7)
-            self.assertAlmostEqual(trans.y, p.y, 7)
+            prec = 3
+            self.assertAlmostEqual(trans.x, p.x, prec)
+            self.assertAlmostEqual(trans.y, p.y, prec)
 
     def test10_difference(self):
         "Testing difference()."
