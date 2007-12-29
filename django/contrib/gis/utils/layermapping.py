@@ -64,6 +64,13 @@
   transform:
    Setting this to False will disable all coordinate transformations.  
 
+  unique:
+   Setting this to the name, or a tuple of names, from the given
+   model will create models unique only to the given name(s).
+   Geometries will from each feature will be added into the collection
+   associated with the unique model.  Forces transaction mode to
+   be 'autocommit'.
+
 Example:
 
  1. You need a GDAL-supported data source, like a shapefile.
@@ -182,7 +189,8 @@ class LayerMapping(object):
     def __init__(self, model, data, mapping, layer=0, 
                  source_srs=None, encoding=None, check=True, 
                  progress=False, interval=1000, strict=False, silent=False,
-                 transaction_mode='commit_on_success', transform=True):
+                 transaction_mode='commit_on_success', transform=True,
+                 unique=False):
         "Takes the Django model, the data source, and the mapping (dictionary)"
 
         # Getting the field names and types from the model
@@ -208,8 +216,11 @@ class LayerMapping(object):
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`
         # keyword is set to False)
-        self.source_srs = self.check_srs(source_srs)
-        self.transform = transform and self.coord_transform()
+        if transform:
+            self.source_srs = self.check_srs(source_srs)
+            self.transform = self.coord_transform()
+        else:
+            self.transform = transform
 
         # Checking the layer -- intitialization of the object will fail if
         # things don't check out before hand.  This may be time-consuming,
@@ -231,6 +242,13 @@ class LayerMapping(object):
             self.encoding = encoding
         else:
             self.encoding = None
+
+        if unique:
+            self.check_unique(unique)
+            transaction_mode = 'autocommit' # Has to be set to autocommit.
+            self.unique = unique
+        else:
+            self.unique = None
 
         # Setting the transaction decorator with the function in the 
         # transaction modes dictionary.
@@ -314,6 +332,26 @@ class LayerMapping(object):
         else:
             return sr
 
+    def check_unique(self, unique):
+        "Checks the `unique` keyword parameter -- may be a sequence or string."
+        # Getting the geometry field; only the first encountered GeometryField
+        # will be used.
+        self.geom_field = False
+        for model_field, ogr_fld in self.mapping.items():
+            if ogr_fld in self.OGC_TYPES:
+                self.geom_field = model_field
+                break
+
+        if isinstance(unique, (list, tuple)):
+            # List of fields to determine uniqueness with
+            for attr in unique: 
+                if not attr in self.mapping: raise ValueError
+        elif isinstance(unique, basestring):
+            # Only a single field passed in.
+            if unique not in self.mapping: raise ValueError
+        else:
+            raise TypeError('Unique keyword argument must be set with a tuple, list, or string.')
+
     def coord_transform(self):
         "Returns the coordinate transformation object."
         try:
@@ -370,6 +408,17 @@ class LayerMapping(object):
                 kwargs[model_field] = val
             
         return kwargs, all_prepped
+
+    def unique_kwargs(self, kwargs):
+        """
+        Given the feature keyword arguments (from `feature_kwargs`) this routine
+        will construct and return the uniqueness keyword arguments -- a subset
+        of the feature kwargs.
+        """
+        if isinstance(self.unique, basestring):
+            return {self.unique : kwargs[self.unique]}
+        else:
+            return dict((fld, kwargs[fld]) for fld in self.unique)
 
     def verify_field(self, fld, model_field):
         """
@@ -485,8 +534,31 @@ class LayerMapping(object):
                 else:
                     # Constructing the model using the keyword args
                     if all_prepped:
-                        m = self.model(**kwargs)
+                        if self.unique:
+                            # If we want unique models on a particular field, handle the
+                            # geometry appropriately.
+                            try:
+                                # Getting the keyword arguments and retrieving
+                                # the unique model.
+                                u_kwargs = self.unique_kwargs(kwargs)
+                                m = self.model.objects.get(**u_kwargs)
+
+                                # Getting the geometry (in OGR form), creating 
+                                # one from the kwargs WKT, adding in additional 
+                                # geometries, and update the attribute with the 
+                                # just-updated geometry WKT.
+                                geom = getattr(m, self.geom_field).ogr
+                                new = OGRGeometry(kwargs[self.geom_field])
+                                for g in new: geom.add(g) 
+                                setattr(m, self.geom_field, geom.wkt)
+                            except ObjectDoesNotExist:
+                                # No unique model exists yet, create.
+                                m = self.model(**kwargs)
+                        else:
+                            m = self.model(**kwargs)
+
                         try:
+                            # Attempting to save.
                             m.save()
                             num_saved += 1
                             if verbose: print 'Saved: %s' % m

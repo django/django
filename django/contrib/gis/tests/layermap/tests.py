@@ -2,12 +2,13 @@ import os, unittest
 from copy import copy
 from datetime import date
 from decimal import Decimal
-from models import City, Interstate, city_mapping, inter_mapping
+from models import City, County, CountyFeat, Interstate, city_mapping, co_mapping, cofeat_mapping, inter_mapping
 from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal
 from django.contrib.gis.gdal import DataSource
 
 shp_path = os.path.dirname(__file__)
 city_shp = os.path.join(shp_path, 'cities/cities.shp')
+co_shp = os.path.join(shp_path, 'counties/counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates/interstates.shp')
 
 class LayerMapTest(unittest.TestCase):
@@ -110,6 +111,61 @@ class LayerMapTest(unittest.TestCase):
                 self.assertAlmostEqual(p1[0], p2[0], 6)
                 self.assertAlmostEqual(p1[1], p2[1], 6)
 
+    def test04_layermap_unique_multigeometry(self):
+        "Testing the `unique`, and `transform` keywords and geometry collection conversion."
+        # All the following should work.
+        try:
+            # Telling LayerMapping that we want no transformations performed on the data.
+            lm = LayerMapping(County, co_shp, co_mapping, transform=False)
+        
+            # Specifying the source spatial reference system via the `source_srs` keyword.
+            lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
+            lm = LayerMapping(County, co_shp, co_mapping, source_srs='NAD83')
+
+            # Unique may take tuple or string parameters.
+            for arg in ('name', ('name', 'mpoly')):
+                lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
+        except:
+            self.fail('No exception should be raised for proper use of keywords.')
+            
+        # Testing invalid params for the `unique` keyword.
+        for e, arg in ((TypeError, 5.0), (ValueError, 'foobar'), (ValueError, ('name', 'mpolygon'))):
+            self.assertRaises(e, LayerMapping, County, co_shp, co_mapping, transform=False, unique=arg)
+
+        # No source reference system defined in the shapefile, should raise an error.
+        self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
+
+        # If a mapping is specified as a collection, all OGR fields that
+        # are not collections will be converted into them.  For example,
+        # a Point column would be converted to MultiPoint. Other things being done
+        # w/the keyword args:
+        #  `transform=False`: Specifies that no transform is to be done; this 
+        #    has the effect of ignoring the spatial reference check (because the
+        #    county shapefile does not have implicit spatial reference info).
+        # 
+        #  `unique='name'`: Creates models on the condition that they have 
+        #    unique county names; geometries from each feature however will be
+        #    appended to the geometry collection of the unique model.  Thus,
+        #    all of the various islands in Honolulu county will be in in one
+        #    database record with a MULTIPOLYGON type.
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name', silent=True)
+        lm.save()
+
+        # A reference that doesn't use the unique keyword; a new database record will
+        # created for each polygon.
+        lm = LayerMapping(CountyFeat, co_shp, cofeat_mapping, transform=False, silent=True)
+        lm.save()
+
+        # Dictionary to hold what's expected in the shapefile.
+        exp = {'names' : ('Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo'),
+               'num' : (1, 2, 2, 19, 1), # Number of polygons for each.
+               }
+        for name, n in zip(exp['names'], exp['num']):
+            c = County.objects.get(name=name) # Should only be one record.
+            self.assertEqual(n, len(c.mpoly))
+            qs = CountyFeat.objects.filter(name=name)
+            self.assertEqual(n, qs.count())
+            
 def suite():
     s = unittest.TestSuite()
     s.addTest(unittest.makeSuite(LayerMapTest))

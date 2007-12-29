@@ -1,5 +1,15 @@
 from django.contrib.gis.db import models
 
+class County(models.Model):
+    name = models.CharField(max_length=25)
+    mpoly = models.MultiPolygonField(srid=4269) # Multipolygon in NAD83
+    objects = models.GeoManager()
+
+class CountyFeat(models.Model):
+    name = models.CharField(max_length=25)
+    poly = models.PolygonField(srid=4269)
+    objects = models.GeoManager()
+
 class City(models.Model):
     name = models.CharField(max_length=25)
     population = models.IntegerField()
@@ -13,8 +23,16 @@ class Interstate(models.Model):
     length = models.DecimalField(max_digits=6, decimal_places=2)
     path = models.LineStringField()
     objects = models.GeoManager()
-    
-# Mapping dictionary for the City model.
+
+# Mapping dictionaries for the models above.
+co_mapping = {'name' : 'Name',
+              'mpoly' : 'MULTIPOLYGON', # Will convert POLYGON features into MULTIPOLYGONS.
+              }
+
+cofeat_mapping = {'name' : 'Name',
+                  'poly' : 'POLYGON',
+                  }
+
 city_mapping = {'name' : 'Name',
                 'population' : 'Population',
                 'density' : 'Density',
@@ -22,7 +40,6 @@ city_mapping = {'name' : 'Name',
                 'point' : 'POINT',
                 }
 
-# Mapping dictionary for the Interstate model.
 inter_mapping = {'name' : 'Name',
                  'length' : 'Length',
                  'path' : 'LINESTRING',
