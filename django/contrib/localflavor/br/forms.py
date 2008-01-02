@@ -17,13 +17,19 @@ except NameError:
 phone_digits_re = re.compile(r'^(\d{2})[-\.]?(\d{4})[-\.]?(\d{4})$')
 
 class BRZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': _('Enter a zip code in the format XXXXX-XXX.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(BRZipCodeField, self).__init__(r'^\d{5}-\d{3}$',
-            max_length=None, min_length=None,
-            error_message=_('Enter a zip code in the format XXXXX-XXX.'),
-                    *args, **kwargs)
+            max_length=None, min_length=None, *args, **kwargs)
 
 class BRPhoneNumberField(Field):
+    default_error_messages = {
+        'invalid': _('Phone numbers must be in XX-XXXX-XXXX format.'),
+    }
+
     def clean(self, value):
         super(BRPhoneNumberField, self).clean(value)
         if value in EMPTY_VALUES:
@@ -32,7 +38,7 @@ class BRPhoneNumberField(Field):
         m = phone_digits_re.search(value)
         if m:
             return u'%s-%s-%s' % (m.group(1), m.group(2), m.group(3))
-        raise ValidationError(_('Phone numbers must be in XX-XXXX-XXXX format.'))
+        raise ValidationError(self.error_messages['invalid'])
 
 class BRStateSelect(Select):
     """
@@ -48,6 +54,9 @@ class BRStateChoiceField(Field):
     A choice field that uses a list of Brazilian states as its choices.
     """
     widget = Select
+    default_error_messages = {
+        'invalid': _(u'Select a valid brazilian state. That state is not one of the available states.'),
+    }
 
     def __init__(self, required=True, widget=None, label=None,
                  initial=None, help_text=None):
@@ -65,9 +74,7 @@ class BRStateChoiceField(Field):
             return value
         valid_values = set([smart_unicode(k) for k, v in self.widget.choices])
         if value not in valid_values:
-            raise ValidationError(_(u'Select a valid brazilian state.'
-                                           u' That state is not one'
-                                           u' of the available states.'))
+            raise ValidationError(self.error_messages['invalid'])
         return value
 
 def DV_maker(v):
@@ -83,6 +90,12 @@ class BRCPFField(CharField):
     More information:
     http://en.wikipedia.org/wiki/Cadastro_de_Pessoas_F%C3%ADsicas
     """
+    default_error_messages = {
+        'invalid': _("Invalid CPF number."),
+        'max_digits': _("This field requires at most 11 digits or 14 characters."),
+        'digits_only': _("This field requires only numbers."),
+    }
+
     def __init__(self, *args, **kwargs):
         super(BRCPFField, self).__init__(max_length=14, min_length=11, *args, **kwargs)
 
@@ -100,9 +113,9 @@ class BRCPFField(CharField):
         try:
             int(value)
         except ValueError:
-            raise ValidationError(_("This field requires only numbers."))
+            raise ValidationError(self.error_messages['digits_only'])
         if len(value) != 11:
-            raise ValidationError(_("This field requires at most 11 digits or 14 characters."))
+            raise ValidationError(self.error_messages['max_digits'])
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(10, 1, -1))])
@@ -112,11 +125,17 @@ class BRCPFField(CharField):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(_("Invalid CPF number."))
+            raise ValidationError(self.error_messages['invalid'])
 
         return orig_value
 
 class BRCNPJField(Field):
+    default_error_messages = {
+        'invalid': _("Invalid CNPJ number."),
+        'digits_only': _("This field requires only numbers."),
+        'max_digits': _("This field requires at least 14 digits"),
+    }
+
     def clean(self, value):
         """
         Value can be either a string in the format XX.XXX.XXX/XXXX-XX or a
@@ -131,10 +150,9 @@ class BRCNPJField(Field):
         try:
             int(value)
         except ValueError:
-            raise ValidationError("This field requires only numbers.")
+            raise ValidationError(self.error_messages['digits_only'])
         if len(value) != 14:
-            raise ValidationError(
-                _("This field requires at least 14 digits"))
+            raise ValidationError(self.error_messages['max_digits'])
         orig_dv = value[-2:]
 
         new_1dv = sum([i * int(value[idx]) for idx, i in enumerate(range(5, 1, -1) + range(9, 1, -1))])
@@ -144,7 +162,6 @@ class BRCNPJField(Field):
         new_2dv = DV_maker(new_2dv % 11)
         value = value[:-1] + str(new_2dv)
         if value[-2:] != orig_dv:
-            raise ValidationError(_("Invalid CNPJ number."))
+            raise ValidationError(self.error_messages['invalid'])
 
         return orig_value
-

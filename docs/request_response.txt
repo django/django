@@ -156,6 +156,18 @@ Methods
    Returns ``True`` or ``False``, designating whether ``request.GET`` or
    ``request.POST`` has the given key.
 
+``get_host()``
+   **New in Django development version**
+
+   Returns the originating host of the request using information from the
+   ``HTTP_X_FORWARDED_HOST`` and ``HTTP_HOST`` headers (in that order). If
+   they don't provide a value, the method uses a combination of
+   ``SERVER_NAME`` and ``SERVER_PORT`` as detailed in `PEP 333`_.
+
+   .. _PEP 333: http://www.python.org/dev/peps/pep-0333/
+
+   Example: ``"127.0.0.1:8000"``
+
 ``get_full_path()``
    Returns the ``path``, plus an appended query string, if applicable.
 
@@ -452,7 +464,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
 ``HttpResponseNotModified``
     The constructor doesn't take any arguments. Use this to designate that a
-    page hasn't been modified since the user's last request.
+    page hasn't been modified since the user's last request (status code 304).
 
 ``HttpResponseBadRequest``
     **New in Django development version.**

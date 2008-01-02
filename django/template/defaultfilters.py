@@ -254,7 +254,7 @@ urlize.is_safe=True
 urlize.needs_autoescape = True
 urlize = stringfilter(urlize)
 
-def urlizetrunc(value, limit):
+def urlizetrunc(value, limit, autoescape=None):
     """
     Converts URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
@@ -262,8 +262,10 @@ def urlizetrunc(value, limit):
     Argument: Length to truncate URLs to.
     """
     from django.utils.html import urlize
-    return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True))
+    return mark_safe(urlize(value, trim_url_limit=int(limit), nofollow=True,
+                            autoescape=autoescape))
 urlizetrunc.is_safe = True
+urlizetrunc.needs_autoescape = True
 urlizetrunc = stringfilter(urlizetrunc)
 
 def wordcount(value):

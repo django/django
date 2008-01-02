@@ -10,11 +10,12 @@ from django.contrib.localflavor.it.util import ssn_check_digit, vat_number_check
 import re
 
 class ITZipCodeField(RegexField):
+    default_error_messages = {
+        'invalid': ugettext('Enter a valid zip code.'),
+    }
     def __init__(self, *args, **kwargs):
         super(ITZipCodeField, self).__init__(r'^\d{5}$',
-        max_length=None, min_length=None,
-        error_message=ugettext('Enter a valid zip code.'),
-                *args, **kwargs)
+        max_length=None, min_length=None, *args, **kwargs)
 
 class ITRegionSelect(Select):
     """
@@ -38,11 +39,13 @@ class ITSocialSecurityNumberField(RegexField):
     For reference see http://www.agenziaentrate.it/ and search for
     'Informazioni sulla codificazione delle persone fisiche'.
     """
-    err_msg = ugettext(u'Enter a valid Social Security number.')
+    default_error_messages = {
+        'invalid': ugettext(u'Enter a valid Social Security number.'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(ITSocialSecurityNumberField, self).__init__(r'^\w{3}\s*\w{3}\s*\w{5}\s*\w{5}$',
-        max_length=None, min_length=None, error_message=self.err_msg,
-        *args, **kwargs)
+        max_length=None, min_length=None, *args, **kwargs)
 
     def clean(self, value):
         value = super(ITSocialSecurityNumberField, self).clean(value)
@@ -52,26 +55,29 @@ class ITSocialSecurityNumberField(RegexField):
         try:
             check_digit = ssn_check_digit(value)
         except ValueError:
-            raise ValidationError(self.err_msg)
+            raise ValidationError(self.error_messages['invalid'])
         if not value[15] == check_digit:
-            raise ValidationError(self.err_msg)
+            raise ValidationError(self.error_messages['invalid'])
         return value
 
 class ITVatNumberField(Field):
     """
     A form field that validates Italian VAT numbers (partita IVA).
     """
+    default_error_messages = {
+        'invalid': ugettext(u'Enter a valid VAT number.'),
+    }
+
     def clean(self, value):
         value = super(ITVatNumberField, self).clean(value)
         if value == u'':
             return value
-        err_msg = ugettext(u'Enter a valid VAT number.')
         try:
             vat_number = int(value)
         except ValueError:
-            raise ValidationError(err_msg)
+            raise ValidationError(self.error_messages['invalid'])
         vat_number = str(vat_number).zfill(11)
         check_digit = vat_number_check_digit(vat_number[0:10])
         if not vat_number[10] == check_digit:
-            raise ValidationError(err_msg)
+            raise ValidationError(self.error_messages['invalid'])
         return smart_unicode(vat_number)

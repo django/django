@@ -277,7 +277,7 @@ model fields:
     any attempt to ``save()`` a ``ModelForm`` with missing fields will fail.
     To avoid this failure, you must instantiate your model with initial values
     for the missing, but required fields, or use ``save(commit=False)`` and
-    manually set anyextra required fields::
+    manually set any extra required fields::
     
         instance = Instance(required_field='value')
         form = InstanceForm(request.POST, instance=instance)
@@ -296,7 +296,7 @@ Overriding the default field types
 ----------------------------------
 
 The default field types, as described in the "Field types" table above, are
-sensible defaults; if you have a ``DateField`` in your model, chances are you'd
+sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
 ``ModelForm`` gives you the flexibility of changing the form field type
 for a given model field. You do this by declaratively specifying fields like

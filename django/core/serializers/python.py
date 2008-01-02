@@ -13,7 +13,9 @@ class Serializer(base.Serializer):
     """
     Serializes a QuerySet to basic Python objects.
     """
-
+    
+    internal_use_only = True
+    
     def start_serialization(self):
         self._current = None
         self.objects = []

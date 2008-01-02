@@ -99,7 +99,7 @@ It implements the following standard dictionary methods:
 
     * ``items()``
 
-    * ``setdefault()``
+    * ``setdefault()`` (**New in Django development version**)
 
 It also has these three methods:
 

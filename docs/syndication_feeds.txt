@@ -201,7 +201,7 @@ the feed.
 
 An example makes this clear. Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication import FeedDoesNotExist
+    from django.contrib.syndication.feeds import FeedDoesNotExist
 
     class BeatFeed(Feed):
         def get_object(self, bits):

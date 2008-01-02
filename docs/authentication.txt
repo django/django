@@ -247,8 +247,8 @@ Anonymous users
 the ``django.contrib.auth.models.User`` interface, with these differences:
 
     * ``id`` is always ``None``.
-    * ``is_staff`` and ``is_superuser`` are always False.
-    * ``is_active`` is always True.
+    * ``is_staff`` and ``is_superuser`` are always ``False``.
+    * ``is_active`` is always ``False``.
     * ``groups`` and ``user_permissions`` are always empty.
     * ``is_anonymous()`` returns ``True`` instead of ``False``.
     * ``is_authenticated()`` returns ``False`` instead of ``True``.

@@ -714,7 +714,7 @@ class EmailField(CharField):
 class FileField(Field):
     def __init__(self, verbose_name=None, name=None, upload_to='', **kwargs):
         self.upload_to = upload_to
-        kwargs['max_length'] = kwargs.get('max_length', 100)        
+        kwargs['max_length'] = kwargs.get('max_length', 100)
         Field.__init__(self, verbose_name, name, **kwargs)
 
     def get_db_prep_save(self, value):
@@ -910,6 +910,11 @@ class NullBooleanField(Field):
     def get_manipulator_field_objs(self):
         return [oldforms.NullBooleanField]
 
+    def formfield(self, **kwargs):
+        defaults = {'form_class': forms.NullBooleanField}
+        defaults.update(kwargs)
+        return super(NullBooleanField, self).formfield(**defaults)
+
 class PhoneNumberField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PhoneNumberField]
@@ -926,11 +931,11 @@ class PhoneNumberField(IntegerField):
 class PositiveIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
         return [oldforms.PositiveIntegerField]
-    
+
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}
         defaults.update(kwargs)
-        return super(PositiveIntegerField, self).formfield(**defaults) 
+        return super(PositiveIntegerField, self).formfield(**defaults)
 
 class PositiveSmallIntegerField(IntegerField):
     def get_manipulator_field_objs(self):
@@ -939,7 +944,7 @@ class PositiveSmallIntegerField(IntegerField):
     def formfield(self, **kwargs):
         defaults = {'min_value': 0}
         defaults.update(kwargs)
-        return super(PositiveSmallIntegerField, self).formfield(**defaults) 
+        return super(PositiveSmallIntegerField, self).formfield(**defaults)
 
 class SlugField(CharField):
     def __init__(self, *args, **kwargs):

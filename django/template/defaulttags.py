@@ -84,19 +84,16 @@ class FirstOfNode(Node):
         return u''
 
 class ForNode(Node):
-    def __init__(self, loopvars, sequence, reversed, nodelist_loop):
+    def __init__(self, loopvars, sequence, is_reversed, nodelist_loop):
         self.loopvars, self.sequence = loopvars, sequence
-        self.reversed = reversed
+        self.is_reversed = is_reversed
         self.nodelist_loop = nodelist_loop
 
     def __repr__(self):
-        if self.reversed:
-            reversed = ' reversed'
-        else:
-            reversed = ''
+        reversed_text = self.is_reversed and ' reversed' or ''
         return "<For Node: for %s in %s, tail_len: %d%s>" % \
             (', '.join(self.loopvars), self.sequence, len(self.nodelist_loop),
-             reversed)
+             reversed_text)
 
     def __iter__(self):
         for node in self.nodelist_loop:
@@ -125,22 +122,23 @@ class ForNode(Node):
         if not hasattr(values, '__len__'):
             values = list(values)
         len_values = len(values)
-        if self.reversed:
+        if self.is_reversed:
             values = reversed(values)
         unpack = len(self.loopvars) > 1
+        # Create a forloop value in the context.  We'll update counters on each
+        # iteration just below.
+        loop_dict = context['forloop'] = {'parentloop': parentloop}
         for i, item in enumerate(values):
-            context['forloop'] = {
-                # Shortcuts for current loop iteration number.
-                'counter0': i,
-                'counter': i+1,
-                # Reverse counter iteration numbers.
-                'revcounter': len_values - i,
-                'revcounter0': len_values - i - 1,
-                # Boolean values designating first and last times through loop.
-                'first': (i == 0),
-                'last': (i == len_values - 1),
-                'parentloop': parentloop,
-            }
+            # Shortcuts for current loop iteration number.
+            loop_dict['counter0'] = i
+            loop_dict['counter'] = i+1
+            # Reverse counter iteration numbers.
+            loop_dict['revcounter'] = len_values - i
+            loop_dict['revcounter0'] = len_values - i - 1
+            # Boolean values designating first and last times through loop.
+            loop_dict['first'] = (i == 0)
+            loop_dict['last'] = (i == len_values - 1)
+
             if unpack:
                 # If there are multiple loop variables, unpack the item into
                 # them.
@@ -619,8 +617,8 @@ def do_for(parser, token):
         raise TemplateSyntaxError("'for' statements should have at least four"
                                   " words: %s" % token.contents)
 
-    reversed = bits[-1] == 'reversed'
-    in_index = reversed and -3 or -2
+    is_reversed = bits[-1] == 'reversed'
+    in_index = is_reversed and -3 or -2
     if bits[in_index] != 'in':
         raise TemplateSyntaxError("'for' statements should use the format"
                                   " 'for x in y': %s" % token.contents)
@@ -634,7 +632,7 @@ def do_for(parser, token):
     sequence = parser.compile_filter(bits[in_index+1])
     nodelist_loop = parser.parse(('endfor',))
     parser.delete_first_token()
-    return ForNode(loopvars, sequence, reversed, nodelist_loop)
+    return ForNode(loopvars, sequence, is_reversed, nodelist_loop)
 do_for = register.tag("for", do_for)
 
 def do_ifequal(parser, token, negate):
@@ -814,7 +812,7 @@ def ssi(parser, token):
     Outputs the contents of a given file into the page.
 
     Like a simple "include" tag, the ``ssi`` tag includes the contents
-    of another file -- which must be specified using an absolute page --
+    of another file -- which must be specified using an absolute path --
     in the current page::
 
         {% ssi /home/html/ljworld.com/includes/right_generic.html %}
@@ -926,20 +924,18 @@ def regroup(parser, token):
         {% regroup people|dictsort:"gender" by gender as grouped %}
 
     """
-    firstbits = token.contents.split(None, 3)
-    if len(firstbits) != 4:
+    bits = token.contents.split()
+    if len(bits) != 6:
         raise TemplateSyntaxError, "'regroup' tag takes five arguments"
-    target = parser.compile_filter(firstbits[1])
-    if firstbits[2] != 'by':
+    target = parser.compile_filter(bits[1])
+    if bits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
-    lastbits_reversed = firstbits[3][::-1].split(None, 2)
-    if lastbits_reversed[1][::-1] != 'as':
+    if bits[4] != 'as':
         raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
                                   " be 'as'")
 
-    expression = parser.compile_filter(lastbits_reversed[2][::-1])
-
-    var_name = lastbits_reversed[0][::-1]
+    expression = parser.compile_filter(bits[3])
+    var_name = bits[5]
     return RegroupNode(target, expression, var_name)
 regroup = register.tag(regroup)
 

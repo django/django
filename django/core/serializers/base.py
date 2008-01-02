@@ -22,6 +22,10 @@ class Serializer(object):
     Abstract serializer base class.
     """
 
+    # Indicates if the implemented serializer is only available for 
+    # internal Django use.
+    internal_use_only = False
+    
     def serialize(self, queryset, **options):
         """
         Serialize a queryset.

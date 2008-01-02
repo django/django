@@ -53,6 +53,11 @@ def get_serializer_formats():
         _load_serializers()
     return _serializers.keys()
 
+def get_public_serializer_formats():
+    if not _serializers:
+        _load_serializers()
+    return [k for k, v in _serializers.iteritems() if not v.Serializer.internal_use_only]
+
 def get_deserializer(format):
     if not _serializers:
         _load_serializers()

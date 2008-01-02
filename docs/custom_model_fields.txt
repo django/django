@@ -44,8 +44,8 @@ Our class looks something like this::
         # ... (other possibly useful methods omitted) ...
 
 This is just an ordinary Python class, with nothing Django-specific about it.
-We'd like to be able to things like this in our models (we assume the ``hand``
-attribute on the model is an instance of ``Hand``)::
+We'd like to be able to do things like this in our models (we assume the
+``hand`` attribute on the model is an instance of ``Hand``)::
 
     example = MyModel.objects.get(pk=1)
     print example.hand.north
