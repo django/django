@@ -97,7 +97,7 @@ Hooking into the current site from views
 ----------------------------------------
 
 On a lower level, you can use the sites framework in your Django views to do
-particular things based on what site in which the view is being called.
+particular things based on the site in which the view is being called.
 For example::
 
     from django.conf import settings
@@ -330,13 +330,13 @@ Here's how Django uses the sites framework:
       retrieving flatpages to display.
 
     * In the `syndication framework`_, the templates for ``title`` and
-      ``description`` automatically have access to a variable ``{{{ site }}}``,
+      ``description`` automatically have access to a variable ``{{ site }}``,
       which is the ``Site`` object representing the current site. Also, the
       hook for providing item URLs will use the ``domain`` from the current
       ``Site`` object if you don't specify a fully-qualified domain.
 
     * In the `authentication framework`_, the ``django.contrib.auth.views.login``
-      view passes the current ``Site`` name to the template as ``{{{ site_name }}}``.
+      view passes the current ``Site`` name to the template as ``{{ site_name }}``.
 
     * The shortcut view (``django.views.defaults.shortcut``) uses the domain of
       the current ``Site`` object when calculating an object's URL.
