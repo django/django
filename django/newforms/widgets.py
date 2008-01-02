@@ -110,10 +110,9 @@ def media_property(cls):
                     m = Media()
                     for medium in extend:
                         m = m + base[medium]
-                    m = m + Media(definition)
                 return m + Media(definition)
             else:
-                 return Media(definition)
+                return Media(definition)
         else:
             return base
     return property(_media)
