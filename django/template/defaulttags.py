@@ -125,19 +125,20 @@ class ForNode(Node):
         if self.is_reversed:
             values = reversed(values)
         unpack = len(self.loopvars) > 1
+        # Create a forloop value in the context.  We'll update counters on each
+        # iteration just below.
+        loop_dict = context['forloop'] = {'parentloop': parentloop}
         for i, item in enumerate(values):
-            context['forloop'] = {
-                # Shortcuts for current loop iteration number.
-                'counter0': i,
-                'counter': i+1,
-                # Reverse counter iteration numbers.
-                'revcounter': len_values - i,
-                'revcounter0': len_values - i - 1,
-                # Boolean values designating first and last times through loop.
-                'first': (i == 0),
-                'last': (i == len_values - 1),
-                'parentloop': parentloop,
-            }
+            # Shortcuts for current loop iteration number.
+            loop_dict['counter0'] = i
+            loop_dict['counter'] = i+1
+            # Reverse counter iteration numbers.
+            loop_dict['revcounter'] = len_values - i
+            loop_dict['revcounter0'] = len_values - i - 1
+            # Boolean values designating first and last times through loop.
+            loop_dict['first'] = (i == 0)
+            loop_dict['last'] = (i == len_values - 1)
+
             if unpack:
                 # If there are multiple loop variables, unpack the item into
                 # them.
