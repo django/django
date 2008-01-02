@@ -201,6 +201,8 @@ class AdminSite(object):
         """
         Displays the login form for the given HttpRequest.
         """
+        from django.contrib.auth.models import User
+
         # If this isn't already the login page, display it.
         if not request.POST.has_key(LOGIN_FORM_KEY):
             if request.POST:
