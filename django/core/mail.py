@@ -67,8 +67,7 @@ def make_msgid(idstring=None):
 class BadHeaderError(ValueError):
     pass
 
-class SafeMIMEText(MIMEText):
-    def __setitem__(self, name, val):
+def forbid_multi_line_headers(name, val):
         "Forbids multi-line headers, to prevent header injection."
         if '\n' in val or '\r' in val:
             raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
@@ -84,25 +83,16 @@ class SafeMIMEText(MIMEText):
                 val = ', '.join(result)
             else:
                 val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
+    return (name, val)
+
+class SafeMIMEText(MIMEText):
+    def __setitem__(self, name, val):
+        name, val = forbid_multi_line_headers(name, val)
         MIMEText.__setitem__(self, name, val)
 
 class SafeMIMEMultipart(MIMEMultipart):
     def __setitem__(self, name, val):
-        "Forbids multi-line headers, to prevent header injection."
-        if '\n' in val or '\r' in val:
-            raise BadHeaderError, "Header values can't contain newlines (got %r for header %r)" % (val, name)
-        try:
-            val = force_unicode(val).encode('ascii')
-        except UnicodeEncodeError:
-            if name.lower() in ('to', 'from', 'cc'):
-                result = []
-                for item in val.split(', '):
-                    nm, addr = parseaddr(item)
-                    nm = str(Header(nm, settings.DEFAULT_CHARSET))
-                    result.append(formataddr((nm, str(addr))))
-                val = ', '.join(result)
-            else:
-                val = Header(force_unicode(val), settings.DEFAULT_CHARSET)
+        name, val = forbid_multi_line_headers(name, val)
         MIMEMultipart.__setitem__(self, name, val)
 
 class SMTPConnection(object):
