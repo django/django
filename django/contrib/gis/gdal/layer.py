@@ -5,6 +5,7 @@ from ctypes import byref
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
 from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
 from django.contrib.gis.gdal.feature import Feature
+from django.contrib.gis.gdal.field import FIELD_CLASSES
 from django.contrib.gis.gdal.geometries import OGRGeomType
 from django.contrib.gis.gdal.srs import SpatialReference
 
@@ -12,8 +13,8 @@ from django.contrib.gis.gdal.srs import SpatialReference
 from django.contrib.gis.gdal.prototypes.ds import \
     get_extent, get_fd_geom_type, get_fd_name, get_feature, get_feature_count, \
     get_field_count, get_field_defn, get_field_name, get_field_precision, \
-    get_field_width, get_layer_defn, get_layer_srs, get_next_feature, \
-    reset_reading
+    get_field_width, get_field_type, get_layer_defn, get_layer_srs, \
+    get_next_feature, reset_reading
 from django.contrib.gis.gdal.prototypes.srs import clone_srs
 
 # For more information, see the OGR C API source code:
@@ -107,10 +108,24 @@ class Layer(object):
 
     @property
     def fields(self):
-        "Returns a list of the fields available in this Layer."
+        """
+        Returns a list of string names corresponding to each of the Fields
+        available in this Layer.
+        """
         return [get_field_name(get_field_defn(self._ldefn, i)) 
                 for i in xrange(self.num_fields) ]
     
+    @property
+    def field_types(self):
+        """
+        Returns a list of the types of fields in this Layer.  For example,
+        the list [OFTInteger, OFTReal, OFTString] would be returned for
+        an OGR layer that had an integer, a floating-point, and string
+        fields.
+        """
+        return [FIELD_CLASSES[get_field_type(get_field_defn(self._ldefn, i))]
+                for i in xrange(self.num_fields)]
+
     @property 
     def field_widths(self):
         "Returns a list of the maximum field widths for the features."

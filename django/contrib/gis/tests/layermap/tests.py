@@ -2,8 +2,8 @@ import os, unittest
 from copy import copy
 from datetime import date
 from decimal import Decimal
-from models import City, County, CountyFeat, Interstate, city_mapping, co_mapping, cofeat_mapping, inter_mapping
-from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal
+from models import City, County, CountyFeat, Interstate, State, city_mapping, co_mapping, cofeat_mapping, inter_mapping
+from django.contrib.gis.utils.layermapping import LayerMapping, LayerMapError, InvalidDecimal, MissingForeignKey
 from django.contrib.gis.gdal import DataSource
 
 shp_path = os.path.dirname(__file__)
@@ -111,8 +111,8 @@ class LayerMapTest(unittest.TestCase):
                 self.assertAlmostEqual(p1[0], p2[0], 6)
                 self.assertAlmostEqual(p1[1], p2[1], 6)
 
-    def test04_layermap_unique_multigeometry(self):
-        "Testing the `unique`, and `transform` keywords and geometry collection conversion."
+    def test04_layermap_unique_multigeometry_fk(self):
+        "Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."
         # All the following should work.
         try:
             # Telling LayerMapping that we want no transformations performed on the data.
@@ -135,6 +135,23 @@ class LayerMapTest(unittest.TestCase):
         # No source reference system defined in the shapefile, should raise an error.
         self.assertRaises(LayerMapError, LayerMapping, County, co_shp, co_mapping)
 
+        # Passing in invalid ForeignKey mapping parameters -- must be a dictionary
+        # mapping for the model the ForeignKey points to.
+        bad_fk_map1 = copy(co_mapping); bad_fk_map1['state'] = 'name'
+        bad_fk_map2 = copy(co_mapping); bad_fk_map2['state'] = {'nombre' : 'State'}
+        self.assertRaises(TypeError, LayerMapping, County, co_shp, bad_fk_map1, transform=False)
+        self.assertRaises(LayerMapError, LayerMapping, County, co_shp, bad_fk_map2, transform=False)
+
+        # There exist no State models for the ForeignKey mapping to work -- should raise
+        # a MissingForeignKey exception (this error would be ignored if the `strict`
+        # keyword is not set).
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name', silent=True, strict=True)
+        self.assertRaises(MissingForeignKey, lm.save)
+
+        # Now creating the state models so the ForeignKey mapping may work.
+        co, hi, tx = State(name='Colorado'), State(name='Hawaii'), State(name='Texas')
+        co.save(), hi.save(), tx.save()
+
         # If a mapping is specified as a collection, all OGR fields that
         # are not collections will be converted into them.  For example,
         # a Point column would be converted to MultiPoint. Other things being done
@@ -148,21 +165,26 @@ class LayerMapTest(unittest.TestCase):
         #    appended to the geometry collection of the unique model.  Thus,
         #    all of the various islands in Honolulu county will be in in one
         #    database record with a MULTIPOLYGON type.
-        lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name', silent=True)
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique='name', silent=True, strict=True)
         lm.save()
 
         # A reference that doesn't use the unique keyword; a new database record will
         # created for each polygon.
-        lm = LayerMapping(CountyFeat, co_shp, cofeat_mapping, transform=False, silent=True)
+        lm = LayerMapping(CountyFeat, co_shp, cofeat_mapping, transform=False, silent=True, strict=True)
         lm.save()
 
         # Dictionary to hold what's expected in the shapefile.
-        exp = {'names' : ('Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo'),
-               'num' : (1, 2, 2, 19, 1), # Number of polygons for each.
-               }
-        for name, n in zip(exp['names'], exp['num']):
-            c = County.objects.get(name=name) # Should only be one record.
+        names = ('Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo')
+        nums  = (1, 2, 1, 19, 1) # Number of polygons for each.
+        states = ('Texas', 'Texas', 'Texas', 'Hawaii', 'Colorado')
+
+        for name, n, st in zip(names, nums, states):
+            # Should only be one record b/c of `unique` keyword.
+            c = County.objects.get(name=name)
             self.assertEqual(n, len(c.mpoly))
+            self.assertEqual(st, c.state.name) # Checking ForeignKey mapping.
+
+            # Multiple records because `unique` was not set.
             qs = CountyFeat.objects.filter(name=name)
             self.assertEqual(n, qs.count())
             
