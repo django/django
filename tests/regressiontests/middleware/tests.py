@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest
-
-from django.test import TestCase 
+from django.test import TestCase
 from django.http import HttpRequest
 from django.middleware.common import CommonMiddleware
 from django.conf import settings
@@ -19,7 +17,7 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_have_slash(self):
         """
-        tests that urls with slashes go unmolested
+        Tests that URLs with slashes go unmolested.
         """
         settings.APPEND_SLASH = True
         request = self._get_request('slash/')
@@ -27,7 +25,7 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_slashless_resource(self):
         """
-        tests that matches to explicit slashless urls go unmolested
+        Tests that matches to explicit slashless URLs go unmolested.
         """
         settings.APPEND_SLASH = True
         request = self._get_request('noslash')
@@ -35,7 +33,7 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_slashless_unknown(self):
         """
-        tests that APPEND_SLASH doesn't redirect to unknown resources
+        Tests that APPEND_SLASH doesn't redirect to unknown resources.
         """
         settings.APPEND_SLASH = True
         request = self._get_request('unknown')
@@ -43,7 +41,7 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_redirect(self):
         """
-        tests that APPEND_SLASH redirects slashless urls to a valid pattern
+        Tests that APPEND_SLASH redirects slashless URLs to a valid pattern.
         """
         settings.APPEND_SLASH = True
         request = self._get_request('slash')
@@ -53,9 +51,9 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_no_redirect_on_POST_in_DEBUG(self):
         """
-        tests that while in debug mode, an exception is raised with a warning
-        when a failed attempt is made to POST to an url which would normally be
-        redirected to a slashed version
+        Tests that while in debug mode, an exception is raised with a warning
+        when a failed attempt is made to POST to an URL which would normally be
+        redirected to a slashed version.
         """
         settings.APPEND_SLASH = True
         settings.DEBUG = True
@@ -69,10 +67,11 @@ class CommonMiddlewareTest(TestCase):
             CommonMiddleware().process_request(request)
         except RuntimeError, e:
             self.assertTrue('end in a slash' in str(e))
+        settings.DEBUG = False
 
     def test_append_slash_disabled(self):
         """
-        tests disabling append slash functionality
+        Tests disabling append slash functionality.
         """
         settings.APPEND_SLASH = False
         request = self._get_request('slash')
@@ -80,8 +79,8 @@ class CommonMiddlewareTest(TestCase):
 
     def test_append_slash_quoted(self):
         """
-        tests that urls which require quoting are redirected to their slash
-        version ok
+        Tests that URLs which require quoting are redirected to their slash
+        version ok.
         """
         settings.APPEND_SLASH = True
         request = self._get_request('needsquoting#')
@@ -90,4 +89,3 @@ class CommonMiddlewareTest(TestCase):
         self.assertEquals(
             r['Location'],
             'http://testserver/middleware/needsquoting%23/')
-
