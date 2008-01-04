@@ -14,7 +14,7 @@ if lib_name:
     pass
 elif os.name == 'nt':
     # Windows NT shared library
-    lib_name = 'libgdal-1.dll'
+    lib_name = 'gdal15.dll'
 elif os.name == 'posix':
     platform = os.uname()[0]
     if platform == 'Darwin':
@@ -28,6 +28,24 @@ else:
 
 # This loads the GDAL/OGR C library
 lgdal = CDLL(lib_name)
+
+# On Windows, the GDAL binaries have some OSR routines exported with 
+# STDCALL, while others are not.  Thus, the library will also need to 
+# be loaded up as WinDLL for said OSR functions that require the 
+# different calling convention.
+if os.name == 'nt':
+    from ctypes import WinDLL
+    lwingdal = WinDLL(lib_name)
+
+def std_call(func):
+    """
+    Returns the correct STDCALL function for certain OSR routines on Win32
+    platforms.
+    """
+    if os.name == 'nt':
+        return lwingdal[func]
+    else:
+        return lgdal[func]
 
 #### Version-information functions. ####
 def _version_info(key):
