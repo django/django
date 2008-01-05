@@ -809,16 +809,6 @@ class Templates(unittest.TestCase):
                           '{% endfor %},' + \
                           '{% endfor %}',
                           {}, ''),
-            
-            # Test syntax.
-            'regroup03': ('{% regroup data by bar as %}', {},
-                          template.TemplateSyntaxError),
-            'regroup04': ('{% regroup data by bar thisaintright grouped %}', {},
-                          template.TemplateSyntaxError),
-            'regroup05': ('{% regroup data thisaintright bar as grouped %}', {},
-                          template.TemplateSyntaxError),
-            'regroup06': ('{% regroup data by bar as grouped toomanyargs %}', {},
-                          template.TemplateSyntaxError),
 
             ### TEMPLATETAG TAG #######################################################
             'templatetag01': ('{% templatetag openblock %}', {}, '{%'),
