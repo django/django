@@ -67,8 +67,7 @@ class DataSource(object):
 
         # Registering all the drivers, this needs to be done
         #  _before_ we try to open up a data source.
-        if not get_driver_count() and not register_all():
-            raise OGRException('Could not register all the OGR data source drivers!')
+        if not get_driver_count(): register_all()
 
         if isinstance(ds_input, basestring):
             # The data source driver is a void pointer.

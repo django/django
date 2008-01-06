@@ -103,6 +103,9 @@ def void_output(func, argtypes, errcheck=True):
         # return void, rather than a status code.
         func.restype = c_int
         func.errcheck = check_errcode
+    else:
+        func.restype = None
+        
     return func
 
 def voidptr_output(func, argtypes):

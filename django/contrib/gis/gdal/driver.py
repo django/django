@@ -56,9 +56,8 @@ class Driver(object):
     def _register(self):
         "Attempts to register all the data source drivers."
         # Only register all if the driver count is 0 (or else all drivers
-        #  will be registered over and over again)
-        if not self.driver_count and not register_all():
-            raise OGRException('Could not register all the OGR data source drivers!')
+        # will be registered over and over again)
+        if not self.driver_count: register_all()
                     
     # Driver properties
     @property
