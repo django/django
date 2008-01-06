@@ -449,6 +449,14 @@ def join(value, arg):
         return data
 join.is_safe = True
 
+def last(value):
+    "Returns the last item in a list"
+    try:
+        return value[-1]
+    except IndexError:
+        return u''
+last.is_safe = True
+
 def length(value):
     """Returns the length of the value - useful for lists."""
     return len(value)
@@ -800,6 +808,7 @@ register.filter(force_escape)
 register.filter(get_digit)
 register.filter(iriencode)
 register.filter(join)
+register.filter(last)
 register.filter(length)
 register.filter(length_is)
 register.filter(linebreaks)

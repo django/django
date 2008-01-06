@@ -1403,6 +1403,11 @@ join
 
 Joins a list with a string, like Python's ``str.join(list)``.
 
+last
+~~~~
+
+Returns the last item in a list.
+
 length
 ~~~~~~
 
