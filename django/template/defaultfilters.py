@@ -433,7 +433,7 @@ def first(value):
         return value[0]
     except IndexError:
         return u''
-first.is_safe = True
+first.is_safe = False
 
 def join(value, arg):
     """Joins a list with a string, like Python's ``str.join(list)``."""
