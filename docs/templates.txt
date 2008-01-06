@@ -1230,7 +1230,7 @@ addslashes
 Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
 **New in Django development version**: for escaping data in JavaScript strings,
-use the `escapejs` filter instead.
+use the `escapejs`_ filter instead.
 
 capfirst
 ~~~~~~~~
