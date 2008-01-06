@@ -66,7 +66,7 @@ class CommonMiddlewareTest(TestCase):
         try:
             CommonMiddleware().process_request(request)
         except RuntimeError, e:
-            self.assertTrue('end in a slash' in str(e))
+            self.failUnless('end in a slash' in str(e))
         settings.DEBUG = False
 
     def test_append_slash_disabled(self):
