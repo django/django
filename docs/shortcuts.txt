@@ -94,7 +94,7 @@ This example is equivalent to::
 
     def my_view(request):
         try:
-            my_object = MyModel.object.get(pk=1)
+            my_object = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404
 
@@ -136,7 +136,7 @@ This example is equivalent to::
     from django.http import Http404
 
     def my_view(request):
-        my_objects = MyModels.object.filter(published=True)
+        my_objects = MyModel.objects.filter(published=True)
         if not my_objects:
             raise Http404
 
