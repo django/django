@@ -538,13 +538,15 @@ class GeometryCollection(OGRGeometry):
     def add(self, geom):
         "Add the geometry to this Geometry Collection."
         if isinstance(geom, OGRGeometry):
-            ptr = geom._ptr
+            if isinstance(geom, self.__class__):
+                for g in geom: add_geom(self._ptr, g._ptr)
+            else:
+                add_geom(self._ptr, geom._ptr)
         elif isinstance(geom, (StringType, UnicodeType)):
             tmp = OGRGeometry(geom)
-            ptr = tmp._ptr
+            add_geom(self._ptr, tmp._ptr)
         else:
             raise OGRException('Must add an OGRGeometry.')
-        add_geom(self._ptr, ptr)
 
     @property
     def point_count(self):
