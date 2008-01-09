@@ -716,8 +716,8 @@ in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
 ``django-admin.py`` will use the ``DJANGO_SETTINGS_MODULE`` environment
 variable.
 
-Note that this option is unnecessary in ``manage.py``, because it takes care of
-setting ``DJANGO_SETTINGS_MODULE`` for you.
+Note that this option is unnecessary in ``manage.py``, because it uses
+``settings.py`` from the current project by default. 
 
 Extra niceties
 ==============

@@ -80,12 +80,12 @@ class CASocialInsuranceNumberField(Field):
 
     Checks the following rules to determine whether the number is valid:
 
-        * Conforms to the XXX-XXX-XXXX format.
+        * Conforms to the XXX-XXX-XXX format.
         * Passes the check digit process "Luhn Algorithm"
              See: http://en.wikipedia.org/wiki/Social_Insurance_Number
     """
     default_error_messages = {
-        'invalid': ugettext('Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format.'),
+        'invalid': ugettext('Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format.'),
     }
 
     def clean(self, value):

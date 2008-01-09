@@ -181,7 +181,7 @@ CASocialInsuranceNumberField
 ----------------------------
 
 A form field that validates input as a Canadian Social Insurance Number (SIN).
-A valid number must have the format XXX-XXX-XXXX and pass a `Luhn mod-10
+A valid number must have the format XXX-XXX-XXX and pass a `Luhn mod-10
 checksum`_.
 
 .. _Luhn mod-10 checksum: http://en.wikipedia.org/wiki/Luhn_algorithm
