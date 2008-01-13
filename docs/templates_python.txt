@@ -827,7 +827,7 @@ Template filter code falls into one of two situations:
        the ``needs_autoescape`` attribute to ``True`` on your function. (If you
        don't specify this attribute, it defaults to ``False``). This attribute
        tells Django that your filter function wants to be passed an extra
-       keyword argument, called ``autoescape``, that is ``True`` is
+       keyword argument, called ``autoescape``, that is ``True`` if
        auto-escaping is in effect and ``False`` otherwise.
 
        For example, let's write a filter that emphasizes the first character of
