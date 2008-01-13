@@ -85,7 +85,7 @@ PROVINCE_CHOICES = (
     ('RC', 'Reggio Calabria'),
     ('RE', 'Reggio Emilia'),
     ('RI', 'Rieti'),
-    ('RN', 'Rimini')
+    ('RN', 'Rimini'),
     ('RM', 'Roma'),
     ('RO', 'Rovigo'),
     ('SA', 'Salerno'),
