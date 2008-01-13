@@ -57,7 +57,7 @@ worth using only if it creates a huge convenience unattainable in other ways,
 and it isn't implemented in a way that confuses developers who are trying to
 learn how to use the feature.
 
-.. _`core Python principle`: http://www.python.org/doc/Humor.html#zen
+.. _`core Python principle`: http://www.python.org/dev/peps/pep-0020/
 
 Consistency
 -----------
