@@ -10,6 +10,9 @@ from django.contrib.auth.models import User
 import getpass
 import os
 import sys
+import re
+
+RE_VALID_USERNAME = re.compile('\w+$')
 
 def createsuperuser(username=None, email=None, password=None):
     """
@@ -43,7 +46,7 @@ def createsuperuser(username=None, email=None, password=None):
                 username = raw_input(input_msg + ': ')
             if default_username and username == '':
                 username = default_username
-            if not username.isalnum():
+            if not RE_VALID_USERNAME.match(username):
                 sys.stderr.write("Error: That username is invalid. Use only letters, digits and underscores.\n")
                 username = None
                 continue
