@@ -9,7 +9,6 @@ class ContextPopException(Exception):
 
 class Context(object):
     "A stack container for variable context"
-
     def __init__(self, dict_=None, autoescape=True):
         dict_ = dict_ or {}
         self.dicts = [dict_]
@@ -78,11 +77,11 @@ def get_standard_processors():
             try:
                 mod = __import__(module, {}, {}, [attr])
             except ImportError, e:
-                raise ImproperlyConfigured, 'Error importing request processor module %s: "%s"' % (module, e)
+                raise ImproperlyConfigured('Error importing request processor module %s: "%s"' % (module, e))
             try:
                 func = getattr(mod, attr)
             except AttributeError:
-                raise ImproperlyConfigured, 'Module "%s" does not define a "%s" callable request processor' % (module, attr)
+                raise ImproperlyConfigured('Module "%s" does not define a "%s" callable request processor' % (module, attr))
             processors.append(func)
         _standard_context_processors = tuple(processors)
     return _standard_context_processors
@@ -102,4 +101,3 @@ class RequestContext(Context):
             processors = tuple(processors)
         for processor in get_standard_processors() + processors:
             self.update(processor(request))
-

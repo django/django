@@ -437,10 +437,12 @@ class FileField(Field):
     def __init__(self, *args, **kwargs):
         super(FileField, self).__init__(*args, **kwargs)
 
-    def clean(self, data):
-        super(FileField, self).clean(data)
+    def clean(self, data, initial=None):
+        super(FileField, self).clean(initial or data)
         if not self.required and data in EMPTY_VALUES:
             return None
+        elif not data and initial:
+            return initial
         try:
             f = UploadedFile(data['filename'], data['content'])
         except TypeError:
@@ -456,12 +458,12 @@ class ImageField(FileField):
         'invalid_image': _(u"Upload a valid image. The file you uploaded was either not an image or a corrupted image."),
     }
 
-    def clean(self, data):
+    def clean(self, data, initial=None):
         """
         Checks that the file-upload field data contains a valid image (GIF, JPG,
         PNG, possibly others -- whatever the Python Imaging Library supports).
         """
-        f = super(ImageField, self).clean(data)
+        f = super(ImageField, self).clean(data, initial)
         if f is None:
             return None
         from PIL import Image

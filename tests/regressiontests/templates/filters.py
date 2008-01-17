@@ -179,6 +179,9 @@ def get_filter_tests():
         'filter-first01': ('{{ a|first }} {{ b|first }}', {"a": ["a&b", "x"], "b": [mark_safe("a&b"), "x"]}, "a&amp;b a&b"),
         'filter-first02': ('{% autoescape off %}{{ a|first }} {{ b|first }}{% endautoescape %}', {"a": ["a&b", "x"], "b": [mark_safe("a&b"), "x"]}, "a&b a&b"),
 
+        'filter-last01': ('{{ a|last }} {{ b|last }}', {"a": ["x", "a&b"], "b": ["x", mark_safe("a&b")]}, "a&amp;b a&b"),
+        'filter-last02': ('{% autoescape off %}{{ a|last }} {{ b|last }}{% endautoescape %}', {"a": ["x", "a&b"], "b": ["x", mark_safe("a&b")]}, "a&b a&b"),
+
         'filter-random01': ('{{ a|random }} {{ b|random }}', {"a": ["a&b", "a&b"], "b": [mark_safe("a&b"), mark_safe("a&b")]}, "a&amp;b a&b"),
         'filter-random02': ('{% autoescape off %}{{ a|random }} {{ b|random }}{% endautoescape %}', {"a": ["a&b", "a&b"], "b": [mark_safe("a&b"), mark_safe("a&b")]}, "a&b a&b"),
 

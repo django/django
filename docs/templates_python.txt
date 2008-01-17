@@ -823,11 +823,11 @@ Template filter code falls into one of two situations:
        can operate in templates where auto-escaping is either on or off in
        order to make things easier for your template authors.
 
-       In order for you filter to know the current auto-escaping state, set the
-       ``needs_autoescape`` attribute to ``True`` on your function. (If you
+       In order for your filter to know the current auto-escaping state, set
+       the ``needs_autoescape`` attribute to ``True`` on your function. (If you
        don't specify this attribute, it defaults to ``False``). This attribute
        tells Django that your filter function wants to be passed an extra
-       keyword argument, called ``autoescape``, that is ``True`` is
+       keyword argument, called ``autoescape``, that is ``True`` if
        auto-escaping is in effect and ``False`` otherwise.
 
        For example, let's write a filter that emphasizes the first character of

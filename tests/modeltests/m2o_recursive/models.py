@@ -14,7 +14,7 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', null=True, related_name='child_set')
+    parent = models.ForeignKey('self', blank=True, null=True, related_name='child_set')
 
     def __unicode__(self):
         return self.name
