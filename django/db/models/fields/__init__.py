@@ -797,13 +797,17 @@ class FileField(Field):
         return os.path.normpath(f)
 
     def save_form_data(self, instance, data):
-        if data:
+        from django.newforms.fields import UploadedFile
+        if data and isinstance(data, UploadedFile):
             getattr(instance, "save_%s_file" % self.name)(data.filename, data.content, save=False)
 
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.FileField}
         # If a file has been provided previously, then the form doesn't require
         # that a new file is provided this time.
+        # The code to mark the form field as not required is used by
+        # form_for_instance, but can probably be removed once form_for_instance
+        # is gone. ModelForm uses a different method to check for an existing file.
         if 'initial' in kwargs:
             defaults['required'] = False
         defaults.update(kwargs)

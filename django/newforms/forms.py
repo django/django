@@ -9,7 +9,7 @@ from django.utils.html import escape
 from django.utils.encoding import StrAndUnicode, smart_unicode, force_unicode
 from django.utils.safestring import mark_safe
 
-from fields import Field
+from fields import Field, FileField
 from widgets import TextInput, Textarea
 from util import flatatt, ErrorDict, ErrorList, ValidationError
 
@@ -182,7 +182,11 @@ class BaseForm(StrAndUnicode):
             # widgets split data over several HTML fields.
             value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
-                value = field.clean(value)
+                if isinstance(field, FileField):
+                    initial = self.initial.get(name, field.initial)
+                    value = field.clean(value, initial)
+                else:
+                    value = field.clean(value)
                 self.cleaned_data[name] = value
                 if hasattr(self, 'clean_%s' % name):
                     value = getattr(self, 'clean_%s' % name)()

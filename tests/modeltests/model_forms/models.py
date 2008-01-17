@@ -7,6 +7,9 @@ examples are probably a poor fit for the ModelForm syntax. In other words,
 most of these tests should be rewritten.
 """
 
+import os
+import tempfile
+
 from django.db import models
 
 ARTICLE_STATUS = (
@@ -54,6 +57,13 @@ class PhoneNumber(models.Model):
 
     def __unicode__(self):
         return self.phone
+
+class TextFile(models.Model):
+    description = models.CharField(max_length=20)
+    file = models.FileField(upload_to=tempfile.gettempdir())
+
+    def __unicode__(self):
+        return self.description
 
 __test__ = {'API_TESTS': """
 >>> from django import newforms as forms
@@ -701,4 +711,75 @@ ValidationError: [u'Select a valid choice. 4 is not one of the available choices
 True
 >>> f.cleaned_data
 {'phone': u'312-555-1212', 'description': u'Assistance'}
+
+# FileField ###################################################################
+
+>>> class TextFileForm(ModelForm):
+...     class Meta:
+...         model = TextFile
+
+Test conditions when files is either not given or empty.
+
+>>> f = TextFileForm(data={'description': u'Assistance'})
+>>> f.is_valid()
+False
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={})
+>>> f.is_valid()
+False
+
+Upload a file and ensure it all works as expected.
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test1.txt', 'content': 'hello world'}})
+>>> f.is_valid()
+True
+>>> type(f.cleaned_data['file'])
+<class 'django.newforms.fields.UploadedFile'>
+>>> instance = f.save()
+>>> instance.file
+u'.../test1.txt'
+
+Edit an instance that already has the file defined in the model. This will not
+save the file again, but leave it exactly as it is.
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, instance=instance)
+>>> f.is_valid()
+True
+>>> f.cleaned_data['file']
+u'.../test1.txt'
+>>> instance = f.save()
+>>> instance.file
+u'.../test1.txt'
+
+Delete the current file since this is not done by Django.
+
+>>> os.unlink(instance.get_file_filename())
+
+Override the file by uploading a new one.
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test2.txt', 'content': 'hello world'}}, instance=instance)
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.file
+u'.../test2.txt'
+
+>>> instance.delete()
+
+Test the non-required FileField
+
+>>> f = TextFileForm(data={'description': u'Assistance'})
+>>> f.fields['file'].required = False
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.file
+''
+
+>>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test3.txt', 'content': 'hello world'}}, instance=instance)
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.file
+u'.../test3.txt'
+>>> instance.delete()
 """}

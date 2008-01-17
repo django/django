@@ -749,32 +749,59 @@ Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
 
+>>> f.clean('', '')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean('', 'files/test1.pdf')
+'files/test1.pdf'
+
 >>> f.clean(None)
 Traceback (most recent call last):
 ...
 ValidationError: [u'This field is required.']
+
+>>> f.clean(None, '')
+Traceback (most recent call last):
+...
+ValidationError: [u'This field is required.']
+
+>>> f.clean(None, 'files/test2.pdf')
+'files/test2.pdf'
 
 >>> f.clean({})
 Traceback (most recent call last):
 ...
 ValidationError: [u'No file was submitted.']
 
+>>> f.clean({}, '')
+Traceback (most recent call last):
+...
+ValidationError: [u'No file was submitted.']
+
+>>> f.clean({}, 'files/test3.pdf')
+'files/test3.pdf'
+
 >>> f.clean('some content that is not a file')
 Traceback (most recent call last):
 ...
 ValidationError: [u'No file was submitted. Check the encoding type on the form.']
 
->>> f.clean({'filename': 'name', 'content':None})
+>>> f.clean({'filename': 'name', 'content': None})
 Traceback (most recent call last):
 ...
 ValidationError: [u'The submitted file is empty.']
 
->>> f.clean({'filename': 'name', 'content':''})
+>>> f.clean({'filename': 'name', 'content': ''})
 Traceback (most recent call last):
 ...
 ValidationError: [u'The submitted file is empty.']
 
->>> type(f.clean({'filename': 'name', 'content':'Some File Content'}))
+>>> type(f.clean({'filename': 'name', 'content': 'Some File Content'}))
+<class 'django.newforms.fields.UploadedFile'>
+
+>>> type(f.clean({'filename': 'name', 'content': 'Some File Content'}, 'files/test4.pdf'))
 <class 'django.newforms.fields.UploadedFile'>
 
 # URLField ##################################################################
