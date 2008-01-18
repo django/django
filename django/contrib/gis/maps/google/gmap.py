@@ -18,7 +18,8 @@ class GoogleMap(object):
     def __init__(self, key=None, api_url=None, version=None,
                  center_lat=0.0, center_lon=0.0, zoom=1, 
                  dom_id='map', load_func='gmap_load', 
-                 kml_urls=[], template='gis/google/js/google-map.js'):
+                 kml_urls=[], template='gis/google/js/google-map.js',
+                 extra_context={}):
 
         # The Google Maps API Key defined in the settings will be used
         #  if not passed in as a parameter.  The use of an API key is
@@ -67,6 +68,7 @@ class GoogleMap(object):
                   'load_func' : load_func,
                   'zoom' : zoom,
                   }
+        params.update(extra_context)
         self.js = render_to_string(template, params)
 
     @property
