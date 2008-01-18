@@ -64,6 +64,13 @@ class TextFile(models.Model):
 
     def __unicode__(self):
         return self.description
+        
+class ImageFile(models.Model):
+    description = models.CharField(max_length=20)
+    image = models.FileField(upload_to=tempfile.gettempdir())
+    
+    def __unicode__(self):
+        return self.description
 
 __test__ = {'API_TESTS': """
 >>> from django import newforms as forms
@@ -718,7 +725,7 @@ True
 ...     class Meta:
 ...         model = TextFile
 
-Test conditions when files is either not given or empty.
+# Test conditions when files is either not given or empty.
 
 >>> f = TextFileForm(data={'description': u'Assistance'})
 >>> f.is_valid()
@@ -727,7 +734,7 @@ False
 >>> f.is_valid()
 False
 
-Upload a file and ensure it all works as expected.
+# Upload a file and ensure it all works as expected.
 
 >>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test1.txt', 'content': 'hello world'}})
 >>> f.is_valid()
@@ -738,8 +745,8 @@ True
 >>> instance.file
 u'.../test1.txt'
 
-Edit an instance that already has the file defined in the model. This will not
-save the file again, but leave it exactly as it is.
+# Edit an instance that already has the file defined in the model. This will not
+# save the file again, but leave it exactly as it is.
 
 >>> f = TextFileForm(data={'description': u'Assistance'}, instance=instance)
 >>> f.is_valid()
@@ -750,11 +757,11 @@ u'.../test1.txt'
 >>> instance.file
 u'.../test1.txt'
 
-Delete the current file since this is not done by Django.
+# Delete the current file since this is not done by Django.
 
 >>> os.unlink(instance.get_file_filename())
 
-Override the file by uploading a new one.
+# Override the file by uploading a new one.
 
 >>> f = TextFileForm(data={'description': u'Assistance'}, files={'file': {'filename': 'test2.txt', 'content': 'hello world'}}, instance=instance)
 >>> f.is_valid()
@@ -765,7 +772,7 @@ u'.../test2.txt'
 
 >>> instance.delete()
 
-Test the non-required FileField
+# Test the non-required FileField
 
 >>> f = TextFileForm(data={'description': u'Assistance'})
 >>> f.fields['file'].required = False
@@ -782,4 +789,71 @@ True
 >>> instance.file
 u'.../test3.txt'
 >>> instance.delete()
+
+# ImageField ###################################################################
+
+# ImageField and FileField are nearly identical, but they differ slighty when
+# it comes to validation. This specifically tests that #6302 is fixed for
+# both file fields and image fields.
+
+>>> class ImageFileForm(ModelForm):
+...     class Meta:
+...         model = ImageFile
+
+>>> image_data = open(os.path.join(os.path.dirname(__file__), "test.png")).read()
+
+>>> f = ImageFileForm(data={'description': u'An image'}, files={'image': {'filename': 'test.png', 'content': image_data}})
+>>> f.is_valid()
+True
+>>> type(f.cleaned_data['image'])
+<class 'django.newforms.fields.UploadedFile'>
+>>> instance = f.save()
+>>> instance.image
+u'.../test.png'
+
+# Edit an instance that already has the image defined in the model. This will not
+# save the image again, but leave it exactly as it is.
+
+>>> f = ImageFileForm(data={'description': u'Look, it changed'}, instance=instance)
+>>> f.is_valid()
+True
+>>> f.cleaned_data['image']
+u'.../test.png'
+>>> instance = f.save()
+>>> instance.image
+u'.../test.png'
+
+# Delete the current image since this is not done by Django.
+
+>>> os.unlink(instance.get_image_filename())
+
+# Override the file by uploading a new one.
+
+>>> f = ImageFileForm(data={'description': u'Changed it'}, files={'image': {'filename': 'test2.png', 'content': image_data}}, instance=instance)
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+u'.../test2.png'
+
+>>> instance.delete()
+
+# Test the non-required ImageField
+
+>>> f = ImageFileForm(data={'description': u'Test'})
+>>> f.fields['image'].required = False
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+''
+
+>>> f = ImageFileForm(data={'description': u'And a final one'}, files={'image': {'filename': 'test3.png', 'content': image_data}}, instance=instance)
+>>> f.is_valid()
+True
+>>> instance = f.save()
+>>> instance.image
+u'.../test3.png'
+>>> instance.delete()
+
 """}
