@@ -70,7 +70,12 @@ class TestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self.client = Client()
-        self._pre_setup()
+        try:
+            self._pre_setup()
+        except Exception:
+            import sys
+            result.addError(self, sys.exc_info())
+            return
         super(TestCase, self).__call__(result)
 
     def assertRedirects(self, response, expected_url, status_code=302,
