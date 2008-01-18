@@ -124,6 +124,7 @@ from django.db import models, transaction
 class LayerMapError(Exception): pass
 class InvalidString(LayerMapError): pass
 class InvalidDecimal(LayerMapError): pass
+class InvalidInteger(LayerMapError): pass
 class MissingForeignKey(LayerMapError): pass
 
 class LayerMapping(object):
@@ -406,12 +407,12 @@ class LayerMapping(object):
                 if len(val) > model_field.max_length:
                     raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
                                         (model_field.name, model_field.max_length, len(val)))
-        elif isinstance(ogr_field, OFTReal):
+        elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):
             try:
                 # Creating an instance of the Decimal value to use.
                 d = Decimal(str(ogr_field.value))
             except:
-                raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field)
+                raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field.value)
 
             # Getting the decimal value as a tuple.
             dtup = d.as_tuple()
@@ -434,6 +435,13 @@ class LayerMapping(object):
                 raise InvalidDecimal('A DecimalField with max_digits %d, decimal_places %d must round to an absolute value less than 10^%d.' %
                                      (model_field.max_digits, model_field.decimal_places, max_prec))
             val = d
+        elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.IntegerField):
+            # If there's an OFTReal field with precision greater than 0 is mapped to
+            # an IntegerField, the decimal places will be truncated.
+            try:
+                val = int(ogr_field.value)
+            except:
+                raise InvalidInteger('Could not construct integer from: %s' % ogr_field.value)
         else:
             val = ogr_field.value
         return val
