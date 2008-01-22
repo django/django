@@ -112,7 +112,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.gis.db.models.fields import GeometryField
-from django.contrib.gis.db.backend import SPATIAL_BACKEND
+from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.gdal import CoordTransform, DataSource, \
     OGRException, OGRGeometry, OGRGeomType, SpatialReference
 from django.contrib.gis.gdal.field import \
@@ -506,7 +506,7 @@ class LayerMapping(object):
         # Getting the GeometryColumn object.
         try:
             db_table = self.model._meta.db_table
-            if SPATIAL_BACKEND == 'oracle': db_table = db_table.upper()
+            if SpatialBackend.name == 'oracle': db_table = db_table.upper()
             gc_kwargs = {GeometryColumns.table_name_col() : db_table}
             return GeometryColumns.objects.get(**gc_kwargs)
         except Exception, msg:

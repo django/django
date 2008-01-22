@@ -172,6 +172,20 @@ class GeoModelTest(unittest.TestCase):
             self.assertAlmostEqual(ptown.x, p.point.x, prec)
             self.assertAlmostEqual(ptown.y, p.point.y, prec)
 
+    @no_oracle # Most likely can do this in Oracle, however, it is not yet implemented (patches welcome!)
+    def test05_extent(self):
+        "Testing the extent() GeoManager method."
+        # Reference query:
+        # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
+        #   =>  BOX(-96.8016128540039 29.7633724212646,-95.3631439208984 32.7820587158203)
+        expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+
+        qs = City.objects.filter(name__in=('Houston', 'Dallas'))
+        extent = qs.extent()
+
+        for val, exp in zip(extent, expected):
+            self.assertAlmostEqual(exp, val, 8)
+
     def test09_disjoint(self):
         "Testing the `disjoint` lookup type."
         if DISABLE: return

@@ -10,6 +10,9 @@ class GeoManager(Manager):
     def distance(self, *args, **kwargs):
         return self.get_query_set().distance(*args, **kwargs)
 
+    def extent(self, *args, **kwargs):
+        return self.get_query_set().extent(*args, **kwargs)
+
     def gml(self, *args, **kwargs):
         return self.get_query_set().gml(*args, **kwargs)
 

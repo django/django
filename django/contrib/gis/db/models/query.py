@@ -6,13 +6,12 @@ from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
 from django.contrib.gis.db.models.fields import GeometryField
 # parse_lookup depends on the spatial database backend.
-from django.contrib.gis.db.backend import parse_lookup, \
-    ASGML, ASKML, DISTANCE, GEOM_SELECT, SPATIAL_BACKEND, TRANSFORM, UNION, VERSION
+from django.contrib.gis.db.backend import parse_lookup, SpatialBackend
 from django.contrib.gis.geos import GEOSGeometry
 
 # Shortcut booleans for determining the backend.
-oracle = SPATIAL_BACKEND == 'oracle'
-postgis = SPATIAL_BACKEND == 'postgis'
+oracle  = SpatialBackend.name == 'oracle'
+postgis = SpatialBackend.name == 'postgis'
 
 class GeoQ(Q):
     "Geographical query encapsulation object."
@@ -23,7 +22,7 @@ class GeoQ(Q):
 
 class GeoQuerySet(QuerySet):
     "Geographical-enabled QuerySet object."
-    
+        
     #### Overloaded QuerySet Routines ####
     def __init__(self, model=None):
         super(GeoQuerySet, self).__init__(model=model)
@@ -37,10 +36,10 @@ class GeoQuerySet(QuerySet):
 
         # If GEOM_SELECT is defined in the backend, then it will be used
         # for the selection format of the geometry column.
-        if GEOM_SELECT:
+        if SpatialBackend.select:
             # Transformed geometries in Oracle use EWKT so that the SRID
             # on the transformed lazy geometries is set correctly).
-            self._geo_fmt = GEOM_SELECT
+            self._geo_fmt = SpatialBackend.select
         else:
             self._geo_fmt = '%s'
 
@@ -259,6 +258,7 @@ class GeoQuerySet(QuerySet):
         given geometry in a `distance` attribute on each element of the
         GeoQuerySet.
         """
+        DISTANCE = SpatialBackend.distance
         if not DISTANCE:
             raise ImproperlyConfigured('Distance() stored proecedure not available.')
 
@@ -299,12 +299,55 @@ class GeoQuerySet(QuerySet):
             dist_select = {'distance' : '%s(%s, %s)' % (DISTANCE, field_col, geom_sql)}
         return self.extra(select=dist_select)
 
+    def extent(self, field_name=None):
+        """
+        Returns the extent (aggregate) of the features in the GeoQuerySet.  The
+        extent will be returned as a 4-tuple, consisting of (xmin, ymin, xmax, ymax).
+        """
+        EXTENT = SpatialBackend.extent
+        if not EXTENT:
+            raise ImproperlyConfigured('Extent stored procedure not available.')
+
+        if not field_name:
+            field_name = self._get_geofield()
+
+        field_col = self._geo_column(field_name)
+        if not field_col:
+            raise TypeError('Extent information only available on GeometryFields.')
+
+        # Getting the SQL for the query.
+        try:
+            select, sql, params = self._get_sql_clause()
+        except EmptyResultSet:
+            return None
+        
+        # Constructing the query that will select the extent.
+        extent_sql = ('SELECT %s(%s)' % (EXTENT, field_col)) + sql
+
+        # Getting a cursor, executing the query, and extracting the returned
+        # value from the extent function.
+        cursor = connection.cursor()
+        cursor.execute(extent_sql, params)
+        box = cursor.fetchone()[0]
+
+        if box: 
+            # TODO: Parsing of BOX3D, Oracle support (patches welcome!)
+            #  Box text will be something like "BOX(-90.0 30.0, -85.0 40.0)"; 
+            #  parsing out and returning as a 4-tuple.
+            ll, ur = box[4:-1].split(',')
+            xmin, ymin = map(float, ll.split())
+            xmax, ymax = map(float, ur.split())
+            return (xmin, ymin, xmax, ymax)
+        else: 
+            return None
+
     def gml(self, field_name=None, precision=8, version=2):
         """
         Returns GML representation of the given field in a `gml` attribute
         on each element of the GeoQuerySet.
         """
         # Is GML output supported?
+        ASGML = SpatialBackend.as_gml
         if not ASGML:
             raise ImproperlyConfigured('AsGML() stored procedure not available.')
 
@@ -322,7 +365,7 @@ class GeoQuerySet(QuerySet):
         elif postgis:
             # PostGIS AsGML() aggregate function parameter order depends on the
             # version -- uggh.
-            major, minor1, minor2 = VERSION
+            major, minor1, minor2 = SpatialBackend.version
             if major >= 1 and (minor1 > 3 or (minor1 == 3 and minor2 > 1)):
                 gml_select = {'gml':'%s(%s,%s,%s)' % (ASGML, version, field_col, precision)}
             else:
@@ -337,6 +380,7 @@ class GeoQuerySet(QuerySet):
         attribute on each element of the GeoQuerySet.
         """
         # Is KML output supported?
+        ASKML = SpatialBackend.as_kml
         if not ASKML:
             raise ImproperlyConfigured('AsKML() stored procedure not available.')
 
@@ -375,6 +419,7 @@ class GeoQuerySet(QuerySet):
 
         # Setting the key for the field's column with the custom SELECT SQL to 
         # override the geometry column returned from the database.
+        TRANSFORM = SpatialBackend.transform
         if oracle:
             custom_sel = '%s(%s, %s)' % (TRANSFORM, col, srid)
             self._ewkt = srid
@@ -391,6 +436,7 @@ class GeoQuerySet(QuerySet):
         Oracle backends only.
         """
         # Making sure backend supports the Union stored procedure
+        UNION = SpatialBackend.union
         if not UNION:
             raise ImproperlyConfigured('Union stored procedure not available.')
 

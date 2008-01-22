@@ -5,17 +5,14 @@
  needed for GeoDjango.
  
  (1) GeoBackEndField, a base class needed for GeometryField.
- (2) GeometryProxy, for lazy-instantiated geometries from the 
-     database output.
- (3) GIS_TERMS, a list of acceptable geographic lookup types for 
+ (2) GIS_TERMS, a list of acceptable geographic lookup types for 
      the backend.
- (4) The `parse_lookup` function, used for spatial SQL construction by
+ (3) The `parse_lookup` function, used for spatial SQL construction by
      the GeoQuerySet.
- (5) The `create_spatial_db`, and `get_geo_where_clause`
+ (4) The `create_spatial_db`, and `get_geo_where_clause`
      routines (needed by `parse_lookup`).
-
- Currently only PostGIS is supported, but someday backends will be added for
- additional spatial databases (e.g., Oracle, DB2).
+ (5) The `SpatialBackend` object, which contains information specific
+     to the spatial backend.
 """
 from types import StringType, UnicodeType
 from django.conf import settings
@@ -26,7 +23,7 @@ from django.utils.datastructures import SortedDict
 from django.contrib.gis.geos import GEOSGeometry
 
 # These routines (needed by GeoManager), default to False.
-ASGML, ASKML, DISTANCE, TRANSFORM, UNION, VERSION = (False, False, False, False, False, False)
+ASGML, ASKML, DISTANCE, EXTENT, TRANSFORM, UNION, VERSION = (False, False, False, False, False, False, False)
 
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     # PostGIS is the spatial database, getting the rquired modules, 
@@ -34,7 +31,7 @@ if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
     from django.contrib.gis.db.backend.postgis import \
         PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
         create_spatial_db, get_geo_where_clause, \
-        ASGML, ASKML, DISTANCE, GEOM_SELECT, TRANSFORM, UNION, \
+        ASGML, ASKML, DISTANCE, EXTENT, GEOM_SELECT, TRANSFORM, UNION, \
         MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2
     VERSION = (MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2)
     SPATIAL_BACKEND = 'postgis'
@@ -54,6 +51,18 @@ elif settings.DATABASE_ENGINE == 'mysql':
     SPATIAL_BACKEND = 'mysql'
 else:
     raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_ENGINE)
+
+class SpatialBackend(object):
+    "A container for properties of the Spatial Backend."
+    as_kml = ASKML
+    as_gml = ASGML
+    distance = DISTANCE
+    extent = EXTENT
+    name = SPATIAL_BACKEND
+    select = GEOM_SELECT
+    transform = TRANSFORM
+    union = UNION
+    version = VERSION
 
 ####    query.py overloaded functions    ####
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py

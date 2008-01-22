@@ -40,6 +40,7 @@ if MAJOR_VERSION >= 1:
     ASKML = get_func('AsKML')
     ASGML = get_func('AsGML')
     DISTANCE = get_func('Distance')
+    EXTENT = get_func('extent')
     GEOM_FROM_TEXT = get_func('GeomFromText')
     GEOM_FROM_WKB = get_func('GeomFromWKB')
     TRANSFORM = get_func('Transform')
