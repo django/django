@@ -18,9 +18,9 @@ repository.
 FreeBSD
 =======
 
-The `FreeBSD`_ ports system offers both Django 0.96 (`py-django`_) and a more 
-recent, but not current, version based on Django's trunk (`py-django-devel`_). 
-These are installed in the normal FreeBSD way; for Django 0.96, for example, type: 
+The `FreeBSD`_ ports system offers both Django 0.96 (`py-django`_) and a more
+recent, but not current, version based on Django's trunk (`py-django-devel`_).
+These are installed in the normal FreeBSD way; for Django 0.96, for example, type:
 ``cd /usr/ports/www/py-django && sudo make install clean``.
 
 .. _FreeBSD: http://www.freebsd.org/
@@ -60,22 +60,22 @@ point to find their preferred version.
 Gentoo
 ------
 
-A Django build is available for `Gentoo Linux`_, and is based on Django 0.96.
-The `current Gentoo build`_ can be installed by typing ``emerge django``.
+A Django package is available for `Gentoo Linux`_, and is based on Django 0.96.1.
+The `current Gentoo package`_ can be installed by typing ``emerge django``.
 
 .. _Gentoo Linux: http://www.gentoo.org/
-.. _current Gentoo build: http://packages.gentoo.org/packages/?category=dev-python;name=django
+.. _current Gentoo package: http://packages.gentoo.org/package/django
 
 Ubuntu
 ------
 
 The Debian ``python-django`` package is also available for `Ubuntu Linux`_, in
-the "universe" repository for Ubuntu 7.04 ("Feisty Fawn"). The `current Ubuntu
-package`_ is also based on Django 0.95.1 and can be installed in the same
-fashion as for Debian.
+the "universe" repository for Ubuntu 7.10 ("Gutsy Gibbon"). The `current Ubuntu
+package`_ is based on Django 0.96.1 and can be installed in the same fashion as
+for Debian.
 
 .. _Ubuntu Linux: http://www.ubuntu.com/
-.. _current Ubuntu package: http://packages.ubuntu.com/feisty/python/python-django
+.. _current Ubuntu package: http://packages.ubuntu.com/gutsy/python/python-django
 
 
 Mac OS X

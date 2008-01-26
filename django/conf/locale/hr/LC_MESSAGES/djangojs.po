@@ -1,118 +1,117 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# translation of djangojs.po to Hrvatski jezik
+# This file is distributed under the same license as the Django package.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-13 11:13+1000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2008-01-05 01:45+0100\n"
+"Last-Translator: Aljosa Mohorovic <aljosa.mohorovic@gmail.com>\n"
+"Language-Team: Hrvatski jezik\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
 msgid "Available %s"
-msgstr ""
+msgstr "Dostupno %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:41
 msgid "Choose all"
-msgstr ""
+msgstr "Odaberi sve"
 
 #: contrib/admin/media/js/SelectFilter2.js:46
 msgid "Add"
-msgstr ""
+msgstr "Dodaj"
 
 #: contrib/admin/media/js/SelectFilter2.js:48
 msgid "Remove"
-msgstr ""
+msgstr "Ukloni"
 
 #: contrib/admin/media/js/SelectFilter2.js:53
 #, perl-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Odabrano %s"
 
 #: contrib/admin/media/js/SelectFilter2.js:54
 msgid "Select your choice(s) and click "
-msgstr ""
+msgstr "Odaberi iz izbora i klikni "
 
 #: contrib/admin/media/js/SelectFilter2.js:59
 msgid "Clear all"
-msgstr ""
+msgstr "Očisti sve"
 
 #: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
 msgid ""
 "January February March April May June July August September October November "
 "December"
-msgstr ""
+msgstr "Siječanj Veljača Ožujak Travanj Svibanj Lipanj Srpanj Kolovoz Rujan Listopad Studeni Prosinac"
 
 #: contrib/admin/media/js/dateparse.js:33
 msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
-msgstr ""
+msgstr "Nedjelja Ponedjeljak Utorak Srijeda Četvrtak Petak Subota"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr ""
+msgstr "N P U S Č P S"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81
 msgid "Now"
-msgstr ""
+msgstr "Sada"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:51
 msgid "Clock"
-msgstr ""
+msgstr "Sat"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:78
 msgid "Choose a time"
-msgstr ""
+msgstr "Izaberite vrijeme"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:82
 msgid "Midnight"
-msgstr ""
+msgstr "Ponoć"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:83
 msgid "6 a.m."
-msgstr ""
+msgstr "6 ujutro"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:84
 msgid "Noon"
-msgstr ""
+msgstr "Podne"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:88
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:183
 msgid "Cancel"
-msgstr ""
+msgstr "Odustani"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:128
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:177
 msgid "Today"
-msgstr ""
+msgstr "Danas"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:132
 msgid "Calendar"
-msgstr ""
+msgstr "Kalendar"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:175
 msgid "Yesterday"
-msgstr ""
+msgstr "Jučer"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:179
 msgid "Tomorrow"
-msgstr ""
+msgstr "Sutra"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:34
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:72
 msgid "Show"
-msgstr ""
+msgstr "Prikaži"
 
 #: contrib/admin/media/js/admin/CollapsedFieldsets.js:63
 msgid "Hide"
-msgstr ""
+msgstr "Sakri"
+

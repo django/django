@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-02 22:26+0100\n"
-"PO-Revision-Date: 2007-12-02 22:32+0100\n"
+"POT-Creation-Date: 2007-12-29 21:28+0100\n"
+"PO-Revision-Date: 2007-12-30 11:38+0100\n"
 "Last-Translator: Marc Fargas <telenieko@telenieko.com>\n"
 "Language-Team:  <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1691,41 +1691,42 @@ msgstr "demà"
 msgid "yesterday"
 msgstr "ahir"
 
-#: contrib/localflavor/ar/forms.py:30 contrib/localflavor/ar/forms.py:38
+#: contrib/localflavor/ar/forms.py:28
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
-msgstr "Introdueixi un codi postal en el format NNNN or ANNNNAAA."
+msgstr "Introdueixi un codi postal en el format NNNN o ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:61 contrib/localflavor/br/forms.py:103
-#: contrib/localflavor/pe/forms.py:34 contrib/localflavor/pe/forms.py:57
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
+#: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
 msgstr "Aquest camps requereix només números."
 
-#: contrib/localflavor/ar/forms.py:64
+#: contrib/localflavor/ar/forms.py:51
 msgid "This field requires 7 or 8 digits."
 msgstr "Aquest camp requereix 7 o 8 dígits."
 
-#: contrib/localflavor/ar/forms.py:75
+#: contrib/localflavor/ar/forms.py:80
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
 "Introdueixi un número CUIT vàlid en el format XX-XXXXXXXX-X o XXXXXXXXXXXX."
 
-#: contrib/localflavor/ar/forms.py:88
+#: contrib/localflavor/ar/forms.py:81
 msgid "Invalid CUIT."
 msgstr "Invàlid CUIT."
 
-#: contrib/localflavor/au/forms.py:18
+#: contrib/localflavor/au/forms.py:16
 msgid "Enter a 4 digit post code."
 msgstr "Introdueixi un codi postal de 4 dígits."
 
-#: contrib/localflavor/br/forms.py:23
+#: contrib/localflavor/br/forms.py:21
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "Introdueixi un codi zip en el format XXXXX-XXX."
 
-#: contrib/localflavor/br/forms.py:35
+#: contrib/localflavor/br/forms.py:30
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "El número de telèfon ha de ser en el format XX-XXXX-XXXX."
 
-#: contrib/localflavor/br/forms.py:68
+#: contrib/localflavor/br/forms.py:58
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
@@ -1733,30 +1734,30 @@ msgstr ""
 "Seleccioni un estat brasiler vàlid. Aquest estat no és un dels estats "
 "disponibles."
 
-#: contrib/localflavor/br/forms.py:105
-msgid "This field requires at most 11 digits or 14 characters."
-msgstr "Aquest camp requereix com a màxim 11 dígits o 14 caracters."
-
-#: contrib/localflavor/br/forms.py:115
+#: contrib/localflavor/br/forms.py:94
 msgid "Invalid CPF number."
 msgstr "Número CPF invàlid."
 
-#: contrib/localflavor/br/forms.py:137
-msgid "This field requires at least 14 digits"
-msgstr "Aquest camp requereix almenys 14 dígits."
+#: contrib/localflavor/br/forms.py:95
+msgid "This field requires at most 11 digits or 14 characters."
+msgstr "Aquest camp requereix com a màxim 11 dígits o 14 caracters."
 
-#: contrib/localflavor/br/forms.py:147
+#: contrib/localflavor/br/forms.py:134
 msgid "Invalid CNPJ number."
 msgstr "Número CNPJ invàlid."
 
-#: contrib/localflavor/ca/forms.py:19
+#: contrib/localflavor/br/forms.py:136
+msgid "This field requires at least 14 digits"
+msgstr "Aquest camp requereix almenys 14 dígits."
+
+#: contrib/localflavor/ca/forms.py:17
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "Introdueixi un codi postal en el format XXX XXX."
 
-#: contrib/localflavor/ca/forms.py:81
+#: contrib/localflavor/ca/forms.py:88
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXXX format."
 msgstr ""
-"Introdueixi un número vàlid de la Seguretat Social de Canada en el format "
+"Introdueixi un número vàlid de la Seguretat Social de Canadà en el format "
 "XXX-XXX-XXXX."
 
 #: contrib/localflavor/ch/ch_states.py:5
@@ -1863,11 +1864,11 @@ msgstr "Zug"
 msgid "Zurich"
 msgstr "Zurich"
 
-#: contrib/localflavor/ch/forms.py:18 contrib/localflavor/no/forms.py:14
+#: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
 msgid "Enter a zip code in the format XXXX."
 msgstr "Introdueixi un codi zip en el format XXXX."
 
-#: contrib/localflavor/ch/forms.py:90
+#: contrib/localflavor/ch/forms.py:64
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -1875,13 +1876,17 @@ msgstr ""
 "Introdueixi un número de identificació o de passaport Suïssos en els formats "
 "1234567890 o X1234567<0."
 
-#: contrib/localflavor/cl/forms.py:32
-msgid "Enter valid a Chilean RUT. The format is XX.XXX.XXX-X."
+#: contrib/localflavor/cl/forms.py:29
+msgid "Enter a valid Chilean RUT."
+msgstr "Introdueixi un RUT Xilè vàlid."
+
+#: contrib/localflavor/cl/forms.py:30
+msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "Introdueixi un RUT Xilè vàlid. El format és XX.XXX.XXX-X"
 
-#: contrib/localflavor/cl/forms.py:37
-msgid "Enter valid a Chilean RUT"
-msgstr "Introdueixi un RUT Xilè vàlid."
+#: contrib/localflavor/cl/forms.py:31
+msgid "The Chilean RUT is not valid."
+msgstr "El RUT Xilè no és vàlid."
 
 #: contrib/localflavor/de/de_states.py:5
 msgid "Baden-Wuerttemberg"
@@ -1947,12 +1952,12 @@ msgstr "Schleswig-Holstein"
 msgid "Thuringia"
 msgstr "Thuringia"
 
-#: contrib/localflavor/de/forms.py:16 contrib/localflavor/fi/forms.py:14
-#: contrib/localflavor/fr/forms.py:17
+#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
+#: contrib/localflavor/fr/forms.py:15
 msgid "Enter a zip code in the format XXXXX."
 msgstr "Introdueixi un codi zip en el format XXXXX."
 
-#: contrib/localflavor/de/forms.py:60
+#: contrib/localflavor/de/forms.py:41
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
@@ -2227,7 +2232,7 @@ msgstr "Comunitat Foral de Navarra"
 msgid "Valencian Community"
 msgstr "Comunitat Valenciana"
 
-#: contrib/localflavor/es/forms.py:22
+#: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
 msgstr "Introdueixi un codi postal en rang i format 01XXX - 52XXX."
 
@@ -2239,40 +2244,42 @@ msgstr ""
 "Introdueixi un número de telèfon vàlid en un dels formats 6XXXXXXXX, "
 "8XXXXXXXX o 9XXXXXXXX."
 
-#: contrib/localflavor/es/forms.py:73 contrib/localflavor/es/forms.py:108
-#: db/models/fields/related.py:55
-#, python-format
-msgid "Please enter a valid %s."
-msgstr "Si us plau, introdueixi un %s vàlid."
+#: contrib/localflavor/es/forms.py:66
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr "Si us plau, introdueixi un NIF, NIE o CIF vàlid."
 
-#: contrib/localflavor/es/forms.py:91
+#: contrib/localflavor/es/forms.py:67
+msgid "Please enter a valid NIF or NIE."
+msgstr "Si us plau, introdueixi un NIF o NIE vàlid."
+
+#: contrib/localflavor/es/forms.py:68
 msgid "Invalid checksum for NIF."
 msgstr "Validació invàlida del NIF."
 
-#: contrib/localflavor/es/forms.py:97
+#: contrib/localflavor/es/forms.py:69
 msgid "Invalid checksum for NIE."
 msgstr "Validació invàlida del NIE."
 
-#: contrib/localflavor/es/forms.py:106
+#: contrib/localflavor/es/forms.py:70
 msgid "Invalid checksum for CIF."
 msgstr "Validació invàlida del CIF."
 
-#: contrib/localflavor/es/forms.py:136
+#: contrib/localflavor/es/forms.py:142
 msgid ""
 "Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
 msgstr ""
 "Introdueixi un número de compte bancari vàlid en el format XXXX-XXXX-XX-"
 "XXXXXXXXXX."
 
-#: contrib/localflavor/es/forms.py:150
+#: contrib/localflavor/es/forms.py:143
 msgid "Invalid checksum for bank account number."
 msgstr "Validació invàlida del número de compte bancari."
 
-#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:45
+#: contrib/localflavor/fi/forms.py:28
 msgid "Enter a valid Finnish social security number."
 msgstr "Introdueixi un número vàlid de la seguretat social finlandesa."
 
-#: contrib/localflavor/in_/forms.py:16
+#: contrib/localflavor/in_/forms.py:14
 msgid "Enter a zip code in the format XXXXXXX."
 msgstr "Introdueixi un codi zip en el format XXXXXXX."
 
@@ -2282,15 +2289,15 @@ msgid ""
 msgstr ""
 "Introdueixi un número de identificació d'Islàndia. El format és XXXXXX-XXXX."
 
-#: contrib/localflavor/is_/forms.py:31
+#: contrib/localflavor/is_/forms.py:18
 msgid "The Icelandic identification number is not valid."
 msgstr "El número de identificació d'Islàndia no és vàlid."
 
-#: contrib/localflavor/it/forms.py:16
+#: contrib/localflavor/it/forms.py:14
 msgid "Enter a valid zip code."
 msgstr "Introdueixi un codi zip vàlid."
 
-#: contrib/localflavor/it/forms.py:41
+#: contrib/localflavor/it/forms.py:43
 msgid "Enter a valid Social Security number."
 msgstr "Introdueixi un número valid de la Seguretat Social."
 
@@ -2298,7 +2305,7 @@ msgstr "Introdueixi un número valid de la Seguretat Social."
 msgid "Enter a valid VAT number."
 msgstr "Introdueixi un número de IVA (VAT) vàlid."
 
-#: contrib/localflavor/jp/forms.py:21
+#: contrib/localflavor/jp/forms.py:19
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr "Introdueixi un codi postal en el format XXXXXXX o XX-XXXX."
 
@@ -2490,15 +2497,143 @@ msgstr "Kagoshima"
 msgid "Okinawa"
 msgstr "Okinawa"
 
-#: contrib/localflavor/nl/forms.py:25
+#: contrib/localflavor/mx/mx_states.py:12
+msgid "Aguascalientes"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:13
+msgid "Baja California"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:14
+msgid "Baja California Sur"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:15
+msgid "Campeche"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:16
+msgid "Chihuahua"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:17
+msgid "Chiapas"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:18
+msgid "Coahuila"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:19
+msgid "Colima"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:20
+msgid "Distrito Federal"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:21
+msgid "Durango"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:22
+msgid "Guerrero"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:23
+msgid "Guanajuato"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:24
+msgid "Hidalgo"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:25
+msgid "Jalisco"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:26
+msgid "Estado de México"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:27
+msgid "Michoacán"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:28
+msgid "Morelos"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:29
+msgid "Nayarit"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:30
+msgid "Nuevo León"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:31
+msgid "Oaxaca"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:32
+msgid "Puebla"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:33
+msgid "Querétaro"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:34
+msgid "Quintana Roo"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:35
+msgid "Sinaloa"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:36
+msgid "San Luis Potosí"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:37
+msgid "Sonora"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:38
+msgid "Tabasco"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:39
+msgid "Tamaulipas"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:40
+msgid "Tlaxcala"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:41
+msgid "Veracruz"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:42
+msgid "Yucatán"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:43
+msgid "Zacatecas"
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
 msgstr "Introdueixi un codi postal vàlid."
 
-#: contrib/localflavor/nl/forms.py:53
+#: contrib/localflavor/nl/forms.py:52
 msgid "Enter a valid phone number"
 msgstr "Introdueixi un número de telèfon vàlid."
 
-#: contrib/localflavor/nl/forms.py:76
+#: contrib/localflavor/nl/forms.py:78
 msgid "Enter a valid SoFi number"
 msgstr "Introdueixi un número SoFi vàlid."
 
@@ -2550,23 +2685,23 @@ msgstr "Zeeland"
 msgid "Zuid-Holland"
 msgstr "Zuid-Holland"
 
-#: contrib/localflavor/no/forms.py:35
+#: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
 msgstr "Introdueixi un número de la seguretat social Noruega vàlid."
 
-#: contrib/localflavor/pe/forms.py:36
+#: contrib/localflavor/pe/forms.py:24
 msgid "This field requires 8 digits."
 msgstr "Aquest camp requereix 8 dígits."
 
-#: contrib/localflavor/pe/forms.py:59
+#: contrib/localflavor/pe/forms.py:52
 msgid "This field requires 11 digits."
 msgstr "Aquest camp requereix 11 dígits."
 
-#: contrib/localflavor/pl/forms.py:41
+#: contrib/localflavor/pl/forms.py:39
 msgid "National Identification Number consists of 11 digits."
 msgstr "El número d'identidicació nacional està compost de 11 digits."
 
-#: contrib/localflavor/pl/forms.py:47
+#: contrib/localflavor/pl/forms.py:40
 msgid "Wrong checksum for the National Identification Number."
 msgstr "Validació invàlida del número d'identificació nacional."
 
@@ -2575,11 +2710,11 @@ msgid ""
 "Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr "Introdueixi un número NIP en el format XXX-XXX-XX-XX o XX-XX-XXX-XXX."
 
-#: contrib/localflavor/pl/forms.py:78
+#: contrib/localflavor/pl/forms.py:73
 msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr "Validació invàlida del número tributari (NIP)."
 
-#: contrib/localflavor/pl/forms.py:107
+#: contrib/localflavor/pl/forms.py:112
 msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
 "El número nacional de registre de negocis (REGON) consisteix en 7 o 9 dígits."
@@ -2588,7 +2723,7 @@ msgstr ""
 msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr "Validació invàlida del número nacional de registre de negocis."
 
-#: contrib/localflavor/pl/forms.py:148
+#: contrib/localflavor/pl/forms.py:156
 msgid "Enter a postal code in the format XX-XXX."
 msgstr "Introdueixi un codi postal en el format XX-XXX."
 
@@ -2656,7 +2791,7 @@ msgstr "Greater Poland"
 msgid "West Pomerania"
 msgstr "West Pomerania"
 
-#: contrib/localflavor/sk/forms.py:32
+#: contrib/localflavor/sk/forms.py:30
 msgid "Enter a postal code in the format XXXXX or XXX XX."
 msgstr "Introdueixi un codi postal en el format XXXXX or XXX XX."
 
@@ -3008,27 +3143,302 @@ msgstr "Regió de Trnava"
 msgid "Zilina region"
 msgstr "Regió de Zilina"
 
-#: contrib/localflavor/uk/forms.py:18
-msgid "Enter a postcode. A space is required between the two postcode parts."
-msgstr ""
-"Introdueixi un codi postal. És necessari un espai entre les dues parts del "
-"codi postal."
+#: contrib/localflavor/uk/forms.py:21
+msgid "Enter a valid postcode."
+msgstr "Introdueixi un codi postal vàlid."
 
-#: contrib/localflavor/us/forms.py:18
+#: contrib/localflavor/uk/uk_regions.py:11
+msgid "Bedfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:12
+msgid "Buckinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:14
+msgid "Cheshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:16
+msgid "Cumbria"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:17
+msgid "Derbyshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:18
+msgid "Devon"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:19
+msgid "Dorset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:20
+msgid "Durham"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:21
+msgid "East Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:22
+msgid "Essex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:23
+msgid "Gloucestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:24
+msgid "Greater London"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:25
+msgid "Greater Manchester"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:26
+msgid "Hampshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:27
+msgid "Hertfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:28
+msgid "Kent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:29
+msgid "Lancashire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:30
+msgid "Leicestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:31
+msgid "Lincolnshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:32
+msgid "Merseyside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:33
+msgid "Norfolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:34
+msgid "North Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:35
+msgid "Northamptonshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:36
+msgid "Northumberland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:37
+msgid "Nottinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:38
+msgid "Oxfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:39
+msgid "Shropshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:40
+msgid "Somerset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:41
+msgid "South Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:42
+msgid "Staffordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:43
+msgid "Suffolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:44
+msgid "Surrey"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:45
+msgid "Tyne and Wear"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:46
+msgid "Warwickshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:47
+msgid "West Midlands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:48
+msgid "West Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:49
+msgid "West Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:50
+msgid "Wiltshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:51
+msgid "Worcestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:55
+msgid "County Antrim"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:56
+msgid "County Armagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:57
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:59
+msgid "County Londonderry"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:60
+msgid "County Tyrone"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:64
+msgid "Clwyd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:65
+msgid "Dyfed"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:66
+msgid "Gwent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:67
+msgid "Gwynedd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:68
+msgid "Mid Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:69
+msgid "Powys"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:70
+msgid "South Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:71
+msgid "West Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:75
+msgid "Borders"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:76
+msgid "Central Scotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:78
+msgid "Fife"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:79
+msgid "Grampian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:80
+msgid "Highland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:81
+msgid "Lothian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:82
+msgid "Orkney Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:83
+msgid "Shetland Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:84
+msgid "Strathclyde"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:85
+msgid "Tayside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:86
+msgid "Western Isles"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:90
+msgid "England"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:91
+msgid "Northern Ireland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:92
+msgid "Scotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:93
+msgid "Wales"
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:16
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
 msgstr "Introdueixi un codi zip en el format XXXXX o XXXXX-XXXX."
 
-#: contrib/localflavor/us/forms.py:51
+#: contrib/localflavor/us/forms.py:54
 msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
 msgstr ""
 "Introdueixi un número vàlid de la Seguretat Social dels E.U.A. en el format "
 "XXX-XX-XXXX."
 
-#: contrib/localflavor/za/forms.py:22
+#: contrib/localflavor/za/forms.py:20
 msgid "Enter a valid South African ID number"
 msgstr "Introdueixi un número d'Identitat Sud Africà valid"
 
-#: contrib/localflavor/za/forms.py:57
+#: contrib/localflavor/za/forms.py:54
 msgid "Enter a valid South African postal code"
 msgstr "Introdueixi un codi postal Sud Africà vàlid."
 
@@ -3503,6 +3913,11 @@ msgstr "Introdueixi un nom de fitxer vàlid."
 msgid "This value must be either None, True or False."
 msgstr "Aquest valor ha de ser None (Cap), True (Veritat) o False (Fals)"
 
+#: db/models/fields/related.py:55
+#, python-format
+msgid "Please enter a valid %s."
+msgstr "Si us plau, introdueixi un %s vàlid."
+
 #: db/models/fields/related.py:658
 msgid "Separate multiple IDs with commas."
 msgstr "Separi múltiples IDs amb comes."
@@ -3599,7 +4014,7 @@ msgstr "Introdueixi una URL vàlida."
 msgid "This URL appears to be a broken link."
 msgstr "Aquesta URL sembla ser un enllaç trencat."
 
-#: newforms/fields.py:555 newforms/models.py:155
+#: newforms/fields.py:555 newforms/models.py:317
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Esculli una opció vàlida; Aquesta opció no és una de les opcions disponibles."
@@ -3609,7 +4024,7 @@ msgstr ""
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "Esculli una opció vàlida. %(value)s no és una de les opcions vàlides."
 
-#: newforms/fields.py:595 newforms/fields.py:657 newforms/models.py:215
+#: newforms/fields.py:595 newforms/fields.py:657 newforms/models.py:377
 msgid "Enter a list of values."
 msgstr "Introdueixi una llista de valors."
 
@@ -3617,7 +4032,7 @@ msgstr "Introdueixi una llista de valors."
 msgid "Enter a valid IPv4 address."
 msgstr "Introdueixi una adreça IPv4 vàlida."
 
-#: newforms/models.py:216
+#: newforms/models.py:378
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "Esculli una opció vàlida; %s' no és una de les opcions vàlides."
@@ -3650,28 +4065,28 @@ msgstr "Introdueixi un número positiu."
 msgid "Enter a whole number between 0 and 32,767."
 msgstr "Introdueixi un número entre 0 i 32,767."
 
-#: template/defaultfilters.py:658
+#: template/defaultfilters.py:683
 msgid "yes,no,maybe"
 msgstr "si,no,potser"
 
-#: template/defaultfilters.py:689
+#: template/defaultfilters.py:714
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
 
-#: template/defaultfilters.py:691
+#: template/defaultfilters.py:716
 #, python-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: template/defaultfilters.py:693
+#: template/defaultfilters.py:718
 #, python-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: template/defaultfilters.py:694
+#: template/defaultfilters.py:719
 #, python-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
@@ -3968,3 +4383,9 @@ msgstr "El/La %(verbose_name)s s'ha actualtzat amb èxit."
 #, python-format
 msgid "The %(verbose_name)s was deleted."
 msgstr "El %(verbose_name)s s'ha eliminat."
+
+#~ msgid ""
+#~ "Enter a postcode. A space is required between the two postcode parts."
+#~ msgstr ""
+#~ "Introdueixi un codi postal. És necessari un espai entre les dues parts "
+#~ "del codi postal."
