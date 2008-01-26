@@ -501,5 +501,42 @@ Bug #6203
 2
 >>> len(Item.objects.dates('created', 'day'))
 2
+
+Test that parallel iterators work.
+
+>>> qs = Tag.objects.all()
+>>> i1, i2 = iter(qs), iter(qs)
+>>> i1.next(), i1.next()
+(<Tag: t1>, <Tag: t2>)
+>>> i2.next(), i2.next(), i2.next()
+(<Tag: t1>, <Tag: t2>, <Tag: t3>)
+>>> i1.next()
+<Tag: t3>
+
+We can do slicing beyond what is currently in the result cache, too.
+
+# We need to mess with the implemenation internals a bit here to decrease the
+# cache fill size so that we don't read all the results at once.
+>>> from django.db.models import query
+>>> query.ITER_CHUNK_SIZE = 2
+>>> qs = Tag.objects.all()
+
+# Fill the cache with the first chunk.
+>>> bool(qs)
+True
+>>> len(qs._result_cache)
+2
+
+# Query beyond the end of the cache and check that it is filled out as required.
+>>> qs[4]
+<Tag: t5>
+>>> len(qs._result_cache)
+5
+
+# But querying beyond the end of the result set will fail.
+>>> qs[100]
+Traceback (most recent call last):
+...
+IndexError: ...
 """}
 

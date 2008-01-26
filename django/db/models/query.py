@@ -21,6 +21,7 @@ except NameError:
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).
 CHUNK_SIZE = 100
+ITER_CHUNK_SIZE = CHUNK_SIZE
 
 class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"
@@ -28,19 +29,40 @@ class _QuerySet(object):
         self.model = model
         self.query = query or sql.Query(self.model, connection)
         self._result_cache = None
+        self._iter = None
 
     ########################
     # PYTHON MAGIC METHODS #
     ########################
 
     def __repr__(self):
-        return repr(self._get_data())
+        return repr(list(iter(self)))
 
     def __len__(self):
-        return len(self._get_data())
+        return len(list(iter(self)))
 
     def __iter__(self):
-        return iter(self._get_data())
+        pos = 0
+        if self._result_cache is None:
+            self._iter = self.iterator()
+            self._result_cache = []
+        while 1:
+            upper = len(self._result_cache)
+            while pos < upper:
+                yield self._result_cache[pos]
+                pos = pos + 1
+            if not self._iter:
+                raise StopIteration
+            if len(self._result_cache) <= pos:
+                self._fill_cache()
+
+    def __nonzero__(self):
+        if self._result_cache is None:
+            try:
+                iter(self).next()
+            except StopIteration:
+                return False
+        return True
 
     def __getitem__(self, k):
         "Retrieve an item or slice from the set of results."
@@ -52,6 +74,15 @@ class _QuerySet(object):
                 "Negative indexing is not supported."
 
         if self._result_cache is not None:
+            if self._iter is not None:
+                # The result cache has only been partially populated, so we may
+                # need to fill it out a bit more.
+                if isinstance(k, slice):
+                    bound = k.stop
+                else:
+                    bound = k + 1
+                if len(self._result_cache) < bound:
+                    self._fill_cache(bound - len(self._result_cache))
             return self._result_cache[k]
 
         if isinstance(k, slice):
@@ -375,10 +406,17 @@ class _QuerySet(object):
             c._setup_query()
         return c
 
-    def _get_data(self):
-        if self._result_cache is None:
-            self._result_cache = list(self.iterator())
-        return self._result_cache
+    def _fill_cache(self, num=None):
+        """
+        Fills the result cache with 'num' more entries (or until the results
+        iterator is exhausted).
+        """
+        if self._iter:
+            try:
+                for i in range(num or ITER_CHUNK_SIZE):
+                    self._result_cache.append(self._iter.next())
+            except StopIteration:
+                self._iter = None
 
 # Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
 if connection.features.uses_custom_queryset:
@@ -394,6 +432,9 @@ class ValuesQuerySet(QuerySet):
 
         # QuerySet.clone() will also set up the _fields attribute with the
         # names of the model fields to select.
+
+    def __iter__(self):
+        return self.iterator()
 
     def iterator(self):
         self.field_names.extend([f for f in self.query.extra_select.keys()])
