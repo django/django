@@ -88,6 +88,7 @@ class Query(object):
         self.rev_join_map = {}  # Reverse of join_map.
         self.quote_cache = {}
         self.default_cols = True
+        self.default_ordering = True
 
         # SQL-related attributes
         self.select = []
@@ -155,6 +156,7 @@ class Query(object):
         obj.rev_join_map = copy.deepcopy(self.rev_join_map)
         obj.quote_cache = {}
         obj.default_cols = self.default_cols
+        obj.default_ordering = self.default_ordering
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = copy.deepcopy(self.where)
@@ -459,12 +461,9 @@ class Query(object):
         """
         if self.extra_order_by:
             ordering = self.extra_order_by
-        elif self.order_by is None:
+        elif not self.default_ordering:
             ordering = []
         else:
-            # Note that self.order_by can be empty in two ways: [] ("use the
-            # default"), which is handled here, and None ("no ordering"), which
-            # is handled in the previous test.
             ordering = self.order_by or self.model._meta.ordering
         qn = self.quote_name_unless_alias
         distinct = self.distinct
@@ -983,6 +982,8 @@ class Query(object):
         clause. These items are either field names (not column names) --
         possibly with a direction prefix ('-' or '?') -- or ordinals,
         corresponding to column positions in the 'select' list.
+
+        If 'ordering' is empty, all ordering is cleared from the query.
         """
         errors = []
         for item in ordering:
@@ -990,18 +991,20 @@ class Query(object):
                 errors.append(item)
         if errors:
             raise TypeError('Invalid order_by arguments: %s' % errors)
-        self.order_by.extend(ordering)
+        if ordering:
+            self.order_by.extend(ordering)
+        else:
+            self.default_ordering = False
 
     def clear_ordering(self, force_empty=False):
         """
         Removes any ordering settings. If 'force_empty' is True, there will be
         no ordering in the resulting query (not even the model's default).
         """
-        if force_empty:
-            self.order_by = None
-        else:
-            self.order_by = []
+        self.order_by = []
         self.extra_order_by = []
+        if force_empty:
+            self.default_ordering = False
 
     def add_count_column(self):
         """

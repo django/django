@@ -533,6 +533,10 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 
 ...since the ``Blog`` model has no default ordering specified.
 
+**New in Django development version:** If you don't want any ordering to be
+applied to a query, not even the default ordering, call ``order_by()`` with no
+parameters.
+
 **New in Django development version:** The syntax for ordering across related
 models has changed. See the `Django 0.96 documentation`_ for the old behaviour.
 
