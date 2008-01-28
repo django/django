@@ -97,6 +97,20 @@ class X(models.Model):
 class Y(models.Model):
     x1 = models.ForeignKey(X, related_name='y1')
 
+# Some models with a cycle in the default ordering. This would be bad if we
+# didn't catch the infinite loop.
+class LoopX(models.Model):
+    y = models.ForeignKey('LoopY')
+
+    class Meta:
+        ordering = ['y']
+
+class LoopY(models.Model):
+    x = models.ForeignKey(LoopX)
+
+    class Meta:
+        ordering = ['x']
+
 __test__ = {'API_TESTS':"""
 >>> t1 = Tag(name='t1')
 >>> t1.save()
@@ -372,6 +386,13 @@ Bug #2076
 # Cover is ordered by Item's default, which uses Note's default).
 >>> Cover.objects.all()
 [<Cover: first>, <Cover: second>]
+
+# If you're not careful, it's possible to introduce infinite loops via default
+# ordering on foreign keys in a cycle. We detect that.
+>>> LoopX.objects.all()
+Traceback (most recent call last):
+...
+TypeError: Infinite loop caused by ordering.
 
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.

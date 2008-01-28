@@ -507,7 +507,8 @@ class Query(object):
                     result.append('%s %s' % (elt, order))
         return result
 
-    def find_ordering_name(self, name, opts, alias=None, default_order='ASC'):
+    def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
+            already_seen=None):
         """
         Returns the table alias (the name might be ambiguous, the alias will
         not be) and column name for ordering by the given 'name' parameter.
@@ -525,10 +526,18 @@ class Query(object):
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
         if len(joins) > 1 and opts.ordering:
+            # Firstly, avoid infinite loops.
+            if not already_seen:
+                already_seen = {}
+            join_tuple = tuple([tuple(j) for j in joins])
+            if join_tuple in already_seen:
+                raise TypeError('Infinite loop caused by ordering.')
+            already_seen[join_tuple] = True
+
             results = []
             for item in opts.ordering:
                 results.extend(self.find_ordering_name(item, opts, alias,
-                        order))
+                        order, already_seen))
             return results
 
         if alias:
