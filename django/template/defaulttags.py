@@ -924,18 +924,20 @@ def regroup(parser, token):
         {% regroup people|dictsort:"gender" by gender as grouped %}
 
     """
-    bits = token.contents.split()
-    if len(bits) != 6:
+    firstbits = token.contents.split(None, 3)
+    if len(firstbits) != 4:
         raise TemplateSyntaxError, "'regroup' tag takes five arguments"
-    target = parser.compile_filter(bits[1])
-    if bits[2] != 'by':
+    target = parser.compile_filter(firstbits[1])
+    if firstbits[2] != 'by':
         raise TemplateSyntaxError("second argument to 'regroup' tag must be 'by'")
-    if bits[4] != 'as':
+    lastbits_reversed = firstbits[3][::-1].split(None, 2)
+    if lastbits_reversed[1][::-1] != 'as':
         raise TemplateSyntaxError("next-to-last argument to 'regroup' tag must"
                                   " be 'as'")
 
-    expression = parser.compile_filter(bits[3])
-    var_name = bits[5]
+    expression = parser.compile_filter(lastbits_reversed[2][::-1])
+
+    var_name = lastbits_reversed[0][::-1]
     return RegroupNode(target, expression, var_name)
 regroup = register.tag(regroup)
 

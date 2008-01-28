@@ -293,7 +293,7 @@ def sql_model_create(model, style, known_models=set()):
             style.SQL_KEYWORD('NULL'))
     for field_constraints in opts.unique_together:
         table_output.append(style.SQL_KEYWORD('UNIQUE') + ' (%s)' % \
-            ", ".join([qn(style.SQL_FIELD(opts.get_field(f).column)) for f in field_constraints]))
+            ", ".join([style.SQL_FIELD(qn(opts.get_field(f).column)) for f in field_constraints]))
 
     full_statement = [style.SQL_KEYWORD('CREATE TABLE') + ' ' + style.SQL_TABLE(qn(opts.db_table)) + ' (']
     for i, line in enumerate(table_output): # Combine and add commas.

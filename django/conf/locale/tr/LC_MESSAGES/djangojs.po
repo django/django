@@ -1,7 +1,4 @@
-# Django 0.95
-# Copyright (C) 2006 Django
 # This file is distributed under the same license as the Django package.
-# Bahadır Kandemir <bahadir@pardus.org.tr>, 2006.
 #
 msgid ""
 msgstr ""

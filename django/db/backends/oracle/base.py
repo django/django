@@ -516,7 +516,10 @@ class FormatStylePlaceholderCursor(Database.Cursor):
         return Database.Cursor.executemany(self, query, new_param_list)
 
     def fetchone(self):
-        return to_unicode(Database.Cursor.fetchone(self))
+        row = Database.Cursor.fetchone(self)
+        if row is None:
+            return row
+        return tuple([to_unicode(e) for e in row])
 
     def fetchmany(self, size=None):
         if size is None:

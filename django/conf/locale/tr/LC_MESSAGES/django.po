@@ -1,17 +1,13 @@
 # translation of django.po to Turkish
-# Django 0.95
-# Copyright (C) 2006 Django
 # This file is distributed under the same license as the Django package.
 # 
-# Can Burak Çilingir <canburak@cs.bilgi.edu.tr>, 2007. (Slight modifications)
-# Bahadır Kandemir <bahadir@pardus.org.tr>, 2006.
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-03-14 01:38+0200\n"
-"PO-Revision-Date: 2007-03-14 02:06+0200\n"
-"Last-Translator: Bahadır Kandemir <bahadir@pardus.org.tr>\n"
+"PO-Revision-Date: 2007-12-30 12:15+0200\n"
+"Last-Translator: Can Burak Çilingir <canburak@cs.bilgi.edu.tr>\n"
 "Language-Team: Turkish <bahadir@pardus.org.tr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,7 +153,7 @@ msgstr "Bengali Dili"
 
 #: conf/global_settings.py:41
 msgid "Catalan"
-msgstr ""
+msgstr "Katalanca"
 
 #: conf/global_settings.py:42
 msgid "Czech"
@@ -225,15 +221,15 @@ msgstr "Japonca"
 
 #: conf/global_settings.py:58
 msgid "Kannada"
-msgstr ""
+msgstr "Kannada Dili"
 
 #: conf/global_settings.py:59
 msgid "Latvian"
-msgstr ""
+msgstr "Leton Dili"
 
 #: conf/global_settings.py:60
 msgid "Macedonian"
-msgstr ""
+msgstr "Makedonca"
 
 #: conf/global_settings.py:61
 msgid "Dutch"
@@ -245,7 +241,7 @@ msgstr "Norveç Dili"
 
 #: conf/global_settings.py:63
 msgid "Polish"
-msgstr ""
+msgstr "Lehçe"
 
 #: conf/global_settings.py:64
 msgid "Brazilian"
@@ -281,7 +277,7 @@ msgstr "Tamilce"
 
 #: conf/global_settings.py:72
 msgid "Telugu"
-msgstr ""
+msgstr "Telugu Dili"
 
 #: conf/global_settings.py:73
 msgid "Turkish"
@@ -615,7 +611,7 @@ msgstr "Geçerli bir seçimde bulunun; seçiminiz mevcut değerlerden birisi de�
 
 #: newforms/models.py:181 newforms/fields.py:378 newforms/fields.py:454
 msgid "Enter a list of values."
-msgstr ""
+msgstr "Değer listesi giriniz."
 
 #: newforms/models.py:187 newforms/fields.py:387
 #, python-format
@@ -648,11 +644,11 @@ msgstr "Geçerli bir tarih girin."
 
 #: newforms/fields.py:190
 msgid "Enter a valid time."
-msgstr ""
+msgstr "Geçerli bir zaman giriniz."
 
 #: newforms/fields.py:226
 msgid "Enter a valid date/time."
-msgstr ""
+msgstr "Geçerli bir tarih/zaman giriniz."
 
 #: newforms/fields.py:240
 msgid "Enter a valid value."
@@ -668,40 +664,40 @@ msgstr "Bu URL kırık bir link gibi duruyor."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "th"
-msgstr ""
+msgstr "."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "st"
-msgstr ""
+msgstr "."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "nd"
-msgstr ""
+msgstr "."
 
 #: contrib/humanize/templatetags/humanize.py:17
 msgid "rd"
-msgstr ""
+msgstr "."
 
 #: contrib/humanize/templatetags/humanize.py:47
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f milyon"
+msgstr[1] "%(value).1f milyon"
 
 #: contrib/humanize/templatetags/humanize.py:50
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f milyar"
+msgstr[1] "%(value).1f milyar"
 
 #: contrib/humanize/templatetags/humanize.py:53
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(value).1f trilyon"
+msgstr[1] "%(value).1f trilyon"
 
 #: contrib/humanize/templatetags/humanize.py:68
 msgid "one"
@@ -2029,6 +2025,8 @@ msgid ""
 "Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
 "password form</a>."
 msgstr ""
+"'[algo]$[salt]$[hexdigest]' yazın ya da <a href=\"password/\">parola\n"
+"değiştir formunu kullanın</a>."
 
 #: contrib/auth/models.py:95
 msgid "staff status"
@@ -2152,7 +2150,7 @@ msgstr "Posta kodu girin. Posta kodunun iki kısmı arasında bir boşluk bırak
 
 #: contrib/localflavor/usa/forms.py:17
 msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
-msgstr ""
+msgstr "XXXXX ya da XXXXX-XXXX biçiminde bir posta kodu yazın."
 
 #: contrib/sessions/models.py:51
 msgid "session key"
@@ -2411,27 +2409,27 @@ msgstr[1] "dakika"
 
 #: utils/dateformat.py:40
 msgid "p.m."
-msgstr ""
+msgstr "ö.s."
 
 #: utils/dateformat.py:41
 msgid "a.m."
-msgstr ""
+msgstr "ö.ö."
 
 #: utils/dateformat.py:46
 msgid "PM"
-msgstr ""
+msgstr "ÖS"
 
 #: utils/dateformat.py:47
 msgid "AM"
-msgstr ""
+msgstr "ÖÖ"
 
 #: utils/dateformat.py:95
 msgid "midnight"
-msgstr ""
+msgstr "gece yarısı"
 
 #: utils/dateformat.py:97
 msgid "noon"
-msgstr ""
+msgstr "öğlen"
 
 #: utils/translation/trans_real.py:362
 msgid "DATE_FORMAT"

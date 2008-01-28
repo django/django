@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 else:
                     formats = []
 
-            if verbosity > 2:
+            if verbosity >= 2:
                 if formats:
                     print "Loading '%s' fixtures..." % fixture_name
                 else:
@@ -109,7 +109,7 @@ class Command(BaseCommand):
                                 return
                             fixture.close()
                     except:
-                        if verbosity > 2:
+                        if verbosity >= 2:
                             print "No %s fixture '%s' in %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
 
@@ -125,7 +125,7 @@ class Command(BaseCommand):
         transaction.leave_transaction_management()
 
         if count[0] == 0:
-            if verbosity > 2:
+            if verbosity >= 2:
                 print "No fixtures found."
         else:
             if verbosity > 0:

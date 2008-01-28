@@ -70,7 +70,12 @@ class TestCase(unittest.TestCase):
         include a call to super().setUp().
         """
         self.client = Client()
-        self._pre_setup()
+        try:
+            self._pre_setup()
+        except Exception:
+            import sys
+            result.addError(self, sys.exc_info())
+            return
         super(TestCase, self).__call__(result)
 
     def assertRedirects(self, response, expected_url, status_code=302,
@@ -103,7 +108,7 @@ class TestCase(unittest.TestCase):
 
     def assertContains(self, response, text, count=None, status_code=200):
         """
-        Asserts that a response indicates that a page was retreived
+        Asserts that a response indicates that a page was retrieved
         successfully, (i.e., the HTTP status code was as expected), and that
         ``text`` occurs ``count`` times in the content of the response.
         If ``count`` is None, the count doesn't matter - the assertion is true

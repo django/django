@@ -953,7 +953,7 @@ Available format strings:
     U                 Not implemented.
     w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                       leading zeros.
-    W                 ISO-8601 week number of year, with        ``1``, ``23``
+    W                 ISO-8601 week number of year, with        ``1``, ``53``
                       weeks starting on Monday.
     y                 Year, 2 digits.                           ``'99'``
     Y                 Year, 4 digits.                           ``'1999'``
@@ -1230,7 +1230,7 @@ addslashes
 Adds slashes before quotes. Useful for escaping strings in CSV, for example.
 
 **New in Django development version**: for escaping data in JavaScript strings,
-use the `escapejs` filter instead.
+use the `escapejs`_ filter instead.
 
 capfirst
 ~~~~~~~~
@@ -1402,6 +1402,11 @@ join
 ~~~~
 
 Joins a list with a string, like Python's ``str.join(list)``.
+
+last
+~~~~
+
+Returns the last item in a list.
 
 length
 ~~~~~~
