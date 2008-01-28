@@ -270,7 +270,7 @@ class UserFlagManager(models.Manager):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = self.objects.get(user__pk=user.id, comment__pk=comment.id)
+            f = self.get(user__pk=user.id, comment__pk=comment.id)
         except self.model.DoesNotExist:
             from django.core.mail import mail_managers
             f = self.model(None, user.id, comment.id, None)
