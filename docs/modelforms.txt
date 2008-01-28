@@ -295,7 +295,7 @@ model fields:
 Overriding the default field types
 ----------------------------------
 
-The default field types, as described in the "Field types" table above, are
+The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
 ``ModelForm`` gives you the flexibility of changing the form field type
