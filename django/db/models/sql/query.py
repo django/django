@@ -1176,7 +1176,7 @@ class UpdateQuery(Query):
         """
         self.select_related = False
         self.pre_sql_setup()
-        if len(tables) != 1:
+        if len(self.tables) != 1:
             raise TypeError('Updates can only access a single database table at a time.')
         result = ['UPDATE %s' % self.tables[0]]
         result.append('SET')
