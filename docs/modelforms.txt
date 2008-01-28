@@ -113,7 +113,7 @@ In addition, each generated form field has attributes set as follows:
       ``default`` value will be initially selected instead).
 
 Finally, note that you can override the form field used for a given model
-field. See "Overriding the default field types" below.
+field. See `Overriding the default field types`_ below.
 
 A full example
 --------------
