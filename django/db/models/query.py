@@ -255,6 +255,17 @@ class _QuerySet(object):
         self._result_cache = None
     delete.alters_data = True
 
+    def update(self, **kwargs):
+        """
+        Updates all elements in the current QuerySet, setting all the given
+        fields to the appropriate values.
+        """
+        query = self.query.clone(sql.UpdateQuery)
+        query.add_update_values(kwargs)
+        query.execute_sql(None)
+        self._result_cache=None
+    update.alters_Data = True
+
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
     ##################################################

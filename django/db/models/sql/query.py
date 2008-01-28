@@ -174,6 +174,8 @@ class Query(object):
         obj.extra_params = self.extra_params[:]
         obj.extra_order_by = self.extra_order_by[:]
         obj.__dict__.update(kwargs)
+        if hasattr(obj, '_setup_query'):
+            obj._setup_query()
         return obj
 
     def results_iter(self):
@@ -1159,6 +1161,12 @@ class UpdateQuery(Query):
     """
     def __init__(self, *args, **kwargs):
         super(UpdateQuery, self).__init__(*args, **kwargs)
+        self._setup_query()
+
+    def _setup_query(self):
+        """
+        Run on initialisation and after cloning.
+        """
         self.values = []
 
     def as_sql(self):
@@ -1166,22 +1174,24 @@ class UpdateQuery(Query):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        assert len(self.tables) == 1, \
-                "Can only update one table at a time."
+        self.select_related = False
+        self.pre_sql_setup()
+        if len(tables) != 1:
+            raise TypeError('Updates can only access a single database table at a time.')
         result = ['UPDATE %s' % self.tables[0]]
         result.append('SET')
         qn = self.quote_name_unless_alias
-        values = ['%s = %s' % (qn(v[0]), v[1]) for v in self.values]
+        values, update_params = [], []
+        for name, val in self.values:
+            if val is not None:
+                values.append('%s = %%s' % qn(name))
+                update_params.append(val)
+            else:
+                values.append('%s = NULL' % qn(name))
         result.append(', '.join(values))
         where, params = self.where.as_sql()
         result.append('WHERE %s' % where)
-        return ' '.join(result), tuple(params)
-
-    def do_query(self, table, values, where):
-        self.tables = [table]
-        self.values = values
-        self.where = where
-        self.execute_sql(NONE)
+        return ' '.join(result), tuple(update_params + params)
 
     def clear_related(self, related_field, pk_list):
         """
@@ -1191,13 +1201,24 @@ class UpdateQuery(Query):
         This is used by the QuerySet.delete_objects() method.
         """
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            where = self.where_class()
+            self.where = self.where_class()
             f = self.model._meta.pk
-            where.add((None, f.column, f, 'in',
+            self.where.add((None, f.column, f, 'in',
                     pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]),
                     AND)
-            values = [(related_field.column, 'NULL')]
-            self.do_query(self.model._meta.db_table, values, where)
+            self.values = [(related_field.column, None)]
+            self.execute_sql(None)
+
+    def add_update_values(self, values):
+        from django.db.models.base import Model
+        for name, val in values.items():
+            field, direct, m2m = self.model._meta.get_field_by_name(name)
+            if not direct or m2m:
+                # Can only update non-relation fields and foreign keys.
+                raise TypeError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+            if field.rel and isinstance(val, Model):
+                val = val.pk
+            self.values.append((field.column, val))
 
 class DateQuery(Query):
     """

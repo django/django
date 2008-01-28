@@ -1972,6 +1972,34 @@ complete query set::
 
     Entry.objects.all().delete()
 
+Updating multiple objects at once
+=================================
+
+**New in Django development version**
+
+Sometimes you want to set a field to a particular value for all the objects in
+a queryset. You can do this with the ``update()`` method. For example::
+
+    # Update all the headlings to the same value.
+    Entry.objects.all().update(headline='Everything is the same')
+
+You can only set non-relation fields and ``ForeignKey`` fields using this
+method and the value you set the field to must be a normal Python value (you
+can't set a field to be equal to some other field at the moment).
+
+To update ``ForeignKey`` fields, set the new value to be the new model
+instance you want to point to. Example::
+
+    b = Blog.objects.get(pk=1)
+    # Make all entries belong to this blog.
+    Entry.objects.all().update(blog=b)
+
+The ``update()`` method is applied instantly and doesn't return anything
+(similar to ``delete()``). The only restriction on the queryset that is
+updated is that it can only access one database table, the model's main
+table. So don't try to filter based on related fields or anything like that;
+it won't work.
+
 Extra instance methods
 ======================
 
