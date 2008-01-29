@@ -263,8 +263,8 @@ class _QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         query.execute_sql(None)
-        self._result_cache=None
-    update.alters_Data = True
+        self._result_cache = None
+    update.alters_data = True
 
     ##################################################
     # PUBLIC METHODS THAT RETURN A QUERYSET SUBCLASS #
@@ -428,6 +428,18 @@ class _QuerySet(object):
                     self._result_cache.append(self._iter.next())
             except StopIteration:
                 self._iter = None
+
+    def _insert(self, _return_id=False, _raw_values=False, **kwargs):
+        """
+        Inserts a new record for the given model. This provides an interface to
+        the InsertQuery class and is how Model.save() is implemented. It is not
+        part of the public API of QuerySet, though.
+        """
+        self._result_cache = None
+        query = self.query.clone(sql.InsertQuery)
+        query.insert_values(kwargs, _raw_values)
+        return query.execute_sql(_return_id)
+    _insert.alters_data = True
 
 # Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
 if connection.features.uses_custom_queryset:

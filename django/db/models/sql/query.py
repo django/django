@@ -57,7 +57,6 @@ ALIAS_NULLABLE=3
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
 SINGLE = 'single'
-NONE = None
 
 ORDER_PATTERN = re.compile(r'\?|[-+]?\w+$')
 ORDER_DIR = {
@@ -66,6 +65,10 @@ ORDER_DIR = {
 
 class Empty(object):
     pass
+
+class RawValue(object):
+    def __init__(self, value):
+        self.value = value
 
 class Query(object):
     """
@@ -461,6 +464,10 @@ class Query(object):
         Determining the ordering SQL can change the tables we need to include,
         so this should be run *before* get_from_clause().
         """
+        # FIXME: It's an SQL-92 requirement that all ordering columns appear as
+        # output columns in the query (in the select statement) or be ordinals.
+        # We don't enforce that here, but we should (by adding to the select
+        # columns), for portability.
         if self.extra_order_by:
             ordering = self.extra_order_by
         elif not self.default_ordering:
@@ -1069,7 +1076,9 @@ class Query(object):
         iterator over the results if the result_type is MULTI.
 
         result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or NONE (no results expected).
+        SINGLE (only retrieve a single row), or None (no results expected, but
+        the cursor is returned, since it's used by subclasses such as
+        InsertQuery).
         """
         try:
             sql, params = self.as_sql()
@@ -1082,8 +1091,8 @@ class Query(object):
         cursor = self.connection.cursor()
         cursor.execute(sql, params)
 
-        if result_type == NONE:
-            return
+        if result_type is None:
+            return cursor
 
         if result_type == SINGLE:
             return cursor.fetchone()
@@ -1111,7 +1120,7 @@ class DeleteQuery(Query):
     def do_query(self, table, where):
         self.tables = [table]
         self.where = where
-        self.execute_sql(NONE)
+        self.execute_sql(None)
 
     def delete_batch_related(self, pk_list):
         """
@@ -1185,11 +1194,23 @@ class UpdateQuery(Query):
         """
         self.select_related = False
         self.pre_sql_setup()
+
         if len(self.tables) != 1:
-            raise TypeError('Updates can only access a single database table at a time.')
-        result = ['UPDATE %s' % self.tables[0]]
-        result.append('SET')
+            # We can only update one table at a time, so we need to check that
+            # only one alias has a nonzero refcount.
+            table = None
+            for alias_list in self.table_map.values():
+                for alias in alias_list:
+                    if self.alias_map[alias][ALIAS_REFCOUNT]:
+                        if table:
+                            raise TypeError('Updates can only access a single database table at a time.')
+                        table = alias
+        else:
+            table = self.tables[0]
+
         qn = self.quote_name_unless_alias
+        result = ['UPDATE %s' % qn(table)]
+        result.append('SET')
         values, update_params = [], []
         for name, val in self.values:
             if val is not None:
@@ -1228,6 +1249,67 @@ class UpdateQuery(Query):
             if field.rel and isinstance(val, Model):
                 val = val.pk
             self.values.append((field.column, val))
+
+class InsertQuery(Query):
+    def __init__(self, *args, **kwargs):
+        super(InsertQuery, self).__init__(*args, **kwargs)
+        self._setup_query()
+
+    def _setup_query(self):
+        """
+        Run on initialisation and after cloning.
+        """
+        self.columns = []
+        self.values = []
+
+    def as_sql(self):
+        self.select_related = False
+        self.pre_sql_setup()
+        qn = self.quote_name_unless_alias
+        result = ['INSERT INTO %s' % qn(self.tables[0])]
+        result.append('(%s)' % ', '.join([qn(c) for c in self.columns]))
+        result.append('VALUES (')
+        params = []
+        first = True
+        for value in self.values:
+            prefix = not first and ', ' or ''
+            if isinstance(value, RawValue):
+                result.append('%s%s' % (prefix, value.value))
+            else:
+                result.append('%s%%s' % prefix)
+                params.append(value)
+            first = False
+        result.append(')')
+        return ' '.join(result), tuple(params)
+
+    def execute_sql(self, return_id=False):
+        cursor = super(InsertQuery, self).execute_sql(None)
+        if return_id:
+            return self.connection.ops.last_insert_id(cursor, self.tables[0],
+                    self.model._meta.pk.column)
+
+    def insert_values(self, insert_values, raw_values=False):
+        """
+        Set up the insert query from the 'insert_values' dictionary. The
+        dictionary gives the model field names and their target values.
+
+        If 'raw_values' is True, the values in the 'insert_values' dictionary
+        are inserted directly into the query, rather than passed as SQL
+        parameters. This provides a way to insert NULL and DEFAULT keywords
+        into the query, for example.
+        """
+        func = lambda x: self.model._meta.get_field_by_name(x)[0].column
+        # keys() and values() return items in the same order, providing the
+        # dictionary hasn't changed between calls. So these lines work as
+        # intended.
+        for name in insert_values:
+            if name == 'pk':
+                name = self.model._meta.pk.name
+            self.columns.append(func(name))
+        if raw_values:
+            self.values.extend([RawValue(v) for v in insert_values.values()])
+        else:
+            self.values.extend(insert_values.values())
 
 class DateQuery(Query):
     """

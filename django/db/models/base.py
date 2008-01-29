@@ -4,7 +4,7 @@ from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel
-from django.db.models.query import delete_objects
+from django.db.models.query import delete_objects, Q
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, transaction
 from django.db.models import signals
@@ -212,9 +212,6 @@ class Model(object):
         dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
-        cursor = connection.cursor()
-
-        qn = connection.ops.quote_name
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val()
@@ -222,50 +219,38 @@ class Model(object):
         # oldforms-style model creation.
         pk_set = pk_val is not None and smart_unicode(pk_val) != u''
         record_exists = True
+        manager = self.__class__._default_manager
         if pk_set:
             # Determine whether a record with the primary key already exists.
-            cursor.execute("SELECT 1 FROM %s WHERE %s=%%s" % \
-                (qn(self._meta.db_table), qn(self._meta.pk.column)),
-                self._meta.pk.get_db_prep_lookup('exact', pk_val))
-            # If it does already exist, do an UPDATE.
-            if cursor.fetchone():
-                db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False)) for f in non_pks]
-                if db_values:
-                    cursor.execute("UPDATE %s SET %s WHERE %s=%%s" % \
-                        (qn(self._meta.db_table),
-                        ','.join(['%s=%%s' % qn(f.column) for f in non_pks]),
-                        qn(self._meta.pk.column)),
-                        db_values + self._meta.pk.get_db_prep_lookup('exact', pk_val))
+            if manager.filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by():
+                # It does already exist, so do an UPDATE.
+                if non_pks:
+                    values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, False))) for f in non_pks]
+                    manager.filter(pk=pk_val).update(**dict(values))
             else:
                 record_exists = False
         if not pk_set or not record_exists:
-            field_names = [qn(f.column) for f in self._meta.fields if not isinstance(f, AutoField)]
-            db_values = [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if not isinstance(f, AutoField)]
-            # If the PK has been manually set, respect that.
-            if pk_set:
-                field_names += [f.column for f in self._meta.fields if isinstance(f, AutoField)]
-                db_values += [f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True)) for f in self._meta.fields if isinstance(f, AutoField)]
-            placeholders = ['%s'] * len(field_names)
+            if not pk_set:
+                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in self._meta.fields if not isinstance(f, AutoField)]
+            else:
+                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in self._meta.fields]
+
             if self._meta.order_with_respect_to:
-                field_names.append(qn('_order'))
-                placeholders.append('%s')
-                subsel = 'SELECT COUNT(*) FROM %s WHERE %s = %%s' % (
-                    qn(self._meta.db_table),
-                    qn(self._meta.order_with_respect_to.column))
-                cursor.execute(subsel, (getattr(self, self._meta.order_with_respect_to.attname),))
-                db_values.append(cursor.fetchone()[0])
+                field = self._meta.order_with_respect_to
+                values.append(('_order', manager.filter(**{field.name: getattr(self, field.attname)}).count()))
             record_exists = False
-            if db_values:
-                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" % \
-                    (qn(self._meta.db_table), ','.join(field_names),
-                    ','.join(placeholders)), db_values)
+
+            update_pk = bool(self._meta.has_auto_field and not pk_set)
+            if values:
+                # Create a new record.
+                result = manager._insert(_return_id=update_pk, **dict(values))
             else:
                 # Create a new record with defaults for everything.
-                cursor.execute("INSERT INTO %s (%s) VALUES (%s)" %
-                    (qn(self._meta.db_table), qn(self._meta.pk.column),
-                     connection.ops.pk_default_value()))
-            if self._meta.has_auto_field and not pk_set:
-                setattr(self, self._meta.pk.attname, connection.ops.last_insert_id(cursor, self._meta.db_table, self._meta.pk.column))
+                result = manager._insert(_return_id=update_pk,
+                        _raw_values=True, pk=connection.ops.pk_default_value())
+
+            if update_pk:
+                setattr(self, self._meta.pk.attname, result)
         transaction.commit_unless_managed()
 
         # Run any post-save hooks.
@@ -338,34 +323,31 @@ class Model(object):
         return force_unicode(dict(field.choices).get(value, value), strings_only=True)
 
     def _get_next_or_previous_by_FIELD(self, field, is_next, **kwargs):
-        qn = connection.ops.quote_name
-        op = is_next and '>' or '<'
-        where = ['(%s %s %%s OR (%s = %%s AND %s.%s %s %%s))' % \
-            (qn(field.column), op, qn(field.column),
-            qn(self._meta.db_table), qn(self._meta.pk.column), op)]
+        op = is_next and 'gt' or 'lt'
+        order = not is_next and '-' or ''
         param = smart_str(getattr(self, field.attname))
-        order_char = not is_next and '-' or ''
-        q = self.__class__._default_manager.filter(**kwargs).order_by(
-                order_char + field.name, order_char + self._meta.pk.name)
-        q = q.extra(where=where, params=[param, param,
-                getattr(self, self._meta.pk.attname)])
+        q = Q(**{'%s__%s' % (field.name, op): param})
+        q = q|Q(**{field.name: param, 'pk__%s' % op: self.pk})
+        qs = self.__class__._default_manager.filter(**kwargs).filter(q).order_by('%s%s' % (order, field.name), '%spk' % order)
         try:
-            return q[0]
+            return qs[0]
         except IndexError:
             raise self.DoesNotExist, "%s matching query does not exist." % self.__class__._meta.object_name
 
     def _get_next_or_previous_in_order(self, is_next):
-        qn = connection.ops.quote_name
         cachename = "__%s_order_cache" % is_next
         if not hasattr(self, cachename):
+            qn = connection.ops.quote_name
             op = is_next and '>' or '<'
+            order = not is_next and '-_order' or '_order'
             order_field = self._meta.order_with_respect_to
+            # FIXME: When querysets support nested queries, this can be turned
+            # into a pure queryset operation.
             where = ['%s %s (SELECT %s FROM %s WHERE %s=%%s)' % \
                 (qn('_order'), op, qn('_order'),
-                qn(self._meta.db_table), qn(self._meta.pk.column)),
-                '%s=%%s' % qn(order_field.column)]
-            params = [self._get_pk_val(), getattr(self, order_field.attname)]
-            obj = self._default_manager.order_by('_order').extra(where=where, params=params)[:1].get()
+                qn(self._meta.db_table), qn(self._meta.pk.column))]
+            params = [self.pk]
+            obj = self._default_manager.filter(**{order_field.name: getattr(self, order_field.attname)}).extra(where=where, params=params).order_by(order)[:1].get()
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
@@ -445,29 +427,20 @@ class Model(object):
 # ORDERING METHODS #########################
 
 def method_set_order(ordered_obj, self, id_list):
-    qn = connection.ops.quote_name
-    cursor = connection.cursor()
-    # Example: "UPDATE poll_choices SET _order = %s WHERE poll_id = %s AND id = %s"
-    sql = "UPDATE %s SET %s = %%s WHERE %s = %%s AND %s = %%s" % \
-        (qn(ordered_obj._meta.db_table), qn('_order'),
-        qn(ordered_obj._meta.order_with_respect_to.column),
-        qn(ordered_obj._meta.pk.column))
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
-    cursor.executemany(sql, [(i, rel_val, j) for i, j in enumerate(id_list)])
+    order_name = ordered_obj._meta.order_with_respect_to.name
+    # FIXME: It would be nice if there was an "update many" version of update
+    # for situations like this.
+    for i, j in enumerate(id_list):
+        ordered_obj.objects.filter(**{'pk': j, order_name: rel_val}).update(_order=i)
     transaction.commit_unless_managed()
 
 def method_get_order(ordered_obj, self):
-    qn = connection.ops.quote_name
-    cursor = connection.cursor()
-    # Example: "SELECT id FROM poll_choices WHERE poll_id = %s ORDER BY _order"
-    sql = "SELECT %s FROM %s WHERE %s = %%s ORDER BY %s" % \
-        (qn(ordered_obj._meta.pk.column),
-        qn(ordered_obj._meta.db_table),
-        qn(ordered_obj._meta.order_with_respect_to.column),
-        qn('_order'))
     rel_val = getattr(self, ordered_obj._meta.order_with_respect_to.rel.field_name)
-    cursor.execute(sql, [rel_val])
-    return [r[0] for r in cursor.fetchall()]
+    order_name = ordered_obj._meta.order_with_respect_to.name
+    pk_name = ordered_obj._meta.pk.name
+    return [r[pk_name] for r in
+            ordered_obj.objects.filter(**{order_name: rel_val}).values(pk_name)]
 
 ##############################################
 # HELPER FUNCTIONS (CURRIED MODEL FUNCTIONS) #

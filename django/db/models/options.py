@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
 from django.db.models.fields import AutoField, FieldDoesNotExist
+from django.db.models.fields.proxy import OrderWrt
 from django.db.models.loading import get_models, app_cache_ready
 from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
@@ -179,6 +180,8 @@ class Options(object):
             cache[f.field.related_query_name()] = (f, False, True)
         for f in self.get_all_related_objects():
             cache[f.field.related_query_name()] = (f, False, False)
+        if self.order_with_respect_to:
+            cache['_order'] = OrderWrt(), True, False
         if app_cache_ready():
             self._name_map = cache
         return cache

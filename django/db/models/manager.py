@@ -37,7 +37,7 @@ class Manager(object):
     #######################
     # PROXIES TO QUERYSET #
     #######################
-    
+
     def get_empty_query_set(self):
         return EmptyQuerySet(self.model)
 
@@ -46,7 +46,7 @@ class Manager(object):
         to easily customize the behavior of the Manager.
         """
         return QuerySet(self.model)
-    
+
     def none(self):
         return self.get_empty_query_set()
 
@@ -70,7 +70,7 @@ class Manager(object):
 
     def get_or_create(self, **kwargs):
         return self.get_query_set().get_or_create(**kwargs)
-        
+
     def create(self, **kwargs):
         return self.get_query_set().create(**kwargs)
 
@@ -100,6 +100,12 @@ class Manager(object):
 
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
+
+    def udpate(self, *args, **kwargs):
+        return self.get_query_set().updated(*args, **kwargs)
+
+    def _insert(self, *args, **kwargs):
+        return self.get_query_set()._insert(*args, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
