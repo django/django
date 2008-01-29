@@ -101,7 +101,7 @@ class Manager(object):
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
 
-    def udpate(self, *args, **kwargs):
+    def update(self, *args, **kwargs):
         return self.get_query_set().updated(*args, **kwargs)
 
     def _insert(self, *args, **kwargs):
