@@ -70,8 +70,6 @@ This example is equivalent to::
         r = HttpResponse(t.render(c),
             mimetype="application/xhtml+xml")
 
-.. _an HttpResponse object: ../request_response/#httpresponse-objects
-
 ``get_object_or_404``
 =====================
 
