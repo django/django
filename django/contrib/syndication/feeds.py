@@ -6,7 +6,7 @@ from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
 
 def add_domain(domain, url):
-    if not url.startswith('http://'):
+    if not (url.startswith('http://') or url.startswith('https://')):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
         url = iri_to_uri(u'http://%s%s' % (domain, url))
