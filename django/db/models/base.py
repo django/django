@@ -209,7 +209,8 @@ class Model(object):
     _prepare = classmethod(_prepare)
 
     def save(self, raw=False):
-        dispatcher.send(signal=signals.pre_save, sender=self.__class__, instance=self)
+        dispatcher.send(signal=signals.pre_save, sender=self.__class__,
+                        instance=self, raw=raw)
 
         non_pks = [f for f in self._meta.fields if not f.primary_key]
         cursor = connection.cursor()
@@ -270,7 +271,7 @@ class Model(object):
 
         # Run any post-save hooks.
         dispatcher.send(signal=signals.post_save, sender=self.__class__,
-                instance=self, created=(not record_exists))
+                        instance=self, created=(not record_exists), raw=raw)
 
     save.alters_data = True
 
