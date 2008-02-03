@@ -105,7 +105,7 @@ class EasyInstance(object):
         return self.instance._get_pk_val()
 
     def url(self):
-        return '%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, iri_to_uri(self.pk()))
+        return mark_safe('%s%s/%s/objects/%s/' % (self.model.site.root_url, self.model.model._meta.app_label, self.model.model._meta.module_name, iri_to_uri(self.pk())))
 
     def fields(self):
         """
