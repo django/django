@@ -55,7 +55,7 @@ NORTHERN_IRELAND_REGION_CHOICES = (
     ("County Antrim", _("County Antrim")),
     ("County Armagh", _("County Armagh")),
     ("County Down", _("County Down")),
-    ("County Fermanagh", _("County Down")),
+    ("County Fermanagh", _("County Fermanagh")),
     ("County Londonderry", _("County Londonderry")),
     ("County Tyrone", _("County Tyrone")),
 )
