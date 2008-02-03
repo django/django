@@ -53,7 +53,7 @@ class SyndicationFeed(object):
             'title': to_unicode(title),
             'link': iri_to_uri(link),
             'description': to_unicode(description),
-            'language': force_unicode(language),
+            'language': to_unicode(language),
             'author_email': to_unicode(author_email),
             'author_name': to_unicode(author_name),
             'author_link': iri_to_uri(author_link),
