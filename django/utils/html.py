@@ -102,18 +102,23 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
                     len(middle) > 0 and middle[0] in string.ascii_letters + string.digits and \
                     (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                middle = '<a href="http://%s"%s>%s</a>' % (
-                        urlquote(middle, safe='/&=:;#?+'),  nofollow_attr,
-                        trim_url(middle))
+                middle = 'http://%s' % middle
             if middle.startswith('http://') or middle.startswith('https://'):
-                middle = '<a href="%s"%s>%s</a>' % (
-                        urlquote(middle, safe='/&=:;#?+'), nofollow_attr,
-                        trim_url(middle))
-            if '@' in middle and not middle.startswith('www.') and \
-                    not ':' in middle and simple_email_re.match(middle):
+                url = urlquote(middle, safe='/&=:;#?+*')
+                if autoescape and not safe_input:
+                    url = escape(url)
+                trimmed_url = trim_url(middle)
+                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr,
+                        trimmed_url)
+            elif '@' in middle and not middle.startswith('www.') and \
+                      not ':' in middle and simple_email_re.match(middle):
+                if autoescape:
+                    middle = conditional_escape(middle)
                 middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
             if lead + middle + trail != word:
-                words[i] = lead + middle + trail
+                if autoescape and not safe_input:
+                    lead, trail = escape(lead), escape(trail)
+                words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             elif autoescape and not safe_input:
                 words[i] = escape(word)
         elif safe_input:
