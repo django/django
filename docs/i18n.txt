@@ -292,6 +292,14 @@ translation string. Example::
 In this case, both the tag and the filter will see the already-translated
 string, so they don't need to be aware of translations.
 
+.. note::
+    In this example, the translation infrastructure will be passed the string
+    ``"yes,no"``, not the individual strings ``"yes"`` and ``"no"``. The
+    translated string will need to contain the comma so that the filter
+    parsing code knows how to split up the arguments. For example, a German
+    translator might translate the string ``"yes,no"`` as ``"ja,nein"``
+    (keeping the comma intact).
+
 .. _Django templates: ../templates_python/
 
 Working with lazy translation objects
