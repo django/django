@@ -72,6 +72,8 @@ class TestCase(unittest.TestCase):
         self.client = Client()
         try:
             self._pre_setup()
+        except (KeyboardInterrupt, SystemExit):
+            raise
         except Exception:
             import sys
             result.addError(self, sys.exc_info())
