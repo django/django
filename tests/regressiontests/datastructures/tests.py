@@ -20,6 +20,19 @@
 >>> md2['chris']
 'cool'
 
+MergeDict can merge MultiValueDicts
+>>> multi1 = MultiValueDict({'key1': ['value1'], 'key2': ['value2', 'value3']})
+>>> multi2 = MultiValueDict({'key2': ['value4'], 'key4': ['value5', 'value6']})
+>>> mm = MergeDict(multi1, multi2)
+
+# Although 'key2' appears in both dictionaries, only the first value is used.
+>>> mm.getlist('key2')
+['value2', 'value3']
+>>> mm.getlist('key4')
+['value5', 'value6']
+>>> mm.getlist('undefined')
+[]
+
 ### MultiValueDict ##########################################################
 
 >>> d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})

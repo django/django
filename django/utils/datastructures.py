@@ -2,6 +2,9 @@ class MergeDict(object):
     """
     A simple class for creating new "virtual" dictionaries that actually look
     up values in more than one dictionary, passed in the constructor.
+
+    If a key appears in more than one of the passed in dictionaries, only the
+    first occurrence will be used.
     """
     def __init__(self, *dicts):
         self.dicts = dicts
@@ -25,11 +28,9 @@ class MergeDict(object):
 
     def getlist(self, key):
         for dict_ in self.dicts:
-            try:
+            if key in dict_.keys():
                 return dict_.getlist(key)
-            except KeyError:
-                pass
-        raise KeyError
+        return []
 
     def items(self):
         item_list = []
