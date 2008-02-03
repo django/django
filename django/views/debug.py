@@ -73,6 +73,12 @@ def technical_500_response(request, exc_type, exc_value, tb):
     template_info = None
     template_does_not_exist = False
     loader_debug_info = None
+
+    # Handle deprecated string exceptions
+    if isinstance(exc_type, basestring):
+        exc_value = Exception('Deprecated String Exception: %r' % exc_type)
+        exc_type = type(exc_value)
+
     if issubclass(exc_type, TemplateDoesNotExist):
         from django.template.loader import template_source_loaders
         template_does_not_exist = True
