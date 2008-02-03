@@ -20,7 +20,7 @@ class ARProvinceSelect(Select):
 
 class ARPostalCodeField(RegexField):
     """
-    A field that accepts a `classic´ NNNN Postal Code or a CPA.
+    A field that accepts a 'classic' NNNN Postal Code or a CPA.
 
     See http://www.correoargentino.com.ar/consulta_cpa/home.php
     """
@@ -44,7 +44,7 @@ class ARPostalCodeField(RegexField):
 
 class ARDNIField(CharField):
     """
-    A field that validates `Documento Nacional de Identidad´ (DNI) numbers.
+    A field that validates 'Documento Nacional de Identidad' (DNI) numbers.
     """
     default_error_messages = {
         'invalid': ugettext("This field requires only numbers."),
@@ -73,7 +73,7 @@ class ARDNIField(CharField):
 
 class ARCUITField(RegexField):
     """
-    This field validates a CUIT (Código Único de Identificación Tributaria). A
+    This field validates a CUIT (CÃ³digo Ãšnico de IdentificaciÃ³n Tributaria). A
     CUIT is of the form XX-XXXXXXXX-V. The last digit is a check digit.
     """
     default_error_messages = {

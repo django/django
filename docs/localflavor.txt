@@ -113,10 +113,23 @@ postal code or a CPA_.
 
 .. _CPA: http://www.correoargentino.com.ar/consulta_cpa/home.php
 
+ARDNIField
+----------
+
+A form field that validates input as a Documento Nacional de Identidad (DNI)
+number.
+
+ARCUITField
+-----------
+
+A form field that validates input as a Código Único de Identificación
+Tributaria (CUIT) number.
+
 ARProvinceSelect
 ----------------
 
-A ``Select`` widget that uses a list of Argentina's provinces as its choices.
+A ``Select`` widget that uses a list of Argentina's provinces and autonomous
+cities as its choices.
 
 Australia (``django.contrib.localflavor.au``)
 =============================================
@@ -610,7 +623,7 @@ UKNationSelect
 
 A ``Select`` widget that uses a list of UK nations as its choices.
 
-United States of America (``django.contrib.localflavor.us``) 
+United States of America (``django.contrib.localflavor.us``)
 ============================================================
 
 USPhoneNumberField
@@ -635,7 +648,7 @@ A valid SSN must obey the following rules:
 USStateField
 ------------
 
-A form field that validates input as a U.S. state name or abbreviation. It 
+A form field that validates input as a U.S. state name or abbreviation. It
 normalizes the input to the standard two-letter postal service abbreviation
 for the given state.
 
