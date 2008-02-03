@@ -192,9 +192,11 @@ def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_na
     Returns (pre_context_lineno, pre_context, context_line, post_context).
     """
     source = None
-    if loader is not None:
-        source = loader.get_source(module_name).splitlines()
-    else:
+    if loader is not None and hasattr(loader, "get_source"):
+        source = loader.get_source(module_name)
+        if source is not None:
+            source = source.splitlines()
+    if source is None:
         try:
             f = open(filename)
             try:
