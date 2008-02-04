@@ -56,7 +56,7 @@ class ExtendsNode(Node):
         if not parent:
             error_msg = "Invalid template name in 'extends' tag: %r." % parent
             if self.parent_name_expr:
-                error_msg += " Got this from the %r variable." % self.parent_name_expr #TODO nice repr.
+                error_msg += " Got this from the '%s' variable." % self.parent_name_expr.token
             raise TemplateSyntaxError, error_msg
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
