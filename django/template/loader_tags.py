@@ -37,10 +37,17 @@ class BlockNode(Node):
             self.parent = BlockNode(self.name, nodelist)
 
 class ExtendsNode(Node):
+    must_be_first = True
+
     def __init__(self, nodelist, parent_name, parent_name_expr, template_dirs=None):
         self.nodelist = nodelist
         self.parent_name, self.parent_name_expr = parent_name, parent_name_expr
         self.template_dirs = template_dirs
+
+    def __repr__(self):
+        if self.parent_name_expr:
+            return "<ExtendsNode: extends %s>" % self.parent_name_expr.token
+        return '<ExtendsNode: extends "%s">' % self.parent_name
 
     def get_parent(self, context):
         if self.parent_name_expr:
