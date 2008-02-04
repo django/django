@@ -1,5 +1,5 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, Variable
-from django.template import Library, Node
+from django.template import Library, Node, TextNode
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
 from django.utils.safestring import mark_safe
@@ -62,7 +62,14 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
-        parent_is_child = isinstance(compiled_parent.nodelist[0], ExtendsNode)
+        if len(compiled_parent.nodelist) > 1:
+            n0, n1 = compiled_parent.nodelist[:2]
+        else:
+            n0, n1 = compiled_parent.nodelist[0], None
+        parent_is_child = (isinstance(n0, ExtendsNode) or
+                (isinstance(n0, TextNode) and isinstance(n1, ExtendsNode)))
+        if parent_is_child:
+            extend_node = int(not isinstance(n0, ExtendsNode))
         parent_blocks = dict([(n.name, n) for n in compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
         for block_node in self.nodelist.get_nodes_by_type(BlockNode):
             # Check for a BlockNode with this node's name, and replace it if found.
@@ -74,7 +81,7 @@ class ExtendsNode(Node):
                 # add this BlockNode to the parent's ExtendsNode nodelist, so
                 # it'll be checked when the parent node's render() is called.
                 if parent_is_child:
-                    compiled_parent.nodelist[0].nodelist.append(block_node)
+                    compiled_parent.nodelist[extend_node].nodelist.append(block_node)
             else:
                 # Keep any existing parents and add a new one. Used by BlockNode.
                 parent_block.parent = block_node.parent
