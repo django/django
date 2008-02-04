@@ -575,6 +575,10 @@ Three things to note about 404 views:
       to the template: ``request_path``, which is the URL that resulted
       in the 404.
 
+    * The 404 view is passed a ``RequestContext`` and will have access to
+      variables supplied by your ``TEMPLATE_CONTEXT_PROCESSORS`` (e.g.
+      ``MEDIA_URL``).
+
     * If ``DEBUG`` is set to ``True`` (in your settings module), then your 404
       view will never be used, and the traceback will be displayed instead.
 
@@ -587,8 +591,9 @@ the view ``django.views.defaults.server_error``, which loads and renders the
 template ``500.html``.
 
 This means you need to define a ``500.html`` template in your root template
-directory. This template will be used for all server errors. The
-default 500 view passes no variables to this template.
+directory. This template will be used for all server errors. The default 500
+view passes no variables to this template and is rendered with an empty
+``Context`` to lessen the chance of additional errors.
 
 This ``server_error`` view should suffice for 99% of Web applications, but if
 you want to override the view, you can specify ``handler500`` in your
