@@ -4,11 +4,12 @@ Oracle database backend for Django.
 Requires cx_Oracle: http://www.python.net/crew/atuining/cx_Oracle/
 """
 
+import datetime
+import os
+
 from django.db.backends import BaseDatabaseWrapper, BaseDatabaseFeatures, BaseDatabaseOperations, util
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_str, force_unicode
-import datetime
-import os
 
 # Oracle takes client-side character set encoding from the environment.
 os.environ['NLS_LANG'] = '.UTF8'
@@ -88,6 +89,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Limits and offset are too complicated to be handled here.
         # Instead, they are handled in django/db/backends/oracle/query.py.
         return ""
+
+    def lookup_cast(self, lookup_type):
+        if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
+            return "UPPER(%s)"
+        return "%s"
 
     def max_name_length(self):
         return 30
@@ -339,6 +345,16 @@ class DatabaseOperations(BaseDatabaseOperations):
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
 
+    def regex_lookup_9(self, lookup_type):
+        raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
+
+    def regex_lookup_10(self, lookup_type):
+        if lookup_type == 'regex':
+            match_option = 'c'
+        else:
+            match_option = 'i'
+        return 'REGEXP_LIKE(%%s %%s %s)' % match_option
+
     def sql_flush(self, style, tables, sequences):
         # Return a list of 'TRUNCATE x;', 'TRUNCATE y;',
         # 'TRUNCATE z;'... style SQL statements
@@ -430,6 +446,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                            "NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF'")
             try:
                 self.oracle_version = int(self.connection.version.split('.')[0])
+                # There's no way for the DatabaseOperations class to know the
+                # currently active Oracle version, so we do some setups here.
+                # TODO: Multi-db support will need a better solution (a way to
+                # communicate the current version).
+                if self.oracle_version <= 9:
+                    self.ops.regex_lookup = self.ops.regex_lookup_9
+                else:
+                    self.ops.regex_lookup = self.ops.regex_lookup_10
             except ValueError:
                 pass
             try:

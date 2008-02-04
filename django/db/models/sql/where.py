@@ -99,19 +99,11 @@ class WhereNode(tree.Node):
         field_sql = connection.ops.field_cast_sql(db_type) % lhs
 
         if isinstance(value, datetime.datetime):
-            # FIXME datetime_cast_sql() should return '%s' by default.
-            cast_sql = connection.ops.datetime_cast_sql() or '%s'
+            cast_sql = connection.ops.datetime_cast_sql()
         else:
             cast_sql = '%s'
 
-        # FIXME: This is out of place. Move to a function like
-        # datetime_cast_sql()
-        if (lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith')
-                and connection.features.needs_upper_for_iops):
-            format = 'UPPER(%s) %s'
-        else:
-            format = '%s %s'
-
+        format = "%s %%s" % connection.ops.lookup_cast(lookup_type)
         params = field.get_db_prep_lookup(lookup_type, value)
 
         if lookup_type in connection.operators:
@@ -135,18 +127,7 @@ class WhereNode(tree.Node):
         elif lookup_type in 'search':
             return (connection.ops.fulltest_search_sql(field_sql), params)
         elif lookup_type in ('regex', 'iregex'):
-            # FIXME: Factor this out in to connection.ops
-            if settings.DATABASE_ENGINE == 'oracle':
-                if connection.oracle_version and connection.oracle_version <= 9:
-                    raise NotImplementedError("Regexes are not supported in Oracle before version 10g.")
-                if lookup_type == 'regex':
-                    match_option = 'c'
-                else:
-                    match_option = 'i'
-                return ("REGEXP_LIKE(%s, %s, '%s')" % (field_sql, cast_sql,
-                        match_option), params)
-            else:
-                raise NotImplementedError
+            return connection.ops.regex_lookup % (field_sql, cast_sql), params
 
         raise TypeError('Invalid lookup_type: %r' % lookup_type)
 
