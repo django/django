@@ -22,12 +22,12 @@ class GZipMiddleware(object):
         if response.has_header('Content-Encoding'):
             return response
 
-        # Older versions of IE have issues with gzipped javascript.
-        # See http://code.djangoproject.com/ticket/2449
-        is_ie = "msie" in request.META.get('HTTP_USER_AGENT', '').lower()
-        is_js = "javascript" in response.get('Content-Type', '').lower()
-        if is_ie and is_js:
-            return response
+        # Older versions of IE have issues with gzipped pages containing either
+        # Javascript and PDF.
+        if "msie" in request.META.get('HTTP_USER_AGENT', '').lower():
+            ctype = response.get('Content-Type', '').lower()
+            if "javascript" in ctype or ctype == "application/pdf":
+                return response
 
         ae = request.META.get('HTTP_ACCEPT_ENCODING', '')
         if not re_accepts_gzip.search(ae):
