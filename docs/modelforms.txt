@@ -17,7 +17,7 @@ class from a Django model.
 For example::
 
     >>> from django.newforms import ModelForm
-    
+
     # Create the form class.
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
@@ -113,7 +113,7 @@ In addition, each generated form field has attributes set as follows:
       ``default`` value will be initially selected instead).
 
 Finally, note that you can override the form field used for a given model
-field. See "Overriding the default field types" below.
+field. See `Overriding the default field types`_ below.
 
 A full example
 --------------
@@ -278,7 +278,7 @@ model fields:
     To avoid this failure, you must instantiate your model with initial values
     for the missing, but required fields, or use ``save(commit=False)`` and
     manually set any extra required fields::
-    
+
         instance = Instance(required_field='value')
         form = InstanceForm(request.POST, instance=instance)
         new_instance = form.save()
@@ -295,7 +295,7 @@ model fields:
 Overriding the default field types
 ----------------------------------
 
-The default field types, as described in the "Field types" table above, are
+The default field types, as described in the `Field types`_ table above, are
 sensible defaults. If you have a ``DateField`` in your model, chances are you'd
 want that to be represented as a ``DateField`` in your form. But
 ``ModelForm`` gives you the flexibility of changing the form field type
@@ -311,3 +311,12 @@ field, you could do the following::
     ...
     ...     class Meta:
     ...         model = Article
+
+If you want to override a field's default widget, then specify the ``widget``
+parameter when declaring the form field::
+
+   >>> class ArticleForm(ModelForm):
+   ...     pub_date = DateField(widget=MyDateWidget())
+   ...
+   ...     class Meta:
+   ...         model = Article

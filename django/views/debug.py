@@ -73,6 +73,12 @@ def technical_500_response(request, exc_type, exc_value, tb):
     template_info = None
     template_does_not_exist = False
     loader_debug_info = None
+
+    # Handle deprecated string exceptions
+    if isinstance(exc_type, basestring):
+        exc_value = Exception('Deprecated String Exception: %r' % exc_type)
+        exc_type = type(exc_value)
+
     if issubclass(exc_type, TemplateDoesNotExist):
         from django.template.loader import template_source_loaders
         template_does_not_exist = True
@@ -192,9 +198,11 @@ def _get_lines_from_file(filename, lineno, context_lines, loader=None, module_na
     Returns (pre_context_lineno, pre_context, context_line, post_context).
     """
     source = None
-    if loader is not None:
-        source = loader.get_source(module_name).splitlines()
-    else:
+    if loader is not None and hasattr(loader, "get_source"):
+        source = loader.get_source(module_name)
+        if source is not None:
+            source = source.splitlines()
+    if source is None:
         try:
             f = open(filename)
             try:
@@ -431,11 +439,11 @@ TECHNICAL_500_TEMPLATE = """
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">
               {% if frame.pre_context %}
-                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start="{{ frame.pre_context_lineno }}" class="pre-context" id="pre{{ frame.id }}">{% for line in frame.pre_context %}{% if line %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endif %}{% endfor %}</ol>
               {% endif %}
               <ol start="{{ frame.lineno }}" class="context-line"><li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ frame.context_line|escape }} <span>...</span></li></ol>
               {% if frame.post_context %}
-                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endfor %}</ol>
+                <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">{% for line in frame.post_context %}{% if line %}<li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')">{{ line|escape }}</li>{% endif %}{% endfor %}</ol>
               {% endif %}
             </div>
           {% endif %}

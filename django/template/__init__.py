@@ -289,6 +289,9 @@ class Parser(object):
         return NodeList()
 
     def extend_nodelist(self, nodelist, node, token):
+        if (node.must_be_first and nodelist and
+                (not isinstance(nodelist[0], TextNode) or len(nodelist) > 2)):
+            raise TemplateSyntaxError("%r must be the first tag in the template." % node)
         nodelist.append(node)
 
     def enter_command(self, command, token):
@@ -708,6 +711,10 @@ class Variable(object):
         return current
 
 class Node(object):
+    # Set this to True for nodes that must be first in the template (although
+    # they can be preceded by text nodes.
+    must_be_first = False
+
     def render(self, context):
         "Return the node rendered as a string"
         pass

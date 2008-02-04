@@ -426,7 +426,7 @@ class MultiWidget(Widget):
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-        return self.format_output(output)
+        return mark_safe(self.format_output(output))
 
     def id_for_label(self, id_):
         # See the comment for RadioSelect.id_for_label()

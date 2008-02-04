@@ -343,7 +343,7 @@ def force_escape(value):
     """
     from django.utils.html import escape
     return mark_safe(escape(value))
-escape = stringfilter(escape)
+force_escape = stringfilter(force_escape)
 force_escape.is_safe = True
 
 def linebreaks(value, autoescape=None):

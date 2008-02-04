@@ -228,7 +228,7 @@ class ModelFormMetaclass(type):
         opts = ModelFormOptions(attrs.get('Meta', None))
         attrs['_meta'] = opts
 
-        # Don't allow more than one Meta model defenition in bases. The fields
+        # Don't allow more than one Meta model definition in bases. The fields
         # would be generated correctly, but the save method won't deal with
         # more than one object.
         base_models = []
