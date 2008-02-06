@@ -218,7 +218,6 @@ class _QuerySet(object):
         qs.query.add_filter(('pk__in', id_list))
         return dict([(obj._get_pk_val(), obj) for obj in qs.iterator()])
 
-    # XXX Mostly DONE
     def delete(self):
         """
         Deletes the records in the current QuerySet.
@@ -234,22 +233,16 @@ class _QuerySet(object):
 
         # Delete objects in chunks to prevent the list of related objects from
         # becoming too long.
-        more_objects = True
-        while more_objects:
+        while 1:
             # Collect all the objects to be deleted in this chunk, and all the
             # objects that are related to the objects that are to be deleted.
             seen_objs = SortedDict()
-            more_objects = False
             for object in del_query[:CHUNK_SIZE]:
-                more_objects = True
                 object._collect_sub_objects(seen_objs)
 
-            # If one or more objects were found, delete them.
-            # Otherwise, stop looping.
-            # FIXME: Does "if seen_objs:.." work here? If so, we can get rid of
-            # more_objects.
-            if more_objects:
-                delete_objects(seen_objs)
+            if not seen_objs:
+                break
+            delete_objects(seen_objs)
 
         # Clear the result cache, in case this QuerySet gets reused.
         self._result_cache = None
