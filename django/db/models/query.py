@@ -78,7 +78,11 @@ class _QuerySet(object):
                 # The result cache has only been partially populated, so we may
                 # need to fill it out a bit more.
                 if isinstance(k, slice):
-                    bound = k.stop
+                    if k.stop is not None:
+                        # Some people insist on passing in strings here.
+                        bound = int(k.stop)
+                    else:
+                        bound = None
                 else:
                     bound = k + 1
                 if len(self._result_cache) < bound:
@@ -87,7 +91,15 @@ class _QuerySet(object):
 
         if isinstance(k, slice):
             qs = self._clone()
-            qs.query.set_limits(k.start, k.stop)
+            if k.start is not None:
+                start = int(k.start)
+            else:
+                start = None
+            if k.stop is not None:
+                stop = int(k.stop)
+            else:
+                stop = None
+            qs.query.set_limits(start, stop)
             return k.step and list(qs)[::k.step] or qs
         try:
             qs = self._clone()
