@@ -627,7 +627,7 @@ class ChangeList(object):
         # Perform a slight optimization: Check to see whether any filters were
         # given. If not, use paginator.hits to calculate the number of objects,
         # because we've already done paginator.hits and the value is cached.
-        if isinstance(self.query_set._filters, models.Q) and not self.query_set._filters.kwargs:
+        if not self.query_set.query.where:
             full_result_count = result_count
         else:
             full_result_count = self.manager.count()
