@@ -7,7 +7,7 @@
  get_pointer_arr(), and GEOM_PTR.
 """
 import atexit, os, re, sys
-from ctypes import c_char_p, string_at, Structure, CDLL, CFUNCTYPE, POINTER
+from ctypes import c_char_p, Structure, CDLL, CFUNCTYPE, POINTER
 from django.contrib.gis.geos.error import GEOSException
 
 # NumPy supported?
@@ -92,9 +92,11 @@ def get_pointer_arr(n):
     GeomArr = GEOM_PTR * n
     return GeomArr()
 
-def geos_version():
-    "Returns the string version of GEOS."
-    return string_at(lgeos.GEOSversion())
+# Returns the string version of the GEOS library. Have to set the restype 
+# explicitly to c_char_p to ensure compatibility accross 32 and 64-bit platforms.
+geos_version = lgeos.GEOSversion
+geos_version.argtypes = None   
+geos_version.restype = c_char_p
 
 # Regular expression should be able to parse version strings such as
 # '3.0.0rc4-CAPI-1.3.3', or '3.0.0-CAPI-1.4.1'
