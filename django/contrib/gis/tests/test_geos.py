@@ -5,7 +5,7 @@ from django.contrib.gis.geos.base import HAS_GDAL
 from django.contrib.gis.tests.geometries import *
     
 if HAS_NUMPY: from numpy import array
-if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference
+if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference, CoordTransform
 
 class GEOSTest(unittest.TestCase):
 
@@ -672,6 +672,25 @@ class GEOSTest(unittest.TestCase):
         cpy2 = copy.deepcopy(poly)
         self.assertNotEqual(poly._ptr, cpy1._ptr)
         self.assertNotEqual(poly._ptr, cpy2._ptr)
+
+    def test23_transform(self):
+        "Testing `transform` method."
+        if not HAS_GDAL: return
+        orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
+        trans = GEOSGeometry('POINT (992385.4472045 481455.4944650)', 2774)
+
+        # Using a srid, a SpatialReference object, and a CoordTransform object
+        # for transformations.
+        t1, t2, t3 = orig.clone(), orig.clone(), orig.clone()
+        t1.transform(trans.srid)
+        t2.transform(SpatialReference('EPSG:2774'))
+        ct = CoordTransform(SpatialReference('WGS84'), SpatialReference(2774))
+        t3.transform(ct)
+
+        for p in (t1, t2, t3):
+            prec = 3
+            self.assertAlmostEqual(trans.x, p.x, prec)
+            self.assertAlmostEqual(trans.y, p.y, prec)
 
 def suite():
     s = unittest.TestSuite()

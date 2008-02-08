@@ -406,12 +406,14 @@ class GEOSGeometry(object):
             wkb = str(g.wkb)
             ptr = from_wkb(wkb, len(wkb))
             if ptr:
-                # Reassigning pointer, and resetting the SRID.
+                # Reassigning pointer, and getting the new coordinate sequence pointer.
                 destroy_geom(self.ptr)
                 self._ptr = ptr
-                self.srid = g.srid
-        else:
-            pass
+                self._set_cs()
+
+                # Some coordinate transformations do not have an SRID associated
+                # with them; only set if one exists.
+                if g.srid: self.srid = g.srid
 
     #### Topology Routines ####
     def _topology(self, gptr):
