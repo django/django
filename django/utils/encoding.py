@@ -98,5 +98,5 @@ def iri_to_uri(iri):
     # section 3.1 of RFC 3987.
     if iri is None:
         return iri
-    return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?')
+    return urllib.quote(smart_str(iri), safe='/#%[]=:;$&()+,!?*')
 

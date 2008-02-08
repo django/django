@@ -6,7 +6,7 @@ from django.utils.encoding import smart_unicode, iri_to_uri
 from django.conf import settings
 
 def add_domain(domain, url):
-    if not url.startswith('http://'):
+    if not (url.startswith('http://') or url.startswith('https://')):
         # 'url' must already be ASCII and URL-quoted, so no need for encoding
         # conversions here.
         url = iri_to_uri(u'http://%s%s' % (domain, url))
@@ -82,7 +82,8 @@ class Feed(object):
             link = link,
             description = self.__get_dynamic_attr('description', obj),
             language = settings.LANGUAGE_CODE.decode(),
-            feed_url = add_domain(current_site, self.__get_dynamic_attr('feed_url', obj)),
+            feed_url = add_domain(current_site.domain,
+                                  self.__get_dynamic_attr('feed_url', obj)),
             author_name = self.__get_dynamic_attr('author_name', obj),
             author_link = self.__get_dynamic_attr('author_link', obj),
             author_email = self.__get_dynamic_attr('author_email', obj),

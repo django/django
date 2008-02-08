@@ -7,312 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-19 15:49+0330\n"
-"PO-Revision-Date: 2007-06-19 16:14+0330\n"
-"Last-Translator: Reza Mohammadi <reza@zeerak.ir>\n"
+"POT-Creation-Date: 2008-02-01 03:29+0330\n"
+"PO-Revision-Date: 2008-02-01 05:19+0330\n"
+"Last-Translator: starrynight <cmorgh@gmail.com>\n"
 "Language-Team: Persian <farsi@lists.sharif.edu>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
-
-#: views/generic/create_update.py:43
-#, python-format
-msgid "The %(verbose_name)s was created successfully."
-msgstr ""
-
-#: views/generic/create_update.py:117
-#, python-format
-msgid "The %(verbose_name)s was updated successfully."
-msgstr ""
-
-#: views/generic/create_update.py:184
-#, python-format
-msgid "The %(verbose_name)s was deleted."
-msgstr ""
-
-#: core/validators.py:65
-msgid "This value must contain only letters, numbers and underscores."
-msgstr ""
-
-#: core/validators.py:69
-msgid ""
-"This value must contain only letters, numbers, underscores, dashes or "
-"slashes."
-msgstr ""
-
-#: core/validators.py:73
-msgid "This value must contain only letters, numbers, underscores or hyphens."
-msgstr ""
-
-#: core/validators.py:77
-msgid "Uppercase letters are not allowed here."
-msgstr ""
-
-#: core/validators.py:81
-msgid "Lowercase letters are not allowed here."
-msgstr ""
-
-#: core/validators.py:88
-msgid "Enter only digits separated by commas."
-msgstr ""
-
-#: core/validators.py:100
-msgid "Enter valid e-mail addresses separated by commas."
-msgstr ""
-
-#: core/validators.py:104
-msgid "Please enter a valid IP address."
-msgstr ""
-
-#: core/validators.py:108
-msgid "Empty values are not allowed here."
-msgstr ""
-
-#: core/validators.py:112
-msgid "Non-numeric characters aren't allowed here."
-msgstr ""
-
-#: core/validators.py:116
-msgid "This value can't be comprised solely of digits."
-msgstr ""
-
-#: core/validators.py:121 newforms/fields.py:135
-msgid "Enter a whole number."
-msgstr ""
-
-#: core/validators.py:125
-msgid "Only alphabetical characters are allowed here."
-msgstr ""
-
-#: core/validators.py:140
-msgid "Year must be 1900 or later."
-msgstr ""
-
-#: core/validators.py:144
-#, python-format
-msgid "Invalid date: %s"
-msgstr ""
-
-#: core/validators.py:149 db/models/fields/__init__.py:463
-msgid "Enter a valid date in YYYY-MM-DD format."
-msgstr ""
-
-#: core/validators.py:154
-msgid "Enter a valid time in HH:MM format."
-msgstr ""
-
-#: core/validators.py:158 db/models/fields/__init__.py:532
-msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
-msgstr ""
-
-#: core/validators.py:163 newforms/fields.py:339
-msgid "Enter a valid e-mail address."
-msgstr ""
-
-#: core/validators.py:175 core/validators.py:453 oldforms/__init__.py:676
-msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
-
-#: core/validators.py:179
-msgid ""
-"Upload a valid image. The file you uploaded was either not an image or a "
-"corrupted image."
-msgstr ""
-
-#: core/validators.py:186
-#, python-format
-msgid "The URL %s does not point to a valid image."
-msgstr ""
-
-#: core/validators.py:190
-#, python-format
-msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
-msgstr ""
-
-#: core/validators.py:198
-#, python-format
-msgid "The URL %s does not point to a valid QuickTime video."
-msgstr ""
-
-#: core/validators.py:202
-msgid "A valid URL is required."
-msgstr ""
-
-#: core/validators.py:216
-#, python-format
-msgid ""
-"Valid HTML is required. Specific errors are:\n"
-"%s"
-msgstr ""
-
-#: core/validators.py:223
-#, python-format
-msgid "Badly formed XML: %s"
-msgstr ""
-
-#: core/validators.py:240
-#, python-format
-msgid "Invalid URL: %s"
-msgstr ""
-
-#: core/validators.py:245 core/validators.py:247
-#, python-format
-msgid "The URL %s is a broken link."
-msgstr ""
-
-#: core/validators.py:253
-msgid "Enter a valid U.S. state abbreviation."
-msgstr ""
-
-#: core/validators.py:267
-#, python-format
-msgid "Watch your mouth! The word %s is not allowed here."
-msgstr ""
-
-#: core/validators.py:274
-#, python-format
-msgid "This field must match the '%s' field."
-msgstr ""
-
-#: core/validators.py:293
-msgid "Please enter something for at least one field."
-msgstr ""
-
-#: core/validators.py:302 core/validators.py:313
-msgid "Please enter both fields or leave them both empty."
-msgstr ""
-
-#: core/validators.py:321
-#, python-format
-msgid "This field must be given if %(field)s is %(value)s"
-msgstr ""
-
-#: core/validators.py:334
-#, python-format
-msgid "This field must be given if %(field)s is not %(value)s"
-msgstr ""
-
-#: core/validators.py:353
-msgid "Duplicate values are not allowed."
-msgstr ""
-
-#: core/validators.py:368
-#, python-format
-msgid "This value must be between %(lower)s and %(upper)s."
-msgstr ""
-
-#: core/validators.py:370
-#, python-format
-msgid "This value must be at least %s."
-msgstr ""
-
-#: core/validators.py:372
-#, python-format
-msgid "This value must be no more than %s."
-msgstr ""
-
-#: core/validators.py:408
-#, python-format
-msgid "This value must be a power of %s."
-msgstr ""
-
-#: core/validators.py:417
-msgid "Please enter a valid decimal number."
-msgstr ""
-
-#: core/validators.py:423
-#, python-format
-msgid "Please enter a valid decimal number with at most %s total digit."
-"Please enter a valid decimal number with at most %s total digits."
-msgstr ""
-
-#: core/validators.py:426
-#, python-format
-msgid ""
-"Please enter a valid decimal number with a whole part of at most %s digit."
-"Please enter a valid decimal number with a whole part of at most %s digits."
-msgstr ""
-
-#: core/validators.py:429
-#, python-format
-msgid "Please enter a valid decimal number with at most %s decimal place."
-"Please enter a valid decimal number with at most %s decimal places."
-msgstr ""
-
-#: core/validators.py:437
-msgid "Please enter a valid floating point number."
-msgstr ""
-
-#: core/validators.py:446
-#, python-format
-msgid "Make sure your uploaded file is at least %s bytes big."
-msgstr ""
-
-#: core/validators.py:447
-#, python-format
-msgid "Make sure your uploaded file is at most %s bytes big."
-msgstr ""
-
-#: core/validators.py:464
-msgid "The format for this field is wrong."
-msgstr ""
-
-#: core/validators.py:479
-msgid "This field is invalid."
-msgstr ""
-
-#: core/validators.py:515
-#, python-format
-msgid "Could not retrieve anything from %s."
-msgstr ""
-
-#: core/validators.py:518
-#, python-format
-msgid ""
-"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
-msgstr ""
-
-#: core/validators.py:551
-#, python-format
-msgid ""
-"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
-"\"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:555
-#, python-format
-msgid ""
-"Some text starting on line %(line)s is not allowed in that context. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:560
-#, python-format
-msgid ""
-"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-
-#: core/validators.py:565
-#, python-format
-msgid ""
-"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
-"(start)s\".)"
-msgstr ""
-
-#: core/validators.py:569
-#, python-format
-msgid ""
-"A tag on line %(line)s is missing one or more required attributes. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
-
-#: core/validators.py:574
-#, python-format
-msgid ""
-"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
-"starts with \"%(start)s\".)"
-msgstr ""
 
 #: conf/global_settings.py:39
 msgid "Arabic"
@@ -352,7 +53,7 @@ msgstr ""
 
 #: conf/global_settings.py:48
 msgid "English"
-msgstr ""
+msgstr "انگلیسی"
 
 #: conf/global_settings.py:49
 msgid "Spanish"
@@ -363,268 +64,1419 @@ msgid "Argentinean Spanish"
 msgstr ""
 
 #: conf/global_settings.py:51
+#, fuzzy
+msgid "Persian"
+msgstr "اجازه‌ها"
+
+#: conf/global_settings.py:52
 msgid "Finnish"
 msgstr ""
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "French"
 msgstr ""
 
-#: conf/global_settings.py:53
-msgid "Galician"
-msgstr ""
-
 #: conf/global_settings.py:54
-msgid "Hungarian"
+msgid "Gaeilge"
 msgstr ""
 
 #: conf/global_settings.py:55
-msgid "Hebrew"
+msgid "Galician"
 msgstr ""
 
 #: conf/global_settings.py:56
-msgid "Icelandic"
+msgid "Hungarian"
 msgstr ""
 
 #: conf/global_settings.py:57
-msgid "Italian"
+msgid "Hebrew"
 msgstr ""
 
 #: conf/global_settings.py:58
-msgid "Japanese"
+msgid "Croatian"
 msgstr ""
 
 #: conf/global_settings.py:59
-msgid "Korean"
+msgid "Icelandic"
 msgstr ""
 
 #: conf/global_settings.py:60
-msgid "Kannada"
-msgstr ""
+msgid "Italian"
+msgstr "ایتالیایی"
 
 #: conf/global_settings.py:61
-msgid "Latvian"
-msgstr ""
+msgid "Japanese"
+msgstr "ژاپنی"
 
 #: conf/global_settings.py:62
-msgid "Macedonian"
-msgstr ""
+msgid "Korean"
+msgstr "کره ای"
 
 #: conf/global_settings.py:63
-msgid "Dutch"
+msgid "Khmer"
 msgstr ""
 
 #: conf/global_settings.py:64
-msgid "Norwegian"
+msgid "Kannada"
 msgstr ""
 
 #: conf/global_settings.py:65
-msgid "Polish"
+msgid "Latvian"
 msgstr ""
 
 #: conf/global_settings.py:66
-msgid "Portugese"
+msgid "Macedonian"
 msgstr ""
 
 #: conf/global_settings.py:67
-msgid "Brazilian"
+msgid "Dutch"
 msgstr ""
 
 #: conf/global_settings.py:68
-msgid "Romanian"
-msgstr ""
+msgid "Norwegian"
+msgstr "نروژی"
 
 #: conf/global_settings.py:69
-msgid "Russian"
+msgid "Polish"
 msgstr ""
 
 #: conf/global_settings.py:70
-msgid "Slovak"
-msgstr ""
+msgid "Portugese"
+msgstr "پرتغالی"
 
 #: conf/global_settings.py:71
+msgid "Brazilian"
+msgstr "برزیلی"
+
+#: conf/global_settings.py:72
+msgid "Romanian"
+msgstr "رومانی"
+
+#: conf/global_settings.py:73
+msgid "Russian"
+msgstr "روسی"
+
+#: conf/global_settings.py:74
+msgid "Slovak"
+msgstr "اسلواکی"
+
+#: conf/global_settings.py:75
 msgid "Slovenian"
 msgstr ""
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:76
 msgid "Serbian"
-msgstr ""
+msgstr "سرب"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:77
 msgid "Swedish"
-msgstr ""
+msgstr "سوءدی"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:78
 msgid "Tamil"
-msgstr ""
+msgstr "تامیل"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:79
 msgid "Telugu"
 msgstr ""
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:80
 msgid "Turkish"
-msgstr ""
+msgstr "ترکی"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:81
 msgid "Ukrainian"
 msgstr ""
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:82
 msgid "Simplified Chinese"
 msgstr ""
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:83
 msgid "Traditional Chinese"
 msgstr ""
 
-#: newforms/fields.py:87 newforms/fields.py:444 newforms/fields.py:520
-#: newforms/fields.py:531 newforms/models.py:185 oldforms/__init__.py:361
-#: db/models/fields/__init__.py:121 db/models/fields/__init__.py:278
-#: db/models/fields/__init__.py:675 db/models/fields/__init__.py:686
-msgid "This field is required."
-msgstr ""
-
-#: newforms/fields.py:110 newforms/fields.py:324
+#: contrib/admin/filterspecs.py:44
 #, python-format
-msgid "Ensure this value has at most %d characters."
+msgid ""
+"<h3>By %s:</h3>\n"
+"<ul>\n"
 msgstr ""
+"<h3>بوسیلهٔ %s:</h3>\n"
+"<ul>\n"
 
-#: newforms/fields.py:112 newforms/fields.py:326
-#, python-format
-msgid "Ensure this value has at least %d characters."
-msgstr ""
+#: contrib/admin/filterspecs.py:74 contrib/admin/filterspecs.py:92
+#: contrib/admin/filterspecs.py:147 contrib/admin/filterspecs.py:173
+msgid "All"
+msgstr "همه"
 
-#: newforms/fields.py:137 newforms/fields.py:160 newforms/fields.py:192
-#, python-format
-msgid "Ensure this value is less than or equal to %s."
-msgstr ""
+#: contrib/admin/filterspecs.py:113
+msgid "Any date"
+msgstr "هر تاریخی"
 
-#: newforms/fields.py:139 newforms/fields.py:162 newforms/fields.py:194
-#, python-format
-msgid "Ensure this value is greater than or equal to %s."
-msgstr ""
+#: contrib/admin/filterspecs.py:114
+msgid "Today"
+msgstr "امروز"
 
-#: newforms/fields.py:158 newforms/fields.py:186
-msgid "Enter a number."
-msgstr ""
+#: contrib/admin/filterspecs.py:117
+msgid "Past 7 days"
+msgstr "۷ روز اخیر"
 
-#: newforms/fields.py:196
-#, python-format
-msgid "Ensure that there are no more than %s digits in total."
-msgstr ""
+#: contrib/admin/filterspecs.py:119
+msgid "This month"
+msgstr "این ماه"
 
-#: newforms/fields.py:198
-#, python-format
-msgid "Ensure that there are no more than %s decimal places."
-msgstr ""
+#: contrib/admin/filterspecs.py:121
+msgid "This year"
+msgstr "امسال"
 
-#: newforms/fields.py:200
-#, python-format
-msgid "Ensure that there are no more than %s digits before the decimal point."
-msgstr ""
-
-#: newforms/fields.py:233
-msgid "Enter a valid date."
-msgstr ""
-
-#: newforms/fields.py:260
-msgid "Enter a valid time."
-msgstr ""
-
-#: newforms/fields.py:296
-msgid "Enter a valid date/time."
-msgstr ""
-
-#: newforms/fields.py:310
-msgid "Enter a valid value."
-msgstr ""
-
-#: newforms/fields.py:357 newforms/fields.py:379
-msgid "Enter a valid URL."
-msgstr ""
-
-#: newforms/fields.py:381
-msgid "This URL appears to be a broken link."
-msgstr ""
-
-#: newforms/fields.py:432 newforms/models.py:172
-msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr ""
-
-#: newforms/fields.py:448 newforms/fields.py:524 newforms/models.py:189
-msgid "Enter a list of values."
-msgstr ""
-
-#: newforms/fields.py:457 newforms/models.py:195
-#, python-format
-msgid "Select a valid choice. %s is not one of the available choices."
-msgstr ""
-
-#: newforms/widgets.py:182 oldforms/__init__.py:581
-#: contrib/admin/filterspecs.py:150
-msgid "Unknown"
-msgstr "ناشناخته"
-
-#: newforms/widgets.py:182 oldforms/__init__.py:581
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
+#: oldforms/__init__.py:592
 msgid "Yes"
 msgstr "بله"
 
-#: newforms/widgets.py:182 oldforms/__init__.py:581
-#: contrib/admin/filterspecs.py:143
+#: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
+#: oldforms/__init__.py:592
 msgid "No"
 msgstr "خیر"
 
-#: oldforms/__init__.py:396
+#: contrib/admin/filterspecs.py:154 newforms/widgets.py:231
+#: oldforms/__init__.py:592
+msgid "Unknown"
+msgstr "ناشناخته"
+
+#: contrib/admin/models.py:18
+msgid "action time"
+msgstr "زمان اتفاق"
+
+#: contrib/admin/models.py:21
+msgid "object id"
+msgstr "شناسهٔ شئ"
+
+#: contrib/admin/models.py:22
+msgid "object repr"
+msgstr "صورت شیء"
+
+#: contrib/admin/models.py:23
+msgid "action flag"
+msgstr "نشانه عمل"
+
+#: contrib/admin/models.py:24
+msgid "change message"
+msgstr "پیغام تغییر"
+
+#: contrib/admin/models.py:27
+msgid "log entry"
+msgstr "مورد اتفاقات"
+
+#: contrib/admin/models.py:28
+msgid "log entries"
+msgstr "موارد اتفاقات"
+
+#: contrib/admin/templates/admin/404.html:4
+#: contrib/admin/templates/admin/404.html:8
+msgid "Page not found"
+msgstr "صفحه یافت نشد"
+
+#: contrib/admin/templates/admin/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "ما متاسفیم، اما صفحه مورد تقاضا یافت نشد."
+
+#: contrib/admin/templates/admin/500.html:4
+#: contrib/admin/templates/admin/base.html:37
+#: contrib/admin/templates/admin/change_form.html:12
+#: contrib/admin/templates/admin/change_list.html:5
+#: contrib/admin/templates/admin/delete_confirmation.html:5
+#: contrib/admin/templates/admin/invalid_setup.html:4
+#: contrib/admin/templates/admin/object_history.html:4
+#: contrib/admin/templates/admin/auth/user/change_password.html:11
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+#: contrib/admin/templates/registration/logged_out.html:4
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+msgid "Home"
+msgstr "آغازه"
+
+#: contrib/admin/templates/admin/500.html:4
+msgid "Server error"
+msgstr "خطای کارگزار"
+
+#: contrib/admin/templates/admin/500.html:6
+msgid "Server error (500)"
+msgstr "خطای کارگزار (۵۰۰)"
+
+#: contrib/admin/templates/admin/500.html:9
+msgid "Server Error <em>(500)</em>"
+msgstr "خطای کارگزار <em>(۵۰۰)</em>"
+
+#: contrib/admin/templates/admin/500.html:10
+msgid ""
+"There's been an error. It's been reported to the site administrators via e-"
+"mail and should be fixed shortly. Thanks for your patience."
+msgstr "مشکلی وجود دارد. این مشکل توسط ایمیل به مدیر سایت گزارش داده شد و در اولین فرصت اصلاح خواهد شد. از بردباری شما متشکریم."
+
+#: contrib/admin/templates/admin/base.html:26
+msgid "Welcome,"
+msgstr "خوش آمدید،"
+
+#: contrib/admin/templates/admin/base.html:28
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Documentation"
+msgstr "مستندات"
+
+#: contrib/admin/templates/admin/base.html:29
+#: contrib/admin/templates/admin/auth/user/change_password.html:14
+#: contrib/admin/templates/admin/auth/user/change_password.html:45
+msgid "Change password"
+msgstr "تغییر گذرواژه"
+
+#: contrib/admin/templates/admin/base.html:30
+#: contrib/comments/templates/comments/form.html:6
+msgid "Log out"
+msgstr "خروج"
+
+#: contrib/admin/templates/admin/base_site.html:4
+msgid "Django site admin"
+msgstr "وب‌گاه مدیریت Django"
+
+#: contrib/admin/templates/admin/base_site.html:7
+msgid "Django administration"
+msgstr "مدیریت Django"
+
+#: contrib/admin/templates/admin/change_form.html:14
+#: contrib/admin/templates/admin/index.html:28
+msgid "Add"
+msgstr "ایجاد"
+
+#: contrib/admin/templates/admin/change_form.html:20
+#: contrib/admin/templates/admin/object_history.html:4
+msgid "History"
+msgstr "تاریخچه"
+
+#: contrib/admin/templates/admin/change_form.html:21
+msgid "View on site"
+msgstr "مشاهده در سایت"
+
+#: contrib/admin/templates/admin/change_form.html:31
+#: contrib/admin/templates/admin/auth/user/change_password.html:23
+msgid "Please correct the error below."
+msgstr "لطفا مشکل زیر را حل نمایید."
+
+#: contrib/admin/templates/admin/change_form.html:49
+msgid "Ordering"
+msgstr "ترتیب"
+
+#: contrib/admin/templates/admin/change_form.html:52
+msgid "Order:"
+msgstr "ترتیب:"
+
+#: contrib/admin/templates/admin/change_list.html:11
 #, python-format
-msgid "Ensure your text is less than %s character."
-msgstr ""
+msgid "Add %(name)s"
+msgstr "اضافه‌کردن %(name)s"
 
-#: oldforms/__init__.py:401
-msgid "Line breaks are not allowed here."
-msgstr ""
+#: contrib/admin/templates/admin/delete_confirmation.html:8
+#: contrib/admin/templates/admin/submit_line.html:3
+msgid "Delete"
+msgstr "حذف"
 
-#: oldforms/__init__.py:502 oldforms/__init__.py:575 oldforms/__init__.py:614
+#: contrib/admin/templates/admin/delete_confirmation.html:13
 #, python-format
-msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr "حذف %(object_name)s·'%(escaped_object)s' می تواند باعث حذف اشیاء مرتبط شود. اما اکانت شما دسترسی لازم برای حذف اشیاءی با انواع زیر را ندارد:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:20
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr "آیا مطمءنید که می خواهید %(object_name)s·\"%(escaped_object)s\" را حذف نمایید؟ کلیه اشیاء مرتبط زیر حذف خواهند شد:"
+
+#: contrib/admin/templates/admin/delete_confirmation.html:25
+msgid "Yes, I'm sure"
+msgstr "بله، مطمئن هستم."
+
+#: contrib/admin/templates/admin/filter.html:2
+#, python-format
+msgid " By %(filter_title)s "
+msgstr " با %(filter_title)s "
+
+#: contrib/admin/templates/admin/filters.html:4
+msgid "Filter"
+msgstr "فیلتر"
+
+#: contrib/admin/templates/admin/index.html:17
+#, python-format
+msgid "Models available in the %(name)s application."
+msgstr "مدلهای موجود در برنامه %(name)s."
+
+#: contrib/admin/templates/admin/index.html:18
+#, python-format
+msgid "%(name)s"
+msgstr "%(name)s"
+
+#: contrib/admin/templates/admin/index.html:34
+msgid "Change"
+msgstr "تغییر"
+
+#: contrib/admin/templates/admin/index.html:44
+msgid "You don't have permission to edit anything."
+msgstr "شما اجازهٔ ویرایش چیزی را ندارید."
+
+#: contrib/admin/templates/admin/index.html:52
+msgid "Recent Actions"
+msgstr "اعمال اخیر"
+
+#: contrib/admin/templates/admin/index.html:53
+msgid "My Actions"
+msgstr "اعمال من"
+
+#: contrib/admin/templates/admin/index.html:57
+msgid "None available"
+msgstr "چیزی در دسترس نیست"
+
+#: contrib/admin/templates/admin/invalid_setup.html:8
+msgid ""
+"Something's wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr "در نصب بانک اطلاعاتی شما مشکلی وجود دارد. مطمءن شوید که جداول صحیح ایجاد شده اند و اطمینان حاصل کنید که بانک اطلاعاتی توسط کاربر صحیح قابل خواندن می باشد."
+
+#: contrib/admin/templates/admin/login.html:17
+#: contrib/comments/templates/comments/form.html:6
+#: contrib/comments/templates/comments/form.html:8
+msgid "Username:"
+msgstr "نام کاربری:"
+
+#: contrib/admin/templates/admin/login.html:20
+#: contrib/comments/templates/comments/form.html:8
+msgid "Password:"
+msgstr "گذرواژه:"
+
+#: contrib/admin/templates/admin/login.html:25
+#: contrib/admin/views/decorators.py:25
+msgid "Log in"
+msgstr "ورود"
+
+#: contrib/admin/templates/admin/object_history.html:17
+msgid "Date/time"
+msgstr "تاریخ/ساعت"
+
+#: contrib/admin/templates/admin/object_history.html:18
+msgid "User"
+msgstr "کاربر"
+
+#: contrib/admin/templates/admin/object_history.html:19
+msgid "Action"
+msgstr "عمل"
+
+#: contrib/admin/templates/admin/object_history.html:25
+msgid "DATE_WITH_TIME_FULL"
+msgstr "DATE_WITH_TIME_FULL"
+
+#: contrib/admin/templates/admin/object_history.html:35
+msgid ""
+"This object doesn't have a change history. It probably wasn't added via this "
+"admin site."
+msgstr "این شیء تاریخچه تغییرات ندارد. احتمالا این شیء توسط سایت مدیریت ایجاد نشده است."
+
+#: contrib/admin/templates/admin/pagination.html:10
+msgid "Show all"
+msgstr "نمایش همه"
+
+#: contrib/admin/templates/admin/search_form.html:8
+msgid "Go"
+msgstr "برو"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "1 result"
+msgstr "۱ نتیجه"
+
+#: contrib/admin/templates/admin/search_form.html:10
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "کل %(full_result_count)s"
+
+#: contrib/admin/templates/admin/submit_line.html:4
+msgid "Save as new"
+msgstr "ذخیره به عنوان جدید"
+
+#: contrib/admin/templates/admin/submit_line.html:5
+msgid "Save and add another"
+msgstr "ذخیره و ایجاد یکی دیگر"
+
+#: contrib/admin/templates/admin/submit_line.html:6
+msgid "Save and continue editing"
+msgstr "ذخیره و ادامه ویرایش"
+
+#: contrib/admin/templates/admin/submit_line.html:7
+msgid "Save"
+msgstr "ذخیره"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:6
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "ابتدا یک نام کاربری و گذرواژه وارد کنید. سپس می توانید مشخصات دیگر را تغییر دهید."
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:12
+msgid "Username"
+msgstr "نام کاربری"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:18
+#: contrib/admin/templates/admin/auth/user/change_password.html:33
+msgid "Password"
+msgstr "گذرواژه"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:23
+#: contrib/admin/templates/admin/auth/user/change_password.html:38
+msgid "Password (again)"
+msgstr "گذرواژه (تکرار)"
+
+#: contrib/admin/templates/admin/auth/user/add_form.html:24
+#: contrib/admin/templates/admin/auth/user/change_password.html:39
+msgid "Enter the same password as above, for verification."
+msgstr "همان گذرواژهٔ بالایی را برای اطمینان دوباره وارد کنید."
+
+#: contrib/admin/templates/admin/auth/user/change_password.html:27
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "برای کابر <strong>%(username)s</strong> یک گذرنامهٔ جدید وارد کنید."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:3
+msgid "Bookmarklets"
+msgstr "یادداشت"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:4
+msgid "Documentation bookmarklets"
+msgstr "یادداشت راهنما"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:8
+msgid ""
+"\n"
+"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
+"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
+"select the bookmarklet from any page in the site.  Note that some of these\n"
+"bookmarklets require you to be viewing the site from a computer designated\n"
+"as \"internal\" (talk to your system administrator if you aren't sure if\n"
+"your computer is \"internal\").</p>\n"
 msgstr ""
 
-#: oldforms/__init__.py:678
-msgid "The submitted file is empty."
+#: contrib/admin/templates/admin_doc/bookmarklets.html:18
+msgid "Documentation for this page"
+msgstr "راهنما برای این صفحه"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:19
+msgid ""
+"Jumps you from any page to the documentation for the view that generates "
+"that page."
+msgstr "شما را از هر صفحه ای که باشید به نمایی که صفحه را ایجاد کرده می برد"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:21
+msgid "Show object ID"
+msgstr "نمایش مشخصه شیء"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:22
+msgid ""
+"Shows the content-type and unique ID for pages that represent a single "
+"object."
+msgstr "نمایش محتوا و مشخصه منحصر به فرد برای صفحاتی که یک شیء را بیان می کنند."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:24
+msgid "Edit this object (current window)"
+msgstr "این شیء را ویرایش کنید (پنجره کنونی)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:25
+msgid "Jumps to the admin page for pages that represent a single object."
+msgstr "رفتن به صفحه مدیر برای صفحاتی که یک شیء را بیان می کنند."
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:27
+msgid "Edit this object (new window)"
+msgstr "این شیء را ویرایش کنید (پنجره جدید)"
+
+#: contrib/admin/templates/admin_doc/bookmarklets.html:28
+msgid "As above, but opens the admin page in a new window."
+msgstr "مانند بالا، اما صفحه مدیر را در پنجره جدیدی باز می کند."
+
+#: contrib/admin/templates/registration/logged_out.html:8
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
+
+#: contrib/admin/templates/registration/logged_out.html:10
+msgid "Log in again"
+msgstr "ورود دوباره"
+
+#: contrib/admin/templates/registration/password_change_done.html:3
+#: contrib/admin/templates/registration/password_change_form.html:3
+#: contrib/admin/templates/registration/password_change_form.html:5
+#: contrib/admin/templates/registration/password_change_form.html:9
+msgid "Password change"
+msgstr "تغییر گذرواژه"
+
+#: contrib/admin/templates/registration/password_change_done.html:5
+#: contrib/admin/templates/registration/password_change_done.html:9
+msgid "Password change successful"
+msgstr "گذرواژه تغییر یافت."
+
+#: contrib/admin/templates/registration/password_change_done.html:11
+msgid "Your password was changed."
+msgstr "گذرواژهٔ شما تغییر یافت."
+
+#: contrib/admin/templates/registration/password_change_form.html:11
+msgid ""
+"Please enter your old password, for security's sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"گذرواژهٔ قدیمی خود را، برای امنیت بیشتر، وارد کنید و سپس گذرواژهٔ جدیدتان را "
+"دوبار وارد کنید تا ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید."
+
+#: contrib/admin/templates/registration/password_change_form.html:16
+msgid "Old password:"
+msgstr "گذرواژهٔ قدیمی"
+
+#: contrib/admin/templates/registration/password_change_form.html:18
+msgid "New password:"
+msgstr "گذرواژهٔ جدید"
+
+#: contrib/admin/templates/registration/password_change_form.html:20
+msgid "Confirm password:"
+msgstr "تکرار گذرواژه"
+
+#: contrib/admin/templates/registration/password_change_form.html:22
+msgid "Change my password"
+msgstr "تغییر گذرواژهٔ من"
+
+#: contrib/admin/templates/registration/password_reset_done.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:4
+#: contrib/admin/templates/registration/password_reset_form.html:6
+#: contrib/admin/templates/registration/password_reset_form.html:10
+msgid "Password reset"
+msgstr "ایجاد گذرواژهٔ جدید"
+
+#: contrib/admin/templates/registration/password_reset_done.html:6
+#: contrib/admin/templates/registration/password_reset_done.html:10
+msgid "Password reset successful"
+msgstr "گذرواژهٔ جدید ایجاد شد."
+
+#: contrib/admin/templates/registration/password_reset_done.html:12
+msgid ""
+"We've e-mailed a new password to the e-mail address you submitted. You "
+"should be receiving it shortly."
+msgstr ""
+"ما به آدرس پست اکترونیکی‌ای که وارد کردید یک گذرواژهٔ جدید فرستادیم. به زودی "
+"به شما می‌رسد."
+
+#: contrib/admin/templates/registration/password_reset_email.html:2
+msgid "You're receiving this e-mail because you requested a password reset"
+msgstr ""
+"درخواستی برای ایجاد گذرواژهٔ جدید با آدرس شما به ما رسیده است و ما این نامه "
+"را برای شما فرستادیم"
+
+#: contrib/admin/templates/registration/password_reset_email.html:3
+#, python-format
+msgid "for your user account at %(site_name)s"
+msgstr "برای حساب کاربریتان در %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:5
+#, python-format
+msgid "Your new password is: %(new_password)s"
+msgstr "گذرواژهٔ جدیدتان: %(new_password)s"
+
+#: contrib/admin/templates/registration/password_reset_email.html:7
+msgid "Feel free to change this password by going to this page:"
+msgstr "با رفتن به صفحهٔ زیر می‌توانید گذرواژه‌تان را عوض کنید:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:11
+msgid "Your username, in case you've forgotten:"
+msgstr "نام کاربریتان، اگر یادتان رفته است:"
+
+#: contrib/admin/templates/registration/password_reset_email.html:13
+msgid "Thanks for using our site!"
+msgstr "متشکر از استفادهٔ شما از وبگاه ما"
+
+#: contrib/admin/templates/registration/password_reset_email.html:15
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "گروه %(site_name)s"
+
+#: contrib/admin/templates/registration/password_reset_form.html:12
+msgid ""
+"Forgotten your password? Enter your e-mail address below, and we'll reset "
+"your password and e-mail the new one to you."
+msgstr "گذرواژه خود را فراموش کرده اید؟ ایمیل خود را وارد کنید. ما گذرواژه را تغییر داده، آنرا برای شما ایمیل می کنیم."
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "E-mail address:"
+msgstr "آدرس پست الکترونیکی:"
+
+#: contrib/admin/templates/registration/password_reset_form.html:16
+msgid "Reset my password"
+msgstr "ایجاد گذرواژهٔ جدید"
+
+#: contrib/admin/templates/widget/date_time.html:3
+msgid "Date:"
+msgstr "تاریخ:"
+
+#: contrib/admin/templates/widget/date_time.html:4
+msgid "Time:"
+msgstr "زمان:"
+
+#: contrib/admin/templates/widget/file.html:2
+msgid "Currently:"
+msgstr "اکنون:"
+
+#: contrib/admin/templates/widget/file.html:3
+msgid "Change:"
+msgstr "تغییر:"
+
+#: contrib/admin/templatetags/admin_list.py:257
+msgid "All dates"
+msgstr "همه تاریخ ها"
+
+#: contrib/admin/views/auth.py:20 contrib/admin/views/main.py:267
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was added successfully."
+msgstr "%(obj)s از %(name)s با موفقیت ایجاد شد."
+
+#: contrib/admin/views/auth.py:25 contrib/admin/views/main.py:271
+#: contrib/admin/views/main.py:356
+msgid "You may edit it again below."
+msgstr "در زیر، می توانید مجددا آنرا ویراش کنید."
+
+#: contrib/admin/views/auth.py:31
+msgid "Add user"
+msgstr "ایجاد کاربر"
+
+#: contrib/admin/views/auth.py:58
+msgid "Password changed successfully."
+msgstr "گذرواژه با موفقیت تغییر یافت."
+
+#: contrib/admin/views/auth.py:65
+#, python-format
+msgid "Change password: %s"
+msgstr "تغییر گذرواژه: %s"
+
+#: contrib/admin/views/decorators.py:11 contrib/auth/forms.py:60
+msgid ""
+"Please enter a correct username and password. Note that both fields are case-"
+"sensitive."
+msgstr "لطفا نام کاربری و گذرواژه صحیح را وارد نمایید. توجه نمایید که هر دو مقدار به حروف کوچک و بزرگ (انگلیسی) حساس می باشند."
+
+#: contrib/admin/views/decorators.py:63
+msgid ""
+"Please log in again, because your session has expired. Don't worry: Your "
+"submission has been saved."
+msgstr "لطفا مجددا وارد شوید. زیرا مدت زیادی در سایت غیر فعال بوده اید. نگران نباشید، کلیه اطلاعات وارد شده شما ذخیره شده اند."
+
+#: contrib/admin/views/decorators.py:70
+msgid ""
+"Looks like your browser isn't configured to accept cookies. Please enable "
+"cookies, reload this page, and try again."
+msgstr "به نظر می رسد تنظیمات browser شما طوری است که cookie ها را قبول نمی کند. لطفا cookie را در browser خود فعال نموده و مجددا تلاش نمایید."
+
+#: contrib/admin/views/decorators.py:84
+msgid "Usernames cannot contain the '@' character."
+msgstr "نام کاربری نمی تواند حاوی حرف '@' باشد."
+
+#: contrib/admin/views/decorators.py:86
+#, python-format
+msgid "Your e-mail address is not your username. Try '%s' instead."
+msgstr "آدرس ایمیل شما نام کابریتان نیست. %s را به جای آن امتحان کنید."
+
+#: contrib/admin/views/doc.py:48 contrib/admin/views/doc.py:50
+#: contrib/admin/views/doc.py:52
+msgid "tag:"
+msgstr "نشانه"
+
+#: contrib/admin/views/doc.py:79 contrib/admin/views/doc.py:81
+#: contrib/admin/views/doc.py:83
+msgid "filter:"
+msgstr "فیلتر"
+
+#: contrib/admin/views/doc.py:137 contrib/admin/views/doc.py:139
+#: contrib/admin/views/doc.py:141
+msgid "view:"
+msgstr "نمایش:"
+
+#: contrib/admin/views/doc.py:166
+#, python-format
+msgid "App %r not found"
+msgstr "برنامه %r یافت نشد"
+
+#: contrib/admin/views/doc.py:173
+#, python-format
+msgid "Model %(name)r not found in app %(label)r"
+msgstr "مدل %(name)r در برنامه %(label)r یافت نشد"
+
+#: contrib/admin/views/doc.py:185
+#, python-format
+msgid "the related `%(label)s.%(type)s` object"
+msgstr "شیء `%(label)s %(type)s` مرتبط"
+
+#: contrib/admin/views/doc.py:185 contrib/admin/views/doc.py:207
+#: contrib/admin/views/doc.py:221 contrib/admin/views/doc.py:226
+msgid "model:"
+msgstr "مدل:"
+
+#: contrib/admin/views/doc.py:216
+#, python-format
+msgid "related `%(label)s.%(name)s` objects"
+msgstr "اشیاء `%(label)s.%(name)s` مرتبط"
+
+#: contrib/admin/views/doc.py:221
+#, python-format
+msgid "all %s"
+msgstr "کل %s"
+
+#: contrib/admin/views/doc.py:226
+#, python-format
+msgid "number of %s"
+msgstr "عدد %s"
+
+#: contrib/admin/views/doc.py:231
+#, python-format
+msgid "Fields on %s objects"
+msgstr "فیلدهای شیء %s"
+
+#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:304
+#: contrib/admin/views/doc.py:306 contrib/admin/views/doc.py:312
+#: contrib/admin/views/doc.py:313 contrib/admin/views/doc.py:315
+msgid "Integer"
+msgstr "عدد صحیح"
+
+#: contrib/admin/views/doc.py:294
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (درست یا غلط)"
+
+#: contrib/admin/views/doc.py:295 contrib/admin/views/doc.py:314
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "String (تا %(max_length)s)"
+
+#: contrib/admin/views/doc.py:296
+msgid "Comma-separated integers"
+msgstr "اعداد صحیح که با ویلگول جدا شده اند"
+
+#: contrib/admin/views/doc.py:297
+msgid "Date (without time)"
+msgstr "تاریخ (بدون زمان)"
+
+#: contrib/admin/views/doc.py:298
+msgid "Date (with time)"
+msgstr "تاریخ (با زمان)"
+
+#: contrib/admin/views/doc.py:299
+msgid "Decimal number"
+msgstr "عدد دهدهی"
+
+#: contrib/admin/views/doc.py:300
+msgid "E-mail address"
+msgstr "آدرس ایمیل"
+
+#: contrib/admin/views/doc.py:301 contrib/admin/views/doc.py:302
+#: contrib/admin/views/doc.py:305
+msgid "File path"
+msgstr "مسیر فایل"
+
+#: contrib/admin/views/doc.py:303
+msgid "Floating point number"
+msgstr "عدد اعشاری"
+
+#: contrib/admin/views/doc.py:307 contrib/comments/models.py:89
+msgid "IP address"
+msgstr "آدرس IP"
+
+#: contrib/admin/views/doc.py:309
+msgid "Boolean (Either True, False or None)"
+msgstr "‌Boolean (درست، نادرست یا پوچ)"
+
+#: contrib/admin/views/doc.py:310
+msgid "Relation to parent model"
 msgstr ""
 
-#: oldforms/__init__.py:734
-msgid "Enter a whole number between -32,768 and 32,767."
-msgstr ""
+#: contrib/admin/views/doc.py:311
+msgid "Phone number"
+msgstr "شماره تلفن"
 
-#: oldforms/__init__.py:744
-msgid "Enter a positive number."
-msgstr ""
+#: contrib/admin/views/doc.py:316
+msgid "Text"
+msgstr "متن"
 
-#: oldforms/__init__.py:754
-msgid "Enter a whole number between 0 and 32,767."
-msgstr ""
+#: contrib/admin/views/doc.py:317
+msgid "Time"
+msgstr "زمان"
 
-#: contrib/sites/models.py:10
-msgid "domain name"
-msgstr ""
-
-#: contrib/sites/models.py:11
-msgid "display name"
-msgstr ""
-
-#: contrib/sites/models.py:15
-msgid "site"
-msgstr ""
-
-#: contrib/sites/models.py:16
-msgid "sites"
-msgstr ""
-
-#: contrib/flatpages/models.py:7 contrib/admin/views/doc.py:316
+#: contrib/admin/views/doc.py:318 contrib/flatpages/models.py:7
 msgid "URL"
+msgstr "آدرس اینترنت"
+
+#: contrib/admin/views/doc.py:319
+msgid "U.S. state (two uppercase letters)"
+msgstr "ایالت آمریکا(دو حرف بزرگ)"
+
+#: contrib/admin/views/doc.py:320
+msgid "XML text"
+msgstr "متن XML"
+
+#: contrib/admin/views/doc.py:346
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "به نظر نمی رسد %s یک شیء از نوع urlpattern باشد"
+
+#: contrib/admin/views/main.py:233
+msgid "Site administration"
+msgstr "مدیریت سایت"
+
+#: contrib/admin/views/main.py:280 contrib/admin/views/main.py:365
+#, python-format
+msgid "You may add another %s below."
+msgstr "شما می توانید یک %s دیگر در زیر اضافه کنید"
+
+#: contrib/admin/views/main.py:298
+#, python-format
+msgid "Add %s"
+msgstr "اضافه کردن %s"
+
+#: contrib/admin/views/main.py:344
+#, python-format
+msgid "Added %s."
+msgstr "%s اضافه شده"
+
+#: contrib/admin/views/main.py:344 contrib/admin/views/main.py:346
+#: contrib/admin/views/main.py:348 core/validators.py:283
+#: db/models/manipulators.py:309
+msgid "and"
+msgstr "و"
+
+#: contrib/admin/views/main.py:346
+#, python-format
+msgid "Changed %s."
+msgstr "%s تغییر یافته."
+
+#: contrib/admin/views/main.py:348
+#, python-format
+msgid "Deleted %s."
+msgstr "%s حذف شده."
+
+#: contrib/admin/views/main.py:351
+msgid "No fields changed."
+msgstr "فیلدی تغییر نیافته است."
+
+#: contrib/admin/views/main.py:354
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was changed successfully."
+msgstr "مورد %(name)s·\"%(obj)s\" با موفقیت تغییر یافت."
+
+#: contrib/admin/views/main.py:362
+#, python-format
+msgid ""
+"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+msgstr "مورد %(name)s·\"%(obj)s\" با موفقیت اضافه شد. شما می توانید در زیر آنرا ویرایش نمایید."
+
+#: contrib/admin/views/main.py:400
+#, python-format
+msgid "Change %s"
+msgstr "تغییر %s"
+
+#: contrib/admin/views/main.py:487
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
 msgstr ""
+
+#: contrib/admin/views/main.py:492
+#, python-format
+msgid "One or more %(fieldname)s in %(name)s:"
+msgstr ""
+
+#: contrib/admin/views/main.py:524
+#, python-format
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
+
+#: contrib/admin/views/main.py:527
+msgid "Are you sure?"
+msgstr "آیا مطمئن هستید؟"
+
+#: contrib/admin/views/main.py:549
+#, python-format
+msgid "Change history: %s"
+msgstr "تاریخچه تغییر: %s"
+
+#: contrib/admin/views/main.py:583
+#, python-format
+msgid "Select %s"
+msgstr "انتخاب %s"
+
+#: contrib/admin/views/main.py:583
+#, python-format
+msgid "Select %s to change"
+msgstr "%s را برای تغییر انتخاب کنید"
+
+#: contrib/admin/views/main.py:784
+msgid "Database error"
+msgstr "اشکال در بانک اطلاعاتی"
+
+#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
+msgid "The two password fields didn't match."
+msgstr "دو فیلد گذرواژه با هم مطابقت ندارند."
+
+#: contrib/auth/forms.py:25
+msgid "A user with that username already exists."
+msgstr "کاربری با این نام کاربری وجود دارد."
+
+#: contrib/auth/forms.py:53
+msgid ""
+"Your Web browser doesn't appear to have cookies enabled. Cookies are "
+"required for logging in."
+msgstr "به نطر می رسد browser شما cookie ها را قبول نمی کند. برای ورود به سایت cookie fhdn فعال شده باشد."
+
+#: contrib/auth/forms.py:62
+msgid "This account is inactive."
+msgstr "این حساب غیرفعال است."
+
+#: contrib/auth/forms.py:84
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr "این ایمیل اکانتی در سیستم ندارد. آیا مطمئن هستید که عضو شده اید؟"
+
+#: contrib/auth/forms.py:107
+#, fuzzy, python-format
+msgid "Password reset on %s"
+msgstr "ایجاد گذرواژهٔ جدید"
+
+#: contrib/auth/forms.py:117
+msgid "The two 'new password' fields didn't match."
+msgstr "دو فیلد «گذرواژهٔ جدید» با هم مطابقت ندارند."
+
+#: contrib/auth/forms.py:124
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "گذرواژهٔ قدیمی شما اشتباه بود. لطفاً دوباره وارد کنید."
+
+#: contrib/auth/models.py:73 contrib/auth/models.py:93
+msgid "name"
+msgstr "نام"
+
+#: contrib/auth/models.py:75
+msgid "codename"
+msgstr "نام کد"
+
+#: contrib/auth/models.py:78
+msgid "permission"
+msgstr "اجازه"
+
+#: contrib/auth/models.py:79 contrib/auth/models.py:94
+msgid "permissions"
+msgstr "اجازه‌ها"
+
+#: contrib/auth/models.py:97
+msgid "group"
+msgstr "گروه"
+
+#: contrib/auth/models.py:98 contrib/auth/models.py:141
+msgid "groups"
+msgstr "گروه‌ها"
+
+#: contrib/auth/models.py:131
+msgid "username"
+msgstr "نام کاربری"
+
+#: contrib/auth/models.py:131
+msgid ""
+"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
+"digits and underscores)."
+msgstr "الزامی. ۳۰ حرف یا کمتر. فقط حروف الفبا (شماره، الفبا و خط زیر)."
+
+#: contrib/auth/models.py:132
+msgid "first name"
+msgstr "نام"
+
+#: contrib/auth/models.py:133
+msgid "last name"
+msgstr "نام خانوادگی"
+
+#: contrib/auth/models.py:134
+msgid "e-mail address"
+msgstr "آدرس پست الکترونیکی"
+
+#: contrib/auth/models.py:135
+msgid "password"
+msgstr "گذرواژه"
+
+#: contrib/auth/models.py:135
+msgid ""
+"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
+"password form</a>."
+msgstr ""
+
+#: contrib/auth/models.py:136
+msgid "staff status"
+msgstr "کارمند"
+
+#: contrib/auth/models.py:136
+msgid "Designates whether the user can log into this admin site."
+msgstr "تعبیه شده برای اینکه در سایت مدیریت، کاربر بتواند یا نتواند وارد شود."
+
+#: contrib/auth/models.py:137
+msgid "active"
+msgstr "فعال"
+
+#: contrib/auth/models.py:137
+msgid ""
+"Designates whether this user can log into the Django admin. Unselect this "
+"instead of deleting accounts."
+msgstr "تعبیه شده برای اینکه کاربر بتواند به سایت مدیریت وارد شود یا خیر. (به جای حذف کاربر آنرا تیک بزنید)."
+
+#: contrib/auth/models.py:138
+msgid "superuser status"
+msgstr "ابرکاربر"
+
+#: contrib/auth/models.py:138
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "تعبیه شده برای اینکه کاربر دسترسی نامحدود به کلیه بخشهای سایت مدیریت داشته باشد یا خیر."
+
+#: contrib/auth/models.py:139
+msgid "last login"
+msgstr "آخرین ورود"
+
+#: contrib/auth/models.py:140
+msgid "date joined"
+msgstr "تاریخ پیوستن"
+
+#: contrib/auth/models.py:142
+msgid ""
+"In addition to the permissions manually assigned, this user will also get "
+"all permissions granted to each group he/she is in."
+msgstr "علاوه بر دسترسی هایی که به طور دستی تنظیم شده، این کاربر تمامی دسترسی هایی که توسط گروه عضو شده به او می رسد را خواهد داشت."
+
+#: contrib/auth/models.py:143
+msgid "user permissions"
+msgstr "اجازه‌های کاربر"
+
+#: contrib/auth/models.py:147
+msgid "user"
+msgstr "کاربر"
+
+#: contrib/auth/models.py:148
+msgid "users"
+msgstr "کاربرها"
+
+#: contrib/auth/models.py:154
+msgid "Personal info"
+msgstr "اطلاعات شخصی"
+
+#: contrib/auth/models.py:155
+msgid "Permissions"
+msgstr "اجازه‌ها"
+
+#: contrib/auth/models.py:156
+msgid "Important dates"
+msgstr "تاریخ‌های مهم"
+
+#: contrib/auth/models.py:157
+msgid "Groups"
+msgstr "گروه‌ها"
+
+#: contrib/auth/models.py:316
+msgid "message"
+msgstr "پیغام"
+
+#: contrib/auth/views.py:47
+msgid "Logged out"
+msgstr "خارج شد"
+
+#: contrib/comments/models.py:71 contrib/comments/models.py:176
+msgid "object ID"
+msgstr "مشخصه شیء"
+
+#: contrib/comments/models.py:72
+msgid "headline"
+msgstr ""
+
+#: contrib/comments/models.py:73 contrib/comments/models.py:95
+#: contrib/comments/models.py:177
+msgid "comment"
+msgstr "نظر"
+
+#: contrib/comments/models.py:74
+msgid "rating #1"
+msgstr "امتیاز #1"
+
+#: contrib/comments/models.py:75
+msgid "rating #2"
+msgstr "امتیاز #2"
+
+#: contrib/comments/models.py:76
+msgid "rating #3"
+msgstr "امتیاز #3"
+
+#: contrib/comments/models.py:77
+msgid "rating #4"
+msgstr "امتیاز #4"
+
+#: contrib/comments/models.py:78
+msgid "rating #5"
+msgstr "امتیاز $5"
+
+#: contrib/comments/models.py:79
+msgid "rating #6"
+msgstr "امتیاز #6"
+
+#: contrib/comments/models.py:80
+msgid "rating #7"
+msgstr "امتیاز #7"
+
+#: contrib/comments/models.py:81
+msgid "rating #8"
+msgstr "امتیاز #8"
+
+#: contrib/comments/models.py:86
+msgid "is valid rating"
+msgstr "آیا رتبه بندی قابل قبول است"
+
+#: contrib/comments/models.py:87 contrib/comments/models.py:179
+msgid "date/time submitted"
+msgstr "تاریخ/زمان ثبت شد"
+
+#: contrib/comments/models.py:88 contrib/comments/models.py:180
+msgid "is public"
+msgstr "عمومی است"
+
+#: contrib/comments/models.py:90
+msgid "is removed"
+msgstr "پاک شده است"
+
+#: contrib/comments/models.py:90
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: contrib/comments/models.py:96
+msgid "comments"
+msgstr "نظرها"
+
+#: contrib/comments/models.py:140 contrib/comments/models.py:222
+msgid "Content object"
+msgstr "شئ نظر"
+
+#: contrib/comments/models.py:168
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr "نظر داده شده توسط %(user)s در تاریخ %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:178
+msgid "person's name"
+msgstr "نام شخص"
+
+#: contrib/comments/models.py:181
+msgid "ip address"
+msgstr "آدرس ip"
+
+#: contrib/comments/models.py:183
+msgid "approved by staff"
+msgstr ""
+
+#: contrib/comments/models.py:187
+msgid "free comment"
+msgstr "نظر آزاد"
+
+#: contrib/comments/models.py:188
+msgid "free comments"
+msgstr "نظرهای آزاد"
+
+#: contrib/comments/models.py:250
+msgid "score"
+msgstr "امتیاز"
+
+#: contrib/comments/models.py:251
+msgid "score date"
+msgstr "تاریخ امتیاز"
+
+#: contrib/comments/models.py:255
+msgid "karma score"
+msgstr "امتیاز عملکرد"
+
+#: contrib/comments/models.py:256
+msgid "karma scores"
+msgstr "امتیازهای عملکرد"
+
+#: contrib/comments/models.py:260
+#, python-format
+msgid "%(score)d rating by %(user)s"
+msgstr "%(score)d رتبه توسط %(user)s"
+
+#: contrib/comments/models.py:277
+#, python-format
+msgid ""
+"This comment was flagged by %(user)s:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/models.py:285
+msgid "flag date"
+msgstr "تاریخ پرچم"
+
+#: contrib/comments/models.py:289
+msgid "user flag"
+msgstr "پرچم کاربر"
+
+#: contrib/comments/models.py:290
+msgid "user flags"
+msgstr "پرچم‌های کاربر"
+
+#: contrib/comments/models.py:294
+#, python-format
+msgid "Flag by %r"
+msgstr "پرچم توسط %r"
+
+#: contrib/comments/models.py:300
+msgid "deletion date"
+msgstr "تاریخ حذف"
+
+#: contrib/comments/models.py:303
+msgid "moderator deletion"
+msgstr "حذف مدیر"
+
+#: contrib/comments/models.py:304
+msgid "moderator deletions"
+msgstr "حذف های مدیر"
+
+#: contrib/comments/models.py:308
+#, python-format
+msgid "Moderator deletion by %r"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:8
+msgid "Forgotten your password?"
+msgstr "گذرواژه‌تان را فراموش کرده‌اید؟"
+
+#: contrib/comments/templates/comments/form.html:12
+msgid "Ratings"
+msgstr ""
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Required"
+msgstr "لازم"
+
+#: contrib/comments/templates/comments/form.html:12
+#: contrib/comments/templates/comments/form.html:23
+msgid "Optional"
+msgstr "اختیاری"
+
+#: contrib/comments/templates/comments/form.html:23
+msgid "Post a photo"
+msgstr "ارسال عکس"
+
+#: contrib/comments/templates/comments/form.html:28
+#: contrib/comments/templates/comments/freeform.html:5
+msgid "Comment:"
+msgstr "نظر:"
+
+#: contrib/comments/templates/comments/form.html:35
+#: contrib/comments/templates/comments/freeform.html:10
+msgid "Preview comment"
+msgstr "پیش‌نمایش نظر"
+
+#: contrib/comments/templates/comments/freeform.html:4
+msgid "Your name:"
+msgstr "نام شما:"
+
+#: contrib/comments/views/comments.py:28
+msgid ""
+"This rating is required because you've entered at least one other rating."
+msgstr ""
+
+#: contrib/comments/views/comments.py:112
+#, python-format
+msgid ""
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comment:\n"
+"\n"
+"%(text)s"
+"This comment was posted by a user who has posted fewer than %(count)s "
+"comments:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/views/comments.py:117
+#, python-format
+msgid ""
+"This comment was posted by a sketchy user:\n"
+"\n"
+"%(text)s"
+msgstr ""
+
+#: contrib/comments/views/comments.py:190
+#: contrib/comments/views/comments.py:283
+msgid "Only POSTs are allowed"
+msgstr ""
+
+#: contrib/comments/views/comments.py:194
+#: contrib/comments/views/comments.py:287
+msgid "One or more of the required fields wasn't submitted"
+msgstr ""
+
+#: contrib/comments/views/comments.py:198
+#: contrib/comments/views/comments.py:289
+msgid "Somebody tampered with the comment form (security violation)"
+msgstr ""
+
+#: contrib/comments/views/comments.py:208
+#: contrib/comments/views/comments.py:295
+msgid ""
+"The comment form had an invalid 'target' parameter -- the object ID was "
+"invalid"
+msgstr ""
+
+#: contrib/comments/views/comments.py:259
+#: contrib/comments/views/comments.py:324
+msgid "The comment form didn't provide either 'preview' or 'post'"
+msgstr ""
+
+#: contrib/comments/views/karma.py:21
+msgid "Anonymous users cannot vote"
+msgstr ""
+
+#: contrib/comments/views/karma.py:25
+msgid "Invalid comment ID"
+msgstr ""
+
+#: contrib/comments/views/karma.py:27
+msgid "No voting for yourself"
+msgstr ""
+
+#: contrib/contenttypes/models.py:37
+msgid "python model class name"
+msgstr ""
+
+#: contrib/contenttypes/models.py:40
+msgid "content type"
+msgstr "نوع محتوا"
+
+#: contrib/contenttypes/models.py:41
+msgid "content types"
+msgstr "نوع‌های محتوا"
 
 #: contrib/flatpages/models.py:8
 msgid ""
@@ -633,11 +1485,11 @@ msgstr ""
 
 #: contrib/flatpages/models.py:9
 msgid "title"
-msgstr ""
+msgstr "تیتر"
 
 #: contrib/flatpages/models.py:10
 msgid "content"
-msgstr ""
+msgstr "محتوا"
 
 #: contrib/flatpages/models.py:11
 msgid "enable comments"
@@ -645,7 +1497,7 @@ msgstr ""
 
 #: contrib/flatpages/models.py:12
 msgid "template name"
-msgstr ""
+msgstr "نام قالب"
 
 #: contrib/flatpages/models.py:13
 msgid ""
@@ -655,120 +1507,162 @@ msgstr ""
 
 #: contrib/flatpages/models.py:14
 msgid "registration required"
-msgstr ""
+msgstr "عضویت اجباریست"
 
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
-msgstr ""
+msgstr "اگر این انتخاب شود، فقط کاربران وارد شده می توانند این صفحه را مشاهده نمایند."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
-msgstr ""
+msgstr "صفحه تخت"
 
 #: contrib/flatpages/models.py:19
 msgid "flat pages"
+msgstr "صفحات تخت"
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "th"
+msgstr "اُم"
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "st"
+msgstr "اُم"
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "nd"
+msgstr "اُم"
+
+#: contrib/humanize/templatetags/humanize.py:20
+msgid "rd"
+msgstr "اُم"
+
+#: contrib/humanize/templatetags/humanize.py:52
+#, python-format
+msgid "%(value).1f million"
 msgstr ""
 
-#: contrib/localflavor/fi/forms.py:14 contrib/localflavor/de/forms.py:16
-#: contrib/localflavor/fr/forms.py:17
-msgid "Enter a zip code in the format XXXXX."
+#: contrib/humanize/templatetags/humanize.py:55
+#, python-format
+msgid "%(value).1f billion"
 msgstr ""
 
-#: contrib/localflavor/fi/forms.py:40 contrib/localflavor/fi/forms.py:45
-msgid "Enter a valid Finnish social security number."
+#: contrib/humanize/templatetags/humanize.py:58
+#, python-format
+msgid "%(value).1f trillion"
 msgstr ""
 
-#: contrib/localflavor/is_/forms.py:16
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "one"
+msgstr "یک"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "two"
+msgstr "دو"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "three"
+msgstr "سه"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "four"
+msgstr "چهار"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "five"
+msgstr "پنج"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "six"
+msgstr "شش"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "seven"
+msgstr "هفت"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "eight"
+msgstr "هشت"
+
+#: contrib/humanize/templatetags/humanize.py:74
+msgid "nine"
+msgstr "نُه"
+
+#: contrib/humanize/templatetags/humanize.py:94
+#, fuzzy
+msgid "today"
+msgstr "امروز"
+
+#: contrib/humanize/templatetags/humanize.py:96
+msgid "tomorrow"
+msgstr "فردا"
+
+#: contrib/humanize/templatetags/humanize.py:98
+msgid "yesterday"
+msgstr "دیروز"
+
+#: contrib/localflavor/ar/forms.py:28
+msgid "Enter a postal code in the format NNNN or ANNNNAAA."
+msgstr "کد پستی را به شکل NNNN یا ANNNNAAA وارد نمایید."
+
+#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
+#: contrib/localflavor/pe/forms.py:51
+msgid "This field requires only numbers."
+msgstr "در این فیلد فقط عدد می توانید وارد کنید."
+
+#: contrib/localflavor/ar/forms.py:51
+msgid "This field requires 7 or 8 digits."
+msgstr "این فیلد ۷ یا ۸ شماره لازم دارد."
+
+#: contrib/localflavor/ar/forms.py:80
+msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
+msgstr ""
+
+#: contrib/localflavor/ar/forms.py:81
+msgid "Invalid CUIT."
+msgstr ""
+
+#: contrib/localflavor/au/forms.py:16
+msgid "Enter a 4 digit post code."
+msgstr "کد پستی ۴ رقمی را وارد کنید."
+
+#: contrib/localflavor/br/forms.py:21
+msgid "Enter a zip code in the format XXXXX-XXX."
+msgstr "کد پستی را به شکل XXXXX-XXX وارد کنید."
+
+#: contrib/localflavor/br/forms.py:30
+msgid "Phone numbers must be in XX-XXXX-XXXX format."
+msgstr "شماره تلفنها باید به شکل XX-XXXX-XXXX باشند."
+
+#: contrib/localflavor/br/forms.py:58
 msgid ""
-"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+"Select a valid brazilian state. That state is not one of the available "
+"states."
 msgstr ""
 
-#: contrib/localflavor/is_/forms.py:30
-msgid "The Icelandic identification number is not valid."
+#: contrib/localflavor/br/forms.py:94
+msgid "Invalid CPF number."
 msgstr ""
 
-#: contrib/localflavor/no/forms.py:15 contrib/localflavor/ch/forms.py:18
-msgid "Enter a zip code in the format XXXX."
+#: contrib/localflavor/br/forms.py:95
+msgid "This field requires at most 11 digits or 14 characters."
+msgstr "طول این فیلد حداقل ۱۱ شماره و حداکثر ۱۴ حرف می باشد."
+
+#: contrib/localflavor/br/forms.py:134
+msgid "Invalid CNPJ number."
 msgstr ""
 
-#: contrib/localflavor/no/forms.py:36
-msgid "Enter a valid Norwegian social security number."
-msgstr ""
+#: contrib/localflavor/br/forms.py:136
+msgid "This field requires at least 14 digits"
+msgstr "فیلد حداقل باید ۱۴ شماره باشد"
 
-#: contrib/localflavor/de/de_states.py:5
-msgid "Baden-Wuerttemberg"
-msgstr ""
+#: contrib/localflavor/ca/forms.py:17
+msgid "Enter a postal code in the format XXX XXX."
+msgstr "کد پستس را به شکل XXX·XXX. وارد کنید."
 
-#: contrib/localflavor/de/de_states.py:6
-msgid "Bavaria"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:7
-msgid "Berlin"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:8
-msgid "Brandenburg"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:9
-msgid "Bremen"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:10
-msgid "Hamburg"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:11
-msgid "Hessen"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:12
-msgid "Mecklenburg-Western Pomerania"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:13
-msgid "Lower Saxony"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:14
-msgid "North Rhine-Westphalia"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:15
-msgid "Rhineland-Palatinate"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:16
-msgid "Saarland"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:17
-msgid "Saxony"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:18
-msgid "Saxony-Anhalt"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:19
-msgid "Schleswig-Holstein"
-msgstr ""
-
-#: contrib/localflavor/de/de_states.py:20
-msgid "Thuringia"
-msgstr ""
-
-#: contrib/localflavor/de/forms.py:60
-msgid ""
-"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
-"format."
-msgstr ""
-
-#: contrib/localflavor/ch/forms.py:90
-msgid ""
-"Enter a valid Swiss identity or passport card number in X1234567<0 or "
-"1234567890 format."
+#: contrib/localflavor/ca/forms.py:88
+msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:5
@@ -875,40 +1769,442 @@ msgstr ""
 msgid "Zurich"
 msgstr ""
 
-#: contrib/localflavor/us/forms.py:18
-msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+#: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
+msgid "Enter a zip code in the format XXXX."
+msgstr "کد پستی صحیح را به شکل XXXX وارد کنید."
+
+#: contrib/localflavor/ch/forms.py:64
+msgid ""
+"Enter a valid Swiss identity or passport card number in X1234567<0 or "
+"1234567890 format."
 msgstr ""
 
-#: contrib/localflavor/us/forms.py:51
-msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+#: contrib/localflavor/cl/forms.py:29
+msgid "Enter a valid Chilean RUT."
 msgstr ""
 
-#: contrib/localflavor/cl/forms.py:21
-msgid "Enter valid a Chilean RUT. The format is XX.XXX.XXX-X."
+#: contrib/localflavor/cl/forms.py:30
+msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr ""
 
-#: contrib/localflavor/cl/forms.py:26
-msgid "Enter valid a Chilean RUT"
+#: contrib/localflavor/cl/forms.py:31
+msgid "The Chilean RUT is not valid."
 msgstr ""
 
-#: contrib/localflavor/au/forms.py:18
-msgid "Enter a 4 digit post code."
+#: contrib/localflavor/de/de_states.py:5
+msgid "Baden-Wuerttemberg"
 msgstr ""
 
-#: contrib/localflavor/uk/forms.py:18
-msgid "Enter a postcode. A space is required between the two postcode parts."
+#: contrib/localflavor/de/de_states.py:6
+msgid "Bavaria"
 msgstr ""
 
-#: contrib/localflavor/it/forms.py:16
+#: contrib/localflavor/de/de_states.py:7
+msgid "Berlin"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:8
+msgid "Brandenburg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:9
+msgid "Bremen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:10
+msgid "Hamburg"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:11
+msgid "Hessen"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:12
+msgid "Mecklenburg-Western Pomerania"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:13
+msgid "Lower Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:14
+msgid "North Rhine-Westphalia"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:15
+msgid "Rhineland-Palatinate"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:16
+msgid "Saarland"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:17
+msgid "Saxony"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:18
+msgid "Saxony-Anhalt"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:19
+msgid "Schleswig-Holstein"
+msgstr ""
+
+#: contrib/localflavor/de/de_states.py:20
+msgid "Thuringia"
+msgstr ""
+
+#: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
+#: contrib/localflavor/fr/forms.py:15
+msgid "Enter a zip code in the format XXXXX."
+msgstr "کد پستی را به شکل XXXXX وارد کنید."
+
+#: contrib/localflavor/de/forms.py:41
+msgid ""
+"Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
+"format."
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:5
+msgid "Arava"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:6
+msgid "Albacete"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:7
+msgid "Alacant"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:8
+msgid "Almeria"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:9
+#, fuzzy
+msgid "Avila"
+msgstr "آوریل"
+
+#: contrib/localflavor/es/es_provinces.py:10
+msgid "Badajoz"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:11
+msgid "Illes Balears"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:12
+msgid "Barcelona"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:13
+msgid "Burgos"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:14
+msgid "Caceres"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:15
+msgid "Cadiz"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:16
+msgid "Castello"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:17
+msgid "Ciudad Real"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:18
+msgid "Cordoba"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:19
+msgid "A Coruna"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:20
+msgid "Cuenca"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:21
+msgid "Girona"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:22
+msgid "Granada"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:23
+msgid "Guadalajara"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:24
+msgid "Guipuzkoa"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:25
+msgid "Huelva"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:26
+msgid "Huesca"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:27
+#, fuzzy
+msgid "Jaen"
+msgstr "ژانویه"
+
+#: contrib/localflavor/es/es_provinces.py:28
+msgid "Leon"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:29
+msgid "Lleida"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:30
+#: contrib/localflavor/es/es_regions.py:17
+msgid "La Rioja"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:31
+msgid "Lugo"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:32
+#: contrib/localflavor/es/es_regions.py:18
+msgid "Madrid"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:33
+msgid "Malaga"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:34
+msgid "Murcia"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:35
+msgid "Navarre"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:36
+msgid "Ourense"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:37
+msgid "Asturias"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:38
+msgid "Palencia"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:39
+msgid "Las Palmas"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:40
+msgid "Pontevedra"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:41
+msgid "Salamanca"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:42
+msgid "Santa Cruz de Tenerife"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:43
+#: contrib/localflavor/es/es_regions.py:11
+msgid "Cantabria"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:44
+msgid "Segovia"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:45
+msgid "Seville"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:46
+msgid "Soria"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:47
+msgid "Tarragona"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:48
+msgid "Teruel"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:49
+msgid "Toledo"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:50
+msgid "Valencia"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:51
+msgid "Valladolid"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:52
+msgid "Bizkaia"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:53
+msgid "Zamora"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:54
+msgid "Zaragoza"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:55
+msgid "Ceuta"
+msgstr ""
+
+#: contrib/localflavor/es/es_provinces.py:56
+msgid "Melilla"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:5
+msgid "Andalusia"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:6
+msgid "Aragon"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:7
+msgid "Principality of Asturias"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:8
+msgid "Balearic Islands"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:9
+msgid "Basque Country"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:10
+msgid "Canary Islands"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:12
+msgid "Castile-La Mancha"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:13
+msgid "Castile and Leon"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:14
+msgid "Catalonia"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:15
+msgid "Extremadura"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:16
+msgid "Galicia"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:19
+msgid "Region of Murcia"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:20
+msgid "Foral Community of Navarre"
+msgstr ""
+
+#: contrib/localflavor/es/es_regions.py:21
+msgid "Valencian Community"
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:19
+msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:39
+msgid ""
+"Enter a valid phone number in one of the formats 6XXXXXXXX, 8XXXXXXXX or "
+"9XXXXXXXX."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:66
+msgid "Please enter a valid NIF, NIE, or CIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:67
+msgid "Please enter a valid NIF or NIE."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:68
+msgid "Invalid checksum for NIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:69
+msgid "Invalid checksum for NIE."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:70
+msgid "Invalid checksum for CIF."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:142
+msgid ""
+"Please enter a valid bank account number in format XXXX-XXXX-XX-XXXXXXXXXX."
+msgstr ""
+
+#: contrib/localflavor/es/forms.py:143
+msgid "Invalid checksum for bank account number."
+msgstr ""
+
+#: contrib/localflavor/fi/forms.py:28
+msgid "Enter a valid Finnish social security number."
+msgstr ""
+
+#: contrib/localflavor/in_/forms.py:14
+msgid "Enter a zip code in the format XXXXXXX."
+msgstr ""
+
+#: contrib/localflavor/is_/forms.py:17
+msgid ""
+"Enter a valid Icelandic identification number. The format is XXXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/is_/forms.py:18
+msgid "The Icelandic identification number is not valid."
+msgstr ""
+
+#: contrib/localflavor/it/forms.py:14
 msgid "Enter a valid zip code."
 msgstr ""
 
-#: contrib/localflavor/it/forms.py:41
+#: contrib/localflavor/it/forms.py:43
 msgid "Enter a valid Social Security number."
 msgstr ""
 
 #: contrib/localflavor/it/forms.py:68
 msgid "Enter a valid VAT number."
+msgstr ""
+
+#: contrib/localflavor/jp/forms.py:19
+msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr ""
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
@@ -1099,879 +2395,996 @@ msgstr ""
 msgid "Okinawa"
 msgstr ""
 
-#: contrib/localflavor/jp/forms.py:21
-msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
+#: contrib/localflavor/mx/mx_states.py:12
+msgid "Aguascalientes"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:18
-msgid "Enter a zip code in the format XXXXX-XXX."
+#: contrib/localflavor/mx/mx_states.py:13
+msgid "Baja California"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:30
-msgid "Phone numbers must be in XX-XXXX-XXXX format."
+#: contrib/localflavor/mx/mx_states.py:14
+msgid "Baja California Sur"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:72
-msgid "This field requires only numbers."
+#: contrib/localflavor/mx/mx_states.py:15
+msgid "Campeche"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:74
-msgid "This field requires at most 11 digits or 14 characters."
+#: contrib/localflavor/mx/mx_states.py:16
+msgid "Chihuahua"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:84
-msgid "Invalid CPF number."
+#: contrib/localflavor/mx/mx_states.py:17
+msgid "Chiapas"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:106
-msgid "This field requires at least 14 digits"
+#: contrib/localflavor/mx/mx_states.py:18
+msgid "Coahuila"
 msgstr ""
 
-#: contrib/localflavor/br/forms.py:116
-msgid "Invalid CNPJ number."
+#: contrib/localflavor/mx/mx_states.py:19
+msgid "Colima"
 msgstr ""
 
-#: contrib/admin/models.py:16
-msgid "action time"
-msgstr "زمان اتفاق"
-
-#: contrib/admin/models.py:19
-msgid "object id"
-msgstr "شناسهٔ شئ"
-
-#: contrib/admin/models.py:20
-msgid "object repr"
-msgstr ""
-
-#: contrib/admin/models.py:21
-msgid "action flag"
-msgstr ""
-
-#: contrib/admin/models.py:22
-msgid "change message"
-msgstr ""
-
-#: contrib/admin/models.py:25
-msgid "log entry"
-msgstr ""
-
-#: contrib/admin/models.py:26
-msgid "log entries"
-msgstr ""
-
-#: contrib/admin/filterspecs.py:40
-#, python-format
-msgid ""
-"<h3>By %s:</h3>\n"
-"<ul>\n"
-msgstr ""
-"<h3>بوسیلهٔ %s:</h3>\n"
-"<ul>\n"
-
-#: contrib/admin/filterspecs.py:70 contrib/admin/filterspecs.py:88
-#: contrib/admin/filterspecs.py:143 contrib/admin/filterspecs.py:169
-msgid "All"
-msgstr "همه"
-
-#: contrib/admin/filterspecs.py:109
-msgid "Any date"
-msgstr "هر تاریخی"
-
-#: contrib/admin/filterspecs.py:110
-msgid "Today"
-msgstr "امروز"
-
-#: contrib/admin/filterspecs.py:113
-msgid "Past 7 days"
-msgstr "۷ روز اخیر"
-
-#: contrib/admin/filterspecs.py:115
-msgid "This month"
-msgstr "این ماه"
-
-#: contrib/admin/filterspecs.py:117
-msgid "This year"
-msgstr "امسال"
-
-#: contrib/admin/views/decorators.py:10 contrib/auth/forms.py:60
-msgid ""
-"Please enter a correct username and password. Note that both fields are case-"
-"sensitive."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:24
-#: contrib/admin/templates/admin/login.html:25
-msgid "Log in"
-msgstr ""
-
-#: contrib/admin/views/decorators.py:62
-msgid ""
-"Please log in again, because your session has expired. Don't worry: Your "
-"submission has been saved."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:69
-msgid ""
-"Looks like your browser isn't configured to accept cookies. Please enable "
-"cookies, reload this page, and try again."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:83
-msgid "Usernames cannot contain the '@' character."
-msgstr ""
-
-#: contrib/admin/views/decorators.py:85
-#, python-format
-msgid "Your e-mail address is not your username. Try '%s' instead."
-msgstr ""
-
-#: contrib/admin/views/main.py:223
-msgid "Site administration"
-msgstr ""
-
-#: contrib/admin/views/main.py:257 contrib/admin/views/auth.py:19
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:261 contrib/admin/views/main.py:347
-#: contrib/admin/views/auth.py:24
-msgid "You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:271 contrib/admin/views/main.py:356
-#, python-format
-msgid "You may add another %s below."
-msgstr ""
-
-#: contrib/admin/views/main.py:289
-#, python-format
-msgid "Add %s"
-msgstr ""
-
-#: contrib/admin/views/main.py:335
-#, python-format
-msgid "Added %s."
-msgstr ""
-
-#: contrib/admin/views/main.py:335 contrib/admin/views/main.py:337
-#: contrib/admin/views/main.py:339 db/models/manipulators.py:308
-msgid "and"
-msgstr ""
-
-#: contrib/admin/views/main.py:337
-#, python-format
-msgid "Changed %s."
-msgstr ""
-
-#: contrib/admin/views/main.py:339
-#, python-format
-msgid "Deleted %s."
-msgstr ""
-
-#: contrib/admin/views/main.py:342
-msgid "No fields changed."
-msgstr ""
-
-#: contrib/admin/views/main.py:345
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:353
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-
-#: contrib/admin/views/main.py:391
-#, python-format
-msgid "Change %s"
-msgstr ""
-
-#: contrib/admin/views/main.py:476
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s: %(obj)s"
-msgstr ""
-
-#: contrib/admin/views/main.py:481
-#, python-format
-msgid "One or more %(fieldname)s in %(name)s:"
-msgstr ""
-
-#: contrib/admin/views/main.py:514
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
-
-#: contrib/admin/views/main.py:517
-msgid "Are you sure?"
-msgstr ""
-
-#: contrib/admin/views/main.py:539
-#, python-format
-msgid "Change history: %s"
-msgstr ""
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s"
-msgstr ""
-
-#: contrib/admin/views/main.py:573
-#, python-format
-msgid "Select %s to change"
-msgstr ""
-
-#: contrib/admin/views/main.py:768
-msgid "Database error"
-msgstr ""
-
-#: contrib/admin/views/doc.py:46 contrib/admin/views/doc.py:48
-#: contrib/admin/views/doc.py:50
-msgid "tag:"
-msgstr ""
-
-#: contrib/admin/views/doc.py:77 contrib/admin/views/doc.py:79
-#: contrib/admin/views/doc.py:81
-msgid "filter:"
-msgstr ""
-
-#: contrib/admin/views/doc.py:135 contrib/admin/views/doc.py:137
-#: contrib/admin/views/doc.py:139
-msgid "view:"
-msgstr ""
-
-#: contrib/admin/views/doc.py:164
-#, python-format
-msgid "App %r not found"
-msgstr ""
-
-#: contrib/admin/views/doc.py:171
-#, python-format
-msgid "Model %(name)r not found in app %(label)r"
-msgstr ""
-
-#: contrib/admin/views/doc.py:183
-#, python-format
-msgid "the related `%(label)s.%(type)s` object"
-msgstr ""
-
-#: contrib/admin/views/doc.py:183 contrib/admin/views/doc.py:205
-#: contrib/admin/views/doc.py:219 contrib/admin/views/doc.py:224
-msgid "model:"
-msgstr ""
-
-#: contrib/admin/views/doc.py:214
-#, python-format
-msgid "related `%(label)s.%(name)s` objects"
-msgstr ""
-
-#: contrib/admin/views/doc.py:219
-#, python-format
-msgid "all %s"
-msgstr ""
-
-#: contrib/admin/views/doc.py:224
-#, python-format
-msgid "number of %s"
-msgstr ""
-
-#: contrib/admin/views/doc.py:229
-#, python-format
-msgid "Fields on %s objects"
-msgstr ""
-
-#: contrib/admin/views/doc.py:291 contrib/admin/views/doc.py:302
-#: contrib/admin/views/doc.py:304 contrib/admin/views/doc.py:310
-#: contrib/admin/views/doc.py:311 contrib/admin/views/doc.py:313
-msgid "Integer"
-msgstr ""
-
-#: contrib/admin/views/doc.py:292
-msgid "Boolean (Either True or False)"
+#: contrib/localflavor/mx/mx_states.py:20
+msgid "Distrito Federal"
 msgstr ""
 
-#: contrib/admin/views/doc.py:293 contrib/admin/views/doc.py:312
-#, python-format
-msgid "String (up to %(maxlength)s)"
+#: contrib/localflavor/mx/mx_states.py:21
+msgid "Durango"
 msgstr ""
-
-#: contrib/admin/views/doc.py:294
-msgid "Comma-separated integers"
-msgstr ""
-
-#: contrib/admin/views/doc.py:295
-msgid "Date (without time)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:296
-msgid "Date (with time)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:297
-msgid "Decimal number"
-msgstr ""
-
-#: contrib/admin/views/doc.py:298
-msgid "E-mail address"
-msgstr ""
-
-#: contrib/admin/views/doc.py:299 contrib/admin/views/doc.py:300
-#: contrib/admin/views/doc.py:303
-msgid "File path"
-msgstr ""
-
-#: contrib/admin/views/doc.py:301
-msgid "Floating point number"
-msgstr ""
-
-#: contrib/admin/views/doc.py:305 contrib/comments/models.py:85
-msgid "IP address"
-msgstr ""
-
-#: contrib/admin/views/doc.py:307
-msgid "Boolean (Either True, False or None)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:308
-msgid "Relation to parent model"
-msgstr ""
-
-#: contrib/admin/views/doc.py:309
-msgid "Phone number"
-msgstr ""
-
-#: contrib/admin/views/doc.py:314
-msgid "Text"
-msgstr ""
-
-#: contrib/admin/views/doc.py:315
-msgid "Time"
-msgstr ""
-
-#: contrib/admin/views/doc.py:317
-msgid "U.S. state (two uppercase letters)"
-msgstr ""
-
-#: contrib/admin/views/doc.py:318
-msgid "XML text"
-msgstr ""
-
-#: contrib/admin/views/doc.py:344
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr ""
-
-#: contrib/admin/views/auth.py:30
-msgid "Add user"
-msgstr ""
-
-#: contrib/admin/views/auth.py:57
-msgid "Password changed successfully."
-msgstr ""
-
-#: contrib/admin/views/auth.py:64
-#, python-format
-msgid "Change password: %s"
-msgstr ""
-
-#: contrib/admin/templatetags/admin_list.py:249
-msgid "All dates"
-msgstr ""
-
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
-msgid "Page not found"
-msgstr ""
-
-#: contrib/admin/templates/admin/404.html:10
-msgid "We're sorry, but the requested page could not be found."
-msgstr ""
-
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/comments/templates/comments/form.html:6
-#: contrib/comments/templates/comments/form.html:8
-msgid "Username:"
-msgstr ""
-
-#: contrib/admin/templates/admin/login.html:20
-#: contrib/comments/templates/comments/form.html:8
-msgid "Password:"
-msgstr ""
-
-#: contrib/admin/templates/admin/invalid_setup.html:4
-#: contrib/admin/templates/admin/change_form.html:13
-#: contrib/admin/templates/admin/change_list.html:6
-#: contrib/admin/templates/admin/500.html:4
-#: contrib/admin/templates/admin/base.html:30
-#: contrib/admin/templates/admin/delete_confirmation.html:6
-#: contrib/admin/templates/admin/object_history.html:5
-#: contrib/admin/templates/admin/auth/user/change_password.html:12
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_done.html:4
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Home"
-msgstr "آغازه"
-
-#: contrib/admin/templates/admin/invalid_setup.html:8
-msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
-"database tables have been created, and make sure the database is readable by "
-"the appropriate user."
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Documentation"
-msgstr "مستندات"
-
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:15
-#: contrib/admin/templates/admin/auth/user/change_password.html:46
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-msgid "Change password"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:10
-#: contrib/admin/templates/admin/change_list.html:5
-#: contrib/admin/templates/admin/base.html:25
-#: contrib/admin/templates/admin/delete_confirmation.html:3
-#: contrib/admin/templates/admin/object_history.html:3
-#: contrib/admin/templates/admin/auth/user/change_password.html:9
-#: contrib/admin/templates/admin_doc/view_index.html:5
-#: contrib/admin/templates/admin_doc/missing_docutils.html:4
-#: contrib/admin/templates/admin_doc/view_detail.html:4
-#: contrib/admin/templates/admin_doc/model_index.html:5
-#: contrib/admin/templates/admin_doc/template_detail.html:4
-#: contrib/admin/templates/admin_doc/index.html:4
-#: contrib/admin/templates/admin_doc/bookmarklets.html:4
-#: contrib/admin/templates/admin_doc/template_filter_index.html:5
-#: contrib/admin/templates/admin_doc/template_tag_index.html:5
-#: contrib/admin/templates/admin_doc/model_detail.html:3
-#: contrib/admin/templates/registration/password_change_form.html:3
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/comments/templates/comments/form.html:6
-msgid "Log out"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:15
-#: contrib/admin/templates/admin/index.html:28
-msgid "Add"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/object_history.html:5
-msgid "History"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:22
-msgid "View on site"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:32
-#: contrib/admin/templates/admin/auth/user/change_password.html:24
-msgid "Please correct the error below."
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:50
-msgid "Ordering"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_form.html:53
-msgid "Order:"
-msgstr ""
-
-#: contrib/admin/templates/admin/search_form.html:8
-msgid "Go"
-msgstr ""
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "1 result"
-msgstr ""
-
-#: contrib/admin/templates/admin/search_form.html:10
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr ""
-
-#: contrib/admin/templates/admin/filter.html:2
-#, python-format
-msgid " By %(filter_title)s "
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:3
-#: contrib/admin/templates/admin/delete_confirmation.html:9
-msgid "Delete"
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:4
-msgid "Save as new"
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:5
-msgid "Save and add another"
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:6
-msgid "Save and continue editing"
-msgstr ""
-
-#: contrib/admin/templates/admin/submit_line.html:7
-msgid "Save"
-msgstr ""
-
-#: contrib/admin/templates/admin/change_list.html:12
-#, python-format
-msgid "Add %(name)s"
-msgstr "اضافه‌کردن %(name)s"
-
-#: contrib/admin/templates/admin/base_site.html:4
-msgid "Django site admin"
-msgstr "وب‌گاه مدیریت Djago"
-
-#: contrib/admin/templates/admin/base_site.html:7
-msgid "Django administration"
-msgstr "مدیریت Django"
-
-#: contrib/admin/templates/admin/index.html:17
-#, python-format
-msgid "Models available in the %(name)s application."
-msgstr ""
-
-#: contrib/admin/templates/admin/index.html:18
-#, python-format
-msgid "%(name)s"
-msgstr ""
-
-#: contrib/admin/templates/admin/index.html:34
-msgid "Change"
-msgstr "تغییر"
-
-#: contrib/admin/templates/admin/index.html:44
-msgid "You don't have permission to edit anything."
-msgstr "شما اجازهٔ ویرایش چیزی را ندارید."
-
-#: contrib/admin/templates/admin/index.html:52
-msgid "Recent Actions"
-msgstr "اعمال اخیر"
-
-#: contrib/admin/templates/admin/index.html:53
-msgid "My Actions"
-msgstr "اعمال من"
-
-#: contrib/admin/templates/admin/index.html:57
-msgid "None available"
-msgstr "چیزی در دسترس نیست"
-
-#: contrib/admin/templates/admin/pagination.html:10
-msgid "Show all"
-msgstr "نمایش همه"
 
-#: contrib/admin/templates/admin/500.html:4
-msgid "Server error"
+#: contrib/localflavor/mx/mx_states.py:22
+#, fuzzy
+msgid "Guerrero"
 msgstr "خطای کارگزار"
 
-#: contrib/admin/templates/admin/500.html:6
-msgid "Server error (500)"
-msgstr "خطای کارگزار (۵۰۰)"
+#: contrib/localflavor/mx/mx_states.py:23
+msgid "Guanajuato"
+msgstr ""
 
-#: contrib/admin/templates/admin/500.html:9
-msgid "Server Error <em>(500)</em>"
-msgstr "خطای کارگزار <em>(۵۰۰)</em>"
+#: contrib/localflavor/mx/mx_states.py:24
+msgid "Hidalgo"
+msgstr ""
 
-#: contrib/admin/templates/admin/500.html:10
+#: contrib/localflavor/mx/mx_states.py:25
+msgid "Jalisco"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:26
+msgid "Estado de México"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:27
+msgid "Michoacán"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:28
+msgid "Morelos"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:29
+msgid "Nayarit"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:30
+msgid "Nuevo León"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:31
+msgid "Oaxaca"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:32
+msgid "Puebla"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:33
+msgid "Querétaro"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:34
+msgid "Quintana Roo"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:35
+msgid "Sinaloa"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:36
+msgid "San Luis Potosí"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:37
+msgid "Sonora"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:38
+msgid "Tabasco"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:39
+msgid "Tamaulipas"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:40
+msgid "Tlaxcala"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:41
+msgid "Veracruz"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:42
+msgid "Yucatán"
+msgstr ""
+
+#: contrib/localflavor/mx/mx_states.py:43
+msgid "Zacatecas"
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:21
+msgid "Enter a valid postal code"
+msgstr ""
+
+#: contrib/localflavor/nl/forms.py:52
+msgid "Enter a valid phone number"
+msgstr "شماره تلفن را به طور صحیح وارد نمایید."
+
+#: contrib/localflavor/nl/forms.py:78
+msgid "Enter a valid SoFi number"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:4
+msgid "Drente"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:5
+msgid "Flevoland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:6
+msgid "Friesland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:7
+msgid "Gelderland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:8
+#, fuzzy
+msgid "Groningen"
+msgstr "نُه"
+
+#: contrib/localflavor/nl/nl_provinces.py:9
+msgid "Limburg"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:10
+msgid "Noord-Brabant"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:11
+msgid "Noord-Holland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:12
+msgid "Overijssel"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:13
+msgid "Utrecht"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:14
+msgid "Zeeland"
+msgstr ""
+
+#: contrib/localflavor/nl/nl_provinces.py:15
+msgid "Zuid-Holland"
+msgstr ""
+
+#: contrib/localflavor/no/forms.py:33
+msgid "Enter a valid Norwegian social security number."
+msgstr ""
+
+#: contrib/localflavor/pe/forms.py:24
+msgid "This field requires 8 digits."
+msgstr "این فیلد، ۸ رقم لازم دارد."
+
+#: contrib/localflavor/pe/forms.py:52
+msgid "This field requires 11 digits."
+msgstr "این فیلد ۱۱ رقم لازم دارد."
+
+#: contrib/localflavor/pl/forms.py:39
+msgid "National Identification Number consists of 11 digits."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:40
+msgid "Wrong checksum for the National Identification Number."
+msgstr ""
+
+#: contrib/localflavor/pl/forms.py:72
 msgid ""
-"There's been an error. It's been reported to the site administrators via e-"
-"mail and should be fixed shortly. Thanks for your patience."
+"Enter a tax number field (NIP) in the format XXX-XXX-XX-XX or XX-XX-XXX-XXX."
 msgstr ""
 
-#: contrib/admin/templates/admin/base.html:25
-msgid "Welcome,"
-msgstr "خوش آمدید،"
-
-#: contrib/admin/templates/admin/delete_confirmation.html:14
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
+#: contrib/localflavor/pl/forms.py:73
+msgid "Wrong checksum for the Tax Number (NIP)."
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:21
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
+#: contrib/localflavor/pl/forms.py:112
+msgid "National Business Register Number (REGON) consists of 7 or 9 digits."
 msgstr ""
 
-#: contrib/admin/templates/admin/delete_confirmation.html:26
-msgid "Yes, I'm sure"
-msgstr "بله، مطمئن هستم."
-
-#: contrib/admin/templates/admin/object_history.html:18
-msgid "Date/time"
-msgstr "تاریخ/ساعت"
-
-#: contrib/admin/templates/admin/object_history.html:19
-msgid "User"
-msgstr "کاربر"
-
-#: contrib/admin/templates/admin/object_history.html:20
-msgid "Action"
-msgstr "عمل"
-
-#: contrib/admin/templates/admin/object_history.html:26
-msgid "DATE_WITH_TIME_FULL"
+#: contrib/localflavor/pl/forms.py:113
+msgid "Wrong checksum for the National Business Register Number (REGON)."
 msgstr ""
 
-#: contrib/admin/templates/admin/object_history.html:36
-msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
-"admin site."
+#: contrib/localflavor/pl/forms.py:156
+msgid "Enter a postal code in the format XX-XXX."
 msgstr ""
 
-#: contrib/admin/templates/admin/filters.html:4
-msgid "Filter"
+#: contrib/localflavor/pl/pl_voivodeships.py:8
+msgid "Lower Silesia"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:9
+msgid "Kuyavia-Pomerania"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:10
+msgid "Lublin"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:11
+msgid "Lubusz"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:12
+msgid "Lodz"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:13
+msgid "Lesser Poland"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:14
+msgid "Masovia"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:15
+#, fuzzy
+msgid "Opole"
+msgstr "اختیاری"
+
+#: contrib/localflavor/pl/pl_voivodeships.py:16
+msgid "Subcarpatia"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:17
+msgid "Podlasie"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:18
+msgid "Pomerania"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:19
+msgid "Silesia"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:20
+msgid "Swietokrzyskie"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:21
+msgid "Warmia-Masuria"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:22
+msgid "Greater Poland"
+msgstr ""
+
+#: contrib/localflavor/pl/pl_voivodeships.py:23
+msgid "West Pomerania"
+msgstr ""
+
+#: contrib/localflavor/sk/forms.py:30
+msgid "Enter a postal code in the format XXXXX or XXX XX."
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:8
+msgid "Banska Bystrica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:9
+msgid "Banska Stiavnica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:10
+msgid "Bardejov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:11
+msgid "Banovce nad Bebravou"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:12
+msgid "Brezno"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:13
+msgid "Bratislava I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:14
+msgid "Bratislava II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:15
+msgid "Bratislava III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:16
+msgid "Bratislava IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:17
+msgid "Bratislava V"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:18
+msgid "Bytca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:19
+msgid "Cadca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:20
+msgid "Detva"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:21
+msgid "Dolny Kubin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:22
+msgid "Dunajska Streda"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:23
+msgid "Galanta"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:24
+msgid "Gelnica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:25
+msgid "Hlohovec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:26
+msgid "Humenne"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:27
+msgid "Ilava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:28
+msgid "Kezmarok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:29
+#, fuzzy
+msgid "Komarno"
+msgstr "مارس"
+
+#: contrib/localflavor/sk/sk_districts.py:30
+msgid "Kosice I"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:31
+msgid "Kosice II"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:32
+msgid "Kosice III"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:33
+msgid "Kosice IV"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:34
+msgid "Kosice - okolie"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:35
+msgid "Krupina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:36
+msgid "Kysucke Nove Mesto"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:37
+msgid "Levice"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:38
+msgid "Levoca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:39
+msgid "Liptovsky Mikulas"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:40
+msgid "Lucenec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:41
+#, fuzzy
+msgid "Malacky"
+msgstr "مه"
+
+#: contrib/localflavor/sk/sk_districts.py:42
+msgid "Martin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:43
+msgid "Medzilaborce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:44
+msgid "Michalovce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:45
+msgid "Myjava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:46
+msgid "Namestovo"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:47
+msgid "Nitra"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:48
+msgid "Nove Mesto nad Vahom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:49
+msgid "Nove Zamky"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:50
+msgid "Partizanske"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:51
+msgid "Pezinok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:52
+msgid "Piestany"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:53
+msgid "Poltar"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:54
+msgid "Poprad"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:55
+msgid "Povazska Bystrica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:56
+msgid "Presov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:57
+msgid "Prievidza"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:58
+msgid "Puchov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:59
+msgid "Revuca"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:60
+msgid "Rimavska Sobota"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:61
+msgid "Roznava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:62
+msgid "Ruzomberok"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:63
+#, fuzzy
+msgid "Sabinov"
+msgstr "نوامبر"
+
+#: contrib/localflavor/sk/sk_districts.py:64
+msgid "Senec"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:65
+msgid "Senica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:66
+msgid "Skalica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:67
+#, fuzzy
+msgid "Snina"
+msgstr "نُه"
+
+#: contrib/localflavor/sk/sk_districts.py:68
+msgid "Sobrance"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:69
+msgid "Spisska Nova Ves"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:70
+msgid "Stara Lubovna"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:71
+msgid "Stropkov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:72
+msgid "Svidnik"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:73
+msgid "Sala"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:74
+msgid "Topolcany"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:75
+msgid "Trebisov"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:76
+msgid "Trencin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:77
+msgid "Trnava"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:78
+msgid "Turcianske Teplice"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:79
+msgid "Tvrdosin"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:80
+msgid "Velky Krtis"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:81
+msgid "Vranov nad Toplou"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:82
+msgid "Zlate Moravce"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:83
+msgid "Zvolen"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:84
+msgid "Zarnovica"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:85
+msgid "Ziar nad Hronom"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_districts.py:86
+msgid "Zilina"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:8
+msgid "Banska Bystrica region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:9
+msgid "Bratislava region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:10
+msgid "Kosice region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:11
+msgid "Nitra region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:12
+msgid "Presov region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:13
+msgid "Trencin region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:14
+msgid "Trnava region"
+msgstr ""
+
+#: contrib/localflavor/sk/sk_regions.py:15
+msgid "Zilina region"
+msgstr ""
+
+#: contrib/localflavor/uk/forms.py:21
+msgid "Enter a valid postcode."
+msgstr "کد پستی را به طور صحیح وارد نمایید."
+
+#: contrib/localflavor/uk/uk_regions.py:11
+msgid "Bedfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:12
+msgid "Buckinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:14
+msgid "Cheshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:15
+msgid "Cornwall and Isles of Scilly"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:16
+msgid "Cumbria"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:17
+msgid "Derbyshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:18
+#, fuzzy
+msgid "Devon"
+msgstr "هفت"
+
+#: contrib/localflavor/uk/uk_regions.py:19
+msgid "Dorset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:20
+msgid "Durham"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:21
+msgid "East Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:22
+msgid "Essex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:23
+msgid "Gloucestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:24
+msgid "Greater London"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:25
+msgid "Greater Manchester"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:26
+msgid "Hampshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:27
+msgid "Hertfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:28
+msgid "Kent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:29
+msgid "Lancashire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:30
+msgid "Leicestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:31
+msgid "Lincolnshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:32
+msgid "Merseyside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:33
+msgid "Norfolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:34
+msgid "North Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:35
+msgid "Northamptonshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:36
+msgid "Northumberland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:37
+msgid "Nottinghamshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:38
+msgid "Oxfordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:39
+msgid "Shropshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:40
+msgid "Somerset"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:41
+msgid "South Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:42
+msgid "Staffordshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:43
+msgid "Suffolk"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:44
+msgid "Surrey"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:45
+msgid "Tyne and Wear"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:46
+msgid "Warwickshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:47
+msgid "West Midlands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:48
+msgid "West Sussex"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:49
+msgid "West Yorkshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:50
+msgid "Wiltshire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:51
+msgid "Worcestershire"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:55
+msgid "County Antrim"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:56
+msgid "County Armagh"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:57
+#: contrib/localflavor/uk/uk_regions.py:58
+msgid "County Down"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:59
+msgid "County Londonderry"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:60
+msgid "County Tyrone"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:64
+msgid "Clwyd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:65
+msgid "Dyfed"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:66
+msgid "Gwent"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:67
+msgid "Gwynedd"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:68
+msgid "Mid Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:69
+msgid "Powys"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:70
+msgid "South Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:71
+msgid "West Glamorgan"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:75
+msgid "Borders"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:76
+msgid "Central Scotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:77
+msgid "Dumfries and Galloway"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:78
+#, fuzzy
+msgid "Fife"
 msgstr "فیلتر"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
+#: contrib/localflavor/uk/uk_regions.py:79
+msgid "Grampian"
 msgstr ""
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:12
-msgid "Username"
+#: contrib/localflavor/uk/uk_regions.py:80
+msgid "Highland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:81
+msgid "Lothian"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:82
+msgid "Orkney Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:83
+msgid "Shetland Islands"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:84
+msgid "Strathclyde"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:85
+msgid "Tayside"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:86
+msgid "Western Isles"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:90
+msgid "England"
+msgstr "انگلستان"
+
+#: contrib/localflavor/uk/uk_regions.py:91
+msgid "Northern Ireland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:92
+msgid "Scotland"
+msgstr ""
+
+#: contrib/localflavor/uk/uk_regions.py:93
+msgid "Wales"
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:16
+msgid "Enter a zip code in the format XXXXX or XXXXX-XXXX."
+msgstr ""
+
+#: contrib/localflavor/us/forms.py:54
+msgid "Enter a valid U.S. Social Security number in XXX-XX-XXXX format."
+msgstr ""
+
+#: contrib/localflavor/za/forms.py:20
+msgid "Enter a valid South African ID number"
+msgstr ""
+
+#: contrib/localflavor/za/forms.py:54
+msgid "Enter a valid South African postal code"
+msgstr ""
+
+#: contrib/localflavor/za/za_provinces.py:4
+#, fuzzy
+msgid "Eastern Cape"
 msgstr "نام کاربری"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:18
-#: contrib/admin/templates/admin/auth/user/change_password.html:34
-msgid "Password"
-msgstr "گذرواژه"
+#: contrib/localflavor/za/za_provinces.py:5
+#, fuzzy
+msgid "Free State"
+msgstr "تاریخ امتیاز"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:23
-#: contrib/admin/templates/admin/auth/user/change_password.html:39
-msgid "Password (again)"
-msgstr "گذرواژه (تکرار)"
+#: contrib/localflavor/za/za_provinces.py:6
+#, fuzzy
+msgid "Gauteng"
+msgstr "اوت"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:24
-#: contrib/admin/templates/admin/auth/user/change_password.html:40
-msgid "Enter the same password as above, for verification."
-msgstr "همان گذرواژهٔ بالایی را برای اطمینان دوباره وارد کنید."
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:28
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "برای کابر <strong>%(username)s</strong> یک گذرنامهٔ جدید وارد کنید."
-
-#: contrib/admin/templates/widget/date_time.html:3
-msgid "Date:"
+#: contrib/localflavor/za/za_provinces.py:7
+msgid "KwaZulu-Natal"
 msgstr ""
 
-#: contrib/admin/templates/widget/date_time.html:4
-msgid "Time:"
+#: contrib/localflavor/za/za_provinces.py:8
+msgid "Limpopo"
 msgstr ""
 
-#: contrib/admin/templates/widget/file.html:2
-msgid "Currently:"
+#: contrib/localflavor/za/za_provinces.py:9
+msgid "Mpumalanga"
 msgstr ""
 
-#: contrib/admin/templates/widget/file.html:3
-msgid "Change:"
+#: contrib/localflavor/za/za_provinces.py:10
+msgid "Northern Cape"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:3
-msgid "Bookmarklets"
+#: contrib/localflavor/za/za_provinces.py:11
+msgid "North West"
 msgstr ""
 
-#: contrib/admin/templates/admin_doc/bookmarklets.html:5
-msgid "Documentation bookmarklets"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:9
-msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:19
-msgid "Documentation for this page"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:20
-msgid ""
-"Jumps you from any page to the documentation for the view that generates "
-"that page."
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:22
-msgid "Show object ID"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:23
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:25
-msgid "Edit this object (current window)"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:26
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:28
-msgid "Edit this object (new window)"
-msgstr ""
-
-#: contrib/admin/templates/admin_doc/bookmarklets.html:29
-msgid "As above, but opens the admin page in a new window."
-msgstr ""
-
-#: contrib/admin/templates/registration/password_reset_email.html:2
-msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "درخواستی برای ایجاد گذرواژهٔ جدید با آدرس شما به ما رسیده است و ما این نامه را برای شما فرستادیم"
-
-#: contrib/admin/templates/registration/password_reset_email.html:3
-#, python-format
-msgid "for your user account at %(site_name)s"
-msgstr "برای حساب کاربریتان در %(site_name)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:5
-#, python-format
-msgid "Your new password is: %(new_password)s"
-msgstr "گذرواژهٔ جدیدتان: %(new_password)s"
-
-#: contrib/admin/templates/registration/password_reset_email.html:7
-msgid "Feel free to change this password by going to this page:"
-msgstr "با رفتن به صفحهٔ زیر می‌توانید گذرواژه‌تان را عوض کنید:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:11
-msgid "Your username, in case you've forgotten:"
-msgstr "نام کاربریتان، اگر یادتان رفته است:"
-
-#: contrib/admin/templates/registration/password_reset_email.html:13
-msgid "Thanks for using our site!"
-msgstr "متشکر از استفادهٔ شما از وبگاه ما"
-
-#: contrib/admin/templates/registration/password_reset_email.html:15
-#, python-format
-msgid "The %(site_name)s team"
-msgstr "گروه %(site_name)s"
-
-#: contrib/admin/templates/registration/logged_out.html:8
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
-
-#: contrib/admin/templates/registration/logged_out.html:10
-msgid "Log in again"
-msgstr "ورود دوباره"
-
-#: contrib/admin/templates/registration/password_reset_form.html:4
-#: contrib/admin/templates/registration/password_reset_form.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:10
-#: contrib/admin/templates/registration/password_reset_done.html:4
-msgid "Password reset"
-msgstr "ایجاد گذرواژهٔ جدید"
-
-#: contrib/admin/templates/registration/password_reset_form.html:12
-msgid ""
-"Forgotten your password? Enter your e-mail address below, and we'll reset "
-"your password and e-mail the new one to you."
-msgstr ""
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "E-mail address:"
-msgstr "آدرس پست الکترونیکی:"
-
-#: contrib/admin/templates/registration/password_reset_form.html:16
-msgid "Reset my password"
-msgstr "ایجاد گذرواژهٔ جدید"
-
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:10
-msgid "Password reset successful"
-msgstr "گذرواژهٔ جدید ایجاد شد."
-
-#: contrib/admin/templates/registration/password_reset_done.html:12
-msgid ""
-"We've e-mailed a new password to the e-mail address you submitted. You "
-"should be receiving it shortly."
-msgstr "ما به آدرس پست اکترونیکی‌ای که وارد کردید یک گذرواژهٔ جدید فرستادیم. به زودی به شما می‌رسد."
-
-#: contrib/admin/templates/registration/password_change_form.html:4
-#: contrib/admin/templates/registration/password_change_form.html:6
-#: contrib/admin/templates/registration/password_change_form.html:10
-#: contrib/admin/templates/registration/password_change_done.html:4
-msgid "Password change"
-msgstr "تغییر گذرواژه"
-
-#: contrib/admin/templates/registration/password_change_form.html:12
-msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
-"password twice so we can verify you typed it in correctly."
-msgstr "گذرواژهٔ قدیمی خود را، برای امنیت بیشتر، وارد کنید و سپس گذرواژهٔ جدیدتان را دوبار وارد کنید تا "
-"ما بتوانیم چک کنیم که به درستی تایپ کرده‌اید."
-
-#: contrib/admin/templates/registration/password_change_form.html:17
-msgid "Old password:"
-msgstr "گذرواژهٔ قدیمی"
-
-#: contrib/admin/templates/registration/password_change_form.html:19
-msgid "New password:"
-msgstr "گذرواژهٔ جدید"
-
-#: contrib/admin/templates/registration/password_change_form.html:21
-msgid "Confirm password:"
-msgstr "تکرار گذرواژه"
-
-#: contrib/admin/templates/registration/password_change_form.html:23
-msgid "Change my password"
-msgstr "تغییر گذرواژهٔ من"
-
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_done.html:10
-msgid "Password change successful"
-msgstr "گذرواژه تغییر یافت."
-
-#: contrib/admin/templates/registration/password_change_done.html:12
-msgid "Your password was changed."
-msgstr "گذرواژهٔ شما تغییر یافت."
+#: contrib/localflavor/za/za_provinces.py:12
+#, fuzzy
+msgid "Western Cape"
+msgstr "نام کاربری"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
@@ -2001,854 +3414,823 @@ msgstr ""
 msgid "redirects"
 msgstr ""
 
-#: contrib/sessions/models.py:68
+#: contrib/sessions/models.py:46
 msgid "session key"
 msgstr ""
 
-#: contrib/sessions/models.py:69
+#: contrib/sessions/models.py:47
 msgid "session data"
 msgstr "اطلاعات نشست"
 
-#: contrib/sessions/models.py:70
+#: contrib/sessions/models.py:48
 msgid "expire date"
 msgstr "تاریخ انقضاء"
 
-#: contrib/sessions/models.py:74
+#: contrib/sessions/models.py:53
 msgid "session"
 msgstr "نشست"
 
-#: contrib/sessions/models.py:75
+#: contrib/sessions/models.py:54
 msgid "sessions"
 msgstr "نشست‌ها"
 
-#: contrib/comments/models.py:67 contrib/comments/models.py:166
-msgid "object ID"
+#: contrib/sites/models.py:32
+msgid "domain name"
 msgstr ""
 
-#: contrib/comments/models.py:68
-msgid "headline"
+#: contrib/sites/models.py:33
+msgid "display name"
+msgstr "نام نمایش داده شده"
+
+#: contrib/sites/models.py:37
+msgid "site"
 msgstr ""
 
-#: contrib/comments/models.py:69 contrib/comments/models.py:90
-#: contrib/comments/models.py:167
-msgid "comment"
-msgstr "نظر"
-
-#: contrib/comments/models.py:70
-msgid "rating #1"
+#: contrib/sites/models.py:38
+msgid "sites"
 msgstr ""
 
-#: contrib/comments/models.py:71
-msgid "rating #2"
-msgstr ""
+#: core/validators.py:72
+msgid "This value must contain only letters, numbers and underscores."
+msgstr "این مقدار فقط باید حاوی کلمات، شماره ها و یا خط زیر باشد."
 
-#: contrib/comments/models.py:72
-msgid "rating #3"
-msgstr ""
-
-#: contrib/comments/models.py:73
-msgid "rating #4"
-msgstr ""
-
-#: contrib/comments/models.py:74
-msgid "rating #5"
-msgstr ""
-
-#: contrib/comments/models.py:75
-msgid "rating #6"
-msgstr ""
-
-#: contrib/comments/models.py:76
-msgid "rating #7"
-msgstr ""
-
-#: contrib/comments/models.py:77
-msgid "rating #8"
-msgstr ""
-
-#: contrib/comments/models.py:82
-msgid "is valid rating"
-msgstr ""
-
-#: contrib/comments/models.py:83 contrib/comments/models.py:169
-msgid "date/time submitted"
-msgstr ""
-
-#: contrib/comments/models.py:84 contrib/comments/models.py:170
-msgid "is public"
-msgstr "عمومی است"
-
-#: contrib/comments/models.py:86
-msgid "is removed"
-msgstr "پاک شده است"
-
-#: contrib/comments/models.py:86
+#: core/validators.py:76
 msgid ""
-"Check this box if the comment is inappropriate. A \"This comment has been "
-"removed\" message will be displayed instead."
+"This value must contain only letters, numbers, underscores, dashes or "
+"slashes."
 msgstr ""
 
-#: contrib/comments/models.py:91
-msgid "comments"
-msgstr "نظرها"
+#: core/validators.py:80
+msgid "This value must contain only letters, numbers, underscores or hyphens."
+msgstr ""
 
-#: contrib/comments/models.py:131 contrib/comments/models.py:207
-msgid "Content object"
-msgstr "شئ نظر"
+#: core/validators.py:84
+msgid "Uppercase letters are not allowed here."
+msgstr "حروف بزرگ در اینجا مجاز نمی باشند."
 
-#: contrib/comments/models.py:159
+#: core/validators.py:88
+msgid "Lowercase letters are not allowed here."
+msgstr ""
+
+#: core/validators.py:95
+msgid "Enter only digits separated by commas."
+msgstr ""
+
+#: core/validators.py:107
+msgid "Enter valid e-mail addresses separated by commas."
+msgstr "یک آدرس ایمیل صحیح وارد کنید."
+
+#: core/validators.py:111
+msgid "Please enter a valid IP address."
+msgstr ""
+
+#: core/validators.py:115
+msgid "Empty values are not allowed here."
+msgstr ""
+
+#: core/validators.py:119
+msgid "Non-numeric characters aren't allowed here."
+msgstr ""
+
+#: core/validators.py:123
+msgid "This value can't be comprised solely of digits."
+msgstr "این مقدار عدد یا ترکیبی از آن نیست."
+
+#: core/validators.py:128 newforms/fields.py:151
+msgid "Enter a whole number."
+msgstr ""
+
+#: core/validators.py:132
+msgid "Only alphabetical characters are allowed here."
+msgstr ""
+
+#: core/validators.py:147
+msgid "Year must be 1900 or later."
+msgstr ""
+
+#: core/validators.py:151
+#, python-format
+msgid "Invalid date: %s"
+msgstr ""
+
+#: core/validators.py:156 db/models/fields/__init__.py:509
+msgid "Enter a valid date in YYYY-MM-DD format."
+msgstr ""
+
+#: core/validators.py:161
+msgid "Enter a valid time in HH:MM format."
+msgstr ""
+
+#: core/validators.py:165 db/models/fields/__init__.py:583
+msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
+msgstr ""
+
+#: core/validators.py:170 newforms/fields.py:402
+msgid "Enter a valid e-mail address."
+msgstr "آدرس ایمیل صحیح را وارد نمایید."
+
+#: core/validators.py:182 core/validators.py:474 newforms/fields.py:432
+#: oldforms/__init__.py:687
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: core/validators.py:193 newforms/fields.py:458
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: core/validators.py:200
+#, python-format
+msgid "The URL %s does not point to a valid image."
+msgstr ""
+
+#: core/validators.py:204
+#, python-format
+msgid "Phone numbers must be in XXX-XXX-XXXX format. \"%s\" is invalid."
+msgstr ""
+
+#: core/validators.py:212
+#, python-format
+msgid "The URL %s does not point to a valid QuickTime video."
+msgstr ""
+
+#: core/validators.py:216
+msgid "A valid URL is required."
+msgstr ""
+
+#: core/validators.py:230
 #, python-format
 msgid ""
-"Posted by %(user)s at %(date)s\n"
-"\n"
-"%(comment)s\n"
-"\n"
-"http://%(domain)s%(url)s"
+"Valid HTML is required. Specific errors are:\n"
+"%s"
 msgstr ""
 
-#: contrib/comments/models.py:168
-msgid "person's name"
-msgstr "نام شخص"
-
-#: contrib/comments/models.py:171
-msgid "ip address"
-msgstr ""
-
-#: contrib/comments/models.py:173
-msgid "approved by staff"
-msgstr ""
-
-#: contrib/comments/models.py:176
-msgid "free comment"
-msgstr ""
-
-#: contrib/comments/models.py:177
-msgid "free comments"
-msgstr ""
-
-#: contrib/comments/models.py:233
-msgid "score"
-msgstr "امتیاز"
-
-#: contrib/comments/models.py:234
-msgid "score date"
-msgstr "تاریخ امتیاز"
-
-#: contrib/comments/models.py:237
-msgid "karma score"
-msgstr "امتیاز عملکرد"
-
-#: contrib/comments/models.py:238
-msgid "karma scores"
-msgstr "امتیازهای عملکرد"
-
-#: contrib/comments/models.py:242
+#: core/validators.py:237
 #, python-format
-msgid "%(score)d rating by %(user)s"
+msgid "Badly formed XML: %s"
 msgstr ""
 
-#: contrib/comments/models.py:258
+#: core/validators.py:254
 #, python-format
-msgid ""
-"This comment was flagged by %(user)s:\n"
-"\n"
-"%(text)s"
+msgid "Invalid URL: %s"
 msgstr ""
 
-#: contrib/comments/models.py:265
-msgid "flag date"
-msgstr "تاریخ پرچم"
-
-#: contrib/comments/models.py:268
-msgid "user flag"
-msgstr "پرچم کاربر"
-
-#: contrib/comments/models.py:269
-msgid "user flags"
-msgstr "پرچم‌های کاربر"
-
-#: contrib/comments/models.py:273
+#: core/validators.py:259 core/validators.py:261
 #, python-format
-msgid "Flag by %r"
+msgid "The URL %s is a broken link."
+msgstr "آدرس %s لینک شکسته است."
+
+#: core/validators.py:267
+msgid "Enter a valid U.S. state abbreviation."
 msgstr ""
 
-#: contrib/comments/models.py:278
-msgid "deletion date"
-msgstr ""
-
-#: contrib/comments/models.py:280
-msgid "moderator deletion"
-msgstr ""
-
-#: contrib/comments/models.py:281
-msgid "moderator deletions"
-msgstr ""
-
-#: contrib/comments/models.py:285
+#: core/validators.py:281
 #, python-format
-msgid "Moderator deletion by %r"
+msgid "Watch your mouth! The word %s is not allowed here."
 msgstr ""
 
-#: contrib/comments/views/comments.py:27
-msgid ""
-"This rating is required because you've entered at least one other rating."
+#: core/validators.py:288
+#, python-format
+msgid "This field must match the '%s' field."
+msgstr "این فیلد باید با فیلد %s مطابقت داشته باشد."
+
+#: core/validators.py:307
+msgid "Please enter something for at least one field."
+msgstr "لطفا چیزی را وارد کنید حداقل برای یک فیلد."
+
+#: core/validators.py:316 core/validators.py:327
+msgid "Please enter both fields or leave them both empty."
+msgstr "لطفا هر دو فیلد را پر کنید یا هر دو را خالی بگذارید."
+
+#: core/validators.py:335
+#, python-format
+msgid "This field must be given if %(field)s is %(value)s"
 msgstr ""
 
-#: contrib/comments/views/comments.py:111
+#: core/validators.py:348
+#, python-format
+msgid "This field must be given if %(field)s is not %(value)s"
+msgstr "این فیلد باید پر شود اگر %(field)s با %(value)s برابر نباشد."
+
+#: core/validators.py:367
+msgid "Duplicate values are not allowed."
+msgstr ""
+
+#: core/validators.py:382
+#, python-format
+msgid "This value must be between %(lower)s and %(upper)s."
+msgstr "این مقدار باید بین %(lower)s و %(upper)s باشد."
+
+#: core/validators.py:384
+#, python-format
+msgid "This value must be at least %s."
+msgstr "این مقدار حداقل باید %s باشد."
+
+#: core/validators.py:386
+#, python-format
+msgid "This value must be no more than %s."
+msgstr "این مقدار نباید بیشتر از %s باشد."
+
+#: core/validators.py:427
+#, python-format
+msgid "This value must be a power of %s."
+msgstr "این مقدار باید توانی از %s باشد."
+
+#: core/validators.py:437
+msgid "Please enter a valid decimal number."
+msgstr "لطفا یک عدد صحیح وارد کنید."
+
+#: core/validators.py:444
+#, python-format
+msgid "Please enter a valid decimal number with at most %s total digit."
+"Please enter a valid decimal number with at most %s total digits."
+msgstr ""
+
+#: core/validators.py:447
 #, python-format
 msgid ""
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comment:\n"
-"\n"
-"%(text)s"
-"This comment was posted by a user who has posted fewer than %(count)s "
-"comments:\n"
-"\n"
-"%(text)s"
+"Please enter a valid decimal number with a whole part of at most %s digit."
+"Please enter a valid decimal number with a whole part of at most %s digits."
 msgstr ""
 
-#: contrib/comments/views/comments.py:116
+#: core/validators.py:450
+#, python-format
+msgid "Please enter a valid decimal number with at most %s decimal place."
+"Please enter a valid decimal number with at most %s decimal places."
+msgstr ""
+
+#: core/validators.py:458
+msgid "Please enter a valid floating point number."
+msgstr "لطفا یک عدد اعشاری صحیح وارد کنید."
+
+#: core/validators.py:467
+#, python-format
+msgid "Make sure your uploaded file is at least %s bytes big."
+msgstr ""
+
+#: core/validators.py:468
+#, python-format
+msgid "Make sure your uploaded file is at most %s bytes big."
+msgstr ""
+
+#: core/validators.py:485
+msgid "The format for this field is wrong."
+msgstr ""
+
+#: core/validators.py:500
+msgid "This field is invalid."
+msgstr "این فیلد صحیح نمی باشد."
+
+#: core/validators.py:536
+#, python-format
+msgid "Could not retrieve anything from %s."
+msgstr ""
+
+#: core/validators.py:539
 #, python-format
 msgid ""
-"This comment was posted by a sketchy user:\n"
-"\n"
-"%(text)s"
+"The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr ""
 
-#: contrib/comments/views/comments.py:188
-#: contrib/comments/views/comments.py:280
-msgid "Only POSTs are allowed"
-msgstr ""
-
-#: contrib/comments/views/comments.py:192
-#: contrib/comments/views/comments.py:284
-msgid "One or more of the required fields wasn't submitted"
-msgstr ""
-
-#: contrib/comments/views/comments.py:196
-#: contrib/comments/views/comments.py:286
-msgid "Somebody tampered with the comment form (security violation)"
-msgstr ""
-
-#: contrib/comments/views/comments.py:206
-#: contrib/comments/views/comments.py:292
-msgid ""
-"The comment form had an invalid 'target' parameter -- the object ID was "
-"invalid"
-msgstr ""
-
-#: contrib/comments/views/comments.py:257
-#: contrib/comments/views/comments.py:321
-msgid "The comment form didn't provide either 'preview' or 'post'"
-msgstr ""
-
-#: contrib/comments/views/karma.py:19
-msgid "Anonymous users cannot vote"
-msgstr ""
-
-#: contrib/comments/views/karma.py:23
-msgid "Invalid comment ID"
-msgstr ""
-
-#: contrib/comments/views/karma.py:25
-msgid "No voting for yourself"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:8
-msgid "Forgotten your password?"
-msgstr "گذرواژه‌تان را فراموش کرده‌اید؟"
-
-#: contrib/comments/templates/comments/form.html:12
-msgid "Ratings"
-msgstr ""
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Required"
-msgstr "لازم"
-
-#: contrib/comments/templates/comments/form.html:12
-#: contrib/comments/templates/comments/form.html:23
-msgid "Optional"
-msgstr "اختیاری"
-
-#: contrib/comments/templates/comments/form.html:23
-msgid "Post a photo"
-msgstr "ارسال عکس"
-
-#: contrib/comments/templates/comments/form.html:28
-#: contrib/comments/templates/comments/freeform.html:5
-msgid "Comment:"
-msgstr "نظر:"
-
-#: contrib/comments/templates/comments/form.html:35
-#: contrib/comments/templates/comments/freeform.html:10
-msgid "Preview comment"
-msgstr "پیش‌نمایش نظر"
-
-#: contrib/comments/templates/comments/freeform.html:4
-msgid "Your name:"
-msgstr "نام شما:"
-
-#: contrib/auth/models.py:44 contrib/auth/models.py:64
-msgid "name"
-msgstr "نام"
-
-#: contrib/auth/models.py:46
-msgid "codename"
-msgstr "نام کد"
-
-#: contrib/auth/models.py:49
-msgid "permission"
-msgstr "اجازه"
-
-#: contrib/auth/models.py:50 contrib/auth/models.py:65
-msgid "permissions"
-msgstr "اجازه‌ها"
-
-#: contrib/auth/models.py:68
-msgid "group"
-msgstr "گروه"
-
-#: contrib/auth/models.py:69 contrib/auth/models.py:109
-msgid "groups"
-msgstr "گروه‌ها"
-
-#: contrib/auth/models.py:99
-msgid "username"
-msgstr "نام کاربری"
-
-#: contrib/auth/models.py:99
-msgid ""
-"Required. 30 characters or fewer. Alphanumeric characters only (letters, "
-"digits and underscores)."
-msgstr ""
-
-#: contrib/auth/models.py:100
-msgid "first name"
-msgstr "نام"
-
-#: contrib/auth/models.py:101
-msgid "last name"
-msgstr "نام خانوادگی"
-
-#: contrib/auth/models.py:102
-msgid "e-mail address"
-msgstr "آدرس پست الکترونیکی"
-
-#: contrib/auth/models.py:103
-msgid "password"
-msgstr "گذرواژه"
-
-#: contrib/auth/models.py:103
-msgid ""
-"Use '[algo]$[salt]$[hexdigest]' or use the <a href=\"password/\">change "
-"password form</a>."
-msgstr ""
-
-#: contrib/auth/models.py:104
-msgid "staff status"
-msgstr "کارمند"
-
-#: contrib/auth/models.py:104
-msgid "Designates whether the user can log into this admin site."
-msgstr ""
-
-#: contrib/auth/models.py:105
-msgid "active"
-msgstr "فعال"
-
-#: contrib/auth/models.py:105
-msgid ""
-"Designates whether this user can log into the Django admin. Unselect this "
-"instead of deleting accounts."
-msgstr ""
-
-#: contrib/auth/models.py:106
-msgid "superuser status"
-msgstr "ابرکاربر"
-
-#: contrib/auth/models.py:106
-msgid ""
-"Designates that this user has all permissions without explicitly assigning "
-"them."
-msgstr ""
-
-#: contrib/auth/models.py:107
-msgid "last login"
-msgstr "آخرین ورود"
-
-#: contrib/auth/models.py:108
-msgid "date joined"
-msgstr "تاریخ پیوستن"
-
-#: contrib/auth/models.py:110
-msgid ""
-"In addition to the permissions manually assigned, this user will also get "
-"all permissions granted to each group he/she is in."
-msgstr ""
-
-#: contrib/auth/models.py:111
-msgid "user permissions"
-msgstr "اجازه‌های کاربر"
-
-#: contrib/auth/models.py:115
-msgid "user"
-msgstr "کاربر"
-
-#: contrib/auth/models.py:116
-msgid "users"
-msgstr "کاربرها"
-
-#: contrib/auth/models.py:122
-msgid "Personal info"
-msgstr "اطلاعات شخصی"
-
-#: contrib/auth/models.py:123
-msgid "Permissions"
-msgstr "اجازه‌ها"
-
-#: contrib/auth/models.py:124
-msgid "Important dates"
-msgstr "تاریخ‌های مهم"
-
-#: contrib/auth/models.py:125
-msgid "Groups"
-msgstr "گروه‌ها"
-
-#: contrib/auth/models.py:269
-msgid "message"
-msgstr "پیغام"
-
-#: contrib/auth/models.py:282
-msgid "AnonymousUser"
-msgstr "کاربر ناشناس"
-
-#: contrib/auth/views.py:40
-msgid "Logged out"
-msgstr "خارج شد"
-
-#: contrib/auth/forms.py:17 contrib/auth/forms.py:138
-msgid "The two password fields didn't match."
-msgstr "دو فیلد گذرواژه با هم مطابقت ندارند."
-
-#: contrib/auth/forms.py:25
-msgid "A user with that username already exists."
-msgstr "کاربری با این نام کاربری وجود دارد."
-
-#: contrib/auth/forms.py:53
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr ""
-
-#: contrib/auth/forms.py:62
-msgid "This account is inactive."
-msgstr "این حساب غیرفعال است."
-
-#: contrib/auth/forms.py:85
-msgid ""
-"That e-mail address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr ""
-
-#: contrib/auth/forms.py:117
-msgid "The two 'new password' fields didn't match."
-msgstr "دو فیلد «گذرواژهٔ جدید» با هم مطابقت ندارند."
-
-#: contrib/auth/forms.py:124
-msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "گذرواژهٔ قدیمی شما اشتباه بود. لطفاً دوباره وارد کنید."
-
-#: contrib/contenttypes/models.py:36
-msgid "python model class name"
-msgstr ""
-
-#: contrib/contenttypes/models.py:39
-msgid "content type"
-msgstr "نوع محتوا"
-
-#: contrib/contenttypes/models.py:40
-msgid "content types"
-msgstr "نوع‌های محتوا"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "th"
-msgstr "اُم"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "st"
-msgstr "اُم"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "nd"
-msgstr "اُم"
-
-#: contrib/humanize/templatetags/humanize.py:17
-msgid "rd"
-msgstr "اُم"
-
-#: contrib/humanize/templatetags/humanize.py:47
+#: core/validators.py:572
 #, python-format
-msgid "%(value).1f million"
+msgid ""
+"Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
+"\"%(start)s\".)"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:50
+#: core/validators.py:576
 #, python-format
-msgid "%(value).1f billion"
+msgid ""
+"Some text starting on line %(line)s is not allowed in that context. (Line "
+"starts with \"%(start)s\".)"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:53
+#: core/validators.py:581
 #, python-format
-msgid "%(value).1f trillion"
+msgid ""
+"\"%(attr)s\" on line %(line)s is an invalid attribute. (Line starts with \"%"
+"(start)s\".)"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "one"
-msgstr "یک"
+#: core/validators.py:586
+#, python-format
+msgid ""
+"\"<%(tag)s>\" on line %(line)s is an invalid tag. (Line starts with \"%"
+"(start)s\".)"
+msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "two"
-msgstr "دو"
+#: core/validators.py:590
+#, python-format
+msgid ""
+"A tag on line %(line)s is missing one or more required attributes. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "three"
-msgstr "سه"
+#: core/validators.py:595
+#, python-format
+msgid ""
+"The \"%(attr)s\" attribute on line %(line)s has an invalid value. (Line "
+"starts with \"%(start)s\".)"
+msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "four"
-msgstr "چهار"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "five"
-msgstr "پنج"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "six"
-msgstr "شش"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "seven"
-msgstr "هفت"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "eight"
-msgstr "هشت"
-
-#: contrib/humanize/templatetags/humanize.py:68
-msgid "nine"
-msgstr "نُه"
-
-#: db/models/manipulators.py:307
+#: db/models/manipulators.py:308
 #, python-format
 msgid "%(object)s with this %(type)s already exists for the given %(field)s."
 msgstr ""
 
-#: db/models/fields/__init__.py:46
+#: db/models/fields/__init__.py:52
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr ""
 
-#: db/models/fields/__init__.py:373
+#: db/models/fields/__init__.py:161 db/models/fields/__init__.py:318
+#: db/models/fields/__init__.py:735 db/models/fields/__init__.py:746
+#: newforms/fields.py:45 oldforms/__init__.py:374
+msgid "This field is required."
+msgstr "این فیلد لازم است."
+
+#: db/models/fields/__init__.py:418
 msgid "This value must be an integer."
-msgstr ""
+msgstr "این مقدار باید یک عدد صحیح باشد."
 
-#: db/models/fields/__init__.py:408
+#: db/models/fields/__init__.py:454
 msgid "This value must be either True or False."
-msgstr ""
+msgstr "این مقدار باید درست یا غلط باشد."
 
-#: db/models/fields/__init__.py:429
+#: db/models/fields/__init__.py:475
 msgid "This field cannot be null."
-msgstr ""
+msgstr "این فیلد نمی تواند پوچ باشد."
 
-#: db/models/fields/__init__.py:592
+#: db/models/fields/__init__.py:644
 msgid "This value must be a decimal number."
-msgstr ""
+msgstr "این مقدار باید یک عدد باشد."
 
-#: db/models/fields/__init__.py:695
+#: db/models/fields/__init__.py:755
 msgid "Enter a valid filename."
 msgstr ""
 
-#: db/models/fields/__init__.py:818
+#: db/models/fields/__init__.py:908
 msgid "This value must be either None, True or False."
-msgstr ""
+msgstr "این مقدار باید یکی از مقادیر None یا True یا False باشد."
 
-#: db/models/fields/related.py:53
+#: db/models/fields/related.py:55
 #, python-format
 msgid "Please enter a valid %s."
-msgstr ""
+msgstr "لطفا %s صحیحی وارد نمایید."
 
-#: db/models/fields/related.py:642
+#: db/models/fields/related.py:658
 msgid "Separate multiple IDs with commas."
 msgstr ""
 
-#: db/models/fields/related.py:644
+#: db/models/fields/related.py:660
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
 
-#: db/models/fields/related.py:691
+#: db/models/fields/related.py:707
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
 msgstr ""
 
-#: utils/timesince.py:12
-msgid "year"
-msgstr "سال"
+#: newforms/fields.py:46
+msgid "Enter a valid value."
+msgstr "یک مقدار صحیح وارد کنید."
 
-#: utils/timesince.py:13
-msgid "month"
-msgstr "ماه"
-
-#: utils/timesince.py:14
-msgid "week"
-msgstr "هفته"
-
-#: utils/timesince.py:15
-msgid "day"
-msgstr "روز"
-
-#: utils/timesince.py:16
-msgid "hour"
-msgstr "ساعت"
-
-#: utils/timesince.py:17
-msgid "minute"
-msgstr "دقیقه"
-
-#: utils/timesince.py:40
+#: newforms/fields.py:123
 #, python-format
-msgid "%d milliseconds"
-msgstr "%d میلی‌ثانیه"
+msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
+msgstr ""
 
-#: utils/timesince.py:41
+#: newforms/fields.py:124
 #, python-format
-msgid "%(number)d %(type)s"
+msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
 msgstr ""
 
-#: utils/timesince.py:47
+#: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
 #, python-format
-msgid ", %(number)d %(type)s"
+msgid "Ensure this value is less than or equal to %s."
 msgstr ""
 
-#: utils/dateformat.py:40
-msgid "p.m."
-msgstr "ب.ظ."
-
-#: utils/dateformat.py:41
-msgid "a.m."
-msgstr "صبح"
-
-#: utils/dateformat.py:46
-msgid "PM"
-msgstr "بعد از ظهر"
-
-#: utils/dateformat.py:47
-msgid "AM"
-msgstr "صبح"
-
-#: utils/dateformat.py:95
-msgid "midnight"
+#: newforms/fields.py:153 newforms/fields.py:182 newforms/fields.py:211
+#, python-format
+msgid "Ensure this value is greater than or equal to %s."
 msgstr ""
 
-#: utils/dateformat.py:97
-msgid "noon"
+#: newforms/fields.py:180 newforms/fields.py:209
+msgid "Enter a number."
+msgstr "یک عدد وارد نمایید."
+
+#: newforms/fields.py:212
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
 msgstr ""
 
-#: utils/dates.py:6
-msgid "Monday"
+#: newforms/fields.py:213
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
 msgstr ""
 
-#: utils/dates.py:6
-msgid "Tuesday"
+#: newforms/fields.py:214
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
 msgstr ""
 
-#: utils/dates.py:6
-msgid "Wednesday"
+#: newforms/fields.py:262 newforms/fields.py:723
+msgid "Enter a valid date."
+msgstr "تاریخ را به شکل صحیح وارد نمایید."
+
+#: newforms/fields.py:295 newforms/fields.py:724
+msgid "Enter a valid time."
+msgstr "یک زمان صحیح وارد کنید."
+
+#: newforms/fields.py:334
+msgid "Enter a valid date/time."
+msgstr "تاریخ/زمان را به شکل صحیح وارد نمایید."
+
+#: newforms/fields.py:433
+msgid "No file was submitted."
+msgstr "فایلی ارسال نشده است."
+
+#: newforms/fields.py:434 oldforms/__init__.py:689
+msgid "The submitted file is empty."
 msgstr ""
 
-#: utils/dates.py:6
-msgid "Thursday"
+#: newforms/fields.py:496
+msgid "Enter a valid URL."
 msgstr ""
 
-#: utils/dates.py:6
-msgid "Friday"
+#: newforms/fields.py:497
+msgid "This URL appears to be a broken link."
+msgstr "به نظر می رسد این آدرس یک پیوند شکسته است."
+
+#: newforms/fields.py:559 newforms/models.py:317
+msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 
-#: utils/dates.py:7
-msgid "Saturday"
+#: newforms/fields.py:598
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
 
-#: utils/dates.py:7
-msgid "Sunday"
+#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:377
+msgid "Enter a list of values."
 msgstr ""
 
-#: utils/dates.py:14
-msgid "January"
-msgstr "ژانویه"
-
-#: utils/dates.py:14
-msgid "February"
-msgstr "فوریه"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "March"
-msgstr "مارس"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "April"
-msgstr "آوریل"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "May"
-msgstr "مه"
-
-#: utils/dates.py:14 utils/dates.py:27
-msgid "June"
-msgstr "ژوئن"
-
-#: utils/dates.py:15 utils/dates.py:27
-msgid "July"
-msgstr "ژوئیه"
-
-#: utils/dates.py:15
-msgid "August"
-msgstr "اوت"
-
-#: utils/dates.py:15
-msgid "September"
-msgstr "سپتامبر"
-
-#: utils/dates.py:15
-msgid "October"
-msgstr "اکتبر"
-
-#: utils/dates.py:15
-msgid "November"
-msgstr "نوامبر"
-
-#: utils/dates.py:16
-msgid "December"
-msgstr "دسامبر"
-
-#: utils/dates.py:19
-msgid "jan"
-msgstr "ژانویه"
-
-#: utils/dates.py:19
-msgid "feb"
-msgstr "فوریه"
-
-#: utils/dates.py:19
-msgid "mar"
-msgstr "مارس"
-
-#: utils/dates.py:19
-msgid "apr"
-msgstr "آوریل"
-
-#: utils/dates.py:19
-msgid "may"
-msgstr "مه"
-
-#: utils/dates.py:19
-msgid "jun"
-msgstr "ژوئن"
-
-#: utils/dates.py:20
-msgid "jul"
-msgstr "ژوئیه"
-
-#: utils/dates.py:20
-msgid "aug"
-msgstr "اوت"
-
-#: utils/dates.py:20
-msgid "sep"
-msgstr "سپتامبر"
-
-#: utils/dates.py:20
-msgid "oct"
-msgstr "اکتبر"
-
-#: utils/dates.py:20
-msgid "nov"
-msgstr "نوامبر"
-
-#: utils/dates.py:20
-msgid "dec"
-msgstr "دسامبر"
-
-#: utils/dates.py:27
-msgid "Jan."
-msgstr "ژانویه"
-
-#: utils/dates.py:27
-msgid "Feb."
-msgstr "فوریه"
-
-#: utils/dates.py:28
-msgid "Aug."
-msgstr "اوت"
-
-#: utils/dates.py:28
-msgid "Sept."
-msgstr "سپتامبر"
-
-#: utils/dates.py:28
-msgid "Oct."
-msgstr "اکتبر"
-
-#: utils/dates.py:28
-msgid "Nov."
-msgstr "نوامبر"
-
-#: utils/dates.py:28
-msgid "Dec."
-msgstr "دسامبر"
-
-#: utils/translation/trans_real.py:358
-msgid "DATE_FORMAT"
+#: newforms/fields.py:752
+msgid "Enter a valid IPv4 address."
 msgstr ""
 
-#: utils/translation/trans_real.py:359
-msgid "DATETIME_FORMAT"
+#: newforms/models.py:378
+#, python-format
+msgid "Select a valid choice. %s is not one of the available choices."
 msgstr ""
 
-#: utils/translation/trans_real.py:360
-msgid "TIME_FORMAT"
+#: oldforms/__init__.py:409
+#, python-format
+msgid "Ensure your text is less than %s character."
 msgstr ""
 
-#: utils/translation/trans_real.py:376
-msgid "YEAR_MONTH_FORMAT"
+#: oldforms/__init__.py:414
+msgid "Line breaks are not allowed here."
 msgstr ""
 
-#: utils/translation/trans_real.py:377
-msgid "MONTH_DAY_FORMAT"
+#: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
+#, python-format
+msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
 msgstr ""
 
-#: template/defaultfilters.py:491
+#: oldforms/__init__.py:745
+msgid "Enter a whole number between -32,768 and 32,767."
+msgstr ""
+
+#: oldforms/__init__.py:755
+msgid "Enter a positive number."
+msgstr "یک عدد مثبت وارد نمایید."
+
+#: oldforms/__init__.py:765
+msgid "Enter a whole number between 0 and 32,767."
+msgstr ""
+
+#: template/defaultfilters.py:691
 msgid "yes,no,maybe"
 msgstr "بله،خیر،شاید"
 
-#: template/defaultfilters.py:520
-#, python-format
+#: template/defaultfilters.py:722
+#, fuzzy, python-format
 msgid "%(size)d byte"
 msgstr "%(size)d یایت"
 
-#: template/defaultfilters.py:522
+#: template/defaultfilters.py:724
 #, python-format
 msgid "%.1f KB"
 msgstr ""
 
-#: template/defaultfilters.py:524
+#: template/defaultfilters.py:726
 #, python-format
 msgid "%.1f MB"
 msgstr ""
 
-#: template/defaultfilters.py:525
+#: template/defaultfilters.py:727
 #, python-format
 msgid "%.1f GB"
 msgstr ""
 
+#: utils/dateformat.py:41
+msgid "p.m."
+msgstr "ب.ظ."
+
+#: utils/dateformat.py:42
+msgid "a.m."
+msgstr "صبح"
+
+#: utils/dateformat.py:47
+msgid "PM"
+msgstr "بعد از ظهر"
+
+#: utils/dateformat.py:48
+msgid "AM"
+msgstr "صبح"
+
+#: utils/dateformat.py:97
+msgid "midnight"
+msgstr "نیمه شب"
+
+#: utils/dateformat.py:99
+msgid "noon"
+msgstr "ظهر"
+
+#: utils/dates.py:6
+msgid "Monday"
+msgstr "دوشنبه"
+
+#: utils/dates.py:6
+msgid "Tuesday"
+msgstr "سه شنبه"
+
+#: utils/dates.py:6
+msgid "Wednesday"
+msgstr "چهارشنبه"
+
+#: utils/dates.py:6
+msgid "Thursday"
+msgstr "پنجشنبه"
+
+#: utils/dates.py:6
+msgid "Friday"
+msgstr "جمعه"
+
+#: utils/dates.py:7
+msgid "Saturday"
+msgstr "شنبه"
+
+#: utils/dates.py:7
+msgid "Sunday"
+msgstr "یکشنبه"
+
+#: utils/dates.py:10
+#, fuzzy
+msgid "Mon"
+msgstr "یک"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "سه شنبه"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "چهارشنبه"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "سه شنبه"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "جمعه"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "شنبه"
+
+#: utils/dates.py:11
+#, fuzzy
+msgid "Sun"
+msgstr "ژوئن"
+
+#: utils/dates.py:18
+msgid "January"
+msgstr "ژانویه"
+
+#: utils/dates.py:18
+msgid "February"
+msgstr "فوریه"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "March"
+msgstr "مارس"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "April"
+msgstr "آوریل"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "May"
+msgstr "مه"
+
+#: utils/dates.py:18 utils/dates.py:31
+msgid "June"
+msgstr "ژوئن"
+
+#: utils/dates.py:19 utils/dates.py:31
+msgid "July"
+msgstr "ژوئیه"
+
+#: utils/dates.py:19
+msgid "August"
+msgstr "اوت"
+
+#: utils/dates.py:19
+msgid "September"
+msgstr "سپتامبر"
+
+#: utils/dates.py:19
+msgid "October"
+msgstr "اکتبر"
+
+#: utils/dates.py:19
+msgid "November"
+msgstr "نوامبر"
+
+#: utils/dates.py:20
+msgid "December"
+msgstr "دسامبر"
+
+#: utils/dates.py:23
+msgid "jan"
+msgstr "ژانویه"
+
+#: utils/dates.py:23
+msgid "feb"
+msgstr "فوریه"
+
+#: utils/dates.py:23
+msgid "mar"
+msgstr "مارس"
+
+#: utils/dates.py:23
+msgid "apr"
+msgstr "آوریل"
+
+#: utils/dates.py:23
+msgid "may"
+msgstr "مه"
+
+#: utils/dates.py:23
+msgid "jun"
+msgstr "ژوئن"
+
+#: utils/dates.py:24
+msgid "jul"
+msgstr "ژوئیه"
+
+#: utils/dates.py:24
+msgid "aug"
+msgstr "اوت"
+
+#: utils/dates.py:24
+msgid "sep"
+msgstr "سپتامبر"
+
+#: utils/dates.py:24
+msgid "oct"
+msgstr "اکتبر"
+
+#: utils/dates.py:24
+msgid "nov"
+msgstr "نوامبر"
+
+#: utils/dates.py:24
+msgid "dec"
+msgstr "دسامبر"
+
+#: utils/dates.py:31
+msgid "Jan."
+msgstr "ژانویه"
+
+#: utils/dates.py:31
+msgid "Feb."
+msgstr "فوریه"
+
+#: utils/dates.py:32
+msgid "Aug."
+msgstr "اوت"
+
+#: utils/dates.py:32
+msgid "Sept."
+msgstr "سپتامبر"
+
+#: utils/dates.py:32
+msgid "Oct."
+msgstr "اکتبر"
+
+#: utils/dates.py:32
+msgid "Nov."
+msgstr "نوامبر"
+
+#: utils/dates.py:32
+msgid "Dec."
+msgstr "دسامبر"
+
+#: utils/text.py:127
+#, fuzzy
+msgid "or"
+msgstr "چهار"
+
+#: utils/timesince.py:21
+#, fuzzy
+msgid "year"
+msgstr "سال"
+
+#: utils/timesince.py:22
+#, fuzzy
+msgid "month"
+msgstr "ماه"
+
+#: utils/timesince.py:23
+#, fuzzy
+msgid "week"
+msgstr "هفته"
+
+#: utils/timesince.py:24
+#, fuzzy
+msgid "day"
+msgstr "روز"
+
+#: utils/timesince.py:25
+#, fuzzy
+msgid "hour"
+msgstr "ساعت"
+
+#: utils/timesince.py:26
+#, fuzzy
+msgid "minute"
+msgstr "دقیقه"
+
+#: utils/timesince.py:46
+#, fuzzy
+msgid "minutes"
+msgstr "دقیقه"
+
+#: utils/timesince.py:51
+#, python-format
+msgid "%(number)d %(type)s"
+msgstr ""
+
+#: utils/timesince.py:57
+#, python-format
+msgid ", %(number)d %(type)s"
+msgstr ""
+
+#: utils/translation/trans_real.py:399
+msgid "DATE_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:400
+msgid "DATETIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:401
+msgid "TIME_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:417
+msgid "YEAR_MONTH_FORMAT"
+msgstr ""
+
+#: utils/translation/trans_real.py:418
+msgid "MONTH_DAY_FORMAT"
+msgstr ""
+
+#: views/generic/create_update.py:43
+#, python-format
+msgid "The %(verbose_name)s was created successfully."
+msgstr "%(verbose_name)s با موفقیت ایجاد شد."
+
+#: views/generic/create_update.py:117
+#, python-format
+msgid "The %(verbose_name)s was updated successfully."
+msgstr "%(verbose_name)s با موفقیت به روز شد."
+
+#: views/generic/create_update.py:184
+#, python-format
+msgid "The %(verbose_name)s was deleted."
+msgstr "%(verbose_name)s حذف شد."
+
+#~ msgid "AnonymousUser"
+#~ msgstr "کاربر ناشناس"
+
+#~ msgid "%d milliseconds"
+#~ msgstr "%d میلی‌ثانیه"

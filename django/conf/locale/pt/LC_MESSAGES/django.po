@@ -851,6 +851,7 @@ msgstr "Remover"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:14
 #, python-format
+#, fuzzy
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
@@ -1933,6 +1934,7 @@ msgstr[1] "Por favor introduza um número décimal com um máximo de %s digitos.
 
 #: core/validators.py:381
 #, python-format
+#, fuzzy
 msgid ""
 "Please enter a valid decimal number with a whole part of at most %s digit."
 msgid_plural ""
@@ -1973,6 +1975,7 @@ msgstr "Não foi possível extrair nada de %s."
 
 #: core/validators.py:466
 #, python-format
+#, fuzzy
 msgid ""
 "The URL %(url)s returned the invalid Content-Type header '%(contenttype)s'."
 msgstr "O URL %(url)s devolveu um tipo de conteúdo inválido no header: '%s(contenttype)s'."

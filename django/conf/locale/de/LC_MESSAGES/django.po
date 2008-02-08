@@ -2614,6 +2614,34 @@ msgstr "Samstag"
 msgid "Sunday"
 msgstr "Sonntag"
 
+#: utils/dates.py:10
+msgid "Mon"
+msgstr "Mo"
+
+#: utils/dates.py:10
+msgid "Tue"
+msgstr "Di"
+
+#: utils/dates.py:10
+msgid "Wed"
+msgstr "Mi"
+
+#: utils/dates.py:10
+msgid "Thu"
+msgstr "Do"
+
+#: utils/dates.py:10
+msgid "Fri"
+msgstr "Fr"
+
+#: utils/dates.py:11
+msgid "Sat"
+msgstr "Sa"
+
+#: utils/dates.py:11
+msgid "Sun"
+msgstr "So"
+
 #: utils/dates.py:14
 msgid "January"
 msgstr "Januar"
