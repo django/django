@@ -27,7 +27,7 @@
   NAD83 / Texas South Central
 """
 import re
-from types import StringType, UnicodeType, TupleType
+from types import UnicodeType, TupleType
 from ctypes import byref, c_char_p, c_int, c_void_p
 
 # Getting the error checking routine and exceptions
@@ -44,26 +44,35 @@ class SpatialReference(object):
 
     # Well-Known Geographical Coordinate System Name
     _well_known = {'WGS84':4326, 'WGS72':4322, 'NAD27':4267, 'NAD83':4269}
-    _epsg_regex = re.compile('^EPSG:(?P<epsg>\d+)$', re.I)
+    _epsg_regex = re.compile('^(EPSG:)?(?P<epsg>\d+)$', re.I)
+    _proj_regex = re.compile(r'^\+proj')
 
     #### Python 'magic' routines ####
     def __init__(self, srs_input='', srs_type='wkt'):
-        "Creates a spatial reference object from the given OGC Well Known Text (WKT)."
-
+        """
+        Creates a GDAL OSR Spatial Reference object from the given input.
+        The input may be string of OGC Well Known Text (WKT), an integer 
+        EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand 
+        string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
+        """
         # Intializing pointer and string buffer.
         self._ptr = None
         buf = c_char_p('')
 
-        # Encoding to ASCII if unicode passed in.
-        if isinstance(srs_input, UnicodeType):
-            srs_input = srs_input.encode('ascii')
+        if isinstance(srs_input, basestring):
+            # Encoding to ASCII if unicode passed in.
+            if isinstance(srs_input, UnicodeType):
+                srs_input = srs_input.encode('ascii')
 
-        if isinstance(srs_input, StringType):
-            m = self._epsg_regex.match(srs_input)
-            if m:
+            epsg_m = self._epsg_regex.match(srs_input)
+            proj_m = self._proj_regex.match(srs_input)
+            if epsg_m:
                 # Is this an EPSG well known name?    
                 srs_type = 'epsg'
-                srs_input = int(m.group('epsg'))
+                srs_input = int(epsg_m.group('epsg'))
+            elif proj_m:
+                # Is the string a PROJ.4 string?
+                srs_type = 'proj'
             elif srs_input in self._well_known:
                 # Is this a short-hand well known name?  
                 srs_type = 'epsg'
