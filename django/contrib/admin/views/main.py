@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, Per
 from django.core.paginator import ObjectPaginator, InvalidPage
 from django.shortcuts import get_object_or_404, render_to_response
 from django.db import models
-from django.db.models.query import handle_legacy_orderlist, QuerySet
+from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.utils.html import escape
 from django.utils.text import capfirst, get_text_list
@@ -653,14 +653,11 @@ class ChangeList(object):
 
     def get_ordering(self):
         lookup_opts, params = self.lookup_opts, self.params
-        # For ordering, first check the "ordering" parameter in the admin options,
-        # then check the object's default ordering. If neither of those exist,
-        # order descending by ID by default. Finally, look for manually-specified
-        # ordering from the query string.
+        # For ordering, first check the "ordering" parameter in the admin
+        # options, then check the object's default ordering. If neither of
+        # those exist, order descending by ID by default. Finally, look for
+        # manually-specified ordering from the query string.
         ordering = lookup_opts.admin.ordering or lookup_opts.ordering or ['-' + lookup_opts.pk.name]
-
-        # Normalize it to new-style ordering.
-        ordering = handle_legacy_orderlist(ordering)
 
         if ordering[0].startswith('-'):
             order_field, order_type = ordering[0][1:], 'desc'
