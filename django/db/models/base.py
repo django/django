@@ -24,7 +24,8 @@ class ModelBase(type):
     def __new__(cls, name, bases, attrs):
         # If this isn't a subclass of Model, don't do anything special.
         try:
-            if not filter(lambda b: issubclass(b, Model), bases):
+            parents = [b for b in bases if issubclass(b, Model)]
+            if not parents:
                 return super(ModelBase, cls).__new__(cls, name, bases, attrs)
         except NameError:
             # 'Model' isn't defined yet, meaning we're looking at Django's own
@@ -39,9 +40,8 @@ class ModelBase(type):
             types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
 
         # Build complete list of parents
-        for base in bases:
-            # TODO: Checking for the presence of '_meta' is hackish.
-            if '_meta' in dir(base):
+        for base in parents:
+            if base is not Model:
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
 
@@ -78,6 +78,35 @@ class ModelBase(type):
         # should only be one class for each model, so we must always return the
         # registered version.
         return get_model(new_class._meta.app_label, name, False)
+
+    def add_to_class(cls, name, value):
+        if name == 'Admin':
+            assert type(value) == types.ClassType, "%r attribute of %s model must be a class, not a %s object" % (name, cls.__name__, type(value))
+            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_')]))
+        if hasattr(value, 'contribute_to_class'):
+            value.contribute_to_class(cls, name)
+        else:
+            setattr(cls, name, value)
+
+    def _prepare(cls):
+        # Creates some methods once self._meta has been populated.
+        opts = cls._meta
+        opts._prepare(cls)
+
+        if opts.order_with_respect_to:
+            cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
+            cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
+            setattr(opts.order_with_respect_to.rel.to, 'get_%s_order' % cls.__name__.lower(), curry(method_get_order, cls))
+            setattr(opts.order_with_respect_to.rel.to, 'set_%s_order' % cls.__name__.lower(), curry(method_set_order, cls))
+
+        # Give the class a docstring -- its definition.
+        if cls.__doc__ is None:
+            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
+
+        if hasattr(cls, 'get_absolute_url'):
+            cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
+
+        dispatcher.send(signal=signals.class_prepared, sender=cls)
 
 class Model(object):
     __metaclass__ = ModelBase
@@ -175,38 +204,6 @@ class Model(object):
             if kwargs:
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
-
-    def add_to_class(cls, name, value):
-        if name == 'Admin':
-            assert type(value) == types.ClassType, "%r attribute of %s model must be a class, not a %s object" % (name, cls.__name__, type(value))
-            value = AdminOptions(**dict([(k, v) for k, v in value.__dict__.items() if not k.startswith('_')]))
-        if hasattr(value, 'contribute_to_class'):
-            value.contribute_to_class(cls, name)
-        else:
-            setattr(cls, name, value)
-    add_to_class = classmethod(add_to_class)
-
-    def _prepare(cls):
-        # Creates some methods once self._meta has been populated.
-        opts = cls._meta
-        opts._prepare(cls)
-
-        if opts.order_with_respect_to:
-            cls.get_next_in_order = curry(cls._get_next_or_previous_in_order, is_next=True)
-            cls.get_previous_in_order = curry(cls._get_next_or_previous_in_order, is_next=False)
-            setattr(opts.order_with_respect_to.rel.to, 'get_%s_order' % cls.__name__.lower(), curry(method_get_order, cls))
-            setattr(opts.order_with_respect_to.rel.to, 'set_%s_order' % cls.__name__.lower(), curry(method_set_order, cls))
-
-        # Give the class a docstring -- its definition.
-        if cls.__doc__ is None:
-            cls.__doc__ = "%s(%s)" % (cls.__name__, ", ".join([f.attname for f in opts.fields]))
-
-        if hasattr(cls, 'get_absolute_url'):
-            cls.get_absolute_url = curry(get_absolute_url, opts, cls.get_absolute_url)
-
-        dispatcher.send(signal=signals.class_prepared, sender=cls)
-
-    _prepare = classmethod(_prepare)
 
     def save(self, raw=False):
         dispatcher.send(signal=signals.pre_save, sender=self.__class__,

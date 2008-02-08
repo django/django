@@ -42,7 +42,10 @@ accept_language_re = re.compile(r'''
         ''', re.VERBOSE)
 
 def to_locale(language, to_lower=False):
-    "Turns a language name (en-us) into a locale name (en_US)."
+    """
+    Turns a language name (en-us) into a locale name (en_US). If 'to_lower' is
+    True, the last component is lower-cased (en_us).
+    """
     p = language.find('-')
     if p >= 0:
         if to_lower:
@@ -357,19 +360,20 @@ def get_language_from_request(request):
         return lang_code
 
     accept = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    for lang, unused in parse_accept_lang_header(accept):
-        if lang == '*':
+    for accept_lang, unused in parse_accept_lang_header(accept):
+        if accept_lang == '*':
             break
 
         # We have a very restricted form for our language files (no encoding
         # specifier, since they all must be UTF-8 and only one possible
         # language each time. So we avoid the overhead of gettext.find() and
-        # look up the MO file manually.
+        # work out the MO file manually.
 
-        normalized = locale.locale_alias.get(to_locale(lang, True))
+        # 'normalized' is the root name of the locale in POSIX format (which is
+        # the format used for the directories holding the MO files).
+        normalized = locale.locale_alias.get(to_locale(accept_lang, True))
         if not normalized:
             continue
-
         # Remove the default encoding from locale_alias
         normalized = normalized.split('.')[0]
 
@@ -378,10 +382,11 @@ def get_language_from_request(request):
             # need to check again.
             return _accepted[normalized]
 
-        for lang in (normalized, normalized.split('_')[0]):
+        for lang, dirname in ((accept_lang, normalized),
+                (accept_lang.split('-')[0], normalized.split('_')[0])):
             if lang not in supported:
                 continue
-            langfile = os.path.join(globalpath, lang, 'LC_MESSAGES',
+            langfile = os.path.join(globalpath, dirname, 'LC_MESSAGES',
                     'django.mo')
             if os.path.exists(langfile):
                 _accepted[normalized] = lang

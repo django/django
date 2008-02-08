@@ -2,6 +2,11 @@ tests = """
 >>> from django.utils.translation.trans_real import parse_accept_lang_header
 >>> p = parse_accept_lang_header
 
+#
+# Testing HTTP header parsing. First, we test that we can parse the values
+# according to the spec (and that we extract all the pieces in the right order).
+#
+
 Good headers.
 >>> p('de')
 [('de', 1.0)]
@@ -54,4 +59,44 @@ Bad headers; should always return [].
 >>> p('')
 []
 
+#
+# Now test that we parse a literal HTTP header correctly.
+#
+
+>>> from django.utils.translation.trans_real import get_language_from_request
+>>> g = get_language_from_request
+>>> from django.http import HttpRequest
+>>> r = HttpRequest
+>>> r.COOKIES = {}
+
+These tests assumes the es, es_AR, pt and pt_BR translations exit in the Django
+source tree.
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt-br'}
+>>> g(r)
+'pt-br'
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'pt'}
+>>> g(r)
+'pt'
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'es,de'}
+>>> g(r)
+'es'
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-ar,de'}
+>>> g(r)
+'es-ar'
+
+This test assumes there won't be a Django translation to a US variation
+of the Spanish language, a safe assumption. When the user sets it
+as the preferred language, the main 'es' translation should be selected
+instead.
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'es-us'}
+>>> g(r)
+'es'
+
+This tests the following scenario: there isn't a main language (zh)
+translation of Django but there is a translation to variation (zh_CN)
+the user sets zh-cn as the preferred language, it should be selected by
+Django without falling back nor ignoring it.
+>>> r.META = {'HTTP_ACCEPT_LANGUAGE': 'zh-cn,de'}
+>>> g(r)
+'zh-cn'
 """

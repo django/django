@@ -971,6 +971,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin/delete_confirmation.html:21
 #, python-format
+#,fuzzy
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
@@ -2181,6 +2182,7 @@ msgstr ""
 
 #: core/validators.py:256
 #, python-format
+#,fuzzy
 msgid "Watch your mouth! The word %s is not allowed here."
 msgstr ""
 "ನಾಲಿಗೆ ಬಿಗಿ ಹಿಡಿಯಿರಿ! %s  "
@@ -2486,6 +2488,7 @@ msgstr ""
 
 #: forms/__init__.py:381
 #, python-format
+#,fuzzy
 msgid "Ensure your text is less than %s character."
 msgstr ""
 "ನಿಮ್ಮ ಗದ್ಯ %s ಅಕ್ಷರಕ್ಕಿಂತ "

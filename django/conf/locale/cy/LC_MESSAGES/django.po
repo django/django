@@ -153,6 +153,7 @@ msgstr "Sgorau Carma"
 
 #: contrib/comments/models.py:242
 #, python-format
+#, fuzzy
 msgid "%(score)d rating by %(user)s"
 msgstr "%(score)d"
 
