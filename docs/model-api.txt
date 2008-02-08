@@ -979,9 +979,6 @@ the relationship should work. All are optional:
 One-to-one relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The semantics of one-to-one relationships will be changing soon, so we don't
-recommend you use them. If that doesn't scare you away, keep reading.
-
 To define a one-to-one relationship, use ``OneToOneField``. You use it just
 like any other ``Field`` type: by including it as a class attribute of your
 model.
@@ -1003,9 +1000,11 @@ As with ``ForeignKey``, a relationship to self can be defined by using the
 string ``"self"`` instead of the model name; references to as-yet undefined
 models can be made by using a string containing the model name.
 
-This ``OneToOneField`` will actually replace the primary key ``id`` field
-(since one-to-one relations share the same primary key), and will be displayed
-as a read-only field when you edit an object in the admin interface:
+**New in Django development version:** ``OneToOneField`` classes used to
+automatically become the primary key on a model. This is no longer true,
+although you can manually pass in the ``primary_key`` attribute if you like.
+Thus, it's now possible to have multilpe fields of type ``OneToOneField`` on a
+single model.
 
 See the `One-to-one relationship model example`_ for a full example.
 
