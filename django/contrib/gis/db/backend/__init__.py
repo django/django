@@ -9,66 +9,101 @@
      the backend.
  (3) The `parse_lookup` function, used for spatial SQL construction by
      the GeoQuerySet.
- (4) The `create_spatial_db`, and `get_geo_where_clause`
-     routines (needed by `parse_lookup`).
+ (4) The `create_spatial_db`, and `get_geo_where_clause` 
+     (needed by `parse_lookup`) functions.
  (5) The `SpatialBackend` object, which contains information specific
      to the spatial backend.
 """
-from types import StringType, UnicodeType
 from django.conf import settings
 from django.db import connection
 from django.db.models.query import field_choices, find_field, get_where_clause, \
     FieldFound, LOOKUP_SEPARATOR, QUERY_TERMS
 from django.utils.datastructures import SortedDict
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.db.backend.util import gqn
 
 # These routines (needed by GeoManager), default to False.
-ASGML, ASKML, DISTANCE, EXTENT, TRANSFORM, UNION, VERSION = (False, False, False, False, False, False, False)
+ASGML, ASKML, DISTANCE, DISTANCE_SPHEROID, EXTENT, TRANSFORM, UNION, VERSION = tuple(False for i in range(8))
 
+# Lookup types in which the rest of the parameters are not 
+# needed to be substitute in the WHERE SQL (e.g., the 'relate'
+# operation on Oracle does not need the mask substituted back
+# into the query SQL.).
+LIMITED_WHERE = []
+
+# Retrieving the necessary settings from the backend.
 if settings.DATABASE_ENGINE == 'postgresql_psycopg2':
-    # PostGIS is the spatial database, getting the rquired modules, 
-    # renaming as necessary.
-    from django.contrib.gis.db.backend.postgis import \
-        PostGISField as GeoBackendField, POSTGIS_TERMS as GIS_TERMS, \
-        create_spatial_db, get_geo_where_clause, \
-        ASGML, ASKML, DISTANCE, EXTENT, GEOM_SELECT, TRANSFORM, UNION, \
+    from django.contrib.gis.db.backend.postgis.adaptor import \
+        PostGISAdaptor as GeoAdaptor
+    from django.contrib.gis.db.backend.postgis.field import \
+        PostGISField as GeoBackendField
+    from django.contrib.gis.db.backend.postgis.creation import create_spatial_db
+    from django.contrib.gis.db.backend.postgis.query import \
+        get_geo_where_clause, POSTGIS_TERMS as GIS_TERMS, \
+        ASGML, ASKML, DISTANCE, DISTANCE_SPHEROID, DISTANCE_FUNCTIONS, \
+        EXTENT, GEOM_SELECT, TRANSFORM, UNION, \
         MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2
+    # PostGIS version info is needed to determine calling order of some
+    # stored procedures (e.g., AsGML()).
     VERSION = (MAJOR_VERSION, MINOR_VERSION1, MINOR_VERSION2)
     SPATIAL_BACKEND = 'postgis'
 elif settings.DATABASE_ENGINE == 'oracle':
-    from django.contrib.gis.db.backend.oracle import \
-         OracleSpatialField as GeoBackendField, \
-         ORACLE_SPATIAL_TERMS as GIS_TERMS, \
-         create_spatial_db, get_geo_where_clause, \
-         ASGML, DISTANCE, GEOM_SELECT, TRANSFORM, UNION
+    from django.contrib.gis.db.backend.oracle.adaptor import \
+        OracleSpatialAdaptor as GeoAdaptor
+    from django.contrib.gis.db.backend.oracle.field import \
+        OracleSpatialField as GeoBackendField
+    from django.contrib.gis.db.backend.oracle.creation import create_spatial_db
+    from django.contrib.gis.db.backend.oracle.query import \
+        get_geo_where_clause, ORACLE_SPATIAL_TERMS as GIS_TERMS, \
+        ASGML, DISTANCE, DISTANCE_FUNCTIONS, GEOM_SELECT, TRANSFORM, UNION
     SPATIAL_BACKEND = 'oracle'
+    LIMITED_WHERE = ['relate']
 elif settings.DATABASE_ENGINE == 'mysql':
-    from django.contrib.gis.db.backend.mysql import \
-        MySQLGeoField as GeoBackendField, \
-        MYSQL_GIS_TERMS as GIS_TERMS, \
-        create_spatial_db, get_geo_where_clause, \
-        GEOM_SELECT
+    from django.contrib.gis.db.backend.mysql.adaptor import \
+        MySQLAdaptor as GeoAdaptor
+    from django.contrib.gis.db.backend.mysql.field import \
+        MySQLGeoField as GeoBackendField
+    from django.contrib.gis.db.backend.mysql.creation import create_spatial_db
+    from django.contrib.gis.db.backend.mysql.query import \
+        get_geo_where_clause, MYSQL_GIS_TERMS as GIS_TERMS, GEOM_SELECT
+    DISTANCE_FUNCTIONS = {}
     SPATIAL_BACKEND = 'mysql'
 else:
     raise NotImplementedError('No Geographic Backend exists for %s' % settings.DATABASE_ENGINE)
 
 class SpatialBackend(object):
-    "A container for properties of the Spatial Backend."
+    "A container for properties of the SpatialBackend."
+    # Stored procedure names used by the `GeoManager`.
     as_kml = ASKML
     as_gml = ASGML
     distance = DISTANCE
+    distance_spheroid = DISTANCE_SPHEROID
     extent = EXTENT
     name = SPATIAL_BACKEND
     select = GEOM_SELECT
     transform = TRANSFORM
     union = UNION
+    
+    # Version information, if defined.
     version = VERSION
+    
+    # All valid GIS lookup terms, and distance functions.
+    gis_terms = GIS_TERMS
+    distance_functions = DISTANCE_FUNCTIONS
+    
+    # Lookup types where additional WHERE parameters are excluded.
+    limited_where = LIMITED_WHERE
+
+    # Class for the backend field.
+    Field = GeoBackendField
+
+    # Adaptor class used for quoting GEOS geometries in the database.
+    Adaptor = GeoAdaptor
 
 ####    query.py overloaded functions    ####
 # parse_lookup() and lookup_inner() are modified from their django/db/models/query.py
 #  counterparts to support constructing SQL for geographic queries.
 #
-# Status: Synced with r5982.
+# Status: Synced with r7098.
 #
 def parse_lookup(kwarg_items, opts):
     # Helper function that handles converting API kwargs
@@ -290,16 +325,17 @@ def lookup_inner(path, lookup_type, value, opts, table, column):
         # If the field is a geometry field, then the WHERE clause will need to be obtained
         # with the get_geo_where_clause()
         if hasattr(field, '_geom'):
-            # Getting the preparation SQL object from the field.
-            geo_prep = field.get_db_prep_lookup(lookup_type, value)
+            # Getting additional SQL WHERE and params arrays associated with 
+            # the geographic field.
+            geo_where, geo_params = field.get_db_prep_lookup(lookup_type, value)
             
-            # Getting the adapted geometry from the field.
-            gwc = get_geo_where_clause(lookup_type, current_table, column, value)
+            # Getting the geographic WHERE clause.
+            gwc = get_geo_where_clause(lookup_type, current_table, field, value)
 
-            # Substituting in the the where parameters into the geographic where
-            # clause, and extending the parameters.
-            where.append(gwc % tuple(geo_prep.where))
-            params.extend(geo_prep.params)
+            # Appending the geographic WHERE componnents and parameters onto
+            # the where and params arrays. 
+            where.append(gwc % tuple(geo_where))
+            params.extend(geo_params)
         else:
             where.append(get_where_clause(lookup_type, current_table + '.', column, value, db_type))
             params.extend(field.get_db_prep_lookup(lookup_type, value))

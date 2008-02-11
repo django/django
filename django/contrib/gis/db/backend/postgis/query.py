@@ -40,6 +40,7 @@ if MAJOR_VERSION >= 1:
     ASKML = get_func('AsKML')
     ASGML = get_func('AsGML')
     DISTANCE = get_func('Distance')
+    DISTANCE_SPHEROID = get_func('distance_spheroid')
     EXTENT = get_func('extent')
     GEOM_FROM_TEXT = get_func('GeomFromText')
     GEOM_FROM_WKB = get_func('GeomFromWKB')
@@ -74,8 +75,20 @@ class PostGISFunctionParam(PostGISFunction):
 
 class PostGISDistance(PostGISFunction):
     "For PostGIS distance operations."
+    dist_func = 'Distance'
     def __init__(self, operator):
-        super(PostGISDistance, self).__init__('Distance', end_subst=') %s %s', operator=operator, result='%%s')
+        super(PostGISDistance, self).__init__(self.dist_func, end_subst=') %s %s', 
+                                              operator=operator, result='%%s')
+
+class PostGISSphereDistance(PostGISFunction):
+    "For PostGIS spherical distance operations."
+    dist_func = 'distance_spheroid'
+    def __init__(self, operator):
+        # An extra parameter in `end_subst` is needed for the spheroid string.
+        super(PostGISSphereDistance, self).__init__(self.dist_func, 
+                                                    beg_subst='%s(%s, %%s, %%s', 
+                                                    end_subst=') %s %s',
+                                                    operator=operator, result='%%s')
 
 class PostGISRelate(PostGISFunctionParam):
     "For PostGIS Relate(<geom>, <pattern>) calls."
@@ -148,21 +161,24 @@ POSTGIS_GEOMETRY_FUNCTIONS = {
     }
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int)
+dtypes = (Decimal, Distance, float, int, long)
+def get_dist_ops(operator):
+    "Returns operations for both regular and spherical distances."
+    return (PostGISDistance(operator), PostGISSphereDistance(operator))
 DISTANCE_FUNCTIONS = {
-    'distance_gt' : (PostGISDistance('>'), dtypes),
-    'distance_gte' : (PostGISDistance('>='), dtypes),
-    'distance_lt' : (PostGISDistance('<'), dtypes),
-    'distance_lte' : (PostGISDistance('<='), dtypes),
+    'distance_gt' : (get_dist_ops('>'), dtypes),
+    'distance_gte' : (get_dist_ops('>='), dtypes),
+    'distance_lt' : (get_dist_ops('<'), dtypes),
+    'distance_lte' : (get_dist_ops('<='), dtypes),
     }
 
 if GEOM_FUNC_PREFIX == 'ST_':
     # The ST_DWithin, ST_CoveredBy, and ST_Covers routines become available in 1.2.2+
     POSTGIS_GEOMETRY_FUNCTIONS.update(
-        {'dwithin' : (PostGISFunctionParam('DWithin'), dtypes),
-         'coveredby' : PostGISFunction('CoveredBy'),
+        {'coveredby' : PostGISFunction('CoveredBy'),
          'covers' : PostGISFunction('Covers'),
          })
+    DISTANCE_FUNCTIONS['dwithin'] = (PostGISFunctionParam('DWithin'), dtypes)
 
 # Distance functions are a part of PostGIS geometry functions.
 POSTGIS_GEOMETRY_FUNCTIONS.update(DISTANCE_FUNCTIONS)
@@ -178,10 +194,10 @@ POSTGIS_TERMS += MISC_TERMS # Adding any other miscellaneous terms (e.g., 'isnul
 POSTGIS_TERMS = tuple(POSTGIS_TERMS) # Making immutable
 
 #### The `get_geo_where_clause` function for PostGIS. ####
-def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
+def get_geo_where_clause(lookup_type, table_prefix, field, value):
     "Returns the SQL WHERE clause for use in PostGIS SQL construction."
     # Getting the quoted field as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field_name))
+    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
     if lookup_type in POSTGIS_OPERATORS:
         # See if a PostGIS operator matches the lookup type.
         return POSTGIS_OPERATORS[lookup_type].as_sql(geo_col)
@@ -198,7 +214,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
             op, arg_type = tmp
 
             # Ensuring that a tuple _value_ was passed in from the user
-            if not isinstance(value, tuple): 
+            if not isinstance(value, (tuple, list)): 
                 raise TypeError('Tuple required for `%s` lookup type.' % lookup_type)
             if len(value) != 2:
                 raise ValueError('2-element tuple required or `%s` lookup type.' % lookup_type)
@@ -209,7 +225,18 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
 
             # For lookup type `relate`, the op instance is not yet created (has
             # to be instantiated here to check the pattern parameter).
-            if lookup_type == 'relate': op = op(value[1])
+            if lookup_type == 'relate': 
+                op = op(value[1])
+            elif lookup_type in DISTANCE_FUNCTIONS and lookup_type != 'dwithin':
+                if field._unit_name == 'degree':
+                    # Geodetic distances are only availble from Points to PointFields.
+                    if field._geom != 'POINT':
+                        raise TypeError('PostGIS spherical operations are only valid on PointFields.')
+                    if value[0].geom_typeid != 0:
+                        raise TypeError('PostGIS geometry distance parameter is required to be of type Point.')
+                    op = op[1]
+                else:
+                    op = op[0]
         else:
             op = tmp
         # Calling the `as_sql` function on the operation instance.

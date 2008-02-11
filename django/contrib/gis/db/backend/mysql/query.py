@@ -1,6 +1,11 @@
 """
- This module contains the spatial lookup types, and the get_geo_where_clause()
- routine for MySQL
+ This module contains the spatial lookup types, and the `get_geo_where_clause`
+ routine for MySQL.
+
+ Please note that MySQL only supports bounding box queries, also
+ known as MBRs (Minimum Bounding Rectangles).  Moreover, spatial
+ indices may only be used on MyISAM tables -- if you need 
+ transactions, take a look at PostGIS.
 """
 from django.db import connection
 qn = connection.ops.quote_name
@@ -34,10 +39,10 @@ MYSQL_GIS_TERMS  = MYSQL_GIS_FUNCTIONS.keys()
 MYSQL_GIS_TERMS += MISC_TERMS
 MYSQL_GIS_TERMS = tuple(MYSQL_GIS_TERMS) # Making immutable
 
-def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
+def get_geo_where_clause(lookup_type, table_prefix, field, value):
     "Returns the SQL WHERE clause for use in MySQL spatial SQL construction."
     # Getting the quoted field as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field_name))
+    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
 
     # See if a MySQL Geometry function matches the lookup type next
     lookup_info = MYSQL_GIS_FUNCTIONS.get(lookup_type, False)

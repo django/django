@@ -21,7 +21,7 @@ class SpatialRefSysMixin(object):
     #  TODO: Flattening not used in all ellipsoids, could also be a minor axis, or 'b'
     #        parameter.
     spheroid_regex = re.compile(r'.+SPHEROID\[\"(?P<name>.+)\",(?P<major>\d+(\.\d+)?),(?P<flattening>\d{3}\.\d+),')
-    
+
     # For pulling out the units on platforms w/o GDAL installed.
     # TODO: Figure out how to pull out angular units of projected coordinate system and
     # fix for LOCAL_CS types.  GDAL should be highly recommended for performing 
@@ -71,7 +71,7 @@ class SpatialRefSysMixin(object):
 
     @property
     def spheroid(self):
-        "Returns the spheroid for this spatial reference."
+        "Returns the spheroid name for this spatial reference."
         return self.srs['spheroid']
 
     @property
@@ -169,6 +169,34 @@ class SpatialRefSysMixin(object):
         else:
             m = cls.units_regex.match(wkt)
             return m.group('unit'), m.group('unit_name')
+
+    @classmethod
+    def get_spheroid(cls, wkt, string=True):
+        """
+        Class method used by GeometryField on initialization to
+        retrieve the `SPHEROID[..]` parameters from the given WKT.
+        """
+        if HAS_GDAL:
+            srs = SpatialReference(wkt)
+            sphere_params = srs.ellipsoid
+            sphere_name = srs['spheroid']
+        else:
+            m = cls.spheroid_regex.match(wkt)
+            if m: 
+                sphere_params = (float(m.group('major')), float(m.group('flattening')))
+                sphere_name = m.group('name')
+            else: 
+                return None
+        
+        if not string: 
+            return sphere_name, sphere_params
+        else:
+            # `string` parameter used to place in format acceptable by PostGIS
+            if len(sphere_params) == 3:
+                radius, flattening = sphere_params[0], sphere_params[2]
+            else:
+                radius, flattening = sphere_params
+            return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening) 
 
     def __unicode__(self):
         """

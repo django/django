@@ -1,20 +1,11 @@
-from types import UnicodeType
 from django.db import connection
 from django.db.models.fields import Field # Django base Field class
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.db.backend.util import GeoFieldSQL
-from django.contrib.gis.db.backend.postgis.adaptor import PostGISAdaptor
-from django.contrib.gis.db.backend.postgis.query import \
-    DISTANCE_FUNCTIONS, POSTGIS_TERMS, TRANSFORM
+from django.contrib.gis.db.backend.util import gqn
+from django.contrib.gis.db.backend.postgis.query import TRANSFORM
 
 # Quotename & geographic quotename, respectively
 qn = connection.ops.quote_name
-def gqn(value):
-    if isinstance(value, basestring):
-        if isinstance(value, UnicodeType): value = value.encode('ascii')
-        return "'%s'" % value
-    else: 
-        return str(value)
 
 class PostGISField(Field):
     """
@@ -92,59 +83,14 @@ class PostGISField(Field):
         """
         return None
 
-    def get_db_prep_lookup(self, lookup_type, value):
-        """
-        Returns field's value prepared for database lookup, accepts WKT and 
-        GEOS Geometries for the value.
-        """
-        if lookup_type in POSTGIS_TERMS:
-            # special case for isnull lookup
-            if lookup_type == 'isnull': return GeoFieldSQL([], [])
-
-            # Get the geometry with SRID; defaults SRID to 
-            # that of the field if it is None.
-            geom = self.get_geometry(value)
-
-            # The adaptor will be used by psycopg2 for quoting the WKB.
-            adapt = PostGISAdaptor(geom)
-
-            if geom.srid != self._srid:
-                # Adding the necessary string substitutions and parameters
-                # to perform a geometry transformation.
-                where = ['%s(%%s,%%s)' % TRANSFORM]
-                params = [adapt, self._srid]
-            else:
-                # Otherwise, the adaptor will take care of everything.
-                where = ['%s']
-                params = [adapt]
-
-            if isinstance(value, tuple):
-                if lookup_type in DISTANCE_FUNCTIONS or lookup_type == 'dwithin':
-                    # Getting the distance parameter in the units of the field.
-                    where += [self.get_distance(value[1])]
-                else:
-                    where += map(gqn, value[1:])
-            return GeoFieldSQL(where, params)
-        else:
-            raise TypeError("Field has invalid lookup: %s" % lookup_type)
-
-
-    def get_db_prep_save(self, value):
-        "Prepares the value for saving in the database."
-        if not bool(value): return None
-        if isinstance(value, GEOSGeometry):
-            return PostGISAdaptor(value)
-        else:
-            raise TypeError('Geometry Proxy should only return GEOSGeometry objects.')
-
     def get_placeholder(self, value):
         """
         Provides a proper substitution value for Geometries that are not in the
         SRID of the field.  Specifically, this routine will substitute in the
         ST_Transform() function call.
         """
-        if isinstance(value, GEOSGeometry) and value.srid != self._srid:
+        if value is None or value.srid == self._srid:
+            return '%s'
+        else:
             # Adding Transform() to the SQL placeholder.
             return '%s(%%s, %s)' % (TRANSFORM, self._srid)
-        else:
-            return '%s'

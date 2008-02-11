@@ -1,23 +1,16 @@
-class GeoFieldSQL(object):
-    """
-    Container for passing values to `parse_lookup` from the various
-    backend geometry fields.
-    """
-    def __init__(self, where=[], params=[]):
-        self.where = where
-        self.params = params
+from types import UnicodeType
 
-    def __str__(self):
-        return self.as_sql()
-
-    def as_sql(self, quote=False):
-        if not quote:
-            return self.where[0] % tuple(self.params)
-        else:
-            # Used for quoting WKT on certain backends.
-            tmp_params = ["'%s'" % self.params[0]]
-            tmp_params.extend(self.params[1:])
-            return self.where[0] % tuple(tmp_params)
+def gqn(val):
+    """
+    The geographic quote name function; used for quoting tables and 
+    geometries (they use single rather than the double quotes of the
+    backend quotename function).
+    """
+    if isinstance(val, basestring):
+        if isinstance(val, UnicodeType): val = val.encode('ascii')
+        return "'%s'" % val
+    else:
+        return str(val)
 
 class SpatialOperation(object):
     """

@@ -1,6 +1,11 @@
 """
- This module contains the spatial lookup types, and the get_geo_where_clause()
+ This module contains the spatial lookup types, and the `get_geo_where_clause`
  routine for Oracle Spatial.
+
+ Please note that WKT support is broken on the XE version, and thus
+ this backend will not work on such platforms.  Specifically, XE lacks 
+ support for an internal JVM, and Java libraries are required to use 
+ the WKT constructors.
 """
 import re
 from decimal import Decimal
@@ -25,8 +30,11 @@ GEOM_SELECT = 'SDO_UTIL.TO_WKTGEOMETRY(%s)'
 #### Classes used in constructing Oracle spatial SQL ####
 class SDOOperation(SpatialFunction):
     "Base class for SDO* Oracle operations."
-    def __init__(self, func, end_subst=") %s '%s'"):
-        super(SDOOperation, self).__init__(func, end_subst=end_subst, operator='=', result='TRUE')
+    def __init__(self, func, **kwargs):
+        kwargs.setdefault('operator', '=')
+        kwargs.setdefault('result', 'TRUE')
+        kwargs.setdefault('end_subst', ") %s '%s'")
+        super(SDOOperation, self).__init__(func, **kwargs)
 
 class SDODistance(SpatialFunction):
     "Class for Distance queries."
@@ -55,12 +63,14 @@ class SDORelate(SpatialFunction):
 #### Lookup type mapping dictionaries of Oracle spatial operations ####
 
 # Valid distance types and substitutions
-dtypes = (Decimal, Distance, float, int)
+dtypes = (Decimal, Distance, float, int, long)
 DISTANCE_FUNCTIONS = {
     'distance_gt' : (SDODistance('>'), dtypes),
     'distance_gte' : (SDODistance('>='), dtypes),
     'distance_lt' : (SDODistance('<'), dtypes),
     'distance_lte' : (SDODistance('<='), dtypes),
+    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE', 
+                              beg_subst="%s(%s, %%s, 'distance=%%s'"), dtypes),
     }
 
 ORACLE_GEOMETRY_FUNCTIONS = {
@@ -68,7 +78,6 @@ ORACLE_GEOMETRY_FUNCTIONS = {
     'coveredby' : SDOOperation('SDO_COVEREDBY'),
     'covers' : SDOOperation('SDO_COVERS'),
     'disjoint' : SDOGeomRelate('DISJOINT'),
-    'dwithin' : (SDOOperation('SDO_WITHIN_DISTANCE', end_subst=", %%s, 'distance=%%s') %s '%s'"), dtypes),
     'intersects' : SDOOperation('SDO_OVERLAPBDYINTERSECT'), # TODO: Is this really the same as ST_Intersects()?
     'equals' : SDOOperation('SDO_EQUAL'),
     'exact' : SDOOperation('SDO_EQUAL'),
@@ -89,10 +98,10 @@ ORACLE_SPATIAL_TERMS += MISC_TERMS
 ORACLE_SPATIAL_TERMS = tuple(ORACLE_SPATIAL_TERMS) # Making immutable
 
 #### The `get_geo_where_clause` function for Oracle ####
-def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
+def get_geo_where_clause(lookup_type, table_prefix, field, value):
     "Returns the SQL WHERE clause for use in Oracle spatial SQL construction."
     # Getting the quoted table name as `geo_col`.
-    geo_col = '%s.%s' % (qn(table_prefix), qn(field_name))
+    geo_col = '%s.%s' % (qn(table_prefix), qn(field.column))
 
     # See if a Oracle Geometry function matches the lookup type next
     lookup_info = ORACLE_GEOMETRY_FUNCTIONS.get(lookup_type, False)
@@ -122,7 +131,7 @@ def get_geo_where_clause(lookup_type, table_prefix, field_name, value):
                 # Otherwise, just call the `as_sql` method on the SDOOperation instance.
                 return sdo_op.as_sql(geo_col)
         else:
-            # Lookup info is a SDOOperation instance, whos `as_sql` method returns
+            # Lookup info is a SDOOperation instance, whose `as_sql` method returns
             # the SQL necessary for the geometry function call. For example:  
             #  SDO_CONTAINS("geoapp_country"."poly", SDO_GEOMTRY('POINT(5 23)', 4326)) = 'TRUE'
             return lookup_info.as_sql(geo_col)

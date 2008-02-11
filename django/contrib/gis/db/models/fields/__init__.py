@@ -1,7 +1,9 @@
 from decimal import Decimal
 from django.conf import settings
 from django.db import connection
-from django.contrib.gis.db.backend import GeoBackendField # these depend on the spatial database backend.
+# Getting the SpatialBackend container and the geographic quoting method.
+from django.contrib.gis.db.backend import SpatialBackend, gqn
+# GeometryProxy, GEOS, Distance, and oldforms imports.
 from django.contrib.gis.db.models.proxy import GeometryProxy
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.contrib.gis.measure import Distance
@@ -14,7 +16,7 @@ except NotImplementedError:
     SpatialRefSys = None
 
 #TODO: Flesh out widgets; consider adding support for OGR Geometry proxies.
-class GeometryField(GeoBackendField):
+class GeometryField(SpatialBackend.Field):
     "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 
     # The OpenGIS Geometry name.
@@ -38,21 +40,19 @@ class GeometryField(GeoBackendField):
          The number of dimensions for this geometry.  Defaults to 2.
         """
 
-        # Backward-compatibility notice, this will disappear in future revisions.
-        if 'index' in kwargs:
-            from warnings import warn
-            warn('The `index` keyword has been deprecated, please use the `spatial_index` keyword instead.')
-            self._index = kwargs['index']
-        else:
-            self._index = spatial_index
+        # Setting the index flag with the value of the `spatial_index` keyword.
+        self._index = spatial_index
 
-        # Setting the SRID and getting the units.
+        # Setting the SRID and getting the units.  Unit information must be 
+        # easily available in the field instance for distance queries.
         self._srid = srid
         if SpatialRefSys:
-            # This doesn't work when we actually use: SpatialRefSys.objects.get(srid=srid)
+            # Getting the spatial reference WKT associated with the SRID from the
+            # `spatial_ref_sys` (or equivalent) spatial database table.
+            #
+            # The following doesn't work: SpatialRefSys.objects.get(srid=srid)
             # Why?  `syncdb` fails to recognize installed geographic models when there's
-            # an ORM query instantiated within a model field.  No matter, this works fine
-            # too.
+            # an ORM query instantiated within a model field.
             cur = connection.cursor()
             qn = connection.ops.quote_name
             stmt = 'SELECT %(table)s.%(wkt_col)s FROM %(table)s WHERE (%(table)s.%(srid_col)s = %(srid)s)'
@@ -62,27 +62,48 @@ class GeometryField(GeoBackendField):
                            'srid' : srid,
                            }
             cur.execute(stmt)
-            row = cur.fetchone()
-            self._unit, self._unit_name = SpatialRefSys.get_units(row[0])
+            srs_wkt = cur.fetchone()[0]
             
+            # Getting metadata associated with the spatial reference system identifier.
+            # Specifically, getting the unit information and spheroid information 
+            # (both required for distance queries).
+            self._unit, self._unit_name = SpatialRefSys.get_units(srs_wkt)
+            self._spheroid = SpatialRefSys.get_spheroid(srs_wkt)
+
         # Setting the dimension of the geometry field.
         self._dim = dim
+
         super(GeometryField, self).__init__(**kwargs) # Calling the parent initializtion function
 
     ### Routines specific to GeometryField ###
     def get_distance(self, dist):
+        """
+        Returns a distance number in units of the field.  For example, if 
+        `D(km=1)` was passed in and the units of the field were in meters,
+        then 1000 would be returned.
+        """
         if isinstance(dist, Distance):
-            return getattr(dist, Distance.unit_attname(self._unit_name))
-        elif isinstance(dist, (int, float, Decimal)):
+            if self._unit_name in ('Decimal Degree', 'degree'):
+                # Spherical distance calculation parameter should be in meters.
+                dist_param = dist.m
+            else:
+                dist_param = getattr(dist, Distance.unit_attname(self._unit_name))
+        else:
             # Assuming the distance is in the units of the field.
-            return dist
+            dist_param = dist
+
+        # Sphereical distance query; returning meters.
+        if SpatialBackend.name == 'postgis' and self._unit_name == 'degree':
+            return [gqn(self._spheroid), dist_param]
+        else:
+            return [dist_param]
 
     def get_geometry(self, value):
         """
         Retrieves the geometry, setting the default SRID from the given
         lookup parameters.
         """
-        if isinstance(value, tuple): 
+        if isinstance(value, (tuple, list)): 
             geom = value[0]
         else:
             geom = value
@@ -120,6 +141,49 @@ class GeometryField(GeoBackendField):
         
         # Setup for lazy-instantiated GEOSGeometry object.
         setattr(cls, self.attname, GeometryProxy(GEOSGeometry, self))
+
+    def get_db_prep_lookup(self, lookup_type, value):
+        """
+        Returns the spatial WHERE clause and associated parameters for the
+        given lookup type and value.  The value will be prepared for database
+        lookup (e.g., spatial transformation SQL will be added if necessary).
+        """
+        if lookup_type in SpatialBackend.gis_terms:
+            # special case for isnull lookup
+            if lookup_type == 'isnull': return [], []
+
+            # Get the geometry with SRID; defaults SRID to that of the field
+            # if it is None.
+            geom = self.get_geometry(value)
+
+            # Getting the WHERE clause list and the associated params list. The params 
+            # list is populated with the Adaptor wrapping the GEOSGeometry for the 
+            # backend.  The WHERE clause list contains the placeholder for the adaptor
+            # (e.g. any transformation SQL).
+            where = [self.get_placeholder(geom)]
+            params = [SpatialBackend.Adaptor(geom)]
+
+            if isinstance(value, (tuple, list)):
+                if lookup_type in SpatialBackend.distance_functions:
+                    # Getting the distance parameter in the units of the field.
+                    where += self.get_distance(value[1])
+                elif lookup_type in SpatialBackend.limited_where:
+                    pass
+                else:
+                    # Otherwise, making sure any other parameters are properly quoted.
+                    where += map(gqn, value[1:])
+            return where, params
+        else:
+            raise TypeError("Field has invalid lookup: %s" % lookup_type)
+
+    def get_db_prep_save(self, value):
+        "Prepares the value for saving in the database."
+        if isinstance(value, GEOSGeometry):
+            return SpatialBackend.Adaptor(value)
+        elif value is None:
+            return None
+        else:
+            raise TypeError('Geometry Proxy should only return GEOSGeometry objects or None.')
 
     def get_manipulator_field_objs(self):
         "Using the WKTField (defined above) to be our manipulator."
