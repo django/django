@@ -1,7 +1,7 @@
 from django.core.management.base import AppCommand
 
 class Command(AppCommand):
-    help = "Prints the CREATE TABLE, initial-data and CREATE INDEX SQL statements for the given model module name(s)."
+    help = "Prints the CREATE TABLE, initial SQL and CREATE INDEX SQL statements for the given model module name(s)."
 
     output_transaction = True
 
