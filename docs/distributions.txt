@@ -5,7 +5,7 @@ Third-party distributions of Django
 Several third-party distributors are now providing versions of Django integrated
 with their package-management systems. These can make installation and upgrading
 much easier for users of Django since the integration includes the ability to
-automatically install dependancies (like database adapters) that Django
+automatically install dependencies (like database adapters) that Django
 requires.
 
 Typically, these packages are based on the latest stable release of Django, so
