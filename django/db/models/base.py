@@ -139,7 +139,7 @@ class Model(object):
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
         # The reason for the kwargs check is that standard iterator passes in by
-        # args, and nstantiation for iteration is 33% faster.
+        # args, and instantiation for iteration is 33% faster.
         args_len = len(args)
         if args_len > len(self._meta.fields):
             # Daft, but matches old exception sans the err msg.
