@@ -1,5 +1,5 @@
 import os, sys
-from ctypes import CDLL, string_at
+from ctypes import c_char_p, CDLL
 from ctypes.util import find_library
 from django.contrib.gis.gdal.error import OGRException
 
@@ -48,10 +48,11 @@ def std_call(func):
         return lgdal[func]
 
 #### Version-information functions. ####
-def _version_info(key):
-    "Returns GDAL library version information with the given key."
-    buf = lgdal.GDALVersionInfo(key)
-    if buf: return string_at(buf)
+
+# Returns GDAL library version information with the given key.
+_version_info = lgdal.GDALVersionInfo
+_version_info.argtypes = [c_char_p]
+_version_info.restype = c_char_p
 
 def gdal_version():
     "Returns only the GDAL version number information."
@@ -67,9 +68,9 @@ def gdal_release_date(date=False):
     If the date keyword argument is set to True, a Python datetime object
     will be returned instead.
     """
-    from datetime import datetime
+    from datetime import date as date_type
     rel = _version_info('RELEASE_DATE')
     yy, mm, dd = map(int, (rel[0:4], rel[4:6], rel[6:8]))
-    d = datetime(yy, mm, dd)
+    d = date_type(yy, mm, dd)
     if date: return d
     else: return d.strftime('%Y/%m/%d')

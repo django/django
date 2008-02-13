@@ -63,6 +63,16 @@ class OGRGeomTest(unittest.TestCase):
             geom2 = OGRGeometry(wkb)
             self.assertEqual(geom1, geom2)
 
+    def test01e_json(self):
+        "Testing GeoJSON input/output."
+        from django.contrib.gis.gdal.prototypes.geom import GEOJSON
+        if not GEOJSON: return
+        for g in json_geoms:
+            geom = OGRGeometry(g.wkt)
+            self.assertEqual(g.json, geom.json)
+            self.assertEqual(g.json, geom.geojson)
+            self.assertEqual(OGRGeometry(g.wkt), OGRGeometry(geom.json))
+
     def test02_points(self):
         "Testing Point objects."
 

@@ -1,10 +1,18 @@
+from datetime import date
 from ctypes import c_char, c_char_p, c_double, c_int, c_ubyte, c_void_p, POINTER
 from django.contrib.gis.gdal.envelope import OGREnvelope
-from django.contrib.gis.gdal.libgdal import lgdal
+from django.contrib.gis.gdal.libgdal import lgdal, gdal_version
 from django.contrib.gis.gdal.prototypes.errcheck import check_bool, check_envelope
 from django.contrib.gis.gdal.prototypes.generation import \
     const_string_output, double_output, geom_output, int_output, \
     srs_output, string_output, void_output
+
+# Some prototypes need to be aware of what version GDAL we have.
+major, minor1, minor2 = map(int, gdal_version().split('.'))
+if major <= 1 and minor1 <= 4:
+    GEOJSON = False
+else:
+    GEOJSON = True
 
 ### Generation routines specific to this module ###
 def env_func(f, argtypes):
@@ -25,6 +33,14 @@ def topology_func(f):
     return f
 
 ### OGR_G ctypes function prototypes ###
+
+# GeoJSON routines, if supported.
+if GEOJSON:
+    from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
+    to_json = string_output(lgdal.OGR_G_ExportToJson, [c_void_p], str_result=True)
+else:
+    from_json = False
+    to_json = False
 
 # GetX, GetY, GetZ all return doubles.
 getx = pnt_func(lgdal.OGR_G_GetX)
