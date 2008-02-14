@@ -5,7 +5,7 @@
 # Python, ctypes and types dependencies.
 import re
 from ctypes import addressof, byref, c_double, c_size_t
-from types import StringType, UnicodeType, IntType, FloatType, BufferType
+from types import UnicodeType
 
 # GEOS-related dependencies.
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
@@ -20,16 +20,17 @@ from django.contrib.gis.geos.prototypes import *
 # Trying to import GDAL libraries, if available.  Have to place in
 # try/except since this package may be used outside GeoDjango.
 try:
-    from django.contrib.gis.gdal import OGRGeometry, SpatialReference
-    HAS_GDAL=True
+    from django.contrib.gis.gdal import OGRGeometry, SpatialReference, GEOJSON
+    HAS_GDAL = True
 except:
-    HAS_GDAL=False
+    HAS_GDAL, GEOJSON = False, False
 
 # Regular expression for recognizing HEXEWKB and WKT.  A prophylactic measure
 # to prevent potentially malicious input from reaching the underlying C
 # library.  Not a substitute for good web security programming practices.
 hex_regex = re.compile(r'^[0-9A-F]+$', re.I)
 wkt_regex = re.compile(r'^(SRID=(?P<srid>\d+);)?(?P<wkt>(POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)[ACEGIMLONPSRUTY\d,\.\-\(\) ]+)$', re.I)
+json_regex = re.compile(r'^\{.+\}$')
 
 class GEOSGeometry(object):
     "A class that, generally, encapsulates a GEOS geometry."
@@ -50,24 +51,29 @@ class GEOSGeometry(object):
         The `srid` keyword is used to specify the Source Reference Identifier
         (SRID) number for this Geometry.  If not set, the SRID will be None.
         """ 
-        if isinstance(geo_input, UnicodeType):
-            # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
-            geo_input = geo_input.encode('ascii')
-        if isinstance(geo_input, StringType):
-            if hex_regex.match(geo_input):
-                # If the regex matches, the geometry is in HEX form.
+        if isinstance(geo_input, basestring):
+            if isinstance(geo_input, UnicodeType):
+                # Encoding to ASCII, WKT or HEXEWKB doesn't need any more.
+                geo_input = geo_input.encode('ascii')
+                            
+            wkt_m = wkt_regex.match(geo_input)
+            if wkt_m:
+                # Handling WKT input.
+                if wkt_m.group('srid'): srid = int(wkt_m.group('srid'))
+                g = from_wkt(wkt_m.group('wkt'))
+            elif hex_regex.match(geo_input):
+                # Handling HEXEWKB input.
                 g = from_hex(geo_input, len(geo_input))
+            elif GEOJSON and json_regex.match(geo_input):
+                # Handling GeoJSON input.
+                wkb_input = str(OGRGeometry(geo_input).wkb)
+                g = from_wkb(wkb_input, len(wkb_input))
             else:
-                m = wkt_regex.match(geo_input)
-                if m:
-                    if m.group('srid'): srid = int(m.group('srid'))
-                    g = from_wkt(m.group('wkt'))
-                else:
-                    raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
+                raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
         elif isinstance(geo_input, GEOM_PTR):
             # When the input is a pointer to a geomtry (GEOM_PTR).
             g = geo_input
-        elif isinstance(geo_input, BufferType):
+        elif isinstance(geo_input, buffer):
             # When the input is a buffer (WKB).
             wkb_input = str(geo_input)
             g = from_wkb(wkb_input, len(wkb_input))
@@ -191,7 +197,8 @@ class GEOSGeometry(object):
     @property
     def coord_seq(self):
         "Returns a clone of the coordinate sequence for this Geometry."
-        return self._cs.clone()
+        if self.has_cs:
+            return self._cs.clone()
 
     #### Geometry Info ####
     @property
@@ -307,7 +314,7 @@ class GEOSGeometry(object):
         Returns true if the elements in the DE-9IM intersection matrix for the
         two Geometries match the elements in pattern.
         """
-        if not isinstance(pattern, StringType) or len(pattern) > 9:
+        if not isinstance(pattern, str) or len(pattern) > 9:
             raise GEOSException('invalid intersection matrix pattern')
         return geos_relatepattern(self.ptr, other.ptr, pattern)
 
@@ -359,6 +366,15 @@ class GEOSGeometry(object):
         # A possible faster, all-python, implementation: 
         #  str(self.wkb).encode('hex')
         return to_hex(self.ptr, byref(c_size_t()))
+
+    @property
+    def json(self):
+        """
+        Returns GeoJSON representation of this Geometry if GDAL 1.5+ 
+        is installed.
+        """
+        if GEOJSON: return self.ogr.json
+    geojson = json
 
     @property
     def wkb(self):
@@ -520,6 +536,21 @@ class GEOSGeometry(object):
         if not isinstance(other, GEOSGeometry): 
             raise TypeError('distance() works only on other GEOS Geometries.')
         return geos_distance(self.ptr, other.ptr, byref(c_double()))
+
+    @property
+    def extent(self):
+        """
+        Returns the extent of this geometry as a 4-tuple, consisting of
+        (xmin, ymin, xmax, ymax).
+        """
+        env = self.envelope
+        if isinstance(env, Point):
+            xmin, ymin = env.tuple
+            xmax, ymax = xmin, ymin
+        else:
+            xmin, ymin = env[0][0]
+            xmax, ymax = env[0][2]
+        return (xmin, ymin, xmax, ymax)
 
     @property
     def length(self):

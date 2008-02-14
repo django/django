@@ -85,9 +85,13 @@ class GeometryCollection(GEOSGeometry):
     @property
     def kml(self):
         "Returns the KML for this Geometry Collection."
-        kml = '<MultiGeometry>'
-        for g in self: kml += g.kml
-        return kml + '</MultiGeometry>'
+        return '<MultiGeometry>%s</MultiGeometry>' % ''.join([g.kml for g in self])
+
+    @property
+    def tuple(self):
+        "Returns a tuple of all the coordinates in this Geometry Collection"
+        return tuple([g.tuple for g in self])
+    coords = tuple
 
 # MultiPoint, MultiLineString, and MultiPolygon class definitions.
 class MultiPoint(GeometryCollection): 

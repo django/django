@@ -4,7 +4,6 @@
  GEOSGeometry.
 """
 from ctypes import c_uint, byref
-from types import FloatType, IntType, ListType, TupleType
 from django.contrib.gis.geos.base import GEOSGeometry
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
@@ -24,15 +23,15 @@ class Point(GEOSGeometry):
         >>> p = Point(5, 23, 8) # 3D point, passed in with individual parameters
         """
 
-        if isinstance(x, (TupleType, ListType)):
+        if isinstance(x, (tuple, list)):
             # Here a tuple or list was passed in under the `x` parameter.
             ndim = len(x)
             if ndim < 2 or ndim > 3:
                 raise TypeError('Invalid sequence parameter: %s' % str(x))
             coords = x
-        elif isinstance(x, (IntType, FloatType)) and isinstance(y, (IntType, FloatType)):
+        elif isinstance(x, (int, float, long)) and isinstance(y, (int, float, long)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
-            if isinstance(z, (IntType, FloatType)):
+            if isinstance(z, (int, float, long)):
                 ndim = 3
                 coords = [x, y, z]
             else:
@@ -103,7 +102,7 @@ class Point(GEOSGeometry):
     
     # The tuple and coords properties
     tuple = property(get_coords, set_coords)
-    coords = property(get_coords, set_coords)
+    coords = tuple
 
 class LineString(GEOSGeometry):
 
@@ -124,7 +123,7 @@ class LineString(GEOSGeometry):
         if len(args) == 1: coords = args[0]
         else: coords = args
 
-        if isinstance(coords, (TupleType, ListType)):
+        if isinstance(coords, (tuple, list)):
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ncoords = len(coords)
@@ -133,7 +132,7 @@ class LineString(GEOSGeometry):
             self._checkdim(ndim)
             # Incrementing through each of the coordinates and verifying
             for i in xrange(1, ncoords):
-                if not isinstance(coords[i], (TupleType, ListType, Point)):
+                if not isinstance(coords[i], (tuple, list, Point)):
                     raise TypeError('each coordinate should be a sequence (list or tuple)')
                 if len(coords[i]) != ndim: raise TypeError('Dimension mismatch.')
             numpy_coords = False
@@ -193,6 +192,7 @@ class LineString(GEOSGeometry):
     def tuple(self):
         "Returns a tuple version of the geometry from the coordinate sequence."
         return self._cs.tuple
+    coords = tuple
 
     def _listarr(self, func):
         """
@@ -236,12 +236,17 @@ class Polygon(GEOSGeometry):
     def __init__(self, *args, **kwargs):
         """
         Initializes on an exterior ring and a sequence of holes (both
-        instances of LinearRings.
+        instances may be either LinearRing instances, or a tuple/list
+        that may be constructed into a LinearRing).
         
-        Below are some examples of initialization, where shell, hole1, and 
-        hole2 are valid LinearRing geometries:
+        Examples of initialization, where shell, hole1, and hole2 are 
+        valid LinearRing geometries:
         >>> poly = Polygon(shell, hole1, hole2)
         >>> poly = Polygon(shell, (hole1, hole2))
+
+        Example where a tuple parameters are used:
+        >>> poly = Polygon(((0, 0), (0, 10), (10, 10), (0, 10), (0, 0)), 
+                           ((4, 4), (4, 6), (6, 6), (6, 4), (4, 4)))
         """
         if not args:
             raise TypeError('Must provide at list one LinearRing instance to initialize Polygon.')
@@ -249,32 +254,38 @@ class Polygon(GEOSGeometry):
         # Getting the ext_ring and init_holes parameters from the argument list
         ext_ring = args[0]
         init_holes = args[1:]
-        if len(init_holes) == 1 and isinstance(init_holes[0], (TupleType, ListType)): 
+        n_holes = len(init_holes)
+
+        # If initialized as Polygon(shell, (LinearRing, LinearRing)) [for backward-compatibility]
+        if n_holes == 1 and isinstance(init_holes[0], (tuple, list)) and \
+                (len(init_holes[0]) == 0 or isinstance(init_holes[0][0], LinearRing)): 
             init_holes = init_holes[0]
+            n_holes = len(init_holes)
 
-        # Ensuring the exterior ring parameter is a LinearRing object
-        if not isinstance(ext_ring, LinearRing):
-            raise TypeError('First argument for Polygon initialization must be a LinearRing.')
+        # Ensuring the exterior ring and holes parameters are LinearRing objects
+        # or may be instantiated into LinearRings.
+        ext_ring = self._construct_ring(ext_ring, 'Exterior parameter must be a LinearRing or an object that can initialize a LinearRing.')
+        holes_list = [] # Create new list, cause init_holes is a tuple.
+        for i in xrange(n_holes):
+            holes_list.append(self._construct_ring(init_holes[i], 'Holes parameter must be a sequence of LinearRings or objects that can initialize to LinearRings'))
 
-        # Making sure all of the holes are LinearRing objects
-        if False in [isinstance(hole, LinearRing) for hole in init_holes]:
-            raise TypeError('Holes parameter must be a sequence of LinearRings.')
-
-        # Getting the holes array.
-        nholes = len(init_holes)
-        holes = get_pointer_arr(nholes)
-        for i in xrange(nholes): holes[i] = geom_clone(init_holes[i].ptr)
+        # Why another loop?  Because if a TypeError is raised, cloned pointers will
+        # be around that can't be cleaned up.
+        holes = get_pointer_arr(n_holes)
+        for i in xrange(n_holes): holes[i] = geom_clone(holes_list[i].ptr)
                       
-        # Getting the shell pointer address, 
+        # Getting the shell pointer address.
         shell = geom_clone(ext_ring.ptr)
 
         # Calling with the GEOS createPolygon factory.
-        super(Polygon, self).__init__(create_polygon(shell, byref(holes), c_uint(nholes)), **kwargs)
+        super(Polygon, self).__init__(create_polygon(shell, byref(holes), c_uint(n_holes)), **kwargs)
 
     def __getitem__(self, index):
         """
-        Returns the ring at the specified index.  The first index, 0, will always
-        return the exterior ring.  Indices > 0 will return the interior ring.
+        Returns the ring at the specified index.  The first index, 0, will 
+        always return the exterior ring.  Indices > 0 will return the 
+        interior ring at the given index (e.g., poly[1] and poly[2] would
+        return the first and second interior ring, respectively).
         """
         if index == 0:
             return self.exterior_ring
@@ -330,6 +341,15 @@ class Polygon(GEOSGeometry):
         if index < 0 or index >= len(self):
             raise GEOSIndexError('invalid Polygon ring index: %s' % index)
 
+    def _construct_ring(self, param, msg=''):
+        "Helper routine for trying to construct a ring from the given parameter."
+        if isinstance(param, LinearRing): return param
+        try:
+            ring = LinearRing(param)
+            return ring
+        except TypeError:
+            raise TypeError(msg)
+
     def get_interior_ring(self, ring_i):
         """
         Gets the interior ring at the specified index, 0 is for the first 
@@ -355,18 +375,17 @@ class Polygon(GEOSGeometry):
 
     # properties for the exterior ring/shell
     exterior_ring = property(get_ext_ring, set_ext_ring)
-    shell = property(get_ext_ring, set_ext_ring)
+    shell = exterior_ring
     
     @property
     def tuple(self):
         "Gets the tuple for each ring in this Polygon."
-        return tuple(self[i].tuple for i in xrange(len(self)))
+        return tuple([self[i].tuple for i in xrange(len(self))])
+    coords = tuple
 
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
-        inner_kml = ''
-        if self.num_interior_rings > 0: 
-            for i in xrange(self.num_interior_rings):
-                inner_kml += "<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml
+        inner_kml = ''.join(["<innerBoundaryIs>%s</innerBoundaryIs>" % self[i+1].kml 
+                             for i in xrange(self.num_interior_rings)])
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

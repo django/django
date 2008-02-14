@@ -5,7 +5,7 @@ from django.contrib.gis.geos.base import HAS_GDAL
 from django.contrib.gis.tests.geometries import *
     
 if HAS_NUMPY: from numpy import array
-if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference, CoordTransform
+if HAS_GDAL: from django.contrib.gis.gdal import OGRGeometry, SpatialReference, CoordTransform, GEOJSON
 
 class GEOSTest(unittest.TestCase):
 
@@ -85,7 +85,16 @@ class GEOSTest(unittest.TestCase):
             self.assertEqual(srid, poly.shell.srid)
             self.assertEqual(srid, fromstr(poly.ewkt).srid) # Checking export
     
-    def test01i_eq(self):
+    def test01i_json(self):
+        "Testing GeoJSON input/output (via GDAL)."
+        if not HAS_GDAL or not GEOJSON: return
+        for g in json_geoms:
+            geom = GEOSGeometry(g.wkt)
+            self.assertEqual(g.json, geom.json)
+            self.assertEqual(g.json, geom.geojson)
+            self.assertEqual(GEOSGeometry(g.wkt), GEOSGeometry(geom.json))
+
+    def test01j_eq(self):
         "Testing equivalence with WKT."
         p = fromstr('POINT(5 23)')
         self.assertEqual(p, p.wkt)
@@ -268,7 +277,7 @@ class GEOSTest(unittest.TestCase):
 
             # Testing __getitem__ and __setitem__ on invalid indices
             self.assertRaises(GEOSIndexError, poly.__getitem__, len(poly))
-            #self.assertRaises(GEOSIndexError, poly.__setitem__, len(poly), False)
+            self.assertRaises(GEOSIndexError, poly.__setitem__, len(poly), False)
             self.assertRaises(GEOSIndexError, poly.__getitem__, -1)
 
             # Testing __iter__ 
@@ -279,8 +288,16 @@ class GEOSTest(unittest.TestCase):
             # Testing polygon construction.
             self.assertRaises(TypeError, Polygon.__init__, 0, [1, 2, 3])
             self.assertRaises(TypeError, Polygon.__init__, 'foo')
+            
+            # Polygon(shell, (hole1, ... holeN))
             rings = tuple(r for r in poly)
             self.assertEqual(poly, Polygon(rings[0], rings[1:]))
+            
+            # Polygon(shell_tuple, hole_tuple1, ... , hole_tupleN)
+            ring_tuples = tuple(r.tuple for r in poly)
+            self.assertEqual(poly, Polygon(*ring_tuples))
+
+            # Constructing with tuples of LinearRings.
             self.assertEqual(poly.wkt, Polygon(*tuple(r for r in poly)).wkt)
             self.assertEqual(poly.wkt, Polygon(*tuple(LinearRing(r.tuple) for r in poly)).wkt)
 
@@ -686,11 +703,26 @@ class GEOSTest(unittest.TestCase):
         t2.transform(SpatialReference('EPSG:2774'))
         ct = CoordTransform(SpatialReference('WGS84'), SpatialReference(2774))
         t3.transform(ct)
-
+        prec = 3
         for p in (t1, t2, t3):
-            prec = 3
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
+
+    def test24_extent(self):
+        "Testing `extent` method."
+        # The xmin, ymin, xmax, ymax of the MultiPoint should be returned.
+        mp = MultiPoint(Point(5, 23), Point(0, 0), Point(10, 50))
+        self.assertEqual((0.0, 0.0, 10.0, 50.0), mp.extent)
+        pnt = Point(5.23, 17.8)
+        # Extent of points is just the point itself repeated.
+        self.assertEqual((5.23, 17.8, 5.23, 17.8), pnt.extent)
+        # Testing on the 'real world' Polygon.
+        poly = fromstr(polygons[3].wkt)
+        ring = poly.shell
+        x, y = ring.x, ring.y
+        xmin, ymin = min(x), min(y)
+        xmax, ymax = max(x), max(y)
+        self.assertEqual((xmin, ymin, xmax, ymax), poly.extent)
 
 def suite():
     s = unittest.TestSuite()

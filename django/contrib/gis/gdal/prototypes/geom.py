@@ -105,7 +105,5 @@ geom_transform = void_output(lgdal.OGR_G_Transform, [c_void_p, c_void_p])
 geom_transform_to = void_output(lgdal.OGR_G_TransformTo, [c_void_p, c_void_p])
 
 # For retrieving the envelope of the geometry.
-get_envelope = lgdal.OGR_G_GetEnvelope
-get_envelope.restype = None
-get_envelope.argtypes = [c_void_p, POINTER(OGREnvelope)]
-get_envelope.errcheck = check_envelope
+get_envelope = env_func(lgdal.OGR_G_GetEnvelope, [c_void_p, POINTER(OGREnvelope)])
+

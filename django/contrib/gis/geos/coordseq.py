@@ -153,14 +153,12 @@ class GEOSCoordSeq(object):
         #  a Z dimension.
         if self.hasz: substr = '%s,%s,%s '
         else: substr = '%s,%s,0 '
-        kml = '<coordinates>'
-        for i in xrange(len(self)):
-            kml += substr % self[i]
-        return kml.strip() + '</coordinates>'
+        return '<coordinates>%s</coordinates>' % \
+            ''.join([substr % self[i] for i in xrange(len(self))]).strip()
 
     @property
     def tuple(self):
         "Returns a tuple version of this coordinate sequence."
         n = self.size
         if n == 1: return self[0]
-        else: return tuple(self[i] for i in xrange(n))
+        else: return tuple([self[i] for i in xrange(n)])
