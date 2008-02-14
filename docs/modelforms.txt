@@ -320,3 +320,41 @@ parameter when declaring the form field::
    ...
    ...     class Meta:
    ...         model = Article
+
+Form inheritance
+----------------
+As with the basic forms, you can extend and reuse ``ModelForms`` by inheriting
+them. Normally, this will be useful if you need to declare some extra fields
+or extra methods on a parent class for use in a number of forms derived from
+models. For example, using the previous ``ArticleForm`` class::
+
+    >>> class EnhancedArticleForm(ArticleForm):
+    ...     def clean_pub_date(self):
+    ...         ...
+
+This creates a form that behaves identically to ``ArticleForm``, except there
+is some extra validation and cleaning for the ``pub_date`` field.
+
+There are a couple of things to note, however. Most of these won't normally be
+of concern unless you are trying to do something tricky with subclassing.
+
+ * All the fields from the parent classes will appear in the child
+   ``ModelForm``. This means you cannot change a parent's ``Meta.exclude``
+   attribute, for example, and except it to have an effect, since the field is
+   already part of the field list in the parent class.
+
+ * Normal Python name resolution rules apply. If you have multiple base
+   classes that declare a ``Meta`` inner class, only the first one will be
+   used.  This means the child's ``Meta``, if it exists, otherwise the
+   ``Meta`` of the first parent, etc.
+
+ * For technical reasons, you cannot have a subclass that is inherited from
+   both a ``ModelForm`` and a ``Form`` simultaneously.
+
+Because of the "child inherits all fields from parents" behaviour, you
+shouldn't try to declare model fields in multiple classes (parent and child).
+Instead, declare all the model-related stuff in one class and use inheritance
+to add "extra" non-model fields and methods to the final result. Whether you
+put the "extra" functions in the parent class or the child class will depend
+on how you intend to reuse them.
+

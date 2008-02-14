@@ -22,23 +22,26 @@ def pretty_name(name):
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
 
+def get_declared_fields(bases, attrs):
+    fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
+    fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+
+    # If this class is subclassing another Form, add that Form's fields.
+    # Note that we loop over the bases in *reverse*. This is necessary in
+    # order to preserve the correct order of fields.
+    for base in bases[::-1]:
+        if hasattr(base, 'base_fields'):
+            fields = base.base_fields.items() + fields
+
+    return SortedDict(fields)
+
 class DeclarativeFieldsMetaclass(type):
     """
     Metaclass that converts Field attributes to a dictionary called
     'base_fields', taking into account parent class 'base_fields' as well.
     """
     def __new__(cls, name, bases, attrs):
-        fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
-        fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
-
-        # If this class is subclassing another Form, add that Form's fields.
-        # Note that we loop over the bases in *reverse*. This is necessary in
-        # order to preserve the correct order of fields.
-        for base in bases[::-1]:
-            if hasattr(base, 'base_fields'):
-                fields = base.base_fields.items() + fields
-
-        attrs['base_fields'] = SortedDict(fields)
+        attrs['base_fields'] = get_declared_fields(bases, attrs)
         return type.__new__(cls, name, bases, attrs)
 
 class BaseForm(StrAndUnicode):
