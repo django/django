@@ -8,8 +8,8 @@ from django.contrib.gis.gdal.prototypes.generation import \
     srs_output, string_output, void_output
 
 # Some prototypes need to be aware of what version GDAL we have.
-major, minor1, minor2 = map(int, gdal_version().split('.'))
-if major <= 1 and minor1 <= 4:
+major, minor = map(int, gdal_version().split('.')[:2])
+if major <= 1 and minor <= 4:
     GEOJSON = False
 else:
     GEOJSON = True

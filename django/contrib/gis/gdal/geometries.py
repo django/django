@@ -216,7 +216,13 @@ class OGRGeometry(object):
     @property
     def envelope(self):
         "Returns the envelope for this Geometry."
+        # TODO: Fix Envelope() for Point geometries.
         return Envelope(get_envelope(self._ptr, byref(OGREnvelope())))
+
+    @property
+    def extent(self):
+        "Returns the envelope as a 4-tuple, instead of as an Envelope object."
+        return self.envelope.tuple
 
     #### SpatialReference-related Properties ####
     
@@ -446,7 +452,8 @@ class Point(OGRGeometry):
     @property
     def z(self):
         "Returns the Z coordinate for this Point."
-        return getz(self._ptr, 0)
+        if self.coord_dim == 3:
+            return getz(self._ptr, 0)
 
     @property
     def tuple(self):
@@ -455,6 +462,7 @@ class Point(OGRGeometry):
             return (self.x, self.y)
         elif self.coord_dim == 3:
             return (self.x, self.y, self.z)
+    coords = tuple
 
 class LineString(OGRGeometry):
 
@@ -485,7 +493,31 @@ class LineString(OGRGeometry):
     @property
     def tuple(self):
         "Returns the tuple representation of this LineString."
-        return tuple(self[i] for i in xrange(len(self)))
+        return tuple([self[i] for i in xrange(len(self))])
+    coords = tuple
+
+    def _listarr(self, func):
+        """
+        Internal routine that returns a sequence (list) corresponding with
+        the given function.
+        """
+        return [func(self._ptr, i) for i in xrange(len(self))]
+
+    @property
+    def x(self):
+        "Returns the X coordinates in a list."
+        return self._listarr(getx)
+
+    @property
+    def y(self):
+        "Returns the Y coordinates in a list."
+        return self._listarr(gety)
+    
+    @property
+    def z(self):
+        "Returns the Z coordinates in a list."
+        if self.coord_dim == 3:
+            return self._listarr(getz)
 
 # LinearRings are used in Polygons.
 class LinearRing(LineString): pass
@@ -513,11 +545,13 @@ class Polygon(OGRGeometry):
     def shell(self):
         "Returns the shell of this Polygon."
         return self[0] # First ring is the shell
+    exterior_ring = shell
 
     @property
     def tuple(self):
         "Returns a tuple of LinearRing coordinate tuples."
-        return tuple(self[i].tuple for i in xrange(self.geom_count))
+        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+    coords = tuple
 
     @property
     def point_count(self):
@@ -575,7 +609,8 @@ class GeometryCollection(OGRGeometry):
     @property
     def tuple(self):
         "Returns a tuple representation of this Geometry Collection."
-        return tuple(self[i].tuple for i in xrange(self.geom_count)) 
+        return tuple([self[i].tuple for i in xrange(self.geom_count)])
+    coords = tuple
 
 # Multiple Geometry types.
 class MultiPoint(GeometryCollection): pass
