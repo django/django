@@ -215,7 +215,7 @@ each ``TaggedItem`` will have a ``content_object`` field that returns the
 object it's related to, and you can also assign to that field or use it when
 creating a ``TaggedItem``::
 
-    >>> from django.contrib.models.auth import User
+    >>> from django.contrib.auth.models import User
     >>> guido = User.objects.get(username='Guido')
     >>> t = TaggedItem(content_object=guido, tag='bdfl')
     >>> t.save()
@@ -235,7 +235,7 @@ a "reverse" generic relationship to enable an additional API. For example::
 ``Bookmark`` instances will each have a ``tags`` attribute, which can
 be used to retrieve their associated ``TaggedItems``::
 
-    >>> b = Bookmark('http://www.djangoproject.com/')
+    >>> b = Bookmark(url='http://www.djangoproject.com/')
     >>> b.save()
     >>> t1 = TaggedItem(content_object=b, tag='django')
     >>> t1.save()
