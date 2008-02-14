@@ -225,7 +225,7 @@ class ModelFormMetaclass(type):
                     attrs)
 
         new_class = type.__new__(cls, name, bases, attrs)
-        declared_fields = get_declared_fields(bases, attrs)
+        declared_fields = get_declared_fields(bases, attrs, False)
         opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
         if opts.model:
             # If a model is defined, extract form fields from it.
@@ -236,27 +236,8 @@ class ModelFormMetaclass(type):
             fields.update(declared_fields)
         else:
             fields = declared_fields
+        new_class.declared_fields = declared_fields
         new_class.base_fields = fields
-
-        # XXX: The following is a sanity check for the user to avoid
-        # inadvertent attribute hiding.
-
-        # Search base classes, but don't allow more than one Meta model
-        # definition. The fields would be generated correctly, but the save
-        # method won't deal with more than one object. Also, it wouldn't be
-        # clear what to do with multiple fields and exclude lists.
-        first = None
-        current = opts.model
-        for base in parents:
-            base_opts = getattr(base, '_meta', None)
-            base_model = getattr(base_opts, 'model', None)
-            if base_model:
-                if current:
-                    if base_model is not current:
-                        raise ImproperlyConfigured("%s's base classes define more than one model." % name)
-                else:
-                    current = base_model
-
         return new_class
 
 class BaseModelForm(BaseForm):

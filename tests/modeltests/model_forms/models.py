@@ -155,29 +155,25 @@ familiar with the mechanics.
 ...     class Meta:
 ...         model = Category
 
->>> class BadForm(CategoryForm):
+>>> class OddForm(CategoryForm):
 ...     class Meta:
 ...         model = Article
-Traceback (most recent call last):
-...
-ImproperlyConfigured: BadForm's base classes define more than one model.
+
+OddForm is now an Article-related thing, because BadForm.Meta overrides
+CategoryForm.Meta.
+>>> OddForm.base_fields.keys()
+['headline', 'slug', 'pub_date', 'writer', 'article', 'status', 'categories']
 
 >>> class ArticleForm(ModelForm):
 ...     class Meta:
 ...         model = Article
 
+First class with a Meta class wins.
+
 >>> class BadForm(ArticleForm, CategoryForm):
 ...     pass
-Traceback (most recent call last):
-...
-ImproperlyConfigured: BadForm's base classes define more than one model.
-
-This one is OK since the subclass specifies the same model as the parent.
-
->>> class SubCategoryForm(CategoryForm):
-...     class Meta:
-...         model = Category
-
+>>> OddForm.base_fields.keys()
+['headline', 'slug', 'pub_date', 'writer', 'article', 'status', 'categories']
 
 Subclassing without specifying a Meta on the class will use the parent's Meta
 (or the first parent in the MRO if there are multiple parent classes).
@@ -185,13 +181,26 @@ Subclassing without specifying a Meta on the class will use the parent's Meta
 >>> class CategoryForm(ModelForm):
 ...     class Meta:
 ...         model = Category
-...         exclude = ['url']
 >>> class SubCategoryForm(CategoryForm):
 ...     pass
+>>> SubCategoryForm.base_fields.keys()
+['name', 'slug', 'url']
+
+We can also subclass the Meta inner class to change the fields list.
+
+>>> class CategoryForm(ModelForm):
+...     checkbox = forms.BooleanField()
+...
+...     class Meta:
+...         model = Category
+>>> class SubCategoryForm(CategoryForm):
+...     class Meta(CategoryForm.Meta):
+...         exclude = ['url']
 
 >>> print SubCategoryForm()
 <tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>
 <tr><th><label for="id_slug">Slug:</label></th><td><input id="id_slug" type="text" name="slug" maxlength="20" /></td></tr>
+<tr><th><label for="id_checkbox">Checkbox:</label></th><td><input type="checkbox" name="checkbox" id="id_checkbox" /></td></tr>
 
 # Old form_for_x tests #######################################################
 

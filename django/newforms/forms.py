@@ -22,16 +22,30 @@ def pretty_name(name):
     name = name[0].upper() + name[1:]
     return name.replace('_', ' ')
 
-def get_declared_fields(bases, attrs):
+def get_declared_fields(bases, attrs, with_base_fields=True):
+    """
+    Create a list of form field instances from the passed in 'attrs', plus any
+    similar fields on the base classes (in 'bases'). This is used by both the
+    Form and ModelForm metclasses.
+
+    If 'with_base_fields' is True, all fields from the bases are used.
+    Otherwise, only fields in the 'declared_fields' attribute on the bases are
+    used. The distinction is useful in ModelForm subclassing.
+    """
     fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
     fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
 
     # If this class is subclassing another Form, add that Form's fields.
     # Note that we loop over the bases in *reverse*. This is necessary in
     # order to preserve the correct order of fields.
-    for base in bases[::-1]:
-        if hasattr(base, 'base_fields'):
-            fields = base.base_fields.items() + fields
+    if with_base_fields:
+        for base in bases[::-1]:
+            if hasattr(base, 'base_fields'):
+                fields = base.base_fields.items() + fields
+    else:
+        for base in bases[::-1]:
+            if hasattr(base, 'declared_fields'):
+                fields = base.declared_fields.items() + fields
 
     return SortedDict(fields)
 

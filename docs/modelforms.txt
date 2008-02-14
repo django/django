@@ -335,13 +335,18 @@ models. For example, using the previous ``ArticleForm`` class::
 This creates a form that behaves identically to ``ArticleForm``, except there
 is some extra validation and cleaning for the ``pub_date`` field.
 
+You can also subclass the parent's ``Meta`` inner class if you want to change
+the ``Meta.fields`` or ``Meta.excludes`` lists::
+
+    >>> class RestrictedArticleForm(EnhancedArticleForm):
+    ...     class Meta(ArticleForm.Meta):
+    ...         exclude = ['body']
+
+This adds in the extra method from the ``EnhancedArticleForm`` and modifies
+the original ``ArticleForm.Meta`` to remove one field.
+
 There are a couple of things to note, however. Most of these won't normally be
 of concern unless you are trying to do something tricky with subclassing.
-
- * All the fields from the parent classes will appear in the child
-   ``ModelForm``. This means you cannot change a parent's ``Meta.exclude``
-   attribute, for example, and except it to have an effect, since the field is
-   already part of the field list in the parent class.
 
  * Normal Python name resolution rules apply. If you have multiple base
    classes that declare a ``Meta`` inner class, only the first one will be
@@ -350,11 +355,4 @@ of concern unless you are trying to do something tricky with subclassing.
 
  * For technical reasons, you cannot have a subclass that is inherited from
    both a ``ModelForm`` and a ``Form`` simultaneously.
-
-Because of the "child inherits all fields from parents" behaviour, you
-shouldn't try to declare model fields in multiple classes (parent and child).
-Instead, declare all the model-related stuff in one class and use inheritance
-to add "extra" non-model fields and methods to the final result. Whether you
-put the "extra" functions in the parent class or the child class will depend
-on how you intend to reuse them.
 
