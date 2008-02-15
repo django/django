@@ -736,7 +736,7 @@ class Templates(unittest.TestCase):
             'i18n09': ('{% load i18n %}{% trans "Page not found" noop %}', {'LANGUAGE_CODE': 'de'}, "Page not found"),
 
             # translation of a variable with a translated filter
-            'i18n10': ('{{ bool|yesno:_("ja,nein") }}', {'bool': True}, 'ja'),
+            'i18n10': ('{{ bool|yesno:_("yes,no,maybe") }}', {'bool': True, 'LANGUAGE_CODE': 'de'}, 'Ja'),
 
             # translation of a variable with a non-translated filter
             'i18n11': ('{{ bool|yesno:"ja,nein" }}', {'bool': True}, 'ja'),

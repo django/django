@@ -88,7 +88,7 @@ change:
      API changes may be necessary.
 
    - Generic relations will most likely be moved out of core and into the
-     content-types contrib package to avoid core dependancies on optional
+     content-types contrib package to avoid core dependencies on optional
      components.
 
    - The comments framework, which is yet undocumented, will likely get a complete

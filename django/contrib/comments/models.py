@@ -1,24 +1,26 @@
+import datetime
+
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-import datetime
 
 MIN_PHOTO_DIMENSION = 5
 MAX_PHOTO_DIMENSION = 1000
 
-# option codes for comment-form hidden fields
+# Option codes for comment-form hidden fields.
 PHOTOS_REQUIRED = 'pr'
 PHOTOS_OPTIONAL = 'pa'
 RATINGS_REQUIRED = 'rr'
 RATINGS_OPTIONAL = 'ra'
 IS_PUBLIC = 'ip'
 
-# what users get if they don't have any karma
+# What users get if they don't have any karma.
 DEFAULT_KARMA = 5
 KARMA_NEEDED_BEFORE_DISPLAYED = 3
+
 
 class CommentManager(models.Manager):
     def get_security_hash(self, options, photo_options, rating_options, target):
@@ -61,7 +63,9 @@ class CommentManager(models.Manager):
                 return True
         return False
 
+
 class Comment(models.Model):
+    """A comment by a registered user."""
     user = models.ForeignKey(User)
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
@@ -124,7 +128,7 @@ class Comment(models.Model):
     get_content_object.short_description = _('Content object')
 
     def _fill_karma_cache(self):
-        "Helper function that populates good/bad karma caches"
+        """Helper function that populates good/bad karma caches."""
         good, bad = 0, 0
         for k in self.karmascore_set:
             if k.score == -1:
@@ -153,8 +157,9 @@ class Comment(models.Model):
             {'user': self.user.username, 'date': self.submit_date,
             'comment': self.comment, 'domain': self.site.domain, 'url': self.get_absolute_url()}
 
+
 class FreeComment(models.Model):
-    # A FreeComment is a comment by a non-registered user.
+    """A comment by a non-registered user."""
     content_type = models.ForeignKey(ContentType)
     object_id = models.IntegerField(_('object ID'))
     comment = models.TextField(_('comment'), max_length=3000)
@@ -193,6 +198,7 @@ class FreeComment(models.Model):
 
     get_content_object.short_description = _('Content object')
 
+
 class KarmaScoreManager(models.Manager):
     def vote(self, user_id, comment_id, score):
         try:
@@ -214,6 +220,7 @@ class KarmaScoreManager(models.Manager):
             return DEFAULT_KARMA
         return int(round((4.5 * score) + 5.5))
 
+
 class KarmaScore(models.Model):
     user = models.ForeignKey(User)
     comment = models.ForeignKey(Comment)
@@ -229,6 +236,7 @@ class KarmaScore(models.Model):
     def __unicode__(self):
         return _("%(score)d rating by %(user)s") % {'score': self.score, 'user': self.user}
 
+
 class UserFlagManager(models.Manager):
     def flag(self, comment, user):
         """
@@ -239,13 +247,14 @@ class UserFlagManager(models.Manager):
         if int(comment.user_id) == int(user.id):
             return # A user can't flag his own comment. Fail silently.
         try:
-            f = self.objects.get(user__pk=user.id, comment__pk=comment.id)
+            f = self.get(user__pk=user.id, comment__pk=comment.id)
         except self.model.DoesNotExist:
             from django.core.mail import mail_managers
             f = self.model(None, user.id, comment.id, None)
             message = _('This comment was flagged by %(user)s:\n\n%(text)s') % {'user': user.username, 'text': comment.get_as_text()}
             mail_managers('Comment flagged', message, fail_silently=True)
             f.save()
+
 
 class UserFlag(models.Model):
     user = models.ForeignKey(User)
@@ -260,6 +269,7 @@ class UserFlag(models.Model):
 
     def __unicode__(self):
         return _("Flag by %r") % self.user
+
 
 class ModeratorDeletion(models.Model):
     user = models.ForeignKey(User, verbose_name='moderator')

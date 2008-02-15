@@ -1,5 +1,5 @@
 from django.template import TemplateSyntaxError, TemplateDoesNotExist, Variable
-from django.template import Library, Node
+from django.template import Library, Node, TextNode
 from django.template.loader import get_template, get_template_from_string, find_template_source
 from django.conf import settings
 from django.utils.safestring import mark_safe
@@ -37,10 +37,17 @@ class BlockNode(Node):
             self.parent = BlockNode(self.name, nodelist)
 
 class ExtendsNode(Node):
+    must_be_first = True
+
     def __init__(self, nodelist, parent_name, parent_name_expr, template_dirs=None):
         self.nodelist = nodelist
         self.parent_name, self.parent_name_expr = parent_name, parent_name_expr
         self.template_dirs = template_dirs
+
+    def __repr__(self):
+        if self.parent_name_expr:
+            return "<ExtendsNode: extends %s>" % self.parent_name_expr.token
+        return '<ExtendsNode: extends "%s">' % self.parent_name
 
     def get_parent(self, context):
         if self.parent_name_expr:
@@ -49,7 +56,7 @@ class ExtendsNode(Node):
         if not parent:
             error_msg = "Invalid template name in 'extends' tag: %r." % parent
             if self.parent_name_expr:
-                error_msg += " Got this from the %r variable." % self.parent_name_expr #TODO nice repr.
+                error_msg += " Got this from the '%s' variable." % self.parent_name_expr.token
             raise TemplateSyntaxError, error_msg
         if hasattr(parent, 'render'):
             return parent # parent is a Template object
@@ -62,7 +69,10 @@ class ExtendsNode(Node):
 
     def render(self, context):
         compiled_parent = self.get_parent(context)
-        parent_is_child = isinstance(compiled_parent.nodelist[0], ExtendsNode)
+        pos = 0
+        while isinstance(compiled_parent.nodelist[pos], TextNode):
+            pos += 1
+        parent_is_child = isinstance(compiled_parent.nodelist[pos], ExtendsNode)
         parent_blocks = dict([(n.name, n) for n in compiled_parent.nodelist.get_nodes_by_type(BlockNode)])
         for block_node in self.nodelist.get_nodes_by_type(BlockNode):
             # Check for a BlockNode with this node's name, and replace it if found.
@@ -74,7 +84,7 @@ class ExtendsNode(Node):
                 # add this BlockNode to the parent's ExtendsNode nodelist, so
                 # it'll be checked when the parent node's render() is called.
                 if parent_is_child:
-                    compiled_parent.nodelist[0].nodelist.append(block_node)
+                    compiled_parent.nodelist[pos].nodelist.append(block_node)
             else:
                 # Keep any existing parents and add a new one. Used by BlockNode.
                 parent_block.parent = block_node.parent

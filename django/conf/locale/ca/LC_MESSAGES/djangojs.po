@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: djangojs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-05-20 18:25+0200\n"
-"PO-Revision-Date: 2007-12-01 12:06+0100\n"
-"Last-Translator: Antoni Aloy <antoni.aloy@trespams.com>\n"
+"PO-Revision-Date: 2008-01-22 19:39+0100\n"
+"Last-Translator: Marc Garcia <marc.garcia@accopensys.com>\n"
 "Language-Team: español <ca@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: contrib/admin/media/js/SelectFilter2.js:33
 #, perl-format
@@ -50,9 +50,7 @@ msgstr "Deseleccionar tots"
 
 #: contrib/admin/media/js/dateparse.js:32
 #: contrib/admin/media/js/calendar.js:24
-msgid ""
-"January February March April May June July August September October November "
-"December"
+msgid "January February March April May June July August September October November December"
 msgstr "Gener Febrer Març Abril Maig Juny Juliol Agost Setembre Octubre Novembre Desembre"
 
 #: contrib/admin/media/js/dateparse.js:33
@@ -61,7 +59,7 @@ msgstr "Diumenge Dilluns Dimarts Dimecres Dijous Divendres Dissabte"
 
 #: contrib/admin/media/js/calendar.js:25
 msgid "S M T W T F S"
-msgstr "D L M X J V S"
+msgstr "Dg Dl Dt Dc Dj Dv Ds"
 
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:47
 #: contrib/admin/media/js/admin/DateTimeShortcuts.js:81

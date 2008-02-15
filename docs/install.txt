@@ -138,7 +138,7 @@ Installing a distribution-specific package
 Check the `distribution specific notes`_ to see if your
 platform/distribution provides official Django packages/installers.
 Distribution-provided packages will typically allow for automatic
-installation of dependancies and easy upgrade paths.
+installation of dependencies and easy upgrade paths.
 
 Installing an official release
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

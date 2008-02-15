@@ -466,6 +466,8 @@ class ImageField(FileField):
         f = super(ImageField, self).clean(data, initial)
         if f is None:
             return None
+        elif not data and initial:
+            return initial
         from PIL import Image
         from cStringIO import StringIO
         try:

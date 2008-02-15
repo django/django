@@ -289,6 +289,14 @@ class Parser(object):
         return NodeList()
 
     def extend_nodelist(self, nodelist, node, token):
+        if node.must_be_first and nodelist:
+            try:
+                if nodelist.contains_nontext:
+                    raise AttributeError
+            except AttributeError:
+                raise TemplateSyntaxError("%r must be the first tag in the template." % node)
+        if isinstance(nodelist, NodeList) and not isinstance(node, TextNode):
+            nodelist.contains_nontext = True
         nodelist.append(node)
 
     def enter_command(self, command, token):
@@ -708,6 +716,10 @@ class Variable(object):
         return current
 
 class Node(object):
+    # Set this to True for nodes that must be first in the template (although
+    # they can be preceded by text nodes.
+    must_be_first = False
+
     def render(self, context):
         "Return the node rendered as a string"
         pass
@@ -725,6 +737,10 @@ class Node(object):
         return nodes
 
 class NodeList(list):
+    # Set to True the first time a non-TextNode is inserted by
+    # extend_nodelist().
+    contains_nontext = False
+
     def render(self, context):
         bits = []
         for node in self:
