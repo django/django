@@ -384,7 +384,7 @@ The admin represents this as an ``<input type="text">`` (a single-line input).
 ``IPAddressField``
 ~~~~~~~~~~~~~~~~~~
 
-An IP address, in string format (i.e. "24.124.1.30").
+An IP address, in string format (e.g. "192.0.2.30").
 
 The admin represents this as an ``<input type="text">`` (a single-line input).
 
@@ -952,10 +952,10 @@ the relationship should work. All are optional:
     ``limit_choices_to``     See the description under ``ForeignKey`` above.
 
     ``symmetrical``          Only used in the definition of ManyToManyFields on self.
-                             Consider the following model:
+                             Consider the following model::
 
-                             class Person(models.Model):
-                                 friends = models.ManyToManyField("self")
+                                 class Person(models.Model):
+                                     friends = models.ManyToManyField("self")
 
                              When Django processes this model, it identifies that it has
                              a ``ManyToManyField`` on itself, and as a result, it
@@ -1872,7 +1872,7 @@ more simply as::
 
 If you define a ``__unicode__()`` method on your model and not a ``__str__()``
 method, Django will automatically provide you with a ``__str__()`` that calls
-``__unicode()__`` and then converts the result correctly to a UTF-8 encoded
+``__unicode__()`` and then converts the result correctly to a UTF-8 encoded
 string object. This is recommended development practice: define only
 ``__unicode__()`` and let Django take care of the conversion to string objects
 when required.
