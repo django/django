@@ -231,8 +231,8 @@ class ModelFormMetaclass(type):
             # If a model is defined, extract form fields from it.
             fields = fields_for_model(opts.model, opts.fields,
                                       opts.exclude, formfield_callback)
-            # Fields defined on the base classes override local fields and are
-            # always included.
+            # Override default model fields with any custom declared ones
+            # (plus, include all the other declared fields).
             fields.update(declared_fields)
         else:
             fields = declared_fields
