@@ -41,7 +41,9 @@ class ModelBase(type):
 
         # Build complete list of parents
         for base in parents:
-            if base is not Model:
+            # Things without _meta aren't functional models, so they're
+            # uninteresting parents.
+            if hasattr(base, '_meta'):
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
 
