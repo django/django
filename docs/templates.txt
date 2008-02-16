@@ -1406,6 +1406,8 @@ Joins a list with a string, like Python's ``str.join(list)``.
 last
 ~~~~
 
+**New in Django development version.**
+
 Returns the last item in a list.
 
 length

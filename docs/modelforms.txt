@@ -323,17 +323,18 @@ parameter when declaring the form field::
 
 Form inheritance
 ----------------
-As with the basic forms, you can extend and reuse ``ModelForms`` by inheriting
-them. Normally, this will be useful if you need to declare some extra fields
-or extra methods on a parent class for use in a number of forms derived from
-models. For example, using the previous ``ArticleForm`` class::
+
+As with basic forms, you can extend and reuse ``ModelForms`` by inheriting
+them. This is useful if you need to declare extra fields or extra methods on a
+parent class for use in a number of forms derived from models. For example,
+using the previous ``ArticleForm`` class::
 
     >>> class EnhancedArticleForm(ArticleForm):
     ...     def clean_pub_date(self):
     ...         ...
 
-This creates a form that behaves identically to ``ArticleForm``, except there
-is some extra validation and cleaning for the ``pub_date`` field.
+This creates a form that behaves identically to ``ArticleForm``, except there's
+some extra validation and cleaning for the ``pub_date`` field.
 
 You can also subclass the parent's ``Meta`` inner class if you want to change
 the ``Meta.fields`` or ``Meta.excludes`` lists::
@@ -342,17 +343,18 @@ the ``Meta.fields`` or ``Meta.excludes`` lists::
     ...     class Meta(ArticleForm.Meta):
     ...         exclude = ['body']
 
-This adds in the extra method from the ``EnhancedArticleForm`` and modifies
+This adds the extra method from the ``EnhancedArticleForm`` and modifies
 the original ``ArticleForm.Meta`` to remove one field.
 
-There are a couple of things to note, however. Most of these won't normally be
-of concern unless you are trying to do something tricky with subclassing.
+There are a couple of things to note, however.
 
  * Normal Python name resolution rules apply. If you have multiple base
    classes that declare a ``Meta`` inner class, only the first one will be
-   used.  This means the child's ``Meta``, if it exists, otherwise the
+   used. This means the child's ``Meta``, if it exists, otherwise the
    ``Meta`` of the first parent, etc.
 
- * For technical reasons, you cannot have a subclass that is inherited from
-   both a ``ModelForm`` and a ``Form`` simultaneously.
+ * For technical reasons, a subclass cannot inherit from both a ``ModelForm``
+   and a ``Form`` simultaneously.
 
+Chances are these notes won't affect you unless you're trying to do something
+tricky with subclassing.
