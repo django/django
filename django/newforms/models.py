@@ -11,7 +11,7 @@ from django.utils.datastructures import SortedDict
 from django.core.exceptions import ImproperlyConfigured
 
 from util import ValidationError, ErrorList
-from forms import BaseForm
+from forms import BaseForm, get_declared_fields
 from fields import Field, ChoiceField, EMPTY_VALUES
 from widgets import Select, SelectMultiple, MultipleHiddenInput
 
@@ -211,57 +211,39 @@ class ModelFormOptions(object):
         self.fields = getattr(options, 'fields', None)
         self.exclude = getattr(options, 'exclude', None)
 
+
 class ModelFormMetaclass(type):
     def __new__(cls, name, bases, attrs,
                 formfield_callback=lambda f: f.formfield()):
-        fields = [(field_name, attrs.pop(field_name)) for field_name, obj in attrs.items() if isinstance(obj, Field)]
-        fields.sort(lambda x, y: cmp(x[1].creation_counter, y[1].creation_counter))
+        try:
+            parents = [b for b in bases if issubclass(b, ModelForm)]
+        except NameError:
+            # We are defining ModelForm itself.
+            parents = None
+        if not parents:
+            return super(ModelFormMetaclass, cls).__new__(cls, name, bases,
+                    attrs)
 
-        # If this class is subclassing another Form, add that Form's fields.
-        # Note that we loop over the bases in *reverse*. This is necessary in
-        # order to preserve the correct order of fields.
-        for base in bases[::-1]:
-            if hasattr(base, 'base_fields'):
-                fields = base.base_fields.items() + fields
-        declared_fields = SortedDict(fields)
-
-        opts = ModelFormOptions(attrs.get('Meta', None))
-        attrs['_meta'] = opts
-
-        # Don't allow more than one Meta model definition in bases. The fields
-        # would be generated correctly, but the save method won't deal with
-        # more than one object.
-        base_models = []
-        for base in bases:
-            base_opts = getattr(base, '_meta', None)
-            base_model = getattr(base_opts, 'model', None)
-            if base_model is not None:
-                base_models.append(base_model)
-        if len(base_models) > 1:
-            raise ImproperlyConfigured("%s's base classes define more than one model." % name)
-
-        # If a model is defined, extract form fields from it and add them to base_fields
-        if attrs['_meta'].model is not None:
-            # Don't allow a subclass to define a different Meta model than a
-            # parent class has. Technically the right fields would be generated,
-            # but the save method will not deal with more than one model.
-            for base in bases:
-                base_opts = getattr(base, '_meta', None)
-                base_model = getattr(base_opts, 'model', None)
-                if base_model and base_model is not opts.model:
-                    raise ImproperlyConfigured('%s defines a different model than its parent.' % name)
-            model_fields = fields_for_model(opts.model, opts.fields,
-                    opts.exclude, formfield_callback)
-            # fields declared in base classes override fields from the model
-            model_fields.update(declared_fields)
-            attrs['base_fields'] = model_fields
+        new_class = type.__new__(cls, name, bases, attrs)
+        declared_fields = get_declared_fields(bases, attrs, False)
+        opts = new_class._meta = ModelFormOptions(getattr(new_class, 'Meta', None))
+        if opts.model:
+            # If a model is defined, extract form fields from it.
+            fields = fields_for_model(opts.model, opts.fields,
+                                      opts.exclude, formfield_callback)
+            # Override default model fields with any custom declared ones
+            # (plus, include all the other declared fields).
+            fields.update(declared_fields)
         else:
-            attrs['base_fields'] = declared_fields
-        return type.__new__(cls, name, bases, attrs)
+            fields = declared_fields
+        new_class.declared_fields = declared_fields
+        new_class.base_fields = fields
+        return new_class
 
 class BaseModelForm(BaseForm):
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList, label_suffix=':', instance=None):
+                 initial=None, error_class=ErrorList, label_suffix=':',
+                 instance=None):
         opts = self._meta
         if instance is None:
             # if we didn't get an instance, instantiate a new one
@@ -277,7 +259,8 @@ class BaseModelForm(BaseForm):
 
     def save(self, commit=True):
         """
-        Saves this ``form``'s cleaned_data into model instance ``self.instance``.
+        Saves this ``form``'s cleaned_data into model instance
+        ``self.instance``.
 
         If commit=True, then the changes to ``instance`` will be saved to the
         database. Returns ``instance``.

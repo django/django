@@ -2,8 +2,8 @@
 6. Specifying ordering
 
 Specify default ordering for a model using the ``ordering`` attribute, which
-should be a list or tuple of field names. This tells Django how to order the
-results of ``get_list()`` and other similar functions.
+should be a list or tuple of field names. This tells Django how to order
+queryset results.
 
 If a field name in ``ordering`` starts with a hyphen, that field will be
 ordered in descending order. Otherwise, it'll be ordered in ascending order.

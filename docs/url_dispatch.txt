@@ -190,6 +190,28 @@ The remaining arguments should be tuples in this format::
 ...where ``optional dictionary`` and ``optional name`` are optional. (See
 `Passing extra options to view functions`_ below.)
 
+.. note::
+    Because `patterns()` is a function call, it accepts a maximum of 255
+    arguments (URL patterns, in this case). This is a limit for all Python
+    function calls. This is rarely a problem in practice, because you'll
+    typically structure your URL patterns modularly by using `include()`
+    sections. However, on the off-chance you do hit the 255-argument limit,
+    realize that `patterns()` returns a Python list, so you can split up the
+    construction of the list.
+
+    ::
+
+        urlpatterns = patterns('',
+            ...
+            )
+        urlpatterns += patterns('',
+            ...
+            )
+
+    Python lists have unlimited size, so there's no limit to how many URL
+    patterns you can construct. The only limit is that you can only create 254
+    at a time (the 255th argument is the initial prefix argument).
+
 url
 ---
 
