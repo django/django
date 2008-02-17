@@ -389,8 +389,13 @@ class Query(object):
                         aliases.append(col.alias)
         elif self.default_cols:
             table_alias = self.tables[0]
-            result = ['%s.%s' % (qn(table_alias), qn(f.column))
-                    for f in self.model._meta.fields]
+            root_pk = self.model._meta.pk.column
+            seen = {None: table_alias}
+            for field, model in self.model._meta.get_fields_with_model():
+                if model not in seen:
+                    seen[model] = self.join((table_alias, model._meta.db_table,
+                            root_pk, model._meta.pk.column))
+                result.append('%s.%s' % (qn(seen[model]), qn(field.column)))
             aliases = result[:]
 
         result.extend(['(%s) AS %s' % (col, alias)
@@ -742,7 +747,7 @@ class Query(object):
         opts = self.model._meta
         alias = self.join((None, opts.db_table, None, None))
 
-        field, target, unused, join_list, = self.setup_joins(parts, opts,
+        field, target, opts, join_list, = self.setup_joins(parts, opts,
                 alias, (connector == AND))
         col = target.column
         alias = join_list[-1][-1]
@@ -850,11 +855,21 @@ class Query(object):
                 name = opts.pk.name
 
             try:
-                field, direct, m2m = opts.get_field_by_name(name)
+                field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
                 names = opts.get_all_field_names()
                 raise TypeError("Cannot resolve keyword %r into field. "
                         "Choices are: %s" % (name, ", ".join(names)))
+            if model:
+                # The field lives on a base class of the current model.
+                alias_list = []
+                for int_model in opts.get_base_chain(model):
+                    lhs_col = opts.parents[int_model].column
+                    opts = int_model._meta
+                    alias = self.join((alias, opts.db_table, lhs_col,
+                            opts.pk.column))
+                    alias_list.append(alias)
+                joins.append(alias_list)
             cached_data = opts._join_cache.get(name)
             orig_opts = opts
 
@@ -899,6 +914,7 @@ class Query(object):
                             nullable=field.null)
                     joins.append([alias])
                 else:
+                    # Non-relation fields.
                     target = field
                     break
             else:
@@ -1242,7 +1258,7 @@ class UpdateQuery(Query):
     def add_update_values(self, values):
         from django.db.models.base import Model
         for name, val in values.items():
-            field, direct, m2m = self.model._meta.get_field_by_name(name)
+            field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 # Can only update non-relation fields and foreign keys.
                 raise TypeError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)

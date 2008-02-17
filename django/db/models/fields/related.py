@@ -494,8 +494,9 @@ class OneToOneRel(ManyToOneRel):
         # ignored here. We accept them as parameters only to match the calling
         # signature of ManyToOneRel.__init__().
         super(OneToOneRel, self).__init__(to, field_name, num_in_admin,
-                edit_inline, related_name, limit_choices_to, lookup_overrides,
-                raw_id_admin)
+                edit_inline=edit_inline, related_name=related_name,
+                limit_choices_to=limit_choices_to,
+                lookup_overrides=lookup_overrides, raw_id_admin=raw_id_admin)
         self.multiple = False
 
 class ManyToManyRel(object):
@@ -754,7 +755,7 @@ class ManyToManyField(RelatedField, Field):
 
     def save_form_data(self, instance, data):
         setattr(instance, self.attname, data)
-        
+
     def formfield(self, **kwargs):
         defaults = {'form_class': forms.ModelMultipleChoiceField, 'queryset': self.rel.to._default_manager.all()}
         defaults.update(kwargs)

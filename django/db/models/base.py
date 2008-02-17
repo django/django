@@ -1,9 +1,14 @@
+import types
+import sys
+import os
+from itertools import izip
+
 import django.db.models.manipulators
 import django.db.models.manager
 from django.core import validators
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
-from django.db.models.fields.related import OneToOneRel, ManyToOneRel
+from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q
 from django.db.models.options import Options, AdminOptions
 from django.db import connection, transaction
@@ -14,10 +19,6 @@ from django.utils.datastructures import SortedDict
 from django.utils.functional import curry
 from django.utils.encoding import smart_str, force_unicode, smart_unicode
 from django.conf import settings
-from itertools import izip
-import types
-import sys
-import os
 
 class ModelBase(type):
     "Metaclass for all models"
@@ -25,29 +26,46 @@ class ModelBase(type):
         # If this isn't a subclass of Model, don't do anything special.
         try:
             parents = [b for b in bases if issubclass(b, Model)]
-            if not parents:
-                return super(ModelBase, cls).__new__(cls, name, bases, attrs)
         except NameError:
             # 'Model' isn't defined yet, meaning we're looking at Django's own
             # Model class, defined below.
+            parents = []
+        if not parents:
             return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
         new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
-        new_class.add_to_class('_meta', Options(attrs.pop('Meta', None)))
+        meta = attrs.pop('Meta', None)
+        # FIXME: Promote Meta to a newstyle class before attaching it to the
+        # model.
+        ## if meta:
+        ##     new_class.Meta = meta
+        new_class.add_to_class('_meta', Options(meta))
+        # FIXME: Need to be smarter here. Exception is an old-style class in
+        # Python <= 2.4, new-style in Python 2.5+. This construction is only
+        # really correct for old-style classes.
         new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
-        new_class.add_to_class('MultipleObjectsReturned',
-            types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
+        new_class.add_to_class('MultipleObjectsReturned', types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
 
-        # Build complete list of parents
+        # Do the appropriate setup for any model parents.
+        abstract_parents = []
         for base in parents:
-            # Things without _meta aren't functional models, so they're
-            # uninteresting parents.
-            if hasattr(base, '_meta'):
-                new_class._meta.parents.append(base)
-                new_class._meta.parents.extend(base._meta.parents)
+            if not hasattr(base, '_meta'):
+                # Things without _meta aren't functional models, so they're
+                # uninteresting parents.
+                continue
+            if not base._meta.abstract:
+                attr_name = '%s_ptr' % base._meta.module_name
+                field = OneToOneField(base, name=attr_name, auto_created=True)
+                new_class.add_to_class(attr_name, field)
+                new_class._meta.parents[base] = field
+            else:
+                abstract_parents.append(base)
 
-
+        if getattr(new_class, '_default_manager', None) is not None:
+            # We have a parent who set the default manager. We need to override
+            # this.
+            new_class._default_manager = None
         if getattr(new_class._meta, 'app_label', None) is None:
             # Figure out the app_label by looking one level up.
             # For 'django.contrib.sites.models', this would be 'sites'.
@@ -63,21 +81,26 @@ class ModelBase(type):
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
 
-        # Add Fields inherited from parents
-        for parent in new_class._meta.parents:
-            for field in parent._meta.fields:
-                # Only add parent fields if they aren't defined for this class.
-                try:
-                    new_class._meta.get_field(field.name)
-                except FieldDoesNotExist:
-                    field.contribute_to_class(new_class, field.name)
+        for parent in abstract_parents:
+            names = [f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many]
+            for field in parent._meta.local_fields:
+                if field.name in names:
+                    raise TypeError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
+                            % (field.name, name, parent.__name__))
+                new_class.add_to_class(field.name, field)
+
+        if new_class._meta.abstract:
+            # Abstract base models can't be instantiated and don't appear in
+            # the list of models for an app. We do the final setup for them a
+            # little differently from normal models.
+            return new_class
 
         new_class._prepare()
-
         register_models(new_class._meta.app_label, new_class)
+
         # Because of the way imports happen (recursively), we may or may not be
-        # the first class for this model to register with the framework. There
-        # should only be one class for each model, so we must always return the
+        # the first time this model tries to register with the framework. There
+        # should only be one class for each model, so we always return the
         # registered version.
         return get_model(new_class._meta.app_label, name, False)
 
@@ -113,8 +136,10 @@ class ModelBase(type):
 class Model(object):
     __metaclass__ = ModelBase
 
-    def _get_pk_val(self):
-        return getattr(self, self._meta.pk.attname)
+    def _get_pk_val(self, meta=None):
+        if not meta:
+            meta = self._meta
+        return getattr(self, meta.pk.attname)
 
     def _set_pk_val(self, value):
         return setattr(self, self._meta.pk.attname, value)
@@ -207,19 +232,30 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
-    def save(self, raw=False):
-        dispatcher.send(signal=signals.pre_save, sender=self.__class__,
-                        instance=self, raw=raw)
+    def save(self, raw=False, cls=None):
+        if not cls:
+            dispatcher.send(signal=signals.pre_save, sender=self.__class__,
+                    instance=self, raw=raw)
+            cls = self.__class__
+            meta = self._meta
+            signal = True
+        else:
+            meta = cls._meta
+            signal = False
 
-        non_pks = [f for f in self._meta.fields if not f.primary_key]
+        for parent, field in meta.parents.items():
+            self.save(raw, parent)
+            setattr(self, field.attname, self._get_pk_val(parent._meta))
+
+        non_pks = [f for f in self._meta.local_fields if not f.primary_key]
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
-        pk_val = self._get_pk_val()
+        pk_val = self._get_pk_val(meta)
         # Note: the comparison with '' is required for compatibility with
         # oldforms-style model creation.
         pk_set = pk_val is not None and smart_unicode(pk_val) != u''
         record_exists = True
-        manager = self.__class__._default_manager
+        manager = cls._default_manager
         if pk_set:
             # Determine whether a record with the primary key already exists.
             if manager.filter(pk=pk_val).extra(select={'a': 1}).values('a').order_by():
@@ -231,16 +267,16 @@ class Model(object):
                 record_exists = False
         if not pk_set or not record_exists:
             if not pk_set:
-                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in self._meta.fields if not isinstance(f, AutoField)]
+                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields if not isinstance(f, AutoField)]
             else:
-                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in self._meta.fields]
+                values = [(f.name, f.get_db_prep_save(raw and getattr(self, f.attname) or f.pre_save(self, True))) for f in meta.local_fields]
 
-            if self._meta.order_with_respect_to:
-                field = self._meta.order_with_respect_to
+            if meta.order_with_respect_to:
+                field = meta.order_with_respect_to
                 values.append(('_order', manager.filter(**{field.name: getattr(self, field.attname)}).count()))
             record_exists = False
 
-            update_pk = bool(self._meta.has_auto_field and not pk_set)
+            update_pk = bool(meta.has_auto_field and not pk_set)
             if values:
                 # Create a new record.
                 result = manager._insert(_return_id=update_pk, **dict(values))
@@ -250,12 +286,13 @@ class Model(object):
                         _raw_values=True, pk=connection.ops.pk_default_value())
 
             if update_pk:
-                setattr(self, self._meta.pk.attname, result)
+                setattr(self, meta.pk.attname, result)
         transaction.commit_unless_managed()
 
-        # Run any post-save hooks.
-        dispatcher.send(signal=signals.post_save, sender=self.__class__,
-                        instance=self, created=(not record_exists), raw=raw)
+        if signal:
+            # Run any post-save hooks.
+            dispatcher.send(signal=signals.post_save, sender=self.__class__,
+                    instance=self, created=(not record_exists), raw=raw)
 
     save.alters_data = True
 

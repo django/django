@@ -1,3 +1,6 @@
+import re
+from bisect import bisect
+
 from django.conf import settings
 from django.db.models.related import RelatedObject
 from django.db.models.fields.related import ManyToManyRel
@@ -7,19 +10,19 @@ from django.db.models.loading import get_models, app_cache_ready
 from django.db.models import Manager
 from django.utils.translation import activate, deactivate_all, get_language, string_concat
 from django.utils.encoding import force_unicode, smart_str
-from bisect import bisect
-import re
+from django.utils.datastructures import SortedDict
 
 # Calculate the verbose_name by converting from InitialCaps to "lowercase with spaces".
 get_verbose_name = lambda class_name: re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', ' \\1', class_name).lower().strip()
 
 DEFAULT_NAMES = ('verbose_name', 'db_table', 'ordering',
                  'unique_together', 'permissions', 'get_latest_by',
-                 'order_with_respect_to', 'app_label', 'db_tablespace')
+                 'order_with_respect_to', 'app_label', 'db_tablespace',
+                 'abstract')
 
 class Options(object):
     def __init__(self, meta):
-        self.fields, self.many_to_many = [], []
+        self.local_fields, self.local_many_to_many = [], []
         self.module_name, self.verbose_name = None, None
         self.verbose_name_plural = None
         self.db_table = ''
@@ -35,7 +38,8 @@ class Options(object):
         self.pk = None
         self.has_auto_field, self.auto_field = False, None
         self.one_to_one_field = None
-        self.parents = []
+        self.abstract = False
+        self.parents = SortedDict()
 
     def contribute_to_class(self, cls, name):
         cls._meta = self
@@ -82,9 +86,16 @@ class Options(object):
             self.order_with_respect_to = None
 
         if self.pk is None:
-            auto = AutoField(verbose_name='ID', primary_key=True)
-            auto.creation_counter = -1
-            model.add_to_class('id', auto)
+            if self.parents:
+                # Promote the first parent link in lieu of adding yet another
+                # field.
+                field = self.parents.value_for_index(0)
+                field.primary_key = True
+                self.pk = field
+            else:
+                auto = AutoField(verbose_name='ID', primary_key=True,
+                        auto_created=True)
+                model.add_to_class('id', auto)
 
         # If the db_table wasn't provided, use the app_label + module_name.
         if not self.db_table:
@@ -97,12 +108,22 @@ class Options(object):
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToManyRel):
-            self.many_to_many.insert(bisect(self.many_to_many, field), field)
+            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
         else:
-            self.fields.insert(bisect(self.fields, field), field)
+            self.local_fields.insert(bisect(self.local_fields, field), field)
             if not self.pk and field.primary_key:
                 self.pk = field
                 field.serialize = False
+
+        # All of these internal caches need to be updated the next time they
+        # are used.
+        # TODO: Do this more neatly. (Also, use less caches!)
+        if hasattr(self, '_field_cache'):
+            del self._field_cache
+        if hasattr(self, '_m2m_cache'):
+            del self._m2m_cache
+        if hasattr(self, '_name_map'):
+            del self._name_map
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
@@ -123,8 +144,76 @@ class Options(object):
         return raw
     verbose_name_raw = property(verbose_name_raw)
 
+    def _fields(self):
+        """
+        The getter for self.fields. This returns the list of field objects
+        available to this model (including through parent models).
+        """
+        try:
+            self._field_cache
+        except AttributeError:
+            self._fill_fields_cache()
+        return self._field_cache.keys()
+    fields = property(_fields)
+
+    def get_fields_with_model(self):
+        """
+        Returns a list of (field, model) pairs for all fields. The "model"
+        element is None for fields on the current model. Mostly of use when
+        constructing queries so that we know which model a field belongs to.
+        """
+        try:
+            self._field_cache
+        except AttributeError:
+            self._fill_fields_cache()
+        return self._field_cache.items()
+
+    def _fill_fields_cache(self):
+        cache = SortedDict()
+        for parent in self.parents:
+            for field, model in parent._meta.get_fields_with_model():
+                if model:
+                    cache[field] = model
+                else:
+                    cache[field] = parent
+        for field in self.local_fields:
+            cache[field] = None
+        self._field_cache = cache
+
+    def _many_to_many(self):
+        try:
+            self._m2m_cache
+        except AttributeError:
+            self._fill_m2m_cache()
+        return self._m2m_cache.keys()
+    many_to_many = property(_many_to_many)
+
+    def get_m2m_with_model(self):
+        """
+        The many-to-many version of get_fields_with_model().
+        """
+        try:
+            self._m2m_cache
+        except AttributeError:
+            self._fill_m2m_cache()
+        return self._m2m_cache.items()
+
+    def _fill_m2m_cache(self):
+        cache = SortedDict()
+        for parent in self.parents:
+            for field, model in parent._meta.get_m2m_with_model():
+                if model:
+                    cache[field] = model
+                else:
+                    cache[field] = parent
+        for field in self.local_many_to_many:
+            cache[field] = None
+        self._m2m_cache = cache
+
     def get_field(self, name, many_to_many=True):
-        "Returns the requested field by name. Raises FieldDoesNotExist on error."
+        """
+        Returns the requested field by name. Raises FieldDoesNotExist on error.
+        """
         to_search = many_to_many and (self.fields + self.many_to_many) or self.fields
         for f in to_search:
             if f.name == name:
@@ -133,8 +222,9 @@ class Options(object):
 
     def get_field_by_name(self, name, only_direct=False):
         """
-        Returns the (field_object, direct, m2m), where field_object is the
-        Field instance for the given name, direct is True if the field exists
+        Returns the (field_object, model, direct, m2m), where field_object is
+        the Field instance for the given name, model is the model containing
+        this field (None for local fields), direct is True if the field exists
         on this model, and m2m is True for many-to-many relations. When
         'direct' is False, 'field_object' is the corresponding RelatedObject
         for this field (since the field doesn't have an instance associated
@@ -151,7 +241,7 @@ class Options(object):
             cache = self.init_name_map()
             result = cache.get(name)
 
-        if not result or (not result[1] and only_direct):
+        if not result or (only_direct and not result[2]):
             raise FieldDoesNotExist('%s has no field named %r'
                     % (self.object_name, name))
         return result
@@ -173,15 +263,16 @@ class Options(object):
         """
         Initialises the field name -> field object mapping.
         """
-        cache = dict([(f.name, (f, True, False)) for f in self.fields])
-        for f in self.many_to_many:
-            cache[f.name] = (f, True, True)
-        for f in self.get_all_related_many_to_many_objects():
-            cache[f.field.related_query_name()] = (f, False, True)
-        for f in self.get_all_related_objects():
-            cache[f.field.related_query_name()] = (f, False, False)
+        cache = dict([(f.name, (f, m, True, False)) for f, m in
+                self.get_fields_with_model()])
+        for f, model in self.get_m2m_with_model():
+            cache[f.name] = (f, model, True, True)
+        for f, model in self.get_all_related_m2m_objects_with_model():
+            cache[f.field.related_query_name()] = (f, model, False, True)
+        for f, model in self.get_all_related_objects_with_model():
+            cache[f.field.related_query_name()] = (f, model, False, False)
         if self.order_with_respect_to:
-            cache['_order'] = OrderWrt(), True, False
+            cache['_order'] = OrderWrt(), None, True, False
         if app_cache_ready():
             self._name_map = cache
         return cache
@@ -195,17 +286,81 @@ class Options(object):
     def get_delete_permission(self):
         return 'delete_%s' % self.object_name.lower()
 
-    def get_all_related_objects(self):
-        try: # Try the cache first.
-            return self._all_related_objects
+    def get_all_related_objects(self, local_only=False):
+        try:
+            self._related_objects_cache
         except AttributeError:
-            rel_objs = []
-            for klass in get_models():
-                for f in klass._meta.fields:
-                    if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
-                        rel_objs.append(RelatedObject(f.rel.to, klass, f))
-            self._all_related_objects = rel_objs
-            return rel_objs
+            self._fill_related_objects_cache()
+        if local_only:
+            return [k for k, v in self._related_objects_cache.items() if not v]
+        return self._related_objects_cache.keys()
+
+    def get_all_related_objects_with_model(self):
+        """
+        Returns a list of (related-object, model) pairs. Similar to
+        get_fields_with_model().
+        """
+        try:
+            self._related_objects_cache
+        except AttributeError:
+            self._fill_related_objects_cache()
+        return self._related_objects_cache.items()
+
+    def _fill_related_objects_cache(self):
+        cache = SortedDict()
+        parent_list = self.get_parent_list()
+        for parent in self.parents:
+            for obj, model in parent._meta.get_all_related_objects_with_model():
+                if obj.field.creation_counter < 0 and obj.model not in parent_list:
+                    continue
+                if not model:
+                    cache[obj] = parent
+                else:
+                    cache[obj] = model
+        for klass in get_models():
+            for f in klass._meta.local_fields:
+                if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
+                    cache[RelatedObject(f.rel.to, klass, f)] = None
+        self._related_objects_cache = cache
+
+    def get_all_related_many_to_many_objects(self, local_only=False):
+        try:
+            cache = self._related_many_to_many_cache
+        except AttributeError:
+            cache = self._fill_related_many_to_many_cache()
+        if local_only:
+            return [k for k, v in cache.items() if not v]
+        return cache.keys()
+
+    def get_all_related_m2m_objects_with_model(self):
+        """
+        Returns a list of (related-m2m-object, model) pairs. Similar to
+        get_fields_with_model().
+        """
+        try:
+            cache = self._related_many_to_many_cache
+        except AttributeError:
+            cache = self._fill_related_many_to_many_cache()
+        return cache.items()
+
+    def _fill_related_many_to_many_cache(self):
+        cache = SortedDict()
+        parent_list = self.get_parent_list()
+        for parent in self.parents:
+            for obj, model in parent._meta.get_all_related_m2m_objects_with_model():
+                if obj.field.creation_counter < 0 and obj.model not in parent_list:
+                    continue
+                if not model:
+                    cache[obj] = parent
+                else:
+                    cache[obj] = model
+        for klass in get_models():
+            for f in klass._meta.local_many_to_many:
+                if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
+                    cache[RelatedObject(f.rel.to, klass, f)] = None
+        if app_cache_ready():
+            self._related_many_to_many_cache = cache
+        return cache
 
     def get_followed_related_objects(self, follow=None):
         if follow == None:
@@ -229,18 +384,35 @@ class Options(object):
                 follow[f.name] = fol
         return follow
 
-    def get_all_related_many_to_many_objects(self):
-        try: # Try the cache first.
-            return self._all_related_many_to_many_objects
-        except AttributeError:
-            rel_objs = []
-            for klass in get_models():
-                for f in klass._meta.many_to_many:
-                    if f.rel and not isinstance(f.rel.to, str) and self == f.rel.to._meta:
-                        rel_objs.append(RelatedObject(f.rel.to, klass, f))
-            if app_cache_ready():
-                self._all_related_many_to_many_objects = rel_objs
-            return rel_objs
+    def get_base_chain(self, model):
+        """
+        Returns a list of parent classes leading to 'model' (order from closet
+        to most distant ancestor). This has to handle the case were 'model' is
+        a granparent or even more distant relation.
+        """
+        if not self.parents:
+            return
+        if model in self.parents:
+            return [model]
+        for parent in self.parents:
+            res = parent._meta.get_base_chain(model)
+            if res:
+                res.insert(0, parent)
+                return res
+        raise TypeError('%r is not an ancestor of this model'
+                % model._meta.module_name)
+
+    def get_parent_list(self):
+        """
+        Returns a list of all the ancestor of this model as a list. Useful for
+        determining if something is an ancestor, regardless of lineage.
+        """
+        # FIXME: Fix model hashing and then use a Set here.
+        result = []
+        for parent in self.parents:
+            result.append(parent)
+            result.extend(parent._meta.get_parent_list())
+        return result
 
     def get_ordered_objects(self):
         "Returns a list of Options objects that are ordered with respect to this object."

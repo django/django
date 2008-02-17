@@ -2028,6 +2028,105 @@ You can also prevent saving::
 
 .. _database API docs: ../db-api/
 
+Model inheritance
+=================
+
+Abstract base classes
+---------------------
+
+Abstract base classes are useful when you want to put some common information
+into a number of other models. You write your base class and put
+``abstract=True`` in the ``Meta`` class. This model will then not be used to
+create any database table. Instead, when it is used as a base class for other
+models, its fields will be added to those of the child class. It is an error
+to have fields in the abstract base class with the same name as those in the
+child (and Django will raise an exception).
+
+An example::
+
+    class CommonInfo(models.Model):
+        name = models.CharField(max_length=100)
+        age = models.PositiveIntegerField()
+
+        class Meta:
+            abstract = True
+
+    class Student(CommonInfo):
+        home_group = models.CharField(max_length=5)
+
+The ``Student`` model will have three fields: ``name``, ``age`` and
+``home_group``. The ``CommonInfo`` model cannot be used as a normal Django
+model, since it is an abstract base class. It does not generate a database
+table or have a manager or anything like that.
+
+For many uses, this type of model inheritance will be exactly what you want.
+It provides a way to factor out common information at the Python level, whilst
+still only creating one database table per child model at the database level.
+
+Multi-table inheritance
+-----------------------
+
+The second type of model inheritance supported by Django is when each model in
+the hierarchy is a model all by itself. Each model corresponds to its own
+database table and can be queried and created indvidually. The inheritance
+relationship introduces links between the child model and each of its parents
+(via an automatically created ``OneToOneField``). For example::
+
+    class Place(models.Model):
+        name = models.CharField(max_length=50)
+        address = models.CharField(max_length=80)
+
+    class Restaurant(Place):
+        serves_hot_dogs = models.BooleanField()
+        serves_pizza = models.BooleanField()
+
+All of the fields of ``Place`` will also be available in ``Restaurant``,
+although the data will reside in a different database table. So these are both
+possible::
+
+    >>> Place.objects.filter(name="Bob's Cafe")
+    >>> Restaurant.objects.filter(name="Bob's Cafe")
+
+If you have a ``Place`` that is also a ``Restaurant``, you can get from the
+``Place`` object to the ``Restaurant`` object by using the lower-case version
+of the model name::
+
+    >>> p = Place.objects.filter(name="Bob's Cafe")
+    # If Bob's Cafe is a Restaurant object, this will give the child class:
+    >>> p.restaurant
+    <Restaurant: ...>
+
+However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
+created directly as a ``Place`` object or was the parent of some other class),
+referring to ``p.restaurant`` would give an error.
+
+Normally you won't need to worry too much about how model inheritance works.
+It will behave similarly to Python class inheritance.
+
+Inheritance and reverse relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Because multi-table inheritance uses an implicit ``OneToOneField`` to link the
+child and the parent, it's possible to move from the parent down to the child,
+as in the above example. However, this uses up the name that is the default
+``related_name`` value for ``ForeignKey`` and ``ManyToManyField`` relations.
+If you are putting those type of relations on a subclass of another model, you
+**must** specify the ``related_name`` attribute on each such field. If you
+forget, Django will raise an error when you run ``manage.py validate`` or try
+to syncdb.
+
+For example, using the above ``Place`` class again, let's create another
+subclass with a ``ManyToManyField``::
+
+    class Supplier(Place):
+        # Must specify related_name on all relations.
+        customers = models.ManyToManyField(Restaurant,
+                related_name='provider')
+
+For more information about reverse relations, refer to the `Database API
+reference`_ . For now, just remember to run ``manage.py validate`` when
+you're writing your models and pay attention to the error messages.
+
 Models across files
 ===================
 

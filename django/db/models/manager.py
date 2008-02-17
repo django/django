@@ -5,7 +5,7 @@ from django.db.models.fields import FieldDoesNotExist
 
 def ensure_default_manager(sender):
     cls = sender
-    if not hasattr(cls, '_default_manager'):
+    if not hasattr(cls, '_default_manager') or cls._default_manager is None:
         # Create the default manager, if needed.
         try:
             cls._meta.get_field('objects')
@@ -31,7 +31,7 @@ class Manager(object):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
         setattr(model, name, ManagerDescriptor(self))
-        if not hasattr(model, '_default_manager') or self.creation_counter < model._default_manager.creation_counter:
+        if not hasattr(model, '_default_manager') or model._default_manager is None or self.creation_counter < model._default_manager.creation_counter:
             model._default_manager = self
 
     #######################
