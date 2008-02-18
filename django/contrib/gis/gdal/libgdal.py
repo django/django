@@ -50,7 +50,7 @@ def std_call(func):
 #### Version-information functions. ####
 
 # Returns GDAL library version information with the given key.
-_version_info = lgdal.GDALVersionInfo
+_version_info = std_call('GDALVersionInfo')
 _version_info.argtypes = [c_char_p]
 _version_info.restype = c_char_p
 
