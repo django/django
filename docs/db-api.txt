@@ -1605,8 +1605,7 @@ the cache of all one-to-many relationships ahead of time. Example::
     print e.blog  # Doesn't hit the database; uses cached version.
     print e.blog  # Doesn't hit the database; uses cached version.
 
-``select_related()`` is documented in the "QuerySet methods that return new
-QuerySets" section above.
+``select_related()`` is documented in the `QuerySet methods that return new QuerySets`_ section above.
 
 Backward
 ~~~~~~~~
