@@ -100,7 +100,7 @@ __all__ = [
 
 import __future__
 
-import sys, traceback, inspect, linecache, os, re, types
+import sys, traceback, inspect, linecache, os, re
 import unittest, difflib, pdb, tempfile
 import warnings
 from StringIO import StringIO

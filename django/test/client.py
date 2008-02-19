@@ -1,7 +1,5 @@
-import datetime
 import sys
 from cStringIO import StringIO
-from urlparse import urlparse
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.core.handlers.base import BaseHandler
