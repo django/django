@@ -135,6 +135,9 @@ class Model(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash(self._get_pk_val())
+
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
 

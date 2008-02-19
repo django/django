@@ -5,6 +5,11 @@
 This is a basic model with only two non-primary-key fields.
 """
 
+try:
+    set
+except NameError:
+    from sets import Set as set
+
 from django.db import models
 
 class Article(models.Model):
@@ -389,4 +394,10 @@ year, including Jan. 1 and Dec. 31.
 >>> a.save()
 >>> Article.objects.get(pk=a.id).headline
 u'\u6797\u539f \u3081\u3050\u307f'
+
+# Model instances have a hash function, so they can be used in sets or as
+# dictionary keys. Two models compare as equal if their primary keys are equal.
+>>> s = set([a10, a11, a12])
+>>> Article.objects.get(headline='Article 11') in s
+True
 """
