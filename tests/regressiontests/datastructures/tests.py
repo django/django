@@ -77,6 +77,8 @@ MultiValueDictKeyError: "Key 'lastname' not found in <MultiValueDict: {'position
 'not one'
 >>> d.keys() == d.copy().keys()
 True
+>>> d2 = d.copy()
+>>> d2['four'] = 'four'
 >>> print repr(d)
 {'one': 'not one', 'two': 'two', 'three': 'three'}
 >>> d.pop('one', 'missing')

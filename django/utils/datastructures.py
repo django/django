@@ -145,7 +145,7 @@ class SortedDict(dict):
         """Returns a copy of this object."""
         # This way of initializing the copy means it works for subclasses, too.
         obj = self.__class__(self)
-        obj.keyOrder = self.keyOrder
+        obj.keyOrder = self.keyOrder[:]
         return obj
 
     def __repr__(self):

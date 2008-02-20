@@ -21,7 +21,6 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
 
 from MySQLdb.converters import conversions
 from MySQLdb.constants import FIELD_TYPE
-import types
 import re
 
 # Raise exceptions for database warnings if DEBUG is on

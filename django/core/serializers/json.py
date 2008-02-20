@@ -4,7 +4,6 @@ Serialize data to/from JSON
 
 import datetime
 from django.utils import simplejson
-from django.utils.simplejson import decoder
 from django.core.serializers.python import Serializer as PythonSerializer
 from django.core.serializers.python import Deserializer as PythonDeserializer
 try:

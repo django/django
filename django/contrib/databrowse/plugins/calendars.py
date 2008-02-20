@@ -8,8 +8,6 @@ from django.utils.translation import get_date_formats
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 from django.views.generic import date_based
-import datetime
-import time
 
 class CalendarPlugin(DatabrowsePlugin):
     def __init__(self, field_names=None):
