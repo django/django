@@ -2,7 +2,7 @@ import os, unittest
 from decimal import Decimal
 
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos import GEOSGeometry, Point, LineString
 from django.contrib.gis.measure import D # alias for Distance
 from django.contrib.gis.db.models import GeoQ
 from django.contrib.gis.tests.utils import oracle
@@ -35,7 +35,7 @@ class DistanceTest(unittest.TestCase):
         load_cities(AustraliaCity, 4326, au_cities)
 
         self.assertEqual(10, SouthTexasCity.objects.count())
-        self.assertEqual(10, AustraliaCity.objects.count())
+        self.assertEqual(11, AustraliaCity.objects.count())
 
     def test02_dwithin(self):
         "Testing the `dwithin` lookup type."
@@ -56,17 +56,38 @@ class DistanceTest(unittest.TestCase):
                      138809.684197, 158309.246259, 212183.594374,
                      70870.188967, 165337.758878, 102128.654360, 
                      139196.085105]
+
+        # Testing when the field name is explicitly set.
         dist1 = SouthTexasCity.objects.distance('point', lagrange)
-        dist2 = SouthTexasCity.objects.distance(lagrange)
+        dist2 = SouthTexasCity.objects.distance(lagrange)  # Using GEOSGeometry parameter
+        dist3 = SouthTexasCity.objects.distance(lagrange.ewkt) # Using EWKT string parameter.
 
         # Original query done on PostGIS, have to adjust AlmostEqual tolerance
         # for Oracle.
-        if oracle: tol = 3
+        if oracle: tol = 2
         else: tol = 5
 
-        for qs in [dist1, dist2]:
+        # Ensuring expected distances are returned for each distance queryset.
+        for qs in [dist1, dist2, dist3]:
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(distances[i], c.distance, tol)
+
+        # Now testing geodetic distance aggregation.
+        hillsdale = AustraliaCity.objects.get(name='Hillsdale')
+        if not oracle:
+            # PostGIS is limited to disance queries only to/from point geometries,
+            # ensuring a TypeError is raised if something else is put in.
+            self.assertRaises(TypeError, AustraliaCity.objects.distance, 'LINESTRING(0 0, 1 1)')
+            self.assertRaises(TypeError, AustraliaCity.objects.distance, LineString((0, 0), (1, 1)))
+
+        # Got these distances using the raw SQL statement:
+        #  SELECT ST_distance_spheroid(point, ST_GeomFromText('POINT(151.231341 -33.952685)', 4326), 'SPHEROID["WGS 84",6378137.0,298.257223563]') FROM distapp_australiacity WHERE (NOT (id = 11));
+        geodetic_distances = [60504.0628825298, 77023.948962654, 49154.8867507115, 90847.435881812, 217402.811862568, 709599.234619957, 640011.483583758, 7772.00667666425, 1047861.7859506, 1165126.55237647]
+
+        # Ensuring the expected distances are returned.
+        qs = AustraliaCity.objects.exclude(id=hillsdale.id).distance(hillsdale.point)
+        for i, c in enumerate(qs):
+            self.assertAlmostEqual(geodetic_distances[i], c.distance, tol)
 
     def test04_distance_lookups(self):
         "Testing the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types."

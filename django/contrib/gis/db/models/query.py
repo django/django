@@ -4,10 +4,10 @@ from django.db import connection
 from django.db.models.query import EmptyResultSet, Q, QuerySet, handle_legacy_orderlist, quote_only_if_word, orderfield2column, fill_table_cache
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.datastructures import SortedDict
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.fields import GeometryField, PointField
 # parse_lookup depends on the spatial database backend.
 from django.contrib.gis.db.backend import gqn, parse_lookup, SpatialBackend
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
 
 # Shortcut booleans for determining the backend.
 oracle  = SpatialBackend.name == 'oracle'
@@ -279,24 +279,27 @@ class GeoQuerySet(QuerySet):
         # `distance_lte` lookup type.
         where, params = geo_field.get_db_prep_lookup('distance_lte', (geom, 0))
         if oracle:
-            # The `tolerance` keyword may be used for Oracle.
+            # The `tolerance` keyword may be used for Oracle; the tolerance is 
+            # in meters -- a default of 5 centimeters is used.
             tolerance = kwargs.get('tolerance', 0.05)
-
-            # More legwork here because the OracleSpatialAdaptor doesn't do
-            # quoting of the WKT.
-            tmp_params = [gqn(str(params[0]))]
-            tmp_params.extend(params[1:])
-            dsql = where[0] % tuple(tmp_params)
-            dist_select = {'distance' : '%s(%s, %s, %s)' % (DISTANCE, geo_col, dsql, tolerance)}
+            dist_select = {'distance' : '%s(%s, %s, %s)' % (DISTANCE, geo_col, where[0], tolerance)}
         else:
-            dsql = where[0] % tuple(params)
             if len(where) == 3:
+                # Spherical distance calculation was requested (b/c spheroid 
+                # parameter was attached) However, the PostGIS ST_distance_spheroid() 
+                # procedure may only do queries from point columns to point geometries
+                # some error checking is required.
+                if not isinstance(geo_field, PointField): 
+                    raise TypeError('Spherical distance calculation only supported on PointFields.')
+                if not isinstance(GEOSGeometry(params[0].wkb), Point):
+                    raise TypeError('Spherical distance calculation only supported with Point Geometry parameters')
+
                 # Call to distance_spheroid() requires the spheroid as well.
-                dist_sql = '%s(%s, %s, %s)' % (SpatialBackend.distance_spheroid, geo_col, dsql, where[1])
+                dist_sql = '%s(%s, %s, %s)' % (SpatialBackend.distance_spheroid, geo_col, where[0], where[1])
             else:
-                dist_sql = '%s(%s, %s)' % (DISTANCE, geo_col, dsql)
+                dist_sql = '%s(%s, %s)' % (DISTANCE, geo_col, where[0])
             dist_select = {'distance' : dist_sql}
-        return self.extra(select=dist_select)
+        return self.extra(select=dist_select, params=params)
 
     def extent(self, field_name=None):
         """

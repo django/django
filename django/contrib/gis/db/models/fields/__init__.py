@@ -12,7 +12,7 @@ from django.contrib.gis.oldforms import WKTField
 # Attempting to get the spatial reference system.
 try:
     from django.contrib.gis.models import SpatialRefSys
-except NotImplementedError:
+except ImportError:
     SpatialRefSys = None
 
 #TODO: Flesh out widgets; consider adding support for OGR Geometry proxies.
@@ -21,6 +21,9 @@ class GeometryField(SpatialBackend.Field):
 
     # The OpenGIS Geometry name.
     _geom = 'GEOMETRY'
+
+    # Geodetic units.
+    geodetic_units = ('Decimal Degree', 'degree')
 
     def __init__(self, srid=4326, spatial_index=True, dim=2, **kwargs):
         """
@@ -82,8 +85,9 @@ class GeometryField(SpatialBackend.Field):
         `D(km=1)` was passed in and the units of the field were in meters,
         then 1000 would be returned.
         """
+        
         if isinstance(dist, Distance):
-            if self._unit_name in ('Decimal Degree', 'degree'):
+            if self._unit_name in self.geodetic_units:
                 # Spherical distance calculation parameter should be in meters.
                 dist_param = dist.m
             else:
@@ -93,7 +97,7 @@ class GeometryField(SpatialBackend.Field):
             dist_param = dist
 
         # Sphereical distance query; returning meters.
-        if SpatialBackend.name == 'postgis' and self._unit_name == 'degree':
+        if SpatialBackend.name == 'postgis' and self._unit_name in self.geodetic_units:
             return [gqn(self._spheroid), dist_param]
         else:
             return [dist_param]
