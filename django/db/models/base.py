@@ -34,18 +34,15 @@ class ModelBase(type):
             return super(ModelBase, cls).__new__(cls, name, bases, attrs)
 
         # Create the class.
-        new_class = type.__new__(cls, name, bases, {'__module__': attrs.pop('__module__')})
+        module = attrs.pop('__module__')
         meta = attrs.pop('Meta', None)
-        # FIXME: Promote Meta to a newstyle class before attaching it to the
-        # model.
-        ## if meta:
-        ##     new_class.Meta = meta
+        new_class = type.__new__(cls, name, bases, {'__module__': module})
         new_class.add_to_class('_meta', Options(meta))
-        # FIXME: Need to be smarter here. Exception is an old-style class in
-        # Python <= 2.4, new-style in Python 2.5+. This construction is only
-        # really correct for old-style classes.
-        new_class.add_to_class('DoesNotExist', types.ClassType('DoesNotExist', (ObjectDoesNotExist,), {}))
-        new_class.add_to_class('MultipleObjectsReturned', types.ClassType('MultipleObjectsReturned', (MultipleObjectsReturned, ), {}))
+        new_class.add_to_class('DoesNotExist',
+                subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
+        new_class.add_to_class('MultipleObjectsReturned',
+                subclass_exception('MultipleObjectsReturned',
+                    MultipleObjectsReturned, module))
 
         # Do the appropriate setup for any model parents.
         abstract_parents = []
@@ -488,3 +485,17 @@ def method_get_order(ordered_obj, self):
 
 def get_absolute_url(opts, func, self, *args, **kwargs):
     return settings.ABSOLUTE_URL_OVERRIDES.get('%s.%s' % (opts.app_label, opts.module_name), func)(self, *args, **kwargs)
+
+########
+# MISC #
+########
+
+if sys.version_info < (2, 5):
+    # Prior to Python 2.5, Exception was an old-style class
+    def subclass_exception(name, parent, unused):
+        return types.ClassType(name, (parent,), {})
+
+else:
+    def subclass_exception(name, parent, module):
+        return type(name, (parent,), {'__module__': module})
+

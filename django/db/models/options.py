@@ -1,5 +1,9 @@
 import re
 from bisect import bisect
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
 
 from django.conf import settings
 from django.db.models.related import RelatedObject
@@ -407,11 +411,10 @@ class Options(object):
         Returns a list of all the ancestor of this model as a list. Useful for
         determining if something is an ancestor, regardless of lineage.
         """
-        # FIXME: Fix model hashing and then use a Set here.
-        result = []
+        result = set()
         for parent in self.parents:
-            result.append(parent)
-            result.extend(parent._meta.get_parent_list())
+            result.add(parent)
+            result.update(parent._meta.get_parent_list())
         return result
 
     def get_ordered_objects(self):
