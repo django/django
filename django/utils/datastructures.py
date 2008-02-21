@@ -155,6 +155,10 @@ class SortedDict(dict):
         """
         return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
 
+    def clear(self):
+        super(SortedDict, self).clear()
+        self.keyOrder = []
+
 class MultiValueDictKeyError(KeyError):
     pass
 
