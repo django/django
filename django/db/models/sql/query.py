@@ -607,16 +607,19 @@ class Query(object):
             return True
         return False
 
-    def join(self, (lhs, table, lhs_col, col), always_create=False,
-            exclusions=(), promote=False, outer_if_first=False, nullable=False):
+    def join(self, connection, always_create=False, exclusions=(),
+            promote=False, outer_if_first=False, nullable=False):
         """
-        Returns an alias for a join between 'table' and 'lhs' on the given
-        columns, either reusing an existing alias for that join or creating a
-        new one.
+        Returns an alias for the join in 'connection', either reusing an
+        existing alias for that join or creating a new one. 'connection' is a
+        tuple (lhs, table, lhs_col, col) where 'lhs' is either an existing
+        table alias or a table name. The join correspods to the SQL equivalent
+        of::
 
-        'lhs' is either an existing table alias or a table name. If
-        'always_create' is True, a new alias is always created, regardless of
-        whether one already exists or not.
+            lhs.lhs_col = table.col
+
+        If 'always_create' is True, a new alias is always created, regardless
+        of whether one already exists or not.
 
         If 'exclusions' is specified, it is something satisfying the container
         protocol ("foo in exclusions" must work) and specifies a list of
@@ -633,6 +636,7 @@ class Query(object):
         If 'nullable' is True, the join can potentially involve NULL values and
         is a candidate for promotion (to "left outer") when combining querysets.
         """
+        lhs, table, lhs_col, col = connection
         if lhs is None:
             lhs_table = None
             is_table = False
