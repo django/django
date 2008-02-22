@@ -59,7 +59,10 @@ class Options(object):
             del meta_attrs['__module__']
             del meta_attrs['__doc__']
             for attr_name in DEFAULT_NAMES:
-                setattr(self, attr_name, meta_attrs.pop(attr_name, getattr(self, attr_name)))
+                if attr_name in meta_attrs:
+                    setattr(self, attr_name, meta_attrs.pop(attr_name))
+                elif hasattr(self.meta, attr_name):
+                    setattr(self, attr_name, getattr(self.meta, attr_name))
 
             # unique_together can be either a tuple of tuples, or a single
             # tuple of two strings. Normalize it to a tuple of tuples, so that

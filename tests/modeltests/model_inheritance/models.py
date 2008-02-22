@@ -46,10 +46,14 @@ class Rating(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['-rating']
 
 class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
+
+    class Meta(Rating.Meta):
+        db_table = 'my_restaurant'
 
     def __unicode__(self):
         return u"%s the restaurant" % self.name
@@ -124,7 +128,7 @@ Test constructor for Restaurant.
 >>> r.save()
 
 # Test the constructor for ItalianRestaurant.
->>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Elm', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True)
+>>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Elm', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True, rating=4)
 >>> ir.save()
 
 # Make sure Restaurant and ItalianRestaurant have the right fields in the right
@@ -133,6 +137,8 @@ Test constructor for Restaurant.
 ['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza']
 >>> [f.name for f in ItalianRestaurant._meta.fields]
 ['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza', 'restaurant_ptr', 'serves_gnocchi']
+>>> Restaurant._meta.ordering
+['-rating']
 
 # Even though p.supplier for a Place 'p' (a parent of a Supplier), a Restaurant
 # object cannot access that reverse relation, since it's not part of the
@@ -198,7 +204,7 @@ DoesNotExist: Restaurant matching query does not exist.
 [<Supplier: Luigi's Pasta the supplier>, <Supplier: Joe's Chickens the supplier>]
 
 >>> Restaurant.objects.filter(provider__name__contains="Chickens")
-[<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ristorante Miron the restaurant>]
+[<Restaurant: Ristorante Miron the restaurant>, <Restaurant: Demon Dogs the restaurant>]
 >>> ItalianRestaurant.objects.filter(provider__name__contains="Chickens")
 [<ItalianRestaurant: Ristorante Miron the italian restaurant>]
 
