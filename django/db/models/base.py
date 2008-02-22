@@ -35,14 +35,29 @@ class ModelBase(type):
 
         # Create the class.
         module = attrs.pop('__module__')
-        meta = attrs.pop('Meta', None)
         new_class = type.__new__(cls, name, bases, {'__module__': module})
+        attr_meta = attrs.pop('Meta', None)
+        abstract = getattr(attr_meta, 'abstract', False)
+        if not attr_meta:
+            meta = getattr(new_class, 'Meta', None)
+        else:
+            meta = attr_meta
+        base_meta = getattr(new_class, '_meta', None)
+
         new_class.add_to_class('_meta', Options(meta))
-        new_class.add_to_class('DoesNotExist',
-                subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
-        new_class.add_to_class('MultipleObjectsReturned',
-                subclass_exception('MultipleObjectsReturned',
-                    MultipleObjectsReturned, module))
+        if not abstract:
+            new_class.add_to_class('DoesNotExist',
+                    subclass_exception('DoesNotExist', ObjectDoesNotExist, module))
+            new_class.add_to_class('MultipleObjectsReturned',
+                    subclass_exception('MultipleObjectsReturned', MultipleObjectsReturned, module))
+            if base_meta and not base_meta.abstract:
+                # Non-abstract child classes inherit some attributes from their
+                # non-abstract parent (unless an ABC comes before it in the
+                # method resolution order).
+                if not hasattr(meta, 'ordering'):
+                    new_class._meta.ordering = base_meta.ordering
+                if not hasattr(meta, 'get_latest_by'):
+                    new_class._meta.get_latest_by = base_meta.get_latest_by
 
         # Do the appropriate setup for any model parents.
         abstract_parents = []
@@ -86,10 +101,12 @@ class ModelBase(type):
                             % (field.name, name, parent.__name__))
                 new_class.add_to_class(field.name, field)
 
-        if new_class._meta.abstract:
+        if abstract:
             # Abstract base models can't be instantiated and don't appear in
             # the list of models for an app. We do the final setup for them a
             # little differently from normal models.
+            attr_meta.abstract = False
+            new_class.Meta = attr_meta
             return new_class
 
         new_class._prepare()

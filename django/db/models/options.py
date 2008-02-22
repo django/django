@@ -55,7 +55,7 @@ class Options(object):
 
         # Next, apply any overridden values from 'class Meta'.
         if self.meta:
-            meta_attrs = self.meta.__dict__
+            meta_attrs = self.meta.__dict__.copy()
             del meta_attrs['__module__']
             del meta_attrs['__doc__']
             for attr_name in DEFAULT_NAMES:

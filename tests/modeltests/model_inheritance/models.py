@@ -20,6 +20,7 @@ class CommonInfo(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['name']
 
     def __unicode__(self):
         return u'%s %s' % (self.__class__.__name__, self.name)
@@ -30,6 +31,9 @@ class Worker(CommonInfo):
 class Student(CommonInfo):
     school_class = models.CharField(max_length=10)
 
+    class Meta:
+        pass
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -37,7 +41,13 @@ class Place(models.Model):
     def __unicode__(self):
         return u"%s the place" % self.name
 
-class Restaurant(Place):
+class Rating(models.Model):
+    rating = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
 
@@ -71,12 +81,24 @@ __test__ = {'API_TESTS':"""
 
 >>> w = Worker(name='Fred', age=35, job='Quarry worker')
 >>> w.save()
+>>> w2 = Worker(name='Barney', age=34, job='Quarry worker')
+>>> w2.save()
 >>> s = Student(name='Pebbles', age=5, school_class='1B')
 >>> s.save()
 >>> unicode(w)
 u'Worker Fred'
 >>> unicode(s)
 u'Student Pebbles'
+
+# The children inherit the Meta class of their parents (if they don't specify
+# their own).
+>>> Worker.objects.values('name')
+[{'name': u'Barney'}, {'name': u'Fred'}]
+
+# Since Student does not subclass CommonInfo's Meta, it has the effect of
+# completely overriding it. So ordering by name doesn't take place for Students.
+>>> Student._meta.ordering
+[]
 
 # However, the CommonInfo class cannot be used as a normal model (it doesn't
 # exist as a model).
@@ -96,7 +118,7 @@ AttributeError: type object 'CommonInfo' has no attribute 'objects'
 >>> p2.save()
 
 Test constructor for Restaurant.
->>> r = Restaurant(name='Demon Dogs', address='944 W. Fullerton', serves_hot_dogs=True, serves_pizza=False)
+>>> r = Restaurant(name='Demon Dogs', address='944 W. Fullerton',serves_hot_dogs=True, serves_pizza=False, rating=2)
 >>> r.save()
 
 # Test the constructor for ItalianRestaurant.
@@ -106,9 +128,9 @@ Test constructor for Restaurant.
 # Make sure Restaurant and ItalianRestaurant have the right fields in the right
 # order.
 >>> [f.name for f in Restaurant._meta.fields]
-['id', 'name', 'address', 'place_ptr', 'serves_hot_dogs', 'serves_pizza']
+['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza']
 >>> [f.name for f in ItalianRestaurant._meta.fields]
-['id', 'name', 'address', 'place_ptr', 'serves_hot_dogs', 'serves_pizza', 'restaurant_ptr', 'serves_gnocchi']
+['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza', 'restaurant_ptr', 'serves_gnocchi']
 
 # Even though p.supplier for a Place 'p' (a parent of a Supplier), a Restaurant
 # object cannot access that reverse relation, since it's not part of the
@@ -118,7 +140,7 @@ Test constructor for Restaurant.
 >>> Restaurant.objects.filter(supplier__name='foo')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'supplier' into field. Choices are: address, id, italianrestaurant, lot, name, place_ptr, provider, serves_hot_dogs, serves_pizza
+TypeError: Cannot resolve keyword 'supplier' into field. Choices are: address, id, italianrestaurant, lot, name, place_ptr, provider, rating, serves_hot_dogs, serves_pizza
 
 # Parent fields can be used directly in filters on the child model.
 >>> Restaurant.objects.filter(name='Demon Dogs')
