@@ -67,6 +67,8 @@ class Supplier(Place):
         return u"%s the supplier" % self.name
 
 class ParkingLot(Place):
+    # An explicit link to the parent (we can control the attribute name).
+    parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
     main_site = models.ForeignKey(Place, related_name='lot')
 
     def __unicode__(self):

@@ -59,21 +59,6 @@ class ModelBase(type):
                 if not hasattr(meta, 'get_latest_by'):
                     new_class._meta.get_latest_by = base_meta.get_latest_by
 
-        # Do the appropriate setup for any model parents.
-        abstract_parents = []
-        for base in parents:
-            if not hasattr(base, '_meta'):
-                # Things without _meta aren't functional models, so they're
-                # uninteresting parents.
-                continue
-            if not base._meta.abstract:
-                attr_name = '%s_ptr' % base._meta.module_name
-                field = OneToOneField(base, name=attr_name, auto_created=True)
-                new_class.add_to_class(attr_name, field)
-                new_class._meta.parents[base] = field
-            else:
-                abstract_parents.append(base)
-
         if getattr(new_class, '_default_manager', None) is not None:
             # We have a parent who set the default manager. We need to override
             # this.
@@ -93,13 +78,32 @@ class ModelBase(type):
         for obj_name, obj in attrs.items():
             new_class.add_to_class(obj_name, obj)
 
-        for parent in abstract_parents:
-            names = [f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many]
-            for field in parent._meta.local_fields:
-                if field.name in names:
-                    raise TypeError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
-                            % (field.name, name, parent.__name__))
-                new_class.add_to_class(field.name, field)
+        # Do the appropriate setup for any model parents.
+        o2o_map = dict([(f.rel.to, f) for f in new_class._meta.local_fields
+                if isinstance(f, OneToOneField)])
+        for base in parents:
+            if not hasattr(base, '_meta'):
+                # Things without _meta aren't functional models, so they're
+                # uninteresting parents.
+                continue
+            if not base._meta.abstract:
+                if base in o2o_map:
+                    field = o2o_map[base]
+                    field.primary_key = True
+                    new_class._meta.setup_pk(field)
+                else:
+                    attr_name = '%s_ptr' % base._meta.module_name
+                    field = OneToOneField(base, name=attr_name,
+                            auto_created=True, parent_link=True)
+                    new_class.add_to_class(attr_name, field)
+                new_class._meta.parents[base] = field
+            else:
+                names = [f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many]
+                for field in base._meta.local_fields:
+                    if field.name in names:
+                        raise TypeError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
+                                % (field.name, name, base.__name__))
+                    new_class.add_to_class(field.name, field)
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in

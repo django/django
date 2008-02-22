@@ -113,21 +113,21 @@ class Options(object):
         # self.many_to_many.
         if field.rel and isinstance(field.rel, ManyToManyRel):
             self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+            if hasattr(self, '_m2m_cache'):
+                del self._m2m_cache
         else:
             self.local_fields.insert(bisect(self.local_fields, field), field)
-            if not self.pk and field.primary_key:
-                self.pk = field
-                field.serialize = False
+            self.setup_pk(field)
+            if hasattr(self, '_field_cache'):
+                del self._field_cache
 
-        # All of these internal caches need to be updated the next time they
-        # are used.
-        # TODO: Do this more neatly. (Also, use less caches!)
-        if hasattr(self, '_field_cache'):
-            del self._field_cache
-        if hasattr(self, '_m2m_cache'):
-            del self._m2m_cache
         if hasattr(self, '_name_map'):
             del self._name_map
+
+    def setup_pk(self, field):
+        if not self.pk and field.primary_key:
+            self.pk = field
+            field.serialize = False
 
     def __repr__(self):
         return '<Options for %s>' % self.object_name
@@ -315,7 +315,7 @@ class Options(object):
         parent_list = self.get_parent_list()
         for parent in self.parents:
             for obj, model in parent._meta.get_all_related_objects_with_model():
-                if obj.field.creation_counter < 0 and obj.model not in parent_list:
+                if (obj.field.creation_counter < 0 or obj.field.rel.parent_link) and obj.model not in parent_list:
                     continue
                 if not model:
                     cache[obj] = parent

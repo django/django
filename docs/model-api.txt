@@ -1000,6 +1000,21 @@ As with ``ForeignKey``, a relationship to self can be defined by using the
 string ``"self"`` instead of the model name; references to as-yet undefined
 models can be made by using a string containing the model name.
 
+Finally, ``OneToOneField`` takes the following extra option:
+
+    =======================  ============================================================
+    Argument                 Description
+    =======================  ============================================================
+    ``parent_link``          When ``True`` and used in a model inherited from
+                             another model, indicates that this field should
+                             be used as the link from the child back to the
+                             parent. See `Model inheritance`_ for more
+                             details.
+
+                             **New in Django development version**
+
+    =======================  ============================================================
+
 **New in Django development version:** ``OneToOneField`` classes used to
 automatically become the primary key on a model. This is no longer true,
 although you can manually pass in the ``primary_key`` attribute if you like.
@@ -1035,6 +1050,14 @@ Model metadata is "anything that's not a field", such as ordering options, etc.
 
 Here's a list of all possible ``Meta`` options. No options are required. Adding
 ``class Meta`` to a model is completely optional.
+
+``abstract``
+------------
+
+**New in Django development version**
+
+When set to ``True``, denotes this model as an abstract base class. See
+`Abstract base classes`_ for more details. Defaults to ``False``.
 
 ``db_table``
 ------------
@@ -2191,6 +2214,20 @@ subclass with a ``ManyToManyField``::
 For more information about reverse relations, refer to the `Database API
 reference`_ . For now, just remember to run ``manage.py validate`` when
 you're writing your models and pay attention to the error messages.
+
+Specifying the parent link field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As mentioned, Django will automatically create a ``OneToOneField`` linking
+your child class back any non-abstract parent models. If you want to control
+the name of the attribute linking back to the parent, you can create your own
+link field and pass it ``parent_link=True``. For example, to explicitly
+specify the field that will link ``Supplier`` to ``Place`` in the above
+example, you could write::
+
+    class Supplier(Place):
+        parent = models.OneToOneField(Place, parent_link=True)
+        ...
 
 Multiple inheritance
 --------------------

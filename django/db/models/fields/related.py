@@ -461,8 +461,9 @@ class ReverseManyRelatedObjectsDescriptor(object):
 
 class ManyToOneRel(object):
     def __init__(self, to, field_name, num_in_admin=3, min_num_in_admin=None,
-        max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
-        related_name=None, limit_choices_to=None, lookup_overrides=None, raw_id_admin=False):
+            max_num_in_admin=None, num_extra_on_change=1, edit_inline=False,
+            related_name=None, limit_choices_to=None, lookup_overrides=None,
+            raw_id_admin=False, parent_link=False):
         try:
             to._meta
         except AttributeError: # to._meta doesn't exist, so it must be RECURSIVE_RELATIONSHIP_CONSTANT
@@ -477,6 +478,7 @@ class ManyToOneRel(object):
         self.lookup_overrides = lookup_overrides or {}
         self.raw_id_admin = raw_id_admin
         self.multiple = True
+        self.parent_link = parent_link
 
     def get_related_field(self):
         """
@@ -489,14 +491,15 @@ class OneToOneRel(ManyToOneRel):
     def __init__(self, to, field_name, num_in_admin=0, min_num_in_admin=None,
             max_num_in_admin=None, num_extra_on_change=None, edit_inline=False,
             related_name=None, limit_choices_to=None, lookup_overrides=None,
-            raw_id_admin=False):
+            raw_id_admin=False, parent_link=False):
         # NOTE: *_num_in_admin and num_extra_on_change are intentionally
         # ignored here. We accept them as parameters only to match the calling
         # signature of ManyToOneRel.__init__().
         super(OneToOneRel, self).__init__(to, field_name, num_in_admin,
                 edit_inline=edit_inline, related_name=related_name,
                 limit_choices_to=limit_choices_to,
-                lookup_overrides=lookup_overrides, raw_id_admin=raw_id_admin)
+                lookup_overrides=lookup_overrides, raw_id_admin=raw_id_admin,
+                parent_link=parent_link)
         self.multiple = False
 
 class ManyToManyRel(object):
@@ -541,7 +544,8 @@ class ForeignKey(RelatedField, Field):
             related_name=kwargs.pop('related_name', None),
             limit_choices_to=kwargs.pop('limit_choices_to', None),
             lookup_overrides=kwargs.pop('lookup_overrides', None),
-            raw_id_admin=kwargs.pop('raw_id_admin', False))
+            raw_id_admin=kwargs.pop('raw_id_admin', False),
+            parent_link=kwargs.pop('parent_link', False))
         Field.__init__(self, **kwargs)
 
         self.db_index = True
