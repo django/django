@@ -102,7 +102,7 @@ class Manager(object):
         return self.get_query_set().values(*args, **kwargs)
 
     def update(self, *args, **kwargs):
-        return self.get_query_set().updated(*args, **kwargs)
+        return self.get_query_set().update(*args, **kwargs)
 
     def _insert(self, *args, **kwargs):
         return self.get_query_set()._insert(*args, **kwargs)

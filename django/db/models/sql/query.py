@@ -1240,7 +1240,8 @@ class UpdateQuery(Query):
                 values.append('%s = NULL' % qn(name))
         result.append(', '.join(values))
         where, params = self.where.as_sql()
-        result.append('WHERE %s' % where)
+        if where:
+            result.append('WHERE %s' % where)
         return ' '.join(result), tuple(update_params + params)
 
     def clear_related(self, related_field, pk_list):

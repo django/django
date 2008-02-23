@@ -56,5 +56,12 @@ Multiple fields can be updated at once
 >>> d.value, d.another_value
 (u'fruit', u'peaches')
 
+In the rare case you want to update every instance of a model, update() is also
+a manager method.
+
+>>> DataPoint.objects.update(value='thing')
+>>> DataPoint.objects.values('value').distinct()
+[{'value': u'thing'}]
+
 """
 }
