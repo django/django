@@ -63,6 +63,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name # Quoting once is enough.
         return '"%s"' % name
 
+    def no_limit_value(self):
+        return -1
+
     def sql_flush(self, style, tables, sequences):
         # NB: The generated SQL below is specific to SQLite
         # Note: The DELETE FROM... SQL generated below works for SQLite databases

@@ -262,11 +262,15 @@ class Query(object):
         if ordering:
             result.append('ORDER BY %s' % ', '.join(ordering))
 
+        # FIXME: Pull this out to make life easier for Oracle et al.
         if with_limits:
             if self.high_mark:
                 result.append('LIMIT %d' % (self.high_mark - self.low_mark))
             if self.low_mark:
-                assert self.high_mark, "'offset' is not allowed without 'limit'"
+                if not self.high_mark:
+                    val = self.connection.ops.no_limit_value()
+                    if val:
+                        result.append('LIMIT %d' % val)
                 result.append('OFFSET %d' % self.low_mark)
 
         params.extend(self.extra_params)
