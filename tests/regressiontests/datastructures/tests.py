@@ -101,6 +101,12 @@ Init from sequence of tuples
 >>> print repr(d)
 {1: 'one', 0: 'zero', 2: 'two'}
 
+>>> d.clear()
+>>> d
+{}
+>>> d.keyOrder
+[]
+
 ### DotExpandedDict ############################################################
 
 >>> d = DotExpandedDict({'person.1.firstname': ['Simon'], 'person.1.lastname': ['Willison'], 'person.2.firstname': ['Adrian'], 'person.2.lastname': ['Holovaty']})
