@@ -228,7 +228,11 @@ class Field(object):
                 value = int(value)
             except ValueError:
                 raise ValueError("The __year lookup type requires an integer argument")
-            return ['%s-01-01 00:00:00' % value, '%s-12-31 23:59:59.999999' % value]
+            if settings.DATABASE_ENGINE == 'sqlite3':
+                first = '%s-01-01'
+            else:
+                first = '%s-01-01 00:00:00'
+            return [first % value, '%s-12-31 23:59:59.999999' % value]
         raise TypeError("Field has invalid lookup: %s" % lookup_type)
 
     def has_default(self):
