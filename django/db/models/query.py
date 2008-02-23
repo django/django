@@ -409,6 +409,14 @@ class _QuerySet(object):
             clone.query.extra_order_by = order_by
         return clone
 
+    def reverse(self):
+        """
+        Reverses the ordering of the queryset.
+        """
+        clone = self._clone()
+        clone.query.standard_ordering = not clone.query.standard_ordering
+        return clone
+
     ###################
     # PRIVATE METHODS #
     ###################

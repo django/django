@@ -554,6 +554,26 @@ There's no way to specify whether ordering should be case sensitive. With
 respect to case-sensitivity, Django will order results however your database
 backend normally orders them.
 
+``reverse()``
+~~~~~~~~~~~~~
+
+**New in Django development version**
+
+If you want to reverse the order in which a queryset's elements are returned,
+you can use the ``reverse()`` method. Calling ``reverse()`` a second time
+restores the ordering back to the normal direction.
+
+To retrieve the ''last'' five items in a queryset, you could do this::
+
+    my_queryset.reverse()[:5]
+
+Note that this is not quite the same as slicing from the end of a sequence in
+Python. The above example will return the last item first, then the
+penultimate item and so on. If we had a Python sequence and looked at
+``seq[:-5]``, we would see the fifth-last item first. Django doesn't support
+that mode of access (slicing from the end), since it is not possible to do it
+efficiently in SQL.
+
 ``distinct()``
 ~~~~~~~~~~~~~~
 

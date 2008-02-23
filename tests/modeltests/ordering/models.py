@@ -48,6 +48,13 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.order_by('pub_date', '-headline')
 [<Article: Article 1>, <Article: Article 3>, <Article: Article 2>, <Article: Article 4>]
 
+# Only the last order_by has any effect (since they each override any previous
+# ordering).
+>>> Article.objects.order_by('id')
+[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
+>>> Article.objects.order_by('id').order_by('-headline')
+[<Article: Article 4>, <Article: Article 3>, <Article: Article 2>, <Article: Article 1>]
+
 # Use the 'stop' part of slicing notation to limit the results.
 >>> Article.objects.order_by('headline')[:2]
 [<Article: Article 1>, <Article: Article 2>]
@@ -65,10 +72,9 @@ __test__ = {'API_TESTS':"""
 >>> Article.objects.order_by('?')
 [...]
 
-# order_by() overrides any previous ordering, so only the last one has any
-# effect.
->>> Article.objects.order_by('id')
-[<Article: Article 1>, <Article: Article 2>, <Article: Article 3>, <Article: Article 4>]
->>> Article.objects.order_by('id').order_by('-headline')
-[<Article: Article 4>, <Article: Article 3>, <Article: Article 2>, <Article: Article 1>]
+# Ordering can be reversed using the reverse() method on a queryset. This
+# allows you to extract things like "the last two items" (reverse and then
+# take the first two).
+>>> Article.objects.all().reverse()[:2]
+[<Article: Article 1>, <Article: Article 3>]
 """}

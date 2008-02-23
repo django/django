@@ -104,6 +104,9 @@ class Manager(object):
     def update(self, *args, **kwargs):
         return self.get_query_set().update(*args, **kwargs)
 
+    def reverse(self, *args, **kwargs):
+        return self.get_query_set().reverse(*args, **kwargs)
+
     def _insert(self, *args, **kwargs):
         return self.get_query_set()._insert(*args, **kwargs)
 

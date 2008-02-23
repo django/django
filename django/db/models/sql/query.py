@@ -92,6 +92,7 @@ class Query(object):
         self.quote_cache = {}
         self.default_cols = True
         self.default_ordering = True
+        self.standard_ordering = True
 
         # SQL-related attributes
         self.select = []
@@ -160,6 +161,7 @@ class Query(object):
         obj.quote_cache = {}
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
+        obj.standard_ordering = self.standard_ordering
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = copy.deepcopy(self.where)
@@ -487,23 +489,27 @@ class Query(object):
         distinct = self.distinct
         select_aliases = self._select_aliases
         result = []
+        if self.standard_ordering:
+            asc, desc = ORDER_DIR['ASC']
+        else:
+            asc, desc = ORDER_DIR['DESC']
         for field in ordering:
             if field == '?':
                 result.append(self.connection.ops.random_function_sql())
                 continue
             if isinstance(field, int):
                 if field < 0:
-                    order = 'DESC'
+                    order = desc
                     field = -field
                 else:
-                    order = 'ASC'
+                    order = asc
                 result.append('%s %s' % (field, order))
                 continue
             if '.' in field:
                 # This came in through an extra(ordering=...) addition. Pass it
                 # on verbatim, after mapping the table name to an alias, if
                 # necessary.
-                col, order = get_order_dir(field)
+                col, order = get_order_dir(field, asc)
                 table, col = col.split('.', 1)
                 elt = '%s.%s' % (qn(self.table_alias(table)[0]), col)
                 if not distinct or elt in select_aliases:
@@ -512,12 +518,12 @@ class Query(object):
                 # 'col' is of the form 'field' or 'field1__field2' or
                 # '-field1__field2__field', etc.
                 for table, col, order in self.find_ordering_name(field,
-                        self.model._meta):
+                        self.model._meta, default_order=asc):
                     elt = '%s.%s' % (qn(table), qn(col))
                     if not distinct or elt in select_aliases:
                         result.append('%s %s' % (elt, order))
             else:
-                col, order = get_order_dir(field)
+                col, order = get_order_dir(field, asc)
                 elt = qn(col)
                 if not distinct or elt in select_aliases:
                     result.append('%s %s' % (elt, order))

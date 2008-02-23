@@ -317,6 +317,8 @@ Bug #5324
 [<Item: four>]
 >>> Item.objects.exclude(tags__name='t4').order_by('name').distinct()
 [<Item: one>, <Item: three>, <Item: two>]
+>>> Item.objects.exclude(tags__name='t4').order_by('name').distinct().reverse()
+[<Item: two>, <Item: three>, <Item: one>]
 >>> Author.objects.exclude(item__name='one').distinct().order_by('name')
 [<Author: a2>, <Author: a3>, <Author: a4>]
 
