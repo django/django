@@ -165,6 +165,23 @@ FieldDoesNotExist: Article has no field named 'id_plus_two'
 >>> list(Article.objects.filter(id=5).values()) == [{'id': 5, 'headline': 'Article 5', 'pub_date': datetime(2005, 8, 1, 9, 0)}]
 True
 
+# valueslist() is similar to values(), except that the results are returned as
+# a list of tuples, rather than a list of dictionaries. Within each tuple, the
+# order of the elemnts is the same as the order of fields in the valueslist()
+# call.
+>>> Article.objects.valueslist('headline')
+[(u'Article 5',), (u'Article 6',), (u'Article 4',), (u'Article 2',), (u'Article 3',), (u'Article 7',), (u'Article 1',)]
+
+>>> Article.objects.valueslist('id').order_by('id')
+[(1,), (2,), (3,), (4,), (5,), (6,), (7,)]
+>>> Article.objects.valueslist('id', flat=True).order_by('id')
+[1, 2, 3, 4, 5, 6, 7]
+
+>>> Article.objects.valueslist('id', 'headline', flat=True)
+Traceback (most recent call last):
+...
+TypeError: 'flat' is not valid when valueslist is called with more than one field.
+
 # Every DateField and DateTimeField creates get_next_by_FOO() and
 # get_previous_by_FOO() methods.
 # In the case of identical date values, these methods will use the ID as a

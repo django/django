@@ -101,6 +101,9 @@ class Manager(object):
     def values(self, *args, **kwargs):
         return self.get_query_set().values(*args, **kwargs)
 
+    def valueslist(self, *args, **kwargs):
+        return self.get_query_set().valueslist(*args, **kwargs)
+
     def update(self, *args, **kwargs):
         return self.get_query_set().update(*args, **kwargs)
 

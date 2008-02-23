@@ -278,6 +278,16 @@ class _QuerySet(object):
     def values(self, *fields):
         return self._clone(klass=ValuesQuerySet, setup=True, _fields=fields)
 
+    def valueslist(self, *fields, **kwargs):
+        flat = kwargs.pop('flat', False)
+        if kwargs:
+            raise TypeError('Unexpected keyword arguments to valueslist: %s'
+                    % (kwargs.keys(),))
+        if flat and len(fields) > 1:
+            raise TypeError("'flat' is not valid when valueslist is called with more than one field.")
+        return self._clone(klass=ValuesListQuerySet, setup=True, flat=flat,
+                _fields=fields)
+
     def dates(self, field_name, kind, order='ASC'):
         """
         Returns a list of datetime objects representing all available dates
@@ -530,6 +540,21 @@ class ValuesQuerySet(QuerySet):
         if setup and hasattr(c, '_setup_query'):
             c._setup_query()
         return c
+
+class ValuesListQuerySet(ValuesQuerySet):
+    def iterator(self):
+        self.field_names.extend([f for f in self.query.extra_select.keys()])
+        if self.flat and len(self._fields) == 1:
+            for row in self.query.results_iter():
+                yield row[0]
+        else:
+            for row in self.query.results_iter():
+                yield row
+
+    def _clone(self, *args, **kwargs):
+        clone = super(ValuesListQuerySet, self)._clone(*args, **kwargs)
+        clone.flat = self.flat
+        return clone
 
 class DateQuerySet(QuerySet):
     def iterator(self):
