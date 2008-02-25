@@ -178,12 +178,11 @@ class WSGIHandler(BaseHandler):
         try:
             request = WSGIRequest(environ)
             response = self.get_response(request.path, request)
+            # Apply response middleware
+            for middleware_method in self._response_middleware:
+                response = middleware_method(request, response)
         finally:
             db.db.close()
-
-        # Apply response middleware
-        for middleware_method in self._response_middleware:
-            response = middleware_method(request, response)
 
         try:
             status_text = STATUS_CODE_TEXT[response.status_code]
