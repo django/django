@@ -515,7 +515,7 @@ Multiple filter statements are joined using "AND" all the time.
 >>> Author.objects.filter(Q(extra__note=n1)|Q(item__note=n3)).filter(id=a1.id)
 [<Author: a1>]
 
-Bug #6203
+Bug #6180, #6203
 >>> Item.objects.count()
 4
 >>> Item.objects.dates('created', 'month').count()
@@ -524,6 +524,8 @@ Bug #6203
 2
 >>> len(Item.objects.dates('created', 'day'))
 2
+>>> Item.objects.dates('created', 'day')[0]
+datetime.datetime(2007, 12, 19, 0, 0)
 
 Test that parallel iterators work.
 
