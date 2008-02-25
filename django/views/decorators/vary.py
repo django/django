@@ -1,3 +1,8 @@
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+
 from django.utils.cache import patch_vary_headers
 
 def vary_on_headers(*headers):
@@ -16,7 +21,7 @@ def vary_on_headers(*headers):
             response = func(*args, **kwargs)
             patch_vary_headers(response, headers)
             return response
-        return inner_func
+        return wraps(func)(inner_func)
     return decorator
 
 def vary_on_cookie(func):
@@ -32,4 +37,4 @@ def vary_on_cookie(func):
         response = func(*args, **kwargs)
         patch_vary_headers(response, ('Cookie',))
         return response
-    return inner_func
+    return wraps(func)(inner_func)
