@@ -39,7 +39,6 @@ class Base(models.Model):
 class Article(models.Model):
     name = models.CharField(max_length=50)
     text = models.TextField()
-    submitted_from = models.IPAddressField(blank=True, null=True)
 
     def __str__(self):
         return "Article %s" % self.name
@@ -99,11 +98,4 @@ __test__ = {'API_TESTS': ur"""
 
 >>> Article.objects.get(text__contains='quick brown fox')
 <Article: Article Test>
-
-# Regression test for #708: "like" queries on IP address fields require casting
-# to text (on PostgreSQL).
->>> Article(name='IP test', text='The body', submitted_from='192.0.2.100').save()
->>> Article.objects.filter(submitted_from__contains='192.0.2')
-[<Article: Article IP test>]
-
 """}

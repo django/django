@@ -27,11 +27,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def field_cast_sql(self, db_type):
-        if db_type == 'inet':
-            return 'CAST(%s AS TEXT)'
-        return '%s'
-
     def last_insert_id(self, cursor, table_name, pk_name):
         cursor.execute("SELECT CURRVAL('\"%s_%s_seq\"')" % (table_name, pk_name))
         return cursor.fetchone()[0]
