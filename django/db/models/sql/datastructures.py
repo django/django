@@ -9,6 +9,13 @@ class EmptyResultSet(Exception):
 class FullResultSet(Exception):
     pass
 
+class Empty(object):
+    pass
+
+class RawValue(object):
+    def __init__(self, value):
+        self.value = value
+
 class Aggregate(object):
     """
     Base class for all aggregate-related classes (min, max, avg, count, sum).
