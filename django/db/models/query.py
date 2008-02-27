@@ -1,22 +1,11 @@
-import datetime
-import operator
-import re
 import warnings
 
-from django.conf import settings
 from django.db import connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
 from django.db.models.query_utils import Q, QNot, EmptyResultSet
-from django.db.models import signals, loading, sql
+from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
-from django.utils.encoding import smart_unicode
-from django.contrib.contenttypes import generic
-
-try:
-    set
-except NameError:
-    from sets import Set as set   # Python 2.3 fallback
 
 # Used to control how many objects are worked with at once in some cases (e.g.
 # when deleting objects).

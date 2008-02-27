@@ -15,15 +15,12 @@ from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
-from django.db.models.fields import FieldDoesNotExist, Field, related
+from django.db.models.fields import FieldDoesNotExist
 from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty
 from constants import *
 
-try:
-    reversed
-except NameError:
-    from django.utils.itercompat import reversed    # For python 2.3.
+__all__ = ['Query']
 
 class Query(object):
     """
