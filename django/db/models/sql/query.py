@@ -329,15 +329,10 @@ class Query(object):
                 # Since 'self' matches everything, add an explicit "include
                 # everything" where-constraint so that connections between the
                 # where clauses won't exclude valid results.
-                alias = self.join((None, self.model._meta.db_table, None, None))
-                pk = self.model._meta.pk
                 self.where.add(EverythingNode(), AND)
         elif self.where:
-            # rhs has an empty where clause. Make it match everything (see
-            # above for reasoning).
+            # rhs has an empty where clause.
             w = self.where_class()
-            alias = self.join((None, self.model._meta.db_table, None, None))
-            pk = self.model._meta.pk
             w.add(EverythingNode(), AND)
         else:
             w = self.where_class()
