@@ -157,7 +157,7 @@ class UpdateQuery(Query):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 # Can only update non-relation fields and foreign keys.
-                raise fieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+                raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
             if field.rel and isinstance(val, Model):
                 val = val.pk
             self.values.append((field.column, val))
