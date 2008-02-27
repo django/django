@@ -171,7 +171,7 @@ class QueryDict(MultiValueDict):
             dict.__setitem__(result, key, value)
         return result
 
-    def __deepcopy__(self, memo={}):
+    def __deepcopy__(self, memo):
         import copy
         result = self.__class__('', mutable=True)
         memo[id(self)] = result
@@ -223,7 +223,7 @@ class QueryDict(MultiValueDict):
 
     def copy(self):
         "Returns a mutable copy of this object."
-        return self.__deepcopy__()
+        return self.__deepcopy__({})
 
     def urlencode(self):
         output = []
