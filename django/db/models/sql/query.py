@@ -19,6 +19,7 @@ from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count, Date
 from django.db.models.fields import FieldDoesNotExist, Field, related
 from django.contrib.contenttypes import generic
+from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet
 
 try:
@@ -548,7 +549,7 @@ class Query(object):
                 already_seen = {}
             join_tuple = tuple([tuple(j) for j in joins])
             if join_tuple in already_seen:
-                raise TypeError('Infinite loop caused by ordering.')
+                raise FieldError('Infinite loop caused by ordering.')
             already_seen[join_tuple] = True
 
             results = []
@@ -735,7 +736,7 @@ class Query(object):
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
         if not parts:
-            raise TypeError("Cannot parse keyword query %r" % arg)
+            raise FieldError("Cannot parse keyword query %r" % arg)
 
         # Work out the lookup type and remove it from 'parts', if necessary.
         if len(parts) == 1 or parts[-1] not in self.query_terms:
@@ -867,7 +868,7 @@ class Query(object):
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
                 names = opts.get_all_field_names()
-                raise TypeError("Cannot resolve keyword %r into field. "
+                raise FieldError("Cannot resolve keyword %r into field. "
                         "Choices are: %s" % (name, ", ".join(names)))
             if model:
                 # The field lives on a base class of the current model.
@@ -972,7 +973,7 @@ class Query(object):
                     joins.append([alias])
 
         if pos != len(names) - 1:
-            raise TypeError("Join on field %r not permitted." % name)
+            raise FieldError("Join on field %r not permitted." % name)
 
         return field, target, opts, joins
 
@@ -1033,7 +1034,7 @@ class Query(object):
             if not ORDER_PATTERN.match(item):
                 errors.append(item)
         if errors:
-            raise TypeError('Invalid order_by arguments: %s' % errors)
+            raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
             self.order_by.extend(ordering)
         else:
@@ -1228,7 +1229,7 @@ class UpdateQuery(Query):
                 for alias in alias_list:
                     if self.alias_map[alias][ALIAS_REFCOUNT]:
                         if table:
-                            raise TypeError('Updates can only access a single database table at a time.')
+                            raise FieldError('Updates can only access a single database table at a time.')
                         table = alias
         else:
             table = self.tables[0]
@@ -1271,7 +1272,7 @@ class UpdateQuery(Query):
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
                 # Can only update non-relation fields and foreign keys.
-                raise TypeError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+                raise fieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
             if field.rel and isinstance(val, Model):
                 val = val.pk
             self.values.append((field.column, val))

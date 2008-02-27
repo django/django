@@ -148,7 +148,7 @@ Test constructor for Restaurant.
 >>> Restaurant.objects.filter(supplier__name='foo')
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'supplier' into field. Choices are: address, id, italianrestaurant, lot, name, place_ptr, provider, rating, serves_hot_dogs, serves_pizza
+FieldError: Cannot resolve keyword 'supplier' into field. Choices are: address, id, italianrestaurant, lot, name, place_ptr, provider, rating, serves_hot_dogs, serves_pizza
 
 # Parent fields can be used directly in filters on the child model.
 >>> Restaurant.objects.filter(name='Demon Dogs')

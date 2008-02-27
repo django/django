@@ -5,6 +5,7 @@ Tests for field subclassing.
 from django.db import models
 from django.utils.encoding import force_unicode
 from django.core import serializers
+from django.core.exceptions import FieldError
 
 class Small(object):
     """
@@ -50,7 +51,7 @@ class SmallField(models.Field):
             return [force_unicode(v) for v in value]
         if lookup_type == 'isnull':
             return []
-        raise TypeError('Invalid lookup type: %r' % lookup_type)
+        raise FieldError('Invalid lookup type: %r' % lookup_type)
 
     def flatten_data(self, follow, obj=None):
         return {self.attname: force_unicode(self._get_val_from_obj(obj))}
@@ -94,7 +95,7 @@ True
 >>> MyModel.objects.filter(data__lt=s)
 Traceback (most recent call last):
 ...
-TypeError: Invalid lookup type: 'lt'
+FieldError: Invalid lookup type: 'lt'
 
 # Serialization works, too.
 >>> stream = serializers.serialize("json", MyModel.objects.all())

@@ -6,7 +6,7 @@ from itertools import izip
 import django.db.models.manipulators
 import django.db.models.manager
 from django.core import validators
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned, FieldError
 from django.db.models.fields import AutoField, ImageField, FieldDoesNotExist
 from django.db.models.fields.related import OneToOneRel, ManyToOneRel, OneToOneField
 from django.db.models.query import delete_objects, Q
@@ -101,7 +101,7 @@ class ModelBase(type):
                 names = [f.name for f in new_class._meta.local_fields + new_class._meta.many_to_many]
                 for field in base._meta.local_fields:
                     if field.name in names:
-                        raise TypeError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
+                        raise FieldError('Local field %r in class %r clashes with field of similar name from abstract base class %r'
                                 % (field.name, name, base.__name__))
                     new_class.add_to_class(field.name, field)
 

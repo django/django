@@ -27,3 +27,8 @@ class MiddlewareNotUsed(Exception):
 class ImproperlyConfigured(Exception):
     "Django is somehow improperly configured"
     pass
+
+class FieldError(Exception):
+    """Some kind of problem with a model field."""
+    pass
+

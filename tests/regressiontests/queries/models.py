@@ -394,7 +394,7 @@ Bug #2076
 >>> LoopX.objects.all()
 Traceback (most recent call last):
 ...
-TypeError: Infinite loop caused by ordering.
+FieldError: Infinite loop caused by ordering.
 
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.

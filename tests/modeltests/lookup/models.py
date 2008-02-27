@@ -270,12 +270,12 @@ DoesNotExist: Article matching query does not exist.
 >>> Article.objects.filter(pub_date_year='2005').count()
 Traceback (most recent call last):
     ...
-TypeError: Cannot resolve keyword 'pub_date_year' into field. Choices are: headline, id, pub_date
+FieldError: Cannot resolve keyword 'pub_date_year' into field. Choices are: headline, id, pub_date
 
 >>> Article.objects.filter(headline__starts='Article')
 Traceback (most recent call last):
     ...
-TypeError: Join on field 'headline' not permitted.
+FieldError: Join on field 'headline' not permitted.
 
 # Create some articles with a bit more interesting headlines for testing field lookups:
 >>> now = datetime.now()

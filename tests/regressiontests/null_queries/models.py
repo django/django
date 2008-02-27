@@ -37,7 +37,7 @@ Excluding the previous result returns everything.
 >>> Choice.objects.filter(foo__exact=None)
 Traceback (most recent call last):
 ...
-TypeError: Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll
+FieldError: Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll
 
 # Can't use None on anything other than __exact
 >>> Choice.objects.filter(id__gt=None)
