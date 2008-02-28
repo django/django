@@ -717,7 +717,7 @@ in Python package syntax, e.g. ``mysite.settings``. If this isn't provided,
 variable.
 
 Note that this option is unnecessary in ``manage.py``, because it uses
-``settings.py`` from the current project by default. 
+``settings.py`` from the current project by default.
 
 Extra niceties
 ==============
@@ -765,9 +765,9 @@ a command that can be executed as an action when you run ``manage.py``::
                 __init__.py
                 explode.py
         views.py
-        
+
 In this example, the ``explode`` command will be made available to any project
-that includes the ``fancy_blog`` application in ``settings.INSTALLED_APPS``.
+that includes the ``blog`` application in ``settings.INSTALLED_APPS``.
 
 The ``explode.py`` module has only one requirement -- it must define a class
 called ``Command`` that extends ``django.core.management.base.BaseCommand``.

@@ -77,6 +77,8 @@ MultiValueDictKeyError: "Key 'lastname' not found in <MultiValueDict: {'position
 'not one'
 >>> d.keys() == d.copy().keys()
 True
+>>> d2 = d.copy()
+>>> d2['four'] = 'four'
 >>> print repr(d)
 {'one': 'not one', 'two': 'two', 'three': 'three'}
 >>> d.pop('one', 'missing')
@@ -98,6 +100,12 @@ Init from sequence of tuples
 ... (2, "two")))
 >>> print repr(d)
 {1: 'one', 0: 'zero', 2: 'two'}
+
+>>> d.clear()
+>>> d
+{}
+>>> d.keyOrder
+[]
 
 ### DotExpandedDict ############################################################
 

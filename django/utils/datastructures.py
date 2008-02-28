@@ -3,7 +3,7 @@ class MergeDict(object):
     A simple class for creating new "virtual" dictionaries that actually look
     up values in more than one dictionary, passed in the constructor.
 
-    If a key appears in more than one of the passed in dictionaries, only the
+    If a key appears in more than one of the given dictionaries, only the
     first occurrence will be used.
     """
     def __init__(self, *dicts):
@@ -145,7 +145,7 @@ class SortedDict(dict):
         """Returns a copy of this object."""
         # This way of initializing the copy means it works for subclasses, too.
         obj = self.__class__(self)
-        obj.keyOrder = self.keyOrder
+        obj.keyOrder = self.keyOrder[:]
         return obj
 
     def __repr__(self):
@@ -154,6 +154,10 @@ class SortedDict(dict):
         in their sorted order.
         """
         return '{%s}' % ', '.join(['%r: %r' % (k, v) for k, v in self.items()])
+
+    def clear(self):
+        super(SortedDict, self).clear()
+        self.keyOrder = []
 
 class MultiValueDictKeyError(KeyError):
     pass

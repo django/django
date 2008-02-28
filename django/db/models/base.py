@@ -41,7 +41,9 @@ class ModelBase(type):
 
         # Build complete list of parents
         for base in parents:
-            if base is not Model:
+            # Things without _meta aren't functional models, so they're
+            # uninteresting parents.
+            if hasattr(base, '_meta'):
                 new_class._meta.parents.append(base)
                 new_class._meta.parents.extend(base._meta.parents)
 
@@ -133,13 +135,16 @@ class Model(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash(self._get_pk_val())
+
     def __init__(self, *args, **kwargs):
         dispatcher.send(signal=signals.pre_init, sender=self.__class__, args=args, kwargs=kwargs)
 
         # There is a rather weird disparity here; if kwargs, it's set, then args
         # overrides it. It should be one or the other; don't duplicate the work
         # The reason for the kwargs check is that standard iterator passes in by
-        # args, and nstantiation for iteration is 33% faster.
+        # args, and instantiation for iteration is 33% faster.
         args_len = len(args)
         if args_len > len(self._meta.fields):
             # Daft, but matches old exception sans the err msg.

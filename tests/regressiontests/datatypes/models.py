@@ -56,4 +56,30 @@ datetime.date(1938, 6, 4)
 datetime.time(5, 30)
 >>> d3.consumed_at
 datetime.datetime(2007, 4, 20, 16, 19, 59)
+
+# Year boundary tests (ticket #3689)
+
+>>> d = Donut(name='Date Test 2007', baked_date=datetime.datetime(year=2007, month=12, day=31), consumed_at=datetime.datetime(year=2007, month=12, day=31, hour=23, minute=59, second=59))
+>>> d.save()
+>>> d1 = Donut(name='Date Test 2006', baked_date=datetime.datetime(year=2006, month=1, day=1), consumed_at=datetime.datetime(year=2006, month=1, day=1))
+>>> d1.save()
+
+>>> Donut.objects.filter(baked_date__year=2007)
+[<Donut: Date Test 2007>]
+
+>>> Donut.objects.filter(baked_date__year=2006)
+[<Donut: Date Test 2006>]
+
+>>> Donut.objects.filter(consumed_at__year=2007).order_by('name')
+[<Donut: Apple Fritter>, <Donut: Date Test 2007>]
+
+>>> Donut.objects.filter(consumed_at__year=2006)
+[<Donut: Date Test 2006>]
+
+>>> Donut.objects.filter(consumed_at__year=2005)
+[]
+
+>>> Donut.objects.filter(consumed_at__year=2008)
+[]
+
 """}

@@ -30,7 +30,8 @@ class Command(BaseCommand):
         show_traceback = options.get('traceback', False)
 
         # Keep a count of the installed objects and fixtures
-        count = [0, 0]
+        fixture_count = 0
+        object_count = 0
         models = set()
 
         humanize = lambda dirname: dirname and "'%s'" % dirname or 'absolute path'
@@ -65,7 +66,12 @@ class Command(BaseCommand):
                 else:
                     print "Skipping fixture '%s': %s is not a known serialization format" % (fixture_name, format)
 
-            for fixture_dir in app_fixtures + list(settings.FIXTURE_DIRS) + ['']:
+            if os.path.isabs(fixture_name):
+                fixture_dirs = [fixture_name]
+            else:
+                fixture_dirs = app_fixtures + list(settings.FIXTURE_DIRS) + ['']
+
+            for fixture_dir in fixture_dirs:
                 if verbosity > 1:
                     print "Checking %s for fixtures..." % humanize(fixture_dir)
 
@@ -86,14 +92,14 @@ class Command(BaseCommand):
                             transaction.leave_transaction_management()
                             return
                         else:
-                            count[1] += 1
+                            fixture_count += 1
                             if verbosity > 0:
                                 print "Installing %s fixture '%s' from %s." % \
                                     (format, fixture_name, humanize(fixture_dir))
                             try:
                                 objects = serializers.deserialize(format, fixture)
                                 for obj in objects:
-                                    count[0] += 1
+                                    object_count += 1
                                     models.add(obj.object.__class__)
                                     obj.save()
                                 label_found = True
@@ -113,7 +119,7 @@ class Command(BaseCommand):
                             print "No %s fixture '%s' in %s." % \
                                 (format, fixture_name, humanize(fixture_dir))
 
-        if count[0] > 0:
+        if object_count > 0:
             sequence_sql = connection.ops.sequence_reset_sql(self.style, models)
             if sequence_sql:
                 if verbosity > 1:
@@ -124,9 +130,9 @@ class Command(BaseCommand):
         transaction.commit()
         transaction.leave_transaction_management()
 
-        if count[0] == 0:
+        if object_count == 0:
             if verbosity >= 2:
                 print "No fixtures found."
         else:
             if verbosity > 0:
-                print "Installed %d object(s) from %d fixture(s)" % tuple(count)
+                print "Installed %d object(s) from %d fixture(s)" % (object_count, fixture_count)

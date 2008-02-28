@@ -395,6 +395,8 @@ See the `internationalization docs`_ for more.
 django.core.context_processors.media
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**New in Django development version**
+
 If ``TEMPLATE_CONTEXT_PROCESSORS`` contains this processor, every
 ``RequestContext`` will contain a variable ``MEDIA_URL``, providing the
 value of the `MEDIA_URL setting`_.
@@ -1014,7 +1016,7 @@ This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example::
 
     def render(self, context):
-        t = template.load_template('small_fragment.html')
+        t = template.loader.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
 
 If we had neglected to pass in the current ``context.autoescape`` value to our

@@ -2,6 +2,11 @@
 Decorators for views based on HTTP headers.
 """
 
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+
 from django.utils.decorators import decorator_from_middleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.http import HttpResponseNotAllowed
@@ -24,7 +29,7 @@ def require_http_methods(request_method_list):
             if request.method not in request_method_list:
                 return HttpResponseNotAllowed(request_method_list)
             return func(request, *args, **kwargs)
-        return inner
+        return wraps(func)(inner)
     return decorator
 
 require_GET = require_http_methods(["GET"])

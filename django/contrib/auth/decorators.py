@@ -1,3 +1,8 @@
+try:
+    from functools import wraps, update_wrapper
+except ImportError:
+    from django.utils.functional import wraps, update_wrapper  # Python 2.3, 2.4 fallback.
+
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.http import HttpResponseRedirect
 from django.utils.http import urlquote
@@ -51,7 +56,7 @@ class _CheckLogin(object):
         self.test_func = test_func
         self.login_url = login_url
         self.redirect_field_name = redirect_field_name
-        self.__name__ = view_func.__name__
+        update_wrapper(self, view_func)
         
     def __get__(self, obj, cls=None):
         view_func = self.view_func.__get__(obj, cls)

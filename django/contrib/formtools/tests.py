@@ -3,8 +3,6 @@ from django.contrib.formtools import preview
 from django import http
 from django.conf import settings
 from django.test import TestCase
-from django.test.client import Client
-
 
 success_string = "Done was called!"
 test_data = {'field1': u'foo',
@@ -88,6 +86,3 @@ class PreviewTests(TestCase):
         response = self.client.post('/test1/', test_data)
         self.assertEqual(response.content, success_string)
 
-
-if __name__ == '__main__':
-    unittest.main()

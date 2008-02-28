@@ -7,8 +7,6 @@ from django.newforms import ValidationError
 from django.utils.translation import ugettext
 from django.newforms.fields import RegexField, Select
 
-import re
-
 class JPPostalCodeField(RegexField):
     """
     A form field that validates its input is a Japanese postcode.

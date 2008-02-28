@@ -2,8 +2,7 @@ from django.utils.translation import ungettext, ugettext as _
 from django.utils.encoding import force_unicode
 from django import template
 from django.template import defaultfilters
-from django.conf import settings
-from datetime import date, timedelta
+from datetime import date
 import re
 
 register = template.Library()
