@@ -2,7 +2,7 @@ import warnings
 
 from django.db import connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
-from django.db.models.query_utils import Q, QNot, EmptyResultSet
+from django.db.models.query_utils import Q, EmptyResultSet, not_q
 from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -316,7 +316,7 @@ class _QuerySet(object):
         Returns a new QuerySet instance with NOT (args) ANDed to the existing
         set.
         """
-        return self._filter_or_exclude(QNot, *args, **kwargs)
+        return self._filter_or_exclude(not_q, *args, **kwargs)
 
     def _filter_or_exclude(self, mapper, *args, **kwargs):
         # mapper is a callable used to transform Q objects,
@@ -591,14 +591,19 @@ class EmptyQuerySet(QuerySet):
         # (it raises StopIteration immediately).
         yield iter([]).next()
 
-# QOperator, QAnd and QOr are temporarily retained for backwards compatibility.
-# All the old functionality is now part of the 'Q' class.
+# QOperator, QNot, QAnd and QOr are temporarily retained for backwards
+# compatibility. All the old functionality is now part of the 'Q' class.
 class QOperator(Q):
     def __init__(self, *args, **kwargs):
         warnings.warn('Use Q instead of QOr, QAnd or QOperation.',
                 DeprecationWarning, stacklevel=2)
+        super(QOperator, self).__init__(*args, **kwargs)
 
 QOr = QAnd = QOperator
+
+def QNot(q):
+    warnings.warn('Use ~q instead of QNot(q)', DeprecationWarning, stacklevel=2)
+    return ~q
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         requested=None):

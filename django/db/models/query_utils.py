@@ -4,6 +4,9 @@ Various data structures used in query construction.
 Factored out from django.db.models.query so that they can also be used by other
 modules without getting into circular import difficulties.
 """
+
+from copy import deepcopy
+
 from django.utils import tree
 
 class EmptyResultSet(Exception):
@@ -31,8 +34,9 @@ class Q(tree.Node):
     def _combine(self, other, conn):
         if not isinstance(other, Q):
             raise TypeError(other)
-        self.add(other, conn)
-        return self
+        obj = deepcopy(self)
+        obj.add(other, conn)
+        return obj
 
     def __or__(self, other):
         return self._combine(other, self.OR)
@@ -41,18 +45,10 @@ class Q(tree.Node):
         return self._combine(other, self.AND)
 
     def __invert__(self):
-        return QNot(self)
+        obj = deepcopy(self)
+        obj.negate()
+        return obj
 
-class QNot(Q):
-    """
-    Encapsulates the negation of a Q object.
-    """
-    def __init__(self, q):
-        """Creates the negation of the Q object passed in."""
-        super(QNot, self).__init__()
-        self.add(q, self.AND)
-        self.negate()
-
-    def __invert__(self):
-        return self.children[0]
+def not_q(q):
+    return ~q
 

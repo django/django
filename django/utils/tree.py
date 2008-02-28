@@ -3,7 +3,7 @@ A class for storing a tree graph. Primarily used for filter constructs in the
 ORM.
 """
 
-import copy
+from copy import deepcopy
 
 class Node(object):
     """
@@ -15,24 +15,27 @@ class Node(object):
     # subclasses will usually override the value.
     default = 'DEFAULT'
 
-    def __init__(self, children=None, connector=None):
+    def __init__(self, children=None, connector=None, negated=False):
         self.children = children and children[:] or []
         self.connector = connector or self.default
         self.subtree_parents = []
-        self.negated = False
+        self.negated = negated
 
     def __str__(self):
+        if self.negated:
+            return '(NOT (%s: %s))' % (self.connector, ', '.join([str(c) for c
+                    in self.children]))
         return '(%s: %s)' % (self.connector, ', '.join([str(c) for c in
-            self.children]))
+                self.children]))
 
     def __deepcopy__(self, memodict):
         """
         Utility method used by copy.deepcopy().
         """
-        obj = self.__class__(connector=self.connector)
-        obj.children = copy.deepcopy(self.children, memodict)
-        obj.subtree_parents = copy.deepcopy(self.subtree_parents, memodict)
-        obj.negated = self.negated
+        obj = Node(connector=self.connector, negated=self.negated)
+        obj.__class__ = self.__class__
+        obj.children = deepcopy(self.children, memodict)
+        obj.subtree_parents = deepcopy(self.subtree_parents, memodict)
         return obj
 
     def __len__(self):
@@ -63,13 +66,13 @@ class Node(object):
         if len(self.children) < 2:
             self.connector = conn_type
         if self.connector == conn_type:
-            if isinstance(node, Node) and (node.connector == conn_type
-                    or len(node) == 1):
+            if isinstance(node, Node) and (node.connector == conn_type or
+                    len(node) == 1):
                 self.children.extend(node.children)
             else:
                 self.children.append(node)
         else:
-            obj = Node(self.children, self.connector)
+            obj = Node(self.children, self.connector, self.negated)
             self.connector = conn_type
             self.children = [obj, node]
 
@@ -80,8 +83,7 @@ class Node(object):
         Interpreting the meaning of this negate is up to client code. This
         method is useful for implementing "not" arrangements.
         """
-        self.children = [NegatedNode(self.children, self.connector,
-                old_state=self.negated)]
+        self.children = [Node(self.children, self.connector, not self.negated)]
         self.connector = self.default
 
     def start_subtree(self, conn_type):
@@ -93,11 +95,14 @@ class Node(object):
         if len(self.children) == 1:
             self.connector = conn_type
         elif self.connector != conn_type:
-            self.children = [Node(self.children, self.connector)]
+            self.children = [Node(self.children, self.connector, self.negated)]
             self.connector = conn_type
+            self.negated = False
 
-        self.subtree_parents.append(Node(self.children, self.connector))
+        self.subtree_parents.append(Node(self.children, self.connector,
+                self.negated))
         self.connector = self.default
+        self.negated = False
         self.children = []
 
     def end_subtree(self):
@@ -110,15 +115,7 @@ class Node(object):
         obj = self.subtree_parents.pop()
         node = Node(self.children, self.connector)
         self.connector = obj.connector
+        self.negated = obj.negated
         self.children = obj.children
         self.children.append(node)
-
-class NegatedNode(Node):
-    """
-    A class that indicates the connector type should be negated (whatever that
-    means -- it's up to the client) when used by the client code.
-    """
-    def __init__(self, children=None, connector=None, old_state=True):
-        super(NegatedNode, self).__init__(children, connector)
-        self.negated = not old_state
 
