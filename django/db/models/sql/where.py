@@ -105,21 +105,27 @@ class WhereNode(tree.Node):
         else:
             cast_sql = '%s'
 
-        format = "%s %%s" % connection.ops.lookup_cast(lookup_type)
         params = field.get_db_prep_lookup(lookup_type, value)
+        if isinstance(params, tuple):
+            extra, params = params
+        else:
+            extra = ''
 
         if lookup_type in connection.operators:
+            format = "%s %%s %s" % (connection.ops.lookup_cast(lookup_type),
+                    extra)
             return (format % (field_sql,
                     connection.operators[lookup_type] % cast_sql), params)
 
         if lookup_type == 'in':
             if not value:
                 raise EmptyResultSet
+            if extra:
+                return ('%s IN %s' % (field_sql, extra), params)
             return ('%s IN (%s)' % (field_sql, ', '.join(['%s'] * len(value))),
                     params)
         elif lookup_type in ('range', 'year'):
-            return ('%s BETWEEN %%s and %%s' % field_sql,
-                    params)
+            return ('%s BETWEEN %%s and %%s' % field_sql, params)
         elif lookup_type in ('month', 'day'):
             return ('%s = %%s' % connection.ops.date_extract_sql(lookup_type,
                     field_sql), params)

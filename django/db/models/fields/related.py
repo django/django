@@ -100,6 +100,9 @@ class RelatedField(object):
                 pass
             return v
 
+        if hasattr(value, 'as_sql'):
+            sql, params = value.as_sql()
+            return ('(%s)' % sql), params
         if lookup_type == 'exact':
             return [pk_trace(value)]
         if lookup_type == 'in':

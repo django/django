@@ -322,21 +322,18 @@ Bug #5324
 >>> Author.objects.exclude(item__name='one').distinct().order_by('name')
 [<Author: a2>, <Author: a3>, <Author: a4>]
 
+
+# Excluding across a m2m relation when there is more than one related object
+# associated was problematic.
+>>> Item.objects.exclude(tags__name='t1').order_by('name')
+[<Item: four>, <Item: three>]
+>>> Item.objects.exclude(tags__name='t1').exclude(tags__name='t4')
+[<Item: three>]
+
 # Excluding from a relation that cannot be NULL should not use outer joins.
 >>> query = Item.objects.exclude(creator__in=[a1, a2]).query
 >>> query.LOUTER not in [x[2][2] for x in query.alias_map.values()]
 True
-
-# When only one of the joins is nullable (here, the Author -> Item join), we
-# should only get outer joins after that point (one, in this case). We also
-# show that three tables (so, two joins) are involved.
->>> qs = Report.objects.exclude(creator__item__name='one')
->>> list(qs)
-[<Report: r2>]
->>> len([x[2][2] for x in qs.query.alias_map.values() if x[2][2] == query.LOUTER])
-1
->>> len(qs.query.alias_map)
-3
 
 Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So hte following query should only involve one "left outer" join (Author -> Item is 0-to-many).
 >>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))

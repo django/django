@@ -45,6 +45,7 @@ class Query(object):
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
+        self.start_meta = None
 
         # SQL-related attributes
         self.select = []
@@ -81,6 +82,20 @@ class Query(object):
         sql, params = self.as_sql()
         return sql % params
 
+    def __deepcopy__(self, memo):
+        result= self.clone()
+        memo[id(self)] = result
+        return result
+
+    def get_meta(self):
+        """
+        Returns the Options instance (the model._meta) from which to start
+        processing. Normally, this is self.model._meta, but it can change.
+        """
+        if self.start_meta:
+            return self.start_meta
+        return self.model._meta
+
     def quote_name_unless_alias(self, name):
         """
         A wrapper around connection.ops.quote_name that doesn't quote aliases
@@ -114,6 +129,7 @@ class Query(object):
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
+        obj.start_meta = self.start_meta
         obj.select = self.select[:]
         obj.tables = self.tables[:]
         obj.where = copy.deepcopy(self.where)
@@ -384,7 +400,7 @@ class Query(object):
                 join_type = None
                 alias_str = ''
                 name = alias
-            if join_type:
+            if join_type and not first:
                 result.append('%s %s%s ON (%s.%s = %s.%s)'
                         % (join_type, qn(name), alias_str, qn(lhs),
                            qn(lhs_col), qn(alias), qn(col)))
@@ -649,7 +665,7 @@ class Query(object):
             # We've recursed far enough; bail out.
             return
         if not opts:
-            opts = self.model._meta
+            opts = self.get_meta()
             root_alias = self.tables[0]
             self.select.extend([(root_alias, f.column) for f in opts.fields])
         if not used:
@@ -681,9 +697,14 @@ class Query(object):
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
                     used, next, restricted)
 
-    def add_filter(self, filter_expr, connector=AND, negate=False):
+    def add_filter(self, filter_expr, connector=AND, negate=False, trim=False):
         """
-        Add a single filter to the query.
+        Add a single filter to the query. The 'filter_expr' is a pair:
+        (filter_string, value). E.g. ('name__contains', 'fred')
+
+        If 'negate' is True, this is an exclude() filter. If 'trim' is True, we
+        automatically trim the final join group (used internally when
+        constructing nested queries).
         """
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
@@ -706,12 +727,24 @@ class Query(object):
         elif callable(value):
             value = value()
 
-        opts = self.model._meta
+        opts = self.get_meta()
         alias = self.join((None, opts.db_table, None, None))
+        allow_many = trim or not negate
 
-        field, target, opts, join_list, = self.setup_joins(parts, opts,
-                alias, (connector == AND))
-        col = target.column
+        result = self.setup_joins(parts, opts, alias, (connector == AND),
+                allow_many)
+        if isinstance(result, int):
+            self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:result]))
+            return
+        field, target, opts, join_list = result
+        if trim and len(join_list) > 1:
+            extra = join_list[-1]
+            join_list = join_list[:-1]
+            col = self.alias_map[extra[0]][ALIAS_JOIN][LHS_JOIN_COL]
+            for alias in extra:
+                self.unref_alias(alias)
+        else:
+            col = target.column
         alias = join_list[-1][-1]
 
         if join_list:
@@ -729,7 +762,7 @@ class Query(object):
                 len(join_list[0]) > 1):
             # If the comparison is against NULL, we need to use a left outer
             # join when connecting to the previous model. We make that
-            # adjustment here. We don't do this unless needed because it's less
+            # adjustment here. We don't do this unless needed as it's less
             # efficient at the database level.
             self.promote_alias(join_list[-1][0])
 
@@ -767,6 +800,8 @@ class Query(object):
                         flag = True
             self.where.negate()
             if flag:
+                # XXX: Change this to the field we joined against to allow
+                # for node sharing and where-tree optimisation?
                 self.where.add([alias, col, field, 'isnull', True], OR)
 
     def add_q(self, q_object):
@@ -797,7 +832,7 @@ class Query(object):
         if subtree:
             self.where.end_subtree()
 
-    def setup_joins(self, names, opts, alias, dupe_multis):
+    def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -807,9 +842,8 @@ class Query(object):
         disjunctive filters).
 
         Returns the final field involved in the join, the target database
-        column (used for any 'where' constraint), the final 'opts' value, the
-        list of tables joined and a list indicating whether or not each join
-        can be null.
+        column (used for any 'where' constraint), the final 'opts' value and the
+        list of tables joined.
         """
         joins = [[alias]]
         for pos, name in enumerate(names):
@@ -822,6 +856,11 @@ class Query(object):
                 names = opts.get_all_field_names()
                 raise FieldError("Cannot resolve keyword %r into field. "
                         "Choices are: %s" % (name, ", ".join(names)))
+            if not allow_many and (m2m or not direct):
+                for join in joins:
+                    for alias in join:
+                        self.unref_alias(alias)
+                return pos + 1
             if model:
                 # The field lives on a base class of the current model.
                 alias_list = []
@@ -928,6 +967,19 @@ class Query(object):
             raise FieldError("Join on field %r not permitted." % name)
 
         return field, target, opts, joins
+
+    def split_exclude(self, filter_expr, prefix):
+        """
+        When doing an exclude against any kind of N-to-many relation, we need
+        to use a subquery. This method constructs the nested query, given the
+        original exclude filter (filter_expr) and the portion up to the first
+        N-to-many relation field.
+        """
+        query = Query(self.model, self.connection)
+        query.add_filter(filter_expr)
+        query.set_start(prefix)
+        query.clear_ordering(True)
+        self.add_filter(('%s__in' % prefix, query), negate=True, trim=True)
 
     def set_limits(self, low=None, high=None):
         """
@@ -1046,6 +1098,35 @@ class Query(object):
             for part in field.split(LOOKUP_SEP):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
+
+    def set_start(self, start):
+        """
+        Sets the table from which to start joining. The start position is
+        specified by the related attribute from the base model. This will
+        automatically set to the select column to be the column linked from the
+        previous table.
+
+        This method is primarily for internal use and the error checking isn't
+        as friendly as add_filter(). Mostly useful for querying directly
+        against the join table of many-to-many relation in a subquery.
+        """
+        opts = self.model._meta
+        alias = self.join((None, opts.db_table, None, None))
+        field, col, opts, joins = self.setup_joins(start.split(LOOKUP_SEP),
+                opts, alias, False)
+        alias = joins[-1][0]
+        self.select = [(alias, self.alias_map[alias][ALIAS_JOIN][RHS_JOIN_COL])]
+        self.start_meta = opts
+
+        # The call to setup_joins add an extra reference to everything in
+        # joins. So we need to unref everything once, and everything prior to
+        # the final join a second time.
+        for join in joins[:-1]:
+            for alias in join:
+                self.unref_alias(alias)
+                self.unref_alias(alias)
+        for alias in joins[-1]:
+            self.unref_alias(alias)
 
     def execute_sql(self, result_type=MULTI):
         """
