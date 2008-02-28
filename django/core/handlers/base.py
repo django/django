@@ -109,7 +109,8 @@ class BaseHandler(object):
         except exceptions.PermissionDenied:
             return http.HttpResponseForbidden('<h1>Permission denied</h1>')
         except SystemExit:
-            pass # See http://code.djangoproject.com/ticket/1023
+            # Allow sys.exit() to actually exit. See tickets #1023 and #4701
+            raise
         except: # Handle everything else, including SuspiciousOperation, etc.
             # Get the exception info now, in case another exception is thrown later.
             exc_info = sys.exc_info()
