@@ -1166,6 +1166,10 @@ together. It's used in the Django admin and is enforced at the database
 level (i.e., the appropriate ``UNIQUE`` statements are included in the
 ``CREATE TABLE`` statement).
 
+All the fields specified in ``unique_together`` must be part of the current
+model. If you are using `model inheritance`_, you cannot refer to fields from
+any parent classes in ``unique_together``.
+
 **New in Django development version**
 
 For convenience, unique_together can be a single list when dealing

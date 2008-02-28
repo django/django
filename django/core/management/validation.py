@@ -232,5 +232,7 @@ def get_validation_errors(outfile, app=None):
                 else:
                     if isinstance(f.rel, models.ManyToManyRel):
                         e.add(opts, '"unique_together" refers to %s. ManyToManyFields are not supported in unique_together.' % f.name)
+                    if f not in opts.local_fields:
+                        e.add(opts, '"unique_together" refers to %s. This is not in the same model as the unique_together statement.' % f.name)
 
     return len(e.errors)
