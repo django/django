@@ -23,26 +23,64 @@ RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
 pending_lookups = {}
 
-def add_lookup(rel_cls, field):
-    name = field.rel.to
-    module = rel_cls.__module__
-    key = (module, name)
-    # Has the model already been loaded?
-    # If so, resolve the string reference right away
-    model = get_model(rel_cls._meta.app_label, field.rel.to, False)
+def add_lazy_relation(cls, field, relation):
+    """
+    Adds a lookup on ``cls`` when a related field is defined using a string,
+    i.e.::
+    
+        class MyModel(Model):
+            fk = ForeignKey("AnotherModel")
+            
+    This string can be:
+    
+        * RECURSIVE_RELATIONSHIP_CONSTANT (i.e. "self") to indicate a recursive
+          relation.
+          
+        * The name of a model (i.e "AnotherModel") to indicate another model in
+          the same app.
+          
+        * An app-label and model name (i.e. "someapp.AnotherModel") to indicate
+          another model in a different app.
+          
+    If the other model hasn't yet been loaded -- almost a given if you're using
+    lazy relationships -- then the relation won't be set up until the
+    class_prepared signal fires at the end of model initialization.
+    """
+    # Check for recursive relations
+    if relation == RECURSIVE_RELATIONSHIP_CONSTANT:
+        app_label = cls._meta.app_label
+        model_name = cls.__name__
+    
+    else:
+        # Look for an "app.Model" relation
+        try:
+            app_label, model_name = relation.split(".")
+        except ValueError:
+            # If we can't split, assume a model in current app
+            app_label = cls._meta.app_label
+            model_name = relation
+    
+    # Try to look up the related model, and if it's already loaded resolve the
+    # string right away. If get_model returns None, it means that the related
+    # model isn't loaded yet, so we need to pend the relation until the class 
+    # is prepared.
+    model = get_model(app_label, model_name, False)
     if model:
         field.rel.to = model
-        field.do_related_class(model, rel_cls)
+        field.do_related_class(model, cls)
     else:
-        # Mark the related field for later lookup
-        pending_lookups.setdefault(key, []).append((rel_cls, field))
-
+        key = (app_label, model_name)
+        value = (cls, field)
+        pending_lookups.setdefault(key, []).append(value)
+    
 def do_pending_lookups(sender):
-    other_cls = sender
-    key = (other_cls.__module__, other_cls.__name__)
-    for rel_cls, field in pending_lookups.setdefault(key, []):
-        field.rel.to = other_cls
-        field.do_related_class(other_cls, rel_cls)
+    """
+    Handle any pending relations to the sending model. Sent from class_prepared.
+    """
+    key = (sender._meta.app_label, sender.__name__)
+    for cls, field in pending_lookups.pop(key, []):
+        field.rel.to = sender
+        field.do_related_class(sender, cls)
 
 dispatcher.connect(do_pending_lookups, signal=signals.class_prepared)
 
@@ -66,9 +104,7 @@ class RelatedField(object):
             sup.contribute_to_class(cls, name)
         other = self.rel.to
         if isinstance(other, basestring):
-            if other == RECURSIVE_RELATIONSHIP_CONSTANT:
-                self.rel.to = cls.__name__
-            add_lookup(cls, self)
+            add_lazy_relation(cls, self, other)
         else:
             self.do_related_class(other, cls)
 

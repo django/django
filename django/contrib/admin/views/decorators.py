@@ -1,3 +1,11 @@
+import base64
+import md5
+import cPickle as pickle
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
+
 from django import http, template
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -5,8 +13,6 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render_to_response
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.utils.safestring import mark_safe
-import base64, md5
-import cPickle as pickle
 
 ERROR_MESSAGE = ugettext_lazy("Please enter a correct username and password. Note that both fields are case-sensitive.")
 LOGIN_FORM_KEY = 'this_is_the_login_form'
@@ -104,4 +110,4 @@ def staff_member_required(view_func):
             else:
                 return _display_login_form(request, ERROR_MESSAGE)
 
-    return _checklogin
+    return wraps(view_func)(_checklogin)

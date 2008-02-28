@@ -29,7 +29,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def field_cast_sql(self, db_type):
         if db_type == 'inet':
-            return 'CAST(%s AS TEXT)'
+            return 'HOST(%s)'
         return '%s'
 
     def last_insert_id(self, cursor, table_name, pk_name):
