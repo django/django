@@ -245,7 +245,7 @@ class GeoQuerySet(QuerySet):
                     if field_name == field.name: return field
                 else:
                     return field
-        raise False
+        return False
         
     def distance(self, *args, **kwargs):
         """
