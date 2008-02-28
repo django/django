@@ -537,6 +537,10 @@ Test that parallel iterators work.
 
 We can do slicing beyond what is currently in the result cache, too.
 
+# FIXME!! This next test causes really weird PostgreSQL behaviour, but it's
+# only apparent much later when the full test suite runs. I don't understand
+# what's going on here yet.
+
 # We need to mess with the implemenation internals a bit here to decrease the
 # cache fill size so that we don't read all the results at once.
 >>> from django.db.models import query

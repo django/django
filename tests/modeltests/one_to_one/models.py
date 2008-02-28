@@ -6,7 +6,7 @@ To define a one-to-one relationship, use ``OneToOneField()``.
 In this example, a ``Place`` optionally can be a ``Restaurant``.
 """
 
-from django.db import models
+from django.db import models, connection
 
 class Place(models.Model):
     name = models.CharField(max_length=50)
@@ -185,4 +185,9 @@ DoesNotExist: Restaurant matching query does not exist.
 Traceback (most recent call last):
     ...
 IntegrityError: ...
+
+# Because the unittests all use a single connection, we need to force a
+# reconnect here to ensure the connection is clean (after the previous
+# IntegrityError).
+>>> connection.close()
 """}
