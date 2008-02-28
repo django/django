@@ -125,14 +125,19 @@ class SingleRelatedObjectDescriptor(object):
     # SingleRelatedObjectDescriptor instance.
     def __init__(self, related):
         self.related = related
+        self.cache_name = '_%s_cache' % related.field.name
 
     def __get__(self, instance, instance_type=None):
         if instance is None:
             raise AttributeError, "%s must be accessed via instance" % self.related.opts.object_name
 
-        params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
-        rel_obj = self.related.model._default_manager.get(**params)
-        return rel_obj
+        try:
+            return getattr(instance, self.cache_name)
+        except AttributeError:
+            params = {'%s__pk' % self.related.field.name: instance._get_pk_val()}
+            rel_obj = self.related.model._default_manager.get(**params)
+            setattr(instance, self.cache_name, rel_obj)
+            return rel_obj
 
     def __set__(self, instance, value):
         if instance is None:
