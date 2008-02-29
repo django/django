@@ -5,9 +5,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-06 23:55+0100\n"
-"PO-Revision-Date: 2007-05-08 20:29+0200\n"
-"Last-Translator: Jarek Zgoda <jarek.zgoda@gmail.com>\n"
+"POT-Creation-Date: 2008-02-25 12:45+0100\n"
+"PO-Revision-Date: 2008-02-25 15:53+0100\n"
+"Last-Translator: Łukasz Czyżykowki <lukasz.czyzykowski@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -490,7 +490,7 @@ msgstr "Akcja"
 
 #: contrib/admin/templates/admin/object_history.html:25
 msgid "DATE_WITH_TIME_FULL"
-msgstr ""
+msgstr "j F Y H:i:s"
 
 #: contrib/admin/templates/admin/object_history.html:35
 msgid ""
@@ -1759,107 +1759,107 @@ msgstr ""
 
 #: contrib/localflavor/ch/ch_states.py:5
 msgid "Aargau"
-msgstr ""
+msgstr "Argowia"
 
 #: contrib/localflavor/ch/ch_states.py:6
 msgid "Appenzell Innerrhoden"
-msgstr ""
+msgstr "Appenzell Innerrhoden"
 
 #: contrib/localflavor/ch/ch_states.py:7
 msgid "Appenzell Ausserrhoden"
-msgstr ""
+msgstr "Appenzell Ausserrhoden"
 
 #: contrib/localflavor/ch/ch_states.py:8
 msgid "Basel-Stadt"
-msgstr ""
+msgstr "Bazylea-miasto"
 
 #: contrib/localflavor/ch/ch_states.py:9
 msgid "Basel-Land"
-msgstr ""
+msgstr "Bazylea-okręg"
 
 #: contrib/localflavor/ch/ch_states.py:10
 msgid "Berne"
-msgstr ""
+msgstr "Berno"
 
 #: contrib/localflavor/ch/ch_states.py:11
 msgid "Fribourg"
-msgstr ""
+msgstr "Fryburg"
 
 #: contrib/localflavor/ch/ch_states.py:12
 msgid "Geneva"
-msgstr ""
+msgstr "Genewa"
 
 #: contrib/localflavor/ch/ch_states.py:13
 msgid "Glarus"
-msgstr ""
+msgstr "Glarus"
 
 #: contrib/localflavor/ch/ch_states.py:14
 msgid "Graubuenden"
-msgstr ""
+msgstr "Gryzonia"
 
 #: contrib/localflavor/ch/ch_states.py:15
 msgid "Jura"
-msgstr ""
+msgstr "Jura"
 
 #: contrib/localflavor/ch/ch_states.py:16
 msgid "Lucerne"
-msgstr ""
+msgstr "Lucerna"
 
 #: contrib/localflavor/ch/ch_states.py:17
 msgid "Neuchatel"
-msgstr ""
+msgstr "Neuchatel"
 
 #: contrib/localflavor/ch/ch_states.py:18
 msgid "Nidwalden"
-msgstr ""
+msgstr "Nidwalden"
 
 #: contrib/localflavor/ch/ch_states.py:19
 msgid "Obwalden"
-msgstr ""
+msgstr "Obwalden"
 
 #: contrib/localflavor/ch/ch_states.py:20
 msgid "Schaffhausen"
-msgstr ""
+msgstr "Szafuza"
 
 #: contrib/localflavor/ch/ch_states.py:21
 msgid "Schwyz"
-msgstr ""
+msgstr "Schwyz"
 
 #: contrib/localflavor/ch/ch_states.py:22
 msgid "Solothurn"
-msgstr ""
+msgstr "Solura"
 
 #: contrib/localflavor/ch/ch_states.py:23
 msgid "St. Gallen"
-msgstr ""
+msgstr "Sankt Gallen"
 
 #: contrib/localflavor/ch/ch_states.py:24
 msgid "Thurgau"
-msgstr ""
+msgstr "Turgowia"
 
 #: contrib/localflavor/ch/ch_states.py:25
 msgid "Ticino"
-msgstr ""
+msgstr "Ticino"
 
 #: contrib/localflavor/ch/ch_states.py:26
 msgid "Uri"
-msgstr ""
+msgstr "Uri"
 
 #: contrib/localflavor/ch/ch_states.py:27
 msgid "Valais"
-msgstr ""
+msgstr "Valais"
 
 #: contrib/localflavor/ch/ch_states.py:28
 msgid "Vaud"
-msgstr ""
+msgstr "Vaud"
 
 #: contrib/localflavor/ch/ch_states.py:29
 msgid "Zug"
-msgstr ""
+msgstr "Zug"
 
 #: contrib/localflavor/ch/ch_states.py:30
 msgid "Zurich"
-msgstr ""
+msgstr "Zurych"
 
 #: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
 msgid "Enter a zip code in the format XXXX."
@@ -1943,7 +1943,7 @@ msgstr "Saksonia-Anhalt"
 
 #: contrib/localflavor/de/de_states.py:19
 msgid "Schleswig-Holstein"
-msgstr ""
+msgstr "Szlezwik-Holsztyn"
 
 #: contrib/localflavor/de/de_states.py:20
 msgid "Thuringia"
@@ -1964,71 +1964,71 @@ msgstr ""
 
 #: contrib/localflavor/es/es_provinces.py:5
 msgid "Arava"
-msgstr ""
+msgstr "Arawa"
 
 #: contrib/localflavor/es/es_provinces.py:6
 msgid "Albacete"
-msgstr ""
+msgstr "Albacete"
 
 #: contrib/localflavor/es/es_provinces.py:7
 msgid "Alacant"
-msgstr ""
+msgstr "Alicante"
 
 #: contrib/localflavor/es/es_provinces.py:8
 msgid "Almeria"
-msgstr ""
+msgstr "Almeria"
 
 #: contrib/localflavor/es/es_provinces.py:9
 msgid "Avila"
-msgstr ""
+msgstr "Avila"
 
 #: contrib/localflavor/es/es_provinces.py:10
 msgid "Badajoz"
-msgstr ""
+msgstr "Badajoz"
 
 #: contrib/localflavor/es/es_provinces.py:11
 msgid "Illes Balears"
-msgstr ""
+msgstr "Baleary"
 
 #: contrib/localflavor/es/es_provinces.py:12
 msgid "Barcelona"
-msgstr ""
+msgstr "Barcelona"
 
 #: contrib/localflavor/es/es_provinces.py:13
 msgid "Burgos"
-msgstr ""
+msgstr "Burgos"
 
 #: contrib/localflavor/es/es_provinces.py:14
 msgid "Caceres"
-msgstr ""
+msgstr "Caceres"
 
 #: contrib/localflavor/es/es_provinces.py:15
 msgid "Cadiz"
-msgstr ""
+msgstr "Kadyks"
 
 #: contrib/localflavor/es/es_provinces.py:16
 msgid "Castello"
-msgstr ""
+msgstr "Castellon"
 
 #: contrib/localflavor/es/es_provinces.py:17
 msgid "Ciudad Real"
-msgstr ""
+msgstr "Ciudad Real"
 
 #: contrib/localflavor/es/es_provinces.py:18
 msgid "Cordoba"
-msgstr ""
+msgstr "Kordowa"
 
 #: contrib/localflavor/es/es_provinces.py:19
 msgid "A Coruna"
-msgstr ""
+msgstr "A Coruna"
 
 #: contrib/localflavor/es/es_provinces.py:20
 msgid "Cuenca"
-msgstr ""
+msgstr "Cuenca"
 
 #: contrib/localflavor/es/es_provinces.py:21
 msgid "Girona"
-msgstr ""
+msgstr "Girona"
 
 #: contrib/localflavor/es/es_provinces.py:22
 msgid "Granada"
@@ -2036,182 +2036,174 @@ msgstr "Granada"
 
 #: contrib/localflavor/es/es_provinces.py:23
 msgid "Guadalajara"
-msgstr ""
+msgstr "Guadalajara"
 
 #: contrib/localflavor/es/es_provinces.py:24
 msgid "Guipuzkoa"
-msgstr ""
+msgstr "Gipuzkoa"
 
 #: contrib/localflavor/es/es_provinces.py:25
 msgid "Huelva"
-msgstr ""
+msgstr "Huelva"
 
 #: contrib/localflavor/es/es_provinces.py:26
-#, fuzzy
 msgid "Huesca"
-msgstr "Wtorek"
+msgstr "Huesca"
 
 #: contrib/localflavor/es/es_provinces.py:27
-#, fuzzy
 msgid "Jaen"
-msgstr "Sty."
+msgstr "Jaen"
 
 #: contrib/localflavor/es/es_provinces.py:28
-#, fuzzy
 msgid "Leon"
-msgstr "Zaloguj się"
+msgstr "Leon"
 
 #: contrib/localflavor/es/es_provinces.py:29
 msgid "Lleida"
-msgstr ""
+msgstr "Lleida"
 
 #: contrib/localflavor/es/es_provinces.py:30
 #: contrib/localflavor/es/es_regions.py:17
 msgid "La Rioja"
-msgstr ""
+msgstr "La Rioja"
 
 #: contrib/localflavor/es/es_provinces.py:31
 msgid "Lugo"
-msgstr ""
+msgstr "Lugo"
 
 #: contrib/localflavor/es/es_provinces.py:32
 #: contrib/localflavor/es/es_regions.py:18
 msgid "Madrid"
-msgstr ""
+msgstr "Madryt"
 
 #: contrib/localflavor/es/es_provinces.py:33
 msgid "Malaga"
-msgstr ""
+msgstr "Malaga"
 
 #: contrib/localflavor/es/es_provinces.py:34
 msgid "Murcia"
-msgstr ""
+msgstr "Murcja"
 
 #: contrib/localflavor/es/es_provinces.py:35
 msgid "Navarre"
-msgstr ""
+msgstr "Nawarra"
 
 #: contrib/localflavor/es/es_provinces.py:36
 msgid "Ourense"
-msgstr ""
+msgstr "Ourense"
 
 #: contrib/localflavor/es/es_provinces.py:37
 msgid "Asturias"
-msgstr ""
+msgstr "Asturia"
 
 #: contrib/localflavor/es/es_provinces.py:38
-#, fuzzy
 msgid "Palencia"
-msgstr "Galicyjski"
+msgstr "Palencia"
 
 #: contrib/localflavor/es/es_provinces.py:39
 msgid "Las Palmas"
-msgstr ""
+msgstr "Las Palmas"
 
 #: contrib/localflavor/es/es_provinces.py:40
 msgid "Pontevedra"
-msgstr ""
+msgstr "Pontevedra"
 
 #: contrib/localflavor/es/es_provinces.py:41
 msgid "Salamanca"
-msgstr ""
+msgstr "Salamanka"
 
 #: contrib/localflavor/es/es_provinces.py:42
 msgid "Santa Cruz de Tenerife"
-msgstr ""
+msgstr "Santa Cruz de Tenerife"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
-#, fuzzy
 msgid "Cantabria"
-msgstr "Kataloński"
+msgstr "Kantabria"
 
 #: contrib/localflavor/es/es_provinces.py:44
-#, fuzzy
 msgid "Segovia"
-msgstr "Słoweński"
+msgstr "Segowia"
 
 #: contrib/localflavor/es/es_provinces.py:45
 msgid "Seville"
-msgstr ""
+msgstr "Sewilla"
 
 #: contrib/localflavor/es/es_provinces.py:46
-#, fuzzy
 msgid "Soria"
-msgstr "Serbski"
+msgstr "Soria"
 
 #: contrib/localflavor/es/es_provinces.py:47
 msgid "Tarragona"
-msgstr ""
+msgstr "Tarragona"
 
 #: contrib/localflavor/es/es_provinces.py:48
 msgid "Teruel"
-msgstr ""
+msgstr "Teruel"
 
 #: contrib/localflavor/es/es_provinces.py:49
 msgid "Toledo"
-msgstr ""
+msgstr "Toledo"
 
 #: contrib/localflavor/es/es_provinces.py:50
-#, fuzzy
 msgid "Valencia"
-msgstr "Galicyjski"
+msgstr "Walencja"
 
 #: contrib/localflavor/es/es_provinces.py:51
 msgid "Valladolid"
-msgstr ""
+msgstr "Valladolid"
 
 #: contrib/localflavor/es/es_provinces.py:52
 msgid "Bizkaia"
-msgstr ""
+msgstr "Vizcaya"
 
 #: contrib/localflavor/es/es_provinces.py:53
 msgid "Zamora"
-msgstr ""
+msgstr "Zamora"
 
 #: contrib/localflavor/es/es_provinces.py:54
 msgid "Zaragoza"
-msgstr ""
+msgstr "Saragossa"
 
 #: contrib/localflavor/es/es_provinces.py:55
 msgid "Ceuta"
-msgstr ""
+msgstr "Ceuta"
 
 #: contrib/localflavor/es/es_provinces.py:56
 msgid "Melilla"
-msgstr ""
+msgstr "Melilla"
 
 #: contrib/localflavor/es/es_regions.py:5
 msgid "Andalusia"
-msgstr ""
+msgstr "Andaluzja"
 
 #: contrib/localflavor/es/es_regions.py:6
 msgid "Aragon"
-msgstr ""
+msgstr "Aragonia"
 
 #: contrib/localflavor/es/es_regions.py:7
 msgid "Principality of Asturias"
-msgstr ""
+msgstr "Asturia"
 
 #: contrib/localflavor/es/es_regions.py:8
 msgid "Balearic Islands"
-msgstr ""
+msgstr "Baleary"
 
 #: contrib/localflavor/es/es_regions.py:9
 msgid "Basque Country"
-msgstr ""
+msgstr "Kraj Basków"
 
 #: contrib/localflavor/es/es_regions.py:10
 msgid "Canary Islands"
-msgstr ""
+msgstr "Wyspy Kanaryjskie"
 
 #: contrib/localflavor/es/es_regions.py:12
 msgid "Castile-La Mancha"
-msgstr ""
+msgstr "Kastylia-La Mancha"
 
 #: contrib/localflavor/es/es_regions.py:13
 msgid "Castile and Leon"
-msgstr ""
+msgstr "Kastylia-Leon"
 
 #: contrib/localflavor/es/es_regions.py:14
 msgid "Catalonia"
@@ -2219,7 +2211,7 @@ msgstr "Katalonia"
 
 #: contrib/localflavor/es/es_regions.py:15
 msgid "Extremadura"
-msgstr ""
+msgstr "Estremadura"
 
 #: contrib/localflavor/es/es_regions.py:16
 msgid "Galicia"
@@ -2227,15 +2219,15 @@ msgstr "Galicja"
 
 #: contrib/localflavor/es/es_regions.py:19
 msgid "Region of Murcia"
-msgstr ""
+msgstr "Murcja"
 
 #: contrib/localflavor/es/es_regions.py:20
 msgid "Foral Community of Navarre"
-msgstr ""
+msgstr "Nawarra"
 
 #: contrib/localflavor/es/es_regions.py:21
 msgid "Valencian Community"
-msgstr ""
+msgstr "Walencja"
 
 #: contrib/localflavor/es/forms.py:19
 msgid "Enter a valid postal code in the range and format 01XXX - 52XXX."
@@ -2314,324 +2306,319 @@ msgstr "Wpisz kod pocztowy w formacie XXXXXXX lub XXX-XXXX."
 
 #: contrib/localflavor/jp/jp_prefectures.py:4
 msgid "Hokkaido"
-msgstr ""
+msgstr "Hokkaido"
 
 #: contrib/localflavor/jp/jp_prefectures.py:5
 msgid "Aomori"
-msgstr ""
+msgstr "Aomori"
 
 #: contrib/localflavor/jp/jp_prefectures.py:6
 msgid "Iwate"
-msgstr ""
+msgstr "Iwate"
 
 #: contrib/localflavor/jp/jp_prefectures.py:7
 msgid "Miyagi"
-msgstr ""
+msgstr "Miyagi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:8
 msgid "Akita"
-msgstr ""
+msgstr "Akita"
 
 #: contrib/localflavor/jp/jp_prefectures.py:9
 msgid "Yamagata"
-msgstr ""
+msgstr "Yamagata"
 
 #: contrib/localflavor/jp/jp_prefectures.py:10
 msgid "Fukushima"
-msgstr ""
+msgstr "Fukushima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:11
 msgid "Ibaraki"
-msgstr ""
+msgstr "Ibaraki"
 
 #: contrib/localflavor/jp/jp_prefectures.py:12
 msgid "Tochigi"
-msgstr ""
+msgstr "Tochigi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:13
 msgid "Gunma"
-msgstr ""
+msgstr "Gunma"
 
 #: contrib/localflavor/jp/jp_prefectures.py:14
 msgid "Saitama"
-msgstr ""
+msgstr "Saitama"
 
 #: contrib/localflavor/jp/jp_prefectures.py:15
 msgid "Chiba"
-msgstr ""
+msgstr "Chiba"
 
 #: contrib/localflavor/jp/jp_prefectures.py:16
 msgid "Tokyo"
-msgstr ""
+msgstr "Tokio"
 
 #: contrib/localflavor/jp/jp_prefectures.py:17
 msgid "Kanagawa"
-msgstr ""
+msgstr "Kanagawa"
 
 #: contrib/localflavor/jp/jp_prefectures.py:18
 msgid "Yamanashi"
-msgstr ""
+msgstr "Yamanashi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:19
 msgid "Nagano"
-msgstr ""
+msgstr "Nagano"
 
 #: contrib/localflavor/jp/jp_prefectures.py:20
 msgid "Niigata"
-msgstr ""
+msgstr "Niigata"
 
 #: contrib/localflavor/jp/jp_prefectures.py:21
 msgid "Toyama"
-msgstr ""
+msgstr "Toyama"
 
 #: contrib/localflavor/jp/jp_prefectures.py:22
 msgid "Ishikawa"
-msgstr ""
+msgstr "Ishikawa"
 
 #: contrib/localflavor/jp/jp_prefectures.py:23
 msgid "Fukui"
-msgstr ""
+msgstr "Fukui"
 
 #: contrib/localflavor/jp/jp_prefectures.py:24
 msgid "Gifu"
-msgstr ""
+msgstr "Gifu"
 
 #: contrib/localflavor/jp/jp_prefectures.py:25
 msgid "Shizuoka"
-msgstr ""
+msgstr "Shizuoka"
 
 #: contrib/localflavor/jp/jp_prefectures.py:26
 msgid "Aichi"
-msgstr ""
+msgstr "Aichi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:27
 msgid "Mie"
-msgstr ""
+msgstr "Mie"
 
 #: contrib/localflavor/jp/jp_prefectures.py:28
 msgid "Shiga"
-msgstr ""
+msgstr "Shiga"
 
 #: contrib/localflavor/jp/jp_prefectures.py:29
 msgid "Kyoto"
-msgstr ""
+msgstr "Kyoto"
 
 #: contrib/localflavor/jp/jp_prefectures.py:30
 msgid "Osaka"
-msgstr ""
+msgstr "Osaka"
 
 #: contrib/localflavor/jp/jp_prefectures.py:31
 msgid "Hyogo"
-msgstr ""
+msgstr "Hyogo"
 
 #: contrib/localflavor/jp/jp_prefectures.py:32
 msgid "Nara"
-msgstr ""
+msgstr "Nara"
 
 #: contrib/localflavor/jp/jp_prefectures.py:33
 msgid "Wakayama"
-msgstr ""
+msgstr "Wakayama"
 
 #: contrib/localflavor/jp/jp_prefectures.py:34
 msgid "Tottori"
-msgstr ""
+msgstr "Tottori"
 
 #: contrib/localflavor/jp/jp_prefectures.py:35
 msgid "Shimane"
-msgstr ""
+msgstr "Shimane"
 
 #: contrib/localflavor/jp/jp_prefectures.py:36
 msgid "Okayama"
-msgstr ""
+msgstr "Okayama"
 
 #: contrib/localflavor/jp/jp_prefectures.py:37
 msgid "Hiroshima"
-msgstr ""
+msgstr "Hiroszima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:38
 msgid "Yamaguchi"
-msgstr ""
+msgstr "Yamaguchi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:39
 msgid "Tokushima"
-msgstr ""
+msgstr "Tokushima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:40
 msgid "Kagawa"
-msgstr ""
+msgstr "Kagawa"
 
 #: contrib/localflavor/jp/jp_prefectures.py:41
 msgid "Ehime"
-msgstr ""
+msgstr "Ehime"
 
 #: contrib/localflavor/jp/jp_prefectures.py:42
 msgid "Kochi"
-msgstr ""
+msgstr "Kochi"
 
 #: contrib/localflavor/jp/jp_prefectures.py:43
 msgid "Fukuoka"
-msgstr ""
+msgstr "Fukuoka"
 
 #: contrib/localflavor/jp/jp_prefectures.py:44
 msgid "Saga"
-msgstr ""
+msgstr "Saga"
 
 #: contrib/localflavor/jp/jp_prefectures.py:45
 msgid "Nagasaki"
-msgstr ""
+msgstr "Nagasaki"
 
 #: contrib/localflavor/jp/jp_prefectures.py:46
 msgid "Kumamoto"
-msgstr ""
+msgstr "Kumamoto"
 
 #: contrib/localflavor/jp/jp_prefectures.py:47
 msgid "Oita"
-msgstr ""
+msgstr "Oita"
 
 #: contrib/localflavor/jp/jp_prefectures.py:48
 msgid "Miyazaki"
-msgstr ""
+msgstr "Miyazaki"
 
 #: contrib/localflavor/jp/jp_prefectures.py:49
 msgid "Kagoshima"
-msgstr ""
+msgstr "Kagoshima"
 
 #: contrib/localflavor/jp/jp_prefectures.py:50
 msgid "Okinawa"
-msgstr ""
+msgstr "Okinawa"
 
 #: contrib/localflavor/mx/mx_states.py:12
 msgid "Aguascalientes"
-msgstr ""
+msgstr "Aguascalientes"
 
 #: contrib/localflavor/mx/mx_states.py:13
 msgid "Baja California"
-msgstr ""
+msgstr "Kalifornia Dolna"
 
 #: contrib/localflavor/mx/mx_states.py:14
 msgid "Baja California Sur"
-msgstr ""
+msgstr "Kalifornia Dolna Południowa"
 
 #: contrib/localflavor/mx/mx_states.py:15
-#, fuzzy
 msgid "Campeche"
-msgstr "Czeski"
+msgstr "Campeche"
 
 #: contrib/localflavor/mx/mx_states.py:16
 msgid "Chihuahua"
-msgstr ""
+msgstr "Chihuahua"
 
 #: contrib/localflavor/mx/mx_states.py:17
 msgid "Chiapas"
-msgstr ""
+msgstr "Chiapas"
 
 #: contrib/localflavor/mx/mx_states.py:18
-#, fuzzy
 msgid "Coahuila"
-msgstr "Horwacki"
+msgstr "Coahuila"
 
 #: contrib/localflavor/mx/mx_states.py:19
 msgid "Colima"
-msgstr ""
+msgstr "Colima"
 
 #: contrib/localflavor/mx/mx_states.py:20
 msgid "Distrito Federal"
-msgstr ""
+msgstr "Meksyk (miasto)"
 
 #: contrib/localflavor/mx/mx_states.py:21
 msgid "Durango"
-msgstr ""
+msgstr "Durango"
 
 #: contrib/localflavor/mx/mx_states.py:22
-#, fuzzy
 msgid "Guerrero"
-msgstr "Błąd serwera"
+msgstr "Guerrero"
 
 #: contrib/localflavor/mx/mx_states.py:23
 msgid "Guanajuato"
-msgstr ""
+msgstr "Guanajuato"
 
 #: contrib/localflavor/mx/mx_states.py:24
 msgid "Hidalgo"
-msgstr ""
+msgstr "Hidalgo"
 
 #: contrib/localflavor/mx/mx_states.py:25
 msgid "Jalisco"
-msgstr ""
+msgstr "Jalisco"
 
 #: contrib/localflavor/mx/mx_states.py:26
-msgid "Estado de México"
-msgstr ""
+msgid "Estado de MÃ©xico"
+msgstr "Meksyk (stan)"
 
 #: contrib/localflavor/mx/mx_states.py:27
-msgid "Michoacán"
-msgstr ""
+msgid "MichoacÃ¡n"
+msgstr "Michocan"
 
 #: contrib/localflavor/mx/mx_states.py:28
 msgid "Morelos"
-msgstr ""
+msgstr "Morelos"
 
 #: contrib/localflavor/mx/mx_states.py:29
 msgid "Nayarit"
-msgstr ""
+msgstr "Nayarit"
 
 #: contrib/localflavor/mx/mx_states.py:30
-msgid "Nuevo León"
-msgstr ""
+msgid "Nuevo LeÃ³n"
+msgstr "Nuevo Leon"
 
 #: contrib/localflavor/mx/mx_states.py:31
 msgid "Oaxaca"
-msgstr ""
+msgstr "Oaxaca"
 
 #: contrib/localflavor/mx/mx_states.py:32
 msgid "Puebla"
-msgstr ""
+msgstr "Puebla"
 
 #: contrib/localflavor/mx/mx_states.py:33
-msgid "Querétaro"
-msgstr ""
+msgid "QuerÃ©taro"
+msgstr "Queretaro"
 
 #: contrib/localflavor/mx/mx_states.py:34
 msgid "Quintana Roo"
-msgstr ""
+msgstr "Quintana Roo"
 
 #: contrib/localflavor/mx/mx_states.py:35
-#, fuzzy
 msgid "Sinaloa"
-msgstr "Słowacki"
+msgstr "Sinaloa"
 
 #: contrib/localflavor/mx/mx_states.py:36
-msgid "San Luis Potosí"
-msgstr ""
+msgid "San Luis PotosÃ­"
+msgstr "San Luis Potasi"
 
 #: contrib/localflavor/mx/mx_states.py:37
-#, fuzzy
 msgid "Sonora"
-msgstr "Serbski"
+msgstr "Sonora"
 
 #: contrib/localflavor/mx/mx_states.py:38
 msgid "Tabasco"
-msgstr ""
+msgstr "Tabasco"
 
 #: contrib/localflavor/mx/mx_states.py:39
 msgid "Tamaulipas"
-msgstr ""
+msgstr "Tamaulipas"
 
 #: contrib/localflavor/mx/mx_states.py:40
 msgid "Tlaxcala"
-msgstr ""
+msgstr "Tlaxcala"
 
 #: contrib/localflavor/mx/mx_states.py:41
 msgid "Veracruz"
-msgstr ""
+msgstr "Veracruz"
 
 #: contrib/localflavor/mx/mx_states.py:42
-msgid "Yucatán"
-msgstr ""
+msgid "YucatÃ¡n"
+msgstr "Jukatan"
 
 #: contrib/localflavor/mx/mx_states.py:43
 msgid "Zacatecas"
-msgstr ""
+msgstr "Zacatecas"
 
 #: contrib/localflavor/nl/forms.py:21
 msgid "Enter a valid postal code"
@@ -2646,57 +2633,52 @@ msgid "Enter a valid SoFi number"
 msgstr "Wpisz poprawny numer SoFi."
 
 #: contrib/localflavor/nl/nl_provinces.py:4
-#, fuzzy
 msgid "Drente"
-msgstr "Usuń"
+msgstr "Drenthe"
 
 #: contrib/localflavor/nl/nl_provinces.py:5
 msgid "Flevoland"
-msgstr ""
+msgstr "Flevoland"
 
 #: contrib/localflavor/nl/nl_provinces.py:6
 msgid "Friesland"
-msgstr ""
+msgstr "Fryzja"
 
 #: contrib/localflavor/nl/nl_provinces.py:7
-#, fuzzy
 msgid "Gelderland"
-msgstr "Niemiecki"
+msgstr "Geldria"
 
 #: contrib/localflavor/nl/nl_provinces.py:8
-#, fuzzy
 msgid "Groningen"
-msgstr "dziewięć"
+msgstr "Groningen"
 
 #: contrib/localflavor/nl/nl_provinces.py:9
 msgid "Limburg"
-msgstr ""
+msgstr "Limburgia"
 
 #: contrib/localflavor/nl/nl_provinces.py:10
 msgid "Noord-Brabant"
-msgstr ""
+msgstr "Brabancja Północna"
 
 #: contrib/localflavor/nl/nl_provinces.py:11
 msgid "Noord-Holland"
-msgstr ""
+msgstr "Holandia Północna"
 
 #: contrib/localflavor/nl/nl_provinces.py:12
 msgid "Overijssel"
-msgstr ""
+msgstr "Overijssel"
 
 #: contrib/localflavor/nl/nl_provinces.py:13
-#, fuzzy
 msgid "Utrecht"
-msgstr "Francuski"
+msgstr "Utrecht"
 
 #: contrib/localflavor/nl/nl_provinces.py:14
-#, fuzzy
 msgid "Zeeland"
-msgstr "Islandzki"
+msgstr "Zelandia"
 
 #: contrib/localflavor/nl/nl_provinces.py:15
 msgid "Zuid-Holland"
-msgstr ""
+msgstr "Holandia Południowa"
 
 #: contrib/localflavor/no/forms.py:33
 msgid "Enter a valid Norwegian social security number."
@@ -2809,362 +2791,351 @@ msgstr "Wpisz kod pocztowy w formacie XXXXX or XXX XX."
 
 #: contrib/localflavor/sk/sk_districts.py:8
 msgid "Banska Bystrica"
-msgstr ""
+msgstr "Bańska Bystrzyca"
 
 #: contrib/localflavor/sk/sk_districts.py:9
 msgid "Banska Stiavnica"
-msgstr ""
+msgstr "Bańska Szczawnica"
 
 #: contrib/localflavor/sk/sk_districts.py:10
 msgid "Bardejov"
-msgstr ""
+msgstr "Bardiów"
 
 #: contrib/localflavor/sk/sk_districts.py:11
 msgid "Banovce nad Bebravou"
-msgstr ""
+msgstr "Banovce nad Bebravou"
 
 #: contrib/localflavor/sk/sk_districts.py:12
 msgid "Brezno"
-msgstr ""
+msgstr "Brezno"
 
 #: contrib/localflavor/sk/sk_districts.py:13
 msgid "Bratislava I"
-msgstr ""
+msgstr "Bratysława I"
 
 #: contrib/localflavor/sk/sk_districts.py:14
 msgid "Bratislava II"
-msgstr ""
+msgstr "Bratysława II"
 
 #: contrib/localflavor/sk/sk_districts.py:15
 msgid "Bratislava III"
-msgstr ""
+msgstr "Bratysława III"
 
 #: contrib/localflavor/sk/sk_districts.py:16
 msgid "Bratislava IV"
-msgstr ""
+msgstr "Bratysława IV"
 
 #: contrib/localflavor/sk/sk_districts.py:17
 msgid "Bratislava V"
-msgstr ""
+msgstr "Bratysława V"
 
 #: contrib/localflavor/sk/sk_districts.py:18
 msgid "Bytca"
-msgstr ""
+msgstr "Bytca"
 
 #: contrib/localflavor/sk/sk_districts.py:19
 msgid "Cadca"
-msgstr ""
+msgstr "Czadca"
 
 #: contrib/localflavor/sk/sk_districts.py:20
 msgid "Detva"
-msgstr ""
+msgstr "Detva"
 
 #: contrib/localflavor/sk/sk_districts.py:21
 msgid "Dolny Kubin"
-msgstr ""
+msgstr "Dolny Kubin"
 
 #: contrib/localflavor/sk/sk_districts.py:22
 msgid "Dunajska Streda"
-msgstr ""
+msgstr "Dunajska Streda"
 
 #: contrib/localflavor/sk/sk_districts.py:23
-#, fuzzy
 msgid "Galanta"
-msgstr "Galicyjski"
+msgstr "Galanta"
 
 #: contrib/localflavor/sk/sk_districts.py:24
-#, fuzzy
 msgid "Gelnica"
-msgstr "Galicyjski"
+msgstr "Gelnica"
 
 #: contrib/localflavor/sk/sk_districts.py:25
 msgid "Hlohovec"
-msgstr ""
+msgstr "Hlohovec"
 
 #: contrib/localflavor/sk/sk_districts.py:26
 msgid "Humenne"
-msgstr ""
+msgstr "Humenne"
 
 #: contrib/localflavor/sk/sk_districts.py:27
 msgid "Ilava"
-msgstr ""
+msgstr "Ilava"
 
 #: contrib/localflavor/sk/sk_districts.py:28
 msgid "Kezmarok"
-msgstr ""
+msgstr "Kieżmarek"
 
 #: contrib/localflavor/sk/sk_districts.py:29
-#, fuzzy
 msgid "Komarno"
-msgstr "Koreański"
+msgstr "Komarno"
 
 #: contrib/localflavor/sk/sk_districts.py:30
 msgid "Kosice I"
-msgstr ""
+msgstr "Koszyce I"
 
 #: contrib/localflavor/sk/sk_districts.py:31
 msgid "Kosice II"
-msgstr ""
+msgstr "Koszyce II"
 
 #: contrib/localflavor/sk/sk_districts.py:32
 msgid "Kosice III"
-msgstr ""
+msgstr "Koszyce III"
 
 #: contrib/localflavor/sk/sk_districts.py:33
 msgid "Kosice IV"
-msgstr ""
+msgstr "Koszyce IV"
 
 #: contrib/localflavor/sk/sk_districts.py:34
 msgid "Kosice - okolie"
-msgstr ""
+msgstr "Koszyce - okolie"
 
 #: contrib/localflavor/sk/sk_districts.py:35
 msgid "Krupina"
-msgstr ""
+msgstr "Krupina"
 
 #: contrib/localflavor/sk/sk_districts.py:36
 msgid "Kysucke Nove Mesto"
-msgstr ""
+msgstr "Kysucke Nove Mesto"
 
 #: contrib/localflavor/sk/sk_districts.py:37
 msgid "Levice"
-msgstr ""
+msgstr "Levice"
 
 #: contrib/localflavor/sk/sk_districts.py:38
 msgid "Levoca"
-msgstr ""
+msgstr "Lewocza"
 
 #: contrib/localflavor/sk/sk_districts.py:39
 msgid "Liptovsky Mikulas"
-msgstr ""
+msgstr "Liptowski Mikulasz"
 
 #: contrib/localflavor/sk/sk_districts.py:40
 msgid "Lucenec"
-msgstr ""
+msgstr "Łuczeniec"
 
 #: contrib/localflavor/sk/sk_districts.py:41
-#, fuzzy
 msgid "Malacky"
-msgstr "Maj"
+msgstr "Malacky"
 
 #: contrib/localflavor/sk/sk_districts.py:42
-#, fuzzy
 msgid "Martin"
-msgstr "Łotewski"
+msgstr "Martin"
 
 #: contrib/localflavor/sk/sk_districts.py:43
 msgid "Medzilaborce"
-msgstr ""
+msgstr "Medzilaborce"
 
 #: contrib/localflavor/sk/sk_districts.py:44
 msgid "Michalovce"
-msgstr ""
+msgstr "Michalovce"
 
 #: contrib/localflavor/sk/sk_districts.py:45
 msgid "Myjava"
-msgstr ""
+msgstr "Myjava"
 
 #: contrib/localflavor/sk/sk_districts.py:46
 msgid "Namestovo"
-msgstr ""
+msgstr "Namestovo"
 
 #: contrib/localflavor/sk/sk_districts.py:47
 msgid "Nitra"
-msgstr ""
+msgstr "Nitra"
 
 #: contrib/localflavor/sk/sk_districts.py:48
 msgid "Nove Mesto nad Vahom"
-msgstr ""
+msgstr "Nove Mesto nad Vahom"
 
 #: contrib/localflavor/sk/sk_districts.py:49
 msgid "Nove Zamky"
-msgstr ""
+msgstr "Nove Zamky"
 
 #: contrib/localflavor/sk/sk_districts.py:50
 msgid "Partizanske"
-msgstr ""
+msgstr "Partizanske"
 
 #: contrib/localflavor/sk/sk_districts.py:51
 msgid "Pezinok"
-msgstr ""
+msgstr "Pezinok"
 
 #: contrib/localflavor/sk/sk_districts.py:52
 msgid "Piestany"
-msgstr ""
+msgstr "Pieszczany"
 
 #: contrib/localflavor/sk/sk_districts.py:53
 msgid "Poltar"
-msgstr ""
+msgstr "Poltar"
 
 #: contrib/localflavor/sk/sk_districts.py:54
 msgid "Poprad"
-msgstr ""
+msgstr "Poprad"
 
 #: contrib/localflavor/sk/sk_districts.py:55
 msgid "Povazska Bystrica"
-msgstr ""
+msgstr "Poważska Bystrzyca"
 
 #: contrib/localflavor/sk/sk_districts.py:56
 msgid "Presov"
-msgstr ""
+msgstr "Preszów"
 
 #: contrib/localflavor/sk/sk_districts.py:57
 msgid "Prievidza"
-msgstr ""
+msgstr "Prievidza"
 
 #: contrib/localflavor/sk/sk_districts.py:58
 msgid "Puchov"
-msgstr ""
+msgstr "Puchov"
 
 #: contrib/localflavor/sk/sk_districts.py:59
 msgid "Revuca"
-msgstr ""
+msgstr "Revuca"
 
 #: contrib/localflavor/sk/sk_districts.py:60
 msgid "Rimavska Sobota"
-msgstr ""
+msgstr "Rimavska Sobota"
 
 #: contrib/localflavor/sk/sk_districts.py:61
 msgid "Roznava"
-msgstr ""
+msgstr "Roznava"
 
 #: contrib/localflavor/sk/sk_districts.py:62
 msgid "Ruzomberok"
-msgstr ""
+msgstr "Rużemberk"
 
 #: contrib/localflavor/sk/sk_districts.py:63
-#, fuzzy
 msgid "Sabinov"
-msgstr "list"
+msgstr "Sabinov"
 
 #: contrib/localflavor/sk/sk_districts.py:64
 msgid "Senec"
-msgstr ""
+msgstr "Senec"
 
 #: contrib/localflavor/sk/sk_districts.py:65
-#, fuzzy
 msgid "Senica"
-msgstr "Słoweński"
+msgstr "Senica"
 
 #: contrib/localflavor/sk/sk_districts.py:66
-#, fuzzy
 msgid "Skalica"
-msgstr "Galicyjski"
+msgstr "Skalica"
 
 #: contrib/localflavor/sk/sk_districts.py:67
-#, fuzzy
 msgid "Snina"
-msgstr "dziewięć"
+msgstr "Snina"
 
 #: contrib/localflavor/sk/sk_districts.py:68
 msgid "Sobrance"
-msgstr ""
+msgstr "Sobrance"
 
 #: contrib/localflavor/sk/sk_districts.py:69
 msgid "Spisska Nova Ves"
-msgstr ""
+msgstr "Nowa Wieś Spiska"
 
 #: contrib/localflavor/sk/sk_districts.py:70
 msgid "Stara Lubovna"
-msgstr ""
+msgstr "Stara Lubowla"
 
 #: contrib/localflavor/sk/sk_districts.py:71
 msgid "Stropkov"
-msgstr ""
+msgstr "Stropkov"
 
 #: contrib/localflavor/sk/sk_districts.py:72
 msgid "Svidnik"
-msgstr ""
+msgstr "Svidnik"
 
 #: contrib/localflavor/sk/sk_districts.py:73
-#, fuzzy
 msgid "Sala"
-msgstr "Słowacki"
+msgstr "Sala"
 
 #: contrib/localflavor/sk/sk_districts.py:74
 msgid "Topolcany"
-msgstr ""
+msgstr "Topolczany"
 
 #: contrib/localflavor/sk/sk_districts.py:75
 msgid "Trebisov"
-msgstr ""
+msgstr "Trebisov"
 
 #: contrib/localflavor/sk/sk_districts.py:76
-#, fuzzy
 msgid "Trencin"
-msgstr "Francuski"
+msgstr "Trenczyn"
 
 #: contrib/localflavor/sk/sk_districts.py:77
 msgid "Trnava"
-msgstr ""
+msgstr "Trnawa"
 
 #: contrib/localflavor/sk/sk_districts.py:78
 msgid "Turcianske Teplice"
-msgstr ""
+msgstr "Turcianske Teplice"
 
 #: contrib/localflavor/sk/sk_districts.py:79
 msgid "Tvrdosin"
-msgstr ""
+msgstr "Twardoszyn"
 
 #: contrib/localflavor/sk/sk_districts.py:80
 msgid "Velky Krtis"
-msgstr ""
+msgstr "Velky Krtis"
 
 #: contrib/localflavor/sk/sk_districts.py:81
 msgid "Vranov nad Toplou"
-msgstr ""
+msgstr "Vranov nad Toplou"
 
 #: contrib/localflavor/sk/sk_districts.py:82
 msgid "Zlate Moravce"
-msgstr ""
+msgstr "Zlate Moravce"
 
 #: contrib/localflavor/sk/sk_districts.py:83
 msgid "Zvolen"
-msgstr ""
+msgstr "Zwoleń"
 
 #: contrib/localflavor/sk/sk_districts.py:84
 msgid "Zarnovica"
-msgstr ""
+msgstr "Zarnovica"
 
 #: contrib/localflavor/sk/sk_districts.py:85
 msgid "Ziar nad Hronom"
-msgstr ""
+msgstr "Ziar nad Hronom"
 
 #: contrib/localflavor/sk/sk_districts.py:86
 msgid "Zilina"
-msgstr ""
+msgstr "Żylina"
 
 #: contrib/localflavor/sk/sk_regions.py:8
 msgid "Banska Bystrica region"
-msgstr ""
+msgstr "Kraj bańskobystrzycki"
 
 #: contrib/localflavor/sk/sk_regions.py:9
 msgid "Bratislava region"
-msgstr ""
+msgstr "Kraj bratysławski"
 
 #: contrib/localflavor/sk/sk_regions.py:10
 msgid "Kosice region"
-msgstr ""
+msgstr "Kraj koszycki"
 
 #: contrib/localflavor/sk/sk_regions.py:11
 msgid "Nitra region"
-msgstr ""
+msgstr "Kraj nitrzański"
 
 #: contrib/localflavor/sk/sk_regions.py:12
 msgid "Presov region"
-msgstr ""
+msgstr "Kraj preszowski"
 
 #: contrib/localflavor/sk/sk_regions.py:13
 msgid "Trencin region"
-msgstr ""
+msgstr "Kraj trenczyński"
 
 #: contrib/localflavor/sk/sk_regions.py:14
 msgid "Trnava region"
-msgstr ""
+msgstr "Kraj trnawski"
 
 #: contrib/localflavor/sk/sk_regions.py:15
 msgid "Zilina region"
-msgstr ""
+msgstr "Kraj żyliński"
 
 #: contrib/localflavor/uk/forms.py:21
 msgid "Enter a valid postcode."
@@ -3172,280 +3143,267 @@ msgstr "Wpisz poprawny kod pocztowy."
 
 #: contrib/localflavor/uk/uk_regions.py:11
 msgid "Bedfordshire"
-msgstr ""
+msgstr "Bedfordshire"
 
 #: contrib/localflavor/uk/uk_regions.py:12
 msgid "Buckinghamshire"
-msgstr ""
+msgstr "Buckinghamshire"
 
 #: contrib/localflavor/uk/uk_regions.py:14
 msgid "Cheshire"
-msgstr ""
+msgstr "Cheshire"
 
 #: contrib/localflavor/uk/uk_regions.py:15
 msgid "Cornwall and Isles of Scilly"
-msgstr ""
+msgstr "Kornwalia i wyspy Scilly"
 
 #: contrib/localflavor/uk/uk_regions.py:16
-#, fuzzy
 msgid "Cumbria"
-msgstr "Kataloński"
+msgstr "Cumbria"
 
 #: contrib/localflavor/uk/uk_regions.py:17
 msgid "Derbyshire"
-msgstr ""
+msgstr "Derbyshire"
 
 #: contrib/localflavor/uk/uk_regions.py:18
-#, fuzzy
 msgid "Devon"
-msgstr "Zaloguj się"
+msgstr "Devon"
 
 #: contrib/localflavor/uk/uk_regions.py:19
-#, fuzzy
 msgid "Dorset"
-msgstr "Usuń"
+msgstr "Dorset"
 
 #: contrib/localflavor/uk/uk_regions.py:20
 msgid "Durham"
-msgstr ""
+msgstr "Durham"
 
 #: contrib/localflavor/uk/uk_regions.py:21
 msgid "East Sussex"
-msgstr ""
+msgstr "East Sussex"
 
 #: contrib/localflavor/uk/uk_regions.py:22
 msgid "Essex"
-msgstr ""
+msgstr "Essex"
 
 #: contrib/localflavor/uk/uk_regions.py:23
 msgid "Gloucestershire"
-msgstr ""
+msgstr "Gloucestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:24
-#, fuzzy
 msgid "Greater London"
-msgstr "Wielkopolskie"
+msgstr "Wielki Londyn"
 
 #: contrib/localflavor/uk/uk_regions.py:25
-#, fuzzy
 msgid "Greater Manchester"
-msgstr "Wielkopolskie"
+msgstr "Greater Manchester"
 
 #: contrib/localflavor/uk/uk_regions.py:26
 msgid "Hampshire"
-msgstr ""
+msgstr "Hampshire"
 
 #: contrib/localflavor/uk/uk_regions.py:27
 msgid "Hertfordshire"
-msgstr ""
+msgstr "Hertfordshire"
 
 #: contrib/localflavor/uk/uk_regions.py:28
-#, fuzzy
 msgid "Kent"
-msgstr "Koreański"
+msgstr "Kent"
 
 #: contrib/localflavor/uk/uk_regions.py:29
 msgid "Lancashire"
-msgstr ""
+msgstr "Lancashire"
 
 #: contrib/localflavor/uk/uk_regions.py:30
 msgid "Leicestershire"
-msgstr ""
+msgstr "Leicestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:31
 msgid "Lincolnshire"
-msgstr ""
+msgstr "Lincolnshire"
 
 #: contrib/localflavor/uk/uk_regions.py:32
 msgid "Merseyside"
-msgstr ""
+msgstr "Merseyside"
 
 #: contrib/localflavor/uk/uk_regions.py:33
 msgid "Norfolk"
-msgstr ""
+msgstr "Norfolk"
 
 #: contrib/localflavor/uk/uk_regions.py:34
 msgid "North Yorkshire"
-msgstr ""
+msgstr "North Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:35
 msgid "Northamptonshire"
-msgstr ""
+msgstr "Northamptonshire"
 
 #: contrib/localflavor/uk/uk_regions.py:36
 msgid "Northumberland"
-msgstr ""
+msgstr "Northumberland"
 
 #: contrib/localflavor/uk/uk_regions.py:37
 msgid "Nottinghamshire"
-msgstr ""
+msgstr "Nottinghamshire"
 
 #: contrib/localflavor/uk/uk_regions.py:38
 msgid "Oxfordshire"
-msgstr ""
+msgstr "Oxfordshire"
 
 #: contrib/localflavor/uk/uk_regions.py:39
 msgid "Shropshire"
-msgstr ""
+msgstr "Shropshire"
 
 #: contrib/localflavor/uk/uk_regions.py:40
 msgid "Somerset"
-msgstr ""
+msgstr "Somerset"
 
 #: contrib/localflavor/uk/uk_regions.py:41
 msgid "South Yorkshire"
-msgstr ""
+msgstr "South Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:42
 msgid "Staffordshire"
-msgstr ""
+msgstr "Staffordshire"
 
 #: contrib/localflavor/uk/uk_regions.py:43
 msgid "Suffolk"
-msgstr ""
+msgstr "Suffolk"
 
 #: contrib/localflavor/uk/uk_regions.py:44
-#, fuzzy
 msgid "Surrey"
-msgstr "Teraz:"
+msgstr "Surrey"
 
 #: contrib/localflavor/uk/uk_regions.py:45
 msgid "Tyne and Wear"
-msgstr ""
+msgstr "Tyne and Wear"
 
 #: contrib/localflavor/uk/uk_regions.py:46
 msgid "Warwickshire"
-msgstr ""
+msgstr "Warwickshire"
 
 #: contrib/localflavor/uk/uk_regions.py:47
 msgid "West Midlands"
-msgstr ""
+msgstr "West Midlands"
 
 #: contrib/localflavor/uk/uk_regions.py:48
 msgid "West Sussex"
-msgstr ""
+msgstr "West Sussex"
 
 #: contrib/localflavor/uk/uk_regions.py:49
 msgid "West Yorkshire"
-msgstr ""
+msgstr "West Yorkshire"
 
 #: contrib/localflavor/uk/uk_regions.py:50
 msgid "Wiltshire"
-msgstr ""
+msgstr "Wiltshire"
 
 #: contrib/localflavor/uk/uk_regions.py:51
 msgid "Worcestershire"
-msgstr ""
+msgstr "Worcestershire"
 
 #: contrib/localflavor/uk/uk_regions.py:55
 msgid "County Antrim"
-msgstr ""
+msgstr "Hrabstwo Antrim"
 
 #: contrib/localflavor/uk/uk_regions.py:56
 msgid "County Armagh"
-msgstr ""
+msgstr "Hrabstwo Armagh"
 
 #: contrib/localflavor/uk/uk_regions.py:57
 msgid "County Down"
-msgstr ""
+msgstr "Hrabstwo Down"
 
 #: contrib/localflavor/uk/uk_regions.py:58
 msgid "County Fermanagh"
-msgstr ""
+msgstr "Hrabstwo Fermanagh"
 
 #: contrib/localflavor/uk/uk_regions.py:59
 msgid "County Londonderry"
-msgstr ""
+msgstr "Hrabstwo Londonderry"
 
 #: contrib/localflavor/uk/uk_regions.py:60
 msgid "County Tyrone"
-msgstr ""
+msgstr "Hrabstwo Tyrone"
 
 #: contrib/localflavor/uk/uk_regions.py:64
 msgid "Clwyd"
-msgstr ""
+msgstr "Clwyd"
 
 #: contrib/localflavor/uk/uk_regions.py:65
 msgid "Dyfed"
-msgstr ""
+msgstr "Dyfed"
 
 #: contrib/localflavor/uk/uk_regions.py:66
 msgid "Gwent"
-msgstr ""
+msgstr "Gwent"
 
 #: contrib/localflavor/uk/uk_regions.py:67
 msgid "Gwynedd"
-msgstr ""
+msgstr "Gwynedd"
 
 #: contrib/localflavor/uk/uk_regions.py:68
 msgid "Mid Glamorgan"
-msgstr ""
+msgstr "Mid Glamorgan"
 
 #: contrib/localflavor/uk/uk_regions.py:69
 msgid "Powys"
-msgstr ""
+msgstr "Powys"
 
 #: contrib/localflavor/uk/uk_regions.py:70
 msgid "South Glamorgan"
-msgstr ""
+msgstr "South Glamorgan"
 
 #: contrib/localflavor/uk/uk_regions.py:71
-#, fuzzy
 msgid "West Glamorgan"
-msgstr "Zachodniopomorskie"
+msgstr "West Glamorgan"
 
 #: contrib/localflavor/uk/uk_regions.py:75
-#, fuzzy
 msgid "Borders"
-msgstr "Porządek:"
+msgstr "Scottish Borders"
 
 #: contrib/localflavor/uk/uk_regions.py:76
-#, fuzzy
 msgid "Central Scotland"
-msgstr "Wielkopolskie"
+msgstr "Central Scotland"
 
 #: contrib/localflavor/uk/uk_regions.py:77
 msgid "Dumfries and Galloway"
-msgstr ""
+msgstr "Dumfries and Galloway"
 
 #: contrib/localflavor/uk/uk_regions.py:78
-#, fuzzy
 msgid "Fife"
-msgstr "Filtr"
+msgstr "Fife"
 
 #: contrib/localflavor/uk/uk_regions.py:79
-#, fuzzy
 msgid "Grampian"
-msgstr "Niemiecki"
+msgstr "Grampian"
 
 #: contrib/localflavor/uk/uk_regions.py:80
 msgid "Highland"
-msgstr ""
+msgstr "Highland"
 
 #: contrib/localflavor/uk/uk_regions.py:81
-#, fuzzy
 msgid "Lothian"
-msgstr "Łotewski"
+msgstr "Lothian"
 
 #: contrib/localflavor/uk/uk_regions.py:82
 msgid "Orkney Islands"
-msgstr ""
+msgstr "Orkady"
 
 #: contrib/localflavor/uk/uk_regions.py:83
 msgid "Shetland Islands"
-msgstr ""
+msgstr "Szetlandy"
 
 #: contrib/localflavor/uk/uk_regions.py:84
 msgid "Strathclyde"
-msgstr ""
+msgstr "Strathclyde"
 
 #: contrib/localflavor/uk/uk_regions.py:85
 msgid "Tayside"
-msgstr ""
+msgstr "Tayside"
 
 #: contrib/localflavor/uk/uk_regions.py:86
 msgid "Western Isles"
-msgstr ""
+msgstr "Hebrydy Zewnętrzne"
 
 #: contrib/localflavor/uk/uk_regions.py:90
 msgid "England"
@@ -3480,45 +3438,40 @@ msgid "Enter a valid South African postal code"
 msgstr "Wpisz poprawny południowoafrykański kod pocztowy"
 
 #: contrib/localflavor/za/za_provinces.py:4
-#, fuzzy
 msgid "Eastern Cape"
-msgstr "Nazwa użytkownika"
+msgstr "Prowincja Przylądkowa Wshodnia"
 
 #: contrib/localflavor/za/za_provinces.py:5
-#, fuzzy
 msgid "Free State"
-msgstr "data przyznania punktów"
+msgstr "Wolne Państwo"
 
 #: contrib/localflavor/za/za_provinces.py:6
-#, fuzzy
 msgid "Gauteng"
-msgstr "sier"
+msgstr "Gauteng"
 
 #: contrib/localflavor/za/za_provinces.py:7
 msgid "KwaZulu-Natal"
-msgstr ""
+msgstr "KwaZulu-Natal"
 
 #: contrib/localflavor/za/za_provinces.py:8
 msgid "Limpopo"
-msgstr ""
+msgstr "Limpopo"
 
 #: contrib/localflavor/za/za_provinces.py:9
 msgid "Mpumalanga"
-msgstr ""
+msgstr "Mpumalanga"
 
 #: contrib/localflavor/za/za_provinces.py:10
 msgid "Northern Cape"
-msgstr ""
+msgstr "Prowincja Przylądkowa Północna"
 
 #: contrib/localflavor/za/za_provinces.py:11
-#, fuzzy
 msgid "North West"
-msgstr "Nadrenia Północna-Westfalia"
+msgstr "Prowincja Północno-Zachodnia"
 
 #: contrib/localflavor/za/za_provinces.py:12
-#, fuzzy
 msgid "Western Cape"
-msgstr "Zachodniopomorskie"
+msgstr "Prowincja Przylądkowa Zachodnia"
 
 #: contrib/redirects/models.py:7
 msgid "redirect from"
