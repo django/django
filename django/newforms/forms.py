@@ -129,7 +129,7 @@ class BaseForm(StrAndUnicode):
             bf_errors = self.error_class([escape(error) for error in bf.errors]) # Escape and cache in local variable.
             if bf.is_hidden:
                 if bf_errors:
-                    top_errors.extend(['(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
+                    top_errors.extend([u'(Hidden field %s) %s' % (name, force_unicode(e)) for e in bf_errors])
                 hidden_fields.append(unicode(bf))
             else:
                 if errors_on_separate_row and bf_errors:
@@ -150,7 +150,7 @@ class BaseForm(StrAndUnicode):
                     help_text = u''
                 output.append(normal_row % {'errors': force_unicode(bf_errors), 'label': force_unicode(label), 'field': unicode(bf), 'help_text': help_text})
         if top_errors:
-            output.insert(0, error_row % top_errors)
+            output.insert(0, error_row % force_unicode(top_errors))
         if hidden_fields: # Insert any hidden fields in the last row.
             str_hidden = u''.join(hidden_fields)
             if output:
