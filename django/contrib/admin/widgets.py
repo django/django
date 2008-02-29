@@ -4,7 +4,7 @@ Form Widget classes specific to the Django admin site.
 
 from django import newforms as forms
 from django.utils.datastructures import MultiValueDict
-from django.utils.text import capfirst
+from django.utils.text import capfirst, truncate_words
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.conf import settings
@@ -100,9 +100,10 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         output.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" onclick="return showRelatedObjectLookupPopup(this);"> ' % \
             (related_url, url, name))
         output.append('<img src="%simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>' % settings.ADMIN_MEDIA_PREFIX)
+        if value:
+            output.append('&nbsp;<strong>%s</strong>' % \
+                truncate_words(self.rel.to.objects.get(pk=value), 14))
         return mark_safe(u''.join(output))
-        #if self.change: # TODO
-            #output.append('&nbsp;<strong>TODO</strong>')
             
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     """

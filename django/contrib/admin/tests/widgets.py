@@ -7,6 +7,7 @@ WIDGET_TESTS = """
 >>> from django.contrib.admin.widgets import AdminFileWidget, ForeignKeyRawIdWidget
 >>> from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 >>> from django.contrib.admin.models import LogEntry
+>>> from django.contrib.auth.models import User
 
 Calling conditional_escape on the output of widget.render will simulate what
 happens in the template. This is easier than setting up a template and context
@@ -29,10 +30,16 @@ HTML escaped.
 >>> print conditional_escape(w.render('test', 'test'))
 Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br>Change: <input type="file" name="test" />
 
+To test ForeignKeyRawIdWidget a user object must be created. Its pk is
+explicitly set to 100 to avoid having to potentially overmatch in the test.
+
+>>> user = User.objects.create(pk=100, username='jdoe')
+>>> entry = LogEntry(action_flag=1, user=user)
+>>> entry.save()
 >>> rel = LogEntry._meta.get_field('user').rel
 >>> w = ForeignKeyRawIdWidget(rel)
->>> print conditional_escape(w.render('test', 'test', attrs={}))
-<input type="text" name="test" value="test" class="vForeignKeyRawIdAdminField" /><a href="../../../auth/user/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>
+>>> print conditional_escape(w.render('test', entry.user.pk, attrs={}))
+<input type="text" name="test" value="100" class="vForeignKeyRawIdAdminField" /><a href="../../../auth/user/" class="related-lookup" id="lookup_id_test" onclick="return showRelatedObjectLookupPopup(this);"> <img src="%(ADMIN_MEDIA_PREFIX)simg/admin/selector-search.gif" width="16" height="16" alt="Lookup"></a>&nbsp;<strong>jdoe</strong>
 
 """ % {
     'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX,
