@@ -503,7 +503,7 @@ class Query(object):
         name, order = get_order_dir(name, default_order)
         pieces = name.split(LOOKUP_SEP)
         if not alias:
-            alias = self.join((None, opts.db_table, None, None))
+            alias = self.get_initial_alias()
         field, target, opts, joins = self.setup_joins(pieces, opts, alias,
                 False)
         alias = joins[-1][-1]
@@ -580,6 +580,62 @@ class Query(object):
             self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
             return True
         return False
+
+    def change_alias(self, old_alias, new_alias):
+        """
+        Changes old_alias to new_alias, relabelling any references to it in
+        select columns and the where clause.
+        """
+        assert new_alias not in self.alias_map
+
+        # 1. Update references in "select" and "where".
+        change_map = {old_alias: new_alias}
+        self.where.relabel_aliases(change_map)
+        for pos, col in enumerate(self.select):
+            if isinstance(col, (list, tuple)):
+                if col[0] == old_alias:
+                    self.select[pos] = (new_alias, col[1])
+            else:
+                col.relabel_aliases(change_map)
+
+        # 2. Rename the alias in the internal table/alias datastructures.
+        alias_data = self.alias_map[old_alias]
+        alias_data[ALIAS_JOIN][RHS_ALIAS] = new_alias
+        table_aliases = self.table_map[alias_data[ALIAS_TABLE]]
+        for pos, alias in enumerate(table_aliases):
+            if alias == old_alias:
+                table_aliases[pos] = new_alias
+                break
+        self.alias_map[new_alias] = alias_data
+        del self.alias_map[old_alias]
+        for pos, alias in enumerate(self.tables):
+            if alias == old_alias:
+                self.tables[pos] = new_alias
+                break
+
+        # 3. Update any joins that refer to the old alias.
+        for data in self.alias_map.values():
+            if data[ALIAS_JOIN][LHS_ALIAS] == old_alias:
+                data[ALIAS_JOIN][LHS_ALIAS] = new_alias
+
+    def get_initial_alias(self):
+        """
+        Returns the first alias for this query, after increasing its reference
+        count.
+        """
+        if self.tables:
+            alias = self.tables[0]
+            self.ref_alias(alias)
+        else:
+            alias = self.join((None, self.model._meta.db_table, None, None))
+        return alias
+
+    def count_active_tables(self):
+        """
+        Returns the number of tables in this query with a non-zero reference
+        count.
+        """
+        return len([1 for o in self.alias_map.values() if o[ALIAS_REFCOUNT]])
 
     def join(self, connection, always_create=False, exclusions=(),
             promote=False, outer_if_first=False, nullable=False):
@@ -728,7 +784,7 @@ class Query(object):
             value = value()
 
         opts = self.get_meta()
-        alias = self.join((None, opts.db_table, None, None))
+        alias = self.get_initial_alias()
         allow_many = trim or not negate
 
         result = self.setup_joins(parts, opts, alias, (connector == AND),
@@ -1021,8 +1077,12 @@ class Query(object):
         Adds the given column names to the select set, assuming they come from
         the root model (the one given in self.model).
         """
-        table = self.model._meta.db_table
-        self.select.extend([(table, col) for col in columns])
+        for alias in self.tables:
+            if self.alias_map[alias][ALIAS_REFCOUNT]:
+                break
+        else:
+            alias = self.get_initial_alias()
+        self.select.extend([(alias, col) for col in columns])
 
     def add_ordering(self, *ordering):
         """
@@ -1111,7 +1171,7 @@ class Query(object):
         against the join table of many-to-many relation in a subquery.
         """
         opts = self.model._meta
-        alias = self.join((None, opts.db_table, None, None))
+        alias = self.get_initial_alias()
         field, col, opts, joins = self.setup_joins(start.split(LOOKUP_SEP),
                 opts, alias, False)
         alias = joins[-1][0]
@@ -1141,6 +1201,8 @@ class Query(object):
         """
         try:
             sql, params = self.as_sql()
+            if not sql:
+                raise EmptyResultSet
         except EmptyResultSet:
             if result_type == MULTI:
                 raise StopIteration
@@ -1173,6 +1235,9 @@ def get_order_dir(field, default='ASC'):
     return field, dirn[0]
 
 def results_iter(cursor):
+    """
+    An iterator over the result set that returns a chunk of rows at a time.
+    """
     while 1:
         rows = cursor.fetchmany(GET_ITERATOR_CHUNK_SIZE)
         if not rows:

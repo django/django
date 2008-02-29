@@ -1,6 +1,8 @@
 """
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
+from copy import deepcopy
+
 from django.contrib.contenttypes import generic
 from django.core.exceptions import FieldError
 from django.db.models.sql.constants import *
@@ -94,31 +96,32 @@ class UpdateQuery(Query):
 
     def _setup_query(self):
         """
-        Run on initialisation and after cloning.
+        Runs on initialisation and after cloning. Any attributes that would
+        normally be set in __init__ should go in here, instead, so that they
+        are also set up after a clone() call.
         """
         self.values = []
+        self.related_updates = {}
+        self.related_ids = None
+
+    def clone(self, klass=None, **kwargs):
+        return super(UpdateQuery, self).clone(klass,
+                related_updates=self.related_updates.copy, **kwargs)
+
+    def execute_sql(self, result_type=None):
+        super(UpdateQuery, self).execute_sql(result_type)
+        for query in self.get_related_updates():
+            query.execute_sql(result_type)
 
     def as_sql(self):
         """
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        self.select_related = False
         self.pre_sql_setup()
-
-        if len(self.tables) != 1:
-            # We can only update one table at a time, so we need to check that
-            # only one alias has a nonzero refcount.
-            table = None
-            for alias_list in self.table_map.values():
-                for alias in alias_list:
-                    if self.alias_map[alias][ALIAS_REFCOUNT]:
-                        if table:
-                            raise FieldError('Updates can only access a single database table at a time.')
-                        table = alias
-        else:
-            table = self.tables[0]
-
+        if not self.values:
+            return '', ()
+        table = self.tables[0]
         qn = self.quote_name_unless_alias
         result = ['UPDATE %s' % qn(table)]
         result.append('SET')
@@ -134,6 +137,55 @@ class UpdateQuery(Query):
         if where:
             result.append('WHERE %s' % where)
         return ' '.join(result), tuple(update_params + params)
+
+    def pre_sql_setup(self):
+        """
+        If the update depends on results from other tables, we need to do some
+        munging of the "where" conditions to match the format required for
+        (portable) SQL updates. That is done here.
+
+        Further, if we are going to be running multiple updates, we pull out
+        the id values to update at this point so that they don't change as a
+        result of the progressive updates.
+        """
+        self.select_related = False
+        self.clear_ordering(True)
+        super(UpdateQuery, self).pre_sql_setup()
+        count = self.count_active_tables()
+        if not self.related_updates and count == 1:
+            return
+
+        # We need to use a sub-select in the where clause to filter on things
+        # from other tables.
+        query = self.clone(klass=Query)
+        main_alias = query.tables[0]
+        if count != 1:
+            query.unref_alias(main_alias)
+        if query.alias_map[main_alias][ALIAS_REFCOUNT]:
+            alias = '%s0' % self.alias_prefix
+            query.change_alias(main_alias, alias)
+            col = query.model._meta.pk.column
+        else:
+            for model in query.model._meta.get_parent_list():
+                for alias in query.table_map.get(model._meta.db_table, []):
+                    if query.alias_map[alias][ALIAS_REFCOUNT]:
+                        col = model._meta.pk.column
+                        break
+        query.add_local_columns([col])
+
+        # Now we adjust the current query: reset the where clause and get rid
+        # of all the tables we don't need (since they're in the sub-select).
+        self.where = self.where_class()
+        if self.related_updates:
+            idents = []
+            for rows in query.execute_sql(MULTI):
+                idents.extend([r[0] for r in rows])
+            self.add_filter(('pk__in', idents))
+            self.related_ids = idents
+        else:
+            self.add_filter(('pk__in', query))
+        for alias in self.tables[1:]:
+            self.alias_map[alias][ALIAS_REFCOUNT] = 0
 
     def clear_related(self, related_field, pk_list):
         """
@@ -156,11 +208,42 @@ class UpdateQuery(Query):
         for name, val in values.items():
             field, model, direct, m2m = self.model._meta.get_field_by_name(name)
             if not direct or m2m:
-                # Can only update non-relation fields and foreign keys.
                 raise FieldError('Cannot update model field %r (only non-relations and foreign keys permitted).' % field)
+            # FIXME: Some sort of db_prep_* is probably more appropriate here.
             if field.rel and isinstance(val, Model):
                 val = val.pk
-            self.values.append((field.column, val))
+            if model:
+                self.add_related_update(model, field.column, val)
+            else:
+                self.values.append((field.column, val))
+
+    def add_related_update(self, model, column, value):
+        """
+        Adds (name, value) to an update query for an ancestor model.
+
+        Updates are coalesced so that we only run one update query per ancestor.
+        """
+        try:
+            self.related_updates[model].append((column, value))
+        except KeyError:
+            self.related_updates[model] = [(column, value)]
+
+    def get_related_updates(self):
+        """
+        Returns a list of query objects: one for each update required to an
+        ancestor model. Each query will have the same filtering conditions as
+        the current query but will only update a single table.
+        """
+        if not self.related_updates:
+            return []
+        result = []
+        for model, values in self.related_updates.items():
+            query = UpdateQuery(model, self.connection)
+            query.values = values
+            if self.related_ids:
+                query.add_filter(('pk__in', self.related_ids))
+            result.append(query)
+        return result
 
 class InsertQuery(Query):
     def __init__(self, *args, **kwargs):

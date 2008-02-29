@@ -216,5 +216,13 @@ DoesNotExist: Restaurant matching query does not exist.
 >>> Restaurant.objects.get(lot__name='Well Lit')
 <Restaurant: Ristorante Miron the restaurant>
 
+# The update() command can update fields in parent and child classes at once
+# (although it executed multiple SQL queries to do so).
+>>> Restaurant.objects.filter(serves_hot_dogs=True, name__contains='D').update(name='Demon Puppies', serves_hot_dogs=False)
+>>> r1 = Restaurant.objects.get(pk=r.pk)
+>>> r1.serves_hot_dogs == False
+True
+>>> r1.name
+u'Demon Puppies'
 
 """}
