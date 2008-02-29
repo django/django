@@ -101,8 +101,9 @@ class UpdateQuery(Query):
         are also set up after a clone() call.
         """
         self.values = []
-        self.related_updates = {}
         self.related_ids = None
+        if not hasattr(self, 'related_updates'):
+            self.related_updates = {}
 
     def clone(self, klass=None, **kwargs):
         return super(UpdateQuery, self).clone(klass,
