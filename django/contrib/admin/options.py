@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin import widgets
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.db import models
+from django.db import models, transaction
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
 from django.utils.html import escape
@@ -401,6 +401,7 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 post_url = '../../../'
             return HttpResponseRedirect(post_url)
+    save_add = transaction.commit_on_success(save_add)
 
     def save_change(self, request, model, form, formsets=None):
         """
@@ -451,6 +452,7 @@ class ModelAdmin(BaseModelAdmin):
         else:
             request.user.message_set.create(message=msg)
             return HttpResponseRedirect("../")
+    save_change = transaction.commit_on_success(save_change)
 
     def render_change_form(self, request, model, context, add=False, change=False, form_url='', obj=None):
         opts = model._meta
