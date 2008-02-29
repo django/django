@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-17 15:03+0400\n"
+"POT-Creation-Date: 2008-02-22 21:55+0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: David Avsajanishvili <avsd05@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,139 +64,142 @@ msgid "Argentinean Spanish"
 msgstr "არგენტინის ესპანური"
 
 #: conf/global_settings.py:51
+msgid "Basque"
+msgstr "ბასკური"
+
+#: conf/global_settings.py:52
 msgid "Persian"
 msgstr "სპარსული"
 
-#: conf/global_settings.py:52
+#: conf/global_settings.py:53
 msgid "Finnish"
 msgstr "ფინური"
 
-#: conf/global_settings.py:53
+#: conf/global_settings.py:54
 msgid "French"
 msgstr "ფრანგული"
 
-#: conf/global_settings.py:54
-msgid "Gaeilge"
-msgstr "გალიჯური"
-
 #: conf/global_settings.py:55
+msgid "Irish"
+msgstr "ირლანდიური"
+
+#: conf/global_settings.py:56
 msgid "Galician"
 msgstr "გალიციური"
 
-#: conf/global_settings.py:56
+#: conf/global_settings.py:57
 msgid "Hungarian"
 msgstr "უნგრული"
 
-#: conf/global_settings.py:57
+#: conf/global_settings.py:58
 msgid "Hebrew"
 msgstr "ებრაული"
 
-#: conf/global_settings.py:58
+#: conf/global_settings.py:59
 msgid "Croatian"
 msgstr "ხორვატიული"
 
-#: conf/global_settings.py:59
+#: conf/global_settings.py:60
 msgid "Icelandic"
 msgstr "ისლანდიური"
 
-#: conf/global_settings.py:60
+#: conf/global_settings.py:61
 msgid "Italian"
 msgstr "იტალიური"
 
-#: conf/global_settings.py:61
+#: conf/global_settings.py:62
 msgid "Japanese"
 msgstr "იაპონური"
 
-#: conf/global_settings.py:62
-#, fuzzy
+#: conf/global_settings.py:63
 msgid "Georgian"
 msgstr "ქართული"
 
-#: conf/global_settings.py:63
+#: conf/global_settings.py:64
 msgid "Korean"
 msgstr "კორეული"
 
-#: conf/global_settings.py:64
+#: conf/global_settings.py:65
 msgid "Khmer"
 msgstr "ხმერული"
 
-#: conf/global_settings.py:65
+#: conf/global_settings.py:66
 msgid "Kannada"
 msgstr "კანნადა"
 
-#: conf/global_settings.py:66
+#: conf/global_settings.py:67
 msgid "Latvian"
 msgstr "ლატვიური"
 
-#: conf/global_settings.py:67
+#: conf/global_settings.py:68
 msgid "Macedonian"
 msgstr "მაკედონური"
 
-#: conf/global_settings.py:68
+#: conf/global_settings.py:69
 msgid "Dutch"
 msgstr "ჰოლანდიური"
 
-#: conf/global_settings.py:69
+#: conf/global_settings.py:70
 msgid "Norwegian"
 msgstr "ნორვეგიული"
 
-#: conf/global_settings.py:70
+#: conf/global_settings.py:71
 msgid "Polish"
 msgstr "პოლონური"
 
-#: conf/global_settings.py:71
+#: conf/global_settings.py:72
 msgid "Portugese"
 msgstr "პორტუგალიური"
 
-#: conf/global_settings.py:72
+#: conf/global_settings.py:73
 msgid "Brazilian"
 msgstr "ბრაზილიური"
 
-#: conf/global_settings.py:73
+#: conf/global_settings.py:74
 msgid "Romanian"
 msgstr "რუმინული"
 
-#: conf/global_settings.py:74
+#: conf/global_settings.py:75
 msgid "Russian"
 msgstr "რუსული"
 
-#: conf/global_settings.py:75
+#: conf/global_settings.py:76
 msgid "Slovak"
 msgstr "სლოვარური"
 
-#: conf/global_settings.py:76
+#: conf/global_settings.py:77
 msgid "Slovenian"
 msgstr "სლოვენიური"
 
-#: conf/global_settings.py:77
+#: conf/global_settings.py:78
 msgid "Serbian"
 msgstr "სერბული"
 
-#: conf/global_settings.py:78
+#: conf/global_settings.py:79
 msgid "Swedish"
 msgstr "შვედური"
 
-#: conf/global_settings.py:79
+#: conf/global_settings.py:80
 msgid "Tamil"
 msgstr "თამილური"
 
-#: conf/global_settings.py:80
+#: conf/global_settings.py:81
 msgid "Telugu"
 msgstr "ტელუგუ"
 
-#: conf/global_settings.py:81
+#: conf/global_settings.py:82
 msgid "Turkish"
 msgstr "თურქული"
 
-#: conf/global_settings.py:82
+#: conf/global_settings.py:83
 msgid "Ukrainian"
 msgstr "უკრაინული"
 
-#: conf/global_settings.py:83
+#: conf/global_settings.py:84
 msgid "Simplified Chinese"
 msgstr "გამარტივებული ჩინური"
 
-#: conf/global_settings.py:84
+#: conf/global_settings.py:85
 msgid "Traditional Chinese"
 msgstr "ტრადიციული ჩინური"
 
@@ -407,6 +410,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
+"ნამდვილად გსურთ, წაშალოთ %(object_name)s \"%(escaped_object)s\"? ყველა "
+"ქვემოთ მოყვანილი დაკავშირებული ობიექტი წაშლილი იქნება:"
 
 #: contrib/admin/templates/admin/delete_confirmation.html:25
 msgid "Yes, I'm sure"
@@ -1558,7 +1563,8 @@ msgstr "კონტენტის ტიპები"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"მაგალითი: '/about/contact/'. ყურადღება მიაქციეთ დახრილ ხაზებს თავში და ბოლოში."
+"მაგალითი: '/about/contact/'. ყურადღება მიაქციეთ დახრილ ხაზებს თავში და "
+"ბოლოში."
 
 #: contrib/flatpages/models.py:9
 msgid "title"
@@ -1602,127 +1608,135 @@ msgstr "უბრალო გვერდი"
 msgid "flat pages"
 msgstr "უბრალო გვერდები"
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "th"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "st"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "nd"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:20
+#: contrib/humanize/templatetags/humanize.py:19
 msgid "rd"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:52
+#: contrib/humanize/templatetags/humanize.py:51
 #, python-format
 msgid "%(value).1f million"
 msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f მილიონი"
 msgstr[1] "%(value).1f მილიონი"
 
-#: contrib/humanize/templatetags/humanize.py:55
+#: contrib/humanize/templatetags/humanize.py:54
 #, python-format
 msgid "%(value).1f billion"
 msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f მილიარდი"
 msgstr[1] "%(value).1f მილიარდი"
 
-#: contrib/humanize/templatetags/humanize.py:58
+#: contrib/humanize/templatetags/humanize.py:57
 #, python-format
 msgid "%(value).1f trillion"
 msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f ტრილიონი"
 msgstr[1] "%(value).1f ტრილიონი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "one"
 msgstr "ერთი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "two"
 msgstr "ორი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "three"
 msgstr "სამი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "four"
 msgstr "ოთხი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "five"
 msgstr "ხუთი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "six"
 msgstr "ექვსი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "seven"
 msgstr "შვიდი"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "eight"
 msgstr "რვა"
 
-#: contrib/humanize/templatetags/humanize.py:74
+#: contrib/humanize/templatetags/humanize.py:73
 msgid "nine"
 msgstr "ცხრა"
 
-#: contrib/humanize/templatetags/humanize.py:94
+#: contrib/humanize/templatetags/humanize.py:93
 msgid "today"
 msgstr "დღეს"
 
-#: contrib/humanize/templatetags/humanize.py:96
+#: contrib/humanize/templatetags/humanize.py:95
 msgid "tomorrow"
 msgstr "ხვალ"
 
-#: contrib/humanize/templatetags/humanize.py:98
+#: contrib/humanize/templatetags/humanize.py:97
 msgid "yesterday"
 msgstr "გუშინ"
 
-#: contrib/localflavor/ar/forms.py:28
+#: contrib/localflavor/ar/forms.py:27
+#, fuzzy
 msgid "Enter a postal code in the format NNNN or ANNNNAAA."
 msgstr "შეიყვანეთ საფოსტო კოდი ერთ-ერთ ფორმატში: NNNN ან ANNNNAAA."
 
-#: contrib/localflavor/ar/forms.py:50 contrib/localflavor/br/forms.py:96
+#: contrib/localflavor/ar/forms.py:49 contrib/localflavor/br/forms.py:96
 #: contrib/localflavor/br/forms.py:135 contrib/localflavor/pe/forms.py:23
 #: contrib/localflavor/pe/forms.py:51
 msgid "This field requires only numbers."
 msgstr "ამ ველში შეიძლება იყოს მხოლოდ ციფრები."
 
-#: contrib/localflavor/ar/forms.py:51
+#: contrib/localflavor/ar/forms.py:50
+#, fuzzy
 msgid "This field requires 7 or 8 digits."
 msgstr "ამ ველში შეიძლება იყოს მხოლოდ 7 ან 8 თანრიგი."
 
-#: contrib/localflavor/ar/forms.py:80
+#: contrib/localflavor/ar/forms.py:79
+#, fuzzy
 msgid "Enter a valid CUIT in XX-XXXXXXXX-X or XXXXXXXXXXXX format."
 msgstr ""
 "შეიყვანეთ დასაშვები CUIT ერთ-ერთ ფორმატში: XX-XXXXXXXX-X ან XXXXXXXXXXXX."
 
-#: contrib/localflavor/ar/forms.py:81
+#: contrib/localflavor/ar/forms.py:80
+#, fuzzy
 msgid "Invalid CUIT."
 msgstr "არასწორი CUIT."
 
 #: contrib/localflavor/au/forms.py:16
+#, fuzzy
 msgid "Enter a 4 digit post code."
 msgstr "შეიყვანეთ ოთხთანრიგიანი საფოსტო კოდი"
 
 #: contrib/localflavor/br/forms.py:21
+#, fuzzy
 msgid "Enter a zip code in the format XXXXX-XXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში: XXXXX-XXX."
 
 #: contrib/localflavor/br/forms.py:30
+#, fuzzy
 msgid "Phone numbers must be in XX-XXXX-XXXX format."
 msgstr "ტელეფონის ნომრები უნდა იყოს XX-XXXX-XXXX ფორმატში."
 
 #: contrib/localflavor/br/forms.py:58
+#, fuzzy
 msgid ""
 "Select a valid brazilian state. That state is not one of the available "
 "states."
@@ -1730,139 +1744,173 @@ msgstr ""
 "შეიყვანეთ დასაშვები ბრაზილიური შტატი. მოცემული შტატი არ არის დასაშვები."
 
 #: contrib/localflavor/br/forms.py:94
+#, fuzzy
 msgid "Invalid CPF number."
 msgstr "არასწორი CPF ნომერი."
 
 #: contrib/localflavor/br/forms.py:95
+#, fuzzy
 msgid "This field requires at most 11 digits or 14 characters."
 msgstr "ეს ველი უნდა შეიცავდეს 11 ციფრს ან 14 სიმბოლოს, ან ნაკლებს."
 
 #: contrib/localflavor/br/forms.py:134
+#, fuzzy
 msgid "Invalid CNPJ number."
 msgstr "არასწორი CNPJ ნომერი."
 
 #: contrib/localflavor/br/forms.py:136
+#, fuzzy
 msgid "This field requires at least 14 digits"
 msgstr "ეს ველი მოითხოვს არაუმეტეს 14 თანრიგისა"
 
 #: contrib/localflavor/ca/forms.py:17
+#, fuzzy
 msgid "Enter a postal code in the format XXX XXX."
 msgstr "შეიყვანეთ საფოსტო კოდი ფორმატში: XXX XXX."
 
 #: contrib/localflavor/ca/forms.py:88
+#, fuzzy
 msgid "Enter a valid Canadian Social Insurance number in XXX-XXX-XXX format."
 msgstr ""
 "შეიყვანეთ კანადაში დასაშვები სოციალური დაზღვევის ნომერი ფორმატში: XXX-XXX-XXX"
 
 #: contrib/localflavor/ch/ch_states.py:5
+#, fuzzy
 msgid "Aargau"
 msgstr "აარგაუ"
 
 #: contrib/localflavor/ch/ch_states.py:6
+#, fuzzy
 msgid "Appenzell Innerrhoden"
 msgstr "აპენცელ ინერჰოდენ"
 
 #: contrib/localflavor/ch/ch_states.py:7
+#, fuzzy
 msgid "Appenzell Ausserrhoden"
 msgstr "აპენცელ აუსერჰოდენ"
 
 #: contrib/localflavor/ch/ch_states.py:8
+#, fuzzy
 msgid "Basel-Stadt"
 msgstr "ბაზელ-შტადტ"
 
 #: contrib/localflavor/ch/ch_states.py:9
+#, fuzzy
 msgid "Basel-Land"
 msgstr "ბაზელ-ლანდ"
 
 #: contrib/localflavor/ch/ch_states.py:10
+#, fuzzy
 msgid "Berne"
 msgstr "ბერნი"
 
 #: contrib/localflavor/ch/ch_states.py:11
+#, fuzzy
 msgid "Fribourg"
 msgstr "ფრაიბურგი"
 
 #: contrib/localflavor/ch/ch_states.py:12
+#, fuzzy
 msgid "Geneva"
 msgstr "ჟენევა"
 
 #: contrib/localflavor/ch/ch_states.py:13
+#, fuzzy
 msgid "Glarus"
 msgstr "გლარუსი"
 
 #: contrib/localflavor/ch/ch_states.py:14
+#, fuzzy
 msgid "Graubuenden"
 msgstr "გრაუბუენდენ"
 
 #: contrib/localflavor/ch/ch_states.py:15
+#, fuzzy
 msgid "Jura"
 msgstr "ჯურა"
 
 #: contrib/localflavor/ch/ch_states.py:16
+#, fuzzy
 msgid "Lucerne"
 msgstr "ლეცერნი"
 
 #: contrib/localflavor/ch/ch_states.py:17
+#, fuzzy
 msgid "Neuchatel"
 msgstr "ნოიხატლი"
 
 #: contrib/localflavor/ch/ch_states.py:18
+#, fuzzy
 msgid "Nidwalden"
 msgstr "ნიდვალდენი"
 
 #: contrib/localflavor/ch/ch_states.py:19
+#, fuzzy
 msgid "Obwalden"
 msgstr "ობვალდენი"
 
 #: contrib/localflavor/ch/ch_states.py:20
+#, fuzzy
 msgid "Schaffhausen"
 msgstr "შაფჰაუზენი"
 
 #: contrib/localflavor/ch/ch_states.py:21
+#, fuzzy
 msgid "Schwyz"
 msgstr "შვიცი"
 
 #: contrib/localflavor/ch/ch_states.py:22
+#, fuzzy
 msgid "Solothurn"
 msgstr "სოლოთურნი"
 
 #: contrib/localflavor/ch/ch_states.py:23
+#, fuzzy
 msgid "St. Gallen"
 msgstr "სენტ-გალენი"
 
 #: contrib/localflavor/ch/ch_states.py:24
+#, fuzzy
 msgid "Thurgau"
 msgstr "თურგაუ"
 
 #: contrib/localflavor/ch/ch_states.py:25
+#, fuzzy
 msgid "Ticino"
 msgstr "ტიჯინო"
 
 #: contrib/localflavor/ch/ch_states.py:26
+#, fuzzy
 msgid "Uri"
 msgstr "ური"
 
 #: contrib/localflavor/ch/ch_states.py:27
+#, fuzzy
 msgid "Valais"
 msgstr "ვალაისი"
 
 #: contrib/localflavor/ch/ch_states.py:28
+#, fuzzy
 msgid "Vaud"
 msgstr "ვაუდი"
 
 #: contrib/localflavor/ch/ch_states.py:29
+#, fuzzy
 msgid "Zug"
 msgstr "ცუგი"
 
 #: contrib/localflavor/ch/ch_states.py:30
+#, fuzzy
 msgid "Zurich"
 msgstr "ციურიხი"
 
 #: contrib/localflavor/ch/forms.py:16 contrib/localflavor/no/forms.py:12
+#, fuzzy
 msgid "Enter a zip code in the format XXXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXX."
 
 #: contrib/localflavor/ch/forms.py:64
+#, fuzzy
 msgid ""
 "Enter a valid Swiss identity or passport card number in X1234567<0 or "
 "1234567890 format."
@@ -1871,87 +1919,108 @@ msgstr ""
 "X1234567<0 ან 1234567890."
 
 #: contrib/localflavor/cl/forms.py:29
+#, fuzzy
 msgid "Enter a valid Chilean RUT."
 msgstr "შეიყვანეთ დასაშვები ჩილიური RUT."
 
 #: contrib/localflavor/cl/forms.py:30
+#, fuzzy
 msgid "Enter a valid Chilean RUT. The format is XX.XXX.XXX-X."
 msgstr "შეიყვანეთ დასაშვები ჩილიური RUT. ფორმატი: XX.XXX.XXX-X."
 
 #: contrib/localflavor/cl/forms.py:31
+#, fuzzy
 msgid "The Chilean RUT is not valid."
 msgstr "ჩილიური RUT არასწორია."
 
 #: contrib/localflavor/de/de_states.py:5
+#, fuzzy
 msgid "Baden-Wuerttemberg"
 msgstr "ბადენ-ვურტემბერგი"
 
 #: contrib/localflavor/de/de_states.py:6
+#, fuzzy
 msgid "Bavaria"
 msgstr "ბავარია"
 
 #: contrib/localflavor/de/de_states.py:7
+#, fuzzy
 msgid "Berlin"
 msgstr "ბერლინი"
 
 #: contrib/localflavor/de/de_states.py:8
+#, fuzzy
 msgid "Brandenburg"
 msgstr "ბრანდენბურგი"
 
 #: contrib/localflavor/de/de_states.py:9
+#, fuzzy
 msgid "Bremen"
 msgstr "ბრემენი"
 
 #: contrib/localflavor/de/de_states.py:10
+#, fuzzy
 msgid "Hamburg"
 msgstr "ჰამბურგი"
 
 #: contrib/localflavor/de/de_states.py:11
+#, fuzzy
 msgid "Hessen"
 msgstr "ჰესენი"
 
 #: contrib/localflavor/de/de_states.py:12
+#, fuzzy
 msgid "Mecklenburg-Western Pomerania"
 msgstr "მეკლენბურგ-ვესტერნ პომერანია"
 
 #: contrib/localflavor/de/de_states.py:13
+#, fuzzy
 msgid "Lower Saxony"
 msgstr "ქვემო საქსონია"
 
 #: contrib/localflavor/de/de_states.py:14
+#, fuzzy
 msgid "North Rhine-Westphalia"
 msgstr "ჩრდილოეთ რაინ-ვესტფალია"
 
 #: contrib/localflavor/de/de_states.py:15
+#, fuzzy
 msgid "Rhineland-Palatinate"
 msgstr "რაინლანდ-პალატინატა"
 
 #: contrib/localflavor/de/de_states.py:16
+#, fuzzy
 msgid "Saarland"
 msgstr "ზაარლანდი"
 
 #: contrib/localflavor/de/de_states.py:17
+#, fuzzy
 msgid "Saxony"
 msgstr "საქსონია"
 
 #: contrib/localflavor/de/de_states.py:18
+#, fuzzy
 msgid "Saxony-Anhalt"
 msgstr "საქსონია-ანჰალტ"
 
 #: contrib/localflavor/de/de_states.py:19
+#, fuzzy
 msgid "Schleswig-Holstein"
 msgstr "შლეზვიგ-ჰოლშტაინი"
 
 #: contrib/localflavor/de/de_states.py:20
+#, fuzzy
 msgid "Thuringia"
 msgstr "თურინგია"
 
 #: contrib/localflavor/de/forms.py:14 contrib/localflavor/fi/forms.py:12
 #: contrib/localflavor/fr/forms.py:15
+#, fuzzy
 msgid "Enter a zip code in the format XXXXX."
 msgstr "შეიყვანეთ zip-კოდი ფორმატში XXXXX."
 
 #: contrib/localflavor/de/forms.py:41
+#, fuzzy
 msgid ""
 "Enter a valid German identity card number in XXXXXXXXXXX-XXXXXXX-XXXXXXX-X "
 "format."
@@ -1960,269 +2029,335 @@ msgstr ""
 "XXXXXXXXXXX-XXXXXXX-XXXXXXX-X."
 
 #: contrib/localflavor/es/es_provinces.py:5
+#, fuzzy
 msgid "Arava"
 msgstr "არავა"
 
 #: contrib/localflavor/es/es_provinces.py:6
+#, fuzzy
 msgid "Albacete"
 msgstr "ალბასეტე"
 
 #: contrib/localflavor/es/es_provinces.py:7
+#, fuzzy
 msgid "Alacant"
 msgstr "ალასანტი"
 
 #: contrib/localflavor/es/es_provinces.py:8
+#, fuzzy
 msgid "Almeria"
 msgstr "ალმერია"
 
 #: contrib/localflavor/es/es_provinces.py:9
+#, fuzzy
 msgid "Avila"
 msgstr "ავილა"
 
 #: contrib/localflavor/es/es_provinces.py:10
+#, fuzzy
 msgid "Badajoz"
 msgstr "ბადაჰოს"
 
 #: contrib/localflavor/es/es_provinces.py:11
+#, fuzzy
 msgid "Illes Balears"
 msgstr "ილეს ბალეარს"
 
 #: contrib/localflavor/es/es_provinces.py:12
+#, fuzzy
 msgid "Barcelona"
 msgstr "ბარსელონა"
 
 #: contrib/localflavor/es/es_provinces.py:13
+#, fuzzy
 msgid "Burgos"
 msgstr "ბურგოს"
 
 #: contrib/localflavor/es/es_provinces.py:14
+#, fuzzy
 msgid "Caceres"
 msgstr "კასერეს"
 
 #: contrib/localflavor/es/es_provinces.py:15
+#, fuzzy
 msgid "Cadiz"
 msgstr "კადიზ"
 
 #: contrib/localflavor/es/es_provinces.py:16
+#, fuzzy
 msgid "Castello"
 msgstr "კასტელო"
 
 #: contrib/localflavor/es/es_provinces.py:17
+#, fuzzy
 msgid "Ciudad Real"
 msgstr "სიუდად რეალ"
 
 #: contrib/localflavor/es/es_provinces.py:18
+#, fuzzy
 msgid "Cordoba"
 msgstr "კორდობა"
 
 #: contrib/localflavor/es/es_provinces.py:19
+#, fuzzy
 msgid "A Coruna"
 msgstr "ა კორუნია"
 
 #: contrib/localflavor/es/es_provinces.py:20
+#, fuzzy
 msgid "Cuenca"
 msgstr "კუენსა"
 
 #: contrib/localflavor/es/es_provinces.py:21
+#, fuzzy
 msgid "Girona"
 msgstr "გირონა"
 
 #: contrib/localflavor/es/es_provinces.py:22
+#, fuzzy
 msgid "Granada"
 msgstr "გრანადა"
 
 #: contrib/localflavor/es/es_provinces.py:23
+#, fuzzy
 msgid "Guadalajara"
 msgstr "გუადალაჯარა"
 
 #: contrib/localflavor/es/es_provinces.py:24
+#, fuzzy
 msgid "Guipuzkoa"
 msgstr "გუიპუზკოა"
 
 #: contrib/localflavor/es/es_provinces.py:25
+#, fuzzy
 msgid "Huelva"
 msgstr "ჰუელვა"
 
 #: contrib/localflavor/es/es_provinces.py:26
+#, fuzzy
 msgid "Huesca"
 msgstr "ჰუესკა"
 
 #: contrib/localflavor/es/es_provinces.py:27
+#, fuzzy
 msgid "Jaen"
 msgstr "ჯეინი"
 
 #: contrib/localflavor/es/es_provinces.py:28
+#, fuzzy
 msgid "Leon"
 msgstr "ლეონი"
 
 #: contrib/localflavor/es/es_provinces.py:29
+#, fuzzy
 msgid "Lleida"
 msgstr "ლეიდა"
 
 #: contrib/localflavor/es/es_provinces.py:30
 #: contrib/localflavor/es/es_regions.py:17
+#, fuzzy
 msgid "La Rioja"
 msgstr "ლა რიოხა"
 
 #: contrib/localflavor/es/es_provinces.py:31
+#, fuzzy
 msgid "Lugo"
 msgstr "ლუგო"
 
 #: contrib/localflavor/es/es_provinces.py:32
 #: contrib/localflavor/es/es_regions.py:18
+#, fuzzy
 msgid "Madrid"
 msgstr "მადრიდი"
 
 #: contrib/localflavor/es/es_provinces.py:33
+#, fuzzy
 msgid "Malaga"
 msgstr "მალაგა"
 
 #: contrib/localflavor/es/es_provinces.py:34
+#, fuzzy
 msgid "Murcia"
 msgstr "მურსია"
 
 #: contrib/localflavor/es/es_provinces.py:35
+#, fuzzy
 msgid "Navarre"
 msgstr "ნავარე"
 
 #: contrib/localflavor/es/es_provinces.py:36
+#, fuzzy
 msgid "Ourense"
 msgstr "ოურენსი"
 
 #: contrib/localflavor/es/es_provinces.py:37
+#, fuzzy
 msgid "Asturias"
 msgstr "ასტურია"
 
 #: contrib/localflavor/es/es_provinces.py:38
+#, fuzzy
 msgid "Palencia"
 msgstr "პალენსია"
 
 #: contrib/localflavor/es/es_provinces.py:39
+#, fuzzy
 msgid "Las Palmas"
 msgstr "ლას პალმას"
 
 #: contrib/localflavor/es/es_provinces.py:40
+#, fuzzy
 msgid "Pontevedra"
 msgstr "პონტევედრა"
 
 #: contrib/localflavor/es/es_provinces.py:41
+#, fuzzy
 msgid "Salamanca"
 msgstr "სალამანსა"
 
 #: contrib/localflavor/es/es_provinces.py:42
+#, fuzzy
 msgid "Santa Cruz de Tenerife"
 msgstr "სანტა კრუზ დე ტენერიფე"
 
 #: contrib/localflavor/es/es_provinces.py:43
 #: contrib/localflavor/es/es_regions.py:11
+#, fuzzy
 msgid "Cantabria"
 msgstr "კანტაბრია"
 
 #: contrib/localflavor/es/es_provinces.py:44
+#, fuzzy
 msgid "Segovia"
 msgstr "სეგოვია"
 
 #: contrib/localflavor/es/es_provinces.py:45
+#, fuzzy
 msgid "Seville"
 msgstr "სევილი"
 
 #: contrib/localflavor/es/es_provinces.py:46
+#, fuzzy
 msgid "Soria"
 msgstr "სორია"
 
 #: contrib/localflavor/es/es_provinces.py:47
+#, fuzzy
 msgid "Tarragona"
 msgstr "ტარაგონა"
 
 #: contrib/localflavor/es/es_provinces.py:48
+#, fuzzy
 msgid "Teruel"
 msgstr "ტერუელი"
 
 #: contrib/localflavor/es/es_provinces.py:49
+#, fuzzy
 msgid "Toledo"
 msgstr "ტოლედო"
 
 #: contrib/localflavor/es/es_provinces.py:50
+#, fuzzy
 msgid "Valencia"
 msgstr "ვალენსია"
 
 #: contrib/localflavor/es/es_provinces.py:51
+#, fuzzy
 msgid "Valladolid"
 msgstr "ვალადოლიდი"
 
 #: contrib/localflavor/es/es_provinces.py:52
+#, fuzzy
 msgid "Bizkaia"
 msgstr "ბიზკაია"
 
 #: contrib/localflavor/es/es_provinces.py:53
+#, fuzzy
 msgid "Zamora"
 msgstr "სამორა"
 
 #: contrib/localflavor/es/es_provinces.py:54
+#, fuzzy
 msgid "Zaragoza"
 msgstr "სარაგოსა"
 
 #: contrib/localflavor/es/es_provinces.py:55
+#, fuzzy
 msgid "Ceuta"
 msgstr "კეუტა"
 
 #: contrib/localflavor/es/es_provinces.py:56
+#, fuzzy
 msgid "Melilla"
 msgstr "მელილა"
 
 #: contrib/localflavor/es/es_regions.py:5
+#, fuzzy
 msgid "Andalusia"
 msgstr "ანდალუზია"
 
 #: contrib/localflavor/es/es_regions.py:6
+#, fuzzy
 msgid "Aragon"
 msgstr "არაგონ"
 
 #: contrib/localflavor/es/es_regions.py:7
+#, fuzzy
 msgid "Principality of Asturias"
 msgstr "ასტურიის პრინციპატი"
 
 #: contrib/localflavor/es/es_regions.py:8
+#, fuzzy
 msgid "Balearic Islands"
 msgstr "ბალეარის კუნძულები"
 
 #: contrib/localflavor/es/es_regions.py:9
+#, fuzzy
 msgid "Basque Country"
 msgstr "ბასკების ქვეყანა"
 
 #: contrib/localflavor/es/es_regions.py:10
+#, fuzzy
 msgid "Canary Islands"
 msgstr "კანარის კუნძuლები"
 
 #: contrib/localflavor/es/es_regions.py:12
+#, fuzzy
 msgid "Castile-La Mancha"
 msgstr "კასტილია ლა მანჩა"
 
 #: contrib/localflavor/es/es_regions.py:13
+#, fuzzy
 msgid "Castile and Leon"
 msgstr "კასტილია და ლეონი"
 
 #: contrib/localflavor/es/es_regions.py:14
+#, fuzzy
 msgid "Catalonia"
 msgstr "კატალონია"
 
 #: contrib/localflavor/es/es_regions.py:15
+#, fuzzy
 msgid "Extremadura"
 msgstr "ექსტრემადურა"
 
 #: contrib/localflavor/es/es_regions.py:16
+#, fuzzy
 msgid "Galicia"
 msgstr "გალიცია"
 
 #: contrib/localflavor/es/es_regions.py:19
+#, fuzzy
 msgid "Region of Murcia"
 msgstr "მურსიის რეგიონი"
 
 #: contrib/localflavor/es/es_regions.py:20
+#, fuzzy
 msgid "Foral Community of Navarre"
 msgstr "ნავარის ფორალური თემი"
 
 #: contrib/localflavor/es/es_regions.py:21
+#, fuzzy
 msgid "Valencian Community"
 msgstr "ვალენსიის თემი"
 
@@ -2294,7 +2429,7 @@ msgstr ""
 msgid "Enter a valid VAT number."
 msgstr ""
 
-#: contrib/localflavor/jp/forms.py:19
+#: contrib/localflavor/jp/forms.py:17
 msgid "Enter a postal code in the format XXXXXXX or XXX-XXXX."
 msgstr ""
 
@@ -3498,23 +3633,23 @@ msgstr "გადამისამართება"
 msgid "redirects"
 msgstr "გადამისამართებები"
 
-#: contrib/sessions/models.py:46
+#: contrib/sessions/models.py:41
 msgid "session key"
 msgstr "სესიის გასაღები"
 
-#: contrib/sessions/models.py:47
+#: contrib/sessions/models.py:42
 msgid "session data"
 msgstr "სესიის მონაცემები"
 
-#: contrib/sessions/models.py:48
+#: contrib/sessions/models.py:43
 msgid "expire date"
 msgstr "ამოწურვის თარიღი"
 
-#: contrib/sessions/models.py:53
+#: contrib/sessions/models.py:48
 msgid "session"
 msgstr "სესია"
 
-#: contrib/sessions/models.py:54
+#: contrib/sessions/models.py:49
 msgid "sessions"
 msgstr "სესიები"
 
@@ -3603,7 +3738,7 @@ msgstr "წელი უნდა იყოს 1900 ან მეტი."
 msgid "Invalid date: %s"
 msgstr "არასწორი თარიღი: %s"
 
-#: core/validators.py:156 db/models/fields/__init__.py:509
+#: core/validators.py:156 db/models/fields/__init__.py:518
 msgid "Enter a valid date in YYYY-MM-DD format."
 msgstr "შეიყვანეთ სწორი თარიღი YYYY-MM-DD ფორმატში."
 
@@ -3611,7 +3746,7 @@ msgstr "შეიყვანეთ სწორი თარიღი YYYY-MM-D
 msgid "Enter a valid time in HH:MM format."
 msgstr "შეიყვანეთ სწორი დრო HH:MM ფორმატში."
 
-#: core/validators.py:165 db/models/fields/__init__.py:583
+#: core/validators.py:165 db/models/fields/__init__.py:595
 msgid "Enter a valid date/time in YYYY-MM-DD HH:MM format."
 msgstr "შეიყვანეთ სწორი თარიღი და დრო YYYY-MM-DD HH:MM ფორმატში."
 
@@ -3817,8 +3952,8 @@ msgid ""
 "Please close the unclosed %(tag)s tag from line %(line)s. (Line starts with "
 "\"%(start)s\".)"
 msgstr ""
-"გთხოვთ, დახუროთ დაუხურავი %(tag)s ტეგი, ხაზის ნომერია %(line)s. "
-"(სტრიქონი იწყება ტექსტით: \"%(start)s\".)"
+"გთხოვთ, დახუროთ დაუხურავი %(tag)s ტეგი, ხაზის ნომერია %(line)s. (სტრიქონი "
+"იწყება ტექსტით: \"%(start)s\".)"
 
 #: core/validators.py:576
 #, python-format
@@ -3826,8 +3961,8 @@ msgid ""
 "Some text starting on line %(line)s is not allowed in that context. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"ტექსტის ნაწილი, რომელიც %(line)s ხაზზე იწყება, დაუშვებელია მიმდინარე კონტექსტში. (სტრიქონი "
-"იწყება ტექსტით: \"%(start)s\".)"
+"ტექსტის ნაწილი, რომელიც %(line)s ხაზზე იწყება, დაუშვებელია მიმდინარე "
+"კონტექსტში. (სტრიქონი იწყება ტექსტით: \"%(start)s\".)"
 
 #: core/validators.py:581
 #, python-format
@@ -3853,8 +3988,8 @@ msgid ""
 "A tag on line %(line)s is missing one or more required attributes. (Line "
 "starts with \"%(start)s\".)"
 msgstr ""
-"ტეგში %(line)s ხაზზე ერთი ან რამდენიმე ატრიბუტი გამოტოვებულია. (სტრიქონი იწყება "
-"ტექსტით: \"%(start)s\".)"
+"ტეგში %(line)s ხაზზე ერთი ან რამდენიმე ატრიბუტი გამოტოვებულია. (სტრიქონი "
+"იწყება ტექსტით: \"%(start)s\".)"
 
 #: core/validators.py:595
 #, python-format
@@ -3876,7 +4011,7 @@ msgid "%(optname)s with this %(fieldname)s already exists."
 msgstr "%(optname)s მოცემული %(fieldname)s-ით უკვე არსებობს."
 
 #: db/models/fields/__init__.py:161 db/models/fields/__init__.py:318
-#: db/models/fields/__init__.py:735 db/models/fields/__init__.py:746
+#: db/models/fields/__init__.py:750 db/models/fields/__init__.py:761
 #: newforms/fields.py:45 oldforms/__init__.py:374
 msgid "This field is required."
 msgstr "ეს ველი აუცილებელია."
@@ -3885,23 +4020,23 @@ msgstr "ეს ველი აუცილებელია."
 msgid "This value must be an integer."
 msgstr "ეს მნიშვნელობა უნდა იყოს მთელი."
 
-#: db/models/fields/__init__.py:454
+#: db/models/fields/__init__.py:457
 msgid "This value must be either True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს True ან False."
 
-#: db/models/fields/__init__.py:475
+#: db/models/fields/__init__.py:481
 msgid "This field cannot be null."
 msgstr "ეს მნიშვნელობა არ შეიძლება იყოს null."
 
-#: db/models/fields/__init__.py:644
+#: db/models/fields/__init__.py:659
 msgid "This value must be a decimal number."
 msgstr "ეს მნიშვნელობა უნდა იყოს ათობითი რიცხვი."
 
-#: db/models/fields/__init__.py:755
+#: db/models/fields/__init__.py:770
 msgid "Enter a valid filename."
 msgstr "შეიყვანეთ სწორი ფაილის სახელი."
 
-#: db/models/fields/__init__.py:908
+#: db/models/fields/__init__.py:941
 msgid "This value must be either None, True or False."
 msgstr "ეს მნიშვნელობა უნდა იყოს None, True ან False."
 
@@ -3918,15 +4053,18 @@ msgstr "გამოყავით ID-ები მძიმეებით."
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"დააჭირეთ \"Control\", ან \"Command\" Mac-ზე, ერთზე მეტი მნიშვნელობის ასარჩევად."
+"დააჭირეთ \"Control\", ან \"Command\" Mac-ზე, ერთზე მეტი მნიშვნელობის "
+"ასარჩევად."
 
 #: db/models/fields/related.py:707
 #, python-format
 msgid "Please enter valid %(self)s IDs. The value %(value)r is invalid."
 msgid_plural ""
 "Please enter valid %(self)s IDs. The values %(value)r are invalid."
-msgstr[0] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობა %(value)r არასწორია."
-msgstr[1] "გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
+msgstr[0] ""
+"გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობა %(value)r არასწორია."
+msgstr[1] ""
+"გთხოვთ, შეიყვანოთ სწორი %(self)s ID-ები. მნიშვნელობები %(value)r არასწორია."
 
 #: newforms/fields.py:46
 msgid "Enter a valid value."
@@ -3935,12 +4073,16 @@ msgstr "შეიყვანეთ სწორი მნიშვნელო�
 #: newforms/fields.py:123
 #, python-format
 msgid "Ensure this value has at most %(max)d characters (it has %(length)d)."
-msgstr "დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა მისი სიგრძეა %(length)d)."
+msgstr ""
+"დარწმუნდით, რომ მნიშვნელობა შედგება არაუმეტეს %(max)d სიმბოლოსაგან (ახლა "
+"მისი სიგრძეა %(length)d)."
 
 #: newforms/fields.py:124
 #, python-format
 msgid "Ensure this value has at least %(min)d characters (it has %(length)d)."
-msgstr "დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა მისი სიგრძეა %(length)d)."
+msgstr ""
+"დარწმუნდით, რომ მნიშვნელობა შედგება არანაკლებ %(min)d სიმბოლოსაგან (ახლა "
+"მისი სიგრძეა %(length)d)."
 
 #: newforms/fields.py:152 newforms/fields.py:181 newforms/fields.py:210
 #, python-format
@@ -3999,7 +4141,7 @@ msgstr "შეიყვანეთ სწორი URL."
 msgid "This URL appears to be a broken link."
 msgstr "როგორც ჩანს, URL არის გაწყვეტილი ბმული."
 
-#: newforms/fields.py:559 newforms/models.py:317
+#: newforms/fields.py:559 newforms/models.py:300
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. ეს არჩევანი დასაშვები არ არის."
 
@@ -4008,7 +4150,7 @@ msgstr "აირჩიეთ დასაშვები მნიშვნე�
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %(value)s დასაშვები არ არის."
 
-#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:377
+#: newforms/fields.py:599 newforms/fields.py:661 newforms/models.py:360
 msgid "Enter a list of values."
 msgstr "შეიყვანეთ მნიშვნელობების სია."
 
@@ -4016,7 +4158,7 @@ msgstr "შეიყვანეთ მნიშვნელობების �
 msgid "Enter a valid IPv4 address."
 msgstr "შეიყვანეთ სწორი IPv4 მისამართი."
 
-#: newforms/models.py:378
+#: newforms/models.py:361
 #, python-format
 msgid "Select a valid choice. %s is not one of the available choices."
 msgstr "აირჩიეთ დასაშვები მნიშვნელობა. %s დასაშვები არ არის."
@@ -4035,7 +4177,9 @@ msgstr "ახალ ხაზზე გადასვლა აქ დაუ�
 #: oldforms/__init__.py:512 oldforms/__init__.py:586 oldforms/__init__.py:625
 #, python-format
 msgid "Select a valid choice; '%(data)s' is not in %(choices)s."
-msgstr "აირჩიეთ დასაშვები მნიშვნელობა; '%(data)s' არ არის %(choices)s მნიშვნელობების სიაში."
+msgstr ""
+"აირჩიეთ დასაშვები მნიშვნელობა; '%(data)s' არ არის %(choices)s მნიშვნელობების "
+"სიაში."
 
 #: oldforms/__init__.py:745
 msgid "Enter a whole number between -32,768 and 32,767."
@@ -4333,23 +4477,23 @@ msgstr ""
 msgid ", %(number)d %(type)s"
 msgstr ""
 
-#: utils/translation/trans_real.py:399
+#: utils/translation/trans_real.py:404
 msgid "DATE_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:400
+#: utils/translation/trans_real.py:405
 msgid "DATETIME_FORMAT"
 msgstr "d.m.Y H:i"
 
-#: utils/translation/trans_real.py:401
+#: utils/translation/trans_real.py:406
 msgid "TIME_FORMAT"
 msgstr "H:i"
 
-#: utils/translation/trans_real.py:417
+#: utils/translation/trans_real.py:422
 msgid "YEAR_MONTH_FORMAT"
 msgstr "d.m.Y"
 
-#: utils/translation/trans_real.py:418
+#: utils/translation/trans_real.py:423
 msgid "MONTH_DAY_FORMAT"
 msgstr "d.m.Y"
 
