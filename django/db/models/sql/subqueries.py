@@ -1,7 +1,6 @@
 """
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
-from copy import deepcopy
 
 from django.contrib.contenttypes import generic
 from django.core.exceptions import FieldError
@@ -159,20 +158,9 @@ class UpdateQuery(Query):
         # We need to use a sub-select in the where clause to filter on things
         # from other tables.
         query = self.clone(klass=Query)
-        main_alias = query.tables[0]
-        if count != 1:
-            query.unref_alias(main_alias)
-        if query.alias_map[main_alias][ALIAS_REFCOUNT]:
-            alias = '%s0' % self.alias_prefix
-            query.change_alias(main_alias, alias)
-            col = query.model._meta.pk.column
-        else:
-            for model in query.model._meta.get_parent_list():
-                for alias in query.table_map.get(model._meta.db_table, []):
-                    if query.alias_map[alias][ALIAS_REFCOUNT]:
-                        col = model._meta.pk.column
-                        break
-        query.add_local_columns([col])
+        alias = '%s0' % self.alias_prefix
+        query.change_alias(query.tables[0], alias)
+        self.add_local_columns([query.model._meta.pk.column])
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).
