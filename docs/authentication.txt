@@ -666,29 +666,29 @@ successful login.
     * ``login_url``: The URL of the login page to redirect to. This
       will default to ``settings.LOGIN_URL`` if not supplied.
 
-Built-in manipulators
----------------------
+Built-in forms
+--------------
+
+**New in Django development version.**
 
 If you don't want to use the built-in views, but want the convenience
-of not having to write manipulators for this functionality, the
-authentication system provides several built-in manipulators:
+of not having to write forms for this functionality, the authentication
+system provides several built-in forms:
 
-    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: A
-      manipulator used in the admin interface to change a user's
-      password.
+    * ``django.contrib.auth.forms.AdminPasswordChangeForm``: A form used in
+      the admin interface to change a user's password.
 
-    * ``django.contrib.auth.forms.AuthenticationForm``: A manipulator
-      for logging a user in.
+    * ``django.contrib.auth.forms.AuthenticationForm``: A form for logging a
+      user in.
 
-    * ``django.contrib.auth.forms.PasswordChangeForm``: A manipulator
-      for allowing a user to change their password.
+    * ``django.contrib.auth.forms.PasswordChangeForm``: A form for allowing a
+      user to change their password.
 
-    * ``django.contrib.auth.forms.PasswordResetForm``: A manipulator
-      for resetting a user's password and emailing the new password to
-      them.
+    * ``django.contrib.auth.forms.PasswordResetForm``: A form for resetting a
+      user's password and emailing the new password to them.
 
-    * ``django.contrib.auth.forms.UserCreationForm``: A manipulator
-      for creating a new user.
+    * ``django.contrib.auth.forms.UserCreationForm``: A form for creating a
+      new user.
 
 Limiting access to logged-in users that pass a test
 ---------------------------------------------------

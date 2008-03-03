@@ -1,5 +1,6 @@
-"""
->>> from models import User, AnonymousUser
+
+BASIC_TESTS = """
+>>> from django.contrib.auth.models import User, AnonymousUser
 >>> u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
 >>> u.has_usable_password()
 True

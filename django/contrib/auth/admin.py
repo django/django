@@ -27,12 +27,10 @@ class UserAdmin(admin.ModelAdmin):
     def add_view(self, request):
         if not self.has_change_permission(request):
             raise PermissionDenied
-        manipulator = UserCreationForm()
         if request.method == 'POST':
-            new_data = request.POST.copy()
-            errors = manipulator.get_validation_errors(new_data)
-            if not errors:
-                new_user = manipulator.save(new_data)
+            form = UserCreationForm(request.POST)
+            if form.is_valid():
+                new_user = form.save()
                 msg = _('The %(name)s "%(obj)s" was added successfully.') % {'name': 'user', 'obj': new_user}
                 if "_addanother" in request.POST:
                     request.user.message_set.create(message=msg)
@@ -41,8 +39,7 @@ class UserAdmin(admin.ModelAdmin):
                     request.user.message_set.create(message=msg + ' ' + ugettext("You may edit it again below."))
                     return HttpResponseRedirect('../%s/' % new_user.id)
         else:
-            errors = new_data = {}
-        form = oldforms.FormWrapper(manipulator, new_data, errors)
+            form = UserCreationForm()
         return render_to_response('admin/auth/user/add_form.html', {
             'title': _('Add user'),
             'form': form,

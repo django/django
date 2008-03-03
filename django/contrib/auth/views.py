@@ -1,7 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordResetForm, PasswordChangeForm, AdminPasswordChangeForm
 from django.core.exceptions import PermissionDenied
-from django import oldforms
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib.sites.models import Site, RequestSite
@@ -14,30 +13,27 @@ from django.contrib.auth.models import User
 
 def login(request, template_name='registration/login.html', redirect_field_name=REDIRECT_FIELD_NAME):
     "Displays the login form and handles the login action."
-    manipulator = AuthenticationForm(request)
     redirect_to = request.REQUEST.get(redirect_field_name, '')
-    if request.POST:
-        errors = manipulator.get_validation_errors(request.POST)
-        if not errors:
+    if request.method == "POST":
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
             # Light security check -- make sure redirect_to isn't garbage.
             if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
                 from django.conf import settings
                 redirect_to = settings.LOGIN_REDIRECT_URL
             from django.contrib.auth import login
-            login(request, manipulator.get_user())
+            login(request, form.get_user())
             request.session.delete_test_cookie()
             return HttpResponseRedirect(redirect_to)
     else:
-        errors = {}
+        form = AuthenticationForm(request)
     request.session.set_test_cookie()
-
     if Site._meta.installed:
         current_site = Site.objects.get_current()
     else:
         current_site = RequestSite(request)
-
     return render_to_response(template_name, {
-        'form': oldforms.FormWrapper(manipulator, request.POST, errors),
+        'form': form,
         redirect_field_name: redirect_to,
         'site_name': current_site.name,
     }, context_instance=RequestContext(request))
@@ -68,55 +64,54 @@ def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_N
 
 def password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html',
         email_template_name='registration/password_reset_email.html'):
-    new_data, errors = {}, {}
-    form = PasswordResetForm()
-    if request.POST:
-        new_data = request.POST.copy()
-        errors = form.get_validation_errors(new_data)
-        if not errors:
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
             if is_admin_site:
                 form.save(domain_override=request.META['HTTP_HOST'])
             else:
                 form.save(email_template_name=email_template_name)
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
-        context_instance=RequestContext(request))
+    else:
+        form = PasswordResetForm()
+    return render_to_response(template_name, {
+        'form': form,
+    }, context_instance=RequestContext(request))
 
 def password_reset_done(request, template_name='registration/password_reset_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))
 
 def password_change(request, template_name='registration/password_change_form.html'):
-    new_data, errors = {}, {}
-    form = PasswordChangeForm(request.user)
-    if request.POST:
-        new_data = request.POST.copy()
-        errors = form.get_validation_errors(new_data)
-        if not errors:
-            form.save(new_data)
+    if request.method == "POST":
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
             return HttpResponseRedirect('%sdone/' % request.path)
-    return render_to_response(template_name, {'form': oldforms.FormWrapper(form, new_data, errors)},
-        context_instance=RequestContext(request))
+    else:
+        form = PasswordChangeForm(request.user)
+    return render_to_response(template_name, {
+        'form': form,
+    }, context_instance=RequestContext(request))
 password_change = login_required(password_change)
 
 def password_change_done(request, template_name='registration/password_change_done.html'):
     return render_to_response(template_name, context_instance=RequestContext(request))
 
+# TODO: move to admin.py in the ModelAdmin
 def user_change_password(request, id):
+    from django import oldforms
     if not request.user.has_perm('auth.change_user'):
         raise PermissionDenied
     user = get_object_or_404(User, pk=id)
-    manipulator = AdminPasswordChangeForm(user)
     if request.method == 'POST':
-        new_data = request.POST.copy()
-        errors = manipulator.get_validation_errors(new_data)
-        if not errors:
-            new_user = manipulator.save(new_data)
+        form = AdminPasswordChangeForm(user, request.POST)
+        if form.is_valid():
+            new_user = form.save()
             msg = _('Password changed successfully.')
             request.user.message_set.create(message=msg)
             return HttpResponseRedirect('..')
     else:
-        errors = new_data = {}
-    form = oldforms.FormWrapper(manipulator, new_data, errors)
+        form = AdminPasswordChangeForm(user)
     return render_to_response('admin/auth/user/change_password.html', {
         'title': _('Change password: %s') % escape(user.username),
         'form': form,

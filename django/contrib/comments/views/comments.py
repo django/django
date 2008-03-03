@@ -17,6 +17,47 @@ import base64, datetime
 
 COMMENTS_PER_PAGE = 20
 
+class AuthenticationForm(oldforms.Manipulator):
+    """
+    Base class for authenticating users. Extend this to get a form that accepts
+    username/password logins.
+    """
+    def __init__(self, request=None):
+        """
+        If request is passed in, the manipulator will validate that cookies are
+        enabled. Note that the request (a HttpRequest object) must have set a
+        cookie with the key TEST_COOKIE_NAME and value TEST_COOKIE_VALUE before
+        running this validator.
+        """
+        self.request = request
+        self.fields = [
+            oldforms.TextField(field_name="username", length=15, max_length=30, is_required=True,
+                validator_list=[self.isValidUser, self.hasCookiesEnabled]),
+            oldforms.PasswordField(field_name="password", length=15, max_length=30, is_required=True),
+        ]
+        self.user_cache = None
+
+    def hasCookiesEnabled(self, field_data, all_data):
+        if self.request and not self.request.session.test_cookie_worked():
+            raise validators.ValidationError, _("Your Web browser doesn't appear to have cookies enabled. Cookies are required for logging in.")
+
+    def isValidUser(self, field_data, all_data):
+        username = field_data
+        password = all_data.get('password', None)
+        self.user_cache = authenticate(username=username, password=password)
+        if self.user_cache is None:
+            raise validators.ValidationError, _("Please enter a correct username and password. Note that both fields are case-sensitive.")
+        elif not self.user_cache.is_active:
+            raise validators.ValidationError, _("This account is inactive.")
+
+    def get_user_id(self):
+        if self.user_cache:
+            return self.user_cache.id
+        return None
+
+    def get_user(self):
+        return self.user_cache
+
 class PublicCommentManipulator(AuthenticationForm):
     "Manipulator that handles public registered comments"
     def __init__(self, user, ratings_required, ratings_range, num_rating_choices):
