@@ -703,7 +703,7 @@ msgstr ""
 
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Otrzymałeś email gdyż zarządałeś zresetowania hasła"
+msgstr "Otrzymałeś email gdyż zażądałeś zresetowania hasła"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
