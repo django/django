@@ -99,7 +99,6 @@ def password_change_done(request, template_name='registration/password_change_do
 
 # TODO: move to admin.py in the ModelAdmin
 def user_change_password(request, id):
-    from django import oldforms
     if not request.user.has_perm('auth.change_user'):
         raise PermissionDenied
     user = get_object_or_404(User, pk=id)
