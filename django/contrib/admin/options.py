@@ -383,9 +383,7 @@ class ModelAdmin(BaseModelAdmin):
                 post_url_continue += "?_popup=1"
             return HttpResponseRedirect(post_url_continue % pk_value)
         if request.POST.has_key("_popup"):
-            if type(pk_value) is str: # Quote if string, so JavaScript doesn't think it's a variable.
-                pk_value = '"%s"' % pk_value.replace('"', '\\"')
-            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, %s, "%s");</script>' % \
+            return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script>' % \
                 # escape() calls force_unicode.
                 (escape(pk_value), escape(new_object)))
         elif request.POST.has_key("_addanother"):
