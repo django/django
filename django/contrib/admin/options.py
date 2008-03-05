@@ -145,11 +145,6 @@ class BaseModelAdmin(object):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        # For ManyToManyFields with a filter interface, use a special widget.
-        if isinstance(db_field, models.ManyToManyField) and db_field.name in (self.filter_vertical + self.filter_horizontal):
-            kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
-            return db_field.formfield(**kwargs)
-
         # For DateTimeFields, use a special field and widget.
         if isinstance(db_field, models.DateTimeField):
             kwargs['form_class'] = forms.SplitDateTimeField
@@ -176,9 +171,12 @@ class BaseModelAdmin(object):
             if isinstance(db_field, models.ForeignKey) and db_field.name in self.raw_id_fields:
                 kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.rel)
             else:
-                if isinstance(db_field, models.ManyToManyField) and db_field.name in self.raw_id_fields:
-                    kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
-                    kwargs['help_text'] = ''
+                if isinstance(db_field, models.ManyToManyField):
+                    if db_field.name in self.raw_id_fields:
+                        kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.rel)
+                        kwargs['help_text'] = ''
+                    elif db_field.name in (self.filter_vertical + self.filter_horizontal):
+                        kwargs['widget'] = widgets.FilteredSelectMultiple(db_field.verbose_name, (db_field.name in self.filter_vertical))
             # Wrap the widget's render() method with a method that adds
             # extra HTML to the end of the rendered output.
             formfield = db_field.formfield(**kwargs)
