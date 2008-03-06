@@ -983,7 +983,7 @@ Notes:
       exception. It should fail silently, just as template filters should.
 
 Ultimately, this decoupling of compilation and rendering results in an
-efficient template system, because a template can render multiple context
+efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.
 
 Auto-escaping considerations
