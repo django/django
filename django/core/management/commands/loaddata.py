@@ -108,10 +108,12 @@ class Command(BaseCommand):
                                 transaction.rollback()
                                 transaction.leave_transaction_management()
                                 if show_traceback:
-                                    raise
-                                sys.stderr.write(
-                                    self.style.ERROR("Problem installing fixture '%s': %s\n" %
-                                         (full_path, str(e))))
+                                    import traceback
+                                    traceback.print_exc()
+                                else:
+                                    sys.stderr.write(
+                                        self.style.ERROR("Problem installing fixture '%s': %s\n" %
+                                             (full_path, str(e))))
                                 return
                             fixture.close()
                     except:
