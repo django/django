@@ -13,7 +13,7 @@ META:{}>
 GET:<QueryDict: {}>,
 POST:<QueryDict: {}>,
 COOKIES:{},
-META:{'REQUEST_METHOD': 'bogus', 'PATH_INFO': 'bogus'}>
+META:{...}>
 
 >>> from django.core.handlers.modpython import ModPythonRequest
 >>> class FakeModPythonRequest(ModPythonRequest):
