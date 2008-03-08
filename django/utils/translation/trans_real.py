@@ -1,4 +1,4 @@
-"Translation helper functions"
+"""Translation helper functions."""
 
 import locale
 import os
@@ -7,7 +7,6 @@ import sys
 import gettext as gettext_module
 from cStringIO import StringIO
 
-from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe, SafeData
 
 try:
@@ -30,7 +29,7 @@ _active = {}
 # The default translation is based on the settings file.
 _default = None
 
-# This is a cache for normalised accept-header languages to prevent multiple
+# This is a cache for normalized accept-header languages to prevent multiple
 # file lookups when checking the same locale on repeated requests.
 _accepted = {}
 
@@ -56,7 +55,7 @@ def to_locale(language, to_lower=False):
         return language.lower()
 
 def to_language(locale):
-    "Turns a locale name (en_US) into a language name (en-us)."
+    """Turns a locale name (en_US) into a language name (en-us)."""
     p = locale.find('_')
     if p >= 0:
         return locale[:p].lower()+'-'+locale[p+1:].lower()
@@ -229,7 +228,7 @@ def deactivate_all():
     _active[currentThread()] = gettext_module.NullTranslations()
 
 def get_language():
-    "Returns the currently selected language."
+    """Returns the currently selected language."""
     t = _active.get(currentThread(), None)
     if t is not None:
         try:
@@ -251,7 +250,7 @@ def get_language_bidi():
 
 def catalog():
     """
-    This function returns the current active catalog for further processing.
+    Returns the current active catalog for further processing.
     This can be used if you need to modify the catalog or want to access the
     whole message catalog instead of just translating one string.
     """
@@ -374,7 +373,7 @@ def get_language_from_request(request):
         normalized = locale.locale_alias.get(to_locale(accept_lang, True))
         if not normalized:
             continue
-        # Remove the default encoding from locale_alias
+        # Remove the default encoding from locale_alias.
         normalized = normalized.split('.')[0]
 
         if normalized in _accepted:
@@ -396,9 +395,9 @@ def get_language_from_request(request):
 
 def get_date_formats():
     """
-    This function checks whether translation files provide a translation for some
-    technical message ID to store date and time formats. If it doesn't contain
-    one, the formats provided in the settings will be used.
+    Checks whether translation files provide a translation for some technical
+    message ID to store date and time formats. If it doesn't contain one, the
+    formats provided in the settings will be used.
     """
     from django.conf import settings
     date_format = ugettext('DATE_FORMAT')
@@ -414,9 +413,9 @@ def get_date_formats():
 
 def get_partial_date_formats():
     """
-    This function checks whether translation files provide a translation for some
-    technical message ID to store partial date formats. If it doesn't contain
-    one, the formats provided in the settings will be used.
+    Checks whether translation files provide a translation for some technical
+    message ID to store partial date formats. If it doesn't contain one, the
+    formats provided in the settings will be used.
     """
     from django.conf import settings
     year_month_format = ugettext('YEAR_MONTH_FORMAT')
@@ -440,6 +439,7 @@ block_re = re.compile(r"""^\s*blocktrans(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+
 def templatize(src):
     """
     Turns a Django template into something that is understood by xgettext. It
@@ -475,7 +475,7 @@ def templatize(src):
                 elif pluralmatch:
                     inplural = True
                 else:
-                    raise SyntaxError, "Translation blocks must not include other block tags: %s" % t.contents
+                    raise SyntaxError("Translation blocks must not include other block tags: %s" % t.contents)
             elif t.token_type == TOKEN_VAR:
                 if inplural:
                     plural.append('%%(%s)s' % t.contents)
@@ -541,4 +541,3 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(lambda x, y: -cmp(x[1], y[1]))
     return result
-
