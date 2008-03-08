@@ -314,12 +314,18 @@ class HttpResponse(object):
     def get(self, header, alternate):
         return self._headers.get(header.lower(), (None, alternate))[1]
 
-    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=None):
+    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=False):
         self.cookies[key] = value
-        for var in ('max_age', 'path', 'domain', 'secure', 'expires'):
-            val = locals()[var]
-            if val is not None:
-                self.cookies[key][var.replace('_', '-')] = val
+        if max_age is not None:
+            self.cookies[key]['max-age'] = max_age
+        if expires is not None:
+            self.cookies[key]['expires'] = expires
+        if path is not None:
+            self.cookies[key]['path'] = path
+        if domain is not None:
+            self.cookies[key]['domain'] = domain
+        if secure:
+            self.cookies[key]['secure'] = True
 
     def delete_cookie(self, key, path='/', domain=None):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
