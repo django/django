@@ -3,23 +3,25 @@ from Cookie import SimpleCookie
 from pprint import pformat
 from urllib import urlencode
 from urlparse import urljoin
-from django.utils.datastructures import MultiValueDict, FileDict
-from django.utils.encoding import smart_str, iri_to_uri, force_unicode
-from utils import *
-
-RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
-
 try:
     # The mod_python version is more efficient, so try importing it first.
     from mod_python.util import parse_qsl
 except ImportError:
     from cgi import parse_qsl
 
+from django.utils.datastructures import MultiValueDict, FileDict
+from django.utils.encoding import smart_str, iri_to_uri, force_unicode
+
+from utils import *
+
+RESERVED_CHARS="!*'();:@&=+$,/?%#[]"
+
+
 class Http404(Exception):
     pass
 
 class HttpRequest(object):
-    "A basic HTTP request"
+    """A basic HTTP request."""
 
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
@@ -46,7 +48,7 @@ class HttpRequest(object):
     __contains__ = has_key
 
     def get_host(self):
-        "Returns the HTTP host using the environment or request headers."
+        """Returns the HTTP host using the environment or request headers."""
         # We try three options, in order of decreasing preference.
         if 'HTTP_X_FORWARDED_HOST' in self.META:
             host = self.META['HTTP_X_FORWARDED_HOST']
@@ -98,7 +100,7 @@ class HttpRequest(object):
     encoding = property(_get_encoding, _set_encoding)
 
 def parse_file_upload(header_dict, post_data):
-    "Returns a tuple of (POST QueryDict, FILES MultiValueDict)"
+    """Returns a tuple of (POST QueryDict, FILES MultiValueDict)."""
     import email, email.Message
     from cgi import parse_header
     raw_message = '\r\n'.join(['%s:%s' % pair for pair in header_dict.items()])
@@ -130,6 +132,7 @@ def parse_file_upload(header_dict, post_data):
                 POST.appendlist(name_dict['name'], submessage.get_payload())
     return POST, FILES
 
+
 class QueryDict(MultiValueDict):
     """
     A specialized MultiValueDict that takes a query string when initialized.
@@ -148,12 +151,13 @@ class QueryDict(MultiValueDict):
         self.encoding = encoding
         self._mutable = True
         for key, value in parse_qsl((query_string or ''), True): # keep_blank_values=True
-            self.appendlist(force_unicode(key, encoding, errors='replace'), force_unicode(value, encoding, errors='replace'))
+            self.appendlist(force_unicode(key, encoding, errors='replace'),
+                            force_unicode(value, encoding, errors='replace'))
         self._mutable = mutable
 
     def _assert_mutable(self):
         if not self._mutable:
-            raise AttributeError, "This QueryDict instance is immutable"
+            raise AttributeError("This QueryDict instance is immutable")
 
     def __setitem__(self, key, value):
         self._assert_mutable()
@@ -222,7 +226,7 @@ class QueryDict(MultiValueDict):
         return MultiValueDict.setdefault(self, key, default)
 
     def copy(self):
-        "Returns a mutable copy of this object."
+        """Returns a mutable copy of this object."""
         return self.__deepcopy__({})
 
     def urlencode(self):
@@ -243,7 +247,7 @@ def parse_cookie(cookie):
     return cookiedict
 
 class HttpResponse(object):
-    "A basic HTTP response, with content and dictionary-accessed headers"
+    """A basic HTTP response, with content and dictionary-accessed headers."""
 
     status_code = 200
 
@@ -272,13 +276,13 @@ class HttpResponse(object):
         self._headers = {'content-type': ('Content-Type', content_type)}
 
     def __str__(self):
-        "Full HTTP message, including headers"
+        """Full HTTP message, including headers."""
         return '\n'.join(['%s: %s' % (key, value)
             for key, value in self._headers.values()]) \
             + '\n\n' + self.content
 
     def _convert_to_ascii(self, *values):
-        "Convert all values to ascii strings"
+        """Converts all values to ascii strings."""
         for value in values:
             if isinstance(value, unicode):
                 try:
@@ -303,7 +307,7 @@ class HttpResponse(object):
         return self._headers[header.lower()][1]
 
     def has_header(self, header):
-        "Case-insensitive check for a header"
+        """Case-insensitive check for a header."""
         return self._headers.has_key(header.lower())
 
     __contains__ = has_header
@@ -314,7 +318,8 @@ class HttpResponse(object):
     def get(self, header, alternate):
         return self._headers.get(header.lower(), (None, alternate))[1]
 
-    def set_cookie(self, key, value='', max_age=None, expires=None, path='/', domain=None, secure=False):
+    def set_cookie(self, key, value='', max_age=None, expires=None, path='/',
+                   domain=None, secure=False):
         self.cookies[key] = value
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
@@ -329,7 +334,7 @@ class HttpResponse(object):
 
     def delete_cookie(self, key, path='/', domain=None):
         self.set_cookie(key, max_age=0, path=path, domain=domain,
-                expires='Thu, 01-Jan-1970 00:00:00 GMT')
+                        expires='Thu, 01-Jan-1970 00:00:00 GMT')
 
     def _get_content(self):
         if self.has_header('Content-Encoding'):
@@ -360,7 +365,7 @@ class HttpResponse(object):
     # See http://docs.python.org/lib/bltin-file-objects.html
     def write(self, content):
         if not self._is_string:
-            raise Exception, "This %s instance is not writable" % self.__class__
+            raise Exception("This %s instance is not writable" % self.__class__)
         self._container.append(content)
 
     def flush(self):
@@ -368,7 +373,7 @@ class HttpResponse(object):
 
     def tell(self):
         if not self._is_string:
-            raise Exception, "This %s instance cannot tell its position" % self.__class__
+            raise Exception("This %s instance cannot tell its position" % self.__class__)
         return sum([len(chunk) for chunk in self._container])
 
 class HttpResponseRedirect(HttpResponse):
@@ -425,7 +430,7 @@ def get_host(request):
 # this slightly more restricted function.
 def str_to_unicode(s, encoding):
     """
-    Convert basestring objects to unicode, using the given encoding. Illegaly
+    Converts basestring objects to unicode, using the given encoding. Illegally
     encoded input characters are replaced with Unicode "unknown" codepoint
     (\ufffd).
 
@@ -435,4 +440,3 @@ def str_to_unicode(s, encoding):
         return unicode(s, encoding, 'replace')
     else:
         return s
-
