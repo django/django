@@ -8,8 +8,7 @@
  converting to another coordinate system (e.g. WGS84), and then inserting
  into a GeoDjango model.
 
- This utility is still in early stages of development, so its usage
- is subject to change -- please report any bugs.
+ Please report any bugs encountered using this utility.
 
  Requirements:  OGR C Library (from GDAL) required.
 
@@ -111,7 +110,7 @@ import sys
 from datetime import date, datetime
 from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models import GeometryField
 from django.contrib.gis.db.backend import SpatialBackend
 from django.contrib.gis.gdal import CoordTransform, DataSource, \
     OGRException, OGRGeometry, OGRGeomType, SpatialReference
@@ -140,16 +139,21 @@ class LayerMapping(object):
     # counterparts.
     FIELD_TYPES = {
         models.AutoField : OFTInteger,
-        models.IntegerField : (OFTInteger, OFTReal),
+        models.IntegerField : (OFTInteger, OFTReal, OFTString),
         models.FloatField : (OFTInteger, OFTReal),
         models.DateField : OFTDate,
         models.DateTimeField : OFTDateTime,
+        models.EmailField : OFTString,
         models.TimeField : OFTTime,
         models.DecimalField : (OFTInteger, OFTReal),
         models.CharField : OFTString,
+        models.SlugField : OFTString,
         models.TextField : OFTString,
-        models.SmallIntegerField : (OFTInteger, OFTReal),
-        models.PositiveSmallIntegerField : (OFTInteger, OFTReal),
+        models.URLField : OFTString,
+        models.USStateField : OFTString,
+        models.XMLField : OFTString,
+        models.SmallIntegerField : (OFTInteger, OFTReal, OFTString),
+        models.PositiveSmallIntegerField : (OFTInteger, OFTReal, OFTString),
         }
 
     # The acceptable transaction modes.
@@ -310,11 +314,12 @@ class LayerMapping(object):
 
                 # Is the OGR field in the Layer?
                 idx = check_ogr_fld(ogr_name)
-                
+                ogr_field = ogr_field_types[idx]
+
                 # Can the OGR field type be mapped to the Django field type?
-                if not issubclass(ogr_field_types[idx], self.FIELD_TYPES[model_field.__class__]):
+                if not issubclass(ogr_field, self.FIELD_TYPES[model_field.__class__]):
                     raise LayerMapError('OGR field "%s" (of type %s) cannot be mapped to Django %s.' % 
-                                        (ogr_field, ogr_field_types[idx].__name__, fld_name))
+                                        (ogr_field, ogr_field.__name__, fld_name))
                 fields_val = model_field
         
             self.fields[field_name] = fields_val
@@ -397,7 +402,8 @@ class LayerMapping(object):
         model field.  If they are, the verified value is returned, 
         otherwise the proper exception is raised.
         """
-        if isinstance(ogr_field, OFTString):
+        if (isinstance(ogr_field, OFTString) and 
+            isinstance(model_field, (models.CharField, models.TextField))): 
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
@@ -435,9 +441,8 @@ class LayerMapping(object):
                 raise InvalidDecimal('A DecimalField with max_digits %d, decimal_places %d must round to an absolute value less than 10^%d.' %
                                      (model_field.max_digits, model_field.decimal_places, max_prec))
             val = d
-        elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.IntegerField):
-            # If there's an OFTReal field with precision greater than 0 is mapped to
-            # an IntegerField, the decimal places will be truncated.
+        elif isinstance(ogr_field, (OFTReal, OFTString)) and isinstance(model_field, models.IntegerField):
+            # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
             try:
                 val = int(ogr_field.value)
             except:
