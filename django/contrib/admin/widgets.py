@@ -72,7 +72,8 @@ class AdminFileWidget(forms.FileInput):
         from django.conf import settings
         output = []
         if value:
-            output.append('Currently: <a target="_blank" href="%s%s">%s</a> <br>Change: ' % (settings.MEDIA_URL, value, value))
+            output.append('%s <a target="_blank" href="%s%s">%s</a> <br />%s ' % \
+                (_('Currently:'), settings.MEDIA_URL, value, value, _('Change:')))
         output.append(super(AdminFileWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
 

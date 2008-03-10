@@ -28,7 +28,7 @@ HTML escaped.
 
 >>> w = AdminFileWidget()
 >>> print conditional_escape(w.render('test', 'test'))
-Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br>Change: <input type="file" name="test" />
+Currently: <a target="_blank" href="%(MEDIA_URL)stest">test</a> <br />Change: <input type="file" name="test" />
 
 To test ForeignKeyRawIdWidget a user object must be created. Its pk is
 explicitly set to 100 to avoid having to potentially overmatch in the test.
