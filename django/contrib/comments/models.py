@@ -307,7 +307,7 @@ class FreeCommentAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('content_type', 'object_id', 'site')}),
         ('Content', {'fields': ('person_name', 'comment')}),
-        ('Meta', {'fields': ('submit_date', 'is_public', 'ip_address', 'approved')}),
+        ('Meta', {'fields': ('is_public', 'ip_address', 'approved')}),
     )
     list_display = ('person_name', 'submit_date', 'content_type', 'get_content_object')
     list_filter = ('submit_date',)
