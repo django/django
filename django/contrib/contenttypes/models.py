@@ -2,25 +2,49 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import smart_unicode
 
-CONTENT_TYPE_CACHE = {}
 class ContentTypeManager(models.Manager):
+
+    # Cache to avoid re-looking up ContentType objects all over the place.
+    # This cache is shared by all the get_for_* methods.
+    _cache = {}
+    
     def get_for_model(self, model):
         """
-        Returns the ContentType object for the given model, creating the
-        ContentType if necessary.
+        Returns the ContentType object for a given model, creating the
+        ContentType if necessary. Lookups are cached so that subsequent lookups
+        for the same model don't hit the database.
         """
         opts = model._meta
         key = (opts.app_label, opts.object_name.lower())
         try:
-            ct = CONTENT_TYPE_CACHE[key]
+            ct = self.__class__._cache[key]
         except KeyError:
-            # The smart_unicode() is needed around opts.verbose_name_raw because it might
-            # be a django.utils.functional.__proxy__ object.
-            ct, created = self.model._default_manager.get_or_create(app_label=key[0],
-                model=key[1], defaults={'name': smart_unicode(opts.verbose_name_raw)})
-            CONTENT_TYPE_CACHE[key] = ct
+            # Load or create the ContentType entry. The smart_unicode() is 
+            # needed around opts.verbose_name_raw because name_raw might be a
+            # django.utils.functional.__proxy__ object.
+            ct, created = self.get_or_create(
+                app_label = opts.app_label,
+                model = opts.object_name.lower(), 
+                defaults = {'name': smart_unicode(opts.verbose_name_raw)},
+            )
+            self._add_to_cache(ct)
+            
         return ct
-
+        
+    def get_for_id(self, id):
+        """
+        Lookup a ContentType by ID. Uses the same shared cache as get_for_model
+        (though ContentTypes are obviously not created on-the-fly by get_by_id).
+        """
+        try:
+            ct = self.__class__._cache[id]
+        except KeyError:
+            # This could raise a DoesNotExist; that's correct behavior and will
+            # make sure that only correct ctypes get stored in the cache dict.
+            ct = self.get(pk=id)
+            self._add_to_cache(ct)
+        return ct
+            
     def clear_cache(self):
         """
         Clear out the content-type cache. This needs to happen during database
@@ -28,14 +52,21 @@ class ContentTypeManager(models.Manager):
         django.contrib.contenttypes.management.update_contenttypes for where
         this gets called).
         """
-        global CONTENT_TYPE_CACHE
-        CONTENT_TYPE_CACHE = {}
+        self.__class__._cache.clear()
+        
+    def _add_to_cache(self, ct):
+        """Insert a ContentType into the cache."""
+        model = ct.model_class()
+        key = (model._meta.app_label, model._meta.object_name.lower())
+        self.__class__._cache[key] = ct
+        self.__class__._cache[ct.id] = ct
 
 class ContentType(models.Model):
     name = models.CharField(max_length=100)
     app_label = models.CharField(max_length=100)
     model = models.CharField(_('python model class name'), max_length=100)
     objects = ContentTypeManager()
+    
     class Meta:
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
