@@ -19,7 +19,7 @@
        {{ google.scripts }}
      </head>
      {{ google.body }}
-     <div id="{{ google.dom_id }}"></div>
+     <div id="{{ google.dom_id }}" style="width:600px;height:400px;"></div>
      </body>
      </html>
 
@@ -47,7 +47,7 @@
      body tag to load the generated javascript.  By default, returns:
      <body onload="gmap_load()" onunload="GUnload()">
 
-   - The `id` property returns the DOM id for the map.  Defaults to "map".
+   - The `dom_id` property returns the DOM id for the map.  Defaults to "map".
 
   The following attributes may be set or customized in your local settings:
    * GOOGLE_MAPS_API_KEY: String of your Google Maps API key.  These are tied to
@@ -56,5 +56,6 @@
    * GOOGLE_MAPS_URL (optional): Must have a substitution ('%s') for the API
       version.
 """
-from django.contrib.gis.maps.google.gmap import GoogleMap
+from django.contrib.gis.maps.google.gmap import GoogleMap, GZOOM
+from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline
 from django.contrib.gis.maps.google.zoom import GoogleZoom

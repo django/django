@@ -99,7 +99,7 @@ class GoogleZoom(object):
     def pixel_to_lonlat(self, px, zoom):
         "Converts a pixel to a longitude, latitude pair at the given zoom level."
         if len(px) != 2:
-            raise TypeError, 'Pixel should be a sequence of two elements.'
+            raise TypeError('Pixel should be a sequence of two elements.')
 
         # Getting the number of pixels for the given zoom level.
         npix = self._npix[zoom]
@@ -138,8 +138,8 @@ class GoogleZoom(object):
         "Returns the optimal Zoom level for the given geometry."
 
         # Checking the input type.
-        if not isinstance(geom, GEOSGeometry) and geom.srid == 4326:
-            raise TypeError, 'get_zoom() expects a GEOS Geometry with an SRID of 4326.'
+        if not isinstance(geom, GEOSGeometry) or geom.srid != 4326:
+            raise TypeError('get_zoom() expects a GEOS Geometry with an SRID of 4326.')
 
         # Getting the envelope for the geometry, and its associated width, height
         #  and centroid.
@@ -156,9 +156,9 @@ class GoogleZoom(object):
             #  zoom level.
             if (env_w > tile_w) or (env_h > tile_h):
                 if z == 0: 
-                    raise GoogleMapException, \
-                        'Geometry width and height should not exceed that of the Earth.'
+                    raise GoogleMapException('Geometry width and height should not exceed that of the Earth.')
                 return z-1
         
         # Otherwise, we've zoomed in to the max.
         return self._nzoom-1
+
