@@ -541,6 +541,13 @@ primary key if there is no ``Meta.ordering`` specified. For example::
 
 ...since the ``Blog`` model has no default ordering specified.
 
+You can only order by model fields that have a single value attached to them
+for each instance of the model. For example, non-relations, ``ForeignKey`` and
+``OneToOneField`` fields. Explicitly, you can't order by a ``ManyToManyField``
+or a reverse ``ForeignKey`` relation. There's no naturally correct ordering
+for many-valued fields and a lot of the alternatives are not psosible to
+express in SQL very efficiently.
+
 **New in Django development version:** If you don't want any ordering to be
 applied to a query, not even the default ordering, call ``order_by()`` with no
 parameters.

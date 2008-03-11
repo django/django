@@ -418,6 +418,13 @@ FieldError: Infinite loop caused by ordering.
 >>> Ranking.objects.all().order_by('rank')
 [<Ranking: 1: a3>, <Ranking: 2: a2>, <Ranking: 3: a1>]
 
+# Ordering by a many-valued attribute (e.g. a many-to-many or reverse
+# ForeignKey) doesn't make sense (there's no natural ordering).
+>>> Item.objects.all().order_by('tags')
+Traceback (most recent call last):
+...
+FieldError: Cannot order by many-valued field: 'tags'
+
 # If we replace the default ordering, Django adjusts the required tables
 # automatically. Item normally requires a join with Note to do the default
 # ordering, but that isn't needed here.

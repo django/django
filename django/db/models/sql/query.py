@@ -509,8 +509,10 @@ class Query(object):
         pieces = name.split(LOOKUP_SEP)
         if not alias:
             alias = self.get_initial_alias()
-        field, target, opts, joins = self.setup_joins(pieces, opts, alias,
-                False)
+        result = self.setup_joins(pieces, opts, alias, False, False)
+        if isinstance(result, int):
+            raise FieldError("Cannot order by many-valued field: '%s'" % name)
+        field, target, opts, joins = result
         alias = joins[-1][-1]
         col = target.column
 
