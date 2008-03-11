@@ -518,14 +518,14 @@ class Query(object):
 
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model.
-        if len(joins) > 1 and opts.ordering:
+        if field.rel and len(joins) > 1 and opts.ordering:
             # Firstly, avoid infinite loops.
             if not already_seen:
-                already_seen = {}
+                already_seen = set()
             join_tuple = tuple([tuple(j) for j in joins])
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
-            already_seen[join_tuple] = True
+            already_seen.add(join_tuple)
 
             results = []
             for item in opts.ordering:

@@ -407,6 +407,11 @@ Traceback (most recent call last):
 ...
 FieldError: Infinite loop caused by ordering.
 
+# ... but you can still order in a non-recursive fashion amongst linked fields
+# (the previous test failed because the default ordering was recursive).
+>>> LoopX.objects.all().order_by('y__x__id')
+[]
+
 # If the remote model does not have a default ordering, we order by its 'id'
 # field.
 >>> Item.objects.order_by('creator', 'name')
