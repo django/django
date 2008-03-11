@@ -91,8 +91,8 @@ LANGUAGES_BIDI = ("he", "ar", "fa")
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-
 LOCALE_PATHS = ()
+LANGUAGE_COOKIE_NAME = 'django_language'
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.

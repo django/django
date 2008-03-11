@@ -243,6 +243,10 @@ object::
     >>> f.cleaned_data
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
+.. note::
+    **New in Django development version** The ``cleaned_data`` attribute was
+    called ``clean_data`` in earlier releases.
+
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
 always cleans the input into a Unicode string. We'll cover the encoding
 implications later in this document.

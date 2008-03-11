@@ -6,7 +6,7 @@ from django.core import signals
 from django.core.handlers.base import BaseHandler
 from django.dispatch import dispatcher
 from django.utils import datastructures
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_unicode, smart_str
 
 # NOTE: do *not* import settings (or any module which eventually imports
 # settings) until after ModPythonHandler has been called; otherwise os.environ
@@ -36,8 +36,9 @@ class ModPythonRequest(http.HttpRequest):
             meta = pformat(self.META)
         except:
             meta = '<could not parse>'
-        return '<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' % \
-            (self.path, get, post, cookies, meta)
+        return smart_str(u'<ModPythonRequest\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
+                         (self.path, unicode(get), unicode(post),
+                          unicode(cookies), unicode(meta)))
 
     def get_full_path(self):
         return '%s%s' % (self.path, self._req.args and ('?' + self._req.args) or '')

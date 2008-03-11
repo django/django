@@ -6,7 +6,7 @@ try:
 except NameError: 
     from sets import Set as set # Python 2.3 fallback
  	
-class ModelBackend:
+class ModelBackend(object):
     """
     Authenticate against django.contrib.auth.models.User
     """

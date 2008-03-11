@@ -90,6 +90,8 @@ def sql_create(app, style):
         final_output.extend(output)
         for refto, refs in references.items():
             pending_references.setdefault(refto, []).extend(refs)
+            if refto in known_models:
+                final_output.extend(sql_for_pending_references(refto, style, pending_references))
         final_output.extend(sql_for_pending_references(model, style, pending_references))
         # Keep track of the fact that we've created the table for this model.
         known_models.add(model)
