@@ -16,6 +16,14 @@ class Node(object):
     default = 'DEFAULT'
 
     def __init__(self, children=None, connector=None, negated=False):
+        """
+        Constructs a new Node. If no connector is given, the default will be
+        used.
+
+        Warning: You probably don't want to pass in the 'negated' parameter. It
+        is NOT the same as constructing a node and calling negate() on the
+        result.
+        """
         self.children = children and children[:] or []
         self.connector = connector or self.default
         self.subtree_parents = []
@@ -63,6 +71,8 @@ class Node(object):
         Otherwise, the whole tree is pushed down one level and a new root
         connector is created, connecting the existing tree and the new node.
         """
+        if node in self.children:
+            return
         if len(self.children) < 2:
             self.connector = conn_type
         if self.connector == conn_type:
@@ -78,7 +88,10 @@ class Node(object):
 
     def negate(self):
         """
-        Negate the sense of the root connector.
+        Negate the sense of the root connector. This reorganises the children
+        so that the current node has a single child: a negated node containing
+        all the previous children. This slightly odd construction makes adding
+        new children behave more intuitively.
 
         Interpreting the meaning of this negate is up to client code. This
         method is useful for implementing "not" arrangements.

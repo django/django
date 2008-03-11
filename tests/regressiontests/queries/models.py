@@ -312,7 +312,7 @@ Bug #4510
 >>> Author.objects.filter(report__name='r1')
 [<Author: a1>]
 
-Bug #5324
+Bug #5324, #6704
 >>> Item.objects.filter(tags__name='t4')
 [<Item: four>]
 >>> Item.objects.exclude(tags__name='t4').order_by('name').distinct()
@@ -339,6 +339,20 @@ Similarly, when one of the joins cannot possibly, ever, involve NULL values (Aut
 >>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
 >>> len([x[2][2] for x in qs.query.alias_map.values() if x[2][2] == query.LOUTER])
 1
+
+The previous changes shouldn't affect nullable foreign key joins.
+>>> Tag.objects.filter(parent__isnull=True).order_by('name')
+[<Tag: t1>]
+>>> Tag.objects.exclude(parent__isnull=True).order_by('name')
+[<Tag: t2>, <Tag: t3>, <Tag: t4>, <Tag: t5>]
+>>> Tag.objects.exclude(Q(parent__name='t1') | Q(parent__isnull=True)).order_by('name')
+[<Tag: t4>, <Tag: t5>]
+>>> Tag.objects.exclude(Q(parent__isnull=True) | Q(parent__name='t1')).order_by('name')
+[<Tag: t4>, <Tag: t5>]
+>>> Tag.objects.exclude(Q(parent__parent__isnull=True)).order_by('name')
+[<Tag: t4>, <Tag: t5>]
+>>> Tag.objects.filter(~Q(parent__parent__isnull=True)).order_by('name')
+[<Tag: t4>, <Tag: t5>]
 
 Bug #2091
 >>> t = Tag.objects.get(name='t4')

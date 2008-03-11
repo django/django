@@ -20,6 +20,11 @@ from django.core.exceptions import FieldError
 from datastructures import EmptyResultSet, Empty
 from constants import *
 
+try:
+    set
+except NameError:
+    from sets import Set as set     # Python 2.3 fallback
+
 __all__ = ['Query']
 
 class Query(object):
@@ -573,13 +578,9 @@ class Query(object):
         """
         Promotes the join type of an alias to an outer join if it's possible
         for the join to contain NULL values on the left.
-
-        Returns True if the aliased join was promoted.
         """
         if self.alias_map[alias][ALIAS_NULLABLE]:
             self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
-            return True
-        return False
 
     def change_alias(self, old_alias, new_alias):
         """
@@ -753,7 +754,8 @@ class Query(object):
             self.fill_related_selections(f.rel.to._meta, alias, cur_depth + 1,
                     used, next, restricted)
 
-    def add_filter(self, filter_expr, connector=AND, negate=False, trim=False):
+    def add_filter(self, filter_expr, connector=AND, negate=False, trim=False,
+            merge_negated=False):
         """
         Add a single filter to the query. The 'filter_expr' is a pair:
         (filter_string, value). E.g. ('name__contains', 'fred')
@@ -761,6 +763,10 @@ class Query(object):
         If 'negate' is True, this is an exclude() filter. If 'trim' is True, we
         automatically trim the final join group (used internally when
         constructing nested queries).
+
+        If 'merge_negated' is True, this negated filter will be merged with the
+        existing negated where node (if it exists). This is used when
+        constructing an exclude filter from combined subfilters.
         """
         arg, value = filter_expr
         parts = arg.split(LOOKUP_SEP)
@@ -813,9 +819,13 @@ class Query(object):
                 self.unref_alias(alias)
                 alias = join[LHS_ALIAS]
                 col = join[LHS_JOIN_COL]
+                if len(join_list[-1]) == 1:
+                    join_list = join_list[:-1]
+                else:
+                    join_list[-1] = join_list[-1][:-1]
 
-        if lookup_type == 'isnull' and value is True and (len(join_list) > 1 or
-                len(join_list[0]) > 1):
+        if (lookup_type == 'isnull' and value is True and not negate and
+                (len(join_list) > 1 or len(join_list[0]) > 1)):
             # If the comparison is against NULL, we need to use a left outer
             # join when connecting to the previous model. We make that
             # adjustment here. We don't do this unless needed as it's less
@@ -846,19 +856,32 @@ class Query(object):
                 # that's harmless.
                 self.promote_alias(table)
 
-        self.where.add([alias, col, field, lookup_type, value], connector)
+        entry = [alias, col, field, lookup_type, value]
+        if merge_negated:
+            # This case is when we're doing the Q2 filter in exclude(Q1, Q2).
+            # It's different from exclude(Q1).exclude(Q2).
+            for node in self.where.children:
+                if getattr(node, 'negated', False):
+                    node.add(entry, connector)
+                    merged = True
+                    break
+        else:
+            self.where.add(entry, connector)
+            merged = False
 
         if negate:
-            flag = False
-            for seq in join_list:
-                for join in seq:
-                    if self.promote_alias(join):
-                        flag = True
-            self.where.negate()
-            if flag:
-                # XXX: Change this to the field we joined against to allow
-                # for node sharing and where-tree optimisation?
-                self.where.add([alias, col, field, 'isnull', True], OR)
+            count = 0
+            for join in join_list:
+                count += len(join)
+                for alias in join:
+                    self.promote_alias(alias)
+            if not merged:
+                self.where.negate()
+            if count > 1 and lookup_type != 'isnull':
+                j_col = self.alias_map[alias][ALIAS_JOIN][RHS_JOIN_COL]
+                entry = Node([[alias, j_col, None, 'isnull', True]])
+                entry.negate()
+                self.where.add(entry, AND)
 
     def add_q(self, q_object):
         """
@@ -877,13 +900,16 @@ class Query(object):
         else:
             subtree = False
         connector = AND
+        merge = False
         for child in q_object.children:
             if isinstance(child, Node):
                 self.where.start_subtree(connector)
                 self.add_q(child)
                 self.where.end_subtree()
             else:
-                self.add_filter(child, connector, q_object.negated)
+                self.add_filter(child, connector, q_object.negated,
+                        merge_negated=merge)
+                merge = q_object.negated
             connector = q_object.connector
         if subtree:
             self.where.end_subtree()
@@ -902,7 +928,9 @@ class Query(object):
         list of tables joined.
         """
         joins = [[alias]]
+        used = set()
         for pos, name in enumerate(names):
+            used.update(joins[-1])
             if name == 'pk':
                 name = opts.pk.name
 
@@ -924,7 +952,7 @@ class Query(object):
                     lhs_col = opts.parents[int_model].column
                     opts = int_model._meta
                     alias = self.join((alias, opts.db_table, lhs_col,
-                            opts.pk.column))
+                            opts.pk.column), exclusions=used)
                     alias_list.append(alias)
                 joins.append(alias_list)
             cached_data = opts._join_cache.get(name)
@@ -950,9 +978,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, nullable=True)
+                            dupe_multis, used, nullable=True)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, nullable=True)
+                            dupe_multis, used, nullable=True)
                     joins.append([int_alias, alias])
                 elif field.rel:
                     # One-to-one or many-to-one field
@@ -968,7 +996,7 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                            nullable=field.null)
+                            exclusions=used, nullable=field.null)
                     joins.append([alias])
                 else:
                     # Non-relation fields.
@@ -996,9 +1024,9 @@ class Query(object):
                                 target)
 
                     int_alias = self.join((alias, table1, from_col1, to_col1),
-                            dupe_multis, nullable=True)
+                            dupe_multis, used, nullable=True)
                     alias = self.join((int_alias, table2, from_col2, to_col2),
-                            dupe_multis, nullable=True)
+                            dupe_multis, used, nullable=True)
                     joins.append([int_alias, alias])
                 else:
                     # One-to-many field (ForeignKey defined on the target model)
@@ -1016,7 +1044,7 @@ class Query(object):
                                 opts, target)
 
                     alias = self.join((alias, table, from_col, to_col),
-                            dupe_multis, nullable=True)
+                            dupe_multis, used, nullable=True)
                     joins.append([alias])
 
         if pos != len(names) - 1:

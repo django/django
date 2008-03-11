@@ -5,6 +5,7 @@ import datetime
 
 from django.utils import tree
 from django.db import connection
+from django.db.models.fields import Field
 from datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
@@ -105,7 +106,10 @@ class WhereNode(tree.Node):
         else:
             cast_sql = '%s'
 
-        params = field.get_db_prep_lookup(lookup_type, value)
+        if field:
+            params = field.get_db_prep_lookup(lookup_type, value)
+        else:
+            params = Field().get_db_prep_lookup(lookup_type, value)
         if isinstance(params, tuple):
             extra, params = params
         else:
