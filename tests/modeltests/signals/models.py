@@ -66,7 +66,8 @@ post_save_nokwargs signal
 post_save signal, Tom Smith
 Is updated
 
->>> p1.save(raw=True)
+# Calling an internal method purely so that we can trigger a "raw" save.
+>>> p1.save_base(raw=True)
 pre_save_nokwargs signal
 pre_save signal, Tom Smith
 Is raw

@@ -160,37 +160,6 @@ When you save an object, Django performs the following steps:
        is used to provide notification that an object has been successfully
        saved. (These signals are not yet documented.)
 
-Raw saves
-~~~~~~~~~
-
-**New in Django development version**
-
-The pre-processing step (#2 in the previous section) is useful, but it modifies
-the data stored in a field. This can cause problems if you're relying upon the
-data you provide being used as-is.
-
-For example, if you're setting up conditions for a test, you'll want the test
-conditions to be repeatable. If pre-processing is performed, the data used
-to specify test conditions may be modified, changing the conditions for the
-test each time the test is run.
-
-In cases such as this, you need to prevent pre-processing from being performed
-when you save an object. To do this, you can invoke a **raw save**  by passing
-``raw=True`` as an argument to the ``save()`` method::
-
-    b4.save(raw=True) # Save object, but do no pre-processing
-
-A raw save skips the usual data pre-processing that is performed during the
-save. All other steps in the save (pre-save signal, data preparation, data
-insertion, and post-save signal) are performed as normal.
-
-.. admonition:: When to use a raw save
-
-    Generally speaking, you shouldn't need to use a raw save. Disabling field
-    pre-processing is an extraordinary measure that should only be required
-    in extraordinary circumstances, such as setting up reliable test
-    conditions.
-
 Saving changes to objects
 =========================
 

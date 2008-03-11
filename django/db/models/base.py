@@ -253,19 +253,34 @@ class Model(object):
                 raise TypeError, "'%s' is an invalid keyword argument for this function" % kwargs.keys()[0]
         dispatcher.send(signal=signals.post_init, sender=self.__class__, instance=self)
 
-    def save(self, raw=False, cls=None):
+    def save(self):
+        """
+        Save the current instance. Override this in a subclass if you want to
+        control the saving process.
+        """
+        self.save_base()
+
+    save.alters_data = True
+
+    def save_base(self, raw=False, cls=None):
+        """
+        Does the heavy-lifting involved in saving. Subclasses shouldn't need to
+        override this method. It's separate from save() in order to hide the
+        need for overrides of save() to pass around internal-only parameters
+        ('raw' and 'cls').
+        """
         if not cls:
-            dispatcher.send(signal=signals.pre_save, sender=self.__class__,
-                    instance=self, raw=raw)
             cls = self.__class__
             meta = self._meta
             signal = True
+            dispatcher.send(signal=signals.pre_save, sender=self.__class__,
+                    instance=self, raw=raw)
         else:
             meta = cls._meta
             signal = False
 
         for parent, field in meta.parents.items():
-            self.save(raw, parent)
+            self.save_base(raw, parent)
             setattr(self, field.attname, self._get_pk_val(parent._meta))
 
         non_pks = [f for f in meta.local_fields if not f.primary_key]
@@ -311,11 +326,8 @@ class Model(object):
         transaction.commit_unless_managed()
 
         if signal:
-            # Run any post-save hooks.
             dispatcher.send(signal=signals.post_save, sender=self.__class__,
                     instance=self, created=(not record_exists), raw=raw)
-
-    save.alters_data = True
 
     def validate(self):
         """
