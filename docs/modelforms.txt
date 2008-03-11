@@ -226,7 +226,7 @@ For example::
 
     # Create a form instance with POST data.
     >>> a = Author()
-    >>> f = AuthorForm(a, request.POST)
+    >>> f = AuthorForm(request.POST, instance=a)
 
     # Create and save the new author instance. There's no need to do anything else.
     >>> new_author = f.save()
@@ -238,34 +238,34 @@ In some cases, you may not want all the model fields to appear on the generated
 form. There are three ways of telling ``ModelForm`` to use only a subset of the
 model fields:
 
-    1. Set ``editable=False`` on the model field. As a result, *any* form
-       created from the model via ``ModelForm`` will not include that
-       field.
+1. Set ``editable=False`` on the model field. As a result, *any* form
+   created from the model via ``ModelForm`` will not include that
+   field.
 
-    2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta`` class.
-       This attribute, if given, should be a list of field names to include in
-       the form.
+2. Use the ``fields`` attribute of the ``ModelForm``'s inner ``Meta``
+   class.  This attribute, if given, should be a list of field names
+   to include in the form.
 
-    3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta`` class.
-       This attribute, if given, should be a list of field names to exclude
-       the form.
+3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
+   class.  This attribute, if given, should be a list of field names
+   to exclude the form.
 
-       For example, if you want a form for the ``Author`` model (defined above)
-       that includes only the ``name`` and ``title`` fields, you would specify
-       ``fields`` or  ``exclude`` like this::
+For example, if you want a form for the ``Author`` model (defined
+above) that includes only the ``name`` and ``title`` fields, you would
+specify ``fields`` or ``exclude`` like this::
 
-          class PartialAuthorForm(ModelForm):
-              class Meta:
-                  model = Author
-                  fields = ('name', 'title')
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            fields = ('name', 'title')
+    
+    class PartialAuthorForm(ModelForm):
+        class Meta:
+            model = Author
+            exclude = ('birth_date',)
 
-          class PartialAuthorForm(ModelForm):
-              class Meta:
-                  model = Author
-                  exclude = ('birth_date',)
-
-        Since the Author model has only 3 fields, 'name', 'title', and
-        'birth_date', the forms above will contain exactly the same fields.
+Since the Author model has only 3 fields, 'name', 'title', and
+'birth_date', the forms above will contain exactly the same fields.
 
 .. note::
 
