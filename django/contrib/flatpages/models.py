@@ -35,7 +35,7 @@ from django.contrib import admin
 class FlatPageAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('url', 'title', 'content', 'sites')}),
-        ('Advanced options', {'classes': 'collapse', 'fields': ('enable_comments', 'registration_required', 'template_name')}),
+        ('Advanced options', {'classes': ('collapse',), 'fields': ('enable_comments', 'registration_required', 'template_name')}),
     )
     list_filter = ('sites',)
     search_fields = ('url', 'title')
