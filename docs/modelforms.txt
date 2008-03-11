@@ -248,7 +248,7 @@ model fields:
 
 3. Use the ``exclude`` attribute of the ``ModelForm``'s inner ``Meta``
    class.  This attribute, if given, should be a list of field names
-   to exclude the form.
+   to exclude from the form.
 
 For example, if you want a form for the ``Author`` model (defined
 above) that includes only the ``name`` and ``title`` fields, you would
