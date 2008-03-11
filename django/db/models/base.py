@@ -268,7 +268,7 @@ class Model(object):
             self.save(raw, parent)
             setattr(self, field.attname, self._get_pk_val(parent._meta))
 
-        non_pks = [f for f in self._meta.local_fields if not f.primary_key]
+        non_pks = [f for f in meta.local_fields if not f.primary_key]
 
         # First, try an UPDATE. If that doesn't update anything, do an INSERT.
         pk_val = self._get_pk_val(meta)
