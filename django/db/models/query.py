@@ -478,44 +478,29 @@ class ValuesQuerySet(QuerySet):
 
     def _setup_query(self):
         """
-        Sets up any special features of the query attribute.
+        Constructs the field_names list that the values query will be
+        retrieving.
 
         Called by the _clone() method after initialising the rest of the
         instance.
         """
-        # Construct two objects:
-        #   - fields is a list of Field objects to fetch.
-        #   - field_names is a list of field names, which will be the keys in
-        #   the resulting dictionaries.
-        # 'fields' is used to configure the query, whilst field_names is stored
-        # in this object for use by iterator().
         if self._fields:
-            opts = self.model._meta
-            all = dict([(field.column, field) for field in opts.fields])
-            for field in opts.fields:
-                all[field.name] = field
             if not self.query.extra_select:
-                try:
-                    fields = [all[f] for f in self._fields]
-                except KeyError, e:
-                    raise FieldDoesNotExist('%s has no field named %r'
-                                % (opts.object_name, e.args[0]))
                 field_names = list(self._fields)
             else:
-                fields = []
                 field_names = []
+                names = set(self.model._meta.get_all_field_names())
                 for f in self._fields:
-                    if f in all:
-                        fields.append(all[f])
+                    if f in names:
                         field_names.append(f)
                     elif not self.query.extra_select.has_key(f):
                         raise FieldDoesNotExist('%s has no field named %r'
                                 % (self.model._meta.object_name, f))
-        else: # Default to all fields.
-            fields = self.model._meta.fields
-            field_names = [f.attname for f in fields]
+        else:
+            # Default to all fields.
+            field_names = [f.attname for f in self.model._meta.fields]
 
-        self.query.add_local_columns([f.column for f in fields])
+        self.query.add_fields(field_names)
         self.query.default_cols = False
         self.field_names = field_names
 

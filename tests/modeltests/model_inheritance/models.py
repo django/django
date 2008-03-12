@@ -14,6 +14,10 @@ Both styles are demonstrated here.
 
 from django.db import models
 
+#
+# Abstract base classes
+#
+
 class CommonInfo(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveIntegerField()
@@ -33,6 +37,10 @@ class Student(CommonInfo):
 
     class Meta:
         pass
+
+#
+# Multi-table inheritance
+#
 
 class Place(models.Model):
     name = models.CharField(max_length=50)
@@ -226,5 +234,10 @@ DoesNotExist: Restaurant matching query does not exist.
 True
 >>> r1.name
 u'Demon Puppies'
+
+# The values() command also works on fields from parent models.
+>>> d = {'rating': 4, 'name': u'Ristorante Miron'}
+>>> list(ItalianRestaurant.objects.values('name', 'rating')) == [d]
+True
 
 """}

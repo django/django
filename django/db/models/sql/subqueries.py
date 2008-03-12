@@ -160,7 +160,7 @@ class UpdateQuery(Query):
         query = self.clone(klass=Query)
         alias = '%s0' % self.alias_prefix
         query.change_alias(query.tables[0], alias)
-        self.add_local_columns([query.model._meta.pk.column])
+        self.add_fields([query.model._meta.pk.name])
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).

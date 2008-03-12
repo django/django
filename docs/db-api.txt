@@ -596,6 +596,13 @@ Example::
     >>> Blog.objects.values('id', 'name')
     [{'id': 1, 'name': 'Beatles Blog'}]
 
+You can also retrieve values from across ``ForeignKey`` relations by using
+double underscores to separate the field names, just as when calling the
+``filter()`` command. For example::
+
+    >>> Entry.objects.values('blog__name').distinct()
+    [{'name': 'Beatles Blog'}]
+
 A couple of subtleties that are worth mentioning:
 
     * The ``values()`` method does not return anything for ``ManyToManyField``

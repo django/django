@@ -250,6 +250,11 @@ FieldError: Cannot resolve keyword 'reporter_id' into field. Choices are: headli
 >>> Reporter.objects.filter(article__reporter=r).distinct()
 [<Reporter: John Smith>]
 
+# It's possible to use values() calls across many-to-one relations.
+>>> d = {'reporter__first_name': u'John', 'reporter__last_name': u'Smith'}
+>>> list(Article.objects.filter(reporter=r).distinct().values('reporter__first_name', 'reporter__last_name')) == [d]
+True
+
 # If you delete a reporter, his articles will be deleted.
 >>> Article.objects.all()
 [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>, <Article: This is a test>, <Article: This is a test>]

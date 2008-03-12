@@ -916,7 +916,8 @@ class Query(object):
         if subtree:
             self.where.end_subtree()
 
-    def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True):
+    def setup_joins(self, names, opts, alias, dupe_multis, allow_many=True,
+            allow_explicit_fk=False):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -939,9 +940,17 @@ class Query(object):
             try:
                 field, model, direct, m2m = opts.get_field_by_name(name)
             except FieldDoesNotExist:
-                names = opts.get_all_field_names()
-                raise FieldError("Cannot resolve keyword %r into field. "
-                        "Choices are: %s" % (name, ", ".join(names)))
+                for f in opts.fields:
+                    if allow_explicit_fk and name == f.attname:
+                        # XXX: A hack to allow foo_id to work in values() for
+                        # backwards compatibility purposes. If we dropped that
+                        # feature, this could be removed.
+                        field, model, direct, m2m = opts.get_field_by_name(f.name)
+                        break
+                else:
+                    names = opts.get_all_field_names()
+                    raise FieldError("Cannot resolve keyword %r into field. "
+                            "Choices are: %s" % (name, ", ".join(names)))
             if not allow_many and (m2m or not direct):
                 for join in joins:
                     for alias in join:
@@ -1102,17 +1111,17 @@ class Query(object):
         """
         return not (self.low_mark or self.high_mark)
 
-    def add_local_columns(self, columns):
+    def add_fields(self, field_names):
         """
-        Adds the given column names to the select set, assuming they come from
-        the root model (the one given in self.model).
+        Adds the given (model) fields to the select set. The field names are
+        added in the order specified.
         """
-        for alias in self.tables:
-            if self.alias_map[alias][ALIAS_REFCOUNT]:
-                break
-        else:
-            alias = self.get_initial_alias()
-        self.select.extend([(alias, col) for col in columns])
+        alias = self.get_initial_alias()
+        opts = self.get_meta()
+        for name in field_names:
+            u1, target, u2, joins = self.setup_joins(name.split(LOOKUP_SEP),
+                    opts, alias, False, False, True)
+            self.select.append((joins[-1][-1], target.column))
 
     def add_ordering(self, *ordering):
         """
