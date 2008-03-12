@@ -158,8 +158,7 @@ class UpdateQuery(Query):
         # We need to use a sub-select in the where clause to filter on things
         # from other tables.
         query = self.clone(klass=Query)
-        alias = '%s0' % self.alias_prefix
-        query.change_alias(query.tables[0], alias)
+        query.bump_prefix()
         self.add_fields([query.model._meta.pk.name])
 
         # Now we adjust the current query: reset the where clause and get rid
