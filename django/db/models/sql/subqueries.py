@@ -159,7 +159,9 @@ class UpdateQuery(Query):
         # from other tables.
         query = self.clone(klass=Query)
         query.bump_prefix()
-        self.add_fields([query.model._meta.pk.name])
+        query.select = []
+        query.extra_select = {}
+        query.add_fields([query.model._meta.pk.name])
 
         # Now we adjust the current query: reset the where clause and get rid
         # of all the tables we don't need (since they're in the sub-select).
