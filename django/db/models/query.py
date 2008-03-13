@@ -293,6 +293,12 @@ class _QuerySet(object):
         return self._clone(klass=DateQuerySet, setup=True, _field=field,
                 _kind=kind, _order=order)
 
+    def none(self):
+        """
+        Returns an empty queryset.
+        """
+        return self._clone(klass=EmptyQuerySet)
+
     ##################################################################
     # PUBLIC METHODS THAT ALTER ATTRIBUTES AND RETURN A NEW QUERYSET #
     ##################################################################

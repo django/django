@@ -254,6 +254,8 @@ DoesNotExist: Article matching query does not exist.
 []
 >>> Article.objects.none().filter(headline__startswith='Article')
 []
+>>> Article.objects.filter(headline__startswith='Article').none()
+[]
 >>> Article.objects.none().count()
 0
 >>> [article for article in Article.objects.none().iterator()]
