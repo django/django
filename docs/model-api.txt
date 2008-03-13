@@ -784,9 +784,17 @@ you can use the name of the model, rather than the model object itself::
     class Manufacturer(models.Model):
         # ...
 
-Note, however, that you can only use strings to refer to models in the same
-models.py file -- you cannot use a string to reference a model in a different
-application, or to reference a model that has been imported from elsewhere.
+Note, however, that this only refers to models in the same models.py file -- you
+cannot use a string to reference a model defined in another application or
+imported from elsewhere.
+
+**New in Django development version:** to refer to models defined in another
+application, you must instead explicitially specify the application label. That
+is, if the ``Manufacturer`` model above is defined in another application called
+``production``, you'd need to use::
+
+    class Car(models.Model):
+        manufacturer = models.ForeignKey('production.Manufacturer')
 
 Behind the scenes, Django appends ``"_id"`` to the field name to create its
 database column name. In the above example, the database table for the ``Car``

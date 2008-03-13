@@ -83,12 +83,12 @@ Methods
 objects in the same way as any other `Django model`_::
 
     myuser.groups = [group_list]
-    myuser.groups.add(group, group,...)
-    myuser.groups.remove(group, group,...)
+    myuser.groups.add(group, group, ...)
+    myuser.groups.remove(group, group, ...)
     myuser.groups.clear()
     myuser.user_permissions = [permission_list]
     myuser.user_permissions.add(permission, permission, ...)
-    myuser.user_permissions.remove(permission, permission, ...]
+    myuser.user_permissions.remove(permission, permission, ...)
     myuser.user_permissions.clear()
 
 In addition to those automatic API methods, ``User`` objects have the following
@@ -380,14 +380,14 @@ This example shows how you might use both ``authenticate()`` and ``login()``::
             # Return an 'invalid login' error message.
 
 .. admonition:: Calling ``authenticate()`` first
-    
+
     When you're manually logging a user in, you *must* call
     ``authenticate()`` before you call ``login()``. ``authenticate()``
     sets an attribute on the ``User`` noting which authentication
     backend successfully authenticated that user (see the `backends
     documentation`_ for details), and this information is needed later
     during the login process.
-    
+
 .. _backends documentation: #other-authentication-sources
 
 Manually checking a user's password
@@ -460,7 +460,7 @@ introduced in Python 2.4::
 
 In the Django development version, ``login_required`` also takes an optional
 ``redirect_field_name`` parameter. Example::
-    
+
     from django.contrib.auth.decorators import login_required
 
     def my_view(request):
@@ -468,7 +468,7 @@ In the Django development version, ``login_required`` also takes an optional
     my_view = login_required(redirect_field_name='redirect_to')(my_view)
 
 Again, an equivalent example of the more compact decorator syntax introduced in Python 2.4::
-    
+
     from django.contrib.auth.decorators import login_required
 
     @login_required(redirect_field_name='redirect_to')
@@ -479,7 +479,7 @@ Again, an equivalent example of the more compact decorator syntax introduced in 
 
     * If the user isn't logged in, redirect to ``settings.LOGIN_URL``
       (``/accounts/login/`` by default), passing the current absolute URL
-      in the query string as ``next`` or the value of ``redirect_field_name``. 
+      in the query string as ``next`` or the value of ``redirect_field_name``.
       For example:
       ``/accounts/login/?next=/polls/3/``.
     * If the user is logged in, execute the view normally. The view code is
@@ -1119,7 +1119,7 @@ object the first time a user authenticates::
 Handling authorization in custom backends
 -----------------------------------------
 
-Custom auth backends can provide their own permissions. 
+Custom auth backends can provide their own permissions.
 
 The user model will delegate permission lookup functions
 (``get_group_permissions()``, ``get_all_permissions()``, ``has_perm()``, and
@@ -1132,9 +1132,9 @@ one backend grants.
 
 The simple backend above could implement permissions for the magic admin fairly
 simply::
-        
+
     class SettingsBackend:
-    
+
         # ...
 
         def has_perm(self, user_obj, perm):
@@ -1142,7 +1142,7 @@ simply::
                 return True
             else:
                 return False
-                
+
 This gives full permissions to the user granted access in the above example. Notice
 that the backend auth functions all take the user object as an argument, and
 they also accept the same arguments given to the associated ``User`` functions.

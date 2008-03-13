@@ -2,13 +2,12 @@
 # Italian translation of Django.
 # Copyright (C) 2006 the Lawrence Journal-World
 # This file is distributed under the same license as the Django package.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-02-02 18:31+0100\n"
-"PO-Revision-Date: 2008-02-02 19:40+0100\n"
+"PO-Revision-Date: 2008-03-02 11:40+0100\n"
 "Last-Translator: Nicola Larosa <nico@tekNico.net>\n"
 "Language-Team: Italiano\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +78,7 @@ msgstr "Francese"
 
 #: conf/global_settings.py:54
 msgid "Gaeilge"
-msgstr ""
+msgstr "Gaelico"
 
 #: conf/global_settings.py:55
 msgid "Galician"

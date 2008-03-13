@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+import os
 
 class Animal(models.Model):
     name = models.CharField(max_length=150)
@@ -28,6 +29,16 @@ class Stuff(models.Model):
             name = None
         return unicode(name) + u' is owned by ' + unicode(self.owner)
 
+class Absolute(models.Model):
+    name = models.CharField(max_length=40)
+
+    load_count = 0
+
+    def __init__(self, *args, **kwargs):
+        super(Absolute, self).__init__(*args, **kwargs)
+        Absolute.load_count += 1
+
+
 __test__ = {'API_TESTS':"""
 >>> from django.core import management
 
@@ -48,5 +59,16 @@ __test__ = {'API_TESTS':"""
 >>> management.call_command('loaddata', 'pretty.xml', verbosity=0)
 >>> Stuff.objects.all()
 [<Stuff: None is owned by None>]
+
+###############################################
+# Regression test for ticket #6436 -- 
+# os.path.join will throw away the initial parts of a path if it encounters
+# an absolute path. This means that if a fixture is specified as an absolute path, 
+# we need to make sure we don't discover the absolute path in every fixture directory.
+
+>>> load_absolute_path = os.path.join(os.path.dirname(__file__), 'fixtures', 'absolute.json')
+>>> management.call_command('loaddata', load_absolute_path, verbosity=0)
+>>> Absolute.load_count
+1
 
 """}

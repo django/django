@@ -246,6 +246,10 @@ object::
     >>> f.cleaned_data
     {'cc_myself': True, 'message': u'Hi there', 'sender': u'foo@example.com', 'subject': u'hello'}
 
+.. note::
+    **New in Django development version** The ``cleaned_data`` attribute was
+    called ``clean_data`` in earlier releases.
+
 Note that any text-based field -- such as ``CharField`` or ``EmailField`` --
 always cleans the input into a Unicode string. We'll cover the encoding
 implications later in this document.
@@ -1563,7 +1567,7 @@ The three types of cleaning methods are:
 
       Note that any errors raised by your ``Form.clean()`` override will not
       be associated with any field in particular. They go into a special
-      "field" (called ``__all__``, which you can access via the
+      "field" (called ``__all__``), which you can access via the
       ``non_field_errors()`` method if you need to.
 
 These methods are run in the order given above, one field at a time.  That is,

@@ -579,6 +579,16 @@ in standard language format. For example, U.S. English is ``"en-us"``. See the
 
 .. _internationalization docs: ../i18n/
 
+LANGUAGE_COOKIE_NAME
+--------------------
+
+Default: ``'django_language'``
+
+The name of the cookie to use for the language cookie. This can be whatever
+you want (but should be different from SESSION_COOKIE_NAME). See the
+`internationalization docs`_ for details.
+
+
 LANGUAGES
 ---------
 
@@ -822,8 +832,8 @@ SESSION_COOKIE_NAME
 
 Default: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want.
-See the `session docs`_.
+The name of the cookie to use for sessions. This can be whatever you want (but
+should be different from ``LANGUAGE_COOKIE_NAME``). See the `session docs`_.
 
 SESSION_COOKIE_PATH
 -------------------

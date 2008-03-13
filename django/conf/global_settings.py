@@ -52,7 +52,7 @@ LANGUAGES = (
     ('fa', gettext_noop('Persian')),
     ('fi', gettext_noop('Finnish')),
     ('fr', gettext_noop('French')),
-    ('ga', gettext_noop('Gaeilge')),
+    ('ga', gettext_noop('Irish')),
     ('gl', gettext_noop('Galician')),
     ('hu', gettext_noop('Hungarian')),
     ('he', gettext_noop('Hebrew')),
@@ -60,6 +60,7 @@ LANGUAGES = (
     ('is', gettext_noop('Icelandic')),
     ('it', gettext_noop('Italian')),
     ('ja', gettext_noop('Japanese')),
+    ('ka', gettext_noop('Georgian')),
     ('ko', gettext_noop('Korean')),
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
@@ -90,8 +91,8 @@ LANGUAGES_BIDI = ("he", "ar", "fa")
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
-
 LOCALE_PATHS = ()
+LANGUAGE_COOKIE_NAME = 'django_language'
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various e-mails.

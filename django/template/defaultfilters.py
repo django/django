@@ -2,6 +2,10 @@
 
 import re
 import random as random_module
+try:
+    from functools import wraps
+except ImportError:
+    from django.utils.functional import wraps  # Python 2.3, 2.4 fallback.
 
 from django.template import Variable, Library
 from django.conf import settings
@@ -35,7 +39,7 @@ def stringfilter(func):
     for attr in ('is_safe', 'needs_autoescape'):
         if hasattr(func, attr):
             setattr(_dec, attr, getattr(func, attr))
-    return _dec
+    return wraps(func)(_dec)
 
 ###################
 # STRINGS         #

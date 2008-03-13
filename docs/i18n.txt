@@ -547,7 +547,7 @@ following this algorithm:
 
     * First, it looks for a ``django_language`` key in the the current user's
       `session`_.
-    * Failing that, it looks for a cookie called ``django_language``.
+    * Failing that, it looks for a cookie that is named according to your ``LANGUAGE_COOKIE_NAME`` setting (the default name is: ``django_language``).
     * Failing that, it looks at the ``Accept-Language`` HTTP header. This
       header is sent by your browser and tells the server which language(s) you
       prefer, in order by priority. Django tries each language in the header
@@ -719,7 +719,8 @@ Activate this view by adding the following line to your URLconf::
 The view expects to be called via the ``POST`` method, with a ``language``
 parameter set in request. If session support is enabled, the view
 saves the language choice in the user's session. Otherwise, it saves the
-language choice in a ``django_language`` cookie.
+language choice in a cookie that is by default named ``django_language``
+(the name can be changed through the ``LANGUAGE_COOKIE_NAME`` setting).
 
 After setting the language choice, Django redirects the user, following this
 algorithm:

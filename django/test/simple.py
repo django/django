@@ -146,4 +146,3 @@ def run_tests(test_labels, verbosity=1, interactive=True, extra_tests=[]):
     teardown_test_environment()
     
     return len(result.failures) + len(result.errors)
-    

@@ -576,7 +576,7 @@ Three things to note about 404 views:
       in the 404.
 
     * The 404 view is passed a ``RequestContext`` and will have access to
-      variables supplied by your ``TEMPLATE_CONTEXT_PROCESSORS`` (e.g.
+      variables supplied by your ``TEMPLATE_CONTEXT_PROCESSORS`` setting (e.g.,
       ``MEDIA_URL``).
 
     * If ``DEBUG`` is set to ``True`` (in your settings module), then your 404

@@ -27,19 +27,16 @@ for scheme in INSTALL_SCHEMES.values():
 # an easy way to do this.
 packages, data_files = [], []
 root_dir = os.path.dirname(__file__)
-django_dir = os.path.join(root_dir, 'django')
-pieces = fullsplit(root_dir)
-if pieces[-1] == '':
-    len_root_dir = len(pieces) - 1
-else:
-    len_root_dir = len(pieces)
+if root_dir != '':
+    os.chdir(root_dir)
+django_dir = 'django'
 
 for dirpath, dirnames, filenames in os.walk(django_dir):
     # Ignore dirnames that start with '.'
     for i, dirname in enumerate(dirnames):
         if dirname.startswith('.'): del dirnames[i]
     if '__init__.py' in filenames:
-        packages.append('.'.join(fullsplit(dirpath)[len_root_dir:]))
+        packages.append('.'.join(fullsplit(dirpath)))
     elif filenames:
         data_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
 

@@ -7,8 +7,6 @@ from django.utils.text import capfirst
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.safestring import mark_safe
 from django.views.generic import date_based
-import datetime
-import time
 import urllib
 
 class FieldChoicePlugin(DatabrowsePlugin):

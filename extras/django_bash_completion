@@ -61,13 +61,13 @@ _django_completion()
           ||
           # python manage.py, /some/path/python manage.py (if manage.py exists)
           ( ${COMP_CWORD} -eq 2 &&
-            ( $( basename ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
-            ( $( basename ${COMP_WORDS[1]} ) == manage.py) &&
+            ( $( basename -- ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
+            ( $( basename -- ${COMP_WORDS[1]} ) == manage.py) &&
             ( -r ${COMP_WORDS[1]} ) ) 
           ||
           ( ${COMP_CWORD} -eq 2 &&
-            ( $( basename ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
-            ( $( basename ${COMP_WORDS[1]} ) == django-admin.py) &&
+            ( $( basename -- ${COMP_WORDS[0]} ) == python?([1-9]\.[0-9]) ) &&
+            ( $( basename -- ${COMP_WORDS[1]} ) == django-admin.py) &&
             ( -r ${COMP_WORDS[1]} ) ) ]] ; then
 
         case ${cur} in
@@ -149,7 +149,7 @@ unset pythons
 if command -v whereis &>/dev/null; then
     python_interpreters=$(whereis python | cut -d " " -f 2-) 
     for python in $python_interpreters; do
-        pythons="${pythons} $(basename $python)"
+        pythons="${pythons} $(basename -- $python)"
     done
     pythons=$(echo $pythons | tr " " "\n" | sort -u | tr "\n" " ")
 else

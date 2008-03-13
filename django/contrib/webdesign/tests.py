@@ -14,7 +14,6 @@ u'lorem ipsum dolor'
 """
 
 from django.contrib.webdesign.lorem_ipsum import *
-import datetime
 
 if __name__ == '__main__':
     import doctest
