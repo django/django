@@ -788,10 +788,10 @@ Note, however, that this only refers to models in the same models.py file -- you
 cannot use a string to reference a model defined in another application or
 imported from elsewhere.
 
-**New in Django development version:** to refer to models defined in another
-application, you must instead explicitially specify the application label. That
-is, if the ``Manufacturer`` model above is defined in another application called
-``production``, you'd need to use::
+**New in Django development version:** To refer to models defined in another
+application, you must instead explicitly specify the application label. For
+example, if the ``Manufacturer`` model above is defined in another application
+called ``production``, you'd need to use::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey('production.Manufacturer')
