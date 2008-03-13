@@ -17,7 +17,7 @@ from django.db.models.sql.where import WhereNode, EverythingNode, AND, OR
 from django.db.models.sql.datastructures import Count
 from django.db.models.fields import FieldDoesNotExist
 from django.core.exceptions import FieldError
-from datastructures import EmptyResultSet, Empty
+from datastructures import EmptyResultSet, Empty, JoinError
 from constants import *
 
 try:
@@ -507,10 +507,11 @@ class Query(object):
         pieces = name.split(LOOKUP_SEP)
         if not alias:
             alias = self.get_initial_alias()
-        result = self.setup_joins(pieces, opts, alias, False, False)
-        if isinstance(result, int):
+        try:
+            field, target, opts, joins = self.setup_joins(pieces, opts, alias,
+                    False, False)
+        except JoinError:
             raise FieldError("Cannot order by many-valued field: '%s'" % name)
-        field, target, opts, joins = result
         alias = joins[-1][-1]
         col = target.column
 
@@ -812,12 +813,12 @@ class Query(object):
         alias = self.get_initial_alias()
         allow_many = trim or not negate
 
-        result = self.setup_joins(parts, opts, alias, (connector == AND),
-                allow_many)
-        if isinstance(result, int):
-            self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:result]))
+        try:
+            field, target, opts, join_list = self.setup_joins(parts, opts,
+                    alias, (connector == AND), allow_many)
+        except JoinError, e:
+            self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]))
             return
-        field, target, opts, join_list = result
         if trim and len(join_list) > 1:
             extra = join_list[-1]
             join_list = join_list[:-1]
@@ -972,7 +973,7 @@ class Query(object):
                 for join in joins:
                     for alias in join:
                         self.unref_alias(alias)
-                return pos + 1
+                raise JoinError(pos + 1)
             if model:
                 # The field lives on a base class of the current model.
                 alias_list = []
@@ -1128,17 +1129,20 @@ class Query(object):
         """
         return not (self.low_mark or self.high_mark)
 
-    def add_fields(self, field_names):
+    def add_fields(self, field_names, allow_m2m=True):
         """
         Adds the given (model) fields to the select set. The field names are
         added in the order specified.
         """
         alias = self.get_initial_alias()
         opts = self.get_meta()
-        for name in field_names:
-            u1, target, u2, joins = self.setup_joins(name.split(LOOKUP_SEP),
-                    opts, alias, False, False, True)
-            self.select.append((joins[-1][-1], target.column))
+        try:
+            for name in field_names:
+                u1, target, u2, joins = self.setup_joins(name.split(LOOKUP_SEP),
+                        opts, alias, False, allow_m2m, True)
+                self.select.append((joins[-1][-1], target.column))
+        except JoinError:
+            raise FieldError("Invalid field name: '%s'" % name)
 
     def add_ordering(self, *ordering):
         """

@@ -506,7 +506,7 @@ class ValuesQuerySet(QuerySet):
             # Default to all fields.
             field_names = [f.attname for f in self.model._meta.fields]
 
-        self.query.add_fields(field_names)
+        self.query.add_fields(field_names, False)
         self.query.default_cols = False
         self.field_names = field_names
 

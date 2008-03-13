@@ -9,6 +9,10 @@ class EmptyResultSet(Exception):
 class FullResultSet(Exception):
     pass
 
+class JoinError(Exception):
+    def __init__(self, level):
+        self.level = level
+
 class Empty(object):
     pass
 
