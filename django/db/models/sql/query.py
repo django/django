@@ -44,7 +44,7 @@ class Query(object):
         self.connection = connection
         self.alias_map = {}     # Maps alias to table name
         self.table_map = {}     # Maps table names to list of aliases.
-        self.rev_join_map = {}  # Reverse of join_map.
+        self.rev_join_map = {}  # Reverse of join_map. (FIXME: Update comment)
         self.quote_cache = {}
         self.default_cols = True
         self.default_ordering = True
@@ -63,7 +63,7 @@ class Query(object):
         self.distinct = False
         self.select_related = False
 
-        # Arbitrary maximum limit for select_related to prevent infinite
+        # Arbitrary maximum limit for select_related. Prevents infinite
         # recursion. Can be changed by the depth parameter to select_related().
         self.max_depth = 5
 
@@ -361,14 +361,15 @@ class Query(object):
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
         elif self.default_cols:
-            table_alias = self.tables[0]
-            root_pk = self.model._meta.pk.column
-            seen = {None: table_alias}
-            for field, model in self.model._meta.get_fields_with_model():
-                if model not in seen:
-                    seen[model] = self.join((table_alias, model._meta.db_table,
-                            root_pk, model._meta.pk.column))
-                result.append('%s.%s' % (qn(seen[model]), qn(field.column)))
+            #table_alias = self.tables[0]
+            #root_pk = self.model._meta.pk.column
+            #seen = {None: table_alias}
+            #for field, model in self.model._meta.get_fields_with_model():
+            #    if model not in seen:
+            #        seen[model] = self.join((table_alias, model._meta.db_table,
+            #                root_pk, model._meta.pk.column))
+            #    result.append('%s.%s' % (qn(seen[model]), qn(field.column)))
+            result = self.get_default_columns(lambda x, y: "%s.%s" % (qn(x), qn(y)))
             aliases = result[:]
 
         result.extend(['(%s) AS %s' % (col, alias)
@@ -376,6 +377,31 @@ class Query(object):
         aliases.extend(self.extra_select.keys())
 
         self._select_aliases = dict.fromkeys(aliases)
+        return result
+
+    def get_default_columns(self, combine_func=None):
+        """
+        Computes the default columns for selecting every field in the base
+        model. Returns a list of default (alias, column) pairs suitable for
+        direct inclusion as the select columns. The 'combine_func' can be
+        passed in to change the returned data set to a list of some other
+        structure.
+        """
+        # Note: We allow 'combine_func' here because this method is called a
+        # lot. The extra overhead from returning a list and then transforming
+        # it in get_columns() hurt performance in a measurable way.
+        result = []
+        table_alias = self.tables[0]
+        root_pk = self.model._meta.pk.column
+        seen = {None: table_alias}
+        for field, model in self.model._meta.get_fields_with_model():
+            if model not in seen:
+                seen[model] = self.join((table_alias, model._meta.db_table,
+                        root_pk, model._meta.pk.column))
+            if combine_func:
+                result.append(combine_func(seen[model], field.column))
+            else:
+                result.append((seen[model], field.column))
         return result
 
     def get_from_clause(self):
@@ -744,7 +770,7 @@ class Query(object):
         if not opts:
             opts = self.get_meta()
             root_alias = self.tables[0]
-            self.select.extend([(root_alias, f.column) for f in opts.fields])
+            self.select.extend(self.get_default_columns())
         if not used:
             used = []
 
@@ -759,7 +785,7 @@ class Query(object):
 
         for f in opts.fields:
             if (not f.rel or (restricted and f.name not in requested) or
-                    (not restricted and f.null)):
+                    (not restricted and f.null) or f.rel.parent_link):
                 continue
             table = f.rel.to._meta.db_table
             alias = self.join((root_alias, table, f.column,

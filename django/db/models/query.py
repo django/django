@@ -598,8 +598,10 @@ def QNot(q):
 
 def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
         requested=None):
-    """Helper function that recursively returns an object with cache filled"""
-
+    """
+    Helper function that recursively returns an object with the specified
+    related attributes already populated.
+    """
     if max_depth and requested is None and cur_depth > max_depth:
         # We've recursed deeply enough; stop now.
         return None
@@ -608,17 +610,18 @@ def get_cached_row(klass, row, index_start, max_depth=0, cur_depth=0,
     index_end = index_start + len(klass._meta.fields)
     obj = klass(*row[index_start:index_end])
     for f in klass._meta.fields:
-        if f.rel and ((not restricted and not f.null) or
-                (restricted and f.name in requested)):
-            if restricted:
-                next = requested[f.name]
-            else:
-                next = None
-            cached_row = get_cached_row(f.rel.to, row, index_end, max_depth,
-                    cur_depth+1, next)
-            if cached_row:
-                rel_obj, index_end = cached_row
-                setattr(obj, f.get_cache_name(), rel_obj)
+        if (not f.rel or (not restricted and f.null) or
+                (restricted and f.name not in requested) or f.rel.parent_link):
+            continue
+        if restricted:
+            next = requested[f.name]
+        else:
+            next = None
+        cached_row = get_cached_row(f.rel.to, row, index_end, max_depth,
+                cur_depth+1, next)
+        if cached_row:
+            rel_obj, index_end = cached_row
+            setattr(obj, f.get_cache_name(), rel_obj)
     return obj, index_end
 
 def delete_objects(seen_objs):
