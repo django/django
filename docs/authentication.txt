@@ -309,7 +309,7 @@ with that ``User``.
 
 For more information, see `Chapter 12 of the Django book`_.
 
-.. _Chapter 12 of the Django book: http://www.djangobook.com/en/beta/chapter12/#cn226
+.. _Chapter 12 of the Django book: http://www.djangobook.com/en/1.0/chapter12/#cn222
 
 Authentication in Web requests
 ==============================
