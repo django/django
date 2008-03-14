@@ -769,10 +769,10 @@ class Query(object):
             return
         if not opts:
             opts = self.get_meta()
-            root_alias = self.tables[0]
+            root_alias = self.get_initial_alias()
             self.select.extend(self.get_default_columns())
         if not used:
-            used = []
+            used = set()
 
         # Setup for the case when only particular related fields should be
         # included in the related selection.
@@ -783,14 +783,24 @@ class Query(object):
             else:
                 restricted = False
 
-        for f in opts.fields:
+        for f, model in opts.get_fields_with_model():
             if (not f.rel or (restricted and f.name not in requested) or
                     (not restricted and f.null) or f.rel.parent_link):
                 continue
             table = f.rel.to._meta.db_table
-            alias = self.join((root_alias, table, f.column,
+            if model:
+                int_opts = opts
+                alias = root_alias
+                for int_model in opts.get_base_chain(model):
+                    lhs_col = int_opts.parents[int_model].column
+                    int_opts = int_model._meta
+                    alias = self.join((alias, int_opts.db_table, lhs_col,
+                            int_opts.pk.column), exclusions=used)
+            else:
+                alias = root_alias
+            alias = self.join((alias, table, f.column,
                     f.rel.get_related_field().column), exclusions=used)
-            used.append(alias)
+            used.add(alias)
             self.select.extend([(alias, f2.column)
                     for f2 in f.rel.to._meta.fields])
             if restricted:

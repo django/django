@@ -42,6 +42,12 @@ class Student(CommonInfo):
 # Multi-table inheritance
 #
 
+class Chef(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return u"%s the chef" % self.name
+
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
@@ -59,6 +65,7 @@ class Rating(models.Model):
 class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField()
     serves_pizza = models.BooleanField()
+    chef = models.ForeignKey(Chef, null=True, blank=True)
 
     class Meta(Rating.Meta):
         db_table = 'my_restaurant'
@@ -136,7 +143,9 @@ Test constructor for Restaurant.
 >>> r.save()
 
 # Test the constructor for ItalianRestaurant.
->>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Ash', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True, rating=4)
+>>> c = Chef(name="Albert")
+>>> c.save()
+>>> ir = ItalianRestaurant(name='Ristorante Miron', address='1234 W. Ash', serves_hot_dogs=False, serves_pizza=False, serves_gnocchi=True, rating=4, chef=c)
 >>> ir.save()
 >>> ir.address = '1234 W. Elm'
 >>> ir.save()
@@ -144,9 +153,9 @@ Test constructor for Restaurant.
 # Make sure Restaurant and ItalianRestaurant have the right fields in the right
 # order.
 >>> [f.name for f in Restaurant._meta.fields]
-['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza']
+['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza', 'chef']
 >>> [f.name for f in ItalianRestaurant._meta.fields]
-['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza', 'restaurant_ptr', 'serves_gnocchi']
+['id', 'name', 'address', 'place_ptr', 'rating', 'serves_hot_dogs', 'serves_pizza', 'chef', 'restaurant_ptr', 'serves_gnocchi']
 >>> Restaurant._meta.ordering
 ['-rating']
 
@@ -158,7 +167,7 @@ Test constructor for Restaurant.
 >>> Restaurant.objects.filter(supplier__name='foo')
 Traceback (most recent call last):
     ...
-FieldError: Cannot resolve keyword 'supplier' into field. Choices are: address, id, italianrestaurant, lot, name, place_ptr, provider, rating, serves_hot_dogs, serves_pizza
+FieldError: Cannot resolve keyword 'supplier' into field. Choices are: address, chef, id, italianrestaurant, lot, name, place_ptr, provider, rating, serves_hot_dogs, serves_pizza
 
 # Parent fields can be used directly in filters on the child model.
 >>> Restaurant.objects.filter(name='Demon Dogs')
@@ -239,5 +248,20 @@ u'Demon Puppies'
 >>> d = {'rating': 4, 'name': u'Ristorante Miron'}
 >>> list(ItalianRestaurant.objects.values('name', 'rating')) == [d]
 True
+
+# select_related works with fields from the parent object as if they were a
+# normal part of the model.
+>>> from django import db
+>>> from django.conf import settings
+>>> settings.DEBUG = True
+>>> db.reset_queries()
+>>> ItalianRestaurant.objects.all()[0].chef
+<Chef: Albert the chef>
+>>> len(db.connection.queries)
+2
+>>> ItalianRestaurant.objects.select_related('chef')[0].chef
+<Chef: Albert the chef>
+>>> len(db.connection.queries)
+3
 
 """}
