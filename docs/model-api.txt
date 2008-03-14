@@ -1022,6 +1022,8 @@ See the `One-to-one relationship model example`_ for a full example.
 Custom field types
 ------------------
 
+**New in Django development version**
+
 If one of the existing model fields cannot be used to fit your purposes, or if
 you wish to take advantage of some less common database column types, you can
 create your own field class. Full coverage of creating your own fields is
