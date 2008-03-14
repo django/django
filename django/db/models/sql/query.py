@@ -361,14 +361,6 @@ class Query(object):
                     if hasattr(col, 'alias'):
                         aliases.append(col.alias)
         elif self.default_cols:
-            #table_alias = self.tables[0]
-            #root_pk = self.model._meta.pk.column
-            #seen = {None: table_alias}
-            #for field, model in self.model._meta.get_fields_with_model():
-            #    if model not in seen:
-            #        seen[model] = self.join((table_alias, model._meta.db_table,
-            #                root_pk, model._meta.pk.column))
-            #    result.append('%s.%s' % (qn(seen[model]), qn(field.column)))
             result = self.get_default_columns(lambda x, y: "%s.%s" % (qn(x), qn(y)))
             aliases = result[:]
 
