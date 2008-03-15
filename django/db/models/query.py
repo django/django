@@ -28,16 +28,32 @@ class _QuerySet(object):
     ########################
 
     def __repr__(self):
-        return repr(list(iter(self)))
+        return repr(list(self))
 
     def __len__(self):
-        return len(list(iter(self)))
+        # Since __len__ is called quite frequently (as part of list(qs), which
+        # means as part of qs.get(), for example), we make some effort here to
+        # be as efficient as possible whilst not messing up any existing
+        # iterators against the queryset.
+        if self._result_cache is None:
+            if self._iter:
+                self._result_cache = list(self._iter())
+            else:
+                self._result_cache = list(self.iterator())
+        elif self._iter:
+            self.result_cache.extend(list(self._iter))
+        return len(self._result_cache)
 
     def __iter__(self):
-        pos = 0
         if self._result_cache is None:
             self._iter = self.iterator()
             self._result_cache = []
+        if self._iter:
+            return self._result_iter()
+        return iter(self._result_cache)
+
+    def _result_iter(self):
+        pos = 0
         while 1:
             upper = len(self._result_cache)
             while pos < upper:
