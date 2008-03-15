@@ -173,14 +173,14 @@ class _QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
-        obj_list = list(clone)
-        if len(obj_list) < 1:
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
             raise self.model.DoesNotExist("%s matching query does not exist."
                     % self.model._meta.object_name)
-        elif len(obj_list) > 1:
-            raise self.model.MultipleObjectsReturned("get() returned more than one %s -- it returned %s! Lookup parameters were %s"
-                    % (self.model._meta.object_name, len(obj_list), kwargs))
-        return obj_list[0]
+        raise self.model.MultipleObjectsReturned("get() returned more than one %s -- it returned %s! Lookup parameters were %s"
+                % (self.model._meta.object_name, num, kwargs))
 
     def create(self, **kwargs):
         """
