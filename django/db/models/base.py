@@ -315,11 +315,11 @@ class Model(object):
             update_pk = bool(meta.has_auto_field and not pk_set)
             if values:
                 # Create a new record.
-                result = manager._insert(_return_id=update_pk, **dict(values))
+                result = manager._insert(__return_id=update_pk, **dict(values))
             else:
                 # Create a new record with defaults for everything.
-                result = manager._insert(_return_id=update_pk,
-                        _raw_values=True, pk=connection.ops.pk_default_value())
+                result = manager._insert(__return_id=update_pk,
+                        __raw_values=True, pk=connection.ops.pk_default_value())
 
             if update_pk:
                 setattr(self, meta.pk.attname, result)

@@ -1,4 +1,4 @@
-from django.db.models.query import QuerySet, EmptyQuerySet
+from django.db.models.query import QuerySet, EmptyQuerySet, insert_query
 from django.dispatch import dispatcher
 from django.db.models import signals
 from django.db.models.fields import FieldDoesNotExist
@@ -110,8 +110,8 @@ class Manager(object):
     def reverse(self, *args, **kwargs):
         return self.get_query_set().reverse(*args, **kwargs)
 
-    def _insert(self, *args, **kwargs):
-        return self.get_query_set()._insert(*args, **kwargs)
+    def _insert(self, **kwargs):
+        return insert_query(self.model, **kwargs)
 
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.

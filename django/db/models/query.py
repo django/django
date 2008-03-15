@@ -457,18 +457,6 @@ class _QuerySet(object):
             except StopIteration:
                 self._iter = None
 
-    def _insert(self, _return_id=False, _raw_values=False, **kwargs):
-        """
-        Inserts a new record for the given model. This provides an interface to
-        the InsertQuery class and is how Model.save() is implemented. It is not
-        part of the public API of QuerySet, though.
-        """
-        self._result_cache = None
-        query = self.query.clone(sql.InsertQuery)
-        query.insert_values(kwargs, _raw_values)
-        return query.execute_sql(_return_id)
-    _insert.alters_data = True
-
 # Use the backend's QuerySet class if it defines one. Otherwise, use _QuerySet.
 if connection.features.uses_custom_queryset:
     QuerySet = connection.ops.query_set_class(_QuerySet)
@@ -680,4 +668,14 @@ def delete_objects(seen_objs):
             setattr(instance, cls._meta.pk.attname, None)
 
     transaction.commit_unless_managed()
+
+def insert_query(__model, __return_id=False, __raw_values=False, **kwargs):
+    """
+    Inserts a new record for the given model. This provides an interface to
+    the InsertQuery class and is how Model.save() is implemented. It is not
+    part of the public API.
+    """
+    query = sql.InsertQuery(__model, connection)
+    query.insert_values(kwargs, __raw_values)
+    return query.execute_sql(__return_id)
 
