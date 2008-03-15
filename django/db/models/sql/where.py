@@ -151,14 +151,14 @@ class WhereNode(tree.Node):
         """
         if not node:
             node = self
-        for child in node.children:
+        for pos, child in enumerate(node.children):
             if hasattr(child, 'relabel_aliases'):
                 child.relabel_aliases(change_map)
             elif isinstance(child, tree.Node):
                 self.relabel_aliases(change_map, child)
             else:
-                val = child[0]
-                child[0] = change_map.get(val, val)
+                if child[0] in change_map:
+                    node.children[pos] = (change_map[child[0]],) + child[1:]
 
 class EverythingNode(object):
     """

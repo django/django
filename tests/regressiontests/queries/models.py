@@ -205,7 +205,7 @@ Bug #1801
 Bug #2306
 Checking that no join types are "left outer" joins.
 >>> query = Item.objects.filter(tags=t2).query
->>> query.LOUTER not in [x[2][2] for x in query.alias_map.values()]
+>>> query.LOUTER not in [x[2] for x in query.alias_map.values()]
 True
 
 >>> Item.objects.filter(Q(tags=t1)).order_by('name')
@@ -332,12 +332,12 @@ Bug #5324, #6704
 
 # Excluding from a relation that cannot be NULL should not use outer joins.
 >>> query = Item.objects.exclude(creator__in=[a1, a2]).query
->>> query.LOUTER not in [x[2][2] for x in query.alias_map.values()]
+>>> query.LOUTER not in [x[2] for x in query.alias_map.values()]
 True
 
 Similarly, when one of the joins cannot possibly, ever, involve NULL values (Author -> ExtraInfo, in the following), it should never be promoted to a left outer join. So hte following query should only involve one "left outer" join (Author -> Item is 0-to-many).
 >>> qs = Author.objects.filter(id=a1.id).filter(Q(extra__note=n1)|Q(item__note=n3))
->>> len([x[2][2] for x in qs.query.alias_map.values() if x[2][2] == query.LOUTER])
+>>> len([x[2] for x in qs.query.alias_map.values() if x[2] == query.LOUTER])
 1
 
 The previous changes shouldn't affect nullable foreign key joins.

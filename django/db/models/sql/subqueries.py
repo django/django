@@ -175,7 +175,7 @@ class UpdateQuery(Query):
         else:
             self.add_filter(('pk__in', query))
         for alias in self.tables[1:]:
-            self.alias_map[alias][ALIAS_REFCOUNT] = 0
+            self.alias_refcount[alias] = 0
 
     def clear_related(self, related_field, pk_list):
         """

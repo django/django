@@ -22,11 +22,7 @@ JOIN_TYPE = 2
 LHS_ALIAS = 3
 LHS_JOIN_COL = 4
 RHS_JOIN_COL = 5
-# Alias map lists
-ALIAS_TABLE = 0
-ALIAS_REFCOUNT = 1
-ALIAS_JOIN = 2
-ALIAS_NULLABLE=3
+NULLABLE = 6
 
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'

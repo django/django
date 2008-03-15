@@ -7,7 +7,7 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 
-import copy
+from copy import deepcopy
 
 from django.utils.tree import Node
 from django.utils.datastructures import SortedDict
@@ -42,7 +42,8 @@ class Query(object):
     def __init__(self, model, connection, where=WhereNode):
         self.model = model
         self.connection = connection
-        self.alias_map = {}     # Maps alias to table name
+        self.alias_refcount = {}
+        self.alias_map = {}     # Maps alias to join information
         self.table_map = {}     # Maps table names to list of aliases.
         self.rev_join_map = {}  # Reverse of join_map. (FIXME: Update comment)
         self.quote_cache = {}
@@ -69,11 +70,11 @@ class Query(object):
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
-        self.extra_select = SortedDict()  # Maps col_alias -> col_sql.
-        self.extra_tables = []
-        self.extra_where = []
-        self.extra_params = []
-        self.extra_order_by = []
+        self.extra_select = {}  # Maps col_alias -> col_sql.
+        self.extra_tables = ()
+        self.extra_where = ()
+        self.extra_params = ()
+        self.extra_order_by = ()
 
     def __str__(self):
         """
@@ -125,7 +126,8 @@ class Query(object):
         obj.__class__ = klass or self.__class__
         obj.model = self.model
         obj.connection = self.connection
-        obj.alias_map = copy.deepcopy(self.alias_map)
+        obj.alias_refcount = self.alias_refcount.copy()
+        obj.alias_map = self.alias_map.copy()
         obj.table_map = self.table_map.copy()
         obj.rev_join_map = self.rev_join_map.copy()
         obj.quote_cache = {}
@@ -135,7 +137,7 @@ class Query(object):
         obj.start_meta = self.start_meta
         obj.select = self.select[:]
         obj.tables = self.tables[:]
-        obj.where = copy.deepcopy(self.where)
+        obj.where = deepcopy(self.where)
         obj.where_class = self.where_class
         obj.group_by = self.group_by[:]
         obj.having = self.having[:]
@@ -145,10 +147,10 @@ class Query(object):
         obj.select_related = self.select_related
         obj.max_depth = self.max_depth
         obj.extra_select = self.extra_select.copy()
-        obj.extra_tables = self.extra_tables[:]
-        obj.extra_where = self.extra_where[:]
-        obj.extra_params = self.extra_params[:]
-        obj.extra_order_by = self.extra_order_by[:]
+        obj.extra_tables = self.extra_tables
+        obj.extra_where = self.extra_where
+        obj.extra_params = self.extra_params
+        obj.extra_order_by = self.extra_order_by
         obj.__dict__.update(kwargs)
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
@@ -179,7 +181,7 @@ class Query(object):
             obj = self.clone(CountQuery, _query=obj, where=self.where_class(),
                     distinct=False)
             obj.select = []
-            obj.extra_select = SortedDict()
+            obj.extra_select = {}
         obj.add_count_column()
         data = obj.execute_sql(SINGLE)
         if not data:
@@ -272,11 +274,10 @@ class Query(object):
         conjunction = (connector == AND)
         first = True
         for alias in rhs.tables:
-            if not rhs.alias_map[alias][ALIAS_REFCOUNT]:
+            if not rhs.alias_refcount[alias]:
                 # An unused alias.
                 continue
-            promote = (rhs.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] ==
-                    self.LOUTER)
+            promote = (rhs.alias_map[alias][JOIN_TYPE] == self.LOUTER)
             new_alias = self.join(rhs.rev_join_map[alias],
                     (conjunction and not first), used, promote, not conjunction)
             used[new_alias] = None
@@ -288,14 +289,14 @@ class Query(object):
         # to an outer join.
         if not conjunction:
             for alias in self.tables[1:]:
-                if self.alias_map[alias][ALIAS_REFCOUNT] == 1:
-                    self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+                if self.alias_refcount[alias] == 1:
+                    self.promote_alias(alias, True)
                     break
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
         if rhs.where:
-            w = copy.deepcopy(rhs.where)
+            w = deepcopy(rhs.where)
             w.relabel_aliases(change_map)
             if not self.where:
                 # Since 'self' matches everything, add an explicit "include
@@ -316,19 +317,18 @@ class Query(object):
             if isinstance(col, (list, tuple)):
                 self.select.append((change_map.get(col[0], col[0]), col[1]))
             else:
-                item = copy.deepcopy(col)
+                item = deepcopy(col)
                 item.relabel_aliases(change_map)
                 self.select.append(item)
         self.extra_select = rhs.extra_select.copy()
-        self.extra_tables = rhs.extra_tables[:]
-        self.extra_where = rhs.extra_where[:]
-        self.extra_params = rhs.extra_params[:]
+        self.extra_tables = rhs.extra_tables
+        self.extra_where = rhs.extra_where
+        self.extra_params = rhs.extra_params
 
         # Ordering uses the 'rhs' ordering, unless it has none, in which case
         # the current ordering is used.
         self.order_by = rhs.order_by and rhs.order_by[:] or self.order_by
-        self.extra_order_by = (rhs.extra_order_by and rhs.extra_order_by[:] or
-                self.extra_order_by)
+        self.extra_order_by = rhs.extra_order_by or self.extra_order_by
 
     def pre_sql_setup(self):
         """
@@ -411,11 +411,11 @@ class Query(object):
         qn = self.quote_name_unless_alias
         first = True
         for alias in self.tables:
-            if not self.alias_map[alias][ALIAS_REFCOUNT]:
+            if not self.alias_refcount[alias]:
                 continue
-            join = self.alias_map[alias][ALIAS_JOIN]
+            join = self.alias_map[alias]
             if join:
-                name, alias, join_type, lhs, lhs_col, col = join
+                name, alias, join_type, lhs, lhs_col, col, nullable = join
                 alias_str = (alias != name and ' AS %s' % alias or '')
             else:
                 join_type = None
@@ -429,7 +429,6 @@ class Query(object):
                 connector = not first and ', ' or ''
                 result.append('%s%s%s' % (connector, qn(name), alias_str))
             first = False
-        extra_tables = []
         for t in self.extra_tables:
             alias, created = self.table_alias(t)
             if created:
@@ -554,7 +553,7 @@ class Query(object):
             # We have to do the same "final join" optimisation as in
             # add_filter, since the final column might not otherwise be part of
             # the select set (so we can't order on it).
-            join = self.alias_map[alias][ALIAS_JOIN]
+            join = self.alias_map[alias]
             if col == join[RHS_JOIN_COL]:
                 self.unref_alias(alias)
                 alias = join[LHS_ALIAS]
@@ -571,7 +570,7 @@ class Query(object):
         """
         if not create and table_name in self.table_map:
             alias = self.table_map[table_name][-1]
-            self.alias_map[alias][ALIAS_REFCOUNT] += 1
+            self.alias_refcount[alias] += 1
             return alias, False
 
         # Create a new alias for this table.
@@ -580,26 +579,32 @@ class Query(object):
             alias = table_name
         else:
             alias = '%s%d' % (self.alias_prefix, len(self.alias_map) + 1)
-        self.alias_map[alias] = [table_name, 1, None, False]
+        self.alias_refcount[alias] = 1
+        self.alias_map[alias] = None
         self.table_map.setdefault(table_name, []).append(alias)
         self.tables.append(alias)
         return alias, True
 
     def ref_alias(self, alias):
         """ Increases the reference count for this alias. """
-        self.alias_map[alias][ALIAS_REFCOUNT] += 1
+        self.alias_refcount[alias] += 1
 
     def unref_alias(self, alias):
         """ Decreases the reference count for this alias. """
-        self.alias_map[alias][ALIAS_REFCOUNT] -= 1
+        self.alias_refcount[alias] -= 1
 
-    def promote_alias(self, alias):
+    def promote_alias(self, alias, unconditional=False):
         """
         Promotes the join type of an alias to an outer join if it's possible
-        for the join to contain NULL values on the left.
+        for the join to contain NULL values on the left. If 'unconditional' is
+        False, the join is only promoted if it is nullable, otherwise it is
+        always promoted.
         """
-        if self.alias_map[alias][ALIAS_NULLABLE]:
-            self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+        if ((unconditional or self.alias_map[alias][NULLABLE]) and
+                self.alias_map[alias] != self.LOUTER):
+            data = list(self.alias_map[alias])
+            data[JOIN_TYPE] = self.LOUTER
+            self.alias_map[alias] = tuple(data)
 
     def change_aliases(self, change_map):
         """
@@ -619,27 +624,34 @@ class Query(object):
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
-            alias_data = self.alias_map[old_alias]
-            alias_data[ALIAS_JOIN][RHS_ALIAS] = new_alias
+            alias_data = list(self.alias_map[old_alias])
+            alias_data[RHS_ALIAS] = new_alias
+
             self.rev_join_map[new_alias] = self.rev_join_map[old_alias]
             del self.rev_join_map[old_alias]
-            table_aliases = self.table_map[alias_data[ALIAS_TABLE]]
+            self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
+            del self.alias_refcount[old_alias]
+            self.alias_map[new_alias] = tuple(alias_data)
+            del self.alias_map[old_alias]
+
+            table_aliases = self.table_map[alias_data[TABLE_NAME]]
             for pos, alias in enumerate(table_aliases):
                 if alias == old_alias:
                     table_aliases[pos] = new_alias
                     break
-            self.alias_map[new_alias] = alias_data
-            del self.alias_map[old_alias]
             for pos, alias in enumerate(self.tables):
                 if alias == old_alias:
                     self.tables[pos] = new_alias
                     break
 
         # 3. Update any joins that refer to the old alias.
-        for data in self.alias_map.values():
-            alias = data[ALIAS_JOIN][LHS_ALIAS]
-            if alias in change_map:
-                data[ALIAS_JOIN][LHS_ALIAS] = change_map[alias]
+        for alias, data in self.alias_map.items():
+            lhs = data[LHS_ALIAS]
+            if lhs in change_map:
+                data = list(data)
+                data[LHS_ALIAS] = change_map[lhs]
+                self.alias_map[alias] = tuple(data)
+
 
     def bump_prefix(self):
         """
@@ -678,7 +690,7 @@ class Query(object):
         Returns the number of tables in this query with a non-zero reference
         count.
         """
-        return len([1 for o in self.alias_map.values() if o[ALIAS_REFCOUNT]])
+        return len([1 for count in self.alias_refcount.values() if count])
 
     def join(self, connection, always_create=False, exclusions=(),
             promote=False, outer_if_first=False, nullable=False):
@@ -717,34 +729,33 @@ class Query(object):
             lhs_table = lhs
             is_table = True
         else:
-            lhs_table = self.alias_map[lhs][ALIAS_TABLE]
+            lhs_table = self.alias_map[lhs][TABLE_NAME]
             is_table = False
         t_ident = (lhs_table, table, lhs_col, col)
         if not always_create:
             for alias, row in self.rev_join_map.items():
                 if t_ident == row and alias not in exclusions:
                     self.ref_alias(alias)
-                    if promote and self.alias_map[alias][ALIAS_NULLABLE]:
-                        self.alias_map[alias][ALIAS_JOIN][JOIN_TYPE] = self.LOUTER
+                    if promote:
+                        self.promote_alias(alias)
                     return alias
-                # If we get to here (no non-excluded alias exists), we'll fall
-                # through to creating a new alias.
+            # If we get to here (no non-excluded alias exists), we'll fall
+            # through to creating a new alias.
 
         # No reuse is possible, so we need a new alias.
         assert not is_table, \
                 "Must pass in lhs alias when creating a new join."
         alias, _ = self.table_alias(table, True)
-        if promote or outer_if_first:
-            join_type = self.LOUTER
-        else:
-            join_type = self.INNER
-        join = [table, alias, join_type, lhs, lhs_col, col]
         if not lhs:
             # Not all tables need to be joined to anything. No join type
             # means the later columns are ignored.
-            join[JOIN_TYPE] = None
-        self.alias_map[alias][ALIAS_JOIN] = join
-        self.alias_map[alias][ALIAS_NULLABLE] = nullable
+            join_type = None
+        elif promote or outer_if_first:
+            join_type = self.LOUTER
+        else:
+            join_type = self.INNER
+        join = (table, alias, join_type, lhs, lhs_col, col, nullable)
+        self.alias_map[alias] = join
         self.rev_join_map[alias] = t_ident
         return alias
 
@@ -850,7 +861,7 @@ class Query(object):
         if trim and len(join_list) > 1:
             extra = join_list[-1]
             join_list = join_list[:-1]
-            col = self.alias_map[extra[0]][ALIAS_JOIN][LHS_JOIN_COL]
+            col = self.alias_map[extra[0]][LHS_JOIN_COL]
             for alias in extra:
                 self.unref_alias(alias)
         else:
@@ -862,7 +873,7 @@ class Query(object):
             # we are comparing against, we can go back one step in the join
             # chain and compare against the lhs of the join instead. The result
             # (potentially) involves one less table join.
-            join = self.alias_map[alias][ALIAS_JOIN]
+            join = self.alias_map[alias]
             if col == join[RHS_JOIN_COL]:
                 self.unref_alias(alias)
                 alias = join[LHS_ALIAS]
@@ -891,7 +902,7 @@ class Query(object):
             join_it.next(), table_it.next()
             for join in join_it:
                 table = table_it.next()
-                if join == table and self.alias_map[join][ALIAS_REFCOUNT] > 1:
+                if join == table and self.alias_refcount[join] > 1:
                     continue
                 self.promote_alias(join)
                 if table != join:
@@ -904,7 +915,7 @@ class Query(object):
                 # that's harmless.
                 self.promote_alias(table)
 
-        entry = [alias, col, field, lookup_type, value]
+        entry = (alias, col, field, lookup_type, value)
         if merge_negated:
             # This case is when we're doing the Q2 filter in exclude(Q1, Q2).
             # It's different from exclude(Q1).exclude(Q2).
@@ -926,8 +937,8 @@ class Query(object):
             if not merged:
                 self.where.negate()
             if count > 1 and lookup_type != 'isnull':
-                j_col = self.alias_map[alias][ALIAS_JOIN][RHS_JOIN_COL]
-                entry = Node([[alias, j_col, None, 'isnull', True]])
+                j_col = self.alias_map[alias][RHS_JOIN_COL]
+                entry = Node([(alias, j_col, None, 'isnull', True)])
                 entry.negate()
                 self.where.add(entry, AND)
 
@@ -1198,7 +1209,7 @@ class Query(object):
         no ordering in the resulting query (not even the model's default).
         """
         self.order_by = []
-        self.extra_order_by = []
+        self.extra_order_by = ()
         if force_empty:
             self.default_ordering = False
 
@@ -1232,7 +1243,7 @@ class Query(object):
             # level.
             self.distinct = False
         self.select = [select]
-        self.extra_select = SortedDict()
+        self.extra_select = {}
 
     def add_select_related(self, fields):
         """
@@ -1246,6 +1257,27 @@ class Query(object):
             for part in field.split(LOOKUP_SEP):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
+
+    def add_extra(self, select, where, params, tables, order_by):
+        """
+        Adds data to the various extra_* attributes for user-created additiosn
+        to the query.
+        """
+        if select:
+            # The extra select might be ordered (because it will be accepting
+            # parameters).
+            if (isinstance(select, SortedDict) and
+                    not isinstance(self.extra_select, SortedDict)):
+                self.extra_select = SortedDict(self.extra_select)
+            self.extra_select.update(select)
+        if where:
+            self.extra_where += tuple(where)
+        if params:
+            self.extra_params += tuple(params)
+        if tables:
+            self.extra_tables += tuple(tables)
+        if order_by:
+            self.extra_order_by = order_by
 
     def set_start(self, start):
         """
@@ -1263,7 +1295,7 @@ class Query(object):
         field, col, opts, joins = self.setup_joins(start.split(LOOKUP_SEP),
                 opts, alias, False)
         alias = joins[-1][0]
-        self.select = [(alias, self.alias_map[alias][ALIAS_JOIN][RHS_JOIN_COL])]
+        self.select = [(alias, self.alias_map[alias][RHS_JOIN_COL])]
         self.start_meta = opts
 
         # The call to setup_joins add an extra reference to everything in

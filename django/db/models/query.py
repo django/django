@@ -421,16 +421,7 @@ class _QuerySet(object):
         assert self.query.can_filter(), \
                 "Cannot change a query once a slice has been taken"
         clone = self._clone()
-        if select:
-            clone.query.extra_select.update(select)
-        if where:
-            clone.query.extra_where.extend(where)
-        if params:
-            clone.query.extra_params.extend(params)
-        if tables:
-            clone.query.extra_tables.extend(tables)
-        if order_by:
-            clone.query.extra_order_by = order_by
+        clone.query.add_extra(select, where, params, tables, order_by)
         return clone
 
     def reverse(self):
