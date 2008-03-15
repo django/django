@@ -70,6 +70,8 @@ __test__ = {'API_TESTS':"""
 # You could also use "in" to accomplish the same as above.
 >>> Article.objects.filter(pk__in=[1,2,3])
 [<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
+>>> Article.objects.filter(pk__in=(1,2,3))
+[<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]
 
 >>> Article.objects.filter(pk__in=[1,2,3,4])
 [<Article: Hello>, <Article: Goodbye>, <Article: Hello and goodbye>]

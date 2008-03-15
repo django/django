@@ -15,6 +15,14 @@ class EmptyResultSet(Exception):
     """
     pass
 
+class QueryWrapper(object):
+    """
+    A type that indicates the contents are an SQL fragment and the associate
+    parameters. Can be used to pass opaque data to a where-clause, for example.
+    """
+    def __init__(self, sql, params):
+        self.data = sql, params
+
 class Q(tree.Node):
     """
     Encapsulates filters as objects that can then be combined logically (using

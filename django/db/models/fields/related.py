@@ -2,6 +2,7 @@ from django.db import connection, transaction
 from django.db.models import signals, get_model
 from django.db.models.fields import AutoField, Field, IntegerField, PositiveIntegerField, PositiveSmallIntegerField, get_ul_class
 from django.db.models.related import RelatedObject
+from django.db.models.query_utils import QueryWrapper
 from django.utils.text import capfirst
 from django.utils.translation import ugettext_lazy, string_concat, ungettext, ugettext as _
 from django.utils.functional import curry
@@ -138,7 +139,7 @@ class RelatedField(object):
 
         if hasattr(value, 'as_sql'):
             sql, params = value.as_sql()
-            return ('(%s)' % sql), params
+            return QueryWrapper(('(%s)' % sql), params)
         if lookup_type == 'exact':
             return [pk_trace(value)]
         if lookup_type == 'in':

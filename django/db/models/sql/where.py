@@ -6,6 +6,7 @@ import datetime
 from django.utils import tree
 from django.db import connection
 from django.db.models.fields import Field
+from django.db.models.query_utils import QueryWrapper
 from datastructures import EmptyResultSet, FullResultSet
 
 # Connection types
@@ -110,8 +111,8 @@ class WhereNode(tree.Node):
             params = field.get_db_prep_lookup(lookup_type, value)
         else:
             params = Field().get_db_prep_lookup(lookup_type, value)
-        if isinstance(params, tuple):
-            extra, params = params
+        if isinstance(params, QueryWrapper):
+            extra, params = params.data
         else:
             extra = ''
 
