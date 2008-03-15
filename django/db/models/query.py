@@ -2,7 +2,7 @@ import warnings
 
 from django.db import connection, transaction
 from django.db.models.fields import DateField, FieldDoesNotExist
-from django.db.models.query_utils import Q, EmptyResultSet, not_q
+from django.db.models.query_utils import Q, not_q
 from django.db.models import signals, sql
 from django.dispatch import dispatcher
 from django.utils.datastructures import SortedDict
@@ -11,6 +11,9 @@ from django.utils.datastructures import SortedDict
 # when deleting objects).
 CHUNK_SIZE = 100
 ITER_CHUNK_SIZE = CHUNK_SIZE
+
+# Pull into this namespace for backwards compatibility
+EmptyResultSet = sql.EmptyResultSet
 
 class _QuerySet(object):
     "Represents a lazy database lookup for a set of objects"

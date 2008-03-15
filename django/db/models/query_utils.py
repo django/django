@@ -9,12 +9,6 @@ from copy import deepcopy
 
 from django.utils import tree
 
-class EmptyResultSet(Exception):
-    """
-    Raised when a QuerySet cannot contain any data.
-    """
-    pass
-
 class QueryWrapper(object):
     """
     A type that indicates the contents are an SQL fragment and the associate
