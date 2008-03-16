@@ -233,11 +233,11 @@ msgstr "Senaste 7 dagarna"
 
 #: contrib/admin/filterspecs.py:119
 msgid "This month"
-msgstr "Den här månaden"
+msgstr "Denna månad"
 
 #: contrib/admin/filterspecs.py:121
 msgid "This year"
-msgstr "Det här året"
+msgstr "Detta år"
 
 #: contrib/admin/filterspecs.py:147 newforms/widgets.py:231
 #: oldforms/__init__.py:592
@@ -504,7 +504,7 @@ msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
-"Det här objektet har ingen ändringshistorik. Det lades antagligen inte till "
+"Detta objekt har ingen ändringshistorik. Det lades antagligen inte till "
 "via denna administrationssida."
 
 #: contrib/admin/templates/admin/pagination.html:10
@@ -604,7 +604,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:18
 msgid "Documentation for this page"
-msgstr "Dokumentation för den här sidan"
+msgstr "Dokumentation för denna sida"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:19
 msgid ""
@@ -628,7 +628,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:24
 msgid "Edit this object (current window)"
-msgstr "Redigera det här objektet (aktuellt fönster)"
+msgstr "Redigera detta objekt (aktuellt fönster)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:25
 msgid "Jumps to the admin page for pages that represent a single object."
@@ -638,7 +638,7 @@ msgstr ""
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:27
 msgid "Edit this object (new window)"
-msgstr "Redigera det här objektet (nytt fönster)"
+msgstr "Redigera detta objekt (nytt fönster)"
 
 #: contrib/admin/templates/admin_doc/bookmarklets.html:28
 msgid "As above, but opens the admin page in a new window."
@@ -715,7 +715,7 @@ msgstr ""
 #: contrib/admin/templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
 msgstr ""
-"Du får det här e-postbrevet eftersom du bad om att få lösenordet nollställt"
+"Du får detta e-postbrev eftersom du bad om att få lösenordet nollställt"
 
 #: contrib/admin/templates/registration/password_reset_email.html:3
 #, python-format
@@ -730,7 +730,7 @@ msgstr "Ditt nya lösenord är: %(new_password)s"
 #: contrib/admin/templates/registration/password_reset_email.html:7
 msgid "Feel free to change this password by going to this page:"
 msgstr ""
-"Du är välkommen att ändra det här lösenordet genom att gå till den här sidan:"
+"Du är välkommen att ändra detta lösenord genom att gå till denna sida:"
 
 #: contrib/admin/templates/registration/password_reset_email.html:11
 msgid "Your username, in case you've forgotten:"
@@ -826,7 +826,7 @@ msgid ""
 "cookies, reload this page, and try again."
 msgstr ""
 "Det verkar som att din webläsare inte är konfigurerad att acceptera cookies. "
-"Aktivera cookies, ladda om den här sidan och försök igen."
+"Aktivera cookies, ladda om denna sida och försök igen."
 
 #: contrib/admin/views/decorators.py:90
 msgid "Usernames cannot contain the '@' character."
@@ -1178,7 +1178,7 @@ msgstr "personalstatus"
 
 #: contrib/auth/models.py:136
 msgid "Designates whether the user can log into this admin site."
-msgstr "Avgör om användaren kan logga in på den här adminsidan."
+msgstr "Avgör om användaren kan logga in på denna adminsida."
 
 #: contrib/auth/models.py:137
 msgid "active"
@@ -1201,7 +1201,7 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Anger att den här användaren har alla rättigheter utan att uttryckligen "
+"Anger att denna användare har alla rättigheter utan att uttryckligen "
 "tilldela dem."
 
 #: contrib/auth/models.py:139
@@ -1322,8 +1322,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Bocka för den här rutan om kommentaren är olämplig. Ett \"Den här "
-"kommentaren har tagits bort\"-meddelande kommer visas istället."
+"Bocka för denna ruta om kommentaren är olämplig. Ett \"Denna "
+"kommentar har tagits bort\"-meddelande kommer visas istället."
 
 #: contrib/comments/models.py:96
 msgid "comments"
@@ -1396,7 +1396,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Den här kommentaren flaggades av %(user)s:\n"
+"Denna kommentar flaggades av %(user)s:\n"
 "\n"
 "%(text)s"
 
@@ -1473,7 +1473,7 @@ msgstr "Ditt namn:"
 #: contrib/comments/views/comments.py:28
 msgid ""
 "This rating is required because you've entered at least one other rating."
-msgstr "Det här betyget krävs eftersom du har fyllt i minst ett annat betyg."
+msgstr "Detta betyg krävs eftersom du har fyllt i minst ett annat betyg."
 
 #: contrib/comments/views/comments.py:112
 #, python-format
@@ -1488,12 +1488,12 @@ msgid_plural ""
 "\n"
 "%(text)s"
 msgstr[0] ""
-"Den här kommentaren postades av en användare som har postat färre än %(count)"
+"Denna kommentar postades av en användare som har postat färre än %(count)"
 "s kommentar:\n"
 "\n"
 "%(text)s"
 msgstr[1] ""
-"Den här kommentaren postades av en användare som har postat färre än %(count)"
+"Denna kommentar postades av en användare som har postat färre än %(count)"
 "s kommentarer:\n"
 "\n"
 "%(text)s"
@@ -1505,7 +1505,7 @@ msgid ""
 "\n"
 "%(text)s"
 msgstr ""
-"Den här kommentaren postades av en oseriös användare:\n"
+"Denna kommentar postades av en oseriös användare:\n"
 "\n"
 "%(text)s"
 
@@ -1590,7 +1590,7 @@ msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
 msgstr ""
-"Exempel: 'sidor/kontaktsida.html'. Om det här inte fylls i kommer systemet "
+"Exempel: 'sidor/kontaktsida.html'. Om detta inte fylls i kommer systemet "
 "att använda 'flatpages/default.html'."
 
 #: contrib/flatpages/models.py:14
@@ -1600,7 +1600,7 @@ msgstr "registrering krävs"
 #: contrib/flatpages/models.py:14
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Om det här bockas för kommer endast inloggade användare kunna se sidan."
+"Om detta bockas för kommer endast inloggade användare kunna se sidan."
 
 #: contrib/flatpages/models.py:18
 msgid "flat page"
@@ -3490,7 +3490,7 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Det här bör vara en absolut sökväg utan domännamnet. Exempel: '/handelser/"
+"Detta bör vara en absolut sökväg utan domännamnet. Exempel: '/handelser/"
 "sok/'."
 
 #: contrib/redirects/models.py:9
@@ -3552,20 +3552,20 @@ msgstr "webbplatser"
 #: core/validators.py:72
 msgid "This value must contain only letters, numbers and underscores."
 msgstr ""
-"Det här värdet får endast innehålla bokstäver, siffror och understreck."
+"Detta värde får endast innehålla bokstäver, siffror och understreck."
 
 #: core/validators.py:76
 msgid ""
 "This value must contain only letters, numbers, underscores, dashes or "
 "slashes."
 msgstr ""
-"Det här värdet får endast innehålla bokstäver, siffror, understreck, "
+"Detta värde får endast innehålla bokstäver, siffror, understreck, "
 "bindestreck eller snedstreck."
 
 #: core/validators.py:80
 msgid "This value must contain only letters, numbers, underscores or hyphens."
 msgstr ""
-"Det här värdet får endast innehålla bokstäver, siffror, understreck eller "
+"Detta värde får endast innehålla bokstäver, siffror, understreck eller "
 "bindestreck."
 
 #: core/validators.py:84
@@ -3598,7 +3598,7 @@ msgstr "Icke-numeriska tecken är inte tillåtna här."
 
 #: core/validators.py:123
 msgid "This value can't be comprised solely of digits."
-msgstr "Det här värdet kan inte enbart bestå av siffror."
+msgstr "Detta värde kan inte enbart bestå av siffror."
 
 #: core/validators.py:128 newforms/fields.py:151
 msgid "Enter a whole number."
@@ -3705,7 +3705,7 @@ msgstr[1] "Akta din tunga! Orden %s är inte tillåtna här."
 #: core/validators.py:288
 #, python-format
 msgid "This field must match the '%s' field."
-msgstr "Det här fältet måste matcha fältet '%s'."
+msgstr "Detta fält måste matcha fältet '%s'."
 
 #: core/validators.py:307
 msgid "Please enter something for at least one field."
@@ -3718,12 +3718,12 @@ msgstr "Fyll antingen i båda fälten eller lämna båda tomma."
 #: core/validators.py:335
 #, python-format
 msgid "This field must be given if %(field)s is %(value)s"
-msgstr "Det är fältet måste anges om %(field)s är %(value)s"
+msgstr "Detta fält måste anges om %(field)s är %(value)s"
 
 #: core/validators.py:348
 #, python-format
 msgid "This field must be given if %(field)s is not %(value)s"
-msgstr "Det här fältet måste anges om %(field)s inte är %(value)s"
+msgstr "Detta fält måste anges om %(field)s inte är %(value)s"
 
 #: core/validators.py:367
 msgid "Duplicate values are not allowed."
@@ -3732,22 +3732,22 @@ msgstr "Dubbletter är inte tillåtna."
 #: core/validators.py:382
 #, python-format
 msgid "This value must be between %(lower)s and %(upper)s."
-msgstr "Det här värdet måste vara mellan %(lower)s och %(upper)s."
+msgstr "Detta värde måste vara mellan %(lower)s och %(upper)s."
 
 #: core/validators.py:384
 #, python-format
 msgid "This value must be at least %s."
-msgstr "Det här värdet måste vara minst %s."
+msgstr "Detta värde måste vara minst %s."
 
 #: core/validators.py:386
 #, python-format
 msgid "This value must be no more than %s."
-msgstr "Det här värdet får inte vara mer än %s."
+msgstr "Detta värde får inte vara mer än %s."
 
 #: core/validators.py:427
 #, python-format
 msgid "This value must be a power of %s."
-msgstr "Det här värdet måste vara en potens av %s."
+msgstr "Detta värde måste vara en potens av %s."
 
 #: core/validators.py:437
 msgid "Please enter a valid decimal number."
@@ -3796,11 +3796,11 @@ msgstr "Se till att filen du laddade upp är som mest %s byte stor."
 
 #: core/validators.py:485
 msgid "The format for this field is wrong."
-msgstr "Formatet för det här fältet är fel."
+msgstr "Formatet för detta fält är fel."
 
 #: core/validators.py:500
 msgid "This field is invalid."
-msgstr "Det här fältet är ogiltigt."
+msgstr "Detta fält är ogiltigt."
 
 #: core/validators.py:536
 #, python-format
@@ -3877,29 +3877,29 @@ msgstr "%(object)s med typen %(type)s finns redan för %(field)s."
 #: db/models/fields/__init__.py:52
 #, python-format
 msgid "%(optname)s with this %(fieldname)s already exists."
-msgstr "%(optname)s med det här %(fieldname)s finns redan."
+msgstr "%(optname)s med detta %(fieldname)s finns redan."
 
 #: db/models/fields/__init__.py:161 db/models/fields/__init__.py:322
 #: db/models/fields/__init__.py:754 db/models/fields/__init__.py:765
 #: newforms/fields.py:45 oldforms/__init__.py:374
 msgid "This field is required."
-msgstr "Det här fältet är obligatoriskt."
+msgstr "Detta fält måste fyllas i."
 
 #: db/models/fields/__init__.py:422
 msgid "This value must be an integer."
-msgstr "Det här värdet måste vara ett heltal."
+msgstr "Detta värde måste vara ett heltal."
 
 #: db/models/fields/__init__.py:461
 msgid "This value must be either True or False."
-msgstr "Det här värdet måste vara antingen True eller False."
+msgstr "Detta värde måste vara antingen True eller False."
 
 #: db/models/fields/__init__.py:485
 msgid "This field cannot be null."
-msgstr "Det här fältet får inte vara tomt."
+msgstr "Detta fält får inte vara null."
 
 #: db/models/fields/__init__.py:663
 msgid "This value must be a decimal number."
-msgstr "Det här värdet måste vara ett decimaltal."
+msgstr "Detta värde måste vara ett decimaltal."
 
 #: db/models/fields/__init__.py:774
 msgid "Enter a valid filename."
@@ -3907,7 +3907,7 @@ msgstr "Fyll i ett giltigt filnamn."
 
 #: db/models/fields/__init__.py:945
 msgid "This value must be either None, True or False."
-msgstr "Det här värdet måste vara antingen None, True eller False."
+msgstr "Detta värde måste vara antingen None, True eller False."
 
 #: db/models/fields/related.py:93
 #, python-format
